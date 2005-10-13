@@ -1,0 +1,14 @@
+<rulelist name="rulespace1"
+
+	xmlns:other="http://test.other.org/ns/1"
+	
+	xmlns="http://ws.apache.org/synapse/ns/rulelist/1">
+	
+	
+	<!--general rules-->
+	<rule xpath="*" mediator="logbean"/>
+	
+	<!--specific rules-->
+	<rule xpath="//*[symbol='IBM']" mediator="redirect"/>
+	
+</rulelist>	

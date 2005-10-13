@@ -1,0 +1,10 @@
+
+		 org.jaxen.XPath x = new org.apache.axis2.om.xpath.AXIOMXPath("test=5");
+		 
+		 org.apache.axis2.om.OMFactory f = org.apache.axis2.om.OMAbstractFactory.getOMFactory();
+		 org.apache.axis2.om.OMElement e= f.createOMElement("test", "","");
+		 
+		 f.createText(e, "5");
+		 e.serializeWithCache(javax.xml.stream.XMLOutputFactory.newInstance().createXMLStreamWriter(System.out));
+		 
+		

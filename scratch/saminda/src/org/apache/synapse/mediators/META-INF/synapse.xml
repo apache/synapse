@@ -1,0 +1,22 @@
+<rules>
+    <rule>
+        <condition>*</condition>
+        <mediator>Log_1</mediator>
+    </rule>
+    <rule>
+        <condition>*</condition>
+        <mediator>Log</mediator>
+    </rule>
+    <rule>
+        <condition>*</condition>
+        <mediator>Log</mediator>
+    </rule>
+    <rule>
+        <condition>*</condition>
+        <mediator>Log_1</mediator>
+    </rule>
+    <rule>
+        <condition>*</condition>
+        <mediator>Log_1</mediator>
+    </rule>
+</rules>

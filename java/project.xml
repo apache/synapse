@@ -21,19 +21,19 @@
     <inceptionYear>2005</inceptionYear>
     <package></package>
     <logo></logo>
-    <description></description>
+    <description>The Synapse project will create a robust, lightweight implementation of a highly scalable and distributed service mediation framework based on Web services specifications.</description>
     <shortDescription>Apache Synapse</shortDescription>
     <!-- the project home page -->
     <url>http://incubator.apache.org/synapse</url>
     <issueTrackingUrl></issueTrackingUrl>
-    <siteAddress></siteAddress>
+    <siteAddress>http://incubator.apache.org/synapse</siteAddress>
     <siteDirectory></siteDirectory>
     <distributionDirectory></distributionDirectory>
     <mailingLists>
         <mailingList>
             <name>Synapse Developer List</name>
-            <subscribe></subscribe>
-            <unsubscribe></unsubscribe>
+            <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
             <archive></archive>
 
         </mailingList>
@@ -53,25 +53,25 @@
 <developer>
             <name>Fabrice Medio</name>
             <id>Fabrice</id>
-            <email>fmedio@bluetitan.com</email>
+            <email>fmedio AT bluetitan.com</email>
             <organization>Blue Titan</organization>
         </developer>
 <developer>
             <name>Dan Kulp</name>
             <id>dan</id>
-            <email>daniel.kulp@iona.com</email>
+            <email>daniel.kulp AT iona.com</email>
             <organization>Iona</organization>
         </developer>
 <developer>
             <name>Adi Sakala</name>
             <id>adi</id>
-            <email>adi.sakala@iona.com</email>
+            <email>adi.sakala AT iona.com</email>
             <organization>Iona</organization>
         </developer>
 <developer>
             <name>Carl Trieloff </name>
             <id>carl</id>
-            <email>ctrieloff@iona.com</email>
+            <email>ctrieloff AT iona.com</email>
             <organization>Iona</organization>
         </developer>
 <developer>
@@ -95,7 +95,7 @@
 <developer>
             <name>Dave Chappell</name>
             <id>dave</id>
-            <email>chappell@sonicsoftware.com</email>
+            <email>chappell AT sonicsoftware.com</email>
             <organization>Sonic Software</organization>
         </developer>
 
@@ -103,26 +103,39 @@
 <developer>
             <name>Glen Daniels - Member of ASF, Member of WS PMC and Axis Committer</name>
             <id>glen</id>
-            <email>gdaniels@apache.org</email>
-            <organization></organization>
+            <email>gdaniels AT apache.org</email>
+            <organization>Sonic Software</organization>
         </developer>
 
 <developer>
             <name>Paul Fremantle - Member of WS PMC and Axis Committer</name>
             <id>paul</id>
-            <email>paul@wso2.com</email>
+            <email>paul AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
 <developer>
             <name>Davanum Srinivas - Member of ASF, WS PMC Chair and Axis Committer</name>
             <id>dims</id>
-            <email>dims@apache.org</email>
+            <email>dims AT apache.org</email>
             <organization>WSO2</organization>
         </developer>
 <developer>
             <name>Sanjiva Weerawarana - - Member of ASF, Member of WS PMC and Axis Committer</name>
             <id>sanjiva</id>
-            <email>sanjiva@apache.org</email>
+            <email>sanjiva AT apache.org</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Eran Chinthaka - Member of WS PMC and Axis Committer</name>
+            <id>chinthaka</id>
+            <email>chinthaka AT apache.org</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~chinthaka</url>
+        </developer>
+        <developer>
+            <name>Saminda Abeyruwan - Axis Committer</name>
+            <id>saminda</id>
+            <email>saminda AT apache.org</email>
             <organization>WSO2</organization>
         </developer>
         

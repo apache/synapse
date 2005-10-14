@@ -13,7 +13,7 @@ import org.apache.synapse.transport.server.SimpleSynapseServer;
 public class SimpleServer {
     public static void main(String[] args ) {
         try {
-            SimpleSynapseServer sss = new SimpleSynapseServer("/home/saminda/myprojects/synapse/server",8080);
+            SimpleSynapseServer sss = new SimpleSynapseServer("/home/saminda/myprojects/synapse1/server",8081);
             sss.start();
         } catch (AxisFault axisFault) {
             axisFault.printStackTrace();

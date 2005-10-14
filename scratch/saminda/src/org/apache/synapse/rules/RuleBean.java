@@ -8,21 +8,21 @@ package org.apache.synapse.rules;
  * To change this template use File | Settings | File Templates.
  */
 public class RuleBean {
-    private String condition;
-    private String mediatation;
+    private String condition; // this is the xpath of the messagte
+    private String mediator; // is the mediator we need at this point 
 
     public void setCondition(String condition) {
         this.condition = condition;
     }
     public void setMediate(String mediatation) {
-        this.mediatation = mediatation;
+        this.mediator = mediatation;
     }
 
     public String getCondition(){
         return condition;
     }
-    public String getMediatation() {
-        return mediatation;   
+    public String getMediator() {
+        return mediator;
     }
 
 }

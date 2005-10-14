@@ -19,4 +19,10 @@ public interface SynapseConstants {
         public static final String CONDITION = "condition";
         public static final String MEDIATOR = "mediator";
     }
+    public interface SynapseRuleEngine {
+        public static final String GENERAT_RULE_ARRAY_LIST = "generalRules";
+        public static final String XPATH_RULE_ARRAY_LIST= "xpathRules";
+        public static final String SYNAPSE_RECEIVER = "receiver";
+        public static final String SYNAPSE_RULE_ENGINE= "synapseRuleEngine";
+    }
 }

@@ -7,7 +7,6 @@ import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.rules.SynapseRuleEngine;
 import org.apache.synapse.rules.RuleBean;
 import org.apache.synapse.SynapseConstants;
@@ -27,20 +26,6 @@ public class SynapseBaseDispatcher extends AbstractDispatcher {
     protected QName operationName;
 
 
-    /**
-     * Rules which is going to be populated via services.xml
-     */
-    protected SynapseRuleEngine ruleEngine;
-
-    /**
-     * to keep the state
-     */
-    private int synapseState = 0;
-
-    public SynapseBaseDispatcher() {
-        ruleEngine = new SynapseRuleEngine();
-    }
-
     public void initDispatcher() {
         init(new HandlerDescription(NAME));
     }
@@ -48,47 +33,25 @@ public class SynapseBaseDispatcher extends AbstractDispatcher {
     public ServiceDescription findService(MessageContext messageContext)
             throws AxisFault {
 
-        /**
-         * testing the rule searching.
-         *
-         */
-        Object ruleObj = messageContext
-                .getProperty(SynapseConstants.RULE_STATE);
-        if (ruleObj == null) {
-            ruleEngine.ruleConfiguration(messageContext);
-            messageContext.setProperty(SynapseConstants.RULE_STATE, ruleEngine);
-        }
+        String opName = (String) messageContext.getProperty(
+                SynapseConstants.SynapseRuleEngine.SYNAPSE_RECEIVER);
 
-        /**
-         * here "*" all will be handled.
-         */
-        operationName = new QName(this.ruleEngine.getOperationName());
+        operationName = new QName(opName);
 
-        /**
-         * mediator selection
-         */
-
+        ArrayList generalList = (ArrayList) messageContext.getProperty(
+                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST);
         Integer state = (Integer) messageContext
                 .getProperty(SynapseConstants.SYNAPSE_STATE);
-        if (state != null) {
-            synapseState = state.intValue();
-        } else {
-            synapseState = 1;
+        RuleBean bean = null;
+        if (state.intValue() <= generalList.size()) {
+            bean = (RuleBean) generalList.get(state.intValue()-1);
         }
-
-        String key = null;
-        if (synapseState == 1) {
-            key = mediatorType(messageContext, ruleEngine, synapseState);
-        } else {
-            key = mediatorType(messageContext, ruleEngine, synapseState);
-        }
-        serviceName = key;
+        serviceName = bean.getMediator();
 
         AxisConfiguration registry =
                 messageContext.getSystemContext()
                         .getAxisConfiguration();
         return registry.getService(serviceName);
-
 
     }
 
@@ -101,27 +64,5 @@ public class SynapseBaseDispatcher extends AbstractDispatcher {
             return operationDis;
         }
         return null;
-    }
-
-    private String mediatorType(MessageContext messageContext,
-                                SynapseRuleEngine ruleEngine,
-                                int synapseState) {
-        ArrayList ruleArrayList = ruleEngine.getArrayList();
-        String key = null;
-        Integer state = null;
-        if (synapseState <= ruleArrayList.size()) {
-            String rule = (String) ruleArrayList.get(synapseState - 1);
-            if (synapseState == ruleArrayList.size()) {
-                messageContext.setProperty(SynapseConstants.VALUE_FALSE,
-                        new Boolean(false));
-            } else {
-                state = new Integer(++synapseState);
-                messageContext
-                        .setProperty(SynapseConstants.SYNAPSE_STATE, state);
-            }
-
-            key = rule;
-        }
-        return key;
     }
 }

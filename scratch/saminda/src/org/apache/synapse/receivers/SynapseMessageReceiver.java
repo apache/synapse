@@ -63,7 +63,11 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver imple
              * Injecting messageContext for medaite method
              * Will not be on use in the M1
              */
+
+            Integer oldSynapseState = (Integer)msgContext.getProperty(SynapseConstants.SYNAPSE_STATE);
             Boolean mediatorState = DependencyManager.mediatorBusinessLogicProvider(obj, msgContext);
+
+            msgContext.setProperty(SynapseConstants.SYNAPSE_STATE,new Integer((oldSynapseState.intValue())+1));
             msgContext.setProperty(SynapseConstants.MEDEATOT_STATE,mediatorState);
 
         } catch (Exception e) {

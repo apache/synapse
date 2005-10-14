@@ -11,23 +11,20 @@ import org.apache.synapse.SynapseConstants;
  * Time: 5:34:01 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SimpleLoggingMediator implements Mediator{
+public class SimpleLoggingMediator implements Mediator {
     /**
      * Do Some mediation and return true/false
      * false means, mediator consumes the message
      * ture means, medator return for that message, to deal with another Rule
+     *
      * @param msgContext
      * @return Boolean
      */
     public boolean mediate(MessageContext msgContext) throws AxisFault {
         System.out.println("i'm doing the logging mediation...now");
-        Boolean retbool = (Boolean) msgContext
-                .getProperty(SynapseConstants.VALUE_FALSE);
-        if (retbool != null) {
-            return false;
-        } else {
-            return true;
-        }
+
+        return false;
+
     }
 
 }

@@ -1,0 +1,7 @@
+<module name="log" class="org.apache.synapse.handlers.LoggingModule">
+    <inflow>
+        <handler name="IFLog" class="org.apache.synapse.handlers.LoggingHandler">
+            <order phase="log"/>
+        </handler>
+    </inflow>
+</module>

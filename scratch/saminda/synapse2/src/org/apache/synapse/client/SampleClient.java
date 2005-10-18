@@ -39,25 +39,13 @@ public class SampleClient {
 
     public static class ClientUtil {
 
-        public OMElement getEchoOMElement() {
-            OMFactory fac = OMAbstractFactory.getOMFactory();
-            OMNamespace omNs = fac.createOMNamespace(
-                    "http://example1.org/example1", "example1");
-            OMElement method = fac.createOMElement("echo", omNs);
-            OMElement value = fac.createOMElement("Text", omNs);
-            value.addChild(fac.createText(value, "Axis2 Echo String "));
-            method.addChild(value);
-
-            return method;
-        }
-
         public OMElement getPingOMElement() {
             OMFactory fac = OMAbstractFactory.getOMFactory();
             OMNamespace omNs = fac.createOMNamespace(
-                    "http://example1.org/example1", "example1");
+                    "http://synapse.org/synapse", "synapse");
             OMElement method = fac.createOMElement("ping", omNs);
-            OMElement value = fac.createOMElement("Text", omNs);
-            value.addChild(fac.createText(value, "Axis2 Ping String "));
+            OMElement value = fac.createOMElement("text", omNs);
+            value.addChild(fac.createText(value, "Synpase Ping String "));
             method.addChild(value);
 
             return method;

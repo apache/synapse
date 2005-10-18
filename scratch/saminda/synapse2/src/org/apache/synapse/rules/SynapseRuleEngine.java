@@ -13,13 +13,18 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class SynapseRuleEngine {
-    public static  String findService(MessageContext messageContext) {
+    /**
+     * Synapse Rule Engine, which is able to select between "general" and "xpath"
+     * rules and applying it.
+     * This code has been written giving support to Rule Extensibility.
+     * <p/>
+     * 1. First all the general rules will be apply to all the incoming messages.
+     * 2. Xpaht Rule apply to relevent messages.
+     */
+    public static String findService(MessageContext messageContext) {
 
         SynapaseRuleBean bean = null;
         String serviceName = null;
-
-        boolean generalListBoolean = true;
-        boolean xpathListBoolean = true;
 
         ArrayList generalList = (ArrayList) messageContext.getProperty(
                 SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST);
@@ -32,9 +37,13 @@ public class SynapseRuleEngine {
 
         if (generalList.size() > 0) {
             if ((state.intValue() <= generalList.size()) &&
-                    generalListBoolean) {
+                    ((Boolean) messageContext.getProperty(
+                            SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN))
+                            .booleanValue()) {
                 if (state.intValue() == generalList.size()) {
-                    generalListBoolean = false;
+                    messageContext.setProperty(
+                            SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN,
+                            new Boolean(false));
                     messageContext.setProperty(SynapseConstants.SYNAPSE_STATE,
                             new Integer(1));
                 }
@@ -44,15 +53,21 @@ public class SynapseRuleEngine {
         }
 
         if (xpathList.size() > 0) {
-            if (!generalListBoolean) {
-                if ((state.intValue() <= generalList.size()) &&
-                        xpathListBoolean) {
-                    if (state.intValue() == generalList.size()) {
-                        xpathListBoolean = false;
+            if (!((Boolean) messageContext.getProperty(
+                    SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN))
+                    .booleanValue()) {
+                if ((state.intValue() <= xpathList.size()) &&
+                        ((Boolean) messageContext.getProperty(
+                                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN))
+                                .booleanValue()) {
+                    if (state.intValue() == xpathList.size()) {
+                        ((Boolean) messageContext.getProperty(
+                                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN))
+                                .booleanValue();
                         messageContext.setProperty(
                                 SynapseConstants.SYNAPSE_STATE, new Integer(1));
                     }
-                    bean = (SynapaseRuleBean) generalList
+                    bean = (SynapaseRuleBean) xpathList
                             .get(state.intValue() - 1);
                     serviceName = bean.getMediator();
                 }

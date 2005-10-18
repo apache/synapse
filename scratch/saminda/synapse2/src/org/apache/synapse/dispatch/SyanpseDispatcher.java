@@ -41,28 +41,9 @@ public class SyanpseDispatcher extends AbstractDispatcher {
 
         operationName = new QName(opName);
         /**
-         *  Configuration only being done for the General Rule listing
-         *  need to do it for xpath rule listing too
+         *  Synapse Rule Engine, which determine which rules to apply,
+         *  general of xpath {Scope of M1}
          */
-//        SynapaseRuleBean bean = null;
-//
-//        ArrayList generalList = (ArrayList) messageContext.getProperty(
-//                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST);
-//        ArrayList xpathList = (ArrayList) messageContext.getProperty(
-//                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST);
-//
-//
-//        Integer state = (Integer) messageContext
-//                .getProperty(SynapseConstants.SYNAPSE_STATE);
-//
-//        if ( generalList.size() > 0) {
-//            bean = (SynapaseRuleBean) generalList.get(state.intValue() - 1);
-//            serviceName = bean.getMediator();
-//        }
-//
-//        if ( xpathList.size() > 0 ) {
-//
-//        }
         serviceName = SynapseRuleEngine.findService(messageContext);
 
             AxisConfiguration registry =

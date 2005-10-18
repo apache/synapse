@@ -1,0 +1,7 @@
+<module name="AdminModule" class="com.infravio.broker.modules.engage.AdminModule">
+    <inflow>
+        <handler name="InFlowAdminHandler" class="com.infravio.broker.modules.engage.AdminInHandler">
+            <order phase="EngagePhase"/>
+        </handler>
+    </inflow>
+</module>

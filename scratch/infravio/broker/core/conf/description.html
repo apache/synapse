@@ -1,0 +1,40 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>A Build System for Broker Projects</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="Microsoft FrontPage 4.0" name=GENERATOR></HEAD>
+<BODY>
+<CENTER>
+<H1>DESCRIPTION</H1>
+<h1><img border="0" src="demo-arch.bmp" width="804" height="377"></h1>
+</CENTER>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="3" face="Arial">This demo is based
+completely on AXIS2.</font></p>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</p>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="3" face="Arial">A dummy service
+called proxy has to be created for every Provider EndPoint. A provider giving
+similar services at two locations say 2.1 and 2.2 need only create one proxy for
+both the end-points. The details for the routing can be provided in the
+broker-configuration.xml.</font></p>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</p>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="3" face="Arial">When a client
+sends a request to the dummy/proxy service, it is received by the relevant axis2
+listener and passed on to the transport and dispatchers. The custom modules
+which provide the desired broker functionalities, as mentioned in the
+broker-configuration.xml, are engaged on&nbsp; initialization. The modules pick
+up the needed details from the xml file via a custom parser. The custom receiver
+takes care of calling the relevant end-point as selected by say the routing
+module/handler and makes the actual service call.</font></p>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</p>
+<p style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="3" face="Arial">The links missing
+are <b> dynamic disengage</b> and the capability to <b> engage modules at run-time</b> as and
+when needed instead of at initialization. A small step towards these is provided
+by using a active=true/false attribute in the xml file. The modules/handlers can
+be made to perform logic/work only if the active state for them, with respect to
+a particular service is true. Also if any change is made to the xml file after initialization,
+we can hit the Adminservice and see to it that the changes are reflected. This
+can be done using a listener also.&nbsp;</font> </p>
+
+
+</BODY></HTML>

@@ -1,0 +1,124 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>A Build System for Broker Projects</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="Microsoft FrontPage 4.0" name=GENERATOR></HEAD>
+<BODY>
+<CENTER>
+<H1>Broker Build System</H1></CENTER>
+<H2 align=left>Table of Contents</H2>
+<OL>
+  <LI>
+  <P align=left><A
+  href="#Introduction">Introduction</A>
+</P>
+  <LI>
+  <P align=left><A
+  href="#Installation">Installation</A>
+</P>
+<H2><A name=Introduction>Introduction</A></H2>
+<P>This document describes the build environment for compiling and testing the
+Broker project. It provides <I>developers</I>&nbsp; with a quick and efficient way
+to perform the code/test/debug cycle. The system consists simply of a particular
+directory structure and using <CODE>ant</CODE> and the&nbsp;
+<CODE>build.xml</CODE> file to manage the code.</P>
+<H2><A name=Installation>Installation</A></H2>
+<H3> Environment</H3>
+  <pre>operating system
+    - Windows 2000
+</pre>
+
+
+  <pre>The user needs to have the following tools preinstalled on the system:</pre>
+
+
+<UL>
+  <LI>Jdk 1.4.2_08
+  <LI>Apache Ant 1.6.5
+  <LI>Axis2-0.92 Binary Distribution
+  <LI>App server - Tomcat 5.0
+</UL>
+<B><h3>   Instructions
+</h3> </b>
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">
+    1) Create a work folder say C:/work
+
+    2) Set this folder named &quot;broker&quot; under it. Please find build.properties and change axis2 home,</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">       broker home and deployment directory properties to relevant ones.
+
+        ### Broker home directory
+        broker.home=C:/work/broker</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">	### Axis2 Source directory
+        axis2.home=C:/axis2-0.9-bin</pre>
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</pre>
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">
+        ### Target Axis directory where broker has to be deployed
+        deploy.dir=C:/Tomcat-5.0/webapps</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">    4) Place the following jars into the broker/lib folder		</pre>
+
+  <blockquote>
+    <blockquote>
+      <blockquote>
+
+	<UL>
+  		<LI><a href="http://simplethread.sourceforge.net/readme.html">SJT.Mgmt</a>
+		<LI><a href="http://prdownloads.sourceforge.net/xmltask/xmltask-v1.11.jar?download">xmltask-v1.11.jar</a>
+	</UL>
+
+      </blockquote>
+    </blockquote>
+  </blockquote>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">    5) Run ant task on that. This would create broker.zip file under broker directory (distribution file). </pre>
+
+
+  <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">       You can extract the zip to any directory.
+
+    6) Run ant task on the extracted file. This would copy axis2 and the relevant broker files to </pre>
+
+
+  <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">       the webapps directory.</pre>
+
+
+  <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">    
+    7) Start Tomcat. Hit <a href="http://localhost:8080/axis2/">http://localhost:8080/axis2/</a></pre>
+
+
+  <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">    8) The calculator and calculatorv2 services have been configured with proxy already.</pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">       Make use of the SOAP-requests provided in </pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">       samples/sample_SOAP_request.txt and hit the proxy at <a href="http://{machine}:{port}/axis2/serivces/proxy">http://localhost:8080/axis2/serivces/proxy</a></pre>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">       to watch it all work.</pre>
+
+
+</ol>
+
+
+ <pre style="line-height: 100%; margin-top: 0; margin-bottom: 0">	 9) For more information about the working of the distribution look at the files in {distribution}/docs.</pre>
+
+
+</BODY></HTML>

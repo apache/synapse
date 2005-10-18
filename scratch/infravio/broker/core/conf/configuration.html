@@ -1,0 +1,36 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>A Build System for Broker Projects</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="Microsoft FrontPage 4.0" name=GENERATOR></HEAD>
+<BODY>
+<CENTER>
+<H1>Broker-Configuration</H1></CENTER>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="4">&nbsp;&nbsp;&nbsp;
+The broker
+configuration file contained in resources folder acts as a repository for a host
+of meta-data.</font></P>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="4">All the details
+relevant to the broker would find a place in this file. Data that has an overall
+effect, like the details of&nbsp; WSDM capability, are defined at a global
+level. Application level details like the module parameters or service related
+data go down to the service-mapper or the modules level.</font></P>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="4">&nbsp;&nbsp;&nbsp;&nbsp;</font></P>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;&nbsp;&nbsp;<font size="4">
+The main working
+core in the file is the service-mapper section. It is populated with various
+&lt;service&gt;..&lt;/service&gt; tags. Each set is for a service which wants to
+utilize the broker functionality. The &lt;module&gt; tags are used to specify
+the modules that need to be engaged and also act as containers for the relevant
+parameters.</font></P>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0">&nbsp;</P>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font size="4">&nbsp;&nbsp;&nbsp;
+A simple parser
+scans the document at initialization and creates document objects using XMLBeans.
+The various functions provided by the parser are used to&nbsp; retrieve needed
+information.</font> <font size="4">More details can
+be added as the need arises.</font></P>
+
+
+</BODY></HTML>

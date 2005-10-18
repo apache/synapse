@@ -1,0 +1,36 @@
+<project name="module" default="pkg" basedir=".">
+    <property file="../build.properties"/>
+    <import file="../classpath.xml"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <echo message="Compiling Modules "/>
+
+        <mkdir dir="build/classes"/>
+
+        <javac
+            srcdir="src"
+            destdir="build/classes"
+            compiler="${javac.compiler}"
+            debug="${javac.debug}"
+            deprecation="${javac.deprecation}"
+            nowarn="on">
+            <classpath refid="broker.classpath"/>
+        </javac>
+    </target>
+
+    <target name="pkg" depends="compile">
+        <copy file="src/com/infravio/broker/logging/META-INF/module.xml"
+            todir="build/classes/META-INF" overwrite="true"/>
+        <jar destfile="build/logging.jar" basedir="build/classes"
+            includes="**/logging/**/*.class,**/META-INF/module.xml" index="true"/>
+
+        <copy file="src/com/infravio/broker/routing/META-INF/module.xml"
+            todir="build/classes/META-INF" overwrite="true"/>
+        <jar destfile="build/routing.jar" basedir="build/classes"
+            includes="**/routing/**/*.class,**/META-INF/module.xml" index="true"/>
+    </target>
+</project>

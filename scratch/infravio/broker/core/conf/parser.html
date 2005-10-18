@@ -1,0 +1,227 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>A Build System for Broker Projects</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="Microsoft FrontPage 4.0" name=GENERATOR></HEAD>
+<BODY>
+<CENTER>
+<H1><font color="#000000">Parser-functionality</font></H1></CENTER>
+<P style="line-height: 100%; margin-top: 0; margin-bottom: 0"><font color="#000000"><font size="4">&nbsp;&nbsp;&nbsp;
+A simple parser
+scans the document at initialization and creates document objects using XMLBeans.
+The various functions provided by the parser are used to&nbsp; retrieve needed
+information.</font> <font size="4">More details can
+be added as the need arises.</font></font></P>
+
+
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none">&nbsp;</p>
+
+
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size: 10.0pt; font-family: Arial"><font size="3" color="#000000">Constructor:<span style="font-size:10.0pt;
+font-family:Arial"><o:p>
+</span></font></span><u><span style="font-size:10.0pt;
+font-family:Arial"><font color="#000000">
+</o:p>
+</font>
+</span></u></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">IVParser(String FilePath)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><font color="#000000"><span style="mso-tab-count: 1; font-size: 10.0pt; font-family: Arial; color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></font><span style="font-size: 10.0pt; font-family: Arial; color: blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></b><span style="font-size: 10.0pt; font-family: Arial; color: blue"><span style="font-size:10.0pt;font-family:Arial;color:blue"><font color="#000000">Accepts
+the full path to the broker-configurator.xml and creates a parser using the
+instance of an XML factory and a file reader.</font></span></span><span style="font-size:10.0pt;font-family:Arial;color:blue"><font color="#000000"><o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none">&nbsp;</p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size: 10.0pt; font-family: Arial"><font size="3" color="#000000">Private
+functions:</font></span><font size="3" color="#C0C0C0"><span style="font-size: 10.0pt; font-family: Arial"><o:p>
+</span></font><span style="font-size:10.0pt;
+font-family:Arial"><font color="#000000"><u>
+</o:p>
+</u></font>
+</span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">1)int getAttributePosition(String
+AttributeName)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Returns the position of the attribute with
+the given name.<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">2)void getQualifiedName()<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Parses an internal stack to get the
+qualified name of the current element being parsed. <o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">3)void getTo(String element)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Positions the parser at the given element.<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">4)void getToService(String ServiceName)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Positions the parser at the given Service,
+uses getTo(&quot;service&quot;).<o:p>
+&nbsp;
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size: 10.0pt; font-family: Arial"><font size="3" color="#000000">Public
+functions:</font></span><u><font color="#000000"><span style="font-size:10.0pt;
+font-family:Arial"></o:p>
+</span></font></u></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">01)String getActiceAppServer()<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Returns the name of the application server
+whose staus is active true.</font></span><font color="#000000"><b><span style="font-size:10.0pt;font-family:Arial"><o:p>
+</o:p>
+</span></b></font></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">02)Collection getEngagedModules(String
+ServiceName)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Returns a collection of all the modules
+engaged to the given service. The returned modules are the once whose active
+status is set to true.<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">03)String getManageabilityReference()<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-spacerun: yes"><font color="#000000">&nbsp;</font></span><font color="#000000"><span style="mso-tab-count:
+1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Returns
+the Manageability End Point Reference of the proxy setup.</font></span><font color="#000000"><span style="font-size:10.0pt;font-family:Arial"><o:p>
+</o:p>
+</span></font></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">04)HashMap getParameters()<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Scans the entire broker-configurator.xml,
+sets the relevant parameter name as a key and its corresponding value into the
+HashMap that is returned.<span style="mso-tab-count:1"> </span>This function
+takes care of deciding the elements which would be treated as parameters,
+calling getQualifiedName() for obtaining a distinct name for every<span style="mso-tab-count:1">
+</span>parameter.<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">05)Collection getServices()<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Returns a collection of all the services
+present in the broker-configurator.xml<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">06)int getURLCount(String ServiceName)<span style="mso-tab-count:
+1">&nbsp; </span><o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000"><span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Returns the number of End Point URLs that the given service has, is used
+during the parameter setting to distinguish one End Point URL from another and
+can be used during routing decisions too.<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">07)HashMap getURLs(String ServiceName)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Returns a collection of all the URLs to the
+given service as keys and their priority as values.<o:p>
+</o:p>
+</font></span></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">08)String getWSDLLocation(String ServiceName)<o:p>
+</o:p>
+</font></span></b></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Returns the URL, in the form of a string,
+pointing to the location of the Original Provider WSDL.</font></span><font color="#000000"><b><span style="font-size:10.0pt;font-family:Arial"><o:p>
+</o:p>
+</span></b></font></p>
+<p class="MsoNormal" style="mso-pagination:none;mso-layout-grid-align:none;
+text-autospace:none"><b><span style="font-size:10.0pt;font-family:Arial;
+color:blue"><font color="#000000">09)boolean isWSDMManeged(String ServiceName)<o:p>
+</o:p>
+</font></span></b></p>
+<span style="font-size:10.0pt;font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;
+color:blue;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA"><span style="mso-tab-count:1"><font color="#000000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font></span><font color="#000000">Says wether the service is WSDM-out of band
+or not.</font></span>
+
+
+</BODY></HTML>

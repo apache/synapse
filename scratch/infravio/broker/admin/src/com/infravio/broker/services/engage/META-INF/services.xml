@@ -1,0 +1,9 @@
+<service name="AdminService">
+    <description>
+        This is a Engage Service.
+    </description>
+    <parameter name="ServiceClass" locked="xsd:false">com.infravio.broker.services.engage.AdminService</parameter>
+    <operation name="update">
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+    </operation>
+</service>

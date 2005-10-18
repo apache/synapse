@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="usage" name="broker">
+    <property environment="env"/>
+    <property file="build.properties"/>
+    <import file="classpath.xml"/>
+    <property name="temp_broker_dir" value="${java.io.tmpdir}/temp_broker_dir"/>
+    <target name="usage">
+        <echo message="Usage:"/>
+        <echo message="build-broker distribution"/>
+        <echo message="build-broker clean"/>
+    </target>
+    <target name="distribution">
+        <antcall target="dev"/>
+        <antcall target="create-dist"/>
+    </target>
+    <target name="dev">
+        <ant dir="core" target="pkg"/>
+        <ant dir="admin" target="pkg"/>
+        <ant dir="modules" target="pkg"/>
+        <ant dir="services" target="pkg"/>
+    </target>
+    <target name="create-dist">
+        <mkdir dir="${temp_broker_dir}/broker"/>
+        <mkdir dir="${temp_broker_dir}/broker/lib"/>
+        <mkdir dir="${temp_broker_dir}/broker/docs"/>
+        <mkdir dir="${temp_broker_dir}/broker/modules"/>
+        <mkdir dir="${temp_broker_dir}/broker/services"/>
+        <mkdir dir="${temp_broker_dir}/broker/resources"/>
+        <mkdir dir="${temp_broker_dir}/broker/license"/>
+        <mkdir dir="${temp_broker_dir}/broker/samples"/>
+        <copy file="admin/build/AdminModule.jar" overwrite="true" todir="${temp_broker_dir}/broker/modules"/>
+        <copy file="modules/build/logging.jar" overwrite="true" todir="${temp_broker_dir}/broker/modules"/>
+        <copy file="modules/build/routing.jar" overwrite="true" todir="${temp_broker_dir}/broker/modules"/>
+        <copy file="core/build/parser.jar" overwrite="true" 
+        todir="${temp_broker_dir}/broker/lib"/>
+        <copy file="core/build/receiver.jar" overwrite="true" 
+        todir="${temp_broker_dir}/broker/lib"/>
+        <copy file="services/build/proxy.aar" overwrite="true" todir="${temp_broker_dir}/broker/services"/>
+        <copy file="admin/build/AdminService.aar" overwrite="true" todir="${temp_broker_dir}/broker/services"/>
+        <copy file="samples/calculator.aar" overwrite="true" todir="${temp_broker_dir}/broker/samples"/>
+        <copy file="samples/calculatorv2.aar" overwrite="true" todir="${temp_broker_dir}/broker/samples"/>
+        <copy file="core/conf/broker-configuration.xml" overwrite="true" todir="${temp_broker_dir}/broker/resources"/>
+        <copy file="core/conf/parser.html" overwrite="true" 
+        todir="${temp_broker_dir}/broker/docs"/>
+        <copy file="core/conf/demo-arch.bmp" overwrite="true" 
+        todir="${temp_broker_dir}/broker/docs"/>
+        <copy file="core/conf/configuration.html" overwrite="true" todir="${temp_broker_dir}/broker/docs"/>
+        <copy file="core/conf/description.html" overwrite="true" todir="${temp_broker_dir}/broker/docs"/>
+        <copy file="core/conf/build.xml" overwrite="true" todir="${temp_broker_dir}/broker"/>
+        <copy file="build.properties" overwrite="true" todir="${temp_broker_dir}/broker"/>
+        <copy todir="${temp_broker_dir}/broker/license">
+            <fileset dir="license">
+                <include name="*.txt"/>
+            </fileset>
+        </copy>
+        <copy todir="${temp_broker_dir}/broker/lib">
+            <fileset dir="lib"> </fileset>
+        </copy>
+        <zip basedir="${java.io.tmpdir}/temp_broker_dir" destfile="broker.zip"/>
+        <delete dir="${java.io.tmpdir}/temp_broker_dir"/>
+        <delete dir="tmp"/>
+    </target>
+    <target name="clean">
+        <ant dir="admin" target="clean"/>
+        <ant dir="core" target="clean"/>
+        <ant dir="modules" target="clean"/>
+        <ant dir="services" target="clean"/>
+        <delete dir="${java.io.tmpdir}/temp_broker_dir"/>
+        <delete dir="tmp"/>
+        <delete>
+            <fileset dir=".">
+                <include name="*.zip"/>
+            </fileset>
+        </delete>
+    </target>
+</project>

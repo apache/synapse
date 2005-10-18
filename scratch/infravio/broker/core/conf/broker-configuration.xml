@@ -1,0 +1,90 @@
+<broker-configurator>
+    <!-- For out-of-band related configuration details should be put here
+         turn the managed attribute to false for in-band manageability capability -->
+    <wsdm-out-of-band managed="true">
+        <url-managebility-reference>
+            <url>http://ip:port/managebilityrefEPR</url>
+        </url-managebility-reference>
+        <!-- All WSDM related configuration details should be put here-->
+        <wsdm>
+            <jms>
+                <topic name="situation"></topic>
+            </jms>
+        </wsdm>
+    </wsdm-out-of-band>
+    <!-- All app server related configuration details should be put here-->
+    <config>
+        <app-server name="jboss" version="4.0" active="false">
+            <!-- All JMS connection related configuration details should be put here-->
+            <jms>
+                <provider-url></provider-url>
+            </jms>
+            <!-- All JMX connection related configuration details should be put here-->
+            <jmx version="1.0">
+                <provider-url/>
+                <provider-class/>
+            </jmx>
+            <!-- All database connection related configuration details should be put here-->
+            <database>
+                <db name="ORACLE" version="9i" active="true">
+                    <url>198.178.8.6</url>
+                    <driver-class></driver-class>
+                </db>
+                <db name="HSQL" version="4" active="false">
+                    <url>198.178.8.6</url>
+                    <driver-class></driver-class>
+                </db>
+            </database>
+        </app-server>
+        <app-server name="weblogic" version="8.1.3" active="true">
+            <jms></jms>
+            <jmx></jmx>
+            <database>
+                <db name="ORACLE" version="9i" active="true">
+                    <url>198.178.8.6</url>
+                    <driver-class></driver-class>
+                </db>
+                <db name="HSQL" version="4" active="false">
+                    <url>198.178.8.6</url>
+                    <driver-class></driver-class>
+                </db>
+            </database>
+        </app-server>
+    </config>
+    <!-- All service creation related configuration details should be put here-->
+    <service-mapper>
+        <service name="proxy">
+            <!-- The location of the original provider WSDL for the service. Modify and change it
+                  it to service_name.wsdl	-->
+            <wsdl-location>http://provider:8000/services/NativeService1/wsdl/provider.wsdl</wsdl-location>
+            <!-- End point urls for providers. will be used for  routing etc -->
+            <endPointURL>
+                <url priority="1">http://localhost:8080/axis2/services/calculator/</url>
+                <url priority="2">http://localhost:8080/axis2/services/calculatorv2/</url>
+            </endPointURL>
+            <!-- put the relevant modules that you want to engage with the service and the parameter
+                 details-->
+            <modules>
+                <module name="Logging" active="true">
+                </module>
+                <module name="Routing" active="true">
+                </module>
+            </modules>
+        </service>
+        <service name="Contract2">
+            <wsdl-location>http://xyz/services/Contract2/wsdl/provider.wsdl</wsdl-location>
+            <endPointURL>
+                <url priority="1">http://ip21:port/servicename</url>
+                <url priority="2">http://ip22:port/servicename</url>
+            </endPointURL>
+            <modules>
+                <module name="module(21)" active="true">
+                    <parameters name="InfravioSecurity">
+                        <parameter name="username">Admin</parameter>
+                    </parameters>
+                </module>
+                <module name="module(2n)" active="true"/>
+            </modules>
+        </service>
+    </service-mapper>
+</broker-configurator>

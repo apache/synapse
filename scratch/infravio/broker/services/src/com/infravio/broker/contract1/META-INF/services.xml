@@ -1,0 +1,19 @@
+<service name="Proxy1">
+    <description>
+        This is a sample Web Service with a logging module engaged.
+    </description>
+    <parameter name="ServiceClass" locked="xsd:false">com.infravio.broker.services.contract1.ProxyService</parameter>
+    <parameter name="logfilepath" locked="xsd:false">superValue</parameter>
+    <operation name="addition">
+        <messageReceiver class="com.infravio.broker.receivers.InOutSyncMessageReceiver"/>
+    </operation>
+    <operation name="subtraction">
+        <messageReceiver class="com.infravio.broker.receivers.InOutSyncMessageReceiver"/>
+    </operation>
+    <operation name="multiplication">
+        <messageReceiver class="com.infravio.broker.receivers.InOutSyncMessageReceiver"/>
+    </operation>
+    <operation name="division">
+        <messageReceiver class="com.infravio.broker.receivers.InOutSyncMessageReceiver"/>
+    </operation>
+</service>

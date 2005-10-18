@@ -1,0 +1,31 @@
+<project name="ProxyService" default="pkg" basedir=".">
+    <property file="../build.properties"/>
+    <import file="../classpath.xml"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <echo message="Compiling Proxy Service"/>
+
+        <mkdir dir="build/classes"/>
+
+        <copy file="src/com/infravio/broker/contract1/META-INF/services.xml"
+            todir="build/classes/META-INF" overwrite="true"/>
+
+        <javac
+            srcdir="src"
+            destdir="build/classes"
+            compiler="${javac.compiler}"
+            debug="${javac.debug}"
+            deprecation="${javac.deprecation}"
+            nowarn="on">
+            <classpath refid="broker.classpath"/>
+        </javac>
+    </target>
+
+    <target name="pkg" depends="compile">
+        <jar destfile="build/proxy.aar" basedir="build/classes" index="true"/>
+    </target>
+</project>

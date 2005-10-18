@@ -1,0 +1,7 @@
+<module name="synapse">
+    <inflow>
+        <handler name="synapseInHandler" class="org.apache.synapse.handler.SynapseInHandler">
+            <order phase="PreDispatch" after="AddressingInHandler"/>
+        </handler>
+    </inflow>
+</module>

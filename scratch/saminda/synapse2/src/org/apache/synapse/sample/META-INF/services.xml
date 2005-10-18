@@ -1,0 +1,35 @@
+<serviceGroup>
+
+    <description>
+        services.xml taken as the "xml formatted" rule provider.
+    </description>
+
+    <service name="Log">
+        <!-- selecting the mediator; so ServiceClass is the Mediator -->
+        <parameter name="ServiceClass" locked="false">
+            org.apache.synapse.sample.SimpleLoggingMediator</parameter>
+
+        <!-- this is the mock service, which is going to be called-->
+        <!-- because service level message receivers are not allowed to add -->
+
+        <operation name="receiver">
+            <messageReceiver
+                    class="org.apache.synapse.receivers.SynapseMessageReceiver"/>
+        </operation>
+    </service>
+    <service name="Log_1">
+        <!-- selecting the mediator; so ServiceClass is the Mediator -->
+        <parameter name="ServiceClass" locked="false">
+            org.apache.synapse.sample.SimpleDummyMediator</parameter>
+
+        <!-- this is the mock service, which is going to be called-->
+        <!-- because service level message receivers are not allowed to add -->
+
+        <operation name="receiver">
+            <messageReceiver
+                    class="org.apache.synapse.receivers.SynapseMessageReceiver"/>
+        </operation>
+    </service>
+
+
+</serviceGroup>

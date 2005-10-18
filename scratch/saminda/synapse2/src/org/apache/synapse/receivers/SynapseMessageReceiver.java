@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -67,10 +68,10 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
             Boolean mediatorState = DependencyManager
                     .mediatorBusinessLogicProvider(obj, msgContext);
 
+            Integer newSynapseState = new Integer(
+                    (oldSynapseState.intValue()) + 1);
             msgContext.setProperty(SynapseConstants.SYNAPSE_STATE,
-                    new Integer((oldSynapseState.intValue()) + 1));
-            msgContext.setProperty(SynapseConstants.MEDEATOT_STATE,
-                    mediatorState);
+                        newSynapseState);
 
             if (mediatorState.booleanValue()) {
                 /**
@@ -120,9 +121,6 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
         newContext.setServerSide(true);
         newContext.setEnvelope(returnMsgCtx.getEnvelope());
         newContext.setServiceContextID(returnMsgCtx.getServiceContextID());
-        /**
-         * need states realted to axis2 itsetlf
-         */
 
         /**
          * Need to understand the looping
@@ -135,9 +133,10 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
     private void synapseAsClient(MessageContext msgCtx) throws AxisFault {
         MessageSender msgSender = new MessageSender();
 
-        msgSender.setTo(new EndpointReference("http://localhost:8080/axis2/services/MyService"));
+        msgSender.setTo(new EndpointReference(
+                "http://localhost:8080/axis2/services/MyService"));
         msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);
 
-        msgSender.send("",msgCtx.getEnvelope().getBody().getFirstElement());
+        msgSender.send("", msgCtx.getEnvelope().getBody().getFirstElement());
     }
 }

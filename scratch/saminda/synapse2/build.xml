@@ -1,0 +1,73 @@
+<project name="synapse" default="compile" basedir=".">
+
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="./lib"/>
+    <property name="classes.dir" value="./classes"/>
+    <property name="jardrop.dir" value="${build.dir}/services"/>
+
+    <path id="classpath.library">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="prepare">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${jardrop.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${classes.dir}"/>
+        <delete dir="${jardrop.dir}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}">
+            <classpath refid="classpath.library"/>
+        </javac>
+
+        <jar destfile="${jardrop.dir}/mediation.aar">
+            <fileset dir="${classes.dir}">
+                <include name="**/SimpleLoggingMediator.class"/>
+                <include name="**/SimpleDummyMediator.class"/>
+            </fileset>
+            <fileset dir="${src.dir}/org/apache/synapse/sample">
+                <include name="META-INF/services.xml"/>
+            </fileset>
+        </jar>
+        <jar destfile="${jardrop.dir}/synapse_prototype2.mar">
+            <fileset dir="${classes.dir}">
+                <include name="**/SynapseInHandler.class"/>
+            </fileset>
+            <fileset dir="${src.dir}/org/apache/synapse/modules">
+                <include name="META-INF/module.xml"/>
+            </fileset>
+        </jar>
+
+        <jar destfile="${jardrop.dir}/synapse_prototype_2.jar">
+            <fileset dir="${classes.dir}">
+                <include name="**/SynapseDispatcher.class"/>
+                <include name="**/DependencyManager.class"/>
+                <include name="**/SynapseAbstractMessageReceiver.class"/>
+                <include name="**/SynapseMessageReceiver.class"/>
+                <include name="**/SynapseRuleReader.class"/>
+                <include name="**/SynapseRuleEngine.class"/>
+                <include name="**/SynapaseRuleBean.class"/>
+            </fileset>
+        </jar>
+
+        <copy file="/home/saminda/myprojects/synapse2/build/services/mediation.aar"
+        todir="/home/saminda/myprojects/synapse2/server/services" overwrite="true"/>
+        <copy file="/home/saminda/myprojects/synapse2/build/services/synapse_prototype_2.jar"
+        todir="/home/saminda/myprojects/synapse2/server/lib" overwrite="true"/>
+        <copy file="/home/saminda/myprojects/synapse2/build/services/synapse_prototype2.mar"
+        todir="/home/saminda/myprojects/synapse2/server/modules" overwrite="true"/>
+        <copy file="/home/saminda/myprojects/synapse2/synapse.xml"
+        todir="/home/saminda/myprojects/synapse2/server/" overwrite="true"/>
+
+    </target>
+
+</project>

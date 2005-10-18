@@ -72,6 +72,7 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
                     (oldSynapseState.intValue()) + 1);
             msgContext.setProperty(SynapseConstants.SYNAPSE_STATE,
                         newSynapseState);
+            msgContext.setProperty(SynapseConstants.MEDEATOT_STATE,mediatorState);
 
             if (mediatorState.booleanValue()) {
                 /**
@@ -118,6 +119,20 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
                 SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST,
                 returnMsgCtx.getProperty(
                         SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST));
+        newContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST,
+                returnMsgCtx.getProperty(
+                        SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST));
+        newContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN,
+                returnMsgCtx.getProperty(
+                        SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN));
+        newContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN,
+                returnMsgCtx.getProperty(
+                        SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN));
+
+
         newContext.setServerSide(true);
         newContext.setEnvelope(returnMsgCtx.getEnvelope());
         newContext.setServiceContextID(returnMsgCtx.getServiceContextID());

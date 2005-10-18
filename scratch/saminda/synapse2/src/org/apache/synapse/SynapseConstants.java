@@ -20,7 +20,9 @@ public interface SynapseConstants {
     }
     public interface SynapseRuleEngine {
         public static final String GENERAT_RULE_ARRAY_LIST = "generalRules";
+        public static final String GENERAT_RULE_ARRAY_BOOLEAN = "boolean";
         public static final String XPATH_RULE_ARRAY_LIST= "xpathRules";
+        public static final String XPATH_RULE_ARRAY_BOOLEAN= "boolean";
         public static final String SYNAPSE_RECEIVER = "receiver";
         public static final String SYNAPSE_RULE_ENGINE= "synapseRuleEngine";
     }

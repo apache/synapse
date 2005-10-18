@@ -95,9 +95,10 @@ public class SynapseRuleConfiguration {
         Iterator ruleIte = ruleReader.getRulesIterator();
 
         while (ruleIte.hasNext()) {
-            // genertal rule handling with "*"
             SynapaseRuleBean bean = (SynapaseRuleBean) ruleIte.next();
-
+            /**
+             * general rule handling
+             */
             if (bean.getCondition().equals("*")) {
                 // this could be more than this.
                 this.generalRuleList.add(bean);
@@ -109,9 +110,15 @@ public class SynapseRuleConfiguration {
                 //settingup the namespace which needed to be dealt with care
                 SimpleNamespaceContext nameSpace = new SimpleNamespaceContext();
                 //add the relevent name spaces
+                //-------------------- as an Example
+                nameSpace.addNamespace("synapse", "http://synapse.org/synapse");
+                //--------------------
                 xpath.setNamespaceContext(nameSpace);
-
-                boolean xpathBool = xpath.booleanValueOf(nameSpace);
+                /**
+                 * Xpath validation for the incomming message.
+                 */
+                boolean xpathBool = xpath
+                        .booleanValueOf(messageContext.getEnvelope());
 
                 if (xpathBool) {
                     this.xpathRuleList.add(bean);
@@ -124,6 +131,12 @@ public class SynapseRuleConfiguration {
         messageContext.setProperty(
                 SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST,
                 xpathRuleList);
+        messageContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN,
+                new Boolean(true));
+        messageContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN,
+                new Boolean(true));
     }
 
 }

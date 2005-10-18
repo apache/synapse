@@ -4,13 +4,11 @@ import org.apache.axis2.engine.*;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.description.OperationDescription;
+import org.apache.axis2.clientapi.MessageSender;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.wsdl.WSDLService;
 import org.apache.synapse.SynapseConstants;
 
 import java.lang.reflect.Method;
@@ -84,6 +82,8 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
                 /**
                  * Mediation is successful and route the message to the relevant location.
                  */
+                synapseAsClient(msgContext);
+
             }
 
         } catch (Exception e) {
@@ -124,12 +124,20 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
          * need states realted to axis2 itsetlf
          */
 
-
         /**
          * Need to understand the looping
          */
         AxisEngine engine = new AxisEngine(returnMsgCtx.getSystemContext());
         engine.receive(newContext);
 
+    }
+
+    private void synapseAsClient(MessageContext msgCtx) throws AxisFault {
+        MessageSender msgSender = new MessageSender();
+
+        msgSender.setTo(new EndpointReference("http://localhost:8080/axis2/services/MyService"));
+        msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);
+
+        msgSender.send("",msgCtx.getEnvelope().getBody().getFirstElement());
     }
 }

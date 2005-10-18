@@ -4,7 +4,7 @@ import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.rules.SynapseRuleEngine;
+import org.apache.synapse.rules.SynapseRuleConfiguration;
 import org.apache.synapse.SynapseConstants;
 import org.jaxen.JaxenException;
 
@@ -18,12 +18,12 @@ import org.jaxen.JaxenException;
 public class SynapseInHandler extends AbstractHandler implements Handler {
 
 
-    private SynapseRuleEngine ruleEngine;
+    private SynapseRuleConfiguration ruleConfiguration;
 
     private int synapseState = 0;
 
     public SynapseInHandler() {
-        ruleEngine = new SynapseRuleEngine();
+        ruleConfiguration = new SynapseRuleConfiguration();
     }
 
     public void invoke(MessageContext messageContext) throws AxisFault {
@@ -34,15 +34,15 @@ public class SynapseInHandler extends AbstractHandler implements Handler {
         if (loopBoolean == null) {
             messageContext.setProperty(
                     SynapseConstants.SynapseRuleEngine.SYNAPSE_RECEIVER,
-                    ruleEngine.getOperationName());
-            ruleEngine.ruleConfiguration(messageContext);
+                    ruleConfiguration.getOperationName());
+            ruleConfiguration.ruleConfiguration(messageContext);
 
 
             try {
-                ruleEngine.validateXpath(messageContext);
+                ruleConfiguration.validateXpath(messageContext);
                 messageContext.setProperty(
                         SynapseConstants.SynapseRuleEngine.SYNAPSE_RULE_ENGINE,
-                        ruleEngine);
+                        ruleConfiguration);
             } catch (JaxenException e) {
                 throw new AxisFault(e);
             }

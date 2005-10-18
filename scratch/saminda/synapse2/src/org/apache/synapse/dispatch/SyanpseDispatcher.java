@@ -9,6 +9,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.rules.SynapaseRuleBean;
+import org.apache.synapse.rules.SynapseRuleEngine;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -43,19 +44,30 @@ public class SyanpseDispatcher extends AbstractDispatcher {
          *  Configuration only being done for the General Rule listing
          *  need to do it for xpath rule listing too
          */
-        ArrayList generalList = (ArrayList) messageContext.getProperty(
-                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST);
-        Integer state = (Integer) messageContext
-                .getProperty(SynapseConstants.SYNAPSE_STATE);
-        SynapaseRuleBean bean = null;
-        if (state.intValue() <= generalList.size()) {
-            bean = (SynapaseRuleBean) generalList.get(state.intValue() - 1);
-        }
-        serviceName = bean.getMediator();
+//        SynapaseRuleBean bean = null;
+//
+//        ArrayList generalList = (ArrayList) messageContext.getProperty(
+//                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST);
+//        ArrayList xpathList = (ArrayList) messageContext.getProperty(
+//                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST);
+//
+//
+//        Integer state = (Integer) messageContext
+//                .getProperty(SynapseConstants.SYNAPSE_STATE);
+//
+//        if ( generalList.size() > 0) {
+//            bean = (SynapaseRuleBean) generalList.get(state.intValue() - 1);
+//            serviceName = bean.getMediator();
+//        }
+//
+//        if ( xpathList.size() > 0 ) {
+//
+//        }
+        serviceName = SynapseRuleEngine.findService(messageContext);
 
-        AxisConfiguration registry =
-                messageContext.getSystemContext()
-                        .getAxisConfiguration();
+            AxisConfiguration registry =
+                    messageContext.getSystemContext()
+                            .getAxisConfiguration();
         return registry.getService(serviceName);
 
     }

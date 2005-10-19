@@ -59,8 +59,7 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
             Object obj = getTheImplementationObject(msgContext);
 
             /**
-             * Injecting messageContext for medaite method
-             * Will not be on use in the M1
+             * Injecting messageContext for "medaite" method
              */
 
             Integer oldSynapseState = (Integer) msgContext
@@ -73,6 +72,10 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
             msgContext.setProperty(SynapseConstants.SYNAPSE_STATE,
                         newSynapseState);
             msgContext.setProperty(SynapseConstants.MEDEATOT_STATE,mediatorState);
+            /**
+             * below code soulely based on the intelligence of Mediator, he should know
+             * more rules are there to execute per comming message.
+             */
 
             if (mediatorState.booleanValue()) {
                 /**
@@ -115,30 +118,19 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
                 SynapseConstants.SynapseRuleEngine.SYNAPSE_RECEIVER,
                 returnMsgCtx.getProperty(
                         SynapseConstants.SynapseRuleEngine.SYNAPSE_RECEIVER));
-        newContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST,
-                returnMsgCtx.getProperty(
-                        SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST));
-        newContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST,
-                returnMsgCtx.getProperty(
-                        SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST));
-        newContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN,
-                returnMsgCtx.getProperty(
-                        SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN));
-        newContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN,
-                returnMsgCtx.getProperty(
-                        SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN));
 
+         newContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.CUMULATIVE_RUEL_ARRAY_LIST,
+                returnMsgCtx.getProperty(
+                        SynapseConstants.SynapseRuleEngine.CUMULATIVE_RUEL_ARRAY_LIST));
 
         newContext.setServerSide(true);
         newContext.setEnvelope(returnMsgCtx.getEnvelope());
         newContext.setServiceContextID(returnMsgCtx.getServiceContextID());
 
         /**
-         * Need to understand the looping
+         * Now do the looping for the next rule for the incomming message
+         * This will be on the same thread as the pervious rule being excecuted.
          */
         AxisEngine engine = new AxisEngine(returnMsgCtx.getSystemContext());
         engine.receive(newContext);
@@ -147,7 +139,8 @@ public class SynapseMessageReceiver extends SynapseAbstractMessageReceiver
 
     private void synapseAsClient(MessageContext msgCtx) throws AxisFault {
         MessageSender msgSender = new MessageSender();
-
+        // facke enpoint to host different listening port. need to find a better
+        // way to handle this senario.
         msgSender.setTo(new EndpointReference(
                 "http://localhost:8080/axis2/services/MyService"));
         msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);

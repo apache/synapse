@@ -32,14 +32,17 @@ public class SynapseRuleConfiguration {
 
     private ArrayList mediatorList;
 
-    private ArrayList generalRuleList; // contains the beans of Rules
-    private ArrayList xpathRuleList;   //contains the beans of Rules
+    private ArrayList generalRuleList;
+    private ArrayList xpathRuleList;
+
+    private ArrayList cumulativeRuleList; // all rules are cumulated so this is extensible
 
     public SynapseRuleConfiguration() {
         ruleReader = new SynapseRuleReader();
         mediatorList = new ArrayList();
         generalRuleList = new ArrayList();
         xpathRuleList = new ArrayList();
+        cumulativeRuleList = new ArrayList();
     }
 
     public void ruleConfiguration(MessageContext msgCtx) throws AxisFault {
@@ -125,18 +128,15 @@ public class SynapseRuleConfiguration {
                 }
             }
         }
-        messageContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST,
-                generalRuleList);
-        messageContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST,
-                xpathRuleList);
-        messageContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN,
-                new Boolean(true));
-        messageContext.setProperty(
-                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN,
-                new Boolean(true));
+
+        /**
+         * Cumulation of all Rule to single collection so the looping of Rule Engine
+         * Become more simple
+         */
+        cumulativeRuleList.addAll(generalRuleList);
+        cumulativeRuleList.addAll(xpathRuleList);
+
+        messageContext.setProperty(SynapseConstants.SynapseRuleEngine.CUMULATIVE_RUEL_ARRAY_LIST, cumulativeRuleList);
     }
 
 }

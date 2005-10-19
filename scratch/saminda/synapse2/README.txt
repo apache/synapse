@@ -42,3 +42,6 @@ Just change the other 3 entries as there as mentioned above.
 
 7.Once you run the sample you will see the mediation components being executed and Message is routed to Original service. 
 
+Note: 
+
+synapse.xml is the file that contain all the rules pertaining to the incoming messages. 

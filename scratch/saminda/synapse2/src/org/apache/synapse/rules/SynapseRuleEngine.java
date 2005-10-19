@@ -25,56 +25,26 @@ public class SynapseRuleEngine {
 
         SynapaseRuleBean bean = null;
         String serviceName = null;
-
-        ArrayList generalList = (ArrayList) messageContext.getProperty(
-                SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_LIST);
-
-        ArrayList xpathList = (ArrayList) messageContext.getProperty(
-                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_LIST);
+        ArrayList cumulativeRuleList = (ArrayList) messageContext.getProperty(
+                SynapseConstants.SynapseRuleEngine.CUMULATIVE_RUEL_ARRAY_LIST);
 
         Integer state = (Integer) messageContext
                 .getProperty(SynapseConstants.SYNAPSE_STATE);
 
-        if (generalList.size() > 0) {
-            if ((state.intValue() <= generalList.size()) &&
-                    ((Boolean) messageContext.getProperty(
-                            SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN))
-                            .booleanValue()) {
-                if (state.intValue() == generalList.size()) {
-                    messageContext.setProperty(
-                            SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN,
-                            new Boolean(false));
-                    messageContext.setProperty(SynapseConstants.SYNAPSE_STATE,
-                            new Integer(1));
-                }
-                bean = (SynapaseRuleBean) generalList.get(state.intValue() - 1);
-                serviceName = bean.getMediator();
-            }
-        }
 
-        if (xpathList.size() > 0) {
-            if (!((Boolean) messageContext.getProperty(
-                    SynapseConstants.SynapseRuleEngine.GENERAT_RULE_ARRAY_BOOLEAN))
-                    .booleanValue()) {
-                if ((state.intValue() <= xpathList.size()) &&
-                        ((Boolean) messageContext.getProperty(
-                                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN))
-                                .booleanValue()) {
-                    if (state.intValue() == xpathList.size()) {
-                        ((Boolean) messageContext.getProperty(
-                                SynapseConstants.SynapseRuleEngine.XPATH_RULE_ARRAY_BOOLEAN))
-                                .booleanValue();
-                        messageContext.setProperty(
-                                SynapseConstants.SYNAPSE_STATE, new Integer(1));
-                    }
-                    bean = (SynapaseRuleBean) xpathList
+        if (cumulativeRuleList != null) {
+            if (cumulativeRuleList.size() > 0) {
+                if (state.intValue() <= cumulativeRuleList.size()) {
+                    bean = (SynapaseRuleBean) cumulativeRuleList
                             .get(state.intValue() - 1);
                     serviceName = bean.getMediator();
                 }
-
             }
-
         }
+
+        /**
+         * No rule Just send the damn mesage to it's destination.
+         */
         return serviceName;
     }
 }

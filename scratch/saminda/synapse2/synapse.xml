@@ -1,14 +1,21 @@
 <rules>
-    <rule>
-        <condition>*</condition>
-        <mediator>Log</mediator>
-    </rule>
-    <rule>
-        <condition>*</condition>
-        <mediator>Log_1</mediator>
-    </rule>
+    <!-- General Rules parse first
+         They are globle to every incomming message-->
     <!--<rule>-->
         <!--<condition>*</condition>-->
         <!--<mediator>Log</mediator>-->
     <!--</rule>-->
+    <!--<rule>-->
+        <!--<condition>*</condition>-->
+        <!--<mediator>Log</mediator>-->
+    <!--</rule>-->
+    <!-- these are xpath rules. which is
+         specific to an incomming message-->
+    <rule>
+        <!-- need to register the namespaces first
+             following is used as a sample-->
+        <ns prifix="synapse" uri="http://synapse.org/synapse"/>
+        <condition>//synapse:text</condition>
+        <mediator>Log_1</mediator>
+    </rule>
 </rules>

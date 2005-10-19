@@ -3,6 +3,7 @@ package org.apache.synapse.rules;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.SynapseConstants;
@@ -12,6 +13,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,11 +30,14 @@ public class SynapseRuleReader {
     public static final String RULE_XML = "synapse.xml";
     private ArrayList ruleList;
 
+    private HashMap namespaceMap;
+
     public SynapseRuleReader() {
         ruleList = new ArrayList();
+        namespaceMap = new HashMap();
     }
 
-    public  OMElement readRules()
+    public OMElement readRules()
             throws AxisFault {
 
         try {
@@ -65,6 +70,7 @@ public class SynapseRuleReader {
         OMElement rules = readRules();
         if (rules != null) {
             this.fillBean(rules);
+            this.fillNamespaces(rules);
         }
 
     }
@@ -99,6 +105,40 @@ public class SynapseRuleReader {
 
     public Iterator getRulesIterator() {
         return ruleList.iterator();
+    }
+
+    public HashMap getNamespaceMap() {
+        return namespaceMap;
+    }
+
+    private void fillNamespaces(OMElement ele) {
+        Iterator ite = ele.getChildElements();
+        while (ite.hasNext()) {
+            OMElement ruleEle = (OMElement) ite.next();
+            Iterator nsIte = ruleEle.getChildElements();
+            while (nsIte.hasNext()) {
+                OMElement nsEle = (OMElement) nsIte.next();
+                if (nsEle.getLocalName().equalsIgnoreCase(
+                        SynapseConstants.SynapseRuleReader.NAMESPACE)) {
+                    Iterator attIte = nsEle.getAllAttributes();
+                    String prifix = null;
+                    String uri = null;
+                    while (attIte.hasNext()) {
+                        OMAttribute att = (OMAttribute) attIte.next();
+                        if (att.getLocalName().equalsIgnoreCase(
+                                SynapseConstants.SynapseRuleReader.PRIFIX)) {
+                            prifix = att.getValue();
+                        }
+                        if (att.getLocalName().equalsIgnoreCase(
+                                SynapseConstants.SynapseRuleReader.URI)) {
+                            uri = att.getValue();
+                        }
+
+                    }
+                    namespaceMap.put(prifix, uri);
+                }
+            }
+        }
     }
 
 }

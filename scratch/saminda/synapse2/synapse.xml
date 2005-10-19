@@ -1,10 +1,10 @@
 <rules>
     <!-- General Rules parse first
          They are globle to every incomming message-->
-    <!--<rule>-->
-        <!--<condition>*</condition>-->
-        <!--<mediator>Log</mediator>-->
-    <!--</rule>-->
+    <rule>
+        <condition>*</condition>
+        <mediator>Log</mediator>
+    </rule>
     <!--<rule>-->
         <!--<condition>*</condition>-->
         <!--<mediator>Log</mediator>-->

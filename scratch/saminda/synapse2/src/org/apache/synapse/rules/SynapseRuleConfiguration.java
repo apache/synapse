@@ -2,7 +2,10 @@ package org.apache.synapse.rules;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.om.xpath.AXIOMXPath;
+import org.apache.axis2.om.OMDocument;
+import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.SynapseConstants;
 import org.jaxen.JaxenException;
@@ -10,9 +13,9 @@ import org.jaxen.XPath;
 import org.jaxen.SimpleNamespaceContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -97,6 +100,16 @@ public class SynapseRuleConfiguration {
             throws JaxenException {
         Iterator ruleIte = ruleReader.getRulesIterator();
 
+        /**
+         * Need registering qulified namesapaces to Jaxen to work on
+         * xpath.
+         */
+        HashMap namespacesMap = ruleReader.getNamespaceMap();
+
+
+        SOAPEnvelope envelope = messageContext.getEnvelope();
+        envelope.build();
+
         while (ruleIte.hasNext()) {
             SynapaseRuleBean bean = (SynapaseRuleBean) ruleIte.next();
             /**
@@ -106,22 +119,32 @@ public class SynapseRuleConfiguration {
                 // this could be more than this.
                 this.generalRuleList.add(bean);
             } else {
+
+                Iterator nsIte = namespacesMap.entrySet().iterator();
+                Map.Entry entry = null;
+                String prifix = null;
+                String uri = null;
+
+                //settingup the namespace which needed to be dealt with care
+                SimpleNamespaceContext nsCtx = new SimpleNamespaceContext();
+
+                while (nsIte.hasNext()) {
+                    entry = (Map.Entry) nsIte.next();
+                    prifix = (String) entry.getKey();
+                    uri = (String) entry.getValue();
+                    nsCtx.addNamespace(prifix, uri);
+                }
+
                 // which deal with the xpath of the message
                 String xpathExpression = bean.getCondition();
                 XPath xpath = new AXIOMXPath(xpathExpression);
 
-                //settingup the namespace which needed to be dealt with care
-                SimpleNamespaceContext nameSpace = new SimpleNamespaceContext();
-                //add the relevent name spaces
-                //-------------------- as an Example
-                nameSpace.addNamespace("synapse", "http://synapse.org/synapse");
-                //--------------------
-                xpath.setNamespaceContext(nameSpace);
+                xpath.setNamespaceContext(nsCtx);
                 /**
                  * Xpath validation for the incomming message.
                  */
                 boolean xpathBool = xpath
-                        .booleanValueOf(messageContext.getEnvelope());
+                        .booleanValueOf(envelope);
 
                 if (xpathBool) {
                     this.xpathRuleList.add(bean);
@@ -136,7 +159,9 @@ public class SynapseRuleConfiguration {
         cumulativeRuleList.addAll(generalRuleList);
         cumulativeRuleList.addAll(xpathRuleList);
 
-        messageContext.setProperty(SynapseConstants.SynapseRuleEngine.CUMULATIVE_RUEL_ARRAY_LIST, cumulativeRuleList);
+        messageContext.setProperty(
+                SynapseConstants.SynapseRuleEngine.CUMULATIVE_RUEL_ARRAY_LIST,
+                cumulativeRuleList);
     }
 
 }

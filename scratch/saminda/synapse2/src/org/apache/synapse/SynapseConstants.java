@@ -17,6 +17,9 @@ public interface SynapseConstants {
     public interface SynapseRuleReader {
         public static final String CONDITION = "condition";
         public static final String MEDIATOR = "mediator";
+        public static final String NAMESPACE = "ns";
+        public static final String PRIFIX = "prifix";
+        public static final String URI = "uri";
     }
     public interface SynapseRuleEngine {
         public static final String CUMULATIVE_RUEL_ARRAY_LIST="cumulative";

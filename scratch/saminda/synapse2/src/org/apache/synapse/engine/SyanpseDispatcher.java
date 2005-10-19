@@ -1,4 +1,4 @@
-package org.apache.synapse.dispatch;
+package org.apache.synapse.engine;
 
 import org.apache.axis2.engine.AbstractDispatcher;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -8,11 +8,9 @@ import org.apache.axis2.description.OperationDescription;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.rules.SynapaseRuleBean;
 import org.apache.synapse.rules.SynapseRuleEngine;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.

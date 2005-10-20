@@ -127,11 +127,11 @@ public class SynapseRuleReader {
                         OMAttribute att = (OMAttribute) attIte.next();
                         if (att.getLocalName().equalsIgnoreCase(
                                 SynapseConstants.SynapseRuleReader.PRIFIX)) {
-                            prifix = att.getValue();
+                            prifix = att.getAttributeValue();
                         }
                         if (att.getLocalName().equalsIgnoreCase(
                                 SynapseConstants.SynapseRuleReader.URI)) {
-                            uri = att.getValue();
+                            uri = att.getAttributeValue();
                         }
 
                     }

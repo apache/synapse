@@ -1,0 +1,6 @@
+<synapse>
+    <ruleengine class="org.apache.synapse.impl.SynapseDefaultRuleEngine"/>
+    
+    <rule id="Rule1" mediator="org.apache.synapse.mediators.LogMediator"/>
+    <rule id="Rule2" mediator="org.apache.synapse.mediators.ValueCheckMediator"/>
+</synapse>

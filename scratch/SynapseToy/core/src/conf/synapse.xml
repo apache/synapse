@@ -1,5 +1,7 @@
 <synapse>
     <ruleengine class="org.apache.synapse.impl.SynapseDefaultRuleEngine"/>
+
+    <searchTime value="60000"/>
     
     <rule id="Rule1" mediator="org.apache.synapse.mediators.LogMediator"/>
     <rule id="Rule2" mediator="org.apache.synapse.mediators.ValueCheckMediator"/>

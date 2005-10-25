@@ -25,7 +25,7 @@ import java.io.IOException;
 */
 
 public class SynapseServlet extends AxisServlet {
-
+     
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws javax.servlet.ServletException, IOException {
        //this hsa to be overide the way you want
     }

@@ -18,7 +18,7 @@ import org.apache.axis2.AxisFault;
  */
 public class SampleClient {
     private static EndpointReference targetEPR = new EndpointReference(
-            "http://localhost:8081/");
+            "http://localhost:8081/synapse/services/dummyservice");
 
     public static void main(String[] args) {
         try {

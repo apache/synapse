@@ -13,6 +13,7 @@ public interface SynapseConstants {
     public static final String VALUE_FALSE="false";
     public static final String SYNAPSE_STATE="state";
     public static final String RULE_STATE="ruleState";
+    public static final String PATH="path";
 
     public interface SynapseRuleReader {
         public static final String CONDITION = "condition";

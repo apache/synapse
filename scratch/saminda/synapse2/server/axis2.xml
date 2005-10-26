@@ -102,9 +102,9 @@
     <!-- ================================================= -->
     <!-- Phases  -->
     <!-- ================================================= -->
-    <dispatchOrder>
-        <dispatcher name="SyanpseDispatcher" class="org.apache.synapse.dispatch.SyanpseDispatcher"/>
-    </dispatchOrder>
+    <!--<dispatchOrder>-->
+        <!--<dispatcher name="SyanpseDispatcher" class="org.apache.synapse.engine.SyanpseDispatcher"/>-->
+    <!--</dispatchOrder>-->
 
     <phaseOrder type="inflow">
         <!--  System pre defined phases       -->

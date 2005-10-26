@@ -6,6 +6,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseConstants;
 
 import javax.xml.stream.XMLStreamReader;
@@ -32,16 +33,27 @@ public class SynapseRuleReader {
 
     private HashMap namespaceMap;
 
+
     public SynapseRuleReader() {
         ruleList = new ArrayList();
         namespaceMap = new HashMap();
     }
 
-    public OMElement readRules()
+
+    public OMElement readRules(MessageContext messageContext)
             throws AxisFault {
 
         try {
-            File absolutePath = new File(".");
+            String path = (String) messageContext.getSystemContext()
+                    .getProperty(SynapseConstants.PATH);
+            File absolutePath = null;
+
+            if (path == null) {
+                absolutePath = new File(".");
+            } else {
+                absolutePath = new File(path);
+            }
+
             File inFile = new File(absolutePath.getAbsolutePath(), RULE_XML);
             InputStream in = new FileInputStream(inFile);
             if (in == null) {
@@ -64,10 +76,10 @@ public class SynapseRuleReader {
         }
     }
 
-    public void populateRules() throws
+    public void populateRules(MessageContext messageContexgt) throws
             AxisFault {
 
-        OMElement rules = readRules();
+        OMElement rules = readRules(messageContexgt);
         if (rules != null) {
             this.fillBean(rules);
             this.fillNamespaces(rules);

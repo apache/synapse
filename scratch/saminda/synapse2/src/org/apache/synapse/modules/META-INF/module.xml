@@ -3,5 +3,8 @@
         <handler name="synapseInHandler" class="org.apache.synapse.handler.SynapseInHandler">
             <order phase="PreDispatch" after="AddressingInHandler"/>
         </handler>
+        <handler name="SyanpseDispatcher" class="org.apache.synapse.engine.SyanpseDispatcher">
+            <order phaseFirst="true" phase="Dispatch"/>
+        </handler>
     </inflow>
 </module>

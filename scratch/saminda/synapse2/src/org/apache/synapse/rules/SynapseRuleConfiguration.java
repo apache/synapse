@@ -4,8 +4,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.om.xpath.AXIOMXPath;
-import org.apache.axis2.om.OMDocument;
-import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.SynapseConstants;
 import org.jaxen.JaxenException;
@@ -54,7 +52,7 @@ public class SynapseRuleConfiguration {
 
         HashMap serviceMap = registry.getServices();
 
-        ruleReader.populateRules();
+        ruleReader.populateRules(msgCtx);
 
         Iterator ite = serviceMap.entrySet().iterator();
         Map.Entry entry = null;

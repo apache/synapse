@@ -49,7 +49,8 @@
 
         <jar destfile="${jardrop.dir}/synapse_prototype_2.jar">
             <fileset dir="${classes.dir}">
-                <include name="**/SynapseDispatcher.class"/>
+                <include name="**/SyanpseDispatcher.class"/>
+                <include name="**/Mediator.class"/>
                 <include name="**/DependencyManager.class"/>
                 <include name="**/SynapseAbstractMessageReceiver.class"/>
                 <include name="**/SynapseMessageReceiver.class"/>
@@ -57,6 +58,7 @@
                 <include name="**/SynapseRuleEngine.class"/>
                 <include name="**/SynapaseRuleBean.class"/>
                 <include name="**/SynapseRuleConfiguration.class"/>
+                <include name="**/SynapseServlet.class"/>
                 <include name="**/Utils.class"/>
             </fileset>
         </jar>
@@ -71,5 +73,6 @@
         todir="/home/saminda/myprojects/synapse2/server/" overwrite="true"/>
 
     </target>
+
 
 </project>

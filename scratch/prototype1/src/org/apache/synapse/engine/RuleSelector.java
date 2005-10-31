@@ -16,6 +16,8 @@ public interface RuleSelector {
      * In other words, RuleSelector should be created per stage per direction
      */
     public void init(OMElement ruleSet);
+
+
     Rule [] getRules();
 
     /**

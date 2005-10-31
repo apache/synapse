@@ -13,8 +13,6 @@ public class SynapseConfiguration {
     private OMElement outgoingProcessingStageRuleSet;
     private OMElement outgoingPostStageRuleSet;
 
-    private Class ruleEngineClass;
-
     public OMElement getIncomingPreStageRuleSet() {
         return incomingPreStageRuleSet;
     }
@@ -65,13 +63,5 @@ public class SynapseConfiguration {
     public void setOutgoingPostStageRuleSet(
             OMElement outgoingPostStageRuleSet) {
         this.outgoingPostStageRuleSet = outgoingPostStageRuleSet;
-    }
-
-    public Class getRuleEngineClass() {
-        return ruleEngineClass;
-    }
-
-    public void setRuleEngineClass(Class ruleEngineClass) {
-        this.ruleEngineClass = ruleEngineClass;
     }
 }

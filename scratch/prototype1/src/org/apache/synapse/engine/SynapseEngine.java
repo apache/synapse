@@ -1,6 +1,9 @@
 package org.apache.synapse.engine;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisConfigurationImpl;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
@@ -10,6 +13,7 @@ import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class SynapseEngine {
@@ -22,12 +26,14 @@ public class SynapseEngine {
     private RuleSelector outgoingProcessingStageRuleSelector;
     private RuleSelector outgoingPostStageRuleSelector;
 
+    private AxisConfiguration axisConfig;
+
     /**
      *
      */
     public void init(SynapseConfiguration synapseConfiguration)
             throws SynapseException {
-
+        axisConfig = new AxisConfigurationImpl();
         incomingPreStageRuleSelector = createRuleSelector(
                 synapseConfiguration.getIncomingPreStageRuleSet());
         incomingProcessingStageRuleSelector = createRuleSelector(
@@ -167,11 +173,15 @@ public class SynapseEngine {
             Rule []   rules = ruleSelector.getRules();
             for (int i = 0; i < rules.length; i++) {
                 Rule rule = rules[i];
-                rule.setAxisConfig();
+                AxisService service = new AxisService(new QName(rule.getName()));
+                List qoslist = rule.getQosModules();
+                for (int j = 0; j < qoslist.size(); j++) {
+                    String moduleName = (String) qoslist.get(j);
+                    //todo engage all the mdoule to the service
+                }
+                axisConfig.addService(service);
+//                rule.setAxisConfig();
             }
-
-
-
             return ruleSelector;
         } catch (Exception e) {
             throw new SynapseException(e);

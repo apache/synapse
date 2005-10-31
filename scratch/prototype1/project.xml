@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+    <name>Synapse</name>
+    <pomVersion>3</pomVersion>
+
+    <!-- a unique name for this project -->
+    <name>Synapse - Prototype</name>
+    <id>synapse</id>
+    <groupId>synapse</groupId>
+    <package>org.apache.synapse</package>
+
+    <currentVersion>Proto1</currentVersion>
+
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://apache.org/</url>
+        <logo></logo>
+    </organization>
+
+    <inceptionYear>2005</inceptionYear>
+    <logo>http://incubator.apache.org/synapse/images/synapse.png</logo>
+    <description>Synapse is a mediation framework</description>
+    <shortDescription>Synapse</shortDescription>
+    <!-- the project home page -->
+    <url>http://incubator.apache.org/synapse/</url>
+    <!--<issueTrackingUrl></issueTrackingUrl>-->
+    <siteAddress></siteAddress>
+    <!--<siteDirectory></siteDirectory>-->
+    <!--<distributionDirectory></distributionDirectory>-->
+    <!-- repository></repository -->
+   
+    <!-- ========== -->
+    <!-- Mailing lists -->
+    <!-- ========== -->
+
+    <mailingLists>
+        <mailingList>
+            <name>Synapse Developer List</name>
+            <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
+            <archive></archive>
+        </mailingList>
+    </mailingLists>
+
+    <!-- ========== -->
+    <!-- Developers -->
+    <!-- ========== -->
+
+    <developers>
+        <developer>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Davanum Srinivas</name>
+            <id>dims</id>
+            <email>dims AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Paul Fremantle</name>
+            <id>paul</id>
+            <email>paul AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Eran Chinthaka</name>
+            <id>chinthaka</id>
+            <email>chinthaka AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~chinthaka</url>
+        </developer>
+        <developer>
+            <name>Deepal Jayasinghe</name>
+            <id>deepal</id>
+            <email>deepal AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~deepal</url>
+        </developer>
+        <developer>
+            <name>Ajith Ranabahu</name>
+            <id>ajith</id>
+            <email>ajith AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~ajith</url>
+        </developer>
+        <developer>
+            <name>Ruchith Fernando</name>
+            <id>ruchith</id>
+            <email>ruchithf AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Saminda Abeyruwan</name>
+            <id>saminda</id>
+            <email>saminda AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Chamil Thanthrimudalige</name>
+            <id>chamil</id>
+            <email>chamil AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Sathish Kumar</name>
+            <id>sathish</id>
+            <email>sathish AT infravio.com</email>
+            <organization>Infravio</organization>
+        </developer>
+        <developer>
+            <name>Vikas Roonwal</name>
+            <id>Vikas</id>
+            <email>Vikas AT infravio.com</email>
+            <organization>Infravio</organization>
+        </developer>
+    </developers>
+
+
+    <!-- build information for the project -->
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+
+        <!--
+            <sourceModifications>
+                <sourceModification>
+                    <className>fakeClass</className>
+                    <excludes>
+                        <exclude>org/apache/axis2</exclude>
+                        <exclude>**/_*.java</exclude>
+                    </excludes>
+                </sourceModification>
+            </sourceModifications
+
+        -->
+        <unitTest>
+
+            <!--<excludes>-->
+                <!--<exclude></exclude>-->
+            <!--</excludes>-->
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+
+            <resources>
+                <resource>
+                    <directory>${basedir}/test-resources</directory>
+                </resource>
+                <resource>
+                    <directory>conf</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>src</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                        <include>**/*.xml</include>
+                        <include>**/*.xsl</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>test</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                        <include>**/*.xml</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+    </build>
+
+    <dependencies>
+        <!-- Axis2 Jars-->
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>${commons.discovery.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+            <url>http://dist.codehaus.org/stax/jars/</url>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax</artifactId>
+            <version>${stax.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>${stax.api.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>${axis.wsdl4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+                <properties>
+                    <classloader>root</classloader>
+            </properties>
+        </dependency>
+        
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>${jaxen.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <!-- other jars -->
+
+
+    </dependencies>
+
+
+    <!-- ======= -->
+    <!-- Reports -->
+    <!-- ======= -->
+
+    <reports>
+        <report>maven-changes-plugin</report>
+    </reports>
+
+</project>
+

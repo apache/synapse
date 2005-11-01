@@ -10,8 +10,8 @@ import org.apache.synapse.engine.SynapseEngine;
 public class SynapseMessageReceiver extends AbstractInMessageReceiver {
     public void invokeBusinessLogic(MessageContext messageContext)
             throws AxisFault {
-        SynapseEngine synapseEngine = (SynapseEngine) messageContext
-                .getProperty(SynapseConstants.SYNAPSE_ENGINE);
+       SynapseEngine synapseEngine = (SynapseEngine) messageContext
+                .getParameter(SynapseConstants.SYNAPSE_ENGINE).getValue();
         synapseEngine.processIncoming(messageContext);
     }
 }

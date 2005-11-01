@@ -2,6 +2,7 @@ package org.apache.synapse.engine;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
 import org.apache.axis2.context.MessageContext;
@@ -30,13 +31,17 @@ public class SynapseEngine {
     private RuleSelector outgoingPostStageRuleSelector;
 
     private AxisConfiguration axisConfig;
+    private AxisServiceGroup mediatorServiceGroup;
 
     /**
      *
      */
     public void init(SynapseConfiguration synapseConfiguration)
             throws SynapseException {
+        //todo : Deepal , the axisConfiguartion creation has to be improevd
         axisConfig = new AxisConfigurationImpl();
+        mediatorServiceGroup = new AxisServiceGroup(axisConfig);
+        mediatorServiceGroup.setServiceGroupName("mediator_service_group");
         incomingPreStageRuleSelector = createRuleSelector(
                 synapseConfiguration.getIncomingPreStageRuleSet());
         incomingProcessingStageRuleSelector = createRuleSelector(
@@ -50,6 +55,13 @@ public class SynapseEngine {
                 synapseConfiguration.getOutgoingProcessingStageRuleSet());
         outgoingPostStageRuleSelector = createRuleSelector(
                 synapseConfiguration.getOutgoingPostStageRuleSet());
+
+        // adding service group into axisConfig
+        try {
+            axisConfig.addServiceGroup(mediatorServiceGroup);
+        } catch (AxisFault axisFault) {
+            throw new SynapseException(axisFault);
+        }
     }
 
     public void processIncoming(MessageContext messageContext) {
@@ -182,7 +194,7 @@ public class SynapseEngine {
                     String moduleName = (String) qoslist.get(j);
                     //todo engage all the mdoule to the service
                 }
-                axisConfig.addService(service);
+                mediatorServiceGroup.addService(service);
 //                rule.setAxisConfig();
             }
             return ruleSelector;

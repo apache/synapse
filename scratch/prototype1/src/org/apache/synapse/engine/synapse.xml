@@ -16,5 +16,4 @@
         <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="PROCESS"/>
         <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="OUT"/>
     </direction>
-
 </synapse>

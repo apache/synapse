@@ -1,4 +1,4 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.util;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,7 +1,8 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.rule;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMElement;
+import org.apache.synapse.rule.Rule;
 
 import java.util.Iterator;
 

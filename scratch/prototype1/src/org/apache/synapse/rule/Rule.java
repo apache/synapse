@@ -1,4 +1,4 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.rule;
 
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.synapse.mediator.Mediator;

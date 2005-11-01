@@ -1,6 +1,6 @@
 <synapse>
     <direction name="incomming">
-        <ruleSet class="org.apache.synapse.engine.RuleSelectorImpl" stage="IN">
+        <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="IN">
             <rule name="Rule1">
                 <xpath>*</xpath>
                 <mediator name="Log"/>
@@ -8,13 +8,13 @@
                 <qos>Addressing</qos>
             </rule>
         </ruleSet>
-        <ruleSet class="org.apache.synapse.engine.RuleSelectorImpl" stage="PROCESS"/>
-        <ruleSet class="org.apache.synapse.engine.RuleSelectorImpl" stage="OUT"/>
+        <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="PROCESS"/>
+        <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="OUT"/>
     </direction>
     <direction name="outgoing">
-        <ruleSet class="org.apache.synapse.engine.RuleSelectorImpl" stage="IN"/>
-        <ruleSet class="org.apache.synapse.engine.RuleSelectorImpl" stage="PROCESS"/>
-        <ruleSet class="org.apache.synapse.engine.RuleSelectorImpl" stage="OUT"/>
+        <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="IN"/>
+        <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="PROCESS"/>
+        <ruleSet class="org.apache.synapse.rule.RuleSelectorImpl" stage="OUT"/>
     </direction>
 
 </synapse>

@@ -1,11 +1,12 @@
 package org.apache.synapse.engine;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisConfigurationImpl;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.transport.TransportSender;
@@ -31,6 +32,7 @@ public class SynapseEngine {
     private RuleSelector outgoingPostStageRuleSelector;
 
     private AxisConfiguration axisConfig;
+    private ConfigurationContext configContxt;
     private AxisServiceGroup mediatorServiceGroup;
 
     /**
@@ -40,6 +42,7 @@ public class SynapseEngine {
             throws SynapseException {
         //todo : Deepal , the axisConfiguartion creation has to be improevd
         axisConfig = new AxisConfigurationImpl();
+        configContxt = new ConfigurationContext(axisConfig);
         mediatorServiceGroup = new AxisServiceGroup(axisConfig);
         mediatorServiceGroup.setServiceGroupName("mediator_service_group");
         incomingPreStageRuleSelector = createRuleSelector(
@@ -165,7 +168,7 @@ public class SynapseEngine {
         Iterator inStageRulesIter = ruleSelector.match(messageContext);
         while (inStageRulesIter.hasNext() && proceed) {
             rule = (Rule) inStageRulesIter.next();
-            proceed = RuleExecutor.execute(rule, messageContext);
+            proceed = RuleExecutor.execute(rule, messageContext,configContxt);
         }
     }
 
@@ -210,7 +213,7 @@ public class SynapseEngine {
         Rule rule;
         while (proceed && (rule = ruleSelector
                 .getBestMatch(messageContext)) != null) {
-            proceed = RuleExecutor.execute(rule, messageContext);
+            proceed = RuleExecutor.execute(rule, messageContext,configContxt);
         }
     }
 

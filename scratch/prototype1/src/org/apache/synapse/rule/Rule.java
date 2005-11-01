@@ -9,7 +9,6 @@ import java.util.List;
 public class Rule {
 
     private Mediator[] mediators;
-    private AxisConfiguration axisConfig;
     private List qosModules;
     private String name;
 
@@ -21,15 +20,6 @@ public class Rule {
 
         this.mediators = mediators;
     }
-
-    public AxisConfiguration getAxisConfig() {
-        return axisConfig;
-    }
-
-    public void setAxisConfig(AxisConfiguration axisConfig) {
-        this.axisConfig = axisConfig;
-    }
-
     public List getQosModules() {
         return qosModules;
     }

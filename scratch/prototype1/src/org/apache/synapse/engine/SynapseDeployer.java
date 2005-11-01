@@ -1,21 +1,21 @@
 package org.apache.synapse.engine;
 
-import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMAttribute;
+import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Iterator;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -44,8 +44,8 @@ public class SynapseDeployer {
         this.synpseConfig = synpseConfig;
     }
 
-    public SynapseConfiguration populteConfig() throws SynapseException{
-        SynapseConfiguration synConfig = new  SynapseConfiguration();
+    public SynapseConfiguration populteConfig() throws SynapseException {
+        SynapseConfiguration synConfig = new SynapseConfiguration();
         try {
             InputStream in = new FileInputStream(synpseConfig);
             XMLStreamReader xmlReader =
@@ -57,43 +57,43 @@ public class SynapseDeployer {
             Iterator disElements = element.getChildrenWithName(new QName(SynapseConstants.DIRECTION_IN));
             while (disElements.hasNext()) {
                 OMElement omElement = (OMElement) disElements.next();
-                OMAttribute nameatt =   omElement.getAttribute(new QName("name"));
-                if(nameatt !=null){
-                    if(SynapseConstants.DIRECTION_IN.equals(nameatt.getAttributeValue())){
+                OMAttribute nameatt = omElement.getAttribute(new QName("name"));
+                if (nameatt != null) {
+                    if (SynapseConstants.DIRECTION_IN.equals(nameatt.getAttributeValue())) {
                         Iterator rulitr = omElement.getChildrenWithName(new QName("ruleSet"));
                         while (rulitr.hasNext()) {
                             OMElement rulset = (OMElement) rulitr.next();
                             OMAttribute stageAtt = rulset.getAttribute(new QName("stage"));
-                            if(stageAtt != null){
+                            if (stageAtt != null) {
                                 String satge = stageAtt.getAttributeValue();
-                                if(SynapseConstants.STAGE_IN.equals(satge)){
+                                if (SynapseConstants.STAGE_IN.equals(satge)) {
                                     synConfig.setIncomingPreStageRuleSet(rulset);
-                                } else if(SynapseConstants.STAGE_PROCESS.equals(satge)){
+                                } else if (SynapseConstants.STAGE_PROCESS.equals(satge)) {
                                     synConfig.setIncomingProcessingStageRuleSet(rulset);
-                                } else if (SynapseConstants.STAGE_OUT.equals(satge)){
+                                } else if (SynapseConstants.STAGE_OUT.equals(satge)) {
                                     synConfig.setIncomingPostStageRuleSet(rulset);
                                 }
                             }
                         }
-                    }   else if(SynapseConstants.DIRECTION_OUT.equals(nameatt.getAttributeValue())){
+                    } else if (SynapseConstants.DIRECTION_OUT.equals(nameatt.getAttributeValue())) {
                         Iterator rulitr = omElement.getChildrenWithName(new QName("ruleSet"));
                         while (rulitr.hasNext()) {
                             OMElement rulset = (OMElement) rulitr.next();
                             OMAttribute stageAtt = rulset.getAttribute(new QName("stage"));
-                            if(stageAtt != null){
+                            if (stageAtt != null) {
                                 String satge = stageAtt.getAttributeValue();
-                                if(SynapseConstants.STAGE_IN.equals(satge)){
+                                if (SynapseConstants.STAGE_IN.equals(satge)) {
                                     synConfig.setOutgoingPreStageRuleSet(rulset);
-                                } else if(SynapseConstants.STAGE_PROCESS.equals(satge)){
+                                } else if (SynapseConstants.STAGE_PROCESS.equals(satge)) {
                                     synConfig.setOutgoingProcessingStageRuleSet(rulset);
-                                } else if (SynapseConstants.STAGE_OUT.equals(satge)){
+                                } else if (SynapseConstants.STAGE_OUT.equals(satge)) {
                                     synConfig.setOutgoingPostStageRuleSet(rulset);
                                 }
                             }
                         }
                     }
-                }   else {
-                    throw new SynapseException("direction name requird") ;
+                } else {
+                    throw new SynapseException("direction name requird");
                 }
             }
         } catch (FileNotFoundException e) {

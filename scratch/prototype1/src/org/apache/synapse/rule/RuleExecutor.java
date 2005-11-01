@@ -15,10 +15,8 @@ import org.apache.synapse.rule.Rule;
 
 public class RuleExecutor {
     // this should get a mediator and should invoke it with an AxisEngine
-    public static boolean execute(Rule rule, MessageContext messageContext) throws SynapseException {
+    public static boolean execute(Rule rule, MessageContext messageContext,ConfigurationContext configurationContext) throws SynapseException {
         try {
-            ConfigurationContext configurationContext = new ConfigurationContext(
-                    rule.getAxisConfig());
             AxisEngine engine = new AxisEngine(configurationContext);
             MessageContext newMessageContext = copyMessageContext(messageContext,
                     configurationContext);

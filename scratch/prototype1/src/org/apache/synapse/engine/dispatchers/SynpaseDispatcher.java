@@ -1,12 +1,11 @@
 package org.apache.synapse.engine.dispatchers;
 
-import org.apache.axis2.engine.AbstractDispatcher;
-import org.apache.axis2.description.HandlerDescription;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.HandlerDescription;
+import org.apache.axis2.engine.AbstractDispatcher;
 import org.apache.synapse.SynapseConstants;
 
 import javax.xml.namespace.QName;
@@ -47,7 +46,7 @@ public class SynpaseDispatcher extends AbstractDispatcher {
     }
 
     public AxisOperation findOperation(AxisService service,
-                                              MessageContext messageContext) throws AxisFault {
+                                       MessageContext messageContext) throws AxisFault {
         return service.getOperation(SynapseConstants.SYNAPSE_OPERATION);
     }
 

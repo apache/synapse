@@ -1,4 +1,4 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.rule;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -11,6 +11,7 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.miheaders.RelatesTo;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.rule.Rule;
 
 public class RuleExecutor {
     // this should get a mediator and should invoke it with an AxisEngine
@@ -38,7 +39,7 @@ public class RuleExecutor {
      * @param configurationContext
      */
     private static MessageContext copyMessageContext(MessageContext inMessageContext,
-                                              ConfigurationContext configurationContext) throws SynapseException {
+                                                     ConfigurationContext configurationContext) throws SynapseException {
         MessageContext newmsgCtx =
                 null;
         try {

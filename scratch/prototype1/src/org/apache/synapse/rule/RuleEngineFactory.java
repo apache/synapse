@@ -1,4 +1,6 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.rule;
+
+import org.apache.synapse.rule.Rule;
 
 public class RuleEngineFactory {
 

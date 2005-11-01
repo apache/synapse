@@ -1,4 +1,4 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.messagereceiver;
 
 import org.apache.axis2.receivers.AbstractInMessageReceiver;
 import org.apache.axis2.context.MessageContext;

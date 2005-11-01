@@ -1,8 +1,10 @@
-package org.apache.synapse.engine;
+package org.apache.synapse.rule;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMAttribute;
+import org.apache.synapse.rule.Rule;
+import org.apache.synapse.rule.RuleSelector;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

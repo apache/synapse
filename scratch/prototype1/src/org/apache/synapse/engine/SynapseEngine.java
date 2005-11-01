@@ -10,6 +10,9 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.http.CommonsHTTPTransportSender;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.rule.Rule;
+import org.apache.synapse.rule.RuleExecutor;
+import org.apache.synapse.rule.RuleSelector;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

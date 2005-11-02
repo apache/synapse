@@ -54,7 +54,7 @@ public class SynapseDeployer {
             StAXOMBuilder staxOMBuilder = new StAXOMBuilder(fac, xmlReader);
             OMElement element = staxOMBuilder.getDocumentElement();
             element.build();
-            Iterator disElements = element.getChildrenWithName(new QName(SynapseConstants.DIRECTION_IN));
+            Iterator disElements = element.getChildElements();
             while (disElements.hasNext()) {
                 OMElement omElement = (OMElement) disElements.next();
                 OMAttribute nameatt = omElement.getAttribute(new QName("name"));

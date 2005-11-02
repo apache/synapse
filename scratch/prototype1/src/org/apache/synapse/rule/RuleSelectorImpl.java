@@ -5,6 +5,8 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMAttribute;
 import org.apache.synapse.rule.Rule;
 import org.apache.synapse.rule.RuleSelector;
+import org.apache.synapse.mediator.Mediator;
+import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -22,21 +24,32 @@ public class RuleSelectorImpl implements RuleSelector {
      * a particular stage for a given direction
      * In other words, RuleSelector should be created per stage per direction
      */
-    public void init(OMElement ruleSet) {
+    public void init(OMElement ruleSet) throws SynapseException {
         ArrayList ruleslist = new ArrayList();
         Iterator itsruls = ruleSet.getChildrenWithName(new QName("rule"));
         while (itsruls.hasNext()) {
-            OMElement ruleelement = (OMElement) itsruls.next();
-            OMAttribute attributeName = ruleelement.getAttribute(new QName("name"));
+            OMElement ruleElement = (OMElement) itsruls.next();
+            OMAttribute attributeName = ruleElement.getAttribute(new QName("name"));
             if(attributeName != null){
                 String rulename = attributeName.getAttributeValue();
                 Rule rule = new Rule();
-                Iterator mediatoes =  ruleelement.getChildrenWithName(new QName("mediator"));
+                Iterator mediatoes =  ruleElement.getChildrenWithName(new QName("mediator"));
+                ArrayList mediatorList = new ArrayList();
                 while (mediatoes.hasNext()) {
                     OMElement mediatorElement = (OMElement) mediatoes.next();
-                    OMAttribute mediatorName = mediatorElement.getAttribute(new QName("name"));
+                    OMAttribute mediatorName = mediatorElement.getAttribute(new QName("name")); //what is the use of this
+                    OMAttribute mediatorImplClass = mediatorElement.getAttribute(new QName("class"));
+
+                    try {
+                        Mediator mediator = (Mediator) Class.forName(mediatorImplClass.getAttributeValue()).newInstance();
+                        mediatorList.add(mediator);
+                    } catch (Exception e){
+                        throw new SynapseException(e);
+                    }
+
                     //todo: Deepal mediator has to create and add the rule
                 }
+                rule.setMediators((Mediator[])mediatorList.toArray(new Mediator[mediatorList.size()]));
                 rule.setName(rulename);
                 ruleslist.add(rule);
             }

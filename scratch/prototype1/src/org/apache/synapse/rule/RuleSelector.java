@@ -3,6 +3,7 @@ package org.apache.synapse.rule;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMElement;
 import org.apache.synapse.rule.Rule;
+import org.apache.synapse.SynapseException;
 
 import java.util.Iterator;
 
@@ -16,7 +17,7 @@ public interface RuleSelector {
      * a particular stage for a given direction
      * In other words, RuleSelector should be created per stage per direction
      */
-    public void init(OMElement ruleSet);
+    public void init(OMElement ruleSet) throws SynapseException;
 
 
     Rule [] getRules();

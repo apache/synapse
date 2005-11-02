@@ -11,6 +11,7 @@ public class Rule {
     private Mediator[] mediators;
     private List qosModules;
     private String name;
+    private String xpath;
 
     public Mediator[] getMediators() {
         return mediators;
@@ -34,5 +35,11 @@ public class Rule {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public String getXpath() {
+        return xpath;
+    }
+    public void setXpath(String xpath) {
+        this.xpath = xpath;    
     }
 }

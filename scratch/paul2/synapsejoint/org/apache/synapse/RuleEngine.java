@@ -45,7 +45,7 @@ public class RuleEngine {
 	}
 	
 	public void process(MessageContext messageContext) {
-		System.out.println("starting process");
+		System.out.println("starting process"+messageContext.getSystemContext().getAxisConfiguration().hashCode());
 		
 		Iterator iterator = rl.iterator();
 		while (iterator.hasNext()) {

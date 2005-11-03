@@ -22,9 +22,11 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.synapse.RuleEngine;
 
 public class SynapseMessageReceiver implements MessageReceiver {
-	// THIS IS THE 
+	
 	
 	public void receive(MessageContext mc) throws AxisFault {
+		System.out.println("received by SMR");
+		System.out.println(mc.getSystemContext().getAxisConfiguration().hashCode());
 		RuleEngine ruleEngine = Axis2RuleEngineFinder.getRuleEngine(mc);
 		ruleEngine.process(mc);
 	}

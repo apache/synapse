@@ -46,34 +46,25 @@ public class Sender {
 					messageContext);
 
 			AxisOperation ao = messageContext.getAxisOperation();
-
-			MessageContext outMsgContext = call.invokeBlocking(ao,
-					messageContext);
-
-			outMsgContext.setConfigurationContext(sc);
-
-			System.out.println(messageContext.getSystemContext()
-					.getAxisConfiguration().hashCode());
 			AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
 
-			// outMsgContext.getSystemContext().getAxisConfiguration().addParameter(messageContext.getSystemContext().getAxisConfiguration().getParameter(Axis2RuleEngineFinder.RULE_ENGINE));
-			// run all rules again
-			outMsgContext.setServerSide(true);
+			if (messageContext.getProperty("response") == null
+					|| messageContext.getProperty("response") == Boolean.TRUE) {
 
-			// deal with the fact that AddressingOutHandler has a bug if
-			// there
-			// is no header at all.
-			if (outMsgContext.getEnvelope().getHeader() == null)
-				outMsgContext.getEnvelope().getBody().insertSiblingBefore(
-						OMAbstractFactory.getSOAP11Factory()
-								.getDefaultEnvelope().getHeader());
+				MessageContext outMsgContext = call.invokeBlocking(ao,
+						messageContext);
+				outMsgContext.setConfigurationContext(sc);
 
-			if (outMsgContext.getProperty("response") == null
-					|| outMsgContext.getProperty("response") == Boolean.TRUE) {
-				System.out.println("receive");
-				outMsgContext.setAxisService(synapseService);
-				outMsgContext.setAxisOperation(synapseOperation);
-				outMsgContext.setProperty("response", new Boolean(true));
+				// run all rules on response
+				outMsgContext.setServerSide(true);
+
+				// deal with the fact that AddressingOutHandler has a bug if
+				// there
+				// is no header at all.
+				if (outMsgContext.getEnvelope().getHeader() == null)
+					outMsgContext.getEnvelope().getBody().insertSiblingBefore(
+							OMAbstractFactory.getSOAP11Factory()
+									.getDefaultEnvelope().getHeader());
 				Object os = messageContext
 						.getProperty(MessageContext.TRANSPORT_OUT);
 				outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
@@ -81,20 +72,15 @@ public class Sender {
 						.getProperty(HTTPConstants.HTTPOutTransportInfo);
 				outMsgContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
 						ti);
+				outMsgContext.setAxisService(synapseService);
+				outMsgContext.setAxisOperation(synapseOperation);
+
+				outMsgContext.setProperty("response", new Boolean(true));
+
 				ae.receive(outMsgContext);
 
 			} else {
-
-				System.out.println("send");
-				Object os = messageContext
-						.getProperty(MessageContext.TRANSPORT_OUT);
-				outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
-				Object ti = messageContext
-						.getProperty(HTTPConstants.HTTPOutTransportInfo);
-				outMsgContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
-						ti);
-				// respond to client
-				ae.send(outMsgContext);
+				ae.send(messageContext);
 			}
 		} catch (AxisFault e) {
 			throw new SynapseException(e);

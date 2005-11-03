@@ -58,8 +58,7 @@ public class MediatorMessageReceiver extends AbstractMessageReceiver {
         AxisService axisService = msgContext.getOperationContext()
                 .getServiceContext().getAxisService();
         MediatorDescription md = new MediatorDescription(axisService);
-        System.out.println(axisService.getAxisServiceName());
-
+        
         Parameter param = axisService.getParameter(SERVICE_CLASS);
         String className = (String) param.getValue();
 

@@ -26,6 +26,7 @@ public class Expression {
 	public Expression(String expr) {
 		try {
 			this.xp = new AXIOMXPath(expr);
+
 		} catch (JaxenException je) {
 			throw new SynapseException(je);
 		}
@@ -39,5 +40,14 @@ public class Expression {
 		}
 
 	}
+	public void addNamespace(String prefix, String uri) {
+		if (xp!=null) { 
+			try {
+				xp.addNamespace(prefix, uri);
+			}catch (JaxenException je) { throw new SynapseException(je); }
+		}
+		else throw new SynapseException("XPath not yet initialised");
+	}
 
 }
+ 

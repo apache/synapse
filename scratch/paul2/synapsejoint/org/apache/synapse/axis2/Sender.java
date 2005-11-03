@@ -17,9 +17,9 @@ package org.apache.synapse.axis2;
 
 import javax.xml.stream.FactoryConfigurationError;
 
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.clientapi.Call;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
@@ -37,6 +37,7 @@ public class Sender {
 		try {
 			Call call = new Call();
 			call.setTo(messageContext.getTo());
+			ConfigurationContext sc = messageContext.getSystemContext();
 
 			SynapseDispatcher sd = new SynapseDispatcher();
 			sd.initDispatcher();
@@ -49,36 +50,57 @@ public class Sender {
 			MessageContext outMsgContext = call.invokeBlocking(ao,
 					messageContext);
 
+			outMsgContext.setConfigurationContext(sc);
+
+			System.out.println(messageContext.getSystemContext()
+					.getAxisConfiguration().hashCode());
 			AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
 
-			// deal with the fact that AddressingOutHandler has a bug if there
+			// outMsgContext.getSystemContext().getAxisConfiguration().addParameter(messageContext.getSystemContext().getAxisConfiguration().getParameter(Axis2RuleEngineFinder.RULE_ENGINE));
+			// run all rules again
+			outMsgContext.setServerSide(true);
+
+			// deal with the fact that AddressingOutHandler has a bug if
+			// there
 			// is no header at all.
 			if (outMsgContext.getEnvelope().getHeader() == null)
 				outMsgContext.getEnvelope().getBody().insertSiblingBefore(
 						OMAbstractFactory.getSOAP11Factory()
 								.getDefaultEnvelope().getHeader());
 
-			outMsgContext.setAxisService(synapseService);
-			outMsgContext.setAxisOperation(synapseOperation);
+			if (outMsgContext.getProperty("response") == null
+					|| outMsgContext.getProperty("response") == Boolean.TRUE) {
+				System.out.println("receive");
+				outMsgContext.setAxisService(synapseService);
+				outMsgContext.setAxisOperation(synapseOperation);
+				outMsgContext.setProperty("response", new Boolean(true));
+				Object os = messageContext
+						.getProperty(MessageContext.TRANSPORT_OUT);
+				outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
+				Object ti = messageContext
+						.getProperty(HTTPConstants.HTTPOutTransportInfo);
+				outMsgContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
+						ti);
+				ae.receive(outMsgContext);
 
-			// run all rules again
-			ae.receive(outMsgContext);
+			} else {
 
-			Object os = messageContext
-					.getProperty(MessageContext.TRANSPORT_OUT);
-			outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
-			Object ti = messageContext
-					.getProperty(HTTPConstants.HTTPOutTransportInfo);
-			outMsgContext.setProperty(HTTPConstants.HTTPOutTransportInfo, ti);
-
-			// respond to client
-			ae.send(outMsgContext);
-
+				System.out.println("send");
+				Object os = messageContext
+						.getProperty(MessageContext.TRANSPORT_OUT);
+				outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
+				Object ti = messageContext
+						.getProperty(HTTPConstants.HTTPOutTransportInfo);
+				outMsgContext.setProperty(HTTPConstants.HTTPOutTransportInfo,
+						ti);
+				// respond to client
+				ae.send(outMsgContext);
+			}
 		} catch (AxisFault e) {
 			throw new SynapseException(e);
 		} catch (FactoryConfigurationError e) {
 			throw new SynapseException(e);
-			
+
 		}
 	}
 

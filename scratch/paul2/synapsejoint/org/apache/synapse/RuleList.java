@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 
 
 import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.synapse.axis2.Expression;
 
@@ -51,6 +52,7 @@ public class RuleList extends ArrayList {
 			StAXOMBuilder builder = new StAXOMBuilder(xsr);
 			OMElement rulelist = builder.getDocumentElement();
 			
+			
 		
 			
 			if (!rulelist.getQName().equals(rulelistQ)) throw new Exception("not a "+rulelistQ.toString()+" element");
@@ -67,7 +69,15 @@ public class RuleList extends ArrayList {
 				OMElement rule = (OMElement)ruleIt.next();
 				Rule r = new Rule();
 				if (rule.getAttribute(xpathQ)==null) throw new Exception("missing "+xpathQ.toString()+" attribute");
-				r.setExpression(new Expression(rule.getAttribute(xpathQ).getAttributeValue()));
+				
+				Expression expr = new Expression(rule.getAttribute(xpathQ).getAttributeValue());
+				Iterator i = rulelist.getAllDeclaredNamespaces();
+				while (i.hasNext()) {
+					OMNamespace n = (OMNamespace)i.next();
+					expr.addNamespace(n.getPrefix(),n.getName());
+				}
+					
+				r.setExpression(expr);
 				if (rule.getAttribute(mediatorQ)==null) throw new Exception("missing "+mediatorQ.toString()+" attribute");
 				r.setMediatorName(rule.getAttribute(mediatorQ).getAttributeValue());
 				if (rule.getAttribute(reliableQ)!=null) r.setReliable(isTrue(rule.getAttribute(reliableQ).getAttributeValue()));

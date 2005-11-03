@@ -38,6 +38,8 @@ public class MediatorExecutor {
 		ConfigurationContext cc = messageContext.getSystemContext(); 
 		AxisConfiguration ac = cc.getAxisConfiguration();
 		AxisEngine ae = new AxisEngine(cc);
+		System.out.println("medex"+cc.hashCode());
+	
 		AxisService as = null;
 		AxisOperation ao = null;
 		try {
@@ -52,7 +54,7 @@ public class MediatorExecutor {
 		                .getAxisSpecifMEPConstant(), ao);
 		        ao.registerOperationContext(messageContext, oc);
 
-		        ServiceContext sc = Utils.fillContextInformation(ao, as, messageContext.getSystemContext());
+		        ServiceContext sc = Utils.fillContextInformation(ao, as, cc);//messageContext.getSystemContext());
 		        oc.setParent(sc);
 		        messageContext.setOperationContext(oc);
 		        messageContext.setServiceContext(sc);

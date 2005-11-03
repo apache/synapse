@@ -28,21 +28,15 @@ import org.apache.synapse.SynapseException;
 public class Axis2RuleEngineFinder {
 	private static final String RULE_LIST_XMLFILE = "RuleListXMLFile";
 
-	private static final String RULE_ENGINE = "org.apache.synapse.RuleEngine";
-
-	public static RuleEngine getRuleEngine(MessageContext mc) {
-
+	public static final String RULE_ENGINE = "org.apache.synapse.RuleEngine";
+	
+	
+	public static synchronized RuleEngine getRuleEngine(MessageContext mc) {
+		
 		AxisConfiguration ac = mc.getSystemContext().getAxisConfiguration();
-		Parameter ruleEngineParam = getRuleEngineParameter(ac);
-		RuleEngine ruleEngine = (RuleEngine) ruleEngineParam.getValue();
-		return ruleEngine;
-	}
-
-	protected static synchronized Parameter getRuleEngineParameter(
-			AxisConfiguration ac) {
-		Parameter ruleEngineParam = null;
-		ruleEngineParam = ac.getParameter(RULE_ENGINE);
+		Parameter ruleEngineParam = ac.getParameter(RULE_ENGINE);
 		if (ruleEngineParam == null) {
+			System.out.println("setting rule engine on"+ac.hashCode());
 			Parameter param = ac.getParameter(RULE_LIST_XMLFILE);
 			if (param == null) {
 				throw new SynapseException("no parameter '" + RULE_LIST_XMLFILE
@@ -58,8 +52,9 @@ public class Axis2RuleEngineFinder {
 				throw new SynapseException(e);
 			}
 		}
-		return ruleEngineParam;
-
+		RuleEngine ruleEngine = (RuleEngine) ruleEngineParam.getValue();
+		return ruleEngine;
 	}
+
 
 }

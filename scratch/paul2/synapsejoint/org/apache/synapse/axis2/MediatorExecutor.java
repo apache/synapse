@@ -38,8 +38,7 @@ public class MediatorExecutor {
 		ConfigurationContext cc = messageContext.getSystemContext(); 
 		AxisConfiguration ac = cc.getAxisConfiguration();
 		AxisEngine ae = new AxisEngine(cc);
-		System.out.println("medex"+cc.hashCode());
-	
+			
 		AxisService as = null;
 		AxisOperation ao = null;
 		try {
@@ -59,7 +58,7 @@ public class MediatorExecutor {
 		        messageContext.setOperationContext(oc);
 		        messageContext.setServiceContext(sc);
 
-			System.out.println("about to try mediate");
+			
 			ae.receive(messageContext);
 			} else throw new SynapseException("Mediator "+mediatorName+" is not registered as a service in the current Axis Configuration");
 		} catch (AxisFault e) {

@@ -25,8 +25,6 @@ public class SynapseMessageReceiver implements MessageReceiver {
 	
 	
 	public void receive(MessageContext mc) throws AxisFault {
-		System.out.println("received by SMR");
-		System.out.println(mc.getSystemContext().getAxisConfiguration().hashCode());
 		RuleEngine ruleEngine = Axis2RuleEngineFinder.getRuleEngine(mc);
 		ruleEngine.process(mc);
 	}

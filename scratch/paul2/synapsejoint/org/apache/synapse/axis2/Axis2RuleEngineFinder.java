@@ -29,14 +29,13 @@ public class Axis2RuleEngineFinder {
 	private static final String RULE_LIST_XMLFILE = "RuleListXMLFile";
 
 	public static final String RULE_ENGINE = "org.apache.synapse.RuleEngine";
-	
-	
+
 	public static synchronized RuleEngine getRuleEngine(MessageContext mc) {
-		
+
 		AxisConfiguration ac = mc.getSystemContext().getAxisConfiguration();
 		Parameter ruleEngineParam = ac.getParameter(RULE_ENGINE);
 		if (ruleEngineParam == null) {
-			System.out.println("setting rule engine on"+ac.hashCode());
+
 			Parameter param = ac.getParameter(RULE_LIST_XMLFILE);
 			if (param == null) {
 				throw new SynapseException("no parameter '" + RULE_LIST_XMLFILE
@@ -55,6 +54,5 @@ public class Axis2RuleEngineFinder {
 		RuleEngine ruleEngine = (RuleEngine) ruleEngineParam.getValue();
 		return ruleEngine;
 	}
-
 
 }

@@ -45,7 +45,7 @@ public class RuleEngine {
 	}
 	
 	public void process(MessageContext messageContext) {
-		System.out.println("starting process"+messageContext.getSystemContext().getAxisConfiguration().hashCode());
+		
 		
 		Iterator iterator = rl.iterator();
 		while (iterator.hasNext()) {
@@ -53,14 +53,13 @@ public class RuleEngine {
 				Expression e = r.getExpression();
 				if (e.match(messageContext))
 				{
-					System.out.println("matched mediator: "+r.getMediatorName());
+					
 					boolean cont = MediatorExecutor.execute(r.getMediatorName(), messageContext); 
 					if (!cont) return;
 				}
 		}
 		// send now
-		System.out.println("about to send");
-		
+			
 		Sender.send(messageContext);
 	}
 

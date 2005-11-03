@@ -1,6 +1,7 @@
 package org.apache.synapse.samples.mediators;
 
 import org.apache.synapse.mediator.Mediator;
+import org.apache.synapse.mediator.AbstractMediator;
 import org.apache.axis2.context.MessageContext;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -19,16 +20,9 @@ import org.apache.axis2.context.MessageContext;
 *
 */
 
-public class LogMediator implements Mediator {
+public class LogMediator extends AbstractMediator implements Mediator {
+
     public boolean mediate(MessageContext messageContext) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void addParameter(String key, Object value) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public Object getParameter(String key) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;  
     }
 }

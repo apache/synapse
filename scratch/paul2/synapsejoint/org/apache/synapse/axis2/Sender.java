@@ -15,23 +15,19 @@
  */
 package org.apache.synapse.axis2;
 
-
-
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
+
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.clientapi.Call;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 
 import org.apache.axis2.engine.AxisEngine;
 
-
 import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.util.Utils;
-
+import org.apache.axis2.transport.http.HTTPConstants;
 
 import org.apache.synapse.SynapseException;
 
@@ -42,54 +38,48 @@ public class Sender {
 			Call call = new Call();
 			call.setTo(messageContext.getTo());
 
-			System.out.println(messageContext.getTo().getAddress());
-			 
-			AxisOperation ao = messageContext.getAxisOperation();
-			System.out.println("sending");
-			MessageContext result = call.invokeBlocking(ao, messageContext); 
-			 
-	        
+			SynapseDispatcher sd = new SynapseDispatcher();
+			sd.initDispatcher();
+			AxisService synapseService = sd.findService(messageContext);
+			AxisOperation synapseOperation = sd.findOperation(synapseService,
+					messageContext);
 
-	        
-	        MessageContext outMsgContext = Utils.createOutMessageContext(messageContext);
-	        AxisEngine ae =
-	                new AxisEngine(
-	                        messageContext.getOperationContext().getServiceContext().getConfigurationContext());
-	        //hack alert
-            outMsgContext.setEnvelope(result.getEnvelope());
-            if (outMsgContext.getEnvelope().getHeader()==null) outMsgContext.getEnvelope().getBody().insertSiblingBefore(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope().getHeader());
-            result.getEnvelope().serialize(XMLOutputFactory.newInstance().createXMLStreamWriter(System.out));
-            //System.out.println("about to receive");
+			AxisOperation ao = messageContext.getAxisOperation();
+
+			MessageContext outMsgContext = call.invokeBlocking(ao,
+					messageContext);
+
+			AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
+
+			// deal with the fact that AddressingOutHandler has a bug if there
+			// is no header at all.
+			if (outMsgContext.getEnvelope().getHeader() == null)
+				outMsgContext.getEnvelope().getBody().insertSiblingBefore(
+						OMAbstractFactory.getSOAP11Factory()
+								.getDefaultEnvelope().getHeader());
+
+			outMsgContext.setAxisService(synapseService);
+			outMsgContext.setAxisOperation(synapseOperation);
+
+			// run all rules again
 			ae.receive(outMsgContext);
-			System.out.println("about to respond");
+
+			Object os = messageContext
+					.getProperty(MessageContext.TRANSPORT_OUT);
+			outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
+			Object ti = messageContext
+					.getProperty(HTTPConstants.HTTPOutTransportInfo);
+			outMsgContext.setProperty(HTTPConstants.HTTPOutTransportInfo, ti);
+
+			// respond to client
 			ae.send(outMsgContext);
-			
 
 		} catch (AxisFault e) {
 			throw new SynapseException(e);
-		} catch (XMLStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (FactoryConfigurationError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SynapseException(e);
+			
 		}
 	}
 
 }
-/* result.setServerSide(true);
-Object os = messageContext
-.getProperty(MessageContext.TRANSPORT_OUT);
-result.setProperty(MessageContext.TRANSPORT_OUT, os);
-Object ti = messageContext
-.getProperty(HTTPConstants.HTTPOutTransportInfo);
-result.setProperty(HTTPConstants.HTTPOutTransportInfo, ti);
-
-//if (result.getReplyTo()==null) result.setReplyTo(new EndpointReference("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
-//result.setAxisService(null);
-result.setAxisService()
-
-//result.setAxisOperation(null);
-result.setServerSide(true);
-//respMC.setProperty("synapseResponse", Boolean.TRUE);
-*/

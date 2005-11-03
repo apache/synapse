@@ -1,20 +1,18 @@
 package org.apache.synapse.rule;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMAttribute;
-import org.apache.synapse.rule.Rule;
-import org.apache.synapse.rule.RuleSelector;
-import org.apache.synapse.mediator.Mediator;
+import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediator.Mediator;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class RuleSelectorImpl implements RuleSelector {
 
-    private  Rule rules [];
+    private Rule rules [];
 
 
     /**
@@ -29,32 +27,53 @@ public class RuleSelectorImpl implements RuleSelector {
         Iterator itsruls = ruleSet.getChildrenWithName(new QName("rule"));
         while (itsruls.hasNext()) {
             OMElement ruleElement = (OMElement) itsruls.next();
-            OMAttribute attributeName = ruleElement.getAttribute(new QName("name"));
-            if(attributeName != null){
+            OMAttribute attributeName = ruleElement
+                    .getAttribute(new QName("name"));
+            if (attributeName != null) {
                 String rulename = attributeName.getAttributeValue();
                 Rule rule = new Rule();
-                Iterator mediatoes =  ruleElement.getChildrenWithName(new QName("mediator"));
+                Iterator mediatoes = ruleElement
+                        .getChildrenWithName(new QName("mediator"));
                 ArrayList mediatorList = new ArrayList();
                 while (mediatoes.hasNext()) {
                     OMElement mediatorElement = (OMElement) mediatoes.next();
-                    OMAttribute mediatorName = mediatorElement.getAttribute(new QName("name")); //what is the use of this
-                    OMAttribute mediatorImplClass = mediatorElement.getAttribute(new QName("class"));
-
+                    OMAttribute mediatorName = mediatorElement.getAttribute(
+                            new QName("name")); //what is the use of this
+                    OMAttribute mediatorImplClass = mediatorElement
+                            .getAttribute(new QName("class"));
+                    Mediator mediator;
                     try {
-                        Mediator mediator = (Mediator) Class.forName(mediatorImplClass.getAttributeValue()).newInstance();
+                        mediator = (Mediator) Class
+                                .forName(mediatorImplClass.getAttributeValue())
+                                .newInstance();
                         mediatorList.add(mediator);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         throw new SynapseException(e);
+                    }
+
+                    Iterator iteParam = ruleElement.getChildrenWithName(new QName("parameter"));
+                    if (iteParam != null) {
+                       // mediator.addParameter();
+                        //todo : adding mediator action paramenters 
                     }
 
                     //todo: Deepal mediator has to create and add the rule
                 }
-                rule.setMediators((Mediator[])mediatorList.toArray(new Mediator[mediatorList.size()]));
+                Iterator iteXpath = ruleElement
+                        .getChildrenWithName(new QName("xpath"));
+                if (iteXpath != null) {
+                    while (iteXpath.hasNext()) {
+                        OMElement xpathElement = (OMElement) iteXpath.next();
+                        rule.setXpath(xpathElement.getText());
+                    }
+                }
+                rule.setMediators((Mediator[]) mediatorList
+                        .toArray(new Mediator[mediatorList.size()]));
                 rule.setName(rulename);
                 ruleslist.add(rule);
             }
         }
-        rules =   (Rule[])ruleslist.toArray(new Rule[ruleslist.size()]);
+        rules = (Rule[]) ruleslist.toArray(new Rule[ruleslist.size()]);
     }
 
     public Rule [] getRules() {

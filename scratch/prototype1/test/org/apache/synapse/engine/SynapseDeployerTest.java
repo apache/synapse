@@ -33,21 +33,24 @@ public class SynapseDeployerTest extends TestCase {
 
         SynapseConfiguration config = deployer.populteConfig();
         System.out.println(config.getIncomingPreStageRuleSet());
-        System.out.println(config.getIncomingProcessingStageRuleSet().toString());
-        System.out.println(config.getIncomingPostStageRuleSet().toString());
 
-        System.out.println(config.getOutgoingPreStageRuleSet().toString());
-        System.out.println(config.getOutgoingProcessingStageRuleSet());
-        System.out.println(config.getOutgoingPostStageRuleSet());
+//        System.out.println(config.getIncomingProcessingStageRuleSet().toString());
+//        System.out.println(config.getIncomingPostStageRuleSet().toString());
+//
+//        System.out.println(config.getOutgoingPreStageRuleSet().toString());
+//        System.out.println(config.getOutgoingProcessingStageRuleSet());
+//        System.out.println(config.getOutgoingPostStageRuleSet());
 
         RuleSelectorImpl selectorImpl = new RuleSelectorImpl();
-        selectorImpl.init(config.getIncomingPreStageRuleSet());
+        selectorImpl.init(config.getIncomingPostStageRuleSet());
 
         Rule[] rules = selectorImpl.getRules();
         for (int i = 0 ; i < rules.length ; i++) {
             Rule pertRule = rules[i];
             System.out.println(pertRule.getName());
             System.out.println(pertRule.getMediators());
+            System.out.println();
+            System.out.println(pertRule.getXpath());
 
         }
 

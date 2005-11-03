@@ -1,8 +1,6 @@
-package org.apache.synapse.samples.mediators;
+package org.apache.synapse.mediator;
 
-import org.apache.synapse.mediator.Mediator;
-import org.apache.synapse.mediator.AbstractMediator;
-import org.apache.axis2.context.MessageContext;
+import java.util.HashMap;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -20,9 +18,18 @@ import org.apache.axis2.context.MessageContext;
 *
 */
 
-public class AdminMediator extends AbstractMediator implements Mediator{
+public abstract class AbstractMediator implements Mediator{
+    protected final HashMap mediatorActionList;
+    public AbstractMediator() {
+        mediatorActionList = new HashMap();
+    }
+    public void addParameter(String key, Object value) {
+        if ( value != null ) {
+            mediatorActionList.put(key,value);
+        }
+    }
 
-    public boolean mediate(MessageContext messageContext) {
-        return false;  
+    public Object getParameter(String key) {
+        return mediatorActionList.get(key);  
     }
 }

@@ -18,13 +18,13 @@ package org.apache.synapse;
 import org.apache.synapse.axis2.Expression;
 
 
-
 public class Rule {
 	private Expression expr= null;
 	private String mediatorName = null;
 	private boolean secure = false;
 	private boolean reliable = false;
 	private boolean transactional = false;
+	private Object beanFactory = null;
 	public void setExpression(Expression expr) {
 		this.expr = expr;
 	}
@@ -74,4 +74,9 @@ public class Rule {
 		
 		return sb.toString();
 	}
+	public void setSpringBeanFactory(Object bf) {
+		this.beanFactory  = bf;
+		
+	}
+	public Object getSpringBeanFactory() { return beanFactory; }
 }

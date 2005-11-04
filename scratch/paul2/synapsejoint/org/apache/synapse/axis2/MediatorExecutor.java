@@ -26,49 +26,84 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
+import org.apache.synapse.Rule;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediator.MediatorMessageReceiver;
 
 public class MediatorExecutor {
-		
+
 	// exexute mediators by calling them as services
 
-	public static boolean execute(String mediatorName, MessageContext messageContext) {
-		
-		ConfigurationContext cc = messageContext.getSystemContext(); 
+	public static boolean execute(Rule r, MessageContext messageContext) {
+
+		ConfigurationContext cc = messageContext.getSystemContext();
 		AxisConfiguration ac = cc.getAxisConfiguration();
 		AxisEngine ae = new AxisEngine(cc);
-			
+
 		AxisService as = null;
 		AxisOperation ao = null;
 		try {
-			
-			as = ac.getService(mediatorName);
-			if (as!=null) {
+			if (r.getSpringBeanFactory() != null) {
+				as = ac.getService("springmediator");
+				messageContext.setProperty(
+						"synapse.mediator.spring.beanFactory", r
+								.getSpringBeanFactory());
+				messageContext.setProperty("synapse.spring.mediatorName", r
+						.getMediatorName());
+
+			}
+			if (as == null) {
+
+				as = ac.getService(r.getMediatorName());
+			}
+			if (as == null) {
+				Class c = null;
+				try {
+					c = messageContext.getSystemContext()
+							.getAxisConfiguration().getService("classmediator")
+							.getClassLoader().loadClass(r.getMediatorName());
+
+				} catch (ClassNotFoundException ce) {
+
+				}
+
+				if (c != null) {
+					messageContext.setProperty("synapse.mediator.class", c);
+					as = ac.getService("classmediator");
+
+				}
+			}
+			if (as == null) {
+				throw new SynapseException(
+						"Mediator "
+								+ r.getMediatorName()
+								+ " is not registered as a service in the current Axis Configuration");
+			}
+
 			ao = as.getOperation("mediate");
-			messageContext.setAxisService(as);
+			OperationContext oc = OperationContextFactory
+					.createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
+			ao.registerOperationContext(messageContext, oc);
+
+			ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+			oc.setParent(sc);
+			messageContext.setOperationContext(oc);
+			messageContext.setServiceContext(sc);
+
+			System.out.println(r.getMediatorName() + ":" + as.getName());
+
 			messageContext.setAxisOperation(ao);
-			
-			 OperationContext oc = OperationContextFactory.createOperationContext(ao
-		                .getAxisSpecifMEPConstant(), ao);
-		        ao.registerOperationContext(messageContext, oc);
-
-		        ServiceContext sc = Utils.fillContextInformation(ao, as, cc);//messageContext.getSystemContext());
-		        oc.setParent(sc);
-		        messageContext.setOperationContext(oc);
-		        messageContext.setServiceContext(sc);
-
-			
+			messageContext.setAxisService(as);
 			ae.receive(messageContext);
-			} else throw new SynapseException("Mediator "+mediatorName+" is not registered as a service in the current Axis Configuration");
+
 		} catch (AxisFault e) {
 			throw new SynapseException(e);
+
 		}
-		
-		return ((Boolean)messageContext.getProperty(MediatorMessageReceiver.RESPONSE_PROPERTY)).booleanValue();
 
-		
-		
+		return ((Boolean) messageContext
+				.getProperty(MediatorMessageReceiver.RESPONSE_PROPERTY))
+				.booleanValue();
+
 	}
-
 }

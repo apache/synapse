@@ -48,6 +48,9 @@ public class Expression {
 		}
 		else throw new SynapseException("XPath not yet initialised");
 	}
+	public String toString() {
+		return xp.getRootExpr().getText();
+	}
 
 }
  

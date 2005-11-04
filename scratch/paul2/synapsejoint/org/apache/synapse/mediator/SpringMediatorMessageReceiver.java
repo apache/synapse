@@ -15,13 +15,20 @@
  */
 package org.apache.synapse.mediator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
 
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediator.Mediator;
 
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
 
 
 /**
@@ -46,9 +53,25 @@ public class SpringMediatorMessageReceiver implements MessageReceiver {
 
           
         
-        BeanFactory bf= (BeanFactory)msgContext.getProperty("synapse.mediator.spring.beanFactory");
-        String mediatorName = (String)msgContext.getProperty("synapse.spring.mediatorName");
-        Object o = bf.getBean(mediatorName);
+        byte[] xmlBytes= (byte[])msgContext.getProperty(Constants.SYNAPSE_MEDIATOR_XML_BYTES);
+        String mediatorName = (String)msgContext.getProperty(Constants.SYNAPSE_SPRING_MEDIATOR_NAME);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			baos.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">"
+							.getBytes());
+			baos.write(xmlBytes);
+		} catch (IOException e) {
+			throw new SynapseException(e);
+		}
+				
+		GenericApplicationContext ctx = new GenericApplicationContext();
+		XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(
+				ctx);
+		xbdr.setValidating(false);
+		xbdr.loadBeanDefinitions(new ByteArrayResource(baos.toByteArray()));
+		ctx.setClassLoader(msgContext.getAxisService().getClassLoader());
+		ctx.refresh();
+        Object o = ctx.getBean(mediatorName);
        	        
         return o;
     }

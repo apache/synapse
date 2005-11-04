@@ -33,9 +33,7 @@ import org.apache.axis2.om.OMNamespace;
 
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.synapse.axis2.Expression;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ByteArrayResource;
+
 
 public class RuleList extends ArrayList {
 	// private namespaceContext
@@ -55,6 +53,7 @@ public class RuleList extends ArrayList {
 	public static final QName xpathQ = new QName("", "xpath");
 
 	public static final QName mediatorQ = new QName("", "mediator");
+	public static final QName mediatorTypeQ = new QName("", "type");
 
 	public static final QName secureQ = new QName("", "secure");
 
@@ -101,6 +100,19 @@ public class RuleList extends ArrayList {
 							+ " attribute");
 				r.setMediatorName(rule.getAttribute(mediatorQ)
 						.getAttributeValue());
+				
+				if (rule.getAttribute(mediatorTypeQ) != null) {
+					String type = rule.getAttribute(mediatorTypeQ).getAttributeValue().trim().toLowerCase();
+					
+					if (type.equals(Constants.MEDIATOR_TYPE_AXIS2SERVICE)) r.setMediatorType(Constants.TYPE_AXIS2SERVICE); 
+					else if (type.equals(Constants.MEDIATOR_TYPE_SPRING)) r.setMediatorType(Constants.TYPE_SPRING);
+					else if (type.equals(Constants.MEDIATOR_TYPE_CLASS)) r.setMediatorType(Constants.TYPE_CLASS);
+					else if (type.equals(Constants.MEDIATOR_TYPE_BPEL)) r.setMediatorType(Constants.TYPE_BPEL);
+					System.out.println(type+Integer.toString(r.getMediatorType()));
+					
+				}
+				
+				
 				if (rule.getAttribute(reliableQ) != null)
 					r.setReliable(isTrue(rule.getAttribute(reliableQ)
 							.getAttributeValue()));
@@ -112,33 +124,18 @@ public class RuleList extends ArrayList {
 							.getAttributeValue()));
 
 				Iterator it2 = rule.getChildElements();
-				while (it2.hasNext()) {
+				if (it2.hasNext()) {
 					OMElement el = (OMElement) it2.next();
-					if (el.getLocalName().equals("beans")) {
-
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						baos
-								.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">"
-										.getBytes());
-
-						XMLStreamWriter xsw = XMLOutputFactory.newInstance()
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					XMLStreamWriter xsw = XMLOutputFactory.newInstance()
 								.createXMLStreamWriter(baos);
+					xsw.setDefaultNamespace(el.getNamespace().getName());
+					el.serialize(xsw);
+					baos.close();
+					r.setXmlBytes(baos.toByteArray());
 						
-						xsw.setDefaultNamespace(el.getNamespace().getName());
-						el.serialize(xsw);
-						baos.close();
-						GenericApplicationContext ctx = new GenericApplicationContext();
-						XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(
-								ctx);
-						byte[] bytes = baos.toByteArray();
-						System.out.println(new String(bytes));
-						xbdr.loadBeanDefinitions(new ByteArrayResource(bytes));
-						ctx.setClassLoader(cl);
-						ctx.refresh();
-
-						r.setSpringBeanFactory(ctx);
-						continue;
-					}
+						
+					
 				}
 
 				this.add(r);

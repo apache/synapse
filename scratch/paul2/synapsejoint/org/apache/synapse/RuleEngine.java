@@ -22,7 +22,7 @@ import java.util.Iterator;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.axis2.Expression;
 import org.apache.synapse.axis2.MediatorExecutor;
-import org.apache.synapse.axis2.Sender;
+
 
 // This class does the hard work, relying on OM/MC for the input
 // and using Expression to match, MedEx to dispatch, and Sender to call on
@@ -31,8 +31,8 @@ public class RuleEngine {
 	
 	public RuleEngine(String ruleFile) {
 		
-		//ClassLoader cl = getClass().getClassLoader();
-		//InputStream ruleIS = cl.getResourceAsStream(ruleFile);
+		ClassLoader cl = getClass().getClassLoader();
+		
 		InputStream ruleIS =null;
 		try {
 			ruleIS = new FileInputStream(ruleFile);
@@ -41,7 +41,7 @@ public class RuleEngine {
 			e.printStackTrace();
 		}
 		if (ruleIS==null) throw new SynapseException("Can't locate rule file: "+ruleFile);
-		rl = new RuleList(ruleIS);
+		rl = new RuleList(ruleIS, cl);
 	}
 	
 	public void process(MessageContext messageContext) {
@@ -54,13 +54,13 @@ public class RuleEngine {
 				if (e.match(messageContext))
 				{
 					
-					boolean cont = MediatorExecutor.execute(r.getMediatorName(), messageContext); 
+					boolean cont = MediatorExecutor.execute(r, messageContext); 
 					if (!cont) return;
 				}
 		}
 		// send now
 			
-		Sender.send(messageContext);
+		//Sender.send(messageContext);
 	}
 
 	

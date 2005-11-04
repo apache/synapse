@@ -80,6 +80,11 @@ public class Sender {
 				ae.receive(outMsgContext);
 
 			} else {
+				if (messageContext.getEnvelope().getHeader() == null)
+					messageContext.getEnvelope().getBody().insertSiblingBefore(
+							OMAbstractFactory.getSOAP11Factory()
+									.getDefaultEnvelope().getHeader());
+
 				ae.send(messageContext);
 			}
 		} catch (AxisFault e) {

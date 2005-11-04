@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="C:/spring/dist/spring-context.jar"/>
 	<classpathentry kind="lib" path="C:/spring/dist/spring-core.jar"/>
 	<classpathentry kind="lib" path="C:/spring/dist/spring.jar"/>
+	<classpathentry kind="lib" path="C:/axdb/target/lib/stax-1.1.2-dev.jar"/>
+	<classpathentry kind="lib" path="C:/axdb/target/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="C:/axdb/target/lib/commons-logging-1.0.3.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

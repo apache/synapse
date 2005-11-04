@@ -24,7 +24,9 @@ public class Rule {
 	private boolean secure = false;
 	private boolean reliable = false;
 	private boolean transactional = false;
-	private Object beanFactory = null;
+	private byte[] xmlBytes ;
+	
+	private int mediatorType = 0;
 	public void setExpression(Expression expr) {
 		this.expr = expr;
 	}
@@ -74,9 +76,17 @@ public class Rule {
 		
 		return sb.toString();
 	}
-	public void setSpringBeanFactory(Object bf) {
-		this.beanFactory  = bf;
-		
+
+	public void setXmlBytes(byte[] xmlBytes) {
+		this.xmlBytes = xmlBytes;
 	}
-	public Object getSpringBeanFactory() { return beanFactory; }
+	public byte[] getXmlBytes() {
+		return xmlBytes;
+	}
+	public void setMediatorType(int mediatorType) {
+		this.mediatorType = mediatorType;
+	}
+	public int getMediatorType() {
+		return mediatorType;
+	}
 }

@@ -26,13 +26,27 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
+import org.apache.synapse.Constants;
 import org.apache.synapse.Rule;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediator.MediatorMessageReceiver;
 
+
+
 public class MediatorExecutor {
 
 	// exexute mediators by calling them as services
+
+	
+
+
+	
+
+	
+
+	
+
+	
 
 	public static boolean execute(Rule r, MessageContext messageContext) {
 
@@ -42,45 +56,59 @@ public class MediatorExecutor {
 
 		AxisService as = null;
 		AxisOperation ao = null;
+		System.out.println("invoking "+r.getMediatorName()+" of type "+(Integer.toString(r.getMediatorType())));
 		try {
-			if (r.getSpringBeanFactory() != null) {
-				as = ac.getService("springmediator");
-				messageContext.setProperty(
-						"synapse.mediator.spring.beanFactory", r
-								.getSpringBeanFactory());
-				messageContext.setProperty("synapse.spring.mediatorName", r
-						.getMediatorName());
+			switch (r.getMediatorType()) { 
+				case  Constants.TYPE_SPRING: {
 
-			}
-			if (as == null) {
-
-				as = ac.getService(r.getMediatorName());
-			}
-			if (as == null) {
-				Class c = null;
-				try {
-					c = messageContext.getSystemContext()
-							.getAxisConfiguration().getService("classmediator")
-							.getClassLoader().loadClass(r.getMediatorName());
-
-				} catch (ClassNotFoundException ce) {
-
+					as = ac.getService(Constants.SPRINGMEDIATOR);
+					if (as == null) throw new SynapseException("cannot locate service " +Constants.SPRINGMEDIATOR);
+					messageContext.setProperty(
+							Constants.SYNAPSE_MEDIATOR_XML_BYTES, r.getXmlBytes());
+									
+					messageContext.setProperty(Constants.SYNAPSE_SPRING_MEDIATOR_NAME, r
+							.getMediatorName());
+					break;
+					
 				}
-
-				if (c != null) {
-					messageContext.setProperty("synapse.mediator.class", c);
-					as = ac.getService("classmediator");
-
+				case Constants.TYPE_AXIS2SERVICE: {
+					as = ac.getService(r.getMediatorName());
+					if (as == null) throw new SynapseException("cannot locate service " +r.getMediatorName());
+					break;
 				}
-			}
-			if (as == null) {
-				throw new SynapseException(
-						"Mediator "
-								+ r.getMediatorName()
-								+ " is not registered as a service in the current Axis Configuration");
-			}
+				case Constants.TYPE_CLASS: {
+					Class c = null;
+					try {
+						c = messageContext.getSystemContext()
+								.getAxisConfiguration().getService(Constants.CLASSMEDIATOR)
+								.getClassLoader().loadClass(r.getMediatorName());
 
-			ao = as.getOperation("mediate");
+					} catch (ClassNotFoundException ce) {
+						throw new SynapseException(ce);
+					}
+
+					messageContext.setProperty(Constants.SYNAPSE_MEDIATOR_CLASS, c);
+					as = ac.getService(Constants.CLASSMEDIATOR);
+					if (as==null) throw new SynapseException("cannot locate service "+Constants.CLASSMEDIATOR);
+					break;
+					
+				}
+				case Constants.TYPE_BPEL: {
+					as = ac.getService(Constants.BPELMEDIATOR);
+					if (as==null) throw new SynapseException("cannot locate service "+Constants.BPELMEDIATOR);
+					messageContext.setProperty(
+							Constants.SYNAPSE_MEDIATOR_XML_BYTES, r.getXmlBytes());
+									
+					messageContext.setProperty(Constants.SYNAPSE_SPRING_MEDIATOR_NAME, r
+							.getMediatorName());
+					break;
+				}
+					
+			}
+			
+			
+
+			ao = as.getOperation(Constants.MEDIATE_OPERATION_NAME);
 			OperationContext oc = OperationContextFactory
 					.createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
 			ao.registerOperationContext(messageContext, oc);
@@ -89,8 +117,6 @@ public class MediatorExecutor {
 			oc.setParent(sc);
 			messageContext.setOperationContext(oc);
 			messageContext.setServiceContext(sc);
-
-			System.out.println(r.getMediatorName() + ":" + as.getName());
 
 			messageContext.setAxisOperation(ao);
 			messageContext.setAxisService(as);

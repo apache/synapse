@@ -1,0 +1,2 @@
+String splits[] = "  ab bc 		cd d e g  ".trim().toLowerCase().split("[ \t\n\f\r]+");
+for (int i=0;i<splits.length;i++) { System.out.println("."+splits[i]+".");}

@@ -123,6 +123,13 @@ public class SynapseEngine {
 				} else
 					outphase[i] = r;
 			}
+		} else {
+			inphase = new RuleEngine[rulesets.size()];
+			for (int i=0;i<inphase.length;i++) {
+				inphase[i] = (RuleEngine)rulesets.get(i);
+			}
+			
+			
 		}
 		
 	}	

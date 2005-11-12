@@ -1,0 +1,11 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse"
+		xmlns:synapse="http://ws.apache.org/ns/synapse"
+		xmlns:all="http://ws.apache.org/ns/synapse/allrule">
+      
+    
+    <stage name="a" rule-type="all">
+        <all:rule>
+            <synapse:mediator type="class" name="logger" class="logbean.Logger"/>
+        </all:rule>
+    </stage>
+</synapse>

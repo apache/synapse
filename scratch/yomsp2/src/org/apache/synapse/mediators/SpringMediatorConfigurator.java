@@ -12,6 +12,7 @@ import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
 import org.apache.synapse.MediatorConfiguration;
 import org.apache.synapse.MediatorConfigurator;
+
 import org.apache.synapse.SynapseException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
@@ -21,6 +22,7 @@ public class SpringMediatorConfigurator implements MediatorConfigurator {
 	
 	
 	public MediatorConfiguration parse(OMElement el, ClassLoader cl) {
+		
 		SpringMediatorConfiguration mc = new SpringMediatorConfiguration();
 		OMAttribute name = el.getAttribute(new QName("", "name"));
 		if (name == null) throw new SynapseException("missing name attribute on "+el.toString());

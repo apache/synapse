@@ -62,10 +62,15 @@ public abstract class OnceRuleEngine implements RuleEngine {
 			Rule ra = (Rule) it.next();
 			RuleCondition rc = ra.getRuleCondition();
 			if (rc.matches(smc)) {
-				MediatorConfiguration mc = ra.getMediatorConfiguration();
-				boolean ret = se.executeMediator(mc, smc);
-				if (!ret)
-					return false;
+				List medConfigs = ra.getMediatorConfigurations();
+				if (medConfigs==null) return true;
+				Iterator mcs = medConfigs.iterator();
+				while (mcs.hasNext()) {
+					MediatorConfiguration mc = (MediatorConfiguration)mcs.next();
+					boolean ret = se.executeMediator(mc, smc);
+					if (!ret) return false;
+				}
+				
 			}
 		}
 		return true;

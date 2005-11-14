@@ -9,14 +9,15 @@ import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.xpath.AXIOMXPath;
 
+import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.jaxen.JaxenException;
 
 public class XPathRuleEngine extends OnceRuleEngine {
-	private static final String XPATH_NS = "http://ws.apache.org/synapse/ns/xpathrule";
+	
 	private static final QName XPATH_RULE_Q = new QName(
-			XPATH_NS, "rule", "xpath");
-	private static final QName XPATH_CONDITION_ATT_Q = new QName(XPATH_NS, "xpath"); 
+			Constants.SYNAPSE_NAMESPACE, "rule", "xpath");
+	private static final QName XPATH_CONDITION_ATT_Q = new QName("", "xpath"); 
 
 	public RuleCondition getRuleCondition(OMElement om) {
 		OMAttribute xpath=om.getAttribute(XPATH_CONDITION_ATT_Q);

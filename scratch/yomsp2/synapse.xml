@@ -4,8 +4,9 @@
       
     
     <stage name="a" rule-type="all">
-        <all:rule>
-            <synapse:mediator type="class" name="logger" class="logbean.Logger"/>
-        </all:rule>
+        <rule>
+            <mediator type="class" name="logger" class="logbean.Logger"/>
+            <mediator type="class" name="logger2" class="logbean.Logger"/> 
+        </rule>
     </stage>
 </synapse>

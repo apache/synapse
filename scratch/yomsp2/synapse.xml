@@ -1,7 +1,4 @@
-<synapse xmlns="http://ws.apache.org/ns/synapse"
-		xmlns:synapse="http://ws.apache.org/ns/synapse"
-		xmlns:all="http://ws.apache.org/ns/synapse/allrule">
-      
+<synapse xmlns="http://ws.apache.org/ns/synapse">
     
     <stage name="a" rule-type="all">
         <rule>

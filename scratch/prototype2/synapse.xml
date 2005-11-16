@@ -1,0 +1,28 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse"
+		
+		xmlns:sq="urn:xmethods-delayed-quotes">
+      
+    
+    <stage name="logall" rule-type="all">
+        <rule>
+            <mediator type="builtin" name="log" />
+        </rule>
+    </stage>
+    <stage name="service-specific" rule-type="xpath">
+		<rule xpath="//sq:getQuote" xmlns:sq="urn:xmethods-delayed-quotes">
+			<mediator type="spring" name="redirect" bean="redirect">
+				<beans>
+					<bean id="redirect" class="sampleMediators.SpringRedirect">
+						<!--property name="uri" value="http://64.124.140.30:9090/soap"/-->
+						<property name="uri" value="http://FREO:8080/axis/services/E4XStock"/>
+					</bean>
+				</beans>
+			</mediator>
+		</rule>
+	</stage>
+	<stage name="sender" rule-type="all">
+		<rule>
+			<mediator type="builtin" name="sender"/>
+		</rule>
+	</stage>
+</synapse>

@@ -18,7 +18,7 @@ package org.apache.synapse.api;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.miheaders.RelatesTo;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.soap.SOAPEnvelope;
 
 

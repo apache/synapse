@@ -34,19 +34,21 @@ public class Axis2SynapseEnvironmentFinder {
 			}
 			String synapseConfig = (String) param.getValue();
 			InputStream is = mc.getAxisService().getClassLoader().getResourceAsStream(synapseConfig);
-			
+
 			StAXOMBuilder builder;
 			try {
 				builder =  new StAXOMBuilder(is);
 
 			} catch (XMLStreamException e1) {
 				throw new SynapseException("Trouble parsing Synapse Configuration ",e1);
-				
-			}		
+
+			}
 			OMElement config = builder.getDocumentElement();
-			Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc.getAxisService().getClassLoader());
-			
-		
+            // todo: ---- following needed to be added. 
+            config.build();
+            Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc.getAxisService().getClassLoader());
+
+
 			synapseEnvParam = new ParameterImpl(SYNAPSE_ENVIRONMENT, null);
 			synapseEnvParam.setValue(se);
 			try {
@@ -56,7 +58,7 @@ public class Axis2SynapseEnvironmentFinder {
 			}
 		}
 		return (SynapseEnvironment) synapseEnvParam.getValue();
-		
+
 	}
 
 }

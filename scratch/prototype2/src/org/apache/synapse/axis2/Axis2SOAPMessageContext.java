@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.miheaders.RelatesTo;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.synapse.Constants;

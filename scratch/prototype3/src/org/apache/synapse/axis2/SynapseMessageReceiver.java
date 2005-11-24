@@ -22,8 +22,8 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.synapse.api.SOAPMessageContext;
-import org.apache.synapse.api.SynapseEnvironment;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
 
 public class SynapseMessageReceiver implements MessageReceiver {
 
@@ -33,7 +33,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
 		log.debug("receiving message");
 		SynapseEnvironment env = Axis2SynapseEnvironmentFinder
 				.getSynapseEnvironment(mc);
-		SOAPMessageContext smc = new Axis2SOAPMessageContext(mc);
+		SynapseMessage smc = new Axis2SOAPMessageContext(mc);
 		env.injectMessage(smc);
 	}
 }

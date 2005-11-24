@@ -12,8 +12,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.api.SynapseEnvironment;
 
 public class Axis2SynapseEnvironmentFinder {
 

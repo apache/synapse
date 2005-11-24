@@ -14,12 +14,12 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseMessage;
 
-import org.apache.synapse.api.SOAPMessageContext;
 
 public class Axis2Sender {
 
-	public static void sendOn(SOAPMessageContext smc) {
+	public static void sendOn(SynapseMessage smc) {
 
 		try {
 
@@ -71,7 +71,7 @@ public class Axis2Sender {
 		}
 	}
 
-	public static void sendBack(SOAPMessageContext smc) {
+	public static void sendBack(SynapseMessage smc) {
 		MessageContext messageContext = ((Axis2SOAPMessageContext) smc)
 				.getMessageContext();
 		AxisEngine ae = new AxisEngine(messageContext.getSystemContext());

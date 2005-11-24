@@ -11,9 +11,9 @@ import org.apache.axis2.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.api.SOAPMessageContext;
-import org.apache.synapse.api.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.AllProcessor;
 import org.jaxen.JaxenException;
 
@@ -37,6 +37,9 @@ public class XPathProcessor extends AllProcessor {
 
 	private AXIOMXPath xp = null;
 
+	/* (non-Javadoc)
+	 * @see org.apache.synapse.spi.Processor#compile(org.apache.synapse.api.SynapseEnvironment, org.apache.axis2.om.OMElement)
+	 */
 	public void compile(SynapseEnvironment se, OMElement el) {
 		super.compile(se, el);
 		OMAttribute xpath = el.getAttribute(XPATH_EXPRESSION_ATT_Q);
@@ -58,7 +61,10 @@ public class XPathProcessor extends AllProcessor {
 		}
 	}
 
-	public boolean process(SynapseEnvironment se, SOAPMessageContext smc) {
+	/* (non-Javadoc)
+	 * @see org.apache.synapse.spi.Processor#process(org.apache.synapse.api.SynapseEnvironment, org.apache.synapse.api.SOAPMessageContext)
+	 */
+	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		if (xp == null) {
 			log.debug("trying to process xpath without being set");
 			return true;

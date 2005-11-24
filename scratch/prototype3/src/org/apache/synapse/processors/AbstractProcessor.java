@@ -6,9 +6,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
-import org.apache.synapse.api.SynapseEnvironment;
+import org.apache.synapse.Processor;
+import org.apache.synapse.SynapseEnvironment;
 
-import org.apache.synapse.spi.Processor;
 
 public abstract class AbstractProcessor implements Processor {
 	private String name = null;

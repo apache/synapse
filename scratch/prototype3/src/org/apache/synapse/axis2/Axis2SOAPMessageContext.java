@@ -9,9 +9,9 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.synapse.Constants;
-import org.apache.synapse.api.SOAPMessageContext;
+import org.apache.synapse.SynapseMessage;
 
-public class Axis2SOAPMessageContext implements SOAPMessageContext {
+public class Axis2SOAPMessageContext implements SynapseMessage {
 
 	private MessageContext mc = null;
 

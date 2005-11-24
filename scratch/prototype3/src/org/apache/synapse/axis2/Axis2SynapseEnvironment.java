@@ -2,11 +2,11 @@ package org.apache.synapse.axis2;
 
 import org.apache.axis2.om.OMElement;
 
-import org.apache.synapse.api.SOAPMessageContext;
-import org.apache.synapse.api.SynapseEnvironment;
+import org.apache.synapse.Processor;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
 
 import org.apache.synapse.processors.SynapseProcessor;
-import org.apache.synapse.spi.Processor;
 
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
 	private Processor processor = new SynapseProcessor();
@@ -20,7 +20,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 		processor.compile(this, synapseConfiguration);
 	}
 
-	public void injectMessage(SOAPMessageContext smc) {
+	public void injectMessage(SynapseMessage smc) {
 		processor.process(this, smc);
 	}
 
@@ -32,12 +32,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 		this.cl = cl;
 	}
 
-	public void sendOn(SOAPMessageContext smc) {
+	public void sendOn(SynapseMessage smc) {
 		Axis2Sender.sendOn(smc);
 
 	}
 
-	public void sendBack(SOAPMessageContext smc) {
+	public void sendBack(SynapseMessage smc) {
 		Axis2Sender.sendBack(smc);
 
 	}

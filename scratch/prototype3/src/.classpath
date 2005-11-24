@@ -11,5 +11,5 @@
 	<classpathentry kind="lib" path="C:/spring/dist/spring-context.jar"/>
 	<classpathentry kind="lib" path="C:/spring/dist/spring-core.jar"/>
 	<classpathentry kind="lib" path="C:/spring/dist/spring-beans.jar"/>
-	<classpathentry kind="output" path=""/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

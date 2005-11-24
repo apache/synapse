@@ -10,9 +10,9 @@ import org.apache.axis2.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.api.SOAPMessageContext;
-import org.apache.synapse.api.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.AllProcessor;
 
 /**
@@ -79,7 +79,7 @@ public class RegexProcessor extends AllProcessor {
 		}
 	}
 
-	public boolean process(SynapseEnvironment se, SOAPMessageContext smc) {
+	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 
 		if (pattern == null) {
 			log.debug("trying to process with empty pattern");

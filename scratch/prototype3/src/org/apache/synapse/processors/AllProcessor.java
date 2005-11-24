@@ -9,11 +9,12 @@ import javax.xml.namespace.QName;
 import org.apache.axis2.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Configurator;
 import org.apache.synapse.Constants;
-import org.apache.synapse.api.SOAPMessageContext;
-import org.apache.synapse.api.SynapseEnvironment;
-import org.apache.synapse.spi.Processor;
+import org.apache.synapse.Processor;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.xml.Configurator;
+
 
 /**
  * @author Paul Fremantle This class simply runs the message through all rules,
@@ -46,7 +47,7 @@ public class AllProcessor extends AbstractProcessor {
 
 	}
 
-	public boolean process(SynapseEnvironment se, SOAPMessageContext smc) {
+	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		if (processors == null) {
 			log.info("process called on empty processor list");
 			return true;

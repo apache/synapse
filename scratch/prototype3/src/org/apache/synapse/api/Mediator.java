@@ -15,6 +15,8 @@
  */
 package org.apache.synapse.api;
 
+import org.apache.synapse.SynapseMessage;
+
 public interface Mediator {
-	public boolean mediate(SOAPMessageContext smc);
+	public boolean mediate(SynapseMessage smc);
 }

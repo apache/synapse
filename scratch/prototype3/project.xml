@@ -82,7 +82,7 @@
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2</artifactId>
-            <version>0.93</version>
+            <version>${axis2.version}</version>
         </dependency>
 
         <!-- external JARs -->

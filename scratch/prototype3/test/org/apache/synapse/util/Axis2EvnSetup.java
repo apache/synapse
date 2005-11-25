@@ -2,23 +2,22 @@ package org.apache.synapse.util;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.om.*;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.om.*;
+import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
+import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.synapse.axis2.SynapseMessageReceiver;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import java.io.File;
 import java.io.ByteArrayInputStream;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -38,7 +37,8 @@ import java.io.ByteArrayInputStream;
 */
 
 public class Axis2EvnSetup {
-    public static MessageContext axis2Deployment(String testingReposity) throws AxisFault {
+    public static MessageContext axis2Deployment(String testingReposity)
+            throws AxisFault {
         ConfigurationContextFactory conFac = new ConfigurationContextFactory();
         ConfigurationContext configCtx = conFac
                 .buildClientConfigurationContext(testingReposity);
@@ -70,12 +70,13 @@ public class Axis2EvnSetup {
                 .getDefaultEnvelope();
         OMDocument doc = fac.createOMDocument();
         doc.addChild(env);
-        OMElement ele = fac.createOMElement("text", "urn:text-body","ns");
+        OMElement ele = fac.createOMElement("text", "urn:text-body", "ns");
         env.getBody().addChild(ele);
         return env;
     }
 
-    public static OMElement getSynapseConfigElement(String synapseXml) throws XMLStreamException {
+    public static OMElement getSynapseConfigElement(String synapseXml)
+            throws XMLStreamException {
         XMLStreamReader parser = XMLInputFactory.newInstance()
                 .createXMLStreamReader(
                         new ByteArrayInputStream(synapseXml.getBytes()));
@@ -84,5 +85,17 @@ public class Axis2EvnSetup {
         OMElement config = staxBuilder.getDocumentElement();
         return config;
 
+    }
+
+    public static OMElement payload() {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace(
+                "urn:text-body", "ns");
+        OMElement method = fac.createOMElement("service", omNs);
+        OMElement value = fac.createOMElement("text", omNs);
+        value.addChild(
+                fac.createText(value, "Synapse Testing String by Saminda "));
+        method.addChild(value);
+        return method;
     }
 }

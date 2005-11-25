@@ -1,9 +1,14 @@
 package org.apache.synapse.spi;
 
 import junit.framework.TestCase;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.util.Axis2EvnSetup;
+
+import javax.xml.namespace.QName;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -22,17 +27,25 @@ import org.apache.synapse.util.Axis2EvnSetup;
 */
 
 public class FaultProcessorTest extends TestCase {
-    private MessageContext mc;
     private SimpleHTTPServer synapseServer;
-    public  void setUp() throws Exception {
-        mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository-fault");
-        synapseServer = new SimpleHTTPServer(mc.getSystemContext(),5043);
+    private EndpointReference targetEpr = new EndpointReference(
+            "http://127.0.0.1:5043/axis2/services/anonymous");
+    private QName operation = new QName("anonymous");
+
+    public void setUp() throws Exception {
+        synapseServer = new SimpleHTTPServer("target/synapse-repository-fault", 5043);
         synapseServer.start();
     }
+
     protected void tearDown() throws Exception {
         synapseServer.stop();
     }
+
     public void testFaultPrcessor() throws Exception {
+        MessageSender msgSender = new MessageSender();
+        msgSender.setTo(targetEpr);
+        msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);
+        msgSender.send(operation.getLocalPart(),Axis2EvnSetup.payload());
 
     }
 

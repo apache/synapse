@@ -17,7 +17,7 @@ package sampleMediators;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.api.SOAPMessageContext;
+import org.apache.synapse.SynapseMessage;
 
 public class SpringRedirect implements Mediator {
 	private String uri = null;
@@ -26,7 +26,7 @@ public class SpringRedirect implements Mediator {
 		this.uri = uri;
 	}
 
-	public boolean mediate(SOAPMessageContext mc) {
+	public boolean mediate(SynapseMessage mc) {
 
 		System.out.println("Redirect.mediate: " + uri);
 

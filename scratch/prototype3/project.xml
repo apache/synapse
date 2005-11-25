@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+    <pomVersion>3</pomVersion>
+
+    <id>Synpase</id>
+
+    <name>Apache Synpase</name>
+
+    <currentVersion>M1-SNAPSHOT</currentVersion>
+
+    <organization>
+        <name>Apache Web Services</name>
+        <url>http://ws.apache.org/</url>
+        <logo>http://www.apache.org/images/asf-logo.gif</logo>
+    </organization>
+
+    <inceptionYear>2005</inceptionYear>
+    <package>org.apache.synapse</package>
+    <logo/>
+    <description>Discription of the project</description>
+    <!-- a short description of what the project does -->
+    <!--<shortDescription></shortDescription>-->
+
+    <!-- the project home page -->
+    <!--todo: need to setup uri, issueTracker, site, and dist dir  -->
+    <!--<url>http://ws.apache.org/synapse/</url>-->
+    <!--<issueTrackingUrl>http://issues.apache.org/jira/browse/KAND</issueTrackingUrl>-->
+    <!--<siteAddress>ws.apache.org</siteAddress>-->
+    <!--<siteDirectory>/synapse/</siteDirectory>-->
+    <!--<distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>-->
+    <!--todo-->
+
+    <!-- any mailing lists for the project -->
+    <!--todo-->
+    <!--<mailingLists>-->
+    <!--<mailingList>-->
+    <!--<name>Synpase Developer List</name>-->
+    <!--<subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>-->
+    <!--<unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>-->
+    <!--<archive></archive>-->
+    <!--</mailingList>-->
+    <!--</mailingLists>-->
+
+    <!-- who the developers are for the project -->
+    <developers>
+        <developer>
+            <name>Paul Fremantle</name>
+            <id>paul</id>
+            <email>paul@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <!--todo : all the developers here-->
+
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- build information for the project -->
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+
+    <dependencies>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>0.93</version>
+        </dependency>
+
+        <!-- external JARs -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>${commons.httpclient.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>${commons.discovery.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons.codec.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+            <url>http://dist.codehaus.org/stax/jars/</url>
+        </dependency>
+        <dependency>
+            <groupId>${stax.impl.groupid}</groupId>
+            <artifactId>${stax.impl.artifactid}</artifactId>
+            <version>${stax.impl.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>${stax.api.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>${axis.wsdl4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>${geronimo.spec.javamail.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>${geronimo.spec.activation.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xmlbeans</groupId>
+            <artifactId>xbean</artifactId>
+            <version>${xbean.version}</version>
+            <type>jar</type>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>wss4j</groupId>
+            <artifactId>wss4j</artifactId>
+            <version>${wss4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>${xmlsec.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov</artifactId>
+            <version>${bcprov.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>${opensaml.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <properties>
+                <classloader>root</classloader>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xmlParserAPIs</artifactId>
+            <version>${xerces.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>${jaxen.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.6.0</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ================================= -->
+    <!-- build information for the project -->
+    <!-- ================================= -->
+
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <!--<excludes>-->
+                <!--<exclude>**/NaughtyTest.java</exclude>-->
+            <!--</excludes>-->
+        </unitTest>
+        <resources>
+            <resource>
+                <directory>repo</directory>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+        </resources>
+
+    </build>
+
+    <!-- ======= -->
+    <!-- Reports -->
+    <!-- ======= -->
+
+    <reports>
+        <!--<report>maven-changes-plugin</report>-->
+        <!--<report>maven-jdepend-plugin</report>-->
+        <!--<report>maven-checkstyle-plugin</report>-->
+        <!--<report>maven-pmd-plugin</report>-->
+        <!--<report>maven-junit-report-plugin</report>-->
+        <!--<report>maven-license-plugin</report>-->
+        <!--<report>maven-jxr-plugin</report>-->
+    </reports>
+</project>
+

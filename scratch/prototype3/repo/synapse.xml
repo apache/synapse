@@ -1,5 +1,4 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
-    
     <stage name="logall">
         <addressing/>
 		<log/>
@@ -14,7 +13,6 @@
 	</stage>
 	<stage name="sender">
 		<send/>
-	</stage>
-	
+	</stage>	
 </synapse>
 

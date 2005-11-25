@@ -35,7 +35,7 @@ public class AddressingProcessorTest extends TestCase {
                     "</synapse>";
 
     public void setUp() throws Exception {
-        msgCtx = Axis2EvnSetup.axis2Deployment();
+        msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
     }
 
     public void testAddressingProcessor() throws Exception {

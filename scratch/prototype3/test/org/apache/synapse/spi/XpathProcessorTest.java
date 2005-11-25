@@ -33,7 +33,7 @@ public class XpathProcessorTest extends TestCase {
                     "</stage>\n" +
             "</synapse>";
     public void testXpathProcessor() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment();
+        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
         SynapseMessage smc = new Axis2SOAPMessageContext(mc);
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),

@@ -35,7 +35,7 @@ public class RegexProcessorTest extends TestCase {
             "</synapse>";
 
     public void testRegexProcessor() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment();
+        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
         mc.setTo(new EndpointReference("http://xmethods.org"));
         SynapseMessage smc = new Axis2SOAPMessageContext(mc);
         SynapseEnvironment env = new Axis2SynapseEnvironment(

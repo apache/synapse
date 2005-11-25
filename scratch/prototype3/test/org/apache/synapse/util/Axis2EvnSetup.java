@@ -38,10 +38,10 @@ import java.io.ByteArrayInputStream;
 */
 
 public class Axis2EvnSetup {
-    public static MessageContext axis2Deployment() throws AxisFault {
+    public static MessageContext axis2Deployment(String testingReposity) throws AxisFault {
         ConfigurationContextFactory conFac = new ConfigurationContextFactory();
         ConfigurationContext configCtx = conFac
-                .buildClientConfigurationContext("target/synapse-repository");
+                .buildClientConfigurationContext(testingReposity);
         MessageContext msgCtx = new MessageContext(configCtx);
         msgCtx.setEnvelope(testEnvSetup());
         msgCtx.setServerSide(true);

@@ -43,9 +43,9 @@ import java.io.ByteArrayInputStream;
 public class Axis2EvnSetup {
     public static MessageContext axis2Deployment() throws AxisFault {
         ConfigurationContextFactory conFac = new ConfigurationContextFactory();
-        File path = new File("./test-resources/axis2");
+//        File path = new File("test-resources/axis2");
         ConfigurationContext configCtx = conFac
-                .buildClientConfigurationContext(path.getAbsolutePath());
+                .buildClientConfigurationContext("synpase-test-resources/axis2");
         MessageContext msgCtx = new MessageContext(configCtx);
         msgCtx.setEnvelope(testEnvSetup());
         msgCtx.setServerSide(true);

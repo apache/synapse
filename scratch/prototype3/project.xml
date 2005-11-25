@@ -18,9 +18,9 @@
     <inceptionYear>2005</inceptionYear>
     <package>org.apache.synapse</package>
     <logo/>
-    <description>Discription of the project</description>
-    <!-- a short description of what the project does -->
-    <!--<shortDescription></shortDescription>-->
+    <description>The Synapse project will create a robust, lightweight
+        implementation of a highly scalable and distributed service mediation
+        framework based on Web services specifications.</description>
 
     <!-- the project home page -->
     <!--todo: need to setup uri, issueTracker, site, and dist dir  -->
@@ -241,7 +241,6 @@
                 <module>true</module>
             </properties>
         </dependency>
-
     </dependencies>
 
     <!-- ================================= -->
@@ -257,16 +256,16 @@
                 <include>**/*Test.java</include>
             </includes>
             <!--<excludes>-->
-                <!--<exclude>**/NaughtyTest.java</exclude>-->
+            <!--<exclude>**/NaughtyTest.java</exclude>-->
             <!--</excludes>-->
         </unitTest>
         <resources>
-            <resource>
-                <directory>repo</directory>
-                <includes>
-                    <include>*.*</include>
-                </includes>
-            </resource>
+            <!--<resource>-->
+                <!--<directory>test-resources</directory>-->
+                <!--<includes>-->
+                    <!--<include>*.*</include>-->
+                <!--</includes>-->
+            <!--</resource>-->
         </resources>
 
     </build>

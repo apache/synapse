@@ -1,6 +1,6 @@
 package org.apache.synapse.processors.mediatortypes.axis2;
 
-import javax.xml.namespace.QName;
+
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
@@ -12,8 +12,6 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.om.OMAttribute;
-import org.apache.axis2.om.OMElement;
 import org.apache.axis2.util.Utils;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
@@ -23,18 +21,9 @@ import org.apache.synapse.axis2.Axis2SOAPMessageContext;
 import org.apache.synapse.processors.AbstractProcessor;
 
 public class ServiceMediatorProcessor extends AbstractProcessor {
-	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE,
-			"servicemediator");
+	
 
 	private String serviceName = null;
-
-	public void compile(SynapseEnvironment se, OMElement el) {
-		OMAttribute attr = el.getAttribute(new QName("service"));
-		if (attr == null)
-			throw new SynapseException(
-					"<servicemediator> must have <service> attribute");
-		serviceName = attr.getAttributeValue();
-	}
 
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		MessageContext messageContext = null;
@@ -57,10 +46,10 @@ public class ServiceMediatorProcessor extends AbstractProcessor {
 			AxisService as = null;
 			AxisOperation ao = null;
 			
-			as = ac.getService(serviceName);
+			as = ac.getService(getServiceName());
 			if (as == null)
 				throw new SynapseException("cannot locate service "
-						+ serviceName);
+						+ getServiceName());
 			
 			ao = as.getOperation(Constants.MEDIATE_OPERATION_NAME);
 			OperationContext oc = OperationContextFactory
@@ -89,9 +78,12 @@ public class ServiceMediatorProcessor extends AbstractProcessor {
 
 	}
 
-	public QName getTagQName() {
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
 
-		return tagName;
+	public String getServiceName() {
+		return serviceName;
 	}
 
 }

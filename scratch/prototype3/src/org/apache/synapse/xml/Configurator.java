@@ -27,11 +27,12 @@ public class Configurator {
 	 */
 	public static Processor getProcessor(SynapseEnvironment synapseEnv, OMElement element) {
 		OMNamespace n = element.getNamespace();
-		Class cls = ProcessorFinder.find(new QName(n.getName(), element
+		System.out.println(n.getName());
+		Class cls = ProcessorConfiguratorFinder.find(new QName(n.getName(), element
 				.getLocalName()));
 		try {
-			Processor p = (Processor) cls.newInstance();
-			p.compile(synapseEnv, element);
+			ProcessorConfigurator pc = (ProcessorConfigurator) cls.newInstance();
+			Processor p = pc.compile(synapseEnv, element);
 			return p;
 		} catch (InstantiationException e) {
 			throw new SynapseException(e);

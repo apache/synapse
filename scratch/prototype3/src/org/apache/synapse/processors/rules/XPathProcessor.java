@@ -1,20 +1,12 @@
 package org.apache.synapse.processors.rules;
 
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-
-import org.apache.axis2.om.OMAttribute;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.processors.AllProcessor;
+import org.apache.synapse.processors.ListProcessor;
 import org.jaxen.JaxenException;
 
 /**
@@ -25,44 +17,17 @@ import org.jaxen.JaxenException;
  * if the test is true
  * 
  */
-public class XPathProcessor extends AllProcessor {
-	private static final String XPATH = "xpath";
-
-	private static final QName XPATH_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"xpath");
-
-	private static final QName XPATH_EXPRESSION_ATT_Q = new QName("expr");
+public class XPathProcessor extends ListProcessor {
 
 	private Log log = LogFactory.getLog(getClass());
 
 	private AXIOMXPath xp = null;
 
-	/* (non-Javadoc)
-	 * @see org.apache.synapse.spi.Processor#compile(org.apache.synapse.api.SynapseEnvironment, org.apache.axis2.om.OMElement)
-	 */
-	public void compile(SynapseEnvironment se, OMElement el) {
-		super.compile(se, el);
-		OMAttribute xpath = el.getAttribute(XPATH_EXPRESSION_ATT_Q);
-		if (xpath == null) {
-			throw new SynapseException(XPATH + " must have "
-					+ XPATH_EXPRESSION_ATT_Q + " attribute: " + el.toString());
-		}
-
-		try {
-			xp = new AXIOMXPath(xpath.getAttributeValue());
-			Iterator it = el.getAllDeclaredNamespaces();
-			while (it.hasNext()) {
-				OMNamespace n = (OMNamespace) it.next();
-				xp.addNamespace(n.getPrefix(), n.getName());
-			}
-		} catch (JaxenException e) {
-			throw new SynapseException("Problem with xpath expression "
-					+ xpath.getAttributeValue(), e);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.synapse.spi.Processor#process(org.apache.synapse.api.SynapseEnvironment, org.apache.synapse.api.SOAPMessageContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.synapse.spi.Processor#process(org.apache.synapse.api.SynapseEnvironment,
+	 *      org.apache.synapse.api.SOAPMessageContext)
 	 */
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		if (xp == null) {
@@ -83,9 +48,25 @@ public class XPathProcessor extends AllProcessor {
 		return true;
 	}
 
-	public QName getTagQName() {
+	public void setXPathExpr(String expr) {
+		try {
+			xp = new AXIOMXPath(expr);
+		} catch (JaxenException je) {
+			throw new SynapseException(je);
+		}
+	}
 
-		return XPATH_Q;
+	public String getXPathExpr() {
+		return xp.toString();
+	}
+
+	public void addXPathNamespace(String prefix, String uri) {
+		try {
+			xp.addNamespace(prefix, uri);
+		} catch (JaxenException je) {
+			throw new SynapseException(je);
+		}
+
 	}
 
 }

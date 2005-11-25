@@ -6,10 +6,10 @@ import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
-import org.apache.synapse.processors.SynapseProcessor;
+import org.apache.synapse.xml.Configurator;
 
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
-	private Processor processor = new SynapseProcessor();
+	private Processor processor = null;
 
 	private ClassLoader cl = null;
 
@@ -17,7 +17,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 			ClassLoader cl) {
 		super();
 		this.cl = cl;
-		processor.compile(this, synapseConfiguration);
+		processor = Configurator.getProcessor(this, synapseConfiguration);
 	}
 
 	public void injectMessage(SynapseMessage smc) {

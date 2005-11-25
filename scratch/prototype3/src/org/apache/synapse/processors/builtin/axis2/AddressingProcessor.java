@@ -33,9 +33,6 @@ import org.apache.synapse.processors.AbstractProcessor;
  * 
  */
 public class AddressingProcessor extends AbstractProcessor {
-	private static final QName ADD_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"addressing");
-
 	private Log log = LogFactory.getLog(getClass());
 
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
@@ -75,9 +72,5 @@ public class AddressingProcessor extends AbstractProcessor {
 		return true;
 	}
 
-	public QName getTagQName() {
-
-		return ADD_Q;
-	}
-
+	
 }

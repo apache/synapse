@@ -16,16 +16,5 @@
 
 package org.apache.synapse.processors;
 
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.Constants;
-
-public class SynapseProcessor extends AllProcessor {
-	private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE,
-			"synapse");
-
-	public QName getTagQName() {
-		return tagname;
-	}
-
+public class SynapseProcessor extends ListProcessor {
 }

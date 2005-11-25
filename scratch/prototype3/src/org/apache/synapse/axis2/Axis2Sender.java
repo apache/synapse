@@ -67,6 +67,7 @@ public class Axis2Sender {
 			ae.receive(outMsgContext);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new SynapseException(e);
 		}
 	}

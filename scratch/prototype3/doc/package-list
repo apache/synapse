@@ -2,8 +2,10 @@ org.apache.synapse
 org.apache.synapse.api
 org.apache.synapse.axis2
 org.apache.synapse.processors
-org.apache.synapse.processors.mediators
+org.apache.synapse.processors.builtin
+org.apache.synapse.processors.builtin.axis2
+org.apache.synapse.processors.mediatortypes
+org.apache.synapse.processors.mediatortypes.axis2
 org.apache.synapse.processors.rules
-org.apache.synapse.spi
-org.apache.synapse.spi.engine
+org.apache.synapse.xml
 sampleMediators

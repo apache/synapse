@@ -70,7 +70,7 @@ public class ProcessorConfiguratorFinder {
 	}
 
 	/**
-	 * @param QName
+	 * @param qn
 	 * @return the class which implements the Processor for the given QName
 	 */
 	public static Class find(QName qn) {

@@ -60,6 +60,7 @@ public class RegexProcessor extends ListProcessor {
 		} else {
 			toMatch = headerType.getHeader(smc);
 		}
+		
 		if (toMatch==null) return true;
 		
 		if (pattern.matcher(toMatch).matches()) {

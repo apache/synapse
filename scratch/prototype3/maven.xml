@@ -42,7 +42,7 @@
         </jar>
 
 
-        <echo message="-----------Creating Testing Repositories----------"/>
+        <echo message="-----------Creating Testing Repository - Genral----------"/>
         <mkdir dir="target/synapse-repository"/>
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository/services/synapse.aar"/>
@@ -55,6 +55,22 @@
               tofile="target/synapse-repository/modules/addressing.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository/axis2.xml"/>
+
+        <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
+        <mkdir dir="target/synapse-repository-fault"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-fault/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-fault/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository-fault/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository-fault/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-fault/axis2.xml"/>
+        <copy file="test/rules/synapse-fault-return.xml"
+              tofile="target/synapse-repository-fault/synapse.xml"/>       
 
     </postGoal>
 

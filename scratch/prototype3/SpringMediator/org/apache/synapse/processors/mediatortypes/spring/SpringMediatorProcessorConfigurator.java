@@ -25,9 +25,9 @@ import org.springframework.core.io.ByteArrayResource;
 
 public class SpringMediatorProcessorConfigurator extends AbstractProcessorConfigurator {
 	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE+"/spring", "springmediator");
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		SpringMediatorProcessor smp = new SpringMediatorProcessor();
-		super.compile(se,el,smp);
+		super.setNameOnProcessor(se,el,smp);
 		
 		OMAttribute bean = el.getAttribute(new QName("bean"));
 		if (bean == null) throw new SynapseException("missing bean attribute on "+el.toString());

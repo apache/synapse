@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="jar"
+         xmlns:j="jelly:core"
+         xmlns:maven="jelly:maven"
+         xmlns:deploy="deploy"
+         xmlns:ant="jelly:ant">
+
+    <goal name="setclasspath">
+        <path id="test.classpath">
+            <path refid="maven.dependency.classpath"/>
+        </path>
+    </goal>
+
+    <postGoal name="test:compile">
+        <ant:mkdir dir="${basedir}/target/lib"/>
+        <deploy:copy-deps todir="${basedir}/target/lib"/>
+
+        <echo message="----------------Creating synapse.mar----------------"/>
+        <mkdir dir="target/modules/synapse/META-INF"/>
+        <copy file="src/org/apache/synapse/axis2/META-INF/module.xml"
+              tofile="target/modules/synapse/META-INF/module.xml"/>
+        <jar jarfile="target/synapse.mar"
+             basedir="target/modules/synapse">
+            <include name="**"/>
+        </jar>
+
+        <echo message="----------------Creating First Dispatching aar----------------"/>
+        <mkdir dir="target/services/synapse/META-INF"/>
+        <copy file="synapse-test-resources/axis2/services/synapse/META-INF/services.xml"
+              tofile="target/services/synapse/META-INF/services.xml"/>
+        <jar jarfile="target/synapse.aar"
+             basedir="target/services/synapse">
+            <include name="**"/>
+        </jar>
+        <echo message="----------------Creating Empty Mediator aar----------------"/>
+        <mkdir dir="target/services/emptymediator/META-INF"/>
+        <copy file="synapse-test-resources/axis2/services/emptymediator/META-INF/services.xml"
+              tofile="target/services/emptymediator/META-INF/services.xml"/>
+        <jar jarfile="target/emptymediator.aar"
+             basedir="target/services/emptymediator">
+            <include name="**"/>
+        </jar>
+
+
+        <echo message="-----------Creating Testing Repositories----------"/>
+        <mkdir dir="target/synapse-repository"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository/axis2.xml"/>
+
+    </postGoal>
+
+</project>

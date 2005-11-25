@@ -1,18 +1,13 @@
 package org.apache.synapse.spi;
 
 import junit.framework.TestCase;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
+import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.axis2.Axis2SOAPMessageContext;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
+import org.apache.synapse.util.Axis2EvnSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -30,20 +25,26 @@ import java.io.ByteArrayInputStream;
 *
 */
 
-public class BuiltInProcessorTest extends TestCase {
-
+public class AddressingProcessorTest extends TestCase {
+    private MessageContext msgCtx;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"logall\">\n" +
-                    "    <log/>\n" +
-                    "</stage>\n"+
-             "</synapse>";
-    private SynapseEnvironment env;
+                    "    <addressing/>\n" +
+                    "</stage>\n" +
+                    "</synapse>";
 
-    public void testSynapseEnvironment() throws Exception {
-        env = new Axis2SynapseEnvironment(
+    public void setUp() throws Exception {
+        msgCtx = Axis2EvnSetup.axis2Deployment();
+    }
+
+    public void testAddressingProcessor() throws Exception {
+        SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-     }
-
+        SynapseMessage smc = new Axis2SOAPMessageContext(msgCtx);
+        env.injectMessage(smc);
+        assertTrue(((Boolean) smc.getProperty(
+                Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
+    }
 }

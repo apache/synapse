@@ -113,7 +113,11 @@ public class Axis2SOAPMessageContext implements SynapseMessage {
 	}
 
 	public Object getProperty(String key) {
-		return props.get(key);
+        Object obj = props.get(key);
+        if ( obj == null) {
+            obj = mc.getProperty(key);
+        }        
+        return obj;
 
 	}
 

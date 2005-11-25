@@ -18,9 +18,9 @@ public class SynapseProcessorConfigurator extends
 		return tagname;
 	}
 
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		SynapseProcessor sp = new SynapseProcessor();
-		super.compile(se, el, sp);
+		super.addChildrenAndSetName(se, el, sp);
 		return sp;
 	}
 

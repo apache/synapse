@@ -18,11 +18,10 @@ package org.apache.synapse;
 
 public interface SynapseEnvironment {
 	public void injectMessage(SynapseMessage smc);
-
 	public ClassLoader getClassLoader();
-
-	public void sendOn(SynapseMessage smc);
-
-	public void sendBack(SynapseMessage smc);
-
+	public void send(SynapseMessage smc);
+	public Processor lookupProcessor(String name);
+	public void addProcessor(Processor p);
+	public Processor getMasterProcessor();
+	public void setMasterProcessor(Processor p);
 }

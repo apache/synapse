@@ -6,9 +6,13 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.synapse.Processor;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 
 import sun.misc.Service;
@@ -35,7 +39,10 @@ public class ProcessorConfiguratorFinder {
 			ClassMediatorProcessorConfigurator.class,
 			ServiceMediatorProcessorConfigurator.class,
 			LogProcessorConfigurator.class, SendProcessorConfigurator.class,
-			FaultProcessorConfigurator.class, AddressingProcessorConfigurator.class };
+			FaultProcessorConfigurator.class,
+			AddressingProcessorConfigurator.class,
+			InProcessorConfigurator.class, OutProcessorConfigurator.class,
+			NeverProcessorConfigurator.class, RefProcessorConfigurator.class };
 
 	private static void initialise() {
 
@@ -69,5 +76,30 @@ public class ProcessorConfiguratorFinder {
 	public static Class find(QName qn) {
 		initialise();
 		return (Class) lookup.get(qn);
+	}
+	
+	/**
+	 * This method returns a Processor given an OMElement. This will be used
+	 * recursively by the elements which contain processor elements themselves
+	 * (e.g. rules)
+	 * 
+	 * @param synapseEnv
+	 * @param element
+	 * @return Processor
+	 */
+	public static Processor getProcessor(SynapseEnvironment synapseEnv, OMElement element) {
+		OMNamespace n = element.getNamespace();
+		System.out.println(element.getLocalName());
+		Class cls = find(new QName(n.getName(), element
+				.getLocalName()));
+		try {
+			ProcessorConfigurator pc = (ProcessorConfigurator) cls.newInstance();
+			Processor p = pc.createProcessor(synapseEnv, element);
+			return p;
+		} catch (InstantiationException e) {
+			throw new SynapseException(e);
+		} catch (IllegalAccessException e) {
+			throw new SynapseException(e);
+		}
 	}
 }

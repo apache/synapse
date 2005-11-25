@@ -17,9 +17,9 @@ public class StageProcessorConfigurator extends
 		return STAGE_Q;
 	}
 
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		StageProcessor sp = new StageProcessor();
-		super.compile(se, el, sp);
+		super.addChildrenAndSetName(se, el, sp);
 		return sp;
 	}
 

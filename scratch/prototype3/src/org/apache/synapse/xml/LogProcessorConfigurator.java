@@ -19,9 +19,9 @@ public class LogProcessorConfigurator extends AbstractProcessorConfigurator {
 	}
 
 
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		LogProcessor lp = new LogProcessor();
-		super.compile(se,el,lp);
+		super.setNameOnProcessor(se,el,lp);
 		return lp;
 	}
 

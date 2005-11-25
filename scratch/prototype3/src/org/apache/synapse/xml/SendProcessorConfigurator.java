@@ -17,9 +17,9 @@ public class SendProcessorConfigurator extends AbstractProcessorConfigurator {
 
 	
 
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		SendProcessor sp =  new SendProcessor();
-		super.compile(se, el,sp);
+		super.setNameOnProcessor(se, el,sp);
 		return sp;
 		
 	}

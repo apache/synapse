@@ -15,9 +15,9 @@ import org.apache.synapse.processors.mediatortypes.axis2.ServiceMediatorProcesso
 public class ServiceMediatorProcessorConfigurator extends AbstractProcessorConfigurator {
 	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE,
 			"servicemediator");
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		ServiceMediatorProcessor smp = new ServiceMediatorProcessor();
-		super.compile(se,el,smp);
+		super.setNameOnProcessor(se,el,smp);
 		
 		OMAttribute attr = el.getAttribute(new QName("service"));
 		if (attr == null)

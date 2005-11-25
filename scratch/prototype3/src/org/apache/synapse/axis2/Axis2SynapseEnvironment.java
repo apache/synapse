@@ -1,27 +1,36 @@
 package org.apache.synapse.axis2;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.axis2.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
-import org.apache.synapse.xml.Configurator;
+import org.apache.synapse.xml.ProcessorConfiguratorFinder;
 
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
-	private Processor processor = null;
+	private Processor mainprocessor = null;
 
 	private ClassLoader cl = null;
+
+	private Map processors = new HashMap();
+
+	private Log log = LogFactory.getLog(getClass());
 
 	public Axis2SynapseEnvironment(OMElement synapseConfiguration,
 			ClassLoader cl) {
 		super();
 		this.cl = cl;
-		processor = Configurator.getProcessor(this, synapseConfiguration);
+		mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
 	}
 
 	public void injectMessage(SynapseMessage smc) {
-		processor.process(this, smc);
+		mainprocessor.process(this, smc);
 	}
 
 	public ClassLoader getClassLoader() {
@@ -32,14 +41,30 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 		this.cl = cl;
 	}
 
-	public void sendOn(SynapseMessage smc) {
-		Axis2Sender.sendOn(smc);
-
+	public void send(SynapseMessage sm) {
+		if (sm.isResponse()) 
+			Axis2Sender.sendBack(sm);
+		else 
+			Axis2Sender.sendOn(sm);
 	}
 
-	public void sendBack(SynapseMessage smc) {
-		Axis2Sender.sendBack(smc);
-
+	
+	public Processor lookupProcessor(String name) {
+		return (Processor) processors.get(name);
 	}
 
+	public void addProcessor(Processor p) {
+		log.debug("adding processor with name " + p.getName());
+		if (processors.containsKey(p.getName()))
+			log.warn("name " + p.getName() + "already present");
+		processors.put(p.getName(), p);
+	}
+
+	public Processor getMasterProcessor() {
+		return mainprocessor;
+	}
+	
+	public void setMasterProcessor(Processor p) {
+		mainprocessor = p;
+	}
 }

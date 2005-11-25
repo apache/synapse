@@ -13,9 +13,9 @@ import org.apache.synapse.processors.mediatortypes.ClassMediatorProcessor;
 public class ClassMediatorProcessorConfigurator extends AbstractProcessorConfigurator {
 	private static final QName CLM_Q = new QName(Constants.SYNAPSE_NAMESPACE,
 			"classmediator");
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		ClassMediatorProcessor cmp = new ClassMediatorProcessor();
-		super.compile(se, el, cmp);
+		super.setNameOnProcessor(se, el, cmp);
 
 		OMAttribute clsName = el.getAttribute(new QName("class"));
 		if (clsName == null)

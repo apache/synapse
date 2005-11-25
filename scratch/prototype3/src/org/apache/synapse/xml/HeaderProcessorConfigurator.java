@@ -28,9 +28,9 @@ public class HeaderProcessorConfigurator extends AbstractProcessorConfigurator{
 		private static final QName TYPE_ATT_Q = new QName("type"),
 			VALUE_ATT_Q = new QName("value");
 
-		public Processor compile(SynapseEnvironment se, OMElement el) {
+		public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 			HeaderProcessor hp = new HeaderProcessor();
-			super.compile(se, el, hp);
+			super.setNameOnProcessor(se, el, hp);
 			OMAttribute val = el.getAttribute(VALUE_ATT_Q);
 			OMAttribute type = el.getAttribute(TYPE_ATT_Q);
 			if (val == null || type == null) {

@@ -27,9 +27,9 @@ public class AddressingProcessorConfigurator extends AbstractProcessorConfigurat
 	}
 
 
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		AddressingProcessor ap = new AddressingProcessor();
-		super.compile(se,el,ap);
+		super.setNameOnProcessor(se,el,ap);
 		return ap;
 	}
 

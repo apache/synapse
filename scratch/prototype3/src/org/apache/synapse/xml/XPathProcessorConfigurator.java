@@ -36,10 +36,10 @@ public class XPathProcessorConfigurator extends
 	 * @see org.apache.synapse.spi.Processor#compile(org.apache.synapse.api.SynapseEnvironment,
 	 *      org.apache.axis2.om.OMElement)
 	 */
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		XPathProcessor xp = new XPathProcessor();
 
-		super.compile(se, el, xp);
+		super.addChildrenAndSetName(se, el, xp);
 
 		OMAttribute expr = el.getAttribute(XPATH_EXPRESSION_ATT_Q);
 		if (expr == null) {

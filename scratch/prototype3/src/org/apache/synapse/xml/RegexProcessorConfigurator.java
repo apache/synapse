@@ -35,9 +35,9 @@ public class RegexProcessorConfigurator extends
 
 	
 
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		RegexProcessor rp = new RegexProcessor();
-		super.compile(se, el, rp);
+		super.addChildrenAndSetName(se, el, rp);
 
 		OMAttribute patt = el.getAttribute(REGEX_PATTERN_ATT_Q);
 		if (patt == null) {

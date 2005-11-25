@@ -14,13 +14,7 @@ public class SendProcessor extends AbstractProcessor {
 	
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		log.debug("process");
-		if (smc.isResponse()) {
-			log.debug("sendback");
-			se.sendBack(smc);
-		} else {
-			log.debug("sendon");
-			se.sendOn(smc);
-		}
+		se.send(smc);
 		return false;
 
 	}

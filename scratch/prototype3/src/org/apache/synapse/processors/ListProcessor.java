@@ -23,9 +23,9 @@ public abstract class ListProcessor extends AbstractProcessor {
 	private Log log = LogFactory.getLog(getClass());
 
 	List processors = null;
-
 	
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+		log.debug("process");
 		if (processors == null) {
 			log.info("process called on empty processor list");
 			return true;
@@ -33,6 +33,7 @@ public abstract class ListProcessor extends AbstractProcessor {
 		Iterator it = processors.iterator();
 		while (it.hasNext()) {
 			Processor p = (Processor) it.next();
+			log.debug(p.getName() + " = "+ p.getClass());
 			if (!p.process(se,smc))
 				return false;
 		}
@@ -40,6 +41,12 @@ public abstract class ListProcessor extends AbstractProcessor {
 	}
 
 	public void setList(List p) {
+		log.debug("setting list");
+		Iterator it = p.iterator();
+		while (it.hasNext()) {
+			Processor x = (Processor)it.next();
+			log.debug(x.getName() +" = "+ x.getClass());
+		}
 		processors = p;
 	}
 	public List getList() {

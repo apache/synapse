@@ -7,7 +7,7 @@ import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 
 public interface ProcessorConfigurator {
-	public Processor compile(SynapseEnvironment se, OMElement el);
+	public Processor createProcessor(SynapseEnvironment se, OMElement el);
 	public QName getTagQName();
 
 }

@@ -23,9 +23,9 @@ public class FaultProcessorConfigurator extends AbstractProcessorConfigurator {
 	
 
 	
-	public Processor compile(SynapseEnvironment se, OMElement el) {
+	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		FaultProcessor fp = new FaultProcessor();
-		super.compile(se, el, fp);
+		super.setNameOnProcessor(se, el, fp);
 		return fp;
 	}
 

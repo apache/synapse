@@ -7,10 +7,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMDocument;
-import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.*;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
@@ -74,7 +71,7 @@ public class Axis2EvnSetup {
                 .getDefaultEnvelope();
         OMDocument doc = fac.createOMDocument();
         doc.addChild(env);
-        OMElement ele = fac.createOMElement("text", "urn:text-body","t");
+        OMElement ele = fac.createOMElement("text", "urn:text-body","ns");
         env.getBody().addChild(ele);
         return env;
     }

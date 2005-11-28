@@ -30,7 +30,6 @@ public class Constants {
 
 	public static final String MEDIATE_OPERATION_NAME = "mediate";
 
-
 	public static final String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
 
 	public static final String ISRESPONSE_PROPERTY = "synapse.isresponse";

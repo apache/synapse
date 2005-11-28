@@ -15,7 +15,7 @@
  */
 package org.apache.synapse;
 
-import javax.xml.namespace.QName;
+
 
 /**
  * @author Paul Fremantle

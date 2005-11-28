@@ -1,3 +1,19 @@
+/*
+ * Copyright 2004,2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.synapse.processors.mediatortypes.axis2;
 
 
@@ -17,9 +33,18 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.axis2.Axis2SOAPMessageContext;
+
+import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
+/**
+ * @author Paul Fremantle
+ * <p>
+ * This class executes a service in the "owning" axis2 engine.
+ * The service operation will be "mediate" and the service name is set as the ServiceName property
+ * 
+ *
+ */
 public class ServiceMediatorProcessor extends AbstractProcessor {
 	
 
@@ -28,7 +53,7 @@ public class ServiceMediatorProcessor extends AbstractProcessor {
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		MessageContext messageContext = null;
 		try {
-			messageContext = ((Axis2SOAPMessageContext) smc)
+			messageContext = ((Axis2SynapseMessage) smc)
 					.getMessageContext();
 		} catch (ClassCastException cce) {
 			throw new SynapseException(

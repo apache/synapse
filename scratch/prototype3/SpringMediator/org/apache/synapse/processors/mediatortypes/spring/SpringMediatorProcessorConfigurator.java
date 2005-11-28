@@ -9,7 +9,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axis2.om.OMAttribute;
 import org.apache.axis2.om.OMElement;
-import org.apache.synapse.Constants;
+import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
@@ -23,6 +23,20 @@ import org.springframework.core.io.ByteArrayResource;
 
 
 
+/**
+ * @author Paul Fremantle
+ * @see org.apache.synapse.processors.mediatortypes.spring.SpringMediatorProcessor
+ * <p> This class configures the Spring mediator type. 
+ * <p> The tag looks like this
+ * <xmp>
+ * <spring:springmediator name="x" bean="beanname">
+ * 		<beans> 
+ * 			spring config here
+ *  	</beans>
+ * </xmp>
+ * The spring config is inlined (future work to let it be pointed to with an attribute). The bean attribute identifies
+ * the bean inside the spring assembly to be used. 
+ */
 public class SpringMediatorProcessorConfigurator extends AbstractProcessorConfigurator {
 	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE+"/spring", "springmediator");
 	public Processor createProcessor(SynapseEnvironment se, OMElement el) {

@@ -25,6 +25,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
+/**
+ * @author Paul Fremantle
+ * 
+ * <p>
+ * 
+ * This is used to "catch" messages in Axis2 and pass them to Synapse for processing.
+ *
+ */
 public class SynapseMessageReceiver implements MessageReceiver {
 
 	private Log log = LogFactory.getLog(getClass());
@@ -33,7 +41,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
 		log.debug("receiving message");
 		SynapseEnvironment env = Axis2SynapseEnvironmentFinder
 				.getSynapseEnvironment(mc);
-		SynapseMessage smc = new Axis2SOAPMessageContext(mc);
+		SynapseMessage smc = new Axis2SynapseMessage(mc);
 		env.injectMessage(smc);
 	}
 }

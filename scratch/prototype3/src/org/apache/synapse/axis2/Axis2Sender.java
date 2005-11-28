@@ -23,7 +23,7 @@ public class Axis2Sender {
 
 		try {
 
-			MessageContext messageContext = ((Axis2SOAPMessageContext) smc)
+			MessageContext messageContext = ((Axis2SynapseMessage) smc)
 					.getMessageContext();
 			AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
 
@@ -73,7 +73,7 @@ public class Axis2Sender {
 	}
 
 	public static void sendBack(SynapseMessage smc) {
-		MessageContext messageContext = ((Axis2SOAPMessageContext) smc)
+		MessageContext messageContext = ((Axis2SynapseMessage) smc)
 				.getMessageContext();
 		AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
 

@@ -1,10 +1,10 @@
 package org.apache.synapse.spi;
 
 import junit.framework.TestCase;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
-import org.apache.axis2.Constants;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.util.Axis2EvnSetup;
 
 import javax.xml.namespace.QName;
@@ -27,25 +27,26 @@ import javax.xml.namespace.QName;
 
 public class SendBackProcessorTest extends TestCase {
     private SimpleHTTPServer synapseServer;
-        private EndpointReference targetEpr = new EndpointReference(
-                "http://127.0.0.1:5043/axis2/services/anonymous");
-        private QName operation = new QName("anonymous");
+    private EndpointReference targetEpr = new EndpointReference(
+            "http://127.0.0.1:5043/axis2/services/anonymous");
+    private QName operation = new QName("anonymous");
 
-        public void setUp() throws Exception {
-            synapseServer = new SimpleHTTPServer("target/synapse-repository-send", 5043);
-            synapseServer.start();
-        }
+    public void setUp() throws Exception {
+        synapseServer = new SimpleHTTPServer("target/synapse-repository-send",
+                5043);
+        synapseServer.start();
+    }
 
-        protected void tearDown() throws Exception {
-            synapseServer.stop();
-        }
+    protected void tearDown() throws Exception {
+        synapseServer.stop();
+    }
 
-        public void testSendPrcessor() throws Exception {
-            MessageSender msgSender = new MessageSender();
-            msgSender.setTo(targetEpr);
-            msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);
-            msgSender.send(operation.getLocalPart(), Axis2EvnSetup.payload());
+    public void testSendPrcessor() throws Exception {
+        MessageSender msgSender = new MessageSender();
+        msgSender.setTo(targetEpr);
+        msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);
+        msgSender.send(operation.getLocalPart(), Axis2EvnSetup.payload());
 
-        }
+    }
 
 }

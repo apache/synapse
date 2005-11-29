@@ -1,10 +1,5 @@
 package org.apache.synapse.processors.mediatortypes.spring;
 
-
-
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.xml.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
@@ -15,7 +10,7 @@ import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * @author Paul Fremantle
- * @see org.apache.synapse.processors.mediatortypes.spring.SpringMediatorProcessorConfigurator
+ * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator
  * <p> This class is the class that "plugs" Spring-based mediators into Synapse. 
  * <p> A spring based mediator is any object that implements mediator and can be instantiated by
  * Spring (see www.springframework.org). The mediator definition is set up using the 
@@ -26,9 +21,7 @@ import org.springframework.context.support.GenericApplicationContext;
  *
  */
 public class SpringMediatorProcessor extends AbstractProcessor {
-	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE
-			+ "/spring", "springmediator");
-
+	
 	private GenericApplicationContext ctx = null;
 
 	private String beanName = null;
@@ -42,10 +35,7 @@ public class SpringMediatorProcessor extends AbstractProcessor {
 
 	}
 
-	public QName getTagQName() {
-
-		return tagName;
-	}
+	
 
 	public void setContext(GenericApplicationContext ctx) {
 		this.ctx = ctx;

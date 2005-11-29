@@ -25,7 +25,7 @@ import org.springframework.core.io.ByteArrayResource;
 
 /**
  * @author Paul Fremantle
- * @see org.apache.synapse.processors.mediatortypes.spring.SpringMediatorProcessor
+ * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessor
  * <p> This class configures the Spring mediator type. 
  * <p> The tag looks like this
  * <xmp>

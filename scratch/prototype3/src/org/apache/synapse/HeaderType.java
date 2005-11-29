@@ -1,7 +1,30 @@
+/*
+ * Copyright 2004,2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.synapse;
 
 import org.apache.axis2.addressing.EndpointReference;
 
+/**
+ * @author Paul Fremantle
+ * <p> This class encapsulates access to headers. It has a set of "logical names" (e.g. strings) 
+ * Once you have set the logical name you can read and write that header on a SynapseMessage
+ * It is used by the RegexProcessor and the HeaderProcessor classes.
+ *
+ */
 public class HeaderType {
 
 	private final static int TO = 1, FROM = 2, FAULT = 3, ACTION = 4,

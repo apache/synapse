@@ -19,7 +19,7 @@ package org.apache.synapse.api;
 import org.apache.synapse.SynapseEnvironment;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>API for Mediators to get access to the Synapse Environment
  *
  */

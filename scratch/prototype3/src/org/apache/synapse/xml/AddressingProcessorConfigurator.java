@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.builtin.axis2.AddressingProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  *  <xmp><synapse:addressing/></xmp>
  *         <p>

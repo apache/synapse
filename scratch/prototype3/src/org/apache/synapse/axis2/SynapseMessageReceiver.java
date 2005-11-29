@@ -26,7 +26,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>
  * 

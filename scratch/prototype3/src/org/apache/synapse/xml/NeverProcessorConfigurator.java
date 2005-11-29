@@ -26,7 +26,7 @@ import org.apache.synapse.processors.NeverProcessor;
 
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <xmp><synapse:never name="optional"><more stuff in here></synapse:never></xmp>
  * Stuff in here never gets processed

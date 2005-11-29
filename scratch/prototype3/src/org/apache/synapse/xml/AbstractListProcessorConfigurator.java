@@ -29,7 +29,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.ListProcessor;
 
 /**
- * @author Paul Fremantle 
+ *
  * 
  * <p> This is the abstract parent of any tag which is a "Node" - so &ltstage>, &ltin>&ltout> and &ltnever> all fit this model
  * <p>It recursively creates a list of processors from the children. 

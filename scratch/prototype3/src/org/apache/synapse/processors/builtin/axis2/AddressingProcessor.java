@@ -43,7 +43,7 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  *         <p>
  *         This class turns on the addressing module and then calls an empty
  *         service There's probably a better way but this should work!

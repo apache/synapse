@@ -29,7 +29,7 @@ import org.apache.synapse.SynapseMessage;
 
 
 /**
- * @author Paul Fremantle This class simply runs the message through all rules,
+ *
  *         stages, mediations that it has as subelements It is a way of grouping
  *         stuff.
  * 

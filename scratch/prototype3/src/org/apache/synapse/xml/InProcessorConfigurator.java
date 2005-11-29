@@ -27,7 +27,7 @@ import org.apache.synapse.processors.InProcessor;
 
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>
  * <xmp><in name="optional">.... </in></xmp>

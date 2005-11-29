@@ -30,8 +30,8 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.xml.ProcessorConfiguratorFinder;
 
 /**
- * @author Paul Fremantle
- * @author Anthony Elder
+ *
+ *
  * 
  * <p> This is the Axis2 implementation of the SynapseEnvironment 
  *

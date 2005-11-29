@@ -18,7 +18,7 @@ import org.apache.synapse.xml.AbstractProcessorConfigurator;
 
 
 /**
- * @author Paul Fremantle
+ *
  * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessor
  * <p> This class configures the XSLT transformer 
  * <p> The tag looks like this

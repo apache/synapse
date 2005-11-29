@@ -32,8 +32,8 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 
 /**
- * @author Paul Fremantle
- * @author Anthony Elder
+
+
  * 
  * <p>
  * The SynapseEnvironment needs to be set up and then is used by the SynapseMessageReceiver to inject messages.

@@ -34,7 +34,7 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  *         <p>
  *         This returns a fault in response to this message
  * 

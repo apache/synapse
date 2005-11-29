@@ -34,7 +34,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.rules.RegexProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  */
 public class RegexProcessorConfigurator extends

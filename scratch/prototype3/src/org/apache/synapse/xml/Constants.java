@@ -16,7 +16,7 @@
 package org.apache.synapse.xml;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>
  * Constants used in the XML processing
  *

@@ -23,7 +23,7 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.synapse.Constants;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>Does nothing! Used as an endpoint so we can engage modules
  *
  */

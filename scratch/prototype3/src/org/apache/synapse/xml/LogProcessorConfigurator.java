@@ -26,7 +26,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.builtin.LogProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>
  * Logs messages using Commons-logging. 

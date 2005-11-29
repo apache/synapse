@@ -18,7 +18,7 @@ package org.apache.synapse;
 
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p> Global constants for the Synapse project
  *

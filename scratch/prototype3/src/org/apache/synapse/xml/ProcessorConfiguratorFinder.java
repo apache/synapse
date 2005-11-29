@@ -35,7 +35,7 @@ import org.apache.synapse.SynapseException;
 import sun.misc.Service;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * This class is based on J2SE Service Provider model
  * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider

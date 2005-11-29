@@ -17,7 +17,7 @@ package org.apache.synapse;
 
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>Common stuff needed to embed Synapse into a given runtime (e.g. Axis2) 
  *

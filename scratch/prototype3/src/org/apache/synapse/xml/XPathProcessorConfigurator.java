@@ -30,7 +30,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.rules.XPathProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>
  * This class executes a test and then processes all subsequent rules/mediations

@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.axis2.Axis2SOAPMessageContext;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EvnSetup;
 /*
@@ -28,7 +28,7 @@ public class ClassMediatorProcessorTest extends TestCase {
     private MessageContext msgCtx;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<stage name=\"logall\">\n" +
+                    "<stage name=\"loger\">\n" +
                     "    <classmediator name=\"mediation\" class=\"sampleMediators.Logger\"/>\n" +
                     "</stage>\n" +
                     "</synapse>";
@@ -41,7 +41,7 @@ public class ClassMediatorProcessorTest extends TestCase {
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-        SynapseMessage smc = new Axis2SOAPMessageContext(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
     }
 }

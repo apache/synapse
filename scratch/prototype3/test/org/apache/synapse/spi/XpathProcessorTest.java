@@ -6,7 +6,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.util.Axis2EvnSetup;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.axis2.Axis2SOAPMessageContext;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -34,7 +34,7 @@ public class XpathProcessorTest extends TestCase {
             "</synapse>";
     public void testXpathProcessor() throws Exception {
         MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
-        SynapseMessage smc = new Axis2SOAPMessageContext(mc);
+        SynapseMessage smc = new Axis2SynapseMessage(mc);
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());

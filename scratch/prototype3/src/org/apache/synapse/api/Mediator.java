@@ -17,6 +17,11 @@ package org.apache.synapse.api;
 
 import org.apache.synapse.SynapseMessage;
 
+/**
+ * @author Paul Fremantle
+ * <p>API interface for pluggable mediators
+ *
+ */
 public interface Mediator {
 	public boolean mediate(SynapseMessage smc);
 }

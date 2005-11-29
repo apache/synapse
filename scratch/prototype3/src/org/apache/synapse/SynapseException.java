@@ -15,6 +15,11 @@
  */
 package org.apache.synapse;
 
+/**
+ * @author Paul Fremantle
+ * <p>Runtime exception for Synapse code to throw
+ *
+ */
 public class SynapseException extends RuntimeException {
 
 	private static final long serialVersionUID = -7244032125641596311L;

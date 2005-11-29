@@ -16,6 +16,12 @@
 package org.apache.synapse;
 
 
+/**
+ * @author Paul Fremantle
+ * 
+ * <p>Common stuff needed to embed Synapse into a given runtime (e.g. Axis2) 
+ *
+ */
 public interface SynapseEnvironment {
 	public void injectMessage(SynapseMessage smc);
 	public ClassLoader getClassLoader();

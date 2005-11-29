@@ -28,7 +28,7 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.ListProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>
  * This checks the pattern against a property and if true processes the message with its child or children
  * <p>

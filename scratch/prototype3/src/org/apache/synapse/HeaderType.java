@@ -19,7 +19,7 @@ package org.apache.synapse;
 import org.apache.axis2.addressing.EndpointReference;
 
 /**
- * @author Paul Fremantle
+ *
  * <p> This class encapsulates access to headers. It has a set of "logical names" (e.g. strings) 
  * Once you have set the logical name you can read and write that header on a SynapseMessage
  * It is used by the RegexProcessor and the HeaderProcessor classes.

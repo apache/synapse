@@ -23,7 +23,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * Calls another processor which is referred to by the Ref property.
  *

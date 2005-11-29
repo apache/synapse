@@ -18,7 +18,7 @@ package org.apache.synapse.api;
 import org.apache.synapse.SynapseMessage;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>API interface for pluggable mediators
  *
  */

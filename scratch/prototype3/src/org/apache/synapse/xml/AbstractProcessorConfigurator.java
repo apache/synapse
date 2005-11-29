@@ -25,7 +25,7 @@ import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p> This is the abstract superclass of any tag that isn't a "node". I.e. mediators or builtin
  * mediators like log

@@ -18,7 +18,7 @@ package org.apache.synapse.processors;
 
 
 /**
- * @author Paul Fremantle A stage is a way of naming and grouping a set of elements
+ *
  * 
  * 
  */

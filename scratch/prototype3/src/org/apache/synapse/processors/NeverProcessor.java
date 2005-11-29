@@ -21,7 +21,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
 /**
- * @author Paul Fremantle
+ *
  * This never executes its children. Used as a holder (for references)
  *
  */

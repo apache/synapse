@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.StageProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  *<xmp><synapse:stage name="optional"> do everything in here </synapse:stage></xmp>
  */
 public class StageProcessorConfigurator extends

@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.builtin.axis2.FaultProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  *         <p>
  *         <xmp><synapse:fault name="optional"/> </xmp>
  * 	TODO add the ability to configure the fault codes, etc

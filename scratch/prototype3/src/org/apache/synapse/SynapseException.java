@@ -16,7 +16,7 @@
 package org.apache.synapse;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>Runtime exception for Synapse code to throw
  *
  */

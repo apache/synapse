@@ -20,8 +20,8 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
 
 /**
- * @author Ant Elder
- * @author Paul Fremantle
+ *
+ *
  * <p>A sample Mediator that logs the message
  * 
  */

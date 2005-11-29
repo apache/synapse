@@ -24,7 +24,7 @@ import org.apache.synapse.api.Mediator;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * This executes the "mediate" operation on a new instance of the specified class
  * 

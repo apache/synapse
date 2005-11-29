@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>
  * Logs the message using commons logging
  * 

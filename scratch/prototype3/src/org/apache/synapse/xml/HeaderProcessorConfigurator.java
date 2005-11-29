@@ -27,7 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.builtin.HeaderProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  *         <p>
  *         <xmp><synapse:header name="optional" type="to|from|faultto|replyto|action"
  *         value="newvalue"/> </xmp>

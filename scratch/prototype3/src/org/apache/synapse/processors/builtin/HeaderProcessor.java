@@ -24,7 +24,7 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  *      @see org.apache.synapse.HeaderType  
  * <p> Sets aspects of the header to new values.
  *   Uses HeaderType to set header values     

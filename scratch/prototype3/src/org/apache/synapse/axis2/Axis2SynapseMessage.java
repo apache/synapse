@@ -28,7 +28,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseMessage;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>
  * A wrapper on Axis2's Message Context that implements the SynapseMessage interface

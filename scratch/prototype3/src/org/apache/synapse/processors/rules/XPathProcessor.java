@@ -26,7 +26,7 @@ import org.apache.synapse.processors.ListProcessor;
 import org.jaxen.JaxenException;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p>
  * This class executes an XPath test against the message envelope and then processes all subsequent rules/mediations

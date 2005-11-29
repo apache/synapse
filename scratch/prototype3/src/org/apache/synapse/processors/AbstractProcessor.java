@@ -19,7 +19,7 @@ package org.apache.synapse.processors;
 import org.apache.synapse.Processor;
 
 /**
- * @author Paul Fremantle
+ *
  * <p> 
  * Abstract Processor... simply has a name
  * 

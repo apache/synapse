@@ -17,7 +17,7 @@
 package org.apache.synapse.processors;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * This implements the main processor. Delegates to ListProcessor
  * Here in case we need the main <synapse> to do anything special

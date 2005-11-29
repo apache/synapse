@@ -9,7 +9,7 @@ import org.apache.synapse.processors.AbstractProcessor;
 import org.springframework.context.support.GenericApplicationContext;
 
 /**
- * @author Paul Fremantle
+ *
  * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator
  * <p> This class is the class that "plugs" Spring-based mediators into Synapse. 
  * <p> A spring based mediator is any object that implements mediator and can be instantiated by

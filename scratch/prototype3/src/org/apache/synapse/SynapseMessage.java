@@ -22,7 +22,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.soap.SOAPEnvelope;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * <p> The core definition of a message flowing thru Axis.
  *

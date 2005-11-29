@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator
  * <p> This class is the class that transforms messages using XSLT. 
  *   

@@ -27,7 +27,7 @@ import org.apache.axis2.engine.AbstractDispatcher;
 import org.apache.axis2.engine.AxisConfiguration;
 
 /**
- * @author Paul Fremantle
+ *
  * 
  * This sends every message to the SynapseMessageReceiver so that it can pass them to Synapse
  *

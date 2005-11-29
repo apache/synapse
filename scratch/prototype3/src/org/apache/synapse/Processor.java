@@ -18,7 +18,7 @@ package org.apache.synapse;
 
 
 /**
- * @author Paul Fremantle This interface implements the core of Synapse. 
+ *
  * 
  * The processor then deals with a message. It returns false if no further
  * processing is desired. It can have a name (or null)

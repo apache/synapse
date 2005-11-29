@@ -26,7 +26,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.mediatortypes.ClassMediatorProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * <xmp><synapse:classmediator name="nm" class="org.fremantle.mediator"</synapse:classmediator></xmp>
  * TODO add ability to configure properties with Strings/OMElements based on children.
  */

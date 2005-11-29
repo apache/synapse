@@ -38,7 +38,7 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
 
 /**
- * @author Paul Fremantle
+ *
  * <p>
  * This class executes a service in the "owning" axis2 engine.
  * The service operation will be "mediate" and the service name is set as the ServiceName property

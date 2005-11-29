@@ -5,7 +5,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.axis2.Axis2SOAPMessageContext;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EvnSetup;
 /*
@@ -42,7 +42,7 @@ public class AddressingProcessorTest extends TestCase {
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-        SynapseMessage smc = new Axis2SOAPMessageContext(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
         assertTrue(((Boolean) smc.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());

@@ -70,7 +70,23 @@
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository-fault/axis2.xml"/>
         <copy file="test/rules/synapse-fault-return.xml"
-              tofile="target/synapse-repository-fault/synapse.xml"/>       
+              tofile="target/synapse-repository-fault/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - Send ----------"/>
+        <mkdir dir="target/synapse-repository-send"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-send/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-send/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-send/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository-send/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository-fault/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-send/axis2.xml"/>
+        <copy file="test/rules/synapse-send.xml"
+              tofile="target/synapse-repository-send/synapse.xml"/>  
 
     </postGoal>
 

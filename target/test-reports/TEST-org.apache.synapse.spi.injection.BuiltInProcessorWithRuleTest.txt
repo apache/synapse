@@ -1,8 +1,0 @@
-Testsuite: org.apache.synapse.spi.injection.BuiltInProcessorWithRuleTest
-Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.391 sec
-
-------------- Standard Output ---------------
-synapse
-stage
-log
-------------- ---------------- ---------------

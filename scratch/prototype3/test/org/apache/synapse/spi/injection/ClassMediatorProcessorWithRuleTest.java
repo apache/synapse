@@ -1,4 +1,4 @@
-package org.apache.synapse.spi;
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
@@ -24,7 +24,7 @@ import org.apache.synapse.util.Axis2EvnSetup;
 *
 */
 
-public class ClassMediatorProcessorTest extends TestCase {
+public class ClassMediatorProcessorWithRuleTest extends TestCase {
     private MessageContext msgCtx;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
@@ -43,5 +43,6 @@ public class ClassMediatorProcessorTest extends TestCase {
                 Thread.currentThread().getContextClassLoader());
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
+        assertNotNull(env.lookupProcessor("mediation"));
     }
 }

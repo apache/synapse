@@ -1,13 +1,13 @@
-package org.apache.synapse.spi;
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.util.Axis2EvnSetup;
-import org.apache.synapse.SynapseMessage;
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.util.Axis2EvnSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -25,21 +25,24 @@ import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 *
 */
 
-public class XpathProcessorTest extends TestCase {
-     private String synapsexml =
+public class RegexProcessorWithRuleTest extends TestCase {
+
+    private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<stage name=\"xpath\">\n" +
-                    "    <xpath expr=\"//ns:text\" xmlns:ns=\"urn:text-body\"/>\n" +
+                    "<stage name=\"regex\">\n" +
+                    "    <regex message-address=\"to\" pattern=\"http://xmethods..\\*\"/>\n" +
                     "</stage>\n" +
             "</synapse>";
-    public void testXpathProcessor() throws Exception {
+
+    public void testRegexProcessor() throws Exception {
         MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        mc.setTo(new EndpointReference("http://xmethods.org"));
         SynapseMessage smc = new Axis2SynapseMessage(mc);
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
         env.injectMessage(smc);
+        assertEquals("regex", env.lookupProcessor("regex").getName());
+
     }
 }
-
-

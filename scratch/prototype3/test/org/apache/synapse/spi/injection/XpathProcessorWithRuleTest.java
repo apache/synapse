@@ -1,13 +1,13 @@
-package org.apache.synapse.state;
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.util.Axis2EvnSetup;
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Constants;
-import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -25,32 +25,22 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 *
 */
 
-public class InTest extends TestCase {
-    private MessageContext msgCtx;
-    private String synapsexml =
+public class XpathProcessorWithRuleTest extends TestCase {
+     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<in>" +
-                    "    <ref ref=\"add\"/>\n" +
-                    "</in>\n" +
-                    "<never>\n"+
-                        "<stage name=\"add\">\n"+
-                            "<addressing/>\n" +
-                        "</stage>\n"+
-                    "</never>\n" +
-            "</synapse>\n";
-
-    public void setUp() throws Exception {
-        msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
-    }
-
-    public void testAddressingProcessor() throws Exception {
+                    "<stage name=\"xpath\">\n" +
+                    "    <xpath expr=\"//ns:text\" xmlns:ns=\"urn:text-body\"/>\n" +
+                    "</stage>\n" +
+            "</synapse>";
+    public void testXpathProcessor() throws Exception {
+        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        SynapseMessage smc = new Axis2SynapseMessage(mc);
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
-        assertTrue(((Boolean) smc.getProperty(
-                Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
+        assertEquals("xpath",env.lookupProcessor("xpath").getName());
     }
-
 }
+
+

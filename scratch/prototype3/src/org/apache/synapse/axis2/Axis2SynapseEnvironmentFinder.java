@@ -30,6 +30,7 @@ import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 
 /**
 
@@ -41,52 +42,48 @@ import org.apache.synapse.SynapseException;
  *  
  *
  */
-public class Axis2SynapseEnvironmentFinder {
+public class Axis2SynapseEnvironmentFinder implements Constants {
 
-	private static final String SYNAPSECONFIGURATION = "SynapseConfiguration";
+   public static synchronized SynapseEnvironment getSynapseEnvironment(
+            MessageContext mc) {
+        AxisConfiguration ac = mc.getSystemContext().getAxisConfiguration();
+        Parameter synapseEnvParam = ac.getParameter(SYNAPSE_ENVIRONMENT);
+        if (synapseEnvParam == null) {
 
-	public static final String SYNAPSE_ENVIRONMENT = "synapse.environment";
+            Parameter param = ac.getParameter(SYNAPSECONFIGURATION);
+            if (param == null) {
+                throw new SynapseException("no parameter '"
+                        + SYNAPSECONFIGURATION + "' in axis2.xml");
+            }
+            String synapseConfig = (String) param.getValue();
+            InputStream is = mc.getAxisService().getClassLoader()
+                    .getResourceAsStream(synapseConfig);
 
-	public static synchronized SynapseEnvironment getSynapseEnvironment(
-			MessageContext mc) {
-		AxisConfiguration ac = mc.getSystemContext().getAxisConfiguration();
-		Parameter synapseEnvParam = ac.getParameter(SYNAPSE_ENVIRONMENT);
-		if (synapseEnvParam == null) {
+            StAXOMBuilder builder;
+            try {
+                builder = new StAXOMBuilder(is);
 
-			Parameter param = ac.getParameter(SYNAPSECONFIGURATION);
-			if (param == null) {
-				throw new SynapseException("no parameter '"
-						+ SYNAPSECONFIGURATION + "' in axis2.xml");
-			}
-			String synapseConfig = (String) param.getValue();
-			InputStream is = mc.getAxisService().getClassLoader()
-					.getResourceAsStream(synapseConfig);
+            } catch (XMLStreamException e1) {
+                throw new SynapseException(
+                        "Trouble parsing Synapse Configuration ", e1);
 
-			StAXOMBuilder builder;
-			try {
-				builder = new StAXOMBuilder(is);
+            }
+            OMElement config = builder.getDocumentElement();
+            // todo: ---- following needed to be added.
+            config.build();
+            Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc
+                    .getAxisService().getClassLoader());
 
-			} catch (XMLStreamException e1) {
-				throw new SynapseException(
-						"Trouble parsing Synapse Configuration ", e1);
+            synapseEnvParam = new ParameterImpl(SYNAPSE_ENVIRONMENT, null);
+            synapseEnvParam.setValue(se);
+            try {
+                ac.addParameter(synapseEnvParam);
+            } catch (AxisFault e) {
+                throw new SynapseException(e);
+            }
+        }
+        return (SynapseEnvironment) synapseEnvParam.getValue();
 
-			}
-			OMElement config = builder.getDocumentElement();
-			// todo: ---- following needed to be added.
-			config.build();
-			Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc
-					.getAxisService().getClassLoader());
-
-			synapseEnvParam = new ParameterImpl(SYNAPSE_ENVIRONMENT, null);
-			synapseEnvParam.setValue(se);
-			try {
-				ac.addParameter(synapseEnvParam);
-			} catch (AxisFault e) {
-				throw new SynapseException(e);
-			}
-		}
-		return (SynapseEnvironment) synapseEnvParam.getValue();
-
-	}
+    }
 
 }

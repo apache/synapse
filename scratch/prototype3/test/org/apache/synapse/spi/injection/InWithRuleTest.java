@@ -1,13 +1,13 @@
-package org.apache.synapse.spi;
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.util.Axis2EvnSetup;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.Constants;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -25,23 +25,33 @@ import org.apache.synapse.util.Axis2EvnSetup;
 *
 */
 
-public class RegexProcessorTest extends TestCase {
-
+public class InWithRuleTest extends TestCase {
+    private MessageContext msgCtx;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<stage name=\"regex\">\n" +
-                    "    <regex message-address=\"to\" pattern=\"http://xmethods..\\*\"/>\n" +
-                    "</stage>\n" +
-            "</synapse>";
+                    "<in>" +
+                    "    <ref ref=\"add\"/>\n" +
+                    "</in>\n" +
+                    "<never>\n"+
+                        "<stage name=\"add\">\n"+
+                            "<addressing/>\n" +
+                        "</stage>\n"+
+                    "</never>\n" +
+            "</synapse>\n";
 
-    public void testRegexProcessor() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
-        mc.setTo(new EndpointReference("http://xmethods.org"));
-        SynapseMessage smc = new Axis2SynapseMessage(mc);
+    public void setUp() throws Exception {
+        msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+    }
+
+    public void testAddressingProcessor() throws Exception {
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
-
+        assertTrue(((Boolean) smc.getProperty(
+                Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
+        assertEquals("add",env.lookupProcessor("add").getName());
     }
+
 }

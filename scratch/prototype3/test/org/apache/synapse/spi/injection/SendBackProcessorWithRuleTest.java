@@ -1,4 +1,4 @@
-package org.apache.synapse.spi;
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.Constants;
@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 *
 */
 
-public class SendBackProcessorTest extends TestCase {
+public class SendBackProcessorWithRuleTest extends TestCase {
     private SimpleHTTPServer synapseServer;
     private EndpointReference targetEpr = new EndpointReference(
             "http://127.0.0.1:5043/axis2/services/anonymous");

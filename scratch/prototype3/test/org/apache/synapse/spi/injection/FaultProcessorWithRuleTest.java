@@ -35,7 +35,7 @@ public class FaultProcessorWithRuleTest extends TestCase {
      */
     private SimpleHTTPServer synapseServer;
     private EndpointReference targetEpr = new EndpointReference(
-            "http://127.0.0.1:5044/axis2/services/anonymous");
+            "http://127.0.0.1:5043/axis2/services/anonymous");
     private QName operation = new QName("anonymous");
 
     public void setUp() throws Exception {

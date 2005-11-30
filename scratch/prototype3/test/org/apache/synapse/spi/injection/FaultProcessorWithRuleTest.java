@@ -1,14 +1,3 @@
-package org.apache.synapse.spi.injection;
-
-import junit.framework.TestCase;
-import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.MessageSender;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.synapse.util.Axis2EvnSetup;
-
-import javax.xml.namespace.QName;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -25,6 +14,18 @@ import javax.xml.namespace.QName;
 * limitations under the License.
 *
 */
+package org.apache.synapse.spi.injection;
+
+import junit.framework.TestCase;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.synapse.util.Axis2EvnSetup;
+
+import javax.xml.namespace.QName;
 
 public class FaultProcessorWithRuleTest extends TestCase {
     /**
@@ -48,8 +49,10 @@ public class FaultProcessorWithRuleTest extends TestCase {
 
     public void testFaultPrcessor() throws Exception {
         MessageSender msgSender = new MessageSender();
-        msgSender.setTo(targetEpr);
-        msgSender.setSenderTransport(Constants.TRANSPORT_HTTP);
+        Options co = new Options();
+        co.setTo(targetEpr);
+        co.setSenderTransportProtocol(Constants.TRANSPORT_HTTP);
+        msgSender.setClientOptions(co);
         msgSender.send(operation.getLocalPart(),Axis2EvnSetup.payload());
 
     }

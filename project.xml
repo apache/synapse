@@ -1,164 +1,287 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <name>Synapse</name>
+
     <pomVersion>3</pomVersion>
 
-    <!-- a unique name for this project -->
-    <name>Apache Synapse</name>
-    <id>synapse</id>
-    <groupId>synapse</groupId>
-    <package>org.apache.synapse</package>
+    <id>Synapse</id>
 
-    <currentVersion></currentVersion>
+    <name>Apache Synpase</name>
 
-    <!-- details about the organization that 'owns' the project -->
+    <currentVersion>M1-SNAPSHOT</currentVersion>
+
     <organization>
-        <name>Apache Software Foundation</name>
-        <url>http://www.apache.org/</url>
+        <name>Apache Web Services</name>
+        <url>http://ws.apache.org/</url>
         <logo>http://www.apache.org/images/asf-logo.gif</logo>
     </organization>
 
     <inceptionYear>2005</inceptionYear>
-    <package></package>
-    <logo></logo>
-    <description>The Synapse project will create a robust, lightweight implementation of a highly scalable and distributed service mediation framework based on Web services specifications.</description>
-    <shortDescription>Apache Synapse</shortDescription>
+    <package>org.apache.synapse</package>
+    <logo/>
+    <description>The Synapse project will create a robust, lightweight
+        implementation of a highly scalable and distributed service mediation
+        framework based on Web services specifications.</description>
+
     <!-- the project home page -->
-    <url>http://incubator.apache.org/synapse</url>
-    <issueTrackingUrl></issueTrackingUrl>
-    <siteAddress>http://incubator.apache.org/synapse</siteAddress>
-    <siteDirectory></siteDirectory>
-    <distributionDirectory></distributionDirectory>
-    <mailingLists>
-        <mailingList>
-            <name>Synapse Developer List</name>
-            <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
-            <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
-            <archive></archive>
+    <!--todo: need to setup uri, issueTracker, site, and dist dir  -->
+    <!--<url>http://ws.apache.org/synapse/</url>-->
+    <!--<issueTrackingUrl>http://issues.apache.org/jira/browse/KAND</issueTrackingUrl>-->
+    <!--<siteAddress>ws.apache.org</siteAddress>-->
+    <!--<siteDirectory>/synapse/</siteDirectory>-->
+    <!--<distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>-->
+    <!--todo-->
 
-        </mailingList>
-        <mailingList>
-            <name>Synapse User List</name>
-            <subscribe></subscribe>
-            <unsubscribe></unsubscribe>
-            <archive></archive>
-        </mailingList>
-    </mailingLists>
+    <!-- any mailing lists for the project -->
+    <!--todo-->
+    <!--<mailingLists>-->
+    <!--<mailingList>-->
+    <!--<name>Synpase Developer List</name>-->
+    <!--<subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>-->
+    <!--<unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>-->
+    <!--<archive></archive>-->
+    <!--</mailingList>-->
+    <!--</mailingLists>-->
 
-    <!-- ========== -->
-    <!-- Developers -->
-    <!-- ========== -->
-
+    <!-- who the developers are for the project -->
     <developers>
-<developer>
-            <name>Fabrice Medio</name>
-            <id>Fabrice</id>
-            <email>fmedio AT bluetitan.com</email>
-            <organization>Blue Titan</organization>
-        </developer>
-<developer>
-            <name>Dan Kulp</name>
-            <id>dan</id>
-            <email>daniel.kulp AT iona.com</email>
-            <organization>Iona</organization>
-        </developer>
-<developer>
-            <name>Adi Sakala</name>
-            <id>adi</id>
-            <email>adi.sakala AT iona.com</email>
-            <organization>Iona</organization>
-        </developer>
-<developer>
-            <name>Carl Trieloff </name>
-            <id>carl</id>
-            <email>ctrieloff AT iona.com</email>
-            <organization>Iona</organization>
-        </developer>
-<developer>
-            <name>Sathish Kumar T.K</name>
-            <id>sathish</id>
-            <email></email>
-            <organization>Infravio</organization>
-        </developer>
-<developer>
-            <name>D. Hariharasudhan</name>
-            <id>hariharasudhan</id>
-            <email></email>
-            <organization>Infravio</organization>
-        </developer>
-<developer>
-            <name> P. Vikas Roonwal</name>
-            <id>vikas</id>
-            <email></email>
-            <organization>Infravio</organization>
-        </developer>
-<developer>
-            <name>Dave Chappell</name>
-            <id>dave</id>
-            <email>chappell AT sonicsoftware.com</email>
-            <organization>Sonic Software</organization>
-        </developer>
-
-
-<developer>
-            <name>Glen Daniels - Member of ASF, Member of WS PMC and Axis Committer</name>
-            <id>glen</id>
-            <email>gdaniels AT apache.org</email>
-            <organization>Sonic Software</organization>
-        </developer>
-
-<developer>
-            <name>Paul Fremantle - Member of WS PMC and Axis Committer</name>
+        <developer>
+            <name>Paul Fremantle</name>
             <id>paul</id>
-            <email>paul AT wso2.com</email>
+            <email>paul@wso2.com</email>
             <organization>WSO2</organization>
         </developer>
-<developer>
-            <name>Davanum Srinivas - Member of ASF, WS PMC Chair and Axis Committer</name>
-            <id>dims</id>
-            <email>dims AT apache.org</email>
-            <organization>WSO2</organization>
-        </developer>
-<developer>
-            <name>Sanjiva Weerawarana - - Member of ASF, Member of WS PMC and Axis Committer</name>
+        <developer>
+            <name>Sanjiva Weerawarana</name>
             <id>sanjiva</id>
-            <email>sanjiva AT apache.org</email>
+            <email>sanjiva@wso2.com</email>
             <organization>WSO2</organization>
         </developer>
-        <developer>
-            <name>Eran Chinthaka - Member of WS PMC and Axis Committer</name>
-            <id>chinthaka</id>
-            <email>chinthaka AT apache.org</email>
-            <organization>WSO2</organization>
-            <url>http://www.apache.org/~chinthaka</url>
-        </developer>
-        <developer>
-            <name>Saminda Abeyruwan - Axis Committer</name>
-            <id>saminda</id>
-            <email>saminda AT apache.org</email>
-            <organization>WSO2</organization>
-        </developer>
-        
+        <!--todo : all the developers here-->
 
     </developers>
-    
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
+    <!-- build information for the project -->
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
 
-    
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
 
- 
+    <dependencies>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+
+        <!-- external JARs -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>${commons.httpclient.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>${commons.discovery.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons.codec.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+            <url>http://dist.codehaus.org/stax/jars/</url>
+        </dependency>
+        <dependency>
+            <groupId>${stax.impl.groupid}</groupId>
+            <artifactId>${stax.impl.artifactid}</artifactId>
+            <version>${stax.impl.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>${stax.api.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>${axis.wsdl4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>${geronimo.spec.javamail.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>${geronimo.spec.activation.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xmlbeans</groupId>
+            <artifactId>xbean</artifactId>
+            <version>${xbean.version}</version>
+            <type>jar</type>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>wss4j</groupId>
+            <artifactId>wss4j</artifactId>
+            <version>${wss4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>${xmlsec.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov</artifactId>
+            <version>${bcprov.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>${opensaml.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <properties>
+                <classloader>root</classloader>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xmlParserAPIs</artifactId>
+            <version>${xerces.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>${jaxen.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.6.0</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+    </dependencies>
+
+    <!-- ================================= -->
+    <!-- build information for the project -->
+    <!-- ================================= -->
+
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <!--<excludes>-->
+            <!--<exclude>**/NaughtyTest.java</exclude>-->
+            <!--</excludes>-->
+        </unitTest>
+        <resources>
+            <!--<resource>-->
+                <!--<directory>test-resources</directory>-->
+                <!--<includes>-->
+                    <!--<include>*.*</include>-->
+                <!--</includes>-->
+            <!--</resource>-->
+        </resources>
+
+    </build>
+
     <!-- ======= -->
     <!-- Reports -->
     <!-- ======= -->
 
     <reports>
-    
-       
-        <report>maven-changes-plugin</report>
-        
-        
+        <!--<report>maven-changes-plugin</report>-->
+        <!--<report>maven-jdepend-plugin</report>-->
+        <!--<report>maven-checkstyle-plugin</report>-->
+        <!--<report>maven-pmd-plugin</report>-->
+        <!--<report>maven-junit-report-plugin</report>-->
+        <!--<report>maven-license-plugin</report>-->
+        <!--<report>maven-jxr-plugin</report>-->
     </reports>
-   
 </project>
 

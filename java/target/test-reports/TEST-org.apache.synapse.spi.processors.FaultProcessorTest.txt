@@ -1,3 +1,0 @@
-Testsuite: org.apache.synapse.spi.processors.FaultProcessorTest
-Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.219 sec
-

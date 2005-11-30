@@ -25,7 +25,7 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 *
 */
 
-public class InWithRuleTest extends TestCase {
+public class InProcessorWithRuleTest extends TestCase {
     private MessageContext msgCtx;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +

@@ -3,8 +3,12 @@ package org.apache.synapse.spi.injection;
 import junit.framework.TestCase;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.Processor;
+import org.apache.synapse.processors.rules.RegexProcessor;
+import org.apache.synapse.xml.RegexProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EvnSetup;
@@ -26,23 +30,35 @@ import org.apache.synapse.util.Axis2EvnSetup;
 */
 
 public class RegexProcessorWithRuleTest extends TestCase {
-
+    private SynapseEnvironment env;
+    private OMElement config;
+    private MessageContext mc;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"regex\">\n" +
                     "    <regex message-address=\"to\" pattern=\"http://xmethods..\\*\"/>\n" +
                     "</stage>\n" +
             "</synapse>";
+    public void setUp() throws Exception{
+        mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        mc.setTo(new EndpointReference("http://xmethods.org"));
+        config = Axis2EvnSetup.getSynapseConfigElement(synapsexml);
+        env = new Axis2SynapseEnvironment(config,
+                Thread.currentThread().getContextClassLoader());
+    }
 
     public void testRegexProcessor() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
-        mc.setTo(new EndpointReference("http://xmethods.org"));
         SynapseMessage smc = new Axis2SynapseMessage(mc);
-        SynapseEnvironment env = new Axis2SynapseEnvironment(
-                Axis2EvnSetup.getSynapseConfigElement(synapsexml),
-                Thread.currentThread().getContextClassLoader());
         env.injectMessage(smc);
         assertEquals("regex", env.lookupProcessor("regex").getName());
+
+    }
+
+    public void testRegexProcessorConfigurator() throws Exception {
+        RegexProcessorConfigurator conf = new RegexProcessorConfigurator();
+        Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
+        assertTrue(pro instanceof RegexProcessor);
+        assertEquals("to",((RegexProcessor)pro).getHeaderType());
 
     }
 }

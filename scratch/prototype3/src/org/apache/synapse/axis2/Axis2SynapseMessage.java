@@ -131,7 +131,6 @@ public class Axis2SynapseMessage implements SynapseMessage {
 	}
 
 	public String getWSAMessageId() {
-
 		return mc.getWSAMessageId();
 	}
 

@@ -1,0 +1,24 @@
+Testsuite: org.apache.synapse.spi.processors.AddressingProcessorTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.532 sec
+
+------------- Standard Output ---------------
+- Handler {http://synapse.apache.org}SynapseDispatcherAdded to place 1 At the Phase Dispatch
+- Handler {http://axis.ws.apache.org}DispatchPostConditionsEvaluator Added to the Phase PostDispatch
+- Handler default HandlerAdded to place 1 At the Phase PostDispatch
+- found the custom dispatching order and continue with that order
+- adding new module
+- Deploying module : addressing
+- adding new module
+- Deploying module : synapse
+- Handler default Handler Added to the Phase MessageProcessing
+- mediate Operation Name not found in WSDL
+- Deployment WS Name  emptymediator.aar
+- Handler default Handler Added to the Phase MessageProcessing
+- mediate Operation Name not found in WSDL
+- Deployment WS Name  synapse.aar
+- Handler default Handler Added to the Phase MessageProcessing
+- Invoking Handler 'AddressingInHandler' in Phase 'PreDispatch'
+- Invoking Handler '{http://synapse.apache.org}SynapseDispatcher' in Phase 'Dispatch'
+- Invoking Handler '{http://axis.ws.apache.org}DispatchPostConditionsEvaluator' in Phase 'PostDispatch'
+- Invoking Handler 'default Handler' in Phase 'PostDispatch'
+------------- ---------------- ---------------

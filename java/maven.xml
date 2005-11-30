@@ -8,6 +8,131 @@
     xmlns:define="jelly:define">
 
 
+
+    <goal name="setclasspath">
+        <path id="test.classpath">
+            <path refid="maven.dependency.classpath"/>
+        </path>
+    </goal>
+
+    <postGoal name="test:compile">
+        <ant:mkdir dir="${basedir}/target/lib"/>
+        <deploy:copy-deps todir="${basedir}/target/lib"/>
+
+        <echo message="----------------Creating synapse.mar----------------"/>
+        <mkdir dir="target/modules/synapse/META-INF"/>
+        <copy file="src/org/apache/synapse/axis2/META-INF/module.xml"
+              tofile="target/modules/synapse/META-INF/module.xml"/>
+        <jar jarfile="target/synapse.mar"
+             basedir="target/modules/synapse">
+            <include name="**"/>
+        </jar>
+
+        <echo message="----------------Creating First Dispatching aar----------------"/>
+        <mkdir dir="target/services/synapse/META-INF"/>
+        <copy file="synapse-test-resources/axis2/services/synapse/META-INF/services.xml"
+              tofile="target/services/synapse/META-INF/services.xml"/>
+        <jar jarfile="target/synapse.aar"
+             basedir="target/services/synapse">
+            <include name="**"/>
+        </jar>
+        <echo message="----------------Creating Empty Mediator aar----------------"/>
+        <mkdir dir="target/services/emptymediator/META-INF"/>
+        <copy file="synapse-test-resources/axis2/services/emptymediator/META-INF/services.xml"
+              tofile="target/services/emptymediator/META-INF/services.xml"/>
+        <jar jarfile="target/emptymediator.aar"
+             basedir="target/services/emptymediator">
+            <include name="**"/>
+        </jar>
+
+        <echo message="----------------Creating NPE aar----------------"/>
+        <mkdir dir="target/services/npe/META-INF"/>
+        <mkdir dir="target/services/npe/org/apache/axis2/test"/>
+        <copy file="test/org/apache/axis2/META-INF/services.xml"
+              tofile="target/services/npe/META-INF/services.xml"/>
+        <copy file="target/test-classes/org/apache/axis2/test/Echo.class"
+              tofile="target/services/npe/org/apache/axis2/test/Echo.class"/>
+        <jar jarfile="target/npe.aar"
+             basedir="target/services/npe">
+            <include name="**"/>
+        </jar>
+
+
+        <echo message="-----------Creating Testing Repository - Genral----------"/>
+        <mkdir dir="target/synapse-repository"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository/axis2.xml"/>
+
+        <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
+        <mkdir dir="target/synapse-repository-fault"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-fault/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-fault/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository-fault/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository-fault/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-fault/axis2.xml"/>
+        <copy file="test/rules/synapse-fault-return.xml"
+              tofile="target/synapse-repository-fault/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - Send ----------"/>
+        <mkdir dir="target/synapse-repository-send"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-send/services/synapse.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-send/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-send/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository-send/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository-send/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-send/axis2.xml"/>
+        <copy file="test/rules/synapse-send.xml"
+              tofile="target/synapse-repository-send/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - SendOn ----------"/>
+        <mkdir dir="target/synapse-repository-sendon"/>
+        <copy file="target/synapse.aar"
+              tofile="target/synapse-repository-sendon/services/synapse.aar"/>
+        <copy file="target/npe.aar"
+              tofile="target/synapse-repository-sendon/services/npe.aar"/>
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
+        <mkdir dir="target/synapse-repository-sendon/modules"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository-sendon/modules/synapse.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository-sendon/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-sendon/axis2.xml"/>
+        <copy file="test/rules/synapse-sendon.xml"
+              tofile="target/synapse-repository-sendon/synapse.xml"/>
+
+        <echo message="-----------Creating Testing Repository - SendOnAxis2 ----------"/>
+        <mkdir dir="target/synapse-repository-sendonAxis2"/>
+
+        <copy file="target/npe.aar"
+              tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>
+
+        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+              tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/axis2.xml"
+              tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
+    </postGoal>
 <!-- ================================================================ -->
     <!--- Reports -->
     <!-- ================================================================ -->
@@ -34,4 +159,6 @@
             <echo>tasklist is disabled.</echo>
 
     </postGoal>
+
+
 </project>

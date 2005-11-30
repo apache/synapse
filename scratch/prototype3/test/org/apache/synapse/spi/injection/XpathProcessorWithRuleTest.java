@@ -2,12 +2,15 @@ package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.util.Axis2EvnSetup;
-import org.apache.synapse.SynapseMessage;
+import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.Processor;
+import org.apache.synapse.processors.rules.XPathProcessor;
+import org.apache.synapse.xml.XPathProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.util.Axis2EvnSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -26,20 +29,34 @@ import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 */
 
 public class XpathProcessorWithRuleTest extends TestCase {
-     private String synapsexml =
+    private MessageContext mc;
+    private OMElement config;
+    private SynapseEnvironment env;
+    private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"xpath\">\n" +
                     "    <xpath expr=\"//ns:text\" xmlns:ns=\"urn:text-body\"/>\n" +
                     "</stage>\n" +
-            "</synapse>";
-    public void testXpathProcessor() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
-        SynapseMessage smc = new Axis2SynapseMessage(mc);
-        SynapseEnvironment env = new Axis2SynapseEnvironment(
-                Axis2EvnSetup.getSynapseConfigElement(synapsexml),
+                    "</synapse>";
+
+    public void setUp() throws Exception {
+        mc = Axis2EvnSetup
+                .axis2Deployment("target/synapse-repository");
+        config = Axis2EvnSetup.getSynapseConfigElement(synapsexml);
+        env = new Axis2SynapseEnvironment(config,
                 Thread.currentThread().getContextClassLoader());
+    }
+
+    public void testXpathProcessor() throws Exception {
+        SynapseMessage smc = new Axis2SynapseMessage(mc);
         env.injectMessage(smc);
-        assertEquals("xpath",env.lookupProcessor("xpath").getName());
+        assertEquals("xpath", env.lookupProcessor("xpath").getName());
+    }
+    public void testXpathProcessorConfigurator() throws Exception {
+        XPathProcessorConfigurator conf = new XPathProcessorConfigurator();
+        Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
+        assertTrue(pro instanceof XPathProcessor);
+        assertEquals("//ns:text",((XPathProcessor)pro).getXPathExpr());
     }
 }
 

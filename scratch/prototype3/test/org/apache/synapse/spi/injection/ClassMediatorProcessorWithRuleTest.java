@@ -2,8 +2,12 @@ package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.Processor;
+import org.apache.synapse.processors.mediatortypes.ClassMediatorProcessor;
+import org.apache.synapse.xml.ClassMediatorProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EvnSetup;
@@ -26,6 +30,8 @@ import org.apache.synapse.util.Axis2EvnSetup;
 
 public class ClassMediatorProcessorWithRuleTest extends TestCase {
     private MessageContext msgCtx;
+    private SynapseEnvironment env;
+    private OMElement config;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"loger\">\n" +
@@ -35,14 +41,21 @@ public class ClassMediatorProcessorWithRuleTest extends TestCase {
 
     public void setUp() throws Exception {
         msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        config = Axis2EvnSetup.getSynapseConfigElement(synapsexml);
+        env = new Axis2SynapseEnvironment(config,
+                Thread.currentThread().getContextClassLoader());
     }
 
     public void testClassMediatorProcessor() throws Exception {
-        SynapseEnvironment env = new Axis2SynapseEnvironment(
-                Axis2EvnSetup.getSynapseConfigElement(synapsexml),
-                Thread.currentThread().getContextClassLoader());
+
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
         assertNotNull(env.lookupProcessor("mediation"));
+    }
+    public void testClassMediatorConfigurator() throws Exception {
+        ClassMediatorProcessorConfigurator conf = new ClassMediatorProcessorConfigurator();
+        Processor pro = conf.createProcessor(env, config.getFirstElement().getFirstElement());
+        assertTrue(pro instanceof ClassMediatorProcessor);
+        assertEquals("mediation",pro.getName());
     }
 }

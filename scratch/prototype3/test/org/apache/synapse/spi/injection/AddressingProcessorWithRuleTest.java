@@ -2,9 +2,13 @@ package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.om.OMElement;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.Processor;
+import org.apache.synapse.processors.builtin.axis2.AddressingProcessor;
+import org.apache.synapse.xml.AddressingProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EvnSetup;
@@ -27,6 +31,8 @@ import org.apache.synapse.util.Axis2EvnSetup;
 
 public class AddressingProcessorWithRuleTest extends TestCase {
     private MessageContext msgCtx;
+    private SynapseEnvironment env;
+    private OMElement config;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"logall\">\n" +
@@ -36,15 +42,24 @@ public class AddressingProcessorWithRuleTest extends TestCase {
 
     public void setUp() throws Exception {
         msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        config =Axis2EvnSetup.getSynapseConfigElement(synapsexml);
+        env = new Axis2SynapseEnvironment(config,
+                Thread.currentThread().getContextClassLoader());
     }
 
     public void testAddressingProcessor() throws Exception {
-        SynapseEnvironment env = new Axis2SynapseEnvironment(
-                Axis2EvnSetup.getSynapseConfigElement(synapsexml),
-                Thread.currentThread().getContextClassLoader());
+
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
         assertTrue(((Boolean) smc.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
+    }
+
+    public void testAddressingConfigurator() throws Exception {
+        AddressingProcessorConfigurator conf = new AddressingProcessorConfigurator();
+
+        Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
+        assertTrue(pro instanceof AddressingProcessor);
+        assertNull(pro.getName());
     }
 }

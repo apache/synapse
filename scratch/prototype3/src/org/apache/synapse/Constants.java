@@ -23,7 +23,7 @@ package org.apache.synapse;
  * <p> Global constants for the Synapse project
  *
  */
-public class Constants {
+public interface Constants {
 	
 
 	public static final String CLASSMEDIATOR = "classmediator";
@@ -35,4 +35,9 @@ public class Constants {
 	public static final String ISRESPONSE_PROPERTY = "synapse.isresponse";
 
 	public static final String EMPTYMEDIATOR = "emptymediator";
+
+    //this is for the synapse.xml config
+    String SYNAPSECONFIGURATION = "SynapseConfiguration";
+
+	String SYNAPSE_ENVIRONMENT = "synapse.environment";
 }

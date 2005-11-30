@@ -1,4 +1,4 @@
-package org.apache.synapse.spi;
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.om.OMAbstractFactory;
@@ -30,7 +30,7 @@ import java.io.ByteArrayInputStream;
 *
 */
 
-public class BuiltInProcessorTest extends TestCase {
+public class BuiltInProcessorWithRuleTest extends TestCase {
 
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
@@ -44,6 +44,7 @@ public class BuiltInProcessorTest extends TestCase {
         env = new Axis2SynapseEnvironment(
                 Axis2EvnSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
+        assertNotNull(env.getMasterProcessor());
      }
 
 }

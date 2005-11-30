@@ -1,0 +1,49 @@
+Testsuite: org.apache.synapse.spi.injection.FaultProcessorWithRuleTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 4.766 sec
+
+------------- Standard Output ---------------
+- Handler {http://synapse.apache.org}SynapseDispatcherAdded to place 1 At the Phase Dispatch
+- Handler {http://axis.ws.apache.org}DispatchPostConditionsEvaluator Added to the Phase PostDispatch
+- Handler default HandlerAdded to place 1 At the Phase PostDispatch
+- found the custom dispatching order and continue with that order
+- adding new module
+- Deploying module : addressing
+- adding new module
+- Deploying module : synapse
+- Handler default Handler Added to the Phase MessageProcessing
+- mediate Operation Name not found in WSDL
+- Deployment WS Name  emptymediator.aar
+- Handler default Handler Added to the Phase MessageProcessing
+- mediate Operation Name not found in WSDL
+- Deployment WS Name  synapse.aar
+- Handler {http://axis.ws.apache.org}AddressingBasedDispatcherAdded to place 1 At the Phase Dispatch
+- Handler {http://axis.ws.apache.org}RequestURIBasedDispatcherAdded to place 1 At the Phase Dispatch
+- Handler {http://axis.ws.apache.org}SOAPActionBasedDispatcherAdded to place 1 At the Phase Dispatch
+- Handler {http://axis.ws.apache.org}SOAPMessageBodyBasedDispatcherAdded to place 1 At the Phase Dispatch
+- Handler {http://axis.ws.apache.org}DispatchPostConditionsEvaluatorAdded to place 1 At the Phase PostDispatch
+- Handler default HandlerAdded to place 1 At the Phase PostDispatch
+- no custom dispatching order found, continuing with the default dispaching order
+- Handler default Handler Added to the Phase MessageProcessing
+- Handler default Handler Added to the Phase MessageProcessing
+- Handler default Handler Added to the Phase MessageProcessing
+- Invoking Handler 'AddressingOutHandler' in Phase 'MessageOut'
+- Build the OMElelment EnvelopeBy the StaxSOAPModelBuilder
+- Starting Process SOAP 1.1 message
+- Build the OMElelment HeaderBy the StaxSOAPModelBuilder
+- Build the OMElelment ToBy the StaxSOAPModelBuilder
+- Build the OMElelment ReplyToBy the StaxSOAPModelBuilder
+- Build the OMElelment AddressBy the StaxSOAPModelBuilder
+- Build the OMElelment MessageIDBy the StaxSOAPModelBuilder
+- Build the OMElelment BodyBy the StaxSOAPModelBuilder
+- Build the OMElelment serviceBy the StaxSOAPModelBuilder
+- Invoking Handler '{http://synapse.apache.org}SynapseDispatcher' in Phase 'Dispatch'
+- Invoking Handler '{http://axis.ws.apache.org}DispatchPostConditionsEvaluator' in Phase 'PostDispatch'
+- Invoking Handler 'default Handler' in Phase 'PostDispatch'
+synapse
+stage
+xpath
+fault
+- Build the OMElelment textBy the StaxSOAPModelBuilder
+- stop called
+- Simple Axis Server Quits
+------------- ---------------- ---------------

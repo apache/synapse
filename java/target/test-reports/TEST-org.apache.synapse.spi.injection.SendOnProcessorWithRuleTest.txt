@@ -1,0 +1,3 @@
+Testsuite: org.apache.synapse.spi.injection.SendOnProcessorWithRuleTest
+Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.218 sec
+

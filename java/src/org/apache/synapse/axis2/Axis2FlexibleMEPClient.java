@@ -25,7 +25,7 @@ import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
-import org.apache.axis2.engine.AxisConfigurationImpl;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.om.OMAbstractFactory;
 
@@ -52,7 +52,7 @@ public class Axis2FlexibleMEPClient {
             AxisService axisService = new AxisService(assumedServiceName);
             AxisOperation axisOperationTemplate = new OutInAxisOperation(
                     new QName("TemplateOperation"));
-            PhasesInfo info = ((AxisConfigurationImpl) configContext
+            PhasesInfo info = ((AxisConfiguration) configContext
                     .getAxisConfiguration()).getPhasesinfo();
             if (info != null) {
                 info.setOperationPhases(axisOperationTemplate);
@@ -124,7 +124,7 @@ public class Axis2FlexibleMEPClient {
             engine.send(msgCtx);
 
             MessageContext response = new MessageContext(msgCtx
-                    .getSystemContext(), msgCtx.getSessionContext(), msgCtx
+                    .getConfigurationContext(), msgCtx.getSessionContext(), msgCtx
                     .getTransportIn(), msgCtx.getTransportOut());
             response.setProperty(MessageContext.TRANSPORT_IN, msgCtx
                     .getProperty(MessageContext.TRANSPORT_IN));
@@ -142,7 +142,7 @@ public class Axis2FlexibleMEPClient {
                     response, msgCtx.getEnvelope().getNamespace().getName());
 
             response.setEnvelope(resenvelope);
-            engine = new AxisEngine(msgCtx.getSystemContext());
+            engine = new AxisEngine(msgCtx.getConfigurationContext());
             engine.receive(response);
             response.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
                     true));

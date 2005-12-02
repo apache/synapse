@@ -64,7 +64,7 @@ public class ServiceMediatorProcessor extends AbstractProcessor {
 		
 
 		try {
-			ConfigurationContext cc = messageContext.getSystemContext();
+			ConfigurationContext cc = messageContext.getConfigurationContext();
 			AxisConfiguration ac = cc.getAxisConfiguration();
 			AxisEngine ae = new AxisEngine(cc);
 

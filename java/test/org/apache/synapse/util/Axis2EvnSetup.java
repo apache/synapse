@@ -46,7 +46,7 @@ public class Axis2EvnSetup {
         msgCtx.setEnvelope(testEnvSetup());
         msgCtx.setServerSide(true);
 
-        AxisConfiguration axisConfiguration = msgCtx.getSystemContext()
+        AxisConfiguration axisConfiguration = msgCtx.getConfigurationContext()
                 .getAxisConfiguration();
         AxisService service = new AxisService(
                 new QName("se"));

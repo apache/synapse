@@ -50,8 +50,7 @@ public class FaultProcessorWithRuleTest extends TestCase {
     public void testFaultPrcessor() throws Exception {
         MessageSender msgSender = new MessageSender();
         Options co = new Options();
-        co.setTo(targetEpr);
-        co.setSenderTransportProtocol(Constants.TRANSPORT_HTTP);
+        co.setTo(targetEpr);        
         msgSender.setClientOptions(co);
         msgSender.send(operation.getLocalPart(),Axis2EvnSetup.payload());
 

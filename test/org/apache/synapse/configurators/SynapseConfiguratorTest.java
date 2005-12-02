@@ -33,7 +33,7 @@ public class SynapseConfiguratorTest extends TestCase {
 				.getSynapseEnvironment(mc);
         assertNotNull(env);
 
-        AxisConfiguration ac = mc.getSystemContext().getAxisConfiguration();
+        AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
 
         Parameter parm =  ac.getParameter(Constants.SYNAPSE_ENVIRONMENT);
         assertNotNull(parm);

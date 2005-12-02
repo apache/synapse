@@ -57,7 +57,7 @@ public class AddressingProcessor extends AbstractProcessor {
 		try {
 			MessageContext mc = ((Axis2SynapseMessage) smc)
 					.getMessageContext();
-			ConfigurationContext cc = mc.getSystemContext();
+			ConfigurationContext cc = mc.getConfigurationContext();
 			AxisConfiguration ac = cc.getAxisConfiguration();
 			AxisEngine ae = new AxisEngine(cc);
 			AxisService as = ac.getService(Constants.EMPTYMEDIATOR);

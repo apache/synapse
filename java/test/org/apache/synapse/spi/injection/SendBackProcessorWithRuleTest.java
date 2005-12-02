@@ -45,8 +45,7 @@ public class SendBackProcessorWithRuleTest extends TestCase {
     public void testSendPrcessor() throws Exception {
         MessageSender msgSender = new MessageSender();
         Options co = new Options();
-        co.setTo(targetEpr);
-        co.setSenderTransportProtocol(Constants.TRANSPORT_HTTP);
+        co.setTo(targetEpr);        
         msgSender.setClientOptions(co);
         msgSender.send(operation.getLocalPart(), Axis2EvnSetup.payload());
 

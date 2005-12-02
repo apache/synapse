@@ -52,13 +52,13 @@ public class FaultProcessor extends AbstractProcessor {
 					.getMessageContext();
 			MessageContext outMC = Utils
 					.createOutMessageContext(messageContext);
-			outMC.setConfigurationContext(messageContext.getSystemContext());
+			outMC.setConfigurationContext(messageContext.getConfigurationContext());
 			outMC.setServerSide(true);
 
 			outMC.setEnvelope(OMAbstractFactory.getSOAP11Factory()
 					.getDefaultFaultEnvelope());
 
-			AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
+			AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
 			Object os = messageContext
 					.getProperty(MessageContext.TRANSPORT_OUT);
 			outMC.setProperty(MessageContext.TRANSPORT_OUT, os);

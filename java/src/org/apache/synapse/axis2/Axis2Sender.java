@@ -41,9 +41,9 @@ public class Axis2Sender {
 
 			MessageContext messageContext = ((Axis2SynapseMessage) smc)
 					.getMessageContext();
-			AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
+			AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
 
-			ConfigurationContext sc = messageContext.getSystemContext();
+			ConfigurationContext sc = messageContext.getConfigurationContext();
 
 			MessageContext outMsgContext = Axis2FlexibleMEPClient
 					.send(messageContext);
@@ -91,7 +91,7 @@ public class Axis2Sender {
 	public static void sendBack(SynapseMessage smc) {
 		MessageContext messageContext = ((Axis2SynapseMessage) smc)
 				.getMessageContext();
-		AxisEngine ae = new AxisEngine(messageContext.getSystemContext());
+		AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
 
 		if (messageContext.getEnvelope().getHeader() == null)
 			messageContext.getEnvelope().getBody().insertSiblingBefore(

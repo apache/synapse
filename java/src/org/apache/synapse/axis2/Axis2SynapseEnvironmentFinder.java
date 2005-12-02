@@ -46,7 +46,7 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
 
    public static synchronized SynapseEnvironment getSynapseEnvironment(
             MessageContext mc) {
-        AxisConfiguration ac = mc.getSystemContext().getAxisConfiguration();
+        AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
         Parameter synapseEnvParam = ac.getParameter(SYNAPSE_ENVIRONMENT);
         if (synapseEnvParam == null) {
 

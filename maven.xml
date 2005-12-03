@@ -1,18 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="jar"
-    xmlns:j="jelly:core"
-    xmlns:u="jelly:util"
-    xmlns:deploy="deploy"
-    xmlns:ant="jelly:ant"
-    xmlns:maven="jelly:maven"
-    xmlns:define="jelly:define">
+         xmlns:j="jelly:core"
+         xmlns:u="jelly:util"
+         xmlns:deploy="deploy"
+         xmlns:ant="jelly:ant"
+         xmlns:maven="jelly:maven"
+         xmlns:define="jelly:define">
 
-
+    <j:set var="dist.name" value="${pom.artifactId}-${pom.currentVersion}"/>
+    <j:set var="dist.dir" value="target/dist"/>
 
     <goal name="setclasspath">
         <path id="test.classpath">
             <path refid="maven.dependency.classpath"/>
         </path>
+    </goal>
+
+    <!-- =============================================================================== -->
+    <!-- =============================================================================== -->
+    <!-- ==================== Creating Lightweight War ================================= -->
+    <goal name="init">
+        <ant:mkdir dir="target"/>
+        <ant:mkdir dir="${dist.dir}"/>
+        <ant:mkdir dir="target/lib"/>
+        <uptodate property="jars.uptodate" targetfile="target/synapse.war">
+            <srcfiles dir="modules">
+                <include name="**/*.java"/>
+                <include name="**/*.xml"/>
+                <exclude name="**/target/**"/>
+            </srcfiles>
+        </uptodate>
+        <echo message="the files are up to date = ${jars.uptodate}"></echo>
+    </goal>
+
+    <goal name="jar">
+        <attainGoal name="multiproject:install"/>
+        <attainGoal name="jar:install"/>
     </goal>
 
     <postGoal name="test:compile">
@@ -133,32 +156,83 @@
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
     </postGoal>
-<!-- ================================================================ -->
+    <!-- ================================================================ -->
     <!--- Reports -->
     <!-- ================================================================ -->
     <!-- Conditionally disable linkcheck based on a property. -->
 
     <postGoal name="xdoc:register-reports">
-        
-            <echo>Reports are disabled. Deregistering all the reports ....</echo>
-            <attainGoal name="maven-linkcheck-plugin:deregister"/>
-            <echo>linkcheck is disabled.</echo>
-            <attainGoal name="maven-checkstyle-plugin:deregister"/>
-            <echo>checkstyle is disabled.</echo>
-            <attainGoal name="maven-changes-plugin:deregister"/>
-            <echo>changes is disabled.</echo>
-            <attainGoal name="maven-changelog-plugin:deregister"/>
-            <echo>changelog is disabled.</echo>
-            <attainGoal name="maven-license-plugin:deregister"/>
-            <echo>license is disabled.</echo>
-            <attainGoal name="maven-javadoc-plugin:deregister"/>
-            <echo>javadoc is disabled.</echo>
-            <attainGoal name="maven-junit-report-plugin:deregister"/>
-            <echo>junit-report is disabled.</echo>
-            <attainGoal name="maven-tasklist-plugin:deregister"/>
-            <echo>tasklist is disabled.</echo>
+
+        <echo>Reports are disabled. Deregistering all the reports ....</echo>
+        <attainGoal name="maven-linkcheck-plugin:deregister"/>
+        <echo>linkcheck is disabled.</echo>
+        <attainGoal name="maven-checkstyle-plugin:deregister"/>
+        <echo>checkstyle is disabled.</echo>
+        <attainGoal name="maven-changes-plugin:deregister"/>
+        <echo>changes is disabled.</echo>
+        <attainGoal name="maven-changelog-plugin:deregister"/>
+        <echo>changelog is disabled.</echo>
+        <attainGoal name="maven-license-plugin:deregister"/>
+        <echo>license is disabled.</echo>
+        <attainGoal name="maven-javadoc-plugin:deregister"/>
+        <echo>javadoc is disabled.</echo>
+        <attainGoal name="maven-junit-report-plugin:deregister"/>
+        <echo>junit-report is disabled.</echo>
+        <attainGoal name="maven-tasklist-plugin:deregister"/>
+        <echo>tasklist is disabled.</echo>
 
     </postGoal>
+
+    <!-- ================================================================ -->
+    <!--- dist-bin -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-bin" prereqs="jar">
+        <property name="bin.dist.dir"
+                  value="target/dist-bin/${pom.artifactId}-${pom.currentVersion}-bin"/>
+        <ant:mkdir dir="${bin.dist.dir}"/>
+        <ant:mkdir dir="${dist.dir}"/>
+        <ant:mkdir dir="${bin.dist.dir}/docs"/>
+        <ant:mkdir dir="${bin.dist.dir}/bin"/>
+        <ant:mkdir dir="${bin.dist.dir}/lib"/>
+        <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
+
+
+        <ant:copy todir="${bin.dist.dir}/docs">
+            <ant:fileset dir="xdocs">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy todir="${bin.dist.dir}/lib" flatten="true">
+            <ant:fileset dir="target/lib">
+                <ant:include name="*.jar"/>
+                <ant:exclude name="**servlet**.jar"/>
+                <ant:exclude name="ant*.jar"/>
+                <ant:exclude name="commons-fileupload-*.jar"/>
+            </ant:fileset>
+            <ant:fileset dir="target">
+                <ant:include
+                        name="${pom.artifactId}-${pom.currentVersion}.jar"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy file="scripts/synapse-lightweight.sh"
+                  tofile="${bin.dist.dir}/bin/synapse-lightweight.sh"/>
+
+        <ant:copy todir="${bin.dist.dir}/synapse_repository">
+            <ant:fileset dir="target/synapse-repository-send/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
+        <ant:zip file="${dist.dir}/${dist.name}-bin.zip"
+                 basedir="target/dist-bin"/>
+        <ant:tar tarfile="target/${dist.name}-bin.tar"
+                 basedir="target/dist-bin"/>
+        <gzip src="target/${dist.name}-bin.tar"
+              zipfile="${dist.dir}/${dist.name}-bin.tar.gz"/>
+        <ant:delete dir="target/dist-bin"/>
+        <ant:delete file="target/${dist.name}-bin.tar"/>
+    </goal>
 
 
 </project>

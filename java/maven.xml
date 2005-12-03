@@ -233,6 +233,37 @@
         <ant:delete dir="target/dist-bin"/>
         <ant:delete file="target/${dist.name}-bin.tar"/>
     </goal>
+    <!-- ================================================================ -->
+    <!--- dist-src -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-src" prereqs="jar">
+        <ant:mkdir dir="${dist.dir}"/>
+        <ant:zip file="${dist.dir}/${dist.name}-src.zip">
+            <ant:fileset dir=".">
+                <ant:include name="**"/>
+                <ant:exclude name="**/target/**"/>
+                <ant:exclude name="**/.svn/**"/>
+                <ant:exclude name="**/bin/**"/>
+                <ant:exclude name="**/*.log"/>
+                <ant:exclude name=".*"/>
+                <ant:exclude name="**/*.license"/>
+            </ant:fileset>
+        </ant:zip>
+        <ant:tar tarfile="target/${dist.name}-src.tar" longfile="gnu">
+            <ant:tarfileset dir=".">
+                <ant:include name="**"/>
+                <ant:exclude name="**/target/**"/>
+                <ant:exclude name="**/.svn/**"/>
+                <ant:exclude name="**/bin/**"/>
+                <ant:exclude name="**/*.log"/>
+                <ant:exclude name=".*"/>
+                <ant:exclude name="**/*.license"/>
+            </ant:tarfileset>
+        </ant:tar>
+        <gzip src="target/${dist.name}-src.tar" zipfile="${dist.dir}/${dist.name}-src.tar.gz"/>
+        <ant:delete file="target/${dist.name}-src.tar"/>
+    </goal>
 
 
 </project>

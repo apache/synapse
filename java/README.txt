@@ -1,5 +1,5 @@
 ======================================================
-Apache Synapse M1 build  (December 7, 2005)
+Apache Synapse M1 build  (Month xx, 200X)
 
 http://incubator.apache.org/synapse/
 ------------------------------------------------------

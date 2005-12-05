@@ -191,7 +191,7 @@
     <!--- dist-bin -->
     <!-- ================================================================ -->
 
-    <goal name="dist-bin" prereqs="jar">
+    <goal name="dist-bin" prereqs="jar,war">
         <property name="bin.dist.dir"
                   value="target/dist-bin/${pom.artifactId}-${pom.currentVersion}-bin"/>
         <ant:mkdir dir="${bin.dist.dir}"/>

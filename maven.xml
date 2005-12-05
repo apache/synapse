@@ -24,7 +24,7 @@
         <ant:mkdir dir="${dist.dir}"/>
         <ant:mkdir dir="target/lib"/>
         <uptodate property="jars.uptodate" targetfile="target/synapse.war">
-            <srcfiles dir="modules">
+            <srcfiles dir="src">
                 <include name="**/*.java"/>
                 <include name="**/*.xml"/>
                 <exclude name="**/target/**"/>
@@ -109,6 +109,8 @@
                   tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
             <copy file="synapse-test-resources/axis2/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
+
+            <ant:delete file="target/npe.aar"/>
         </j:if>
 
 
@@ -125,6 +127,8 @@
               tofile="target/synapse-repository/modules/addressing.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository/axis2.xml"/>
+        <copy file="repo/synapse.xml"
+              tofile="target/synapse-repository/synapse.xml"/>
 
         <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
         <mkdir dir="target/synapse-repository-fault"/>
@@ -157,6 +161,15 @@
               tofile="target/synapse-repository-send/axis2.xml"/>
         <copy file="test/rules/synapse-send.xml"
               tofile="target/synapse-repository-send/synapse.xml"/>
+
+        <!-- Deleteing helper stuff-->
+
+        <ant:delete dir="target/modules"/>
+        <ant:delete dir="target/services"/>
+        <ant:delete file="target/emptymediator.aar"/>
+        <ant:delete file="target/synapse.aar"/>
+        <ant:delete file="target/synapse.mar"/>
+
 
 
     </postGoal>
@@ -191,7 +204,7 @@
     <!--- dist-bin -->
     <!-- ================================================================ -->
 
-    <goal name="dist-bin" prereqs="jar,war">
+    <goal name="dist-bin" prereqs="war">
         <property name="bin.dist.dir"
                   value="target/dist-bin/${pom.artifactId}-${pom.currentVersion}-bin"/>
         <ant:mkdir dir="${bin.dist.dir}"/>
@@ -285,7 +298,7 @@
                 <ant:include
                         name="${pom.artifactId}-${pom.currentVersion}.jar"/>
             </ant:lib>
-            <ant:webinf dir="target/synapse-repository-send/"/>
+            <ant:webinf dir="target/synapse-repository/"/>
         </ant:war>
     </goal>
 

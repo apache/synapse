@@ -35,7 +35,7 @@ public class AddressingProcessorWithRuleTest extends TestCase {
     private OMElement config;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<stage name=\"logall\">\n" +
+                    "<stage name=\"addressing\">\n" +
                     "    <addressing/>\n" +
                     "</stage>\n" +
                     "</synapse>";

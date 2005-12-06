@@ -78,8 +78,6 @@ public class StockQuoteClient {
 
 			// the transport URL
 			options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
-			options.setTransportInfo(Constants.TRANSPORT_HTTP,
-					Constants.TRANSPORT_HTTP, false);
 
 			Call call;
 			call = new Call();

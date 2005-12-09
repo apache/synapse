@@ -260,12 +260,12 @@
             <!--</excludes>-->
         </unitTest>
         <resources>
-            <!--<resource>-->
-                <!--<directory>test-resources</directory>-->
-                <!--<includes>-->
-                    <!--<include>*.*</include>-->
-                <!--</includes>-->
-            <!--</resource>-->
+            <resource>
+                <directory>config</directory>
+                <includes>
+                    <include>*.xml</include>
+                </includes>
+            </resource>
         </resources>
 
     </build>

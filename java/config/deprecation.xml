@@ -1,0 +1,23 @@
+<!-- The time format is d/m/y:H:m and its with respect to UTC.
+TimeZone is that of the system, offset from UTC is calculated internally -->
+<deprecationConfig>
+    <deprecationService Id="http://localhost:8080/deprecatedService">
+        <parameterSet>
+            <deprecationFromdate>16/10/2005:00:00</deprecationFromdate>
+            <deprecationTodate>15/11/2005:00:00</deprecationTodate>
+            <deprecationEnabled>true</deprecationEnabled>
+        </parameterSet>
+        <parameterSet>
+            <deprecationFromdate>06/09/2005:00:00</deprecationFromdate>
+            <deprecationTodate>07/12/2006:00:00</deprecationTodate>
+            <deprecationEnabled>true</deprecationEnabled>
+        </parameterSet>
+    </deprecationService>
+    <deprecationService Id="http://localhost:8080/notDeprecated">
+        <parameterSet>
+            <deprecationFromdate>06/09/2005:00:00</deprecationFromdate>
+            <deprecationTodate>26/12/2005:00:00</deprecationTodate>
+            <deprecationEnabled>false</deprecationEnabled>
+        </parameterSet>
+    </deprecationService>
+</deprecationConfig>

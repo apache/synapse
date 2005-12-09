@@ -123,7 +123,6 @@ public class DeprecationConfigurator {
         //Filter out the required parameters and generate the ConfigMap for this service
         //This is done by using the EndPointReference as a key into the configMap.
         //The value object corresponding to it is the required deprecationMap.
-        //System.out.println("EPR = "+ to);
 
         deprecationConfig = (Map) configMap.get(to.getAddress());
 

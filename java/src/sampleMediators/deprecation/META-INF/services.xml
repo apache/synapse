@@ -1,0 +1,7 @@
+<!-- Can be used if the mediator is to be provided as an axis2 service-->
+<service name="DeprecationMediator">
+    <operation name="mediate">
+        <messageReceiver class="sampleMediators.deprecation.DeprecationMediator"/>
+    </operation>
+</service>
+  

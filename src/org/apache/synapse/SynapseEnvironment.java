@@ -24,10 +24,6 @@ package org.apache.synapse;
  * 
  *
  */
-/**
- * @author Paul
- *
- */
 public interface SynapseEnvironment {
 	
 	/* 

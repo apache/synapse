@@ -114,8 +114,8 @@
             <echo message="-----------Creating Testing Repository - SendOnAxis2 ----------"/>
             <mkdir dir="target/synapse-repository-sendonAxis2"/>
 
-            <!--<copy file="target/npe.aar"-->
-                  <!--tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>-->
+            <copy file="target/npe.aar"
+                  tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>
             <copy file="target/test-mediator.aar"
                   tofile="target/synapse-repository-sendonAxis2/services/test-mediator.aar"/>
 

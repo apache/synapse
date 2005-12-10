@@ -16,19 +16,10 @@
 package org.apache.synapse.xml;
 
 /**
- *
- * <p>
+ * <p/>
  * Constants used in the XML processing
- *
  */
-public class Constants {
-	
-	
-
-	public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
-
-	public static final String SYNAPSE = "synapse";
-
-
-
+public interface Constants {
+    String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+    String SYNAPSE = "synapse";
 }

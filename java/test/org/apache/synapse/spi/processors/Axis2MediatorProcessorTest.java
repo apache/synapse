@@ -1,11 +1,10 @@
 package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
-import org.apache.synapse.util.Axis2EvnSetup;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.processors.rules.RegexProcessor;
+import org.apache.synapse.processors.Axis2MediatorProcessor;
+import org.apache.synapse.util.Axis2EvnSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.axis2.addressing.EndpointReference;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -23,15 +22,14 @@ import org.apache.axis2.addressing.EndpointReference;
 *
 */
 
-public class RegexProcessorTest extends TestCase {
-    public void testRegexProcessor() throws Exception {
-        SynapseMessage sm = new Axis2SynapseMessage(Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
-        sm.setTo(new EndpointReference("http://xmethods.org"));
-        RegexProcessor pro = new RegexProcessor();
-        pro.setPattern("http://xmethods..\\*");
+public class Axis2MediatorProcessorTest extends TestCase {
+    public void testAxis2MediatorProcessor() throws Exception {
+        SynapseMessage sm = new Axis2SynapseMessage(
+                Axis2EvnSetup.axis2Deployment("target/synapse-repository-sendonAxis2"));
+        Axis2MediatorProcessor pro = new Axis2MediatorProcessor();
+        pro.setServiceMediatorName("test-mediator");
         boolean result = pro.process(null,sm);
         assertTrue(result);
-        //todo: smc stuff
-
+        //todo
     }
 }

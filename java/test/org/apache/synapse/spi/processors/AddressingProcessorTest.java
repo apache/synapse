@@ -34,10 +34,10 @@ public class AddressingProcessorTest extends TestCase{
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
         Processor addressingProcessor = new AddressingProcessor();
-        boolean resutl = addressingProcessor.process(null,sm);
+        boolean result = addressingProcessor.process(null,sm);
         assertTrue(((Boolean) sm.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
-        assertTrue(resutl);
+        assertTrue(result);
         //todo: sm stuff
     }
 }

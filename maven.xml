@@ -80,6 +80,18 @@
                  basedir="target/services/npe">
                 <include name="**"/>
             </jar>
+             <echo message="----------------Creating test-mediator aar----------------"/>
+            <mkdir dir="target/services/test-mediator/META-INF"/>
+            <mkdir dir="target/services/test-mediator/org/apache/axis2/test"/>
+            <copy file="test/org/apache/axis2/META-INF/service-mediator.xml"
+                  tofile="target/services/test-mediator/META-INF/services.xml"/>
+            <copy file="target/test-classes/org/apache/axis2/test/TestMediator.class"
+                  tofile="target/services/test-mediator/org/apache/axis2/test/TestMediator.class"/>
+            <jar jarfile="target/test-mediator.aar"
+                 basedir="target/services/test-mediator">
+                <include name="**"/>
+            </jar>
+
 
             <echo message="-----------Creating Testing Repository - SendOn ----------"/>
             <mkdir dir="target/synapse-repository-sendon"/>
@@ -102,8 +114,10 @@
             <echo message="-----------Creating Testing Repository - SendOnAxis2 ----------"/>
             <mkdir dir="target/synapse-repository-sendonAxis2"/>
 
-            <copy file="target/npe.aar"
-                  tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>
+            <!--<copy file="target/npe.aar"-->
+                  <!--tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>-->
+            <copy file="target/test-mediator.aar"
+                  tofile="target/synapse-repository-sendonAxis2/services/test-mediator.aar"/>
 
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
@@ -111,6 +125,8 @@
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
 
             <ant:delete file="target/npe.aar"/>
+            <ant:delete file="target/test-mediator.aar"/>
+
         </j:if>
 
 

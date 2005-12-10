@@ -26,18 +26,20 @@ package org.apache.synapse;
 public interface Constants {
 	
 
-	public static final String CLASSMEDIATOR = "classmediator";
+	String CLASSMEDIATOR = "classmediator";
 
-	public static final String MEDIATE_OPERATION_NAME = "mediate";
+	String MEDIATE_OPERATION_NAME = "mediate";
 
-	public static final String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
+	String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
 
-	public static final String ISRESPONSE_PROPERTY = "synapse.isresponse";
+	String ISRESPONSE_PROPERTY = "synapse.isresponse";
 
-	public static final String EMPTYMEDIATOR = "emptymediator";
+	String EMPTYMEDIATOR = "emptymediator";
 
     //this is for the synapse.xml config
     String SYNAPSECONFIGURATION = "SynapseConfiguration";
 
 	String SYNAPSE_ENVIRONMENT = "synapse.environment";
+    // for the mediator return value
+    String MEDIATOR_STATUS="mediator.status";
 }

@@ -37,7 +37,7 @@ public class SendProcessor extends AbstractProcessor {
 	
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		log.debug("process");
-		se.send(smc);
+		se.send(smc, se);
 		return false;
 
 	}

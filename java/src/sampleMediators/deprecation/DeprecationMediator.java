@@ -16,16 +16,26 @@
 
 package sampleMediators.deprecation;
 
+import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
 
+import java.io.InputStream;
 import java.util.Map;
 
 public class DeprecationMediator implements Mediator {
 
-    private static final DeprecationConfigurator deprecationConfigurator = new DeprecationConfigurator();
-
     DeprecationConfiguration configuration;
+    private InputStream depricationInStream;
+
+    /**
+     * work around to get the deprication.xml into the mediator system
+     */
+    public void init(MessageContext messageContext) {
+        this.depricationInStream = messageContext.getServiceContext()
+                .getAxisService().getClassLoader()
+                .getResourceAsStream("META-INF/deprecation.xml");
+    }
 
     public DeprecationMediator() {
     }
@@ -33,8 +43,10 @@ public class DeprecationMediator implements Mediator {
     public boolean mediate(SynapseMessage synapseMessageContext) {
 
         try {
-
-            Map mediatorConfig = deprecationConfigurator.getConfig(synapseMessageContext.getTo());
+            final DeprecationConfigurator deprecationConfigurator =
+                    new DeprecationConfigurator(this.depricationInStream);
+            Map mediatorConfig = deprecationConfigurator
+                    .getConfig(synapseMessageContext.getTo());
             loadConfiguration(mediatorConfig);
             DeprecationRule rules[] = configuration.getRules();
             boolean deprecated = false;
@@ -47,7 +59,9 @@ public class DeprecationMediator implements Mediator {
 
             }
 
-            synapseMessageContext.setProperty(DeprecationConstants.CFG_DEPRECATION_RESULT, Boolean.valueOf(deprecated));
+            synapseMessageContext.setProperty(
+                    DeprecationConstants.CFG_DEPRECATION_RESULT,
+                    Boolean.valueOf(deprecated));
 
             return !(deprecated);
 
@@ -62,10 +76,14 @@ public class DeprecationMediator implements Mediator {
 
         for (int i = 0; true; i++) {
 
-            String serviceKey = DeprecationConstants.CFG_DEPRECATION_SERVICE + "[" + i + "]";
-            String fromDateKey = DeprecationConstants.CFG_DEPRECATION_FROM_DATE + "[" + i + "]";
-            String toDateKey = DeprecationConstants.CFG_DEPRECATION_TO_DATE + "[" + i + "]";
-            String enabledKey = DeprecationConstants.CFG_DEPRECATION_ENABLED + "[" + i + "]";
+            String serviceKey = DeprecationConstants.CFG_DEPRECATION_SERVICE +
+                    "[" + i + "]";
+            String fromDateKey = DeprecationConstants
+                    .CFG_DEPRECATION_FROM_DATE + "[" + i + "]";
+            String toDateKey = DeprecationConstants.CFG_DEPRECATION_TO_DATE +
+                    "[" + i + "]";
+            String enabledKey = DeprecationConstants.CFG_DEPRECATION_ENABLED +
+                    "[" + i + "]";
 
             if (mediatorConfig.get(serviceKey) == null) {
                 break;

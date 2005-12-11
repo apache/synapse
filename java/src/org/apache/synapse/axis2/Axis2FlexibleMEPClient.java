@@ -39,6 +39,10 @@ import org.apache.synapse.SynapseException;
 import javax.xml.namespace.QName;
 
 
+/**
+ * This is a simple client that handles both in only and in out
+ *
+ */
 public class Axis2FlexibleMEPClient {
 
     // wholesale cut and paste from axis2.clientapi.*

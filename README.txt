@@ -31,13 +31,13 @@ Support
 ===================
  
 Any problem with this release can be reported to Synapse mailing list 
-or in the JIRA issue tracker.{Which will setup soon!}
+or in the JIRA issue tracker.
 
 Mailing list subscription:
     synapse-dev-subscribe@ws.apache.org
 
 Jira:
-    {which will setup soon}
+    http://issues.apache.org/jira/browse/Synapse
 
 
 Thank you for using Synapse!

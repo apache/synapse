@@ -1,6 +1,7 @@
 package org.apache.synapse.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.engine.DependencyManager;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
 import org.apache.synapse.Constants;
@@ -23,9 +24,15 @@ import org.apache.synapse.api.Mediator;
 *
 */
 
-public class MediatationMessageReceiver extends AbstractMessageReceiver {
+public class ServiceMediatorMessageReceiver extends AbstractMessageReceiver {
     public void receive(MessageContext messageContext) throws AxisFault {
-        Mediator mediator = (Mediator) makeNewServiceObject(messageContext);
+        Object obj = makeNewServiceObject(messageContext);
+        /**
+         * Dependency manager is used in inject MessageContext to the mediator object
+         * So some service related properties can be taken from META-INF folder
+         */
+        DependencyManager.configureBusinessLogicProvider(obj,messageContext,null);
+        Mediator mediator = (Mediator)obj;
         SynapseMessage smc = new Axis2SynapseMessage(messageContext);
         boolean returnValue = mediator.mediate(smc);
         messageContext.setProperty(Constants.MEDIATOR_STATUS, new Boolean(returnValue));

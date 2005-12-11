@@ -71,7 +71,7 @@
                  basedir="target/services/npe">
                 <include name="**"/>
             </jar>
-             <echo message="----------------Creating test-mediator aar----------------"/>
+            <echo message="----------------Creating test-mediator aar----------------"/>
             <mkdir dir="target/services/test-mediator/META-INF"/>
             <mkdir dir="target/services/test-mediator/org/apache/axis2/test"/>
             <copy file="test/org/apache/axis2/META-INF/service-mediator.xml"
@@ -115,6 +115,7 @@
 
             <ant:delete file="target/npe.aar"/>
             <ant:delete file="target/test-mediator.aar"/>
+            <ant:delete dir="target/test-mediator"/>
 
         </j:if>
 
@@ -157,9 +158,33 @@
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-send/modules/addressing.mar"/>
         <copy file="repo/axis2.xml"
-                  tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
+              tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
         <copy file="test/rules/synapse-send.xml"
               tofile="target/synapse-repository-send/synapse.xml"/>
+
+        <echo message="----------------Creating DeprecationMediator aar----------------"/>
+        <mkdir dir="target/sample-deprecation/META-INF"/>
+        <mkdir dir="target/sample-deprecation/sampleMediators/deprecation"/>
+        <copy file="src/sampleMediators/deprecation/META-INF/services.xml"
+              tofile="target/sample-deprecation/META-INF/services.xml"/>
+        <copy file="src/sampleMediators/deprecation/META-INF/deprecation.xml"
+              tofile="target/sample-deprecation/META-INF/deprecation.xml"/>
+
+        <ant:copy todir="target/sample-deprecation">
+            <ant:fileset dir="classes">
+                <ant:include name="sampleMediators/deprecation/**"/>
+                <ant:exclude name="sampleMediators/deprecation/**/*.xml"/>
+            </ant:fileset>
+        </ant:copy>
+
+        <mkdir dir="target/samples"/>
+        <jar jarfile="target/DeprecationMediator.aar"
+             basedir="target/sample-deprecation">
+            <include name="**"/>
+        </jar>
+
+        <copy file="target/DeprecationMediator.aar"
+              tofile="target/samples/DeprecationMediator.aar"/>
 
         <!-- Deleteing helper stuff-->
 
@@ -167,6 +192,9 @@
         <ant:delete dir="target/services"/>
         <ant:delete file="target/emptymediator.aar"/>
         <ant:delete file="target/synapse.aar"/>
+        <ant:delete dir="target/sample-deprecation"/>
+        <ant:delete file="target/DeprecationMediator.aar"/>
+
 
 
 

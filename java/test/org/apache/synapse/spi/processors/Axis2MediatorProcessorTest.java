@@ -30,6 +30,5 @@ public class Axis2MediatorProcessorTest extends TestCase {
         pro.setServiceMediatorName("test-mediator");
         boolean result = pro.process(null,sm);
         assertTrue(result);
-        //todo
     }
 }

@@ -31,7 +31,6 @@ public class RegexProcessorTest extends TestCase {
         pro.setPattern("http://xmethods..\\*");
         boolean result = pro.process(null,sm);
         assertTrue(result);
-        //todo: smc stuff
 
     }
 }

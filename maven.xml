@@ -42,15 +42,6 @@
         <ant:mkdir dir="${basedir}/target/lib"/>
         <deploy:copy-deps todir="${basedir}/target/lib"/>
 
-        <echo message="----------------Creating synapse.mar----------------"/>
-        <mkdir dir="target/modules/synapse/META-INF"/>
-        <copy file="src/org/apache/synapse/axis2/META-INF/module.xml"
-              tofile="target/modules/synapse/META-INF/module.xml"/>
-        <jar jarfile="target/synapse.mar"
-             basedir="target/modules/synapse">
-            <include name="**"/>
-        </jar>
-
         <echo message="----------------Creating First Dispatching aar----------------"/>
         <mkdir dir="target/services/synapse/META-INF"/>
         <copy file="synapse-test-resources/axis2/services/synapse/META-INF/services.xml"
@@ -102,8 +93,6 @@
             <copy file="target/emptymediator.aar"
                   tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
             <mkdir dir="target/synapse-repository-sendon/modules"/>
-            <copy file="target/synapse.mar"
-                  tofile="target/synapse-repository-sendon/modules/synapse.mar"/>
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendon/modules/addressing.mar"/>
             <copy file="synapse-test-resources/axis2/axis2.xml"
@@ -121,7 +110,7 @@
 
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
-            <copy file="synapse-test-resources/axis2/axis2.xml"
+            <copy file="repo/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
 
             <ant:delete file="target/npe.aar"/>
@@ -137,8 +126,6 @@
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository/modules"/>
-        <copy file="target/synapse.mar"
-              tofile="target/synapse-repository/modules/synapse.mar"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository/modules/addressing.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
@@ -153,8 +140,6 @@
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository-fault/modules"/>
-        <copy file="target/synapse.mar"
-              tofile="target/synapse-repository-fault/modules/synapse.mar"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-fault/modules/addressing.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
@@ -169,12 +154,10 @@
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository-send/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository-send/modules"/>
-        <copy file="target/synapse.mar"
-              tofile="target/synapse-repository-send/modules/synapse.mar"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-send/modules/addressing.mar"/>
-        <copy file="synapse-test-resources/axis2/axis2.xml"
-              tofile="target/synapse-repository-send/axis2.xml"/>
+        <copy file="repo/axis2.xml"
+                  tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
         <copy file="test/rules/synapse-send.xml"
               tofile="target/synapse-repository-send/synapse.xml"/>
 
@@ -184,7 +167,6 @@
         <ant:delete dir="target/services"/>
         <ant:delete file="target/emptymediator.aar"/>
         <ant:delete file="target/synapse.aar"/>
-        <ant:delete file="target/synapse.mar"/>
 
 
 
@@ -252,7 +234,7 @@
                   tofile="${bin.dist.dir}/bin/synapse-lightweight.sh"/>
 
         <ant:copy todir="${bin.dist.dir}/synapse_repository">
-            <ant:fileset dir="target/synapse-repository-send/">
+            <ant:fileset dir="target/synapse-repository/">
                 <include name="**"/>
             </ant:fileset>
         </ant:copy>

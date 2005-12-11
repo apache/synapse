@@ -18,17 +18,41 @@ package org.apache.synapse;
 
 
 /**
- *
+ * Processors are the main extension mechanism for Synapse. 
+ * <p>
+ * A Processor together with the XML ProcessorConfigurator extends both the synapse.xml 
+ * and the actual processing power of Synapse.
+ * <p>
+ * Some of the processors are "builtin" and those are defined in the ProcessorConfiguratorFinder
+ * <p>
+ * Other processors can be registered using the JAR Service Provider model:
+ * <br><a href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider</a><p>
  * 
  * The processor then deals with a message. It returns false if no further
  * processing is desired. It can have a name (or null)
- * 
+ * <p>
  * Processors can either devolve processing to other processors (e.g. a rule,
  * stage, etc) or deal with the message itself (e.g. mediator)
  * 
  */
 public interface Processor {
+	
+	
+	/**
+	 * This method is used to process a message. A response of true indicates continue processing.
+	 * A response of false indicates to stop processing.
+	 */
 	public boolean process(SynapseEnvironment se, SynapseMessage sm);
+	
+	
+	/**
+	 * the name of the instance of this processor
+	 */
 	public String getName();
+	
+	
+	/**
+	 * set the name of the instance of the processor
+	 */
 	public void setName(String name);
 }

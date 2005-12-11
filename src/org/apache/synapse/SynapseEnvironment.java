@@ -49,7 +49,7 @@ public interface SynapseEnvironment {
 	 * <p>
 	 * This will send request messages on, and send response messages back to the client
 	 */
-	public void send(SynapseMessage smc);
+	public void send(SynapseMessage smc, SynapseEnvironment se);
 	
 	
 	/**

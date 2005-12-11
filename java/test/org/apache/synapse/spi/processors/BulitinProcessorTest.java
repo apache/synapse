@@ -30,7 +30,6 @@ public class BulitinProcessorTest extends TestCase {
         Processor log = new LogProcessor();
         boolean result = log.process(null,sm);
         assertTrue(result);
-        //todo
     }
     public void testSendProcessorTest() throws Exception {
 

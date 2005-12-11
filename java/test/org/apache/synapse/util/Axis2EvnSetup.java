@@ -94,7 +94,7 @@ public class Axis2EvnSetup {
         OMElement method = fac.createOMElement("service", omNs);
         OMElement value = fac.createOMElement("text", omNs);
         value.addChild(
-                fac.createText(value, "Synapse Testing String by Saminda "));
+                fac.createText(value, "Synapse Testing String"));
         method.addChild(value);
         return method;
     }

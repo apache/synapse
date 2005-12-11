@@ -38,6 +38,5 @@ public class AddressingProcessorTest extends TestCase{
         assertTrue(((Boolean) sm.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
         assertTrue(result);
-        //todo: sm stuff
     }
 }

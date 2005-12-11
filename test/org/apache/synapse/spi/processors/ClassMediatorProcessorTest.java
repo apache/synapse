@@ -31,6 +31,5 @@ public class ClassMediatorProcessorTest extends TestCase {
         pro.setClazz(Class.forName("sampleMediators.Logger"));
         boolean result = pro.process(null,sm);
         assertTrue(result);
-        //todo:
     }
 }

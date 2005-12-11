@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 */
 
 public class SendOnProcessorWithRuleTest extends TestCase {
-    
+
     private SimpleHTTPServer synapseServer;
     private SimpleHTTPServer axis2Server;
     private EndpointReference targetEpr = new EndpointReference(
@@ -40,7 +40,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
         /**
          * axis2Server is the one who holds the actual service
          */
-        axis2Server = new SimpleHTTPServer("synapse-repository-sendonAxis2",
+        axis2Server = new SimpleHTTPServer("target/synapse-repository-sendonAxis2",
                 8090);
         synapseServer.start();
         axis2Server.start();
@@ -51,7 +51,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
         axis2Server.stop();
     }
 
-    public void testSendPrcessor() throws Exception {
+    public void testSendProcessor() throws Exception {
         MessageSender msgSender = new MessageSender();
         Options options = new Options();
         options.setTo(targetEpr);

@@ -20,7 +20,7 @@ import org.apache.synapse.api.Mediator;
 *
 */
 
-public class SendOn implements Mediator {
+public class SampleRouter implements Mediator {
     public boolean mediate(SynapseMessage smc) {
         smc.setWSAAction("urn:synapse/sendon");
         smc.setTo(new EndpointReference(

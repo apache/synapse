@@ -64,11 +64,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 		this.cl = cl;
 	}
 
-	public void send(SynapseMessage sm) {
+	public void send(SynapseMessage sm, SynapseEnvironment se) {
 		if (sm.isResponse()) 
 			Axis2Sender.sendBack(sm);
 		else 
-			Axis2Sender.sendOn(sm);
+			Axis2Sender.sendOn(sm, se);
 	}
 
 	

@@ -24,8 +24,14 @@ import org.apache.axis2.soap.SOAPEnvelope;
 /**
  *
  * 
- * <p> The core definition of a message flowing thru Axis.
- *
+ * <p> The core definition of a message flowing thru Synapse.
+ * <p> The aim of this is to capture the Message Addressing Properties
+ * (aka Message Information Headers) and the SOAP Envelope. 
+ * The core To/From/FaultTo/ReplyTo/MessageID/RelatesTo stuff is here. <p>
+ * In addition this has get/setEnvelope.
+ * <p>
+ *  There is also a bag of properties<p>
+ *  There are markers for whether we support REST, MTOM and also if this is a response or not
  */
 public interface SynapseMessage {
 

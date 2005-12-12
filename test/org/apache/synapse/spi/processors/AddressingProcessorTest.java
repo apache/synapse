@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 *
 */
 
-public class AddressingProcessorTest extends TestCase{
+public class AddressingProcessorTest extends TestCase {
 
     public void testAddressingProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(

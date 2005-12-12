@@ -37,11 +37,11 @@ import java.io.ByteArrayInputStream;
 */
 
 public class Axis2EvnSetup {
-    public static MessageContext axis2Deployment(String testingReposity)
+    public static MessageContext axis2Deployment(String testingRepository)
             throws AxisFault {
         ConfigurationContextFactory conFac = new ConfigurationContextFactory();
         ConfigurationContext configCtx = conFac
-                .buildConfigurationContext(testingReposity);
+                .buildConfigurationContext(testingRepository);
         MessageContext msgCtx = new MessageContext(configCtx);
         msgCtx.setEnvelope(testEnvSetup());
         msgCtx.setServerSide(true);

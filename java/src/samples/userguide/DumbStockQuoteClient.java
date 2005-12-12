@@ -1,6 +1,6 @@
 package samples.userguide;
 
-import java.net.URL;
+
 
 import javax.xml.namespace.QName;
 
@@ -25,49 +25,37 @@ import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.om.OMText;
 import org.apache.axis2.transport.http.CommonsHTTPTransportSender;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.transport.http.HttpTransportProperties;
 
-public class ProxyStockQuoteClient {
+public class DumbStockQuoteClient {
 
 	/**
 	 * 
 	 * <p>
-	 * This is a fairly static test client for Synapse using the HTTP Proxy model.
-	 *  It makes a StockQuote request to XMethods stockquote service. There is no
-	 *  WS-Addressing To URL but we set the HTTP proxy URL to point to Synapse. 
-	 *  This results in the destination XMethods URL being embedded in the POST header. 
-	 *  Synapse will pick this out and use it to direct the message
-	 * 
+	 * This is a fairly static test client for Synapse. It makes a StockQuote
+	 * request to XMethods stockquote service. There is no EPR and there is no proxy config.
+	 * It's sort of a Gateway case. It relies on a Synapse config that will look at the URL or 
+	 * message and send it to the right place
 	 */
 	public static void main(String[] args) {
 
 		if (args.length > 0 && args[0].substring(0, 1).equals("-")) {
 			System.out
-					.println("This client demonstrates Synapse as a proxy\n"
-							+ "Usage: ProxyStockQuoteClient Symbol XmethodsURL ProxyURL");
+					.println("This client demonstrates Synapse as a gateway\n"
+							+ "Usage: ProxyStockQuoteClient Symbol SynapseURL");
 			System.out
-					.println("\nDefault values: IBM http://64.124.140.30:9090/soap http://localhost:8080");
-			System.out
-					.println("\nThe XMethods URL will be used in the <wsa:To> header");
-			System.out.println("The Proxy URL will be used as an HTTP proxy");
-			System.out
-					.println("\nTo demonstrate Synapse virtual URLs, set the xmethods URL to urn:xmethods-delayed-quotes\n"
-							+ "\nTo demonstrate content-based behaviour, set the Symbol to MSFT\n"
+					.println("\nDefault values: IBM http://localhost:8080/StockQuote"
 							+ "\nAll examples depend on using the sample synapse.xml");
 			System.exit(0);
 		}
 
 		String symb = "IBM";
-		String xurl = "http://64.124.140.30:9090/soap";
-		String purl = "http://localhost:8080";
+		String url = "http://localhost:8080/StockQuote";
+		
 
 		if (args.length > 0)
 			symb = args[0];
 		if (args.length > 1)
-			xurl = args[1];
-		if (args.length > 2)
-			purl = args[2];
+			url = args[1];
 
 		try {
 
@@ -84,26 +72,13 @@ public class ProxyStockQuoteClient {
 			// step 2 - set up the call object
 
 			// the wsa:To
-			EndpointReference targetEPR = new EndpointReference(xurl);
+			EndpointReference targetEPR = new EndpointReference(url);
 
 			Options options = new Options();
 
 			options.setTo(targetEPR);
 
-			URL url = new URL(purl);
-
-			
-			//engage HTTP Proxy
-			
-			HttpTransportProperties httpProps = new HttpTransportProperties();
-			HttpTransportProperties.ProxyProperties proxyProperties = httpProps.new ProxyProperties();
-			proxyProperties.setProxyName(url.getHost());
-			proxyProperties.setProxyPort(url.getPort());
-
-			
-			options.setProperty(HTTPConstants.PROXY, proxyProperties);
-
-			
+						
 			// create a lightweight Axis Config with no addressing to demonstrate "dumb" SOAP
 			AxisConfiguration ac = new AxisConfiguration();
 			ConfigurationContext cc = new ConfigurationContext(ac);

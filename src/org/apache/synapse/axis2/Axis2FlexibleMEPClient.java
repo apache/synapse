@@ -17,21 +17,24 @@
 package org.apache.synapse.axis2;
 
 import org.apache.axis2.addressing.EndpointReference;
+
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.deployment.util.PhasesInfo;
+import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.OutInAxisOperation;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.om.OMAbstractFactory;
 
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.http.CommonsHTTPTransportSender;
 import org.apache.axis2.util.UUIDGenerator;
+
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 
@@ -48,7 +51,7 @@ public class Axis2FlexibleMEPClient {
     // wholesale cut and paste from axis2.clientapi.*
     public static MessageContext send(MessageContext smc) {
         try {
-
+/*
             ConfigurationContext configContext = null;
             ConfigurationContextFactory efac = new ConfigurationContextFactory();
             configContext = efac.buildClientConfigurationContext(null);
@@ -57,17 +60,39 @@ public class Axis2FlexibleMEPClient {
             AxisOperation axisOperationTemplate = new OutInAxisOperation(
                     new QName("TemplateOperation"));
             PhasesInfo info = ((AxisConfiguration) configContext
-                    .getAxisConfiguration()).getPhasesinfo();
+                    .getAxisConfiguration()).getPhasesInfo();
             if (info != null) {
                 info.setOperationPhases(axisOperationTemplate);
             }
             axisService.addOperation(axisOperationTemplate);
             configContext.getAxisConfiguration().addService(axisService);
-            ServiceContext serviceContext = axisService.getParent()
-                    .getServiceGroupContext(configContext).getServiceContext(
+            ServiceContext serviceContext = axisService.getParent().getServiceGroupContext(configContext).getServiceContext(
                     assumedServiceName.getLocalPart());
 
             MessageContext msgCtx = new MessageContext(serviceContext
+                    .getConfigurationContext());
+
+*/
+        	
+			// create a lightweight Axis Config with no addressing 
+			AxisConfiguration ac = new AxisConfiguration();
+			ConfigurationContext cc = new ConfigurationContext(ac);
+			AxisServiceGroup asg = new AxisServiceGroup(ac);
+			AxisService as = new AxisService(new QName("AnonymousService"));
+			asg.addService(as);
+			ServiceGroupContext sgc = new ServiceGroupContext(cc, asg);
+			ServiceContext sc = sgc.getServiceContext("AnonymousService");
+			AxisOperation axisOperationTemplate = new OutInAxisOperation(
+					new QName("TemplateOperation"));
+			as.addOperation(axisOperationTemplate);
+			cc.getAxisConfiguration().addService(as);
+			TransportOutDescription tod = new TransportOutDescription(
+					new QName(org.apache.axis2.Constants.TRANSPORT_HTTP));
+			tod.setSender(new CommonsHTTPTransportSender());
+			
+			ac.addTransportOut(tod);
+
+			MessageContext msgCtx = new MessageContext(sc
                     .getConfigurationContext());
 
             if (smc.getSoapAction() != null)
@@ -87,6 +112,7 @@ public class Axis2FlexibleMEPClient {
                 msgCtx.setReplyTo(smc.getReplyTo());
             if (smc.getRelatesTo() != null)
                 msgCtx.setRelatesTo(smc.getRelatesTo());
+
             /**
              * We need to detach the body of the Env and attach only the body
              * part that is necessary
@@ -94,12 +120,7 @@ public class Axis2FlexibleMEPClient {
 
             //msgCtx.setEnvelope(smc.getEnvelope());
             msgCtx.setEnvelope(outEnvelopeConfiguration(smc));
-            if (msgCtx.getEnvelope().getHeader() == null)
-                msgCtx.getEnvelope().getBody().insertSiblingBefore(
-                        OMAbstractFactory.getSOAP11Factory()
-                                .getDefaultEnvelope().getHeader());
-
-            msgCtx.setServiceContext(serviceContext);
+            msgCtx.setServiceContext(sc);
 
             EndpointReference epr = msgCtx.getTo();
             String transport = null;
@@ -113,7 +134,7 @@ public class Axis2FlexibleMEPClient {
 
             if (transport != null) {
 
-                msgCtx.setTransportOut(serviceContext.getConfigurationContext()
+                msgCtx.setTransportOut(sc.getConfigurationContext()
                         .getAxisConfiguration().getTransportOut(
                         new QName(transport)));
 
@@ -123,8 +144,13 @@ public class Axis2FlexibleMEPClient {
             // initialize and set the Operation Context
 
             msgCtx.setOperationContext(axisOperationTemplate
-                    .findOperationContext(msgCtx, serviceContext));
-            AxisEngine engine = new AxisEngine(configContext);
+                    .findOperationContext(msgCtx, sc));
+            AxisEngine engine = new AxisEngine(cc);
+
+            // engage addressing if desired
+            Boolean engageAddressing = (Boolean)smc.getProperty(Constants.ADD_ADDRESSING);
+            if (engageAddressing.booleanValue()) ac.engageModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
+            
             engine.send(msgCtx);
 
             MessageContext response = new MessageContext(msgCtx

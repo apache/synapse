@@ -49,7 +49,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 			ClassLoader cl) {
 		super();
 		this.cl = cl;
-		mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
+		if (synapseConfiguration!=null)
+			mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
 	}
 
 	public void injectMessage(SynapseMessage smc) {

@@ -22,7 +22,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.processors.builtin.axis2.AddressingProcessor;
+import org.apache.synapse.processors.builtin.axis2.AddressingInProcessor;
 
 /**
  *
@@ -34,17 +34,16 @@ import org.apache.synapse.processors.builtin.axis2.AddressingProcessor;
  */
 public class AddressingProcessorConfigurator extends AbstractProcessorConfigurator {
 	private static final QName ADD_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"addressing");
+			"engage-addressing-in");
 
 
 	public QName getTagQName() {
-
 		return ADD_Q;
 	}
 
 
 	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-		AddressingProcessor ap = new AddressingProcessor();
+		AddressingInProcessor ap = new AddressingInProcessor();
 		super.setNameOnProcessor(se,el,ap);
 		return ap;
 	}

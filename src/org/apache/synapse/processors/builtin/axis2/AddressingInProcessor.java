@@ -49,7 +49,7 @@ import org.apache.synapse.processors.AbstractProcessor;
  *         service There's probably a better way but this should work!
  * 
  */
-public class AddressingProcessor extends AbstractProcessor {
+public class AddressingInProcessor extends AbstractProcessor {
 	private Log log = LogFactory.getLog(getClass());
 
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {

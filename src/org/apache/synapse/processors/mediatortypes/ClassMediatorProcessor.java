@@ -20,6 +20,7 @@ package org.apache.synapse.processors.mediatortypes;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.api.EnvironmentAware;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.processors.AbstractProcessor;
 
@@ -44,6 +45,9 @@ public class ClassMediatorProcessor extends AbstractProcessor {
 			m = (Mediator) getClazz().newInstance();
 		} catch (Exception e) {
 			throw new SynapseException(e);
+		}
+		if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
+			((EnvironmentAware) m).setSynapseEnvironment(se);
 		}
 		return m.mediate(smc);
 

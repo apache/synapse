@@ -52,7 +52,7 @@ public class Axis2MediatorProcessor extends AbstractProcessor {
             if (as == null)
                 throw new SynapseException("cannot locate service "
                         + mediatorName);
-            // todo: qos stuff goes here
+
             AxisOperation ao = as
                     .getOperation(Constants.MEDIATE_OPERATION_NAME);
             OperationContext oc = OperationContextFactory
@@ -70,6 +70,8 @@ public class Axis2MediatorProcessor extends AbstractProcessor {
             msgContext.setAxisOperation(ao);
             msgContext.setAxisService(as);
 
+            msgContext.setProperty(Constants.MEDIATOR_SYNAPSE_ENV_PROPERTY, se);
+            
             ae.receive(msgContext);
         } catch (AxisFault axisFault) {
             throw new SynapseException(axisFault);

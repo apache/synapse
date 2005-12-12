@@ -15,6 +15,8 @@
  */
 package org.apache.synapse;
 
+import javax.xml.namespace.QName;
+
 
 
 /**
@@ -28,9 +30,10 @@ public interface Constants {
 
 	String CLASSMEDIATOR = "classmediator";
 
-	String MEDIATE_OPERATION_NAME = "mediate";
+	QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
 	String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
+	String MEDIATOR_SYNAPSE_ENV_PROPERTY = "synapse.mediator.environment";
 
 	String ISRESPONSE_PROPERTY = "synapse.isresponse";
 

@@ -25,5 +25,6 @@ import org.apache.synapse.SynapseEnvironment;
  */
 public interface EnvironmentAware {
 	public void setSynapseEnvironment(SynapseEnvironment se);
+	public void setClassLoader(ClassLoader cl);
 
 }

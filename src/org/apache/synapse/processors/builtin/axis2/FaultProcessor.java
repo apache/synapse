@@ -18,20 +18,15 @@ package org.apache.synapse.processors.builtin.axis2;
 
 
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 
-import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.processors.AbstractProcessor;
+
 
 /**
  *
@@ -46,30 +41,18 @@ public class FaultProcessor extends AbstractProcessor {
 
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		log.debug("process");
-		try {
+		
 
-			MessageContext messageContext = ((Axis2SynapseMessage) smc)
-					.getMessageContext();
-			MessageContext outMC = Utils
-					.createOutMessageContext(messageContext);
-			outMC.setConfigurationContext(messageContext.getConfigurationContext());
-			outMC.setServerSide(true);
-
-			outMC.setEnvelope(OMAbstractFactory.getSOAP11Factory()
-					.getDefaultFaultEnvelope());
-
-			AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
-			Object os = messageContext
-					.getProperty(MessageContext.TRANSPORT_OUT);
-			outMC.setProperty(MessageContext.TRANSPORT_OUT, os);
-			Object ti = messageContext
-					.getProperty(HTTPConstants.HTTPOutTransportInfo);
-			outMC.setProperty(HTTPConstants.HTTPOutTransportInfo, ti);
-
-			ae.send(outMC);
-		} catch (AxisFault e) {
-			throw new SynapseException(e);
-		}
+			try {
+				smc.setEnvelope(OMAbstractFactory.getSOAP11Factory()
+						.getDefaultFaultEnvelope());
+			} catch (Exception e) {
+				throw new SynapseException(e);
+			}
+			smc.setResponse(true);
+			se.injectMessage(smc);
+			
+		
 		return false;
 	}
 

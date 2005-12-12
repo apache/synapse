@@ -39,7 +39,7 @@ public class SynapseDispatcher extends AbstractDispatcher {
 
 	private static final String SYNAPSE_SERVICE_NAME = "synapse";
 
-	private static final String MEDIATE_OPERATION_NAME = "mediate";
+	private static final QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
 	public void initDispatcher() {
 		QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");

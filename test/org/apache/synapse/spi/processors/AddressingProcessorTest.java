@@ -1,14 +1,10 @@
 package org.apache.synapse.spi.processors;
 
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.AxisFault;
 import org.apache.synapse.util.Axis2EvnSetup;
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Constants;
 import org.apache.synapse.Processor;
-import org.apache.synapse.processors.builtin.axis2.AddressingProcessor;
-import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.processors.builtin.axis2.AddressingInProcessor;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import junit.framework.TestCase;
 /*
@@ -33,7 +29,7 @@ public class AddressingProcessorTest extends TestCase {
     public void testAddressingProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
-        Processor addressingProcessor = new AddressingProcessor();
+        Processor addressingProcessor = new AddressingInProcessor();
         boolean result = addressingProcessor.process(null,sm);
         assertTrue(((Boolean) sm.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());

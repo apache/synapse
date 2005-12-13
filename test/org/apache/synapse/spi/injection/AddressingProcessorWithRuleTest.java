@@ -7,7 +7,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Processor;
-import org.apache.synapse.processors.builtin.axis2.AddressingProcessor;
+import org.apache.synapse.processors.builtin.axis2.AddressingInProcessor;
 import org.apache.synapse.xml.AddressingProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
@@ -35,8 +35,8 @@ public class AddressingProcessorWithRuleTest extends TestCase {
     private OMElement config;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<stage name=\"addressing\">\n" +
-                    "    <addressing/>\n" +
+                    "<stage name=\"engage-addressing\">\n" +
+                    "    <engage-addressing-in/>\n" +
                     "</stage>\n" +
                     "</synapse>";
 
@@ -59,7 +59,7 @@ public class AddressingProcessorWithRuleTest extends TestCase {
         AddressingProcessorConfigurator conf = new AddressingProcessorConfigurator();
 
         Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
-        assertTrue(pro instanceof AddressingProcessor);
+        assertTrue(pro instanceof AddressingInProcessor);
         assertNull(pro.getName());
     }
 }

@@ -1,18 +1,3 @@
-package org.apache.synapse.spi.injection;
-
-import junit.framework.TestCase;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.util.Axis2EvnSetup;
-import org.apache.synapse.axis2.Axis2SynapseEnvironment;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.ByteArrayInputStream;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -29,6 +14,13 @@ import java.io.ByteArrayInputStream;
 * limitations under the License.
 *
 */
+package org.apache.synapse.spi.injection;
+
+import junit.framework.TestCase;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+
 
 public class BuiltInProcessorWithRuleTest extends TestCase {
 

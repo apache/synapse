@@ -27,8 +27,8 @@ import java.util.Map;
 public class DeprecationMediator implements Mediator, EnvironmentAware {
 
     DeprecationConfiguration configuration;
-    private InputStream depricationInStream;
-    private SynapseEnvironment se;
+    private InputStream deprecationInStream;
+   // private SynapseEnvironment se;
     private ClassLoader cl;
 
 
@@ -38,9 +38,9 @@ public class DeprecationMediator implements Mediator, EnvironmentAware {
     public boolean mediate(SynapseMessage synapseMessageContext) {
 
         try {
-            this.depricationInStream = this.cl.getResourceAsStream("META-INF/deprecation.xml");
+            this.deprecationInStream = this.cl.getResourceAsStream("META-INF/deprecation.xml");
             final DeprecationConfigurator deprecationConfigurator =
-                    new DeprecationConfigurator(this.depricationInStream);
+                    new DeprecationConfigurator(this.deprecationInStream);
             Map mediatorConfig = deprecationConfigurator
                     .getConfig(synapseMessageContext.getTo());
             loadConfiguration(mediatorConfig);
@@ -97,7 +97,8 @@ public class DeprecationMediator implements Mediator, EnvironmentAware {
     }
 
     public void setSynapseEnvironment(SynapseEnvironment se) {
-        this.se = se;
+     //   this.se = se;
+     // we don't use this
     }
 
     public void setClassLoader(ClassLoader cl) {

@@ -6,6 +6,6 @@
         org.apache.axis2.test.TestMediator</parameter>
     <operation name="mediate">
         <messageReceiver
-                class="org.apache.synapse.axis2.MediatationMessageReceiver"/>
+                class="org.apache.synapse.axis2.ServiceMediatorMessageReceiver"/>
     </operation>
 </service>

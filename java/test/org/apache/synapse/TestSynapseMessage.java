@@ -8,8 +8,11 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.OMNamespace;
 
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPHeaderBlock;
+import org.apache.axis2.soap.SOAPFactory;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 public class TestSynapseMessage {
@@ -52,14 +55,11 @@ public class TestSynapseMessage {
             String testingRepository) {
         Axis2SynapseMessage sm =
                 createSampleSOAP11MessageWithoutAddressing(testingRepository);
-
-        OMElement addressingTo = OMAbstractFactory.getOMFactory()
-                .createOMElement("To", Submission.WSA_NAMESPACE, "wsa");
-        OMAbstractFactory.getOMFactory().createText(addressingTo,
-                URN_SAMPLE_TO_ADDRESS);
-        sm.getEnvelope().getHeader().addChild(addressingTo);
-        SOAPEnvelope env = sm.getEnvelope();
-        System.out.println(env);
+        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
+        OMNamespace wsaTo = fac.createOMNamespace(Submission.WSA_NAMESPACE,"wsa");
+        SOAPHeaderBlock addressingToHeaderBlock = fac.createSOAPHeaderBlock("To",wsaTo, sm.getEnvelope().getHeader());
+        addressingToHeaderBlock.setText(URN_SAMPLE_TO_ADDRESS);
+        sm.getEnvelope().getHeader().addChild(addressingToHeaderBlock);
         return sm;
 
     }

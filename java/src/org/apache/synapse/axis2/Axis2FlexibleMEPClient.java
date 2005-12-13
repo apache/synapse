@@ -51,34 +51,12 @@ public class Axis2FlexibleMEPClient {
     // wholesale cut and paste from axis2.clientapi.*
     public static MessageContext send(MessageContext smc) {
         try {
-/*
-            ConfigurationContext configContext = null;
-            ConfigurationContextFactory efac = new ConfigurationContextFactory();
-            configContext = efac.buildClientConfigurationContext(null);
-            QName assumedServiceName = new QName("AnonymousService");
-            AxisService axisService = new AxisService(assumedServiceName);
-            AxisOperation axisOperationTemplate = new OutInAxisOperation(
-                    new QName("TemplateOperation"));
-            PhasesInfo info = ((AxisConfiguration) configContext
-                    .getAxisConfiguration()).getPhasesInfo();
-            if (info != null) {
-                info.setOperationPhases(axisOperationTemplate);
-            }
-            axisService.addOperation(axisOperationTemplate);
-            configContext.getAxisConfiguration().addService(axisService);
-            ServiceContext serviceContext = axisService.getParent().getServiceGroupContext(configContext).getServiceContext(
-                    assumedServiceName.getLocalPart());
-
-            MessageContext msgCtx = new MessageContext(serviceContext
-                    .getConfigurationContext());
-
-*/
         	
 			// create a lightweight Axis Config with no addressing 
 			AxisConfiguration ac = new AxisConfiguration();
 			ConfigurationContext cc = new ConfigurationContext(ac);
 			AxisServiceGroup asg = new AxisServiceGroup(ac);
-			AxisService as = new AxisService(new QName("AnonymousService"));
+			AxisService as = new AxisService("AnonymousService");
 			asg.addService(as);
 			ServiceGroupContext sgc = new ServiceGroupContext(cc, asg);
 			ServiceContext sc = sgc.getServiceContext("AnonymousService");

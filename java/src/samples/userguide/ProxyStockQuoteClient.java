@@ -108,7 +108,7 @@ public class ProxyStockQuoteClient {
 			AxisConfiguration ac = new AxisConfiguration();
 			ConfigurationContext cc = new ConfigurationContext(ac);
 			AxisServiceGroup asg = new AxisServiceGroup(ac);
-			AxisService as = new AxisService(new QName("AnonymousService"));
+			AxisService as = new AxisService("AnonymousService");
 			asg.addService(as);
 			ServiceGroupContext sgc = new ServiceGroupContext(cc, asg);
 			ServiceContext sc = sgc.getServiceContext("AnonymousService");

@@ -48,8 +48,7 @@ public class Axis2EvnSetup {
 
         AxisConfiguration axisConfiguration = msgCtx.getConfigurationContext()
                 .getAxisConfiguration();
-        AxisService service = new AxisService(
-                new QName("se"));
+        AxisService service = new AxisService("se");
         msgCtx.setAxisService(service);
         service.setClassLoader(axisConfiguration.getServiceClassLoader());
         AxisOperation axisOp = new InOutAxisOperation(

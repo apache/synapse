@@ -34,7 +34,7 @@ public class InProcessorWithRuleTest extends TestCase {
                     "</in>\n" +
                     "<never>\n"+
                         "<stage name=\"add\">\n"+
-                            "<addressing/>\n" +
+                            "<engage-addressing-in/>\n" +
                         "</stage>\n"+
                     "</never>\n" +
             "</synapse>\n";

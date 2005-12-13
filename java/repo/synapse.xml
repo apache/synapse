@@ -1,6 +1,6 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
     <stage name="logall">
-        <addressing/>
+        <engage-addressing-in/>
 		<log/>
     </stage>
     <stage name="service-specific" >

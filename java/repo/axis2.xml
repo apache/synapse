@@ -59,7 +59,8 @@
 
     <!--<transportReceiver name="jms" class="org.apache.axis2.transport.jms.SimpleJMSListener">-->
         <!--<parameter name="transport.jms.Destination" locked="false">dynamicQueues/FOO</parameter>-->
-        <!--<parameter name="java.naming.factory.initial" locked="false">org.activemq.jndi.ActiveMQInitialContextFactory</parameter>-->
+        <!--<parameter name="java.naming.factory.initial" locked="false">-->
+            <!--org.activemq.jndi.ActiveMQInitialContextFactory</parameter>-->
         <!--<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>-->
     <!--</transportReceiver>-->
 
@@ -72,7 +73,6 @@
     <!--<transportSender name="jms" class="org.apache.axis2.transport.jms.JMSSender"/>-->
     <transportSender name="http" class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
         <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
-        <!--<parameter name="PROXY" proxy_host="smecube" proxy_port="3128" locked="true">anonymous:anonymous:anonymous</parameter>-->
     </transportSender>
     <transportSender name="https"
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
@@ -107,13 +107,13 @@
         <!--  System pre defined phases       -->
         <phase name="TransportIn"/>
         <phase name="PreDispatch"/>
-        <phase name="Dispatch">
+        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
             <handler name="AddressingBasedDispatcher"
                      class="org.apache.axis2.engine.AddressingBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
 
-             <handler name="RequestURIBasedDispatcher"
+            <handler name="RequestURIBasedDispatcher"
                      class="org.apache.axis2.engine.RequestURIBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
@@ -123,22 +123,12 @@
                 <order phase="Dispatch"/>
             </handler>
 
-             <handler name="SOAPMessageBodyBasedDispatcher"
+            <handler name="SOAPMessageBodyBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
-        </phase>
-        <phase name="PostDispatch">
-             <handler name="DispatchPostConditionsEvaluator"
-                     class="org.apache.axis2.engine.DispatchingChecker">
-                <order phase="PostDispatch"/>
-            </handler>
             <handler name="InstanceDispatcher"
                      class="org.apache.axis2.engine.InstanceDispatcher">
-                <order phase="PostDispatch"/>
-            </handler>
-            <handler name="SOAPProcessingModelChecker"
-                     class="org.apache.axis2.engine.SOAPProcessingModelChecker">
                 <order phase="PostDispatch"/>
             </handler>
         </phase>
@@ -165,4 +155,3 @@
         <phase name="MessageOut"/>
     </phaseOrder>
 </axisconfig>
-

@@ -25,9 +25,9 @@
         <ant:mkdir dir="target/lib"/>
         <uptodate property="jars.uptodate" targetfile="target/synapse.war">
             <srcfiles dir="src">
-                <include name="**/*.java"/>
-                <include name="**/*.xml"/>
-                <exclude name="**/target/**"/>
+                <include name="*.java"/>
+                <include name="*.xml"/>
+                <exclude name="target/**"/>
             </srcfiles>
         </uptodate>
         <echo message="the files are up to date = ${jars.uptodate}"></echo>
@@ -258,8 +258,10 @@
                         name="${pom.artifactId}-${pom.currentVersion}.jar"/>
             </ant:fileset>
         </ant:copy>
-        <ant:copy file="scripts/synapse-lightweight.sh"
-                  tofile="${bin.dist.dir}/bin/synapse-lightweight.sh"/>
+        <ant:copy file="bin/synapse.sh"
+                  tofile="${bin.dist.dir}/bin/synapse.sh"/>
+        <ant:copy file="bin/synapse.bat"
+                  tofile="${bin.dist.dir}/bin/synapse.bat"/>
 
         <ant:copy todir="${bin.dist.dir}/synapse_repository">
             <ant:fileset dir="target/synapse-repository/">
@@ -314,7 +316,7 @@
             <attainGoal name="jar"/>
         </j:if>
         <!-- jar the test classes -->
-        <ant:war destfile="target/synapse.war" webxml="scripts/web.xml">
+        <ant:war destfile="target/synapse.war" webxml="bin/web.xml">
             <ant:lib dir="target/lib">
                 <ant:include name="**"/>
                 <ant:exclude name="**servlet**"/>

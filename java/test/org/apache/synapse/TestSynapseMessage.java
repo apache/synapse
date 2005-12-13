@@ -16,8 +16,7 @@ import org.apache.axis2.soap.SOAPFactory;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 public class TestSynapseMessage {
-//    public static final String URN_SAMPLE_TO_ADDRESS = "urn:sample-toAddress";
-    public static final String URN_SAMPLE_TO_ADDRESS = "http://localhost:7777/axis2/services/Myservice";
+    public static final String URN_SAMPLE_TO_ADDRESS = "urn:sample-toAddress";
 
 
     public static Axis2SynapseMessage createSampleSOAP11MessageWithoutAddressing(

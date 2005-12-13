@@ -255,9 +255,9 @@
             <includes>
                 <include>**/*Test.java</include>
             </includes>
-            <excludes>
-            <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
-            </excludes>
+            <!--<excludes>-->
+                <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
+            <!--</excludes>-->
         </unitTest>
         <resources>
             <resource>

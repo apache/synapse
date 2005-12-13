@@ -2,7 +2,6 @@ package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Processor;
 import org.apache.synapse.processors.mediatortypes.ClassMediatorProcessor;
 import org.apache.synapse.util.Axis2EvnSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;

@@ -1,14 +1,3 @@
-package org.apache.synapse.spi.injection;
-
-import junit.framework.TestCase;
-import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.MessageSender;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.synapse.util.Axis2EvnSetup;
-
-import javax.xml.namespace.QName;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -24,7 +13,18 @@ import javax.xml.namespace.QName;
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *
-*/
+*/package org.apache.synapse.spi.injection;
+
+import junit.framework.TestCase;
+
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.MessageSender;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.synapse.util.Axis2EvnSetup;
+
+import javax.xml.namespace.QName;
+
 
 public class SendOnProcessorWithRuleTest extends TestCase {
 

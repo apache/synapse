@@ -1,14 +1,3 @@
-package org.apache.synapse.configurators;
-
-import junit.framework.TestCase;
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Constants;
-import org.apache.synapse.util.Axis2EvnSetup;
-import org.apache.synapse.axis2.Axis2SynapseEnvironmentFinder;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.description.Parameter;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -25,6 +14,18 @@ import org.apache.axis2.description.Parameter;
 * limitations under the License.
 *
 */
+package org.apache.synapse.configurators;
+
+import junit.framework.TestCase;
+import org.apache.synapse.SynapseEnvironment;
+
+import org.apache.synapse.Constants;
+import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.axis2.Axis2SynapseEnvironmentFinder;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.description.Parameter;
+
 
 public class SynapseConfiguratorTest extends TestCase {
     public void testSynapseEnvironmentFinder() throws Exception {

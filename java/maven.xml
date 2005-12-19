@@ -258,10 +258,13 @@
                         name="${pom.artifactId}-${pom.currentVersion}.jar"/>
             </ant:fileset>
         </ant:copy>
+
         <ant:copy file="bin/synapse.sh"
                   tofile="${bin.dist.dir}/bin/synapse.sh"/>
         <ant:copy file="bin/synapse.bat"
                   tofile="${bin.dist.dir}/bin/synapse.bat"/>
+        <ant:copy file="README.TXT"
+                  tofile="${bin.dist.dir}/README.TXT"/>
 
         <ant:copy todir="${bin.dist.dir}/synapse_repository">
             <ant:fileset dir="target/synapse-repository/">

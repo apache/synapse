@@ -171,7 +171,7 @@
               tofile="target/sample-deprecation/META-INF/deprecation.xml"/>
 
         <ant:copy todir="target/sample-deprecation">
-            <ant:fileset dir="classes">
+            <ant:fileset dir="target/classes">
                 <ant:include name="sampleMediators/deprecation/**"/>
                 <ant:exclude name="sampleMediators/deprecation/**/*.xml"/>
             </ant:fileset>

@@ -22,6 +22,7 @@ import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.Call;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.om.OMElement;
 import org.apache.synapse.util.Axis2EvnSetup;
 
 import javax.xml.namespace.QName;
@@ -57,7 +58,8 @@ public class SendOnProcessorWithRuleTest extends TestCase {
         Options options = new Options();
         options.setTo(targetEpr);
         call.setClientOptions(options);
-        call.invokeBlocking(operation.getLocalPart(), Axis2EvnSetup.payload());
+        OMElement response = call.invokeBlocking(operation.getLocalPart(), Axis2EvnSetup.payload());
+        assertEquals("Synapse Testing String_Response",response.getText());
 
     }
 

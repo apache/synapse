@@ -19,7 +19,7 @@
             <encryptionSymAlgorithm>http://www.w3.org/2001/04/xmlenc#tripledes-cbc</encryptionSymAlgorithm>
             <encryptionUser>bob</encryptionUser>
             <signatureKeyIdentifier>DirectReference</signatureKeyIdentifier>
-            <signaturePropFile>interop.properties</signaturePropFile>
+            <signaturePropFile>synapse.security.properties</signaturePropFile>
         </action>
     </parameter>
 
@@ -28,7 +28,7 @@
             <items>Encrypt Signature Timestamp</items>
             <!--<passwordCallbackClass>org.apache.axis2.security.PWCallback</passwordCallbackClass>-->
             <passwordCallbackClass>sample.security.PWCallback</passwordCallbackClass>
-            <signaturePropFile>interop.properties</signaturePropFile>
+            <signaturePropFile>synapse.security.properties</signaturePropFile>
         </action>
     </parameter>
 

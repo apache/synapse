@@ -59,7 +59,7 @@ public class ProcessorConfiguratorFinder {
 			FaultProcessorConfigurator.class,
 			AddressingProcessorConfigurator.class,
 			InProcessorConfigurator.class, OutProcessorConfigurator.class,
-			NeverProcessorConfigurator.class, RefProcessorConfigurator.class, Axis2MediatorProcessorConfigurator.class };
+			NeverProcessorConfigurator.class, RefProcessorConfigurator.class};
 
 	private static void initialise() {
 

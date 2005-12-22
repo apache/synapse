@@ -17,22 +17,27 @@
 package org.apache.synapse.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAP12Constants;
+import org.apache.axis2.soap.SOAPFactory;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
 
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.om.OMNamespace;
 
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseEnvironment;
 
+import java.util.Iterator;
+
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
- *
  */
 public class Axis2Sender {
 
@@ -48,22 +53,52 @@ public class Axis2Sender {
 
             // run all rules on response
 
+            /**
+             * temprary hack to get 200 ok, sorry
+             */
+            smc.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
+                    true));
+
             outMsgContext.setServerSide(true);
 
             // deal with the fact that AddressingOutHandler has a bug if
             // there is no header at all.        
             // fixed in axis 0.9652 
-            if (outMsgContext.getEnvelope().getHeader() == null) {
-                outMsgContext.getEnvelope().getBody().insertSiblingBefore(
-                        OMAbstractFactory.getSOAP11Factory()
-                                .getDefaultEnvelope().getHeader());
+            SOAPEnvelope envelope = outMsgContext.getEnvelope();
+            // temporarty hack
+            SOAPEnvelope newEnvelope;
+            if (envelope.getHeader() == null) {
+                SOAPFactory soapFactory;
+                if (envelope.getNamespace().getName()
+                        .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
+                     soapFactory = OMAbstractFactory.getSOAP12Factory();
+                    newEnvelope = soapFactory.getDefaultEnvelope();
+                } else {
+                    soapFactory = OMAbstractFactory.getSOAP11Factory();
+                    newEnvelope = soapFactory.getDefaultEnvelope();
+
+                }
+                /**
+                 * Need a big fix here. Axis2 folks should fix this
+                 */
+                //envelope.addChild(soapFactory.createSOAPHeader(envelope));
+                //todo: bug in Axiom when another tree is declared and copy some elements from one tree to other
+                //todo: the second tree doesn't serialize attribute aware namespaces properly
+                //todo: as a temporartory hack this was taken into account
+                Iterator iterator = envelope.getAllDeclaredNamespaces();
+                while (iterator.hasNext()) {
+                    OMNamespace namespace = (OMNamespace)iterator.next();
+                    newEnvelope.declareNamespace(namespace);
+                }
+                newEnvelope.getBody().addChild(envelope.getBody().getFirstElement());
+                outMsgContext.setEnvelope(newEnvelope);
             }
-            
+
             Object os = messageContext
                     .getProperty(MessageContext.TRANSPORT_OUT);
             outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
             TransportInDescription ti = messageContext.getTransportIn();
-                    
+
             outMsgContext.setTransportIn(ti);
             se.injectMessage(new Axis2SynapseMessage(outMsgContext));
 
@@ -76,17 +111,22 @@ public class Axis2Sender {
     public static void sendBack(SynapseMessage smc) {
         MessageContext messageContext = ((Axis2SynapseMessage) smc)
                 .getMessageContext();
-        AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
-
-        if (messageContext.getEnvelope().getHeader() == null)
-            messageContext.getEnvelope().getBody().insertSiblingBefore(
+        AxisEngine ae =
+                new AxisEngine(messageContext.getConfigurationContext());
+        try {
+            if (messageContext.getEnvelope().getHeader() == null) {
+             messageContext.getEnvelope().getBody().insertSiblingBefore(
                     OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope()
                             .getHeader());
 
-        messageContext.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
-                true));
+            }
+            System.out.println(messageContext.getEnvelope());
 
-        try {
+            messageContext
+                    .setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
+                            true));
+
+
             ae.send(messageContext);
         } catch (AxisFault e) {
             throw new SynapseException(e);

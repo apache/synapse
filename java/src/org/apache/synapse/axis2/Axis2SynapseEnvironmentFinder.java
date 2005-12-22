@@ -57,7 +57,7 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
             }
             String synapseConfig = (String) param.getValue();
             InputStream is = mc.getAxisService().getClassLoader()
-                    .getResourceAsStream(synapseConfig);
+                    .getResourceAsStream(synapseConfig.trim());
 
             StAXOMBuilder builder;
             try {

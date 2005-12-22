@@ -6,8 +6,8 @@ import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Processor;
-import org.apache.synapse.processors.Axis2MediatorProcessor;
-import org.apache.synapse.xml.Axis2MediatorProcessorConfigurator;
+import org.apache.synapse.processors.mediatortypes.axis2.ServiceMediatorProcessor;
+import org.apache.synapse.xml.ServiceMediatorProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.util.Axis2EvnSetup;
@@ -28,7 +28,7 @@ import org.apache.synapse.util.Axis2EvnSetup;
 *
 */
 
-public class Axis2MediatorProcessorWithRuleTest extends TestCase {
+public class ServiceMediatorProcessorWithRuleTest extends TestCase {
     private MessageContext msgCtx;
     private SynapseEnvironment env;
     private OMElement config;
@@ -54,10 +54,10 @@ public class Axis2MediatorProcessorWithRuleTest extends TestCase {
     }
 
     public void testAxis2MediagtorConfigurator() throws Exception {
-        Axis2MediatorProcessorConfigurator conf = new Axis2MediatorProcessorConfigurator();
+        ServiceMediatorProcessorConfigurator conf = new ServiceMediatorProcessorConfigurator();
 
         Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
-        assertTrue(pro instanceof Axis2MediatorProcessor);
+        assertTrue(pro instanceof ServiceMediatorProcessor);
         assertNotNull(pro.getName());
     }
 }

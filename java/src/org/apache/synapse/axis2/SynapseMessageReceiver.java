@@ -16,6 +16,7 @@
 package org.apache.synapse.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 
 import org.apache.axis2.engine.MessageReceiver;
@@ -26,22 +27,30 @@ import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
 /**
- *
- * 
- * <p>
- * 
+ * <p/>
+ * <p/>
  * This is used to "catch" messages in Axis2 and pass them to Synapse for processing.
- *
  */
 public class SynapseMessageReceiver implements MessageReceiver {
 
-	private Log log = LogFactory.getLog(getClass());
+    private Log log = LogFactory.getLog(getClass());
 
-	public void receive(MessageContext mc) throws AxisFault {
-		log.debug("receiving message");
-		SynapseEnvironment env = Axis2SynapseEnvironmentFinder
-				.getSynapseEnvironment(mc);
-		SynapseMessage smc = new Axis2SynapseMessage(mc);
-		env.injectMessage(smc);
-	}
+    public void receive(MessageContext mc) throws AxisFault {
+        log.debug("receiving message");
+        SynapseEnvironment env = Axis2SynapseEnvironmentFinder
+                .getSynapseEnvironment(mc);
+        SynapseMessage smc = new Axis2SynapseMessage(mc);
+        env.injectMessage(smc);
+        /**
+         * temprary hack to get 200 ok return to the sender
+         */
+        Boolean responseWritten = (Boolean) smc
+                .getProperty(org.apache.synapse.Constants.ISRESPONSE_PROPERTY);
+        if (responseWritten != null) {
+            if (responseWritten.booleanValue()) {
+                mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
+                        Constants.VALUE_TRUE);
+            }
+        }
+    }
 }

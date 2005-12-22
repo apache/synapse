@@ -4,5 +4,8 @@
             <classmediator name="simpleRouting" class="sampleMediators.SampleRouter"/>
             <send/>
         </xpath>
+        <xpath expr="//ns:response_text" xmlns:ns="urn:text-body">
+            <send/>
+        </xpath>
     </stage>
 </synapse>

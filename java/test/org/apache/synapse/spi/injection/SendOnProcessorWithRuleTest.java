@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.Call;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.util.Axis2EvnSetup;
 
@@ -52,11 +53,11 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     }
 
     public void testSendProcessor() throws Exception {
-        MessageSender msgSender = new MessageSender();
+        Call call = new Call();
         Options options = new Options();
         options.setTo(targetEpr);
-        msgSender.setClientOptions(options);
-        msgSender.send(operation.getLocalPart(), Axis2EvnSetup.payload());
+        call.setClientOptions(options);
+        call.invokeBlocking(operation.getLocalPart(), Axis2EvnSetup.payload());
 
     }
 

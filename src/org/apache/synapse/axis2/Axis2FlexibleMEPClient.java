@@ -58,7 +58,7 @@ public class Axis2FlexibleMEPClient {
             AxisService as = new AxisService("AnonymousService");
             asg.addService(as);
             ServiceGroupContext sgc = new ServiceGroupContext(cc, asg);
-            ServiceContext sc = sgc.getServiceContext("AnonymousService");
+            ServiceContext sc = sgc.getServiceContext(as);
             AxisOperation axisOperationTemplate = new OutInAxisOperation(
                     new QName("TemplateOperation"));
             as.addOperation(axisOperationTemplate);

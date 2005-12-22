@@ -241,6 +241,19 @@
                 <module>true</module>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>annogen</groupId>
+            <artifactId>annogen</artifactId>
+            <version>${annogen.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${XmlSchema.version}</version>
+        </dependency>
     </dependencies>
 
     <!-- ================================= -->

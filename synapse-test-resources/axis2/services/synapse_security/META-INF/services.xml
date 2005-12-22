@@ -1,0 +1,31 @@
+<service name="synapse_security">
+	<!--<parameter locked="false" name="ServiceClass">org.apache.axis2.oasis.ping.PingPortSkeleton</parameter>-->
+	<!--Mounting the method mediate-->
+	<operation name="mediate">
+		<messageReceiver class="org.apache.synapse.axis2.EmptyMessageReceiver"/>
+	</operation>
+
+    <parameter name="InflowSecurity">
+      <action>
+        <items>Encrypt Signature Timestamp</items>
+          <!-- for the time being let use the default PWCallback class which is available on Axis2 distribution-->
+        <passwordCallbackClass>org.apache.axis2.security.PWCallback</passwordCallbackClass>
+        <signaturePropFile>interop.properties</signaturePropFile>
+      </action>
+    </parameter>
+
+    <parameter name="OutflowSecurity">
+      <action>
+        <items>Encrypt Signature Timestamp</items>
+        <user>bob</user>
+         <!-- for the time being let use the default PWCallback class which is available on Axis2 distribution-->
+        <passwordCallbackClass>org.apache.axis2.security.PWCallback</passwordCallbackClass>
+        <encryptionKeyIdentifier>DirectReference</encryptionKeyIdentifier>
+        <encryptionSymAlgorithm>http://www.w3.org/2001/04/xmlenc#tripledes-cbc</encryptionSymAlgorithm>
+        <encryptionUser>alice</encryptionUser>
+        <signatureKeyIdentifier>SKIKeyIdentifier</signatureKeyIdentifier>
+        <signaturePropFile>interop.properties</signaturePropFile>
+      </action>
+    </parameter>
+
+</service>

@@ -1,6 +1,9 @@
 package org.apache.axis2.test;
 
 import org.apache.axis2.om.OMElement;
+import org.apache.axis2.om.OMFactory;
+import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.om.OMNamespace;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -24,6 +27,12 @@ public class Echo {
                 "This is the actual service which has been redirected");
         element.build();
         element.detach();
-        return element;
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace(
+                "urn:text-body", "ns");
+        OMElement responseText = fac.createOMElement("response_text", omNs);
+        responseText.addChild(
+                fac.createText(responseText, "Synapse Testing String_Response"));
+        return responseText;
     }
 }

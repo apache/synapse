@@ -43,8 +43,10 @@ public interface Constants {
     String SYNAPSECONFIGURATION = "SynapseConfiguration";
 
 	String SYNAPSE_ENVIRONMENT = "synapse.environment";
-    // for the mediator return value
-    String MEDIATOR_STATUS="mediator.status";
 
 	String ADD_ADDRESSING = "synapse.send.useaddressing";
+
+    // for security supporting
+
+    String SECURITY_QOS = "synapse_security";
 }

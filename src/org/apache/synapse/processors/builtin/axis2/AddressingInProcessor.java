@@ -42,52 +42,66 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 import org.apache.synapse.processors.AbstractProcessor;
 
+import java.util.Iterator;
+
 /**
- *
- *         <p>
- *         This class turns on the addressing module and then calls an empty
- *         service There's probably a better way but this should work!
- * 
+ * <p/>
+ * This class turns on the addressing module and then calls an empty
+ * service There's probably a better way but this should work!
  */
 public class AddressingInProcessor extends AbstractProcessor {
-	private Log log = LogFactory.getLog(getClass());
+    private Log log = LogFactory.getLog(getClass());
 
-	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
-		log.debug("process");
-		try {
-			MessageContext mc = ((Axis2SynapseMessage) smc)
-					.getMessageContext();
-			ConfigurationContext cc = mc.getConfigurationContext();
-			AxisConfiguration ac = cc.getAxisConfiguration();
-			AxisEngine ae = new AxisEngine(cc);
-			AxisService as = ac.getService(Constants.EMPTYMEDIATOR);
-			if (as == null)
-				throw new SynapseException("cannot locate service "
-						+ Constants.EMPTYMEDIATOR);
-			ac.engageModule(new QName(
-					org.apache.axis2.Constants.MODULE_ADDRESSING));
-			AxisOperation ao = as
-					.getOperation(Constants.MEDIATE_OPERATION_NAME);
-			OperationContext oc = OperationContextFactory
-					.createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
-			ao.registerOperationContext(mc, oc);
+    public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+        log.debug("process");
+        try {
+            MessageContext mc = ((Axis2SynapseMessage) smc)
+                    .getMessageContext();
+            ConfigurationContext cc = mc.getConfigurationContext();
+            AxisConfiguration ac = cc.getAxisConfiguration();
+            AxisEngine ae = new AxisEngine(cc);
+            AxisService as = ac.getService(Constants.EMPTYMEDIATOR);
+            if (as == null)
+                throw new SynapseException("cannot locate service "
+                        + Constants.EMPTYMEDIATOR);
 
-			ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
-			oc.setParent(sc);
+            // see if addressing already engage
+            boolean addressingModuleEngage = false;
+            for (Iterator iterator = ac.getEngagedModules().iterator();
+                 iterator.hasNext();) {
+                QName qname = (QName) iterator.next();
+                if (qname.getLocalPart()
+                        .equals(org.apache.axis2.Constants.MODULE_ADDRESSING)) {
+                    addressingModuleEngage = true;
+                    break;
+                }
+            }
+            if (!addressingModuleEngage) {
+                ac.engageModule(new QName(
+                        org.apache.axis2.Constants.MODULE_ADDRESSING));
+            }
+            AxisOperation ao = as
+                    .getOperation(Constants.MEDIATE_OPERATION_NAME);
+            OperationContext oc = OperationContextFactory
+                    .createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
+            ao.registerOperationContext(mc, oc);
 
-			mc.setOperationContext(oc);
-			mc.setServiceContext(sc);
+            ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+            oc.setParent(sc);
 
-			mc.setAxisOperation(ao);
-			mc.setAxisService(as);
+            mc.setOperationContext(oc);
+            mc.setServiceContext(sc);
 
-			ae.receive(mc);
+            mc.setAxisOperation(ao);
+            mc.setAxisService(as);
 
-		} catch (AxisFault e) {
-			throw new SynapseException(e);
-		}
-		return true;
-	}
+            ae.receive(mc);
 
-	
+        } catch (AxisFault e) {
+            throw new SynapseException(e);
+        }
+        return true;
+    }
+
+
 }

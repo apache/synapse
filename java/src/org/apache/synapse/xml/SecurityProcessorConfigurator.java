@@ -2,10 +2,8 @@ package org.apache.synapse.xml;
 
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.processors.Axis2MediatorProcessor;
+import org.apache.synapse.processors.builtin.axis2.SecurityProcessor;
 import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMAttribute;
 
 import javax.xml.namespace.QName;
 /*
@@ -25,22 +23,16 @@ import javax.xml.namespace.QName;
 *
 */
 
-public class Axis2MediatorProcessorConfigurator extends AbstractProcessorConfigurator{
-
-    private static final QName A2M_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"servicemediator");
+public class SecurityProcessorConfigurator extends AbstractProcessorConfigurator{
+    private static final QName SEC_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+			"engage-security");
     public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-        Axis2MediatorProcessor a2mp = new Axis2MediatorProcessor();
-        super.setNameOnProcessor(se,el,a2mp);
-        OMAttribute serviceName = el.getAttribute(new QName("service"));
-        if (serviceName == null)
-			throw new SynapseException("missing mediator attribute on element"
-                    + el.toString());
-		a2mp.setServiceMediatorName(serviceName.getAttributeValue());
-		return a2mp;          
+        SecurityProcessor sp = new SecurityProcessor();
+        super.setNameOnProcessor(se,el,sp);
+        return sp;
     }
 
     public QName getTagQName() {
-        return A2M_Q;
+        return SEC_Q;
     }
 }

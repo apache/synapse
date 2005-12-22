@@ -1,0 +1,96 @@
+<axisconfig name="AxisJava2.0">
+    <parameter name="hotdeployment" locked="false">true</parameter>
+    <parameter name="hotupdate" locked="false">true</parameter>
+
+    <messageReceiver mep="INOUT" class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+
+    <!-- Engage the security module -->
+    <module ref="security"/>
+
+    <!-- Scenario 6: Client's Configuration:START-->
+
+    <parameter name="OutflowSecurity">
+        <action>
+            <items>Encrypt Signature Timestamp</items>
+            <user>alice</user>
+            <!--<passwordCallbackClass>org.apache.axis2.security.PWCallback</passwordCallbackClass>-->
+            <passwordCallbackClass>sample.security.PWCallback</passwordCallbackClass>
+            <encryptionKeyIdentifier>SKIKeyIdentifier</encryptionKeyIdentifier>
+            <encryptionSymAlgorithm>http://www.w3.org/2001/04/xmlenc#tripledes-cbc</encryptionSymAlgorithm>
+            <encryptionUser>bob</encryptionUser>
+            <signatureKeyIdentifier>DirectReference</signatureKeyIdentifier>
+            <signaturePropFile>interop.properties</signaturePropFile>
+        </action>
+    </parameter>
+
+    <parameter name="InflowSecurity">
+        <action>
+            <items>Encrypt Signature Timestamp</items>
+            <!--<passwordCallbackClass>org.apache.axis2.security.PWCallback</passwordCallbackClass>-->
+            <passwordCallbackClass>sample.security.PWCallback</passwordCallbackClass>
+            <signaturePropFile>interop.properties</signaturePropFile>
+        </action>
+    </parameter>
+
+    <!-- Scenario 6: Client's Configuration:END-->
+
+
+    <transportReceiver name="http">
+    </transportReceiver>
+    <transportSender name="http" class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+        <parameter name="PROTOCOL" locked="false">HTTP/1.0</parameter>
+    </transportSender>
+
+    <phaseOrder type="inflow">
+        <!--  System pre defined phases       -->
+        <phase name="TransportIn"/>
+        <phase name="PreDispatch"/>
+        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
+            <handler name="AddressingBasedDispatcher"
+                     class="org.apache.axis2.engine.AddressingBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="RequestURIBasedDispatcher"
+                     class="org.apache.axis2.engine.RequestURIBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="SOAPActionBasedDispatcher"
+                     class="org.apache.axis2.engine.SOAPActionBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="SOAPMessageBodyBasedDispatcher"
+                     class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            <handler name="InstanceDispatcher"
+                     class="org.apache.axis2.engine.InstanceDispatcher">
+                <order phase="PostDispatch"/>
+            </handler>
+        </phase>
+        <!--  System pre defined phases       -->
+        <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
+        <phase name="userphase1"/>
+    </phaseOrder>
+    <phaseOrder type="outflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="userphase1"/>
+        <!--system predefined phase-->
+        <!--these phase will run irrespective of the service-->
+        <phase name="PolicyDetermination"/>
+        <phase name="MessageOut"/>
+    </phaseOrder>
+    <phaseOrder type="INfaultflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="userphase1"/>
+    </phaseOrder>
+    <phaseOrder type="Outfaultflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="userphase1"/>
+        <phase name="PolicyDetermination"/>
+        <phase name="MessageOut"/>
+    </phaseOrder>
+
+</axisconfig>

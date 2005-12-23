@@ -86,7 +86,7 @@ public class Axis2SynapseMessage implements SynapseMessage {
 	}
 
 	public RelatesTo getRelatesTo() {
-		return getRelatesTo();
+		return mc.getRelatesTo();
 
 	}
 

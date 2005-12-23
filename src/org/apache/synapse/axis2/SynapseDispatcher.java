@@ -51,7 +51,6 @@ public class SynapseDispatcher extends AbstractDispatcher {
 	public AxisService findService(MessageContext mc) throws AxisFault {
 		AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
 		AxisService as = ac.getService(SYNAPSE_SERVICE_NAME);
-		// TODO handle missing config
 		return as;
 	}
 
@@ -59,14 +58,6 @@ public class SynapseDispatcher extends AbstractDispatcher {
 			throws AxisFault {
 
 		AxisOperation ao = svc.getOperation(MEDIATE_OPERATION_NAME);
-		// code taken from InstanceDispatcher
-		OperationContext oc = new OperationContext(ao);
-
-		ao.registerOperationContext(mc, oc);
-
-		// fill the service group context and service context info
-		mc.getConfigurationContext().fillServiceContextAndServiceGroupContext(mc);
-		// TODO handle missing config
 		return ao;
 	}
 

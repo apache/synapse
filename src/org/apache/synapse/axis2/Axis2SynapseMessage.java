@@ -44,9 +44,6 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
 	public Axis2SynapseMessage(MessageContext mc) {
 		setMessageContext(mc);
-		Boolean resp = (Boolean) mc.getProperty(Constants.ISRESPONSE_PROPERTY);
-		if (resp != null)
-			response = resp.booleanValue();
 	}
 
 	public EndpointReference getFaultTo() {
@@ -198,7 +195,7 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
 	public void setResponse(boolean b) {
 		response = b;
-		mc.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(b));
+		mc.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
 	}
 
 	public boolean isResponse() {

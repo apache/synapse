@@ -1,7 +1,7 @@
 <!-- The time format is d/m/y:H:m and its with respect to UTC.
 TimeZone is that of the system, offset from UTC is calculated internally -->
 <deprecationConfig>
-    <deprecationService Id="http://localhost:8080/deprecatedService">
+    <deprecationService Id="http://64.124.140.30:9090/soap">
         <parameterSet>
             <deprecationFromdate>16/10/2005:00:00</deprecationFromdate>
             <deprecationTodate>15/11/2005:00:00</deprecationTodate>

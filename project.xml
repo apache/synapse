@@ -3,11 +3,11 @@
 
     <pomVersion>3</pomVersion>
 
-    <id>Synapse</id>
+    <id>Synapse-Incubating</id>
 
     <name>Apache Synpase</name>
 
-    <currentVersion>M1-SNAPSHOT</currentVersion>
+    <currentVersion>M1-RC1-SNAPSHOT</currentVersion>
 
     <organization>
         <name>Apache Web Services</name>
@@ -22,25 +22,25 @@
         implementation of a highly scalable and distributed service mediation
         framework based on Web services specifications.</description>
 
-    <!-- the project home page -->
-    <!--todo: need to setup uri, issueTracker, site, and dist dir  -->
-    <!--<url>http://ws.apache.org/synapse/</url>-->
-    <!--<issueTrackingUrl>http://issues.apache.org/jira/browse/KAND</issueTrackingUrl>-->
-    <!--<siteAddress>ws.apache.org</siteAddress>-->
-    <!--<siteDirectory>/synapse/</siteDirectory>-->
-    <!--<distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>-->
-    <!--todo-->
+     the project home page
+    todo: need to setup uri, issueTracker, site, and dist dir
+    <url>http://ws.apache.org/synapse/</url>
+    <issueTrackingUrl>http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
+    <siteAddress>ws.apache.org</siteAddress>
+    <siteDirectory>/synapse/</siteDirectory>
+    <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
 
-    <!-- any mailing lists for the project -->
-    <!--todo-->
-    <!--<mailingLists>-->
-    <!--<mailingList>-->
-    <!--<name>Synpase Developer List</name>-->
-    <!--<subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>-->
-    <!--<unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>-->
-    <!--<archive></archive>-->
-    <!--</mailingList>-->
-    <!--</mailingLists>-->
+
+     <!--any mailing lists for the project -->
+
+    <mailingLists>
+    <mailingList>
+    <name>Synpase Developer List</name>
+    <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
+    <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
+    <archive></archive>
+    </mailingList>
+    </mailingLists>
 
     <!-- who the developers are for the project -->
     <developers>
@@ -54,6 +54,30 @@
             <name>Sanjiva Weerawarana</name>
             <id>sanjiva</id>
             <email>sanjiva@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Glen Daniels</name>
+            <id>gdaniels</id>
+            <email>gdaniels@apache.org</email>
+            <organization>Sonic Software</organization>
+        </developer>
+        <developer>
+            <name>Glen Daniels</name>
+            <id>gdaniels</id>
+            <email>gdaniels@apache.org</email>
+            <organization>Sonic Software</organization>
+        </developer>
+        <developer>
+            <name> P. Vikas Roonwal</name>
+            <id>vikas</id>
+            <email>vikas@infravio.com</email>
+            <organization>Infravio</organization>
+        </developer>
+        <developer>
+            <name>Saminda Abeyruwan</name>
+            <id>saminda</id>
+            <email>saminda@apache.org</email>
             <organization>WSO2</organization>
         </developer>
         <!--todo : all the developers here-->

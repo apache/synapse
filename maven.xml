@@ -83,22 +83,6 @@
                 <include name="**"/>
             </jar>
 
-            <echo message="----------------Creating synapse_security aar Server-Side----------------"/>
-            <mkdir dir="target/services/synapse_security/META-INF"/>
-            <mkdir dir="target/services/synapse_security/lib"/>
-
-            <jar jarfile="target/services/synapse_security/lib/interop_properties.jar"
-                 basedir="synapse-test-resources/axis2/services/synapse_security">
-                <include name="interop.properties"/>
-            </jar>
-            <copy file="synapse-test-resources/axis2/services/synapse_security/META-INF/services.xml"
-                  tofile="target/services/synapse_security/META-INF/services.xml"/>
-            <jar jarfile="target/synapse_security.aar"
-                 basedir="target/services/synapse_security">
-                <include name="**"/>
-            </jar>
-
-
             <echo message="-----------Creating Testing Repository - SendOn ----------"/>
             <mkdir dir="target/synapse-repository-sendon"/>
             <copy file="target/synapse.aar"
@@ -141,13 +125,9 @@
               tofile="target/synapse-repository/services/synapse.aar"/>
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository/services/emptymediator.aar"/>
-        <copy file="target/synapse_security.aar"
-              tofile="target/synapse-repository/services/synapse_security.aar"/>
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository/modules/addressing.mar"/>
-        <copy file="synapse-test-resources/axis2/modules/security.mar"
-              tofile="target/synapse-repository/modules/security.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository/axis2.xml"/>
         <copy file="repo/synapse.xml"
@@ -181,29 +161,6 @@
         <copy file="test/rules/synapse-send.xml"
               tofile="target/synapse-repository-send/synapse.xml"/>
 
-
-        <echo message="-----------Creating Testing Repository -Server-Side ----------"/>
-            <mkdir dir="target/synapse-repository-security-server"/>
-            <ant:copy todir="target/synapse-repository-security-server">
-                <ant:fileset dir="target/synapse-repository">
-                    <ant:include name="**"/>
-                    <ant:exclude name="**/synapse.xml"/>
-                </ant:fileset>
-            </ant:copy>
-            <copy file="test/org/apache/axis2/security/security-synapse.xml"
-              tofile="target/synapse-repository-security-server/synapse.xml"/>
-
-            <echo message="-----------Creating Testing Repository -Client-Side ----------"/>
-            <mkdir dir="target/synapse-repository-security-client"/>
-            <ant:copy todir="target/synapse-repository-security-client">
-                <ant:fileset dir="target/synapse-repository">
-                    <ant:include name="**"/>
-                    <ant:exclude name="**/*.xml"/>
-                </ant:fileset>
-            </ant:copy>
-            <copy file="test/org/apache/axis2/security/security-axis2.xml"
-              tofile="target/synapse-repository-security-client/axis2.xml"/>
-
         <echo message="----------------Creating DeprecationMediator aar----------------"/>
         <mkdir dir="target/sample-deprecation/META-INF"/>
         <mkdir dir="target/sample-deprecation/sampleMediators/deprecation"/>
@@ -236,7 +193,6 @@
         <ant:delete file="target/synapse.aar"/>
         <ant:delete dir="target/sample-deprecation"/>
         <ant:delete file="target/DeprecationMediator.aar"/>
-        <ant:delete file="target/synapse_security.aar"/>
 
 
     </postGoal>

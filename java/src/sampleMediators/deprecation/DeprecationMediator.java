@@ -17,20 +17,13 @@
 package sampleMediators.deprecation;
 
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.api.EnvironmentAware;
 
-import java.io.InputStream;
 import java.util.Map;
 
-public class DeprecationMediator implements Mediator, EnvironmentAware {
+public class DeprecationMediator implements Mediator {
 
     DeprecationConfiguration configuration;
-    private InputStream deprecationInStream;
-   // private SynapseEnvironment se;
-    private ClassLoader cl;
-
 
     public DeprecationMediator() {
     }
@@ -38,9 +31,9 @@ public class DeprecationMediator implements Mediator, EnvironmentAware {
     public boolean mediate(SynapseMessage synapseMessageContext) {
 
         try {
-            this.deprecationInStream = this.cl.getResourceAsStream("META-INF/deprecation.xml");
+
             final DeprecationConfigurator deprecationConfigurator =
-                    new DeprecationConfigurator(this.deprecationInStream);
+                    new DeprecationConfigurator();
             Map mediatorConfig = deprecationConfigurator
                     .getConfig(synapseMessageContext.getTo());
             loadConfiguration(mediatorConfig);
@@ -50,6 +43,7 @@ public class DeprecationMediator implements Mediator, EnvironmentAware {
             for (int i = 0, len = rules.length; i < len; i++) {
 
                 if (rules[i].isDeprecated()) {
+
                     deprecated = true;
                 }
 
@@ -96,12 +90,4 @@ public class DeprecationMediator implements Mediator, EnvironmentAware {
 
     }
 
-    public void setSynapseEnvironment(SynapseEnvironment se) {
-     //   this.se = se;
-     // we don't use this
-    }
-
-    public void setClassLoader(ClassLoader cl) {
-        this.cl = cl;
-    }
 }

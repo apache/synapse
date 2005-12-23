@@ -21,7 +21,6 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 
 import javax.xml.namespace.QName;
-import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,76 +69,20 @@ public class DeprecationConfigurator {
             e.printStackTrace();
         }
     }
-    public DeprecationConfigurator(InputStream instream) {
-
-        /**
-         * This has been added to get the consistancy in getting input steams for
-         * Mediator configuraion.
-         */
-        try {
-            configMap = generateMap(instream);
-            setConfig(configMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     private Map generateMap() throws Exception {
 
-        //Read the source and generate a map of the
-        Map generatedMap = new HashMap();
 
-        //ToDo - The file location should come as a parameter,
-        //  read the parameter from Synapse.xml or some other source
-        File file = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-        file = file.getParentFile();
-        String filePath = file.getAbsolutePath() + File.separator + DeprecationConstants.CFG_XML_FOLDER;
-        filePath = filePath + File.separator + DeprecationConstants.CFG_DEPRECATION_XML;
+        String configFile = DeprecationConstants.CFG_XML_FOLDER+"/"+DeprecationConstants.CFG_DEPRECATION_XML;
+        InputStream inStream = this.getClass().getResourceAsStream(configFile);
 
+        //ToDo - The file location should come as a parameter,read the parameter from Synapse.xml or some other source
         StAXOMBuilder staxOMBuilder;
 
-        staxOMBuilder = new StAXOMBuilder(filePath);
-
-        OMElement config = staxOMBuilder.getDocumentElement();
-        config.build();
-        Iterator serviceItr = config.getChildrenWithName(new QName(DeprecationConstants.CFG_DEPRECATION_SERVICE));
-
-        while (serviceItr.hasNext()) {
-            OMElement serviceEle = (OMElement) serviceItr.next();
-            String serviceKey = serviceEle.getAttributeValue(new QName("Id"));
-            Iterator paramItr = serviceEle.getChildElements();
-            int counter = 0;
-            Map dataMap = new HashMap();
-
-            while (paramItr.hasNext()) {
-                OMElement paramEle = (OMElement) paramItr.next();
-                Iterator dataItr = paramEle.getChildElements();
-
-                while (dataItr.hasNext()) {
-                    OMElement dataEle = (OMElement) dataItr.next();
-                    String dataName = dataEle.getLocalName() + "[" + counter + "]";
-                    String dataValue = dataEle.getText();
-                    dataMap.put(dataName, dataValue);
-                }
-
-                //Will be of use if multiple services are facaded by a single serviceEPR
-                dataMap.put(DeprecationConstants.CFG_DEPRECATION_SERVICE + "[" + counter + "]", serviceKey);
-                counter++;
-
-            }
-            generatedMap.put(serviceKey, dataMap);
-        }
-        return generatedMap;
-    }
-
-    private Map generateMap(InputStream instream) throws Exception {
+        staxOMBuilder = new StAXOMBuilder(inStream);
 
         //Read the source and generate a map of the
         Map generatedMap = new HashMap();
-
-        StAXOMBuilder staxOMBuilder;
-
-        staxOMBuilder = new StAXOMBuilder(instream);
 
         OMElement config = staxOMBuilder.getDocumentElement();
         config.build();

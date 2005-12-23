@@ -24,5 +24,5 @@ public interface DeprecationConstants {
     public static final String CFG_DEPRECATION_ENABLED = "deprecationEnabled";
     public static final String CFG_DEPRECATION_RESULT = "synapse.deprecation.result";
     public static final String CFG_DEPRECATION_XML = "deprecation.xml";
-    public static final String CFG_XML_FOLDER = "config";
+    public static final String CFG_XML_FOLDER = "META-INF";
 }

@@ -49,4 +49,5 @@ public interface Constants {
     // for security supporting
 
     String SECURITY_QOS = "synapse_security";
+    String ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT = "addressing_processed_configurationContext";
 }

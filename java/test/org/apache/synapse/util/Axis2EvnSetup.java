@@ -97,4 +97,15 @@ public class Axis2EvnSetup {
         method.addChild(value);
         return method;
     }
+     public static OMElement payloadNamedAdddressing() {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace(
+                "urn:text-body", "ns");
+        OMElement method = fac.createOMElement("service", omNs);
+        OMElement value = fac.createOMElement("text_addressing", omNs);
+        value.addChild(
+                fac.createText(value, "Synapse Testing String Through Addressing"));
+        method.addChild(value);
+        return method;
+    }
 }

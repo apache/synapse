@@ -22,6 +22,7 @@ import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPFactory;
 
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.TransportInDescription;
 
 import org.apache.axis2.engine.AxisEngine;
@@ -58,6 +59,17 @@ public class Axis2Sender {
              */
             smc.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
                     true));
+            ///////////////////////////////////////////////////////////////////
+            // special treat for Module Engagement
+            ConfigurationContext configContext = (ConfigurationContext) smc
+                    .getProperty(
+                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
+            if (configContext != null) {
+                outMsgContext.setProperty(
+                        Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT,
+                        configContext);
+            }
+            //////////////////////////////////////////////////////////////////
 
             outMsgContext.setServerSide(true);
 
@@ -71,7 +83,7 @@ public class Axis2Sender {
                 SOAPFactory soapFactory;
                 if (envelope.getNamespace().getName()
                         .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-                     soapFactory = OMAbstractFactory.getSOAP12Factory();
+                    soapFactory = OMAbstractFactory.getSOAP12Factory();
                     newEnvelope = soapFactory.getDefaultEnvelope();
                 } else {
                     soapFactory = OMAbstractFactory.getSOAP11Factory();
@@ -87,10 +99,11 @@ public class Axis2Sender {
                 //todo: as a temporartory hack this was taken into account
                 Iterator iterator = envelope.getAllDeclaredNamespaces();
                 while (iterator.hasNext()) {
-                    OMNamespace namespace = (OMNamespace)iterator.next();
+                    OMNamespace namespace = (OMNamespace) iterator.next();
                     newEnvelope.declareNamespace(namespace);
                 }
-                newEnvelope.getBody().addChild(envelope.getBody().getFirstElement());
+                newEnvelope.getBody()
+                        .addChild(envelope.getBody().getFirstElement());
                 outMsgContext.setEnvelope(newEnvelope);
             }
 
@@ -114,9 +127,10 @@ public class Axis2Sender {
                 new AxisEngine(messageContext.getConfigurationContext());
         try {
             if (messageContext.getEnvelope().getHeader() == null) {
-             messageContext.getEnvelope().getBody().insertSiblingBefore(
-                    OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope()
-                            .getHeader());
+                messageContext.getEnvelope().getBody().insertSiblingBefore(
+                        OMAbstractFactory.getSOAP11Factory()
+                                .getDefaultEnvelope()
+                                .getHeader());
 
             }
             System.out.println(messageContext.getEnvelope());
@@ -124,7 +138,14 @@ public class Axis2Sender {
             messageContext
                     .setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
                             true));
-
+            // check for addressing is alredy engaged for this message.
+            // if engage we should use the address enable Configuraion context.
+            ConfigurationContext configContext = (ConfigurationContext) smc
+                    .getProperty(
+                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
+            if (configContext != null) {
+                messageContext.setConfigurationContext(configContext);
+            }
 
             ae.send(messageContext);
         } catch (AxisFault e) {

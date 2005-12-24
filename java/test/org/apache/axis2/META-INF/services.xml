@@ -12,4 +12,7 @@
     <operation name="fault" locked="false">
         <parameter name="wsamapping">urn:synapse/sendon-fault</parameter>
     </operation>
+    <operation name="echo_addressing" locked="false">
+        <parameter name="wsamapping">urn:synapse/sendon-addressing-engage</parameter>
+    </operation>
 </service>

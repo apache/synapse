@@ -19,13 +19,10 @@ package org.apache.synapse.processors.builtin.axis2;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
-import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.*;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 
@@ -39,6 +36,7 @@ import org.apache.synapse.SynapseMessage;
 
 
 import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.axis2.EmptyMessageReceiver;
 
 import org.apache.synapse.processors.AbstractProcessor;
 
@@ -57,45 +55,98 @@ public class AddressingInProcessor extends AbstractProcessor {
         try {
             MessageContext mc = ((Axis2SynapseMessage) smc)
                     .getMessageContext();
+            ///////////////////////////////////////////////////////////////////
+            // Default Configurations. We are not going to alter these configurtions
             ConfigurationContext cc = mc.getConfigurationContext();
             AxisConfiguration ac = cc.getAxisConfiguration();
-            AxisEngine ae = new AxisEngine(cc);
-            AxisService as = ac.getService(Constants.EMPTYMEDIATOR);
-            if (as == null)
-                throw new SynapseException("cannot locate service "
-                        + Constants.EMPTYMEDIATOR);
+            //////////////////////////////////////////////////////////////////
+//            AxisService as = ac.getService(Constants.EMPTYMEDIATOR);
+//            if (as == null)
+//                throw new SynapseException("cannot locate service "
+//                        + Constants.EMPTYMEDIATOR);
+
+            ///////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////
+            // making addressing on/off behavior possible
+            // default addressing is on. Allow MessageContext to pass through the chain
+            // and fill the addressingHeaderInformation. Once the chain is excuted old ConfigurationContext
+            // set to the MessageContext.
+            // inorder to make this possible, we create a new ConfigurationContext
+            // from scratch. Then add the service, operation and MessageReceiver
+            // programatically. After the invocation, old ConfigurationContext and
+            // AxisConfiguration is set to the MessageContext
+
+            ConfigurationContextFactory configCtxFac =
+                    new ConfigurationContextFactory();
+            ConfigurationContext configCtx =
+                    configCtxFac.buildConfigurationContext(null);
+            AxisConfiguration axisConfig = configCtx.getAxisConfiguration();
+
+            AxisService service = new AxisService(Constants.EMPTYMEDIATOR);
+            service.setClassLoader(ac.getServiceClassLoader());
+            AxisOperation axisOp =
+                    new InOutAxisOperation(Constants.MEDIATE_OPERATION_NAME);
+            axisOp.setMessageReceiver(new EmptyMessageReceiver());
+            service.addOperation(axisOp);
+            axisConfig.addService(service);
+
+            mc.setConfigurationContext(configCtx);
+
+            //setging the addressing enable ConfigurationContext to SynapeMessage
+
+            smc.setProperty(Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT,
+                    configCtx);
+            //////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////
+            //AxisEngine ae = new AxisEngine(cc);
+            AxisEngine ae = new AxisEngine(configCtx);
 
             // see if addressing already engage
-            boolean addressingModuleEngage = false;
-            for (Iterator iterator = ac.getEngagedModules().iterator();
-                 iterator.hasNext();) {
-                QName qname = (QName) iterator.next();
-                if (qname.getLocalPart()
-                        .equals(org.apache.axis2.Constants.MODULE_ADDRESSING)) {
-                    addressingModuleEngage = true;
-                    break;
-                }
-            }
-            if (!addressingModuleEngage) {
-                ac.engageModule(new QName(
-                        org.apache.axis2.Constants.MODULE_ADDRESSING));
-            }
-            AxisOperation ao = as
-                    .getOperation(Constants.MEDIATE_OPERATION_NAME);
+//            boolean addressingModuleEngage = false;
+//            for (Iterator iterator = ac.getEngagedModules().iterator();
+//                 iterator.hasNext();) {
+//                QName qname = (QName) iterator.next();
+//                if (qname.getLocalPart()
+//                        .equals(org.apache.axis2.Constants.MODULE_ADDRESSING)) {
+//                    addressingModuleEngage = true;
+//                    break;
+//                }
+//            }
+//            if (!addressingModuleEngage) {
+//                ac.engageModule(new QName(
+//                        org.apache.axis2.Constants.MODULE_ADDRESSING));
+//            }
+//            AxisOperation ao = as
+//                    .getOperation(Constants.MEDIATE_OPERATION_NAME);
+//            OperationContext oc = OperationContextFactory
+//                    .createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
             OperationContext oc = OperationContextFactory
-                    .createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
-            ao.registerOperationContext(mc, oc);
+                    .createOperationContext(axisOp.getAxisSpecifMEPConstant(),
+                            axisOp);
+            //ao.registerOperationContext(mc, oc);
+            axisOp.registerOperationContext(mc, oc);
 
-            ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+            //ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+            ServiceContext sc =
+                    Utils.fillContextInformation(axisOp, service, configCtx);
             oc.setParent(sc);
 
             mc.setOperationContext(oc);
             mc.setServiceContext(sc);
 
-            mc.setAxisOperation(ao);
-            mc.setAxisService(as);
+//            mc.setAxisOperation(ao);
+//            mc.setAxisService(as);
+            mc.setAxisOperation(axisOp);
+            mc.setAxisService(service);
 
             ae.receive(mc);
+            //////////////////////////////////////////////////////////////////////
+            // Now the MessageContext is filled with SOAP properties. We don't need to send
+            // this message anymore time through AddressingInHandler. But we need to send it through
+            // AddressingOutHandler
+            // Thus, setting the Default ConfigurationContext
+            mc.setConfigurationContext(cc);
+            /////////////////////////////////////////////////////////////////////
 
         } catch (AxisFault e) {
             throw new SynapseException(e);

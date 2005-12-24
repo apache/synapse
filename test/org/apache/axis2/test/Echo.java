@@ -4,6 +4,7 @@ import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMNamespace;
+import org.apache.axis2.AxisFault;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -34,5 +35,8 @@ public class Echo {
         responseText.addChild(
                 fac.createText(responseText, "Synapse Testing String_Response"));
         return responseText;
+    }
+    public OMElement fault(OMElement element) throws AxisFault {
+        throw new AxisFault("Native End Point Throws an Exception");
     }
 }

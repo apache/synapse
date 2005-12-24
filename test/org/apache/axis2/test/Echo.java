@@ -39,4 +39,17 @@ public class Echo {
     public OMElement fault(OMElement element) throws AxisFault {
         throw new AxisFault("Native End Point Throws an Exception");
     }
+    public OMElement echo_addressing(OMElement element) {
+        System.out.println(
+                "This is the actual service which has been redirected with addressing");
+        element.build();
+        element.detach();
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace(
+                "urn:text-body", "ns");
+        OMElement responseText = fac.createOMElement("response_text_addressing", omNs);
+        responseText.addChild(
+                fac.createText(responseText, "Synapse Testing String_Response_With_Addressing"));
+        return responseText;
+    }
 }

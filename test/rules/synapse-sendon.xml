@@ -7,5 +7,15 @@
         <xpath expr="//ns:response_text" xmlns:ns="urn:text-body">
             <send/>
         </xpath>
+        <xpath expr="//ns:text_addressing" xmlns:ns="urn:text-body">
+            <engage-addressing-in/>
+            <header type="to" value="http://localhost:8090/axis2/services/npe"/>
+            <header type="action" value="urn:synapse/sendon-addressing-engage"/>
+            <send/>
+        </xpath>
+        <xpath expr="//ns:response_text_addressing" xmlns:ns="urn:text-body">
+            <send/>
+        </xpath>
+
     </stage>
 </synapse>

@@ -103,7 +103,6 @@ public class Axis2Sender {
             se.injectMessage(new Axis2SynapseMessage(outMsgContext));
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SynapseException(e);
         }
     }

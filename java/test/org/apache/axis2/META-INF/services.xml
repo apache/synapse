@@ -9,4 +9,7 @@
                 class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
         <parameter name="wsamapping">urn:synapse/sendon</parameter>
     </operation>
+    <operation name="fault" locked="false">
+        <parameter name="wsamapping">urn:synapse/sendon-fault</parameter>
+    </operation>
 </service>

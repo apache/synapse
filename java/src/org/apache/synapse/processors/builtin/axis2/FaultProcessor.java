@@ -17,8 +17,10 @@
 package org.apache.synapse.processors.builtin.axis2;
 
 
-
 import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
@@ -29,32 +31,40 @@ import org.apache.synapse.processors.AbstractProcessor;
 
 
 /**
- *
- *         <p>
- *         This returns a fault in response to this message
- * 
- * 
+ * <p/>
+ * This returns a fault in response to this message
  */
 public class FaultProcessor extends AbstractProcessor {
-	
-	private Log log = LogFactory.getLog(getClass());
 
-	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
-		log.debug("process");
-		
+    private Log log = LogFactory.getLog(getClass());
 
-			try {
-				smc.setEnvelope(OMAbstractFactory.getSOAP11Factory()
-						.getDefaultFaultEnvelope());
-			} catch (Exception e) {
-				throw new SynapseException(e);
-			}
-			smc.setResponse(true);
-			se.injectMessage(smc);
-			
-		
-		return false;
-	}
+    public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+        log.debug("process");
 
-	
+        SOAPEnvelope envelop = smc.getEnvelope();
+        SOAPFactory factory;
+        if (envelop != null) {
+            if (envelop.getNamespace().getName()
+                    .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
+                factory = OMAbstractFactory.getSOAP12Factory();
+            } else {
+                factory = OMAbstractFactory.getSOAP11Factory();
+            }
+
+        } else {
+            factory = OMAbstractFactory.getSOAP11Factory();
+        }
+        try {
+            smc.setEnvelope(factory.getDefaultFaultEnvelope());
+        } catch (Exception e) {
+            throw new SynapseException(e);
+        }
+        smc.setResponse(true);
+        se.injectMessage(smc);
+
+
+        return false;
+    }
+
+
 }

@@ -41,16 +41,21 @@ public class SynapseMessageReceiver implements MessageReceiver {
                 .getSynapseEnvironment(mc);
         SynapseMessage smc = new Axis2SynapseMessage(mc);
         env.injectMessage(smc);
-        /**
-         * temprary hack to get 200 ok return to the sender
-         */
-        Boolean responseWritten = (Boolean) smc
-                .getProperty(org.apache.synapse.Constants.ISRESPONSE_PROPERTY);
-        if (responseWritten != null) {
-            if (responseWritten.booleanValue()) {
-                mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
-                        Constants.VALUE_TRUE);
-            }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Response handling mechanism for 200/202 and 5XX
+        // smc.isResponse =true then the response will be handle with 200 OK
+        // else, response will be 202 OK without no http body
+        // smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
+        if (smc.isResponse()) {
+            mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
+                    Constants.VALUE_TRUE);
         }
+        if (smc.isFaultResponse()) {
+            // todo: a good way to inject faultSoapEnv to the Axis2 Transport 
+            throw new AxisFault(
+                    "Synapse Encounters an Error - Please See Log for More Details");
+        }
+        ///////////////////////////////////////////////////////////////////////
     }
 }

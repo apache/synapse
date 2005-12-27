@@ -21,6 +21,7 @@ import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAP12Constants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
@@ -60,6 +61,12 @@ public class FaultProcessor extends AbstractProcessor {
             throw new SynapseException(e);
         }
         smc.setResponse(true);
+
+        //Flipping the headers
+        EndpointReference tempEPR = smc.getTo();
+        smc.setTo(smc.getReplyTo());
+        smc.setReplyTo(tempEPR);
+        
         se.injectMessage(smc);
 
 

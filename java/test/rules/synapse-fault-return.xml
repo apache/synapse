@@ -4,4 +4,7 @@
             <fault/>
         </xpath>
     </stage>
+    <stage name="fault_return">
+        <send/>
+    </stage>
 </synapse>

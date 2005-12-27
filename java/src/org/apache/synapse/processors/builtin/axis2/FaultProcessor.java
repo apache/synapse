@@ -18,6 +18,7 @@ package org.apache.synapse.processors.builtin.axis2;
 
 
 import org.apache.axis2.om.OMAbstractFactory;
+import org.apache.axis2.om.OMDocument;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPFactory;
 import org.apache.axis2.soap.SOAP12Constants;
@@ -56,7 +57,10 @@ public class FaultProcessor extends AbstractProcessor {
             factory = OMAbstractFactory.getSOAP11Factory();
         }
         try {
-            smc.setEnvelope(factory.getDefaultFaultEnvelope());
+            OMDocument soapFaultDocument = factory.createOMDocument();
+            SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
+            soapFaultDocument.addChild(faultEnvelope);
+            smc.setEnvelope(faultEnvelope);
         } catch (Exception e) {
             throw new SynapseException(e);
         }

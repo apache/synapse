@@ -54,11 +54,8 @@ public class Axis2Sender {
 
             // run all rules on response
 
-            /**
-             * temprary hack to get 200 ok, sorry
-             */
-            smc.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
-                    true));
+            // todo: this logic need to be imporved with sendNow() and drop()
+            smc.setResponse(true);
             ///////////////////////////////////////////////////////////////////
             // special treat for Module Engagement
             ConfigurationContext configContext = (ConfigurationContext) smc

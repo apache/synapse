@@ -109,7 +109,7 @@
 
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
-            <copy file="repo/axis2.xml"
+            <copy file="repository/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
 
             <ant:delete file="target/npe.aar"/>
@@ -130,7 +130,7 @@
               tofile="target/synapse-repository/modules/addressing.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository/axis2.xml"/>
-        <copy file="repo/synapse.xml"
+        <copy file="repository/synapse.xml"
               tofile="target/synapse-repository/synapse.xml"/>
 
         <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
@@ -156,7 +156,7 @@
         <mkdir dir="target/synapse-repository-send/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-send/modules/addressing.mar"/>
-        <copy file="repo/axis2.xml"
+        <copy file="repository/axis2.xml"
               tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
         <copy file="test/rules/synapse-send.xml"
               tofile="target/synapse-repository-send/synapse.xml"/>

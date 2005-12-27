@@ -29,7 +29,7 @@ import org.apache.axis2.description.Parameter;
 
 public class SynapseConfiguratorTest extends TestCase {
     public void testSynapseEnvironmentFinder() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment("repo");
+        MessageContext mc = Axis2EvnSetup.axis2Deployment("repository");
         SynapseEnvironment env = Axis2SynapseEnvironmentFinder
 				.getSynapseEnvironment(mc);
         assertNotNull(env);

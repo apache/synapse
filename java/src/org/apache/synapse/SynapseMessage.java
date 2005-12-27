@@ -92,4 +92,8 @@ public interface SynapseMessage {
 	public void setResponse(boolean b);
 
 	public boolean isResponse();
+
+    public void setFaultResponse(boolean b);
+
+    public boolean isFaultResponse();
 }

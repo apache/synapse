@@ -1,6 +1,15 @@
 package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Call;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.om.OMElement;
+import org.apache.axis2.AxisFault;
+import org.apache.synapse.util.Axis2EvnSetup;
+
+import javax.xml.namespace.QName;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -19,8 +28,33 @@ import junit.framework.TestCase;
 */
 
 public class FaultProcessorTest extends TestCase {
-    public void testFaultProcessor() throws Exception {
-        //todo:
-        // todo: this is a complex test case which should be delt with carefully
+
+    private SimpleHTTPServer synapseServer;
+    private EndpointReference targetEpr = new EndpointReference(
+            "http://127.0.0.1:5043/axis2/services/anonymous");
+    private QName operation = new QName("anonymous");
+
+    public void setUp() throws Exception {
+        synapseServer = new SimpleHTTPServer("target/synapse-repository-fault",
+                5043);
+        synapseServer.start();
     }
+
+    protected void tearDown() throws Exception {
+        synapseServer.stop();
+    }
+
+    public void testFaultProcessor() {
+        try {
+            Call call = new Call();
+            Options options = new Options();
+            options.setTo(targetEpr);
+            call.setClientOptions(options);
+            call.invokeBlocking(operation.getLocalPart(),
+                    Axis2EvnSetup.payload());
+            fail(null);
+        } catch (AxisFault e) {
+        }
+    }
+
 }

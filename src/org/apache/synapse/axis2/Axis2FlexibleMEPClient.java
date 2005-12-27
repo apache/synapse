@@ -95,7 +95,6 @@ public class Axis2FlexibleMEPClient {
              * part that is necessary
              */
 
-            //msgCtx.setEnvelope(smc.getEnvelope());
             msgCtx.setEnvelope(outEnvelopeConfiguration(smc));
             msgCtx.setServiceContext(sc);
 
@@ -139,17 +138,6 @@ public class Axis2FlexibleMEPClient {
              * so we should have first MessageContext properties
              */
 
-//            MessageContext response = new MessageContext(msgCtx
-//                    .getConfigurationContext(), msgCtx.getSessionContext(),
-//                    msgCtx
-//                            .getTransportIn(), msgCtx.getTransportOut());
-//
-//
-//            response.setProperty(MessageContext.TRANSPORT_IN, msgCtx
-//                    .getProperty(MessageContext.TRANSPORT_IN));
-//            msgCtx.getAxisOperation().registerOperationContext(response,
-//                    msgCtx.getOperationContext());
-
             MessageContext response = new MessageContext(smc
                     .getConfigurationContext(), smc.getSessionContext(),
                     smc.getTransportIn(), smc.getTransportOut());
@@ -188,7 +176,6 @@ public class Axis2FlexibleMEPClient {
                             org.apache.axis2.Constants.VALUE_TRUE);
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SynapseException(e);
         }
 

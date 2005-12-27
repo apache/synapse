@@ -42,7 +42,9 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
 	private boolean response = false;
 
-	public Axis2SynapseMessage(MessageContext mc) {
+    private boolean faultResponse = false;
+
+    public Axis2SynapseMessage(MessageContext mc) {
 		setMessageContext(mc);
 	}
 
@@ -201,5 +203,13 @@ public class Axis2SynapseMessage implements SynapseMessage {
 	public boolean isResponse() {
 		return response;
 	}
+
+    public void setFaultResponse(boolean b) {
+        this.faultResponse = b;
+    }
+
+    public boolean isFaultResponse() {
+        return this.faultResponse;  
+    }
 
 }

@@ -56,27 +56,23 @@ public class DeprecationConfigurator {
     public Map deprecationConfig;
     private Map configMap;
 
-    public DeprecationConfigurator() {
+    public DeprecationConfigurator(InputStream inStream) {
 
         //Read from some source, probably a file and set the config map here.
         //If the source is service specific, we can use getConfig() and only access
         //service based parameters else make a general config and filter out the needed parameters
         //and create a Map in the getConfig(EndpointReference to)
         try {
-            configMap = generateMap();
+            configMap = generateMap(inStream);
             setConfig(configMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private Map generateMap() throws Exception {
+    private Map generateMap(InputStream inStream) throws Exception {
 
 
-        String configFile = DeprecationConstants.CFG_XML_FOLDER+"/"+DeprecationConstants.CFG_DEPRECATION_XML;
-        InputStream inStream = this.getClass().getResourceAsStream(configFile);
-
-        //ToDo - The file location should come as a parameter,read the parameter from Synapse.xml or some other source
         StAXOMBuilder staxOMBuilder;
 
         staxOMBuilder = new StAXOMBuilder(inStream);

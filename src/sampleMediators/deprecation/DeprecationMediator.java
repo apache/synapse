@@ -17,13 +17,17 @@
 package sampleMediators.deprecation;
 
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.api.EnvironmentAware;
 
 import java.util.Map;
+import java.io.InputStream;
 
-public class DeprecationMediator implements Mediator {
+public class DeprecationMediator implements Mediator, EnvironmentAware {
 
     DeprecationConfiguration configuration;
+    private ClassLoader classLoader;
 
     public DeprecationMediator() {
     }
@@ -32,8 +36,10 @@ public class DeprecationMediator implements Mediator {
 
         try {
 
+            String resource = DeprecationConstants.CFG_XML_FOLDER+"/"+DeprecationConstants.CFG_DEPRECATION_XML;
+            InputStream inStream = classLoader.getResourceAsStream(resource);
             final DeprecationConfigurator deprecationConfigurator =
-                    new DeprecationConfigurator();
+                    new DeprecationConfigurator(inStream);
             Map mediatorConfig = deprecationConfigurator
                     .getConfig(synapseMessageContext.getTo());
             loadConfiguration(mediatorConfig);
@@ -90,4 +96,11 @@ public class DeprecationMediator implements Mediator {
 
     }
 
+    public void setSynapseEnvironment(SynapseEnvironment se) {
+        //not used for now
+    }
+
+    public void setClassLoader(ClassLoader cl) {
+        this.classLoader = cl;
+    }
 }

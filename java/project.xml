@@ -193,6 +193,14 @@
             </properties>
         </dependency>
         <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>${geronimo.spec.jms.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
             <groupId>xmlbeans</groupId>
             <artifactId>xbean</artifactId>
             <version>${xbean.version}</version>
@@ -304,14 +312,14 @@
                 <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
             <!--</excludes>-->
         </unitTest>
-        <resources>
-            <resource>
-                <directory>config</directory>
-                <includes>
-                    <include>*.xml</include>
-                </includes>
-            </resource>
-        </resources>
+        <!--<resources>-->
+            <!--<resource>-->
+                <!--<directory>config</directory>-->
+                <!--<includes>-->
+                    <!--<include>*.xml</include>-->
+                <!--</includes>-->
+            <!--</resource>-->
+        <!--</resources>-->
 
     </build>
 

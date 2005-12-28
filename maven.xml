@@ -184,7 +184,7 @@
         </jar>
 
         <copy file="target/DeprecationMediator.aar"
-              tofile="target/samples/DeprecationMediator.aar"/>
+              tofile="target/samples/sampleMediators/DeprecationMediator.aar"/>
 
         <!-- Deleteing helper stuff-->
 
@@ -286,6 +286,11 @@
                 <include name="**"/>
             </ant:fileset>
         </ant:copy>
+
+        <ant:copy file="scripts/userguide/build.xml"
+                  tofile="${bin.dist.dir}/samples/userguide/build.xml"/>
+        <ant:copy file="scripts/userguide/README.txt"
+                  tofile="${bin.dist.dir}/samples/userguide/README.txt"/>
 
         <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="target/samples/">

@@ -20,6 +20,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.soap.SOAPFactory;
+import org.apache.axis2.soap.SOAP11Constants;
 
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -97,6 +98,13 @@ public class Axis2Sender {
                 Iterator iterator = envelope.getAllDeclaredNamespaces();
                 while (iterator.hasNext()) {
                     OMNamespace namespace = (OMNamespace) iterator.next();
+                    if (namespace.getName()
+                            .equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI) ||
+                            namespace.getName()
+                                    .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
+                    {
+                        continue;
+                    }
                     newEnvelope.declareNamespace(namespace);
                 }
                 newEnvelope.getBody()

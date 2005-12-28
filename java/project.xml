@@ -278,6 +278,14 @@
             <artifactId>XmlSchema</artifactId>
             <version>${XmlSchema.version}</version>
         </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>ws-policy</artifactId>
+            <version>${ws_policy.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
+        </dependency>
     </dependencies>
 
     <!-- ================================= -->

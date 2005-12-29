@@ -54,10 +54,10 @@
         <echo message="----------------Creating Empty Mediator aar----------------"/>
         <!--<mkdir dir="target/services/emptymediator/META-INF"/>-->
         <!--<copy file="synapse-test-resources/axis2/services/emptymediator/META-INF/services.xml"-->
-              <!--tofile="target/services/emptymediator/META-INF/services.xml"/>-->
+        <!--tofile="target/services/emptymediator/META-INF/services.xml"/>-->
         <!--<jar jarfile="target/emptymediator.aar"-->
-             <!--basedir="target/services/emptymediator">-->
-            <!--<include name="**"/>-->
+        <!--basedir="target/services/emptymediator">-->
+        <!--<include name="**"/>-->
         <!--</jar>-->
         <j:if test="${context.getVariable('maven.test.skip') != 'true'}">
 
@@ -91,7 +91,7 @@
             <copy file="target/npe.aar"
                   tofile="target/synapse-repository-sendon/services/npe.aar"/>
             <!--<copy file="target/emptymediator.aar"-->
-                  <!--tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>-->
+            <!--tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>-->
             <mkdir dir="target/synapse-repository-sendon/modules"/>
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendon/modules/addressing.mar"/>
@@ -125,7 +125,7 @@
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository/services/synapse.aar"/>
         <!--<copy file="target/emptymediator.aar"-->
-              <!--tofile="target/synapse-repository/services/emptymediator.aar"/>-->
+        <!--tofile="target/synapse-repository/services/emptymediator.aar"/>-->
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository/modules/addressing.mar"/>
@@ -139,7 +139,7 @@
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository-fault/services/synapse.aar"/>
         <!--<copy file="target/emptymediator.aar"-->
-              <!--tofile="target/synapse-repository-fault/services/emptymediator.aar"/>-->
+        <!--tofile="target/synapse-repository-fault/services/emptymediator.aar"/>-->
         <mkdir dir="target/synapse-repository-fault/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-fault/modules/addressing.mar"/>
@@ -153,7 +153,7 @@
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository-send/services/synapse.aar"/>
         <!--<copy file="target/emptymediator.aar"-->
-              <!--tofile="target/synapse-repository-send/services/emptymediator.aar"/>-->
+        <!--tofile="target/synapse-repository-send/services/emptymediator.aar"/>-->
         <mkdir dir="target/synapse-repository-send/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-send/modules/addressing.mar"/>
@@ -184,7 +184,7 @@
         </jar>
 
         <copy file="target/DeprecationMediator.aar"
-              tofile="target/samples/sampleMediators/DeprecationMediator.aar"/>
+              tofile="target/samples/samples/deprecation_mediator/DeprecationMediator.aar"/>
 
         <!-- Deleteing helper stuff-->
 
@@ -201,15 +201,34 @@
     <goal name="samples_userguide">
         <mkdir dir="target/samples"/>
         <mkdir dir="${samples.dir}/userguide"/>
+        <mkdir dir="${samples.dir}/samples/deprecation_mediator"/>
         <mkdir dir="${samples.dir}/userguide/src"/>
+        <mkdir dir="${samples.dir}/samples/deprecation_mediator/src"/>
         <ant:copy todir="${samples.dir}/userguide/src">
             <ant:fileset dir="src">
                 <ant:include name="samples/**"/>
             </ant:fileset>
         </ant:copy>
+        <ant:copy todir="${samples.dir}/samples/deprecation_mediator/src">
+            <ant:fileset dir="src">
+                <ant:include name="samples/**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy todir="${samples.dir}/samples/deprecation_mediator/deprecation_mediator/src">
+            <ant:fileset dir="src">
+                <ant:include name="samples/**"/>
+                <ant:include name="sampleMediators/**"/>
+            </ant:fileset>
+        </ant:copy>
         <jar destfile="${samples.dir}/userguide/sample_userguide.jar">
             <fileset dir="target/classes">
                 <include name="samples/**"/>
+            </fileset>
+        </jar>
+        <jar destfile="${samples.dir}/samples/deprecation_mediator/sample_deprecation_mediator.jar">
+            <fileset dir="target/classes">
+                <include name="samples/**"/>
+                <include name="sampleMediators/**"/>
             </fileset>
         </jar>
     </goal>
@@ -291,6 +310,13 @@
                   tofile="${bin.dist.dir}/samples/userguide/build.xml"/>
         <ant:copy file="scripts/userguide/README.txt"
                   tofile="${bin.dist.dir}/samples/userguide/README.txt"/>
+
+        <ant:copy file="scripts/samples/deprecation_mediator/synapse.xml"
+                  tofile="${bin.dist.dir}/samples/samples/deprecation_mediator/synapse.xml"/>
+        <ant:copy file="scripts/samples/deprecation_mediator/README.txt"
+                  tofile="${bin.dist.dir}/samples/samples/deprecation_mediator/README.txt"/>
+        <ant:copy file="scripts/samples/deprecation_mediator/build.xml"
+                  tofile="${bin.dist.dir}/samples/samples/deprecation_mediator/build.xml"/>
 
         <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="target/samples/">

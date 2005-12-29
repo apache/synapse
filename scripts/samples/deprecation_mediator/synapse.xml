@@ -1,0 +1,14 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+    <stage name="logall">
+        <engage-addressing-in/>
+		<log/>
+    </stage>
+    <stage name="service-specific" >
+		<regex message-address="to" pattern="http://64.124.140.30:9090/soap">
+            <servicemediator name="optional" service="DeprecationMediator"/>
+		</regex>
+	</stage>
+	<stage name="sender">
+		<send/>
+	</stage>
+</synapse>

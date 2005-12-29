@@ -1,0 +1,29 @@
+<project name="samples" default="StockQuoteClient">
+    <property name="arg1" value="IBM"/>
+    <property name="arg2" value="http://64.124.140.30:9090/soap"/>
+    <property name="arg3" value="http://localhost:8080"/>
+
+    <path id="axis.classpath">
+        <fileset dir="../../../lib">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement location="sample_deprecation_mediator.jar"/>
+    </path>
+
+    <target name="StockQuoteClient">
+        <java classname="samples.userguide.StockQuoteClient"
+              classpathref="axis.classpath" fork="true">
+            <arg value="${arg1}"/>
+            <arg value="${arg2}"/>
+            <arg value="${arg3}"/>
+        </java>
+    </target>
+
+    <target name="synapse">
+        <java classname="org.apache.axis2.transport.http.SimpleHTTPServer"
+              classpathref="axis.classpath" fork="true">
+            <arg value="../../synapse_repository"/>
+            <arg value="8080"/>
+        </java>
+    </target>
+</project>

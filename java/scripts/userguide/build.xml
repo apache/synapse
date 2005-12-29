@@ -26,4 +26,10 @@
             <arg value="8080"/>
         </java>
     </target>
+
+    <target name="log_with_addressing">
+      <java classname="samples.userguide.log.LoggingClient"
+              classpathref="axis.classpath" fork="true">
+        </java>
+    </target>
 </project>

@@ -84,6 +84,18 @@
                 <include name="**"/>
             </jar>
 
+            <echo message="----------------Creating EnvironmentAware-Mediator aar----------------"/>
+            <mkdir dir="target/services/environmentaware-mediator/META-INF"/>
+            <mkdir dir="target/services/environmentaware-mediator/org/apache/axis2/test"/>
+            <copy file="test/org/apache/axis2/META-INF/environmentaware-service.xml"
+                  tofile="target/services/environmentaware-mediator/META-INF/services.xml"/>
+            <copy file="target/test-classes/org/apache/axis2/test/EnvironmentAwareMediator.class"
+                  tofile="target/services/environmentaware-mediator/org/apache/axis2/test/EnvironmentAwareMediator.class"/>
+            <jar jarfile="target/environmentaware-mediator.aar"
+                 basedir="target/services/environmentaware-mediator">
+                <include name="**"/>
+            </jar>
+
             <echo message="-----------Creating Testing Repository - SendOn ----------"/>
             <mkdir dir="target/synapse-repository-sendon"/>
             <copy file="target/synapse.aar"
@@ -108,14 +120,31 @@
             <copy file="target/test-mediator.aar"
                   tofile="target/synapse-repository-sendonAxis2/services/test-mediator.aar"/>
 
+
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
             <copy file="repository/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
 
+            <echo message="-----------Creating Testing Repository - EnvironmentAware ----------"/>
+            <mkdir dir="target/synapse-repository-environmentaware"/>
+
+            <copy file="target/environmentaware-mediator.aar"
+                  tofile="target/synapse-repository-environmentaware/services/environmentaware-mediator.aar"/>
+            <copy file="target/synapse.aar"
+                  tofile="target/synapse-repository-environmentaware/services/synapse.aar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+                  tofile="target/synapse-repository-environmentaware/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/axis2.xml"
+                  tofile="target/synapse-repository-environmentaware/axis2.xml"/>
+            <copy file="test/rules/synapse-environmentaware.xml"
+                  tofile="target/synapse-repository-environmentaware/synapse.xml"/>
+
             <ant:delete file="target/npe.aar"/>
             <ant:delete file="target/test-mediator.aar"/>
             <ant:delete dir="target/test-mediator"/>
+            <ant:delete dir="target/environmentaware-mediator"/>
+            <ant:delete dir="target/environmentaware-mediator.aar"/>
 
         </j:if>
 
@@ -214,7 +243,8 @@
                 <ant:include name="samples/**"/>
             </ant:fileset>
         </ant:copy>
-        <ant:copy todir="${samples.dir}/samples/deprecation_mediator/deprecation_mediator/src">
+        <ant:copy
+                todir="${samples.dir}/samples/deprecation_mediator/deprecation_mediator/src">
             <ant:fileset dir="src">
                 <ant:include name="samples/**"/>
                 <ant:include name="sampleMediators/**"/>

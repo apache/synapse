@@ -18,14 +18,11 @@
 import junit.framework.TestCase;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.client.Call;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.axis2.om.OMElement;
 import org.apache.synapse.util.Axis2EvnSetup;
-
-import javax.xml.namespace.QName;
 
 
 public class SendOnProcessorWithRuleTest extends TestCase {
@@ -34,7 +31,6 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     private SimpleHTTPServer axis2Server;
     private EndpointReference targetEpr = new EndpointReference(
             "http://127.0.0.1:5043/axis2/services/anonymous");
-    private QName operation = new QName("anonymous");
 
     public void setUp() throws Exception {
         synapseServer = new SimpleHTTPServer("target/synapse-repository-sendon",
@@ -54,11 +50,11 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     }
 
     public void testSendProcessor() throws Exception {
-        Call call = new Call();
+        ServiceClient serviceClient = new ServiceClient();
         Options options = new Options();
         options.setTo(targetEpr);
-        call.setClientOptions(options);
-        OMElement response = call.invokeBlocking(operation.getLocalPart(), Axis2EvnSetup.payload());
+        serviceClient.setOptions(options);
+        OMElement response = serviceClient.sendReceive(Axis2EvnSetup.payload());
         assertEquals("Synapse Testing String_Response",response.getText());
 
     }

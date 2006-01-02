@@ -19,18 +19,16 @@ package org.apache.synapse.spi.injection;
 import junit.framework.TestCase;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.util.Axis2EvnSetup;
 
-import javax.xml.namespace.QName;
 
 public class SendBackProcessorWithRuleTest extends TestCase {
     private SimpleHTTPServer synapseServer;
     private EndpointReference targetEpr = new EndpointReference(
             "http://127.0.0.1:5043/axis2/services/anonymous");
-    private QName operation = new QName("anonymous");
 
     public void setUp() throws Exception {
         synapseServer = new SimpleHTTPServer("target/synapse-repository-send",
@@ -43,11 +41,11 @@ public class SendBackProcessorWithRuleTest extends TestCase {
     }
 
     public void testSendPrcessor() throws Exception {
-        MessageSender msgSender = new MessageSender();
+        ServiceClient serviceClient = new ServiceClient();
         Options co = new Options();
         co.setTo(targetEpr);        
-        msgSender.setClientOptions(co);
-        msgSender.send(operation.getLocalPart(), Axis2EvnSetup.payload());
+        serviceClient.setOptions(co);
+        serviceClient.fireAndForget(Axis2EvnSetup.payload());
 
     }
 

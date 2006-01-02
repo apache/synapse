@@ -22,11 +22,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisServiceGroup;
-import org.apache.axis2.description.OutInAxisOperation;
-import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 
@@ -55,14 +51,18 @@ public class Axis2FlexibleMEPClient {
             AxisConfiguration ac = new AxisConfiguration();
             ConfigurationContext cc = new ConfigurationContext(ac);
             AxisServiceGroup asg = new AxisServiceGroup(ac);
-            AxisService as = new AxisService("AnonymousService");
+            AxisService as = new AxisService("__ANONYMOUS_SERVICE__");
             asg.addService(as);
             ServiceGroupContext sgc = new ServiceGroupContext(cc, asg);
             ServiceContext sc = sgc.getServiceContext(as);
-            AxisOperation axisOperationTemplate = new OutInAxisOperation(
-                    new QName("TemplateOperation"));
-            as.addOperation(axisOperationTemplate);
+            //todo: explicitly assumes __OPERATION_OUT_IN__
+            //todo: need a way to support others __OPERATION_OUT_ONLY__ , __OPERATION_ROBUST_OUT_ONLY__
+            AxisOperation axisOperationTemplateOutIn = new OutInAxisOperation(
+                    new QName("__OPERATION_OUT_IN__"));
+            as.addOperation(axisOperationTemplateOutIn);
             cc.getAxisConfiguration().addService(as);
+            // todo: TransportOutDescription handles Http only. Need to integrate other
+            // todo: transports too.
             TransportOutDescription tod = new TransportOutDescription(
                     new QName(org.apache.axis2.Constants.TRANSPORT_HTTP));
             tod.setSender(new CommonsHTTPTransportSender());
@@ -119,7 +119,7 @@ public class Axis2FlexibleMEPClient {
             }
             // initialize and set the Operation Context
 
-            msgCtx.setOperationContext(axisOperationTemplate
+            msgCtx.setOperationContext(axisOperationTemplateOutIn
                     .findOperationContext(msgCtx, sc));
             AxisEngine engine = new AxisEngine(cc);
 
@@ -164,7 +164,6 @@ public class Axis2FlexibleMEPClient {
             SOAPEnvelope resenvelope = TransportUtils.createSOAPMessage(
                     response, msgCtx.getEnvelope().getNamespace().getName());
 
-            System.out.println(resenvelope.toString());
 
             response.setEnvelope(resenvelope);
             engine = new AxisEngine(msgCtx.getConfigurationContext());

@@ -124,13 +124,13 @@ public class Axis2SynapseMessage implements SynapseMessage {
 		return mc.getWSAAction();
 	}
 
-	public void setWSAMessageId(String messageID) {
+	public void setMessageId(String messageID) {
 		mc.setWSAMessageId(messageID);
 
 	}
 
-	public String getWSAMessageId() {
-		return mc.getWSAMessageId();
+	public String getMessageId() {
+		return mc.getMessageID();
 	}
 
 	public Object getProperty(String key) {

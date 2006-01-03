@@ -42,8 +42,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 	private ClassLoader cl = null;
 
 	private Map processors = new HashMap();
+    private HashMap environmentProperties =  new HashMap();
 
-	private Log log = LogFactory.getLog(getClass());
+    private Log log = LogFactory.getLog(getClass());
 
 	public Axis2SynapseEnvironment(OMElement synapseConfiguration,
 			ClassLoader cl) {
@@ -91,4 +92,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 	public void setMasterProcessor(Processor p) {
 		mainprocessor = p;
 	}
+    // Need to have a parent and set it
+    public void setProperty(String key, Object value) {
+        environmentProperties.put(key,value);
+    }
+    public Object getProperty(String key) {
+        return environmentProperties.get(key);
+    }
 }

@@ -16,7 +16,7 @@
 
 package org.apache.synapse.processors.builtin.axis2;
 
-import javax.xml.namespace.QName;
+
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.*;
@@ -40,7 +40,6 @@ import org.apache.synapse.axis2.EmptyMessageReceiver;
 
 import org.apache.synapse.processors.AbstractProcessor;
 
-import java.util.Iterator;
 
 /**
  * <p/>

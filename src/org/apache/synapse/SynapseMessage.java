@@ -67,9 +67,9 @@ public interface SynapseMessage {
 
 	public String getWSAAction();
 
-	public void setWSAMessageId(String messageID);
+	public void setMessageId(String messageID);
 
-	public String getWSAMessageId();
+	public String getMessageId();
 
 	public Object getProperty(String key);
 

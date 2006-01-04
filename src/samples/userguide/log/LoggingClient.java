@@ -18,27 +18,25 @@ package samples.userguide.log;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.MessageSender;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.om.OMAbstractFactory;
 import org.apache.axis2.om.OMElement;
 import org.apache.axis2.om.OMFactory;
 import org.apache.axis2.om.OMNamespace;
 
-import javax.xml.namespace.QName;
 
 public class LoggingClient {
     private static EndpointReference targetEpr = new EndpointReference(
             "http://127.0.0.1:8080/synapse/services/mock_service");
-    private static QName operation = new QName("mock_operation");
 
     public static void main(String[] args) {
         try {
-            MessageSender msgSender = new MessageSender();
+            ServiceClient serviceClient = new ServiceClient();
             Options co = new Options();
             co.setTo(targetEpr);
-            msgSender.setClientOptions(co);
-            msgSender.send(operation.getLocalPart(), payload());
+            serviceClient.setOptions(co);
+            serviceClient.fireAndForget(payload());
         } catch (AxisFault axisFault) {
             axisFault
                     .printStackTrace();

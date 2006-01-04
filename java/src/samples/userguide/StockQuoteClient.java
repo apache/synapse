@@ -48,7 +48,7 @@ public class StockQuoteClient {
 
         String symb = "IBM";
         String xurl = "http://64.124.140.30:9090/soap";
-        String turl = "http://64.124.140.30:9090/soap";
+        String turl = "http://127.0.0.1:8080";
 
         if (args.length > 0)
             symb = args[0];

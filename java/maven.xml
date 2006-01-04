@@ -126,6 +126,30 @@
             <copy file="repository/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
 
+            <echo message="-----------Creating Testing Repository - SendonAxis2Tcp ----------"/>
+            <mkdir dir="target/synapse-repository-sendonAxis2"/>
+
+            <copy file="target/npe.aar"
+                  tofile="target/synapse-repository-sendonAxis2Tcp/services/npe.aar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+                  tofile="target/synapse-repository-sendonAxis2Tcp/modules/addressing.mar"/>
+            <copy file="repository/axis2.xml"
+                  tofile="target/synapse-repository-sendonAxis2Tcp/axis2.xml"/>
+
+            <echo message="-----------Creating Testing Repository - HttpTcp ----------"/>
+            <mkdir dir="target/synapse-repository-httptcp"/>
+
+            <copy file="target/emptymediator.aar"
+                  tofile="target/synapse-repository-httptcp/services/emptymediator.aar"/>
+            <copy file="target/synapse.aar"
+                  tofile="target/synapse-repository-httptcp/services/synapse.aar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
+                  tofile="target/synapse-repository-httptcp/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/axis2.xml"
+                  tofile="target/synapse-repository-httptcp/axis2.xml"/>
+            <copy file="test/rules/synapse-httptcp.xml"
+                  tofile="target/synapse-repository-httptcp/synapse.xml"/>
+
             <echo message="-----------Creating Testing Repository - EnvironmentAware ----------"/>
             <mkdir dir="target/synapse-repository-environmentaware"/>
 

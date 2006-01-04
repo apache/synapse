@@ -15,6 +15,9 @@
  */
 package org.apache.synapse;
 
+import java.util.Map;
+import java.util.HashMap;
+
 
 /**
  *
@@ -24,57 +27,101 @@ package org.apache.synapse;
  * 
  *
  */
-public interface SynapseEnvironment {
-	
-	/* 
-	 * This method injects a new message into the Synapse engine
-	 * It is used in a couple of ways. Firstly, this is how, for example, 
-	 * Axis2 kicks messages into Synapse to start with.
-	 * <p>
-	 * Also mediators can use this to send messages that they want to be mediated by Synapse
-	 * <p>For example if you want to send a copy of a message somewhere, you can clone it and then 
-	 * injectMessage() 
-	 */
-	public void injectMessage(SynapseMessage smc);
-	
-	/*
-	 * Processors or Mediators that wish to load classes should use the ClassLoader given here
-	 */
-	public ClassLoader getClassLoader();
-	
-	
-	/**
-	 * This method allows you send messages on. As opposed to injectMessage send message does not 
-	 * process these through Synapse.
-	 * <p>
-	 * This will send request messages on, and send response messages back to the client
-	 */
-	public void send(SynapseMessage smc, SynapseEnvironment se);
-	
-	
-	/**
-	 * This is used by the references to find a processor with a given name
-	 * 
-	 */
-	public Processor lookupProcessor(String name);
-	
-	
-	/**
-	 * This is how you add a processor to the list of processors. The name which it can be
-	 * retrieved by is the processor.getName()
-	 */
-	public void addProcessor(Processor p);
-	
-	
-	/**
-	 * This returns the "Master Processor" which is the root processor for this instance of 
-	 * Synapse. Usually this would be the processor derived from &ltsynapse>.  
-	 */
-	public Processor getMasterProcessor();
-	
-	
-	/**
-	 * This sets the root processor for the engine. 
-	 */
-	public void setMasterProcessor(Processor p);
+public abstract class SynapseEnvironment {
+
+    protected SynapseEnvironment parent;
+    protected Map properties;
+
+    protected SynapseEnvironment(SynapseEnvironment parent) {
+        this.properties = new HashMap();
+        this.parent = parent;
+    }
+
+    public SynapseEnvironment getParent() {
+        return this.parent;
+    }
+
+    public void setParent(SynapseEnvironment parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * Retrieves an object given a key.
+     *
+     * @param key - if not found, will return null
+     * @return Returns the property.
+     */
+    public Object getProperty(String key) {
+        Object obj = null;
+
+        obj = properties.get(key);
+
+        if ((obj == null) && (parent != null)) {
+            obj = parent.getProperty(key);
+        }
+
+        return obj;
+    }
+
+    /**
+     * Store a property for message context
+     *
+     * @param key
+     * @param value
+     */
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+    
+    /*
+      * This method injects a new message into the Synapse engine
+      * It is used in a couple of ways. Firstly, this is how, for example,
+      * Axis2 kicks messages into Synapse to start with.
+      * <p>
+      * Also mediators can use this to send messages that they want to be mediated by Synapse
+      * <p>For example if you want to send a copy of a message somewhere, you can clone it and then
+      * injectMessage()
+      */
+    abstract public void injectMessage(SynapseMessage smc);
+
+    /*
+      * Processors or Mediators that wish to load classes should use the ClassLoader given here
+      */
+    abstract public ClassLoader getClassLoader();
+
+
+    /**
+     * This method allows you send messages on. As opposed to injectMessage send message does not
+     * process these through Synapse.
+     * <p>
+     * This will send request messages on, and send response messages back to the client
+     */
+    abstract public void send(SynapseMessage smc, SynapseEnvironment se);
+
+
+    /**
+     * This is used by the references to find a processor with a given name
+     *
+     */
+    abstract public Processor lookupProcessor(String name);
+
+
+    /**
+     * This is how you add a processor to the list of processors. The name which it can be
+     * retrieved by is the processor.getName()
+     */
+    abstract public void addProcessor(Processor p);
+
+
+    /**
+     * This returns the "Master Processor" which is the root processor for this instance of
+     * Synapse. Usually this would be the processor derived from &ltsynapse>.
+     */
+    abstract public Processor getMasterProcessor();
+
+
+    /**
+     * This sets the root processor for the engine.
+     */
+    abstract public void setMasterProcessor(Processor p);
 }

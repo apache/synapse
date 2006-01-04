@@ -29,7 +29,7 @@ public class TestSynapseMessage {
             ConfigurationContextFactory conFac =
                     new ConfigurationContextFactory();
             ConfigurationContext configCtx = conFac
-                    .buildConfigurationContext(testingRepository);
+                    .createConfigurationContextFromFileSystem(testingRepository);
             msgCtx = new MessageContext(configCtx);
             msgCtx.setServerSide(true);
 

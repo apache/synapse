@@ -52,13 +52,13 @@
             <include name="**"/>
         </jar>
         <echo message="----------------Creating Empty Mediator aar----------------"/>
-        <!--<mkdir dir="target/services/emptymediator/META-INF"/>-->
-        <!--<copy file="synapse-test-resources/axis2/services/emptymediator/META-INF/services.xml"-->
-        <!--tofile="target/services/emptymediator/META-INF/services.xml"/>-->
-        <!--<jar jarfile="target/emptymediator.aar"-->
-        <!--basedir="target/services/emptymediator">-->
-        <!--<include name="**"/>-->
-        <!--</jar>-->
+        <mkdir dir="target/services/emptymediator/META-INF"/>
+        <copy file="synapse-test-resources/axis2/services/emptymediator/META-INF/services.xml"
+              tofile="target/services/emptymediator/META-INF/services.xml"/>
+        <jar jarfile="target/emptymediator.aar"
+             basedir="target/services/emptymediator">
+            <include name="**"/>
+        </jar>
         <j:if test="${context.getVariable('maven.test.skip') != 'true'}">
 
             <echo message="----------------Creating NPE aar----------------"/>
@@ -102,8 +102,8 @@
                   tofile="target/synapse-repository-sendon/services/synapse.aar"/>
             <copy file="target/npe.aar"
                   tofile="target/synapse-repository-sendon/services/npe.aar"/>
-            <!--<copy file="target/emptymediator.aar"-->
-            <!--tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>-->
+            <copy file="target/emptymediator.aar"
+                  tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
             <mkdir dir="target/synapse-repository-sendon/modules"/>
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendon/modules/addressing.mar"/>
@@ -119,8 +119,8 @@
                   tofile="target/synapse-repository-sendonAxis2/services/npe.aar"/>
             <copy file="target/test-mediator.aar"
                   tofile="target/synapse-repository-sendonAxis2/services/test-mediator.aar"/>
-
-
+            <copy file="target/emptymediator.aar"
+                  tofile="target/synapse-repository-sendonAxis2/services/emptymediator.aar"/>
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
                   tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
             <copy file="repository/axis2.xml"
@@ -131,6 +131,8 @@
 
             <copy file="target/environmentaware-mediator.aar"
                   tofile="target/synapse-repository-environmentaware/services/environmentaware-mediator.aar"/>
+            <copy file="target/emptymediator.aar"
+                  tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
             <copy file="target/synapse.aar"
                   tofile="target/synapse-repository-environmentaware/services/synapse.aar"/>
             <copy file="synapse-test-resources/axis2/modules/addressing.mar"
@@ -153,8 +155,8 @@
         <mkdir dir="target/synapse-repository"/>
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository/services/synapse.aar"/>
-        <!--<copy file="target/emptymediator.aar"-->
-        <!--tofile="target/synapse-repository/services/emptymediator.aar"/>-->
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository/modules/addressing.mar"/>
@@ -167,8 +169,8 @@
         <mkdir dir="target/synapse-repository-fault"/>
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository-fault/services/synapse.aar"/>
-        <!--<copy file="target/emptymediator.aar"-->
-        <!--tofile="target/synapse-repository-fault/services/emptymediator.aar"/>-->
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository-fault/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-fault/modules/addressing.mar"/>
@@ -181,8 +183,8 @@
         <mkdir dir="target/synapse-repository-send"/>
         <copy file="target/synapse.aar"
               tofile="target/synapse-repository-send/services/synapse.aar"/>
-        <!--<copy file="target/emptymediator.aar"-->
-        <!--tofile="target/synapse-repository-send/services/emptymediator.aar"/>-->
+        <copy file="target/emptymediator.aar"
+              tofile="target/synapse-repository-send/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository-send/modules"/>
         <copy file="synapse-test-resources/axis2/modules/addressing.mar"
               tofile="target/synapse-repository-send/modules/addressing.mar"/>
@@ -219,7 +221,7 @@
 
         <ant:delete dir="target/modules"/>
         <ant:delete dir="target/services"/>
-        <!--<ant:delete file="target/emptymediator.aar"/>-->
+        <ant:delete file="target/emptymediator.aar"/>
         <ant:delete file="target/synapse.aar"/>
         <ant:delete dir="target/sample-deprecation"/>
         <ant:delete file="target/DeprecationMediator.aar"/>

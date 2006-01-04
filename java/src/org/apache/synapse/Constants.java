@@ -50,4 +50,9 @@ public interface Constants {
 
     String SECURITY_QOS = "synapse_security";
     String ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT = "addressing_processed_configurationContext";
+
+    // Synapse's client side repository settng
+
+    String DIRECTORY_HOME_SYNAPSE_AS_CLIENT = ".synapse_as_client";
+    String HOME_USER = "user.home";
 }

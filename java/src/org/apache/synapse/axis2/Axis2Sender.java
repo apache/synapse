@@ -49,6 +49,16 @@ public class Axis2Sender {
 
             MessageContext messageContext = ((Axis2SynapseMessage) smc)
                     .getMessageContext();
+            // runtime switch between AddressingOutProcessor.
+            // By default addressing is engaged. At runtime we check
+            // SynapseEnvironemnt, whether Addressing engaged. If not using the following code
+            // ar runtime Synapse will desable Axis2's AddressingOutHandler
+            if (se.getProperty(Constants.ADDRESSING_PROCESSED) == null) {
+                messageContext
+                        .setProperty(
+                                org.apache.axis2.Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
+                                Boolean.TRUE);
+            }
 
             MessageContext outMsgContext = Axis2FlexibleMEPClient
                     .send(messageContext);

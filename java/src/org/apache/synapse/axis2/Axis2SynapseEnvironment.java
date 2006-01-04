@@ -36,19 +36,18 @@ import org.apache.synapse.xml.ProcessorConfiguratorFinder;
  * <p> This is the Axis2 implementation of the SynapseEnvironment 
  *
  */
-public class Axis2SynapseEnvironment implements SynapseEnvironment {
+public class Axis2SynapseEnvironment extends SynapseEnvironment {
 	private Processor mainprocessor = null;
 
 	private ClassLoader cl = null;
 
 	private Map processors = new HashMap();
-    private HashMap environmentProperties =  new HashMap();
 
     private Log log = LogFactory.getLog(getClass());
 
 	public Axis2SynapseEnvironment(OMElement synapseConfiguration,
 			ClassLoader cl) {
-		super();
+		super(null);
 		this.cl = cl;
 		if (synapseConfiguration!=null)
 			mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
@@ -92,11 +91,4 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 	public void setMasterProcessor(Processor p) {
 		mainprocessor = p;
 	}
-    // Need to have a parent and set it
-    public void setProperty(String key, Object value) {
-        environmentProperties.put(key,value);
-    }
-    public Object getProperty(String key) {
-        return environmentProperties.get(key);
-    }
 }

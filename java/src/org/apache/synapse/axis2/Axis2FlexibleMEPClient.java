@@ -25,6 +25,8 @@ import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 
 import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axis2.soap.SOAPHeader;
+import org.apache.axis2.soap.SOAPHeaderBlock;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.AxisFault;
@@ -36,6 +38,7 @@ import org.apache.wsdl.WSDLConstants;
 
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 
 /**
@@ -45,10 +48,18 @@ public class Axis2FlexibleMEPClient {
 
     private static SOAPEnvelope outEnvelopeConfiguration(MessageContext smc) {
         SOAPEnvelope env = smc.getEnvelope();
-        env.getHeader().detach();
+        SOAPHeader soapHeader = env.getHeader();
+        if (soapHeader != null) {
+            Iterator iterator = soapHeader.getChildren();
+            while (iterator.hasNext()) {
+                SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) iterator.next();
+                headerBlock.detach();
+            }
+        }
         return env;
     }
-    // Following code is based on Axis2 Client code. 
+
+    // Following code is based on Axis2 Client code.
     public static MessageContext send(MessageContext smc) throws AxisFault {
         // In this logic Synapse Work as a Client to a Server
         // So here this logic should expect 200 ok, 202 ok and 500 internal server error
@@ -121,7 +132,7 @@ public class Axis2FlexibleMEPClient {
         // variable
         response.setDoingREST(smc.isDoingREST());
         response.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
-                    true));
+                true));
         return response;
     }
 

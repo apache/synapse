@@ -6,9 +6,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Call;
 
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
@@ -96,14 +96,13 @@ public class DumbStockQuoteClient {
 			tod.setSender(new CommonsHTTPTransportSender());
 			ac.addTransportOut(tod);
 
-			// make the call
-			Call call;
-			call = new Call(sc);
+			// make the ServiceClient
+			ServiceClient serviceClient = new ServiceClient();
 
-			call.setClientOptions(options);
+			serviceClient.setOptions(options);
 
 			// step 3 - Blocking invocation
-			OMElement result = call.invokeBlocking("getQuote", getQuote);
+			OMElement result = serviceClient.sendReceive(getQuote);
 
 			// step 4 - parse result
 			QName gQR = new QName("urn:xmethods-delayed-quotes",

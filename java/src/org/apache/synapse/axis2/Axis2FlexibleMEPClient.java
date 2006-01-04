@@ -119,7 +119,7 @@ public class Axis2FlexibleMEPClient {
         OperationClient mepClient =
                 axisAnonymousOperation.createClient(sc, options);
         mepClient.addMessageContext(mc);
-        mepClient.execute(false);
+        mepClient.execute(true);
         MessageContext response = mepClient
                 .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         response.setProperty(MessageContext.TRANSPORT_OUT,

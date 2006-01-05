@@ -62,7 +62,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     }
 
     public void testSendProcessorMultipleTimes() throws Exception {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             ServiceClient serviceClient = new ServiceClient();
             Options options = new Options();
             options.setTo(targetEpr);
@@ -71,7 +71,6 @@ public class SendOnProcessorWithRuleTest extends TestCase {
                     serviceClient.sendReceive(Axis2EvnSetup.payload());
             assertEquals("Synapse Testing String_Response", response.getText());
             serviceClient.finalizeInvoke();
-            Thread.sleep(2000);
         }
     }
 

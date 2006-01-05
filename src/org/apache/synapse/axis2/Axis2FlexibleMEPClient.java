@@ -69,19 +69,24 @@ public class Axis2FlexibleMEPClient {
         ConfigurationContext cc = smc.getConfigurationContext();
         AxisConfiguration ac = cc.getAxisConfiguration();
         PhasesInfo phasesInfo = ac.getPhasesInfo();
-        // Lets default be OUT_IN
-        OutInAxisOperation outInOperation = new OutInAxisOperation(new QName(
-                "__OPERATION_OUT_IN__"));
-        AxisService axisAnonymousService = new AxisService("ANONYMOUS_SERVICE");
 
         // setting operation default chains
-        phasesInfo.setOperationPhases(outInOperation);
-        axisAnonymousService.addOperation(outInOperation);
-        ac.addService(axisAnonymousService);
-        ServiceGroupContext sgc =
-                new ServiceGroupContext(cc, axisAnonymousService.getParent());
-        ServiceContext sc = sgc.getServiceContext(axisAnonymousService);
-        //
+        if (ac.getService("__ANONYMOUS_SERVICE__") == null) {
+            // Lets default be OUT_IN
+            OutInAxisOperation outInOperation =
+                    new OutInAxisOperation(new QName(
+                            "__OPERATION_OUT_IN__"));
+            AxisService axisAnonymousService =
+                    new AxisService("__ANONYMOUS_SERVICE__");
+            axisAnonymousService.addOperation(outInOperation);
+            ac.addService(axisAnonymousService);
+            phasesInfo.setOperationPhases(outInOperation);
+        }
+        ServiceGroupContext sgc = new ServiceGroupContext(cc,
+                ac.getService("__ANONYMOUS_SERVICE__").getParent());
+        ServiceContext sc =
+                sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
+
         MessageContext mc = new MessageContext(sc.getConfigurationContext());
         ///////////////////////////////////////////////////////////////////////
         // filtering properties
@@ -110,8 +115,9 @@ public class Axis2FlexibleMEPClient {
         ///////////////////////////////////////////////////////////////////////
 
 
-        AxisOperation axisAnonymousOperation = axisAnonymousService
-                .getOperation(new QName("__OPERATION_OUT_IN__"));
+        AxisOperation axisAnonymousOperation =
+                ac.getService("__ANONYMOUS_SERVICE__")
+                        .getOperation(new QName("__OPERATION_OUT_IN__"));
 
         //Options class from Axis2 holds client side settings
         Options options = new Options();

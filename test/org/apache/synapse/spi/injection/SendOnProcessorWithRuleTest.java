@@ -13,7 +13,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *
-*/package org.apache.synapse.spi.injection;
+*/
+package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 
@@ -38,8 +39,9 @@ public class SendOnProcessorWithRuleTest extends TestCase {
         /**
          * axis2Server is the one who holds the actual service
          */
-        axis2Server = new SimpleHTTPServer("target/synapse-repository-sendonAxis2",
-                8090);
+        axis2Server =
+                new SimpleHTTPServer("target/synapse-repository-sendonAxis2",
+                        8090);
         synapseServer.start();
         axis2Server.start();
     }
@@ -55,8 +57,20 @@ public class SendOnProcessorWithRuleTest extends TestCase {
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
         OMElement response = serviceClient.sendReceive(Axis2EvnSetup.payload());
-        assertEquals("Synapse Testing String_Response",response.getText());
+        assertEquals("Synapse Testing String_Response", response.getText());
 
+    }
+
+    public void testSendProcessorMultipleTimes() throws Exception {
+        ServiceClient serviceClient = new ServiceClient();
+        for (int i = 0; i < 5; i++) {
+            Options options = new Options();
+            options.setTo(targetEpr);
+            serviceClient.setOptions(options);
+            OMElement response =
+                    serviceClient.sendReceive(Axis2EvnSetup.payload());
+            assertEquals("Synapse Testing String_Response", response.getText());
+        }
     }
 
 }

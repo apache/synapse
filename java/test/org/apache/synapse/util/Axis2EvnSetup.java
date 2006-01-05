@@ -42,7 +42,8 @@ public class Axis2EvnSetup {
         ConfigurationContextFactory conFac = new ConfigurationContextFactory();
         ConfigurationContext configCtx = conFac
                 .createConfigurationContextFromFileSystem(testingRepository);
-        MessageContext msgCtx = new MessageContext(configCtx);
+        MessageContext msgCtx = new MessageContext();
+        msgCtx.setConfigurationContext(configCtx);
         msgCtx.setEnvelope(testEnvSetup());
         msgCtx.setServerSide(true);
 

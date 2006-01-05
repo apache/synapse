@@ -30,7 +30,8 @@ public class TestSynapseMessage {
                     new ConfigurationContextFactory();
             ConfigurationContext configCtx = conFac
                     .createConfigurationContextFromFileSystem(testingRepository);
-            msgCtx = new MessageContext(configCtx);
+            msgCtx = new MessageContext();
+            msgCtx.setConfigurationContext(configCtx);
             msgCtx.setServerSide(true);
 
             SOAPEnvelope env = OMAbstractFactory.getSOAP11Factory()

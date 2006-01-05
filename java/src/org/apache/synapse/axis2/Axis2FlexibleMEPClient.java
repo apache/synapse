@@ -87,7 +87,8 @@ public class Axis2FlexibleMEPClient {
         ServiceContext sc =
                 sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
 
-        MessageContext mc = new MessageContext(sc.getConfigurationContext());
+        MessageContext mc = new MessageContext();
+        mc.setConfigurationContext(sc.getConfigurationContext());
         ///////////////////////////////////////////////////////////////////////
         // filtering properties
         if (smc.getSoapAction() != null)

@@ -112,6 +112,16 @@ public class Axis2FlexibleMEPClient {
             throw new AxisFault(
                     "To canno't be null, if null Synapse can't infer the transport");
         }
+        if (smc.isDoingREST()) {
+            mc.setDoingREST(true);
+        }
+        if (smc.getProperty(
+                org.apache.axis2.Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES) !=
+                null) {
+            mc.setProperty(
+                    org.apache.axis2.Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
+                    Boolean.TRUE);
+        }
         mc.setEnvelope(outEnvelopeConfiguration(smc));
         ///////////////////////////////////////////////////////////////////////
 

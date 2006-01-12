@@ -5,9 +5,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Processor;
-import org.apache.synapse.processors.mediatortypes.ClassMediatorProcessor;
-import org.apache.synapse.xml.ClassMediatorProcessorConfigurator;
+
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.util.Axis2EvnSetup;

@@ -1,16 +1,3 @@
-package org.apache.synapse.mediators;
-
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.om.OMElement;
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Processor;
-import org.apache.synapse.processors.mediatortypes.ClassMediatorProcessor;
-import org.apache.synapse.xml.ClassMediatorProcessorConfigurator;
-import org.apache.synapse.axis2.Axis2SynapseEnvironment;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.util.Axis2EvnSetup;
-import junit.framework.TestCase;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -27,6 +14,19 @@ import junit.framework.TestCase;
 * limitations under the License.
 *
 */
+
+package org.apache.synapse.mediators;
+
+
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.om.OMElement;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.util.Axis2EvnSetup;
+import junit.framework.TestCase;
+
 
 public class MediatorFalseReturnTest extends TestCase {
     private MessageContext msgCtx;

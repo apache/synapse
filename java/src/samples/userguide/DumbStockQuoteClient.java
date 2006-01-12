@@ -10,8 +10,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.ServiceGroupContext;
+
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
@@ -85,8 +84,8 @@ public class DumbStockQuoteClient {
 			AxisServiceGroup asg = new AxisServiceGroup(ac);
 			AxisService as = new AxisService("AnonymousService");
 			asg.addService(as);
-			ServiceGroupContext sgc = new ServiceGroupContext(cc, asg);
-			ServiceContext sc = sgc.getServiceContext(as);
+			
+			
 			AxisOperation axisOperationTemplate = new OutInAxisOperation(
 					new QName("getQuote"));
 			as.addOperation(axisOperationTemplate);

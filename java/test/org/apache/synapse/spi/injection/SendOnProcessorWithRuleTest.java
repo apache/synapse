@@ -70,7 +70,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
             OMElement response =
                     serviceClient.sendReceive(Axis2EvnSetup.payload());
             assertEquals("Synapse Testing String_Response", response.getText());
-            serviceClient.finalizeInvoke();
+            //serviceClient.finalizeInvoke();
         }
     }
 

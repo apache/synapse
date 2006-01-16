@@ -38,9 +38,6 @@ public class XSLTProcessor extends AbstractProcessor {
 
 	private boolean isBody = false;
 
-	/* (non-Javadoc)
-	 * @see org.apache.synapse.Processor#process(org.apache.synapse.SynapseEnvironment, org.apache.synapse.SynapseMessage)
-	 */
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		XMLStreamWriter xsw;

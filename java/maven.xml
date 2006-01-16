@@ -288,6 +288,29 @@
             </fileset>
         </jar>
     </goal>
+
+    <!-- ================================================================ -->
+    <!--- Create the Java Docs -->
+    <!-- ================================================================ -->
+
+    <goal name="javadocs" prereqs="init">
+        <ant:javadoc packagenames="org.apache.synapse.*"
+                     defaultexcludes="yes"
+                     destdir="target/apidocs"
+                     author="true"
+                     version="true"
+                     use="true"
+                     windowtitle="Synpase API">
+            <ant:sourcepath>
+                <ant:pathelement location="src"/>
+            </ant:sourcepath>
+            <ant:classpath>
+                <ant:fileset dir="target/lib">
+                    <ant:include name="**/*.jar"/>
+                </ant:fileset>
+            </ant:classpath>
+        </ant:javadoc>
+    </goal>
     <!-- ================================================================ -->
     <!--- Reports -->
     <!-- ================================================================ -->

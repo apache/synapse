@@ -42,6 +42,7 @@
     <postGoal name="test:compile">
         <ant:mkdir dir="${basedir}/target/lib"/>
         <deploy:copy-deps todir="${basedir}/target/lib"/>
+        <j:set var="class_test.dir" value="target/test-classes"/>
 
         <echo message="----------------Creating First Dispatching aar----------------"/>
         <mkdir dir="target/services/synapse/META-INF"/>
@@ -249,7 +250,9 @@
         <ant:delete file="target/synapse.aar"/>
         <ant:delete dir="target/sample-deprecation"/>
         <ant:delete file="target/DeprecationMediator.aar"/>
-
+        
+        <ant:path id="classes_test.dir" location="${class_test.dir}"/>
+        <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
 
     </postGoal>
 

@@ -1,4 +1,4 @@
-package sampleMediators;
+package org.apache.synapse.mediators;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseMessage;
@@ -19,9 +19,10 @@ import org.apache.synapse.SynapseMessage;
 *
 */
 
-public class SampleMediator2 implements Mediator {
+public class SampleFalseReturnMediator1 implements Mediator {
     public boolean mediate(SynapseMessage smc) {
-        smc.setProperty("test_string",new String("Done"));
+        System.out
+                .println("you are in the sample \"false\" returning mediator ");
         return false;
     }
 }

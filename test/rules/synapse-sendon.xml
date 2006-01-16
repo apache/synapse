@@ -1,7 +1,7 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
     <stage name="xpath">
         <xpath expr="//ns:text" xmlns:ns="urn:text-body">
-            <classmediator name="simpleRouting" class="sampleMediators.SampleRouter"/>
+            <classmediator name="simpleRouting" class="org.apache.synapse.mediators.SampleRouter"/>
             <send/>
         </xpath>
         <xpath expr="//ns:response_text" xmlns:ns="urn:text-body">

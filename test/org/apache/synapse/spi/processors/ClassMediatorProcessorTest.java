@@ -27,7 +27,7 @@ public class ClassMediatorProcessorTest extends TestCase {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
         ClassMediatorProcessor pro = new ClassMediatorProcessor();
-        pro.setClazz(Class.forName("sampleMediators.Logger"));
+        pro.setClazz(Class.forName("org.apache.synapse.mediators.LoggerTestSample"));
         boolean result = pro.process(null,sm);
         assertTrue(result);
     }

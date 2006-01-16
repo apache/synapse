@@ -37,7 +37,8 @@ public class FaultProcessorWithRuleTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
-        synapseServer = new SimpleHTTPServer("target/synapse-repository-fault", 5043);
+        synapseServer =
+                new SimpleHTTPServer("target/synapse-repository-fault", 5043);
         synapseServer.start();
     }
 
@@ -46,9 +47,11 @@ public class FaultProcessorWithRuleTest extends TestCase {
     }
 
     public void testFaultPrcessor() throws Exception {
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                        "target/synapse-repository-fault"), null);
         Options co = new Options();
-        co.setTo(targetEpr);        
+        co.setTo(targetEpr);
         serviceClient.setOptions(co);
         serviceClient.fireAndForget(Axis2EvnSetup.payload());
     }

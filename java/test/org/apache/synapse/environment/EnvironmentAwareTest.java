@@ -8,7 +8,6 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.synapse.util.Axis2EvnSetup;
 import junit.framework.TestCase;
 
-
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -32,7 +31,8 @@ public class EnvironmentAwareTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
-        synapseServer = new SimpleHTTPServer("target/synapse-repository-environmentaware",
+        synapseServer = new SimpleHTTPServer(
+                "target/synapse-repository-environmentaware",
                 5043);
         synapseServer.start();
     }
@@ -44,7 +44,9 @@ public class EnvironmentAwareTest extends TestCase {
     public void testSendProcessor() throws Exception {
         // this test case throws exceptions if fail
         // exceptions are propergated from Synapes Server
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                        "target/synapse-repository-environmentaware"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);

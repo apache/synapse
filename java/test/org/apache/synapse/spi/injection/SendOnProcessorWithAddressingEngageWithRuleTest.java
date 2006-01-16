@@ -51,11 +51,14 @@ public class SendOnProcessorWithAddressingEngageWithRuleTest extends TestCase {
     }
 
     public void testSendProcessor() throws Exception {
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendon"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
-        OMElement response = serviceClient.sendReceive(Axis2EvnSetup.payloadNamedAdddressing());
+        OMElement response = serviceClient
+                .sendReceive(Axis2EvnSetup.payloadNamedAdddressing());
         assertEquals("Synapse Testing String_Response_With_Addressing",
                 response.getText());
 

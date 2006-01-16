@@ -4,6 +4,7 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -86,10 +87,10 @@ public class ProxyStockQuoteClient {
 			options.setAction("http://www.webserviceX.NET/GetQuote");
 			// create a lightweight Axis Config with no addressing to
 			// demonstrate "dumb" SOAP
+			options.setProperty(Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, new Boolean(true));
+			
+			ServiceClient serviceClient = new ServiceClient();
 
-			ServiceClient serviceClient = StockQuoteXMLHandler
-					.createServiceClient();
-			// make the ServiceClient
 
 			serviceClient.setOptions(options);
 

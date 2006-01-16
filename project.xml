@@ -22,8 +22,6 @@
         implementation of a highly scalable and distributed service mediation
         framework based on Web services specifications.</description>
 
-     the project home page
-    todo: need to setup uri, issueTracker, site, and dist dir
     <url>http://ws.apache.org/synapse/</url>
     <issueTrackingUrl>http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
     <siteAddress>ws.apache.org</siteAddress>
@@ -63,10 +61,10 @@
             <organization>Sonic Software</organization>
         </developer>
         <developer>
-            <name>Glen Daniels</name>
-            <id>gdaniels</id>
-            <email>gdaniels@apache.org</email>
-            <organization>Sonic Software</organization>
+            <name>Anthony Elder</name>
+            <id>ant</id>
+            <email>antelder@apache.org</email>
+            <organization>IBM</organization>
         </developer>
         <developer>
             <name> P. Vikas Roonwal</name>
@@ -150,7 +148,6 @@
             <properties>
                 <module>true</module>
             </properties>
-            <url>http://dist.codehaus.org/stax/jars/</url>
         </dependency>
         <dependency>
             <groupId>${stax.impl.groupid}</groupId>
@@ -200,7 +197,7 @@
                 <module>true</module>
             </properties>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>xmlbeans</groupId>
             <artifactId>xbean</artifactId>
             <version>${xbean.version}</version>
@@ -208,39 +205,39 @@
             <properties>
                 <module>true</module>
             </properties>
-        </dependency>
-        <dependency>
+        </dependency-->
+        <!--dependency>
             <groupId>wss4j</groupId>
             <artifactId>wss4j</artifactId>
             <version>${wss4j.version}</version>
             <properties>
                 <module>true</module>
             </properties>
-        </dependency>
-        <dependency>
+        </dependency-->
+        <!--dependency>
             <groupId>xml-security</groupId>
             <artifactId>xmlsec</artifactId>
             <version>${xmlsec.version}</version>
             <properties>
                 <module>true</module>
             </properties>
-        </dependency>
-        <dependency>
+        </dependency-->
+        <!--dependency>
             <groupId>bouncycastle</groupId>
             <artifactId>bcprov</artifactId>
             <version>${bcprov.version}</version>
             <properties>
                 <module>true</module>
             </properties>
-        </dependency>
-        <dependency>
+        </dependency-->
+        <!--dependency>
             <groupId>opensaml</groupId>
             <artifactId>opensaml</artifactId>
             <version>${opensaml.version}</version>
             <properties>
                 <module>true</module>
             </properties>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -249,14 +246,14 @@
                 <classloader>root</classloader>
             </properties>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>xerces</groupId>
             <artifactId>xmlParserAPIs</artifactId>
             <version>${xerces.version}</version>
             <properties>
                 <module>true</module>
             </properties>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>

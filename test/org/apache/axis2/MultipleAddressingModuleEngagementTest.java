@@ -26,7 +26,7 @@ import org.apache.synapse.util.Axis2EvnSetup;
 *
 */
 
-public class MultipleAddressingMoudleEngagementTest extends TestCase {
+public class MultipleAddressingModuleEngagementTest extends TestCase {
     private MessageContext msgCtx;
     private SynapseEnvironment env;
     private OMElement config;

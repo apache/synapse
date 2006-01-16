@@ -105,8 +105,8 @@
             <copy file="target/emptymediator.aar"
                   tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
             <mkdir dir="target/synapse-repository-sendon/modules"/>
-            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-                  tofile="target/synapse-repository-sendon/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-sendon/modules/addressing-0.94.mar"/>
             <copy file="synapse-test-resources/axis2/axis2.xml"
                   tofile="target/synapse-repository-sendon/axis2.xml"/>
             <copy file="test/rules/synapse-sendon.xml"
@@ -121,8 +121,8 @@
                   tofile="target/synapse-repository-sendonAxis2/services/test-mediator.aar"/>
             <copy file="target/emptymediator.aar"
                   tofile="target/synapse-repository-sendonAxis2/services/emptymediator.aar"/>
-            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-                  tofile="target/synapse-repository-sendonAxis2/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-sendonAxis2/modules/addressing-0.94.mar"/>
             <copy file="repository/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
 
@@ -131,8 +131,8 @@
 
             <copy file="target/npe.aar"
                   tofile="target/synapse-repository-sendonAxis2Tcp/services/npe.aar"/>
-            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-                  tofile="target/synapse-repository-sendonAxis2Tcp/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-sendonAxis2Tcp/modules/addressing-0.94.mar"/>
             <copy file="repository/axis2.xml"
                   tofile="target/synapse-repository-sendonAxis2Tcp/axis2.xml"/>
 
@@ -143,8 +143,8 @@
                   tofile="target/synapse-repository-httptcp/services/emptymediator.aar"/>
             <copy file="target/synapse.aar"
                   tofile="target/synapse-repository-httptcp/services/synapse.aar"/>
-            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-                  tofile="target/synapse-repository-httptcp/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-httptcp/modules/addressing-0.94.mar"/>
             <copy file="synapse-test-resources/axis2/axis2.xml"
                   tofile="target/synapse-repository-httptcp/axis2.xml"/>
             <copy file="test/rules/synapse-httptcp.xml"
@@ -159,8 +159,8 @@
                   tofile="target/synapse-repository-sendon/services/emptymediator.aar"/>
             <copy file="target/synapse.aar"
                   tofile="target/synapse-repository-environmentaware/services/synapse.aar"/>
-            <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-                  tofile="target/synapse-repository-environmentaware/modules/addressing.mar"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-environmentaware/modules/addressing-0.94.mar"/>
             <copy file="synapse-test-resources/axis2/axis2.xml"
                   tofile="target/synapse-repository-environmentaware/axis2.xml"/>
             <copy file="test/rules/synapse-environmentaware.xml"
@@ -182,8 +182,8 @@
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository/modules"/>
-        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-              tofile="target/synapse-repository/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository/modules/addressing-0.94.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository/axis2.xml"/>
         <copy file="repository/synapse.xml"
@@ -196,8 +196,8 @@
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository-fault/modules"/>
-        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-              tofile="target/synapse-repository-fault/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-fault/modules/addressing-0.94.mar"/>
         <copy file="synapse-test-resources/axis2/axis2.xml"
               tofile="target/synapse-repository-fault/axis2.xml"/>
         <copy file="test/rules/synapse-fault-return.xml"
@@ -210,8 +210,8 @@
         <copy file="target/emptymediator.aar"
               tofile="target/synapse-repository-send/services/emptymediator.aar"/>
         <mkdir dir="target/synapse-repository-send/modules"/>
-        <copy file="synapse-test-resources/axis2/modules/addressing.mar"
-              tofile="target/synapse-repository-send/modules/addressing.mar"/>
+        <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+              tofile="target/synapse-repository-send/modules/addressing-0.94.mar"/>
         <copy file="repository/axis2.xml"
               tofile="target/synapse-repository-sendonAxis2/axis2.xml"/>
         <copy file="test/rules/synapse-send.xml"

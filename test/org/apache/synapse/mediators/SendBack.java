@@ -1,8 +1,8 @@
-package sampleMediators;
+package org.apache.synapse.mediators;
 
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.SynapseMessage;
+import org.apache.axis2.addressing.EndpointReference;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -20,11 +20,15 @@ import org.apache.synapse.api.Mediator;
 *
 */
 
-public class SampleRouter implements Mediator {
+public class SendBack implements Mediator {
     public boolean mediate(SynapseMessage smc) {
-        smc.setWSAAction("urn:synapse/sendon");
-        smc.setTo(new EndpointReference(
-                "http://localhost:8090/axis2/services/npe"));
+        /**
+         * Since addressing is not engaged before running this test case 
+         * To give the right behavior for this test-case
+         * setTo is set for anonymous url.
+         */
+        smc.setTo(new EndpointReference("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
+        smc.setResponse(true);
         return true;
     }
 }

@@ -35,7 +35,7 @@ public class ClassMediatorProcessorWithRuleTest extends TestCase {
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"loger\">\n" +
-                    "    <classmediator name=\"mediation\" class=\"sampleMediators.Logger\"/>\n" +
+                    "    <classmediator name=\"mediation\" class=\"org.apache.synapse.mediators.LoggerTestSample\"/>\n" +
                     "</stage>\n" +
                     "</synapse>";
 

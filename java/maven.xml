@@ -169,8 +169,8 @@
 
             <ant:delete file="target/npe.aar"/>
             <ant:delete file="target/test-mediator.aar"/>
+            <ant:delete file="target/environmentaware-mediator.aar"/>
             <ant:delete dir="target/test-mediator"/>
-            <ant:delete dir="target/environmentaware-mediator.aar"/>
             <ant:delete dir="target/environmentaware-mediator"/>
 
         </j:if>
@@ -250,7 +250,8 @@
         <ant:delete file="target/synapse.aar"/>
         <ant:delete dir="target/sample-deprecation"/>
         <ant:delete file="target/DeprecationMediator.aar"/>
-        
+        <ant:delete dir="target/samples"/>
+
         <ant:path id="classes_test.dir" location="${class_test.dir}"/>
         <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
 

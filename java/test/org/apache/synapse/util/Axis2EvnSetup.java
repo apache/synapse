@@ -109,4 +109,11 @@ public class Axis2EvnSetup {
         method.addChild(value);
         return method;
     }
+
+    public static ConfigurationContext getConfigurationContextFromFileSystem(String repository) throws AxisFault {
+        ConfigurationContextFactory fac = new ConfigurationContextFactory();
+        ConfigurationContext configContext =
+                fac.createConfigurationContextFromFileSystem(repository);
+        return configContext;
+    }
 }

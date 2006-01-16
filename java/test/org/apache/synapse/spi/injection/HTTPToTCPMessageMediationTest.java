@@ -32,13 +32,14 @@ public class HTTPToTCPMessageMediationTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
-        synapseServer = new SimpleHTTPServer("target/synapse-repository-httptcp",
-                5043);
+        synapseServer =
+                new SimpleHTTPServer("target/synapse-repository-httptcp",
+                        5043);
         /**
          * axis2TcpServer is the one who holds the actual service
          */
         axis2TcpServer =
-                new TCPServer(8090,"target/synapse-repository-sendonAxis2Tcp");
+                new TCPServer(8090, "target/synapse-repository-sendonAxis2Tcp");
         synapseServer.start();
         axis2TcpServer.start();
     }
@@ -49,7 +50,9 @@ public class HTTPToTCPMessageMediationTest extends TestCase {
     }
 
     public void testSendProcessor() throws Exception {
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                        "target/synapse-repository-httptcp"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);

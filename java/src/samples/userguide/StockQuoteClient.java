@@ -1,35 +1,25 @@
 package samples.userguide;
 
-import java.net.URL;
-
-import javax.xml.namespace.QName;
-
-
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContextConstants;
-
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.om.OMText;
+import org.apache.axis2.om.*;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.axis2.transport.http.HttpTransportProperties.ProxyProperties;
-import org.apache.axis2.Constants;
+
+import javax.xml.namespace.QName;
 
 public class StockQuoteClient {
 
     /**
-     * @param args
-     *            <p>
-     *            This is a fairly static test client for Synapse. It makes a
-     *            StockQuote request to WebServiceX stockquote service. The EPR it
-     *            is sent to is for WebServiceX, but the actual transport URL is
-     *            designed to go to the Synapse listener.
-     *
+     * @param args <p/>
+     *             This is a fairly static test client for Synapse. It makes a
+     *             StockQuote request to WebServiceX stockquote service. The EPR it
+     *             is sent to is for WebServiceX, but the actual transport URL is
+     *             designed to go to the Synapse listener.
      */
     public static void main(String[] args) {
 
@@ -63,47 +53,41 @@ public class StockQuoteClient {
             turl = args[2];
 
         try {
-       
-    			// step 1 - create a request payload
-    			OMElement getQuote = StockQuoteXMLHandler
-    					.createRequestPayload(symb);
 
-    			// step 2 - set up the call object
+            // step 1 - create a request payload
+            OMElement getQuote = StockQuoteXMLHandler
+                    .createRequestPayload(symb);
 
-    			// the wsa:To
-    			EndpointReference targetEPR = new EndpointReference(xurl);
+            // step 2 - set up the call object
 
-    			Options options = new Options();
-    			//options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
-    			options.setTo(targetEPR);
+            // the wsa:To
+            EndpointReference targetEPR = new EndpointReference(xurl);
 
-    	
-    			options.setAction("http://www.webserviceX.NET/GetQuote");
-    			options.setSoapAction("http://www.webserviceX.NET/GetQuote");
-    			
-                // options.setProperty(MessageContextConstants.CHUNKED, Constants.VALUE_FALSE);
-    		    ServiceClient serviceClient = new ServiceClient();
-    	        
-    			serviceClient.setOptions(options);
-
-    			// step 3 - Blocking invocation
-    			OMElement result = serviceClient.sendReceive(new QName("getQuote"),
-    					getQuote);
-    			// System.out.println(result);
-
-    			// step 4 - parse result
-
-    			System.out.println("Stock price = $"
-    					+ StockQuoteXMLHandler.parseResponse(result));
-
-    		} catch (Exception e) {
-    			e.printStackTrace();
-    		}
-
-    	}
+            Options options = new Options();
+            //options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+            options.setTo(targetEPR);
 
 
-           
+            options.setAction("http://www.webserviceX.NET/GetQuote");
+            options.setSoapAction("http://www.webserviceX.NET/GetQuote");
+
+            // options.setProperty(MessageContextConstants.CHUNKED, Constants.VALUE_FALSE);
+            ServiceClient serviceClient = new ServiceClient();
+
+            serviceClient.setOptions(options);
+
+            // step 3 - Blocking invocation
+            OMElement result = serviceClient.sendReceive(new QName("getQuote"),
+                    getQuote);
+            // System.out.println(result);
+
+            // step 4 - parse result
+
+            System.out.println("Stock price = $"
+                    + StockQuoteXMLHandler.parseResponse(result));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
 }

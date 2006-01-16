@@ -52,7 +52,9 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     }
 
     public void testSendProcessor() throws Exception {
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendon"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);

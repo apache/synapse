@@ -41,9 +41,11 @@ public class SendBackProcessorWithRuleTest extends TestCase {
     }
 
     public void testSendPrcessor() throws Exception {
-        ServiceClient serviceClient = new ServiceClient();
+        ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                        "target/synapse-repository-send"), null);
         Options co = new Options();
-        co.setTo(targetEpr);        
+        co.setTo(targetEpr);
         serviceClient.setOptions(co);
         serviceClient.fireAndForget(Axis2EvnSetup.payload());
 

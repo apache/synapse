@@ -103,7 +103,7 @@
     <dependencies>
         <dependency>
             <groupId>axis2</groupId>
-            <artifactId>axis2</artifactId>
+            <artifactId>axis2-core</artifactId>
             <version>${axis2.version}</version>
         </dependency>
 

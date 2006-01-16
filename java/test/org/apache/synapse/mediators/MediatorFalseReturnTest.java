@@ -35,11 +35,11 @@ public class MediatorFalseReturnTest extends TestCase {
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"mediator_false\">\n" +
-                    "    <classmediator name=\"mediator_false\" class=\"sampleMediators.SampleFalseReturnMediator1\"/>\n" +
+                    "    <classmediator name=\"mediator_false\" class=\"org.apache.synapse.mediators.SampleFalseReturnMediator1\"/>\n" +
                     "    <log/>" +
                     "</stage>\n" +
                     "<stage name=\"do_loggin\">\n" +
-                    "    <classmediator name=\"mediator_false\" class=\"sampleMediators.SampleMediator2\"/>\n" +
+                    "    <classmediator name=\"mediator_false\" class=\"org.apache.synapse.mediators.SampleMediator2\"/>\n" +
                     "</stage>\n" +
                     "</synapse>";
 

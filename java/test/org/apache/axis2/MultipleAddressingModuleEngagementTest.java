@@ -34,11 +34,11 @@ public class MultipleAddressingModuleEngagementTest extends TestCase {
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<stage name=\"loger1\">\n" +
                     "    <engage-addressing-in/>" +
-                    "    <classmediator name=\"mediation\" class=\"sampleMediators.Logger\"/>\n" +
+                    "    <classmediator name=\"mediation\" class=\"org.apache.synapse.mediators.LoggerTestSample\"/>\n" +
                     "</stage>\n" +
                     "<stage name=\"loger2\">\n" +
                     "    <engage-addressing-in/>" +
-                    "    <classmediator name=\"mediation\" class=\"sampleMediators.Logger\"/>\n" +
+                    "    <classmediator name=\"mediation\" class=\"org.apache.synapse.mediators.LoggerTestSample\"/>\n" +
                     "</stage>\n" +
                     "</synapse>";
 

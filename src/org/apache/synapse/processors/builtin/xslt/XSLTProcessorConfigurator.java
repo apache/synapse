@@ -22,12 +22,12 @@ import org.apache.synapse.xml.AbstractProcessorConfigurator;
  * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessor
  * <p> This class configures the XSLT transformer 
  * <p> The tag looks like this
- * <xmp><synxslt:xslt name="x" xsl="file.xsl" type="body|envelope"/></xmp>
+ * <xmp><xslt name="x" xsl="file.xsl" type="body|envelope"/></xmp>
  *  Perform the given XSLT on the SOAP-Envelope or Body 
  *  <p>If type is not present, assumed to be body
  */
 public class XSLTProcessorConfigurator extends AbstractProcessorConfigurator {
-	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE+"/xslt", "xslt");
+	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
 	
 	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
 		XSLTProcessor xp = new XSLTProcessor();

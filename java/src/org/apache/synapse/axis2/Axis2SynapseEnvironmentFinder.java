@@ -33,20 +33,16 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 
 /**
-
-
- * 
- * <p>
+ * <p/>
  * The SynapseEnvironment needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
  * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
- *  
- *
  */
 public class Axis2SynapseEnvironmentFinder implements Constants {
 
-   public static synchronized SynapseEnvironment getSynapseEnvironment(
+    public static synchronized SynapseEnvironment getSynapseEnvironment(
             MessageContext mc) {
-        AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
+        AxisConfiguration ac =
+                mc.getConfigurationContext().getAxisConfiguration();
         Parameter synapseEnvParam = ac.getParameter(SYNAPSE_ENVIRONMENT);
         if (synapseEnvParam == null) {
 
@@ -69,7 +65,6 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
 
             }
             OMElement config = builder.getDocumentElement();
-            // todo: ---- following needed to be added.
             config.build();
             Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc
                     .getAxisService().getClassLoader());

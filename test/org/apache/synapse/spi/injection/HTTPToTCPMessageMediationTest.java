@@ -51,7 +51,7 @@ public class HTTPToTCPMessageMediationTest extends TestCase {
 
     public void testSendProcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                Axis2EvnSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-httptcp"), null);
         Options options = new Options();
         options.setTo(targetEpr);

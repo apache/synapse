@@ -110,7 +110,7 @@ public class Axis2EvnSetup {
         return method;
     }
 
-    public static ConfigurationContext getConfigurationContextFromFileSystem(String repository) throws AxisFault {
+    public static ConfigurationContext createConfigurationContextFromFileSystem(String repository) throws AxisFault {
         ConfigurationContextFactory fac = new ConfigurationContextFactory();
         ConfigurationContext configContext =
                 fac.createConfigurationContextFromFileSystem(repository);

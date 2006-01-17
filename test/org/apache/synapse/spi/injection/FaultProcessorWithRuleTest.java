@@ -48,7 +48,7 @@ public class FaultProcessorWithRuleTest extends TestCase {
 
     public void testFaultPrcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                Axis2EvnSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-fault"), null);
         Options co = new Options();
         co.setTo(targetEpr);

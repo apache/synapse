@@ -10,7 +10,7 @@ import org.apache.synapse.processors.mediatortypes.axis2.ServiceMediatorProcesso
 import org.apache.synapse.xml.ServiceMediatorProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -40,8 +40,8 @@ public class ServiceMediatorProcessorWithRuleTest extends TestCase {
                     "</synapse>";
 
     public void setUp() throws Exception {
-        msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository-sendonAxis2");
-        config =Axis2EvnSetup.getSynapseConfigElement(synapsexml);
+        msgCtx = Axis2EnvSetup.axis2Deployment("target/synapse-repository-sendonAxis2");
+        config =Axis2EnvSetup.getSynapseConfigElement(synapsexml);
         env = new Axis2SynapseEnvironment(config,
                 Thread.currentThread().getContextClassLoader());
     }

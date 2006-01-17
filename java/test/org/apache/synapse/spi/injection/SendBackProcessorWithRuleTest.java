@@ -22,7 +22,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 
 
 public class SendBackProcessorWithRuleTest extends TestCase {
@@ -42,12 +42,12 @@ public class SendBackProcessorWithRuleTest extends TestCase {
 
     public void testSendPrcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-send"), null);
         Options co = new Options();
         co.setTo(targetEpr);
         serviceClient.setOptions(co);
-        serviceClient.fireAndForget(Axis2EvnSetup.payload());
+        serviceClient.fireAndForget(Axis2EnvSetup.payload());
 
     }
 

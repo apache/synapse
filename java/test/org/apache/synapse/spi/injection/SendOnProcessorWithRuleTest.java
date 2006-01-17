@@ -23,7 +23,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.axis2.om.OMElement;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 
 
 public class SendOnProcessorWithRuleTest extends TestCase {
@@ -53,12 +53,12 @@ public class SendOnProcessorWithRuleTest extends TestCase {
 
     public void testSendProcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-sendon"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
-        OMElement response = serviceClient.sendReceive(Axis2EvnSetup.payload());
+        OMElement response = serviceClient.sendReceive(Axis2EnvSetup.payload());
         assertEquals("Synapse Testing String_Response", response.getText());
 
     }
@@ -72,7 +72,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
             options.setTo(targetEpr);
             serviceClient.setOptions(options);
             OMElement response =
-                    serviceClient.sendReceive(Axis2EvnSetup.payload());
+                    serviceClient.sendReceive(Axis2EnvSetup.payload());
             assertEquals("Synapse Testing String_Response", response.getText());
         }
     }

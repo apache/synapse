@@ -18,9 +18,6 @@ The configuration data about the deprecation for a particular service is provide
 When a SynapseContext is sent to the DeprecationMediator it checks wether the service to which the request is
 addressed is deprecatd or not. It sets the value in the "synapse.deprecation.result" property in the synapseContext.
 
-A config folder has been created in Synapse to hold the xml files that would be used to pass data to the mediators.
-The deprecation.xml file is the one to begin with.
-
 Return Values
 --------------
 True - Service is not deprecated, the request can go on.
@@ -29,7 +26,10 @@ False - The service is deprecated, need not send the request to the service.
 To try out the mediator
 ------------------------
 
- - Modify the deprecation.xml present in the 'config' folder to suit the configuration you want.
+ - Modify the deprecation.xml present in the 
+      * aar (in case you are using the binary)
+      * src\sampleMediators\deprecation\META-INF (in case you are working with the source)
+   to suit the configuration you want.
  - Send in a request to Synapse and see it work/get rejected depending on the settings.
 
 ~Lots of scope for enhancement and improvement. Will keep adding up!

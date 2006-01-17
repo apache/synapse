@@ -250,7 +250,6 @@
         <ant:delete file="target/synapse.aar"/>
         <ant:delete dir="target/sample-deprecation"/>
         <ant:delete file="target/DeprecationMediator.aar"/>
-        <ant:delete dir="target/samples"/>
 
         <ant:path id="classes_test.dir" location="${class_test.dir}"/>
         <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
@@ -265,30 +264,23 @@
         <mkdir dir="${samples.dir}/samples/deprecation_mediator/src"/>
         <ant:copy todir="${samples.dir}/userguide/src">
             <ant:fileset dir="src">
-                <ant:include name="samples/**"/>
+                <ant:include name="**/userguide/**"/>
             </ant:fileset>
         </ant:copy>
         <ant:copy todir="${samples.dir}/samples/deprecation_mediator/src">
             <ant:fileset dir="src">
-                <ant:include name="samples/**"/>
+                <ant:include name="**/deprecation/**"/>
             </ant:fileset>
         </ant:copy>
-        <ant:copy
-                todir="${samples.dir}/samples/deprecation_mediator/deprecation_mediator/src">
-            <ant:fileset dir="src">
-                <ant:include name="samples/**"/>
-                <ant:include name="sampleMediators/**"/>
-            </ant:fileset>
-        </ant:copy>
+
         <jar destfile="${samples.dir}/userguide/sample_userguide.jar">
             <fileset dir="target/classes">
-                <include name="samples/**"/>
+                <include name="**/userguide/**"/>
             </fileset>
         </jar>
         <jar destfile="${samples.dir}/samples/deprecation_mediator/sample_deprecation_mediator.jar">
             <fileset dir="target/classes">
-                <include name="samples/**"/>
-                <include name="sampleMediators/**"/>
+                <include name="**/deprecation/**"/>
             </fileset>
         </jar>
     </goal>

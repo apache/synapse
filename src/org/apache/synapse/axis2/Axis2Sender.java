@@ -148,7 +148,7 @@ public class Axis2Sender {
                                 .getHeader());
 
             }
-            System.out.println(messageContext.getEnvelope());
+            
 
             messageContext
                     .setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(

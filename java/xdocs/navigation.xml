@@ -13,7 +13,7 @@
         <item name="User Guide" href="userguide.html"/>
         <item name="Writing Processors" href="extension_processor_writing.html"/>
       </item>
-      <item name="Get Involved" href="overview.html" />
+      <item name="Get Involved" href="getInvolved.html" />
       <item name="Project Information">    mail-lists.html
         <item name="Issue Tracking" href="http://issues.apache.org/jira/browse/Synapse"/>
         <item name="Mailing List" href="mail-lists.html"/>

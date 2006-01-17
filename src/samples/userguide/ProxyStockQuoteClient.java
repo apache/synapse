@@ -2,8 +2,6 @@ package samples.userguide;
 
 import java.net.URL;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -95,8 +93,7 @@ public class ProxyStockQuoteClient {
 			serviceClient.setOptions(options);
 
 			// step 3 - Blocking invocation
-			OMElement result = serviceClient.sendReceive(new QName("getQuote"),
-					getQuote);
+			OMElement result = serviceClient.sendReceive(getQuote);
 			// System.out.println(result);
 
 			// step 4 - parse result

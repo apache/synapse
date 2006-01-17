@@ -41,12 +41,7 @@ public class XPathProcessor extends ListProcessor {
 
 	private AXIOMXPath xp = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.synapse.spi.Processor#process(org.apache.synapse.api.SynapseEnvironment,
-	 *      org.apache.synapse.api.SOAPMessageContext)
-	 */
+	
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		if (xp == null) {
 			log.debug("trying to process xpath without being set");

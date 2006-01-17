@@ -20,8 +20,8 @@
 	<!-- these are only called if referenced above-->
 	<never>
 		<stage name="stockquote">
-			<header type="to" value="http://localhost:6060/stockquote.asmx"/>
-			<xpath expr="//*[Symbol='MSFT']">
+			<header type="to" value="http://www.webservicex.net/stockquote.asmx"/>
+			<xpath expr="//*[symbol='MSFT']">
 				<fault/>
 			</xpath>
 		</stage>

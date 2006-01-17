@@ -23,7 +23,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 
 
 public class FaultProcessorWithRuleTest extends TestCase {
@@ -48,12 +48,12 @@ public class FaultProcessorWithRuleTest extends TestCase {
 
     public void testFaultPrcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-fault"), null);
         Options co = new Options();
         co.setTo(targetEpr);
         serviceClient.setOptions(co);
-        serviceClient.fireAndForget(Axis2EvnSetup.payload());
+        serviceClient.fireAndForget(Axis2EnvSetup.payload());
     }
 
 }

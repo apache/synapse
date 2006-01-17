@@ -5,7 +5,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 
 import org.apache.axis2.client.ServiceClient;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import junit.framework.TestCase;
 
 /*
@@ -45,12 +45,12 @@ public class EnvironmentAwareTest extends TestCase {
         // this test case throws exceptions if fail
         // exceptions are propergated from Synapes Server
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-environmentaware"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
-        serviceClient.fireAndForget(Axis2EvnSetup.payloadNamedAdddressing());
+        serviceClient.fireAndForget(Axis2EnvSetup.payloadNamedAdddressing());
 
     }
 

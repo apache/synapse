@@ -18,7 +18,7 @@ package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 
 
@@ -34,7 +34,7 @@ public class BuiltInProcessorWithRuleTest extends TestCase {
 
     public void testSynapseEnvironment() throws Exception {
         env = new Axis2SynapseEnvironment(
-                Axis2EvnSetup.getSynapseConfigElement(synapsexml),
+                Axis2EnvSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
         assertNotNull(env.getMasterProcessor());
      }

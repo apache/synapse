@@ -3,7 +3,7 @@ package org.apache.synapse.spi.processors;
 import junit.framework.TestCase;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.processors.mediatortypes.axis2.ServiceMediatorProcessor;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -25,7 +25,7 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 public class ServiceMediatorProcessorTest extends TestCase {
     public void testServiceMediatorProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EvnSetup.axis2Deployment("target/synapse-repository-sendonAxis2"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository-sendonAxis2"));
         ServiceMediatorProcessor pro = new ServiceMediatorProcessor();
         pro.setServiceName("test-mediator");
         boolean result = pro.process(null,sm);

@@ -298,6 +298,7 @@
     <!-- ================================================================ -->
 
     <goal name="javadocs" prereqs="init">
+        <deploy:copy-deps todir="target/lib"/>
         <ant:javadoc packagenames="org.apache.synapse.*"
                      defaultexcludes="yes"
                      destdir="target/apidocs"
@@ -346,12 +347,13 @@
     <!--- dist-bin -->
     <!-- ================================================================ -->
 
-    <goal name="dist-bin" prereqs="war,samples_userguide">
+    <goal name="dist-bin" prereqs="war,samples_userguide,javadocs">
         <property name="bin.dist.dir"
                   value="target/dist-bin/${pom.artifactId}-${pom.currentVersion}-bin"/>
         <ant:mkdir dir="${bin.dist.dir}"/>
         <ant:mkdir dir="${dist.dir}"/>
         <ant:mkdir dir="${bin.dist.dir}/docs"/>
+        <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
         <ant:mkdir dir="${bin.dist.dir}/bin"/>
         <ant:mkdir dir="${bin.dist.dir}/lib"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
@@ -359,6 +361,11 @@
 
 
         <ant:copy todir="${bin.dist.dir}/docs">
+            <ant:fileset dir="target/apidocs">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy todir="${bin.dist.dir}/xdocs">
             <ant:fileset dir="xdocs">
                 <ant:include name="**"/>
             </ant:fileset>
@@ -414,6 +421,7 @@
         <gzip src="target/${dist.name}-bin.tar"
               zipfile="${dist.dir}/${dist.name}-bin.tar.gz"/>
         <ant:delete dir="target/dist-bin"/>
+        <ant:delete dir="target/samples/"/>
         <ant:delete file="target/${dist.name}-bin.tar"/>
     </goal>
     <!-- ================================================================ -->

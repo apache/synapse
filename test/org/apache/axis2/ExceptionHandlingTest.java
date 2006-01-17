@@ -7,7 +7,7 @@ import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -41,9 +41,9 @@ public class ExceptionHandlingTest extends TestCase {
                     "</synapse>";
 
     public void setUp() throws Exception {
-        msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        msgCtx = Axis2EnvSetup.axis2Deployment("target/synapse-repository");
         msgCtx.setSoapAction(null);
-        config = Axis2EvnSetup.getSynapseConfigElement(synapsexml);
+        config = Axis2EnvSetup.getSynapseConfigElement(synapsexml);
         env = new Axis2SynapseEnvironment(config,
                 Thread.currentThread().getContextClassLoader());
         targetServer = new SimpleHTTPServer(

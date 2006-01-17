@@ -1,6 +1,6 @@
 package org.apache.synapse.spi.processors;
 
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Constants;
 import org.apache.synapse.Processor;
@@ -30,7 +30,7 @@ public class AddressingProcessorTest extends TestCase {
 
     public void testAddressingProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
         Processor addressingProcessor = new AddressingInProcessor();
         SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
         boolean result = addressingProcessor.process(env,sm);

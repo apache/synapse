@@ -2,7 +2,7 @@ package org.apache.synapse.spi.injection;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Constants;
@@ -40,12 +40,12 @@ public class InProcessorWithRuleTest extends TestCase {
             "</synapse>\n";
 
     public void setUp() throws Exception {
-        msgCtx = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        msgCtx = Axis2EnvSetup.axis2Deployment("target/synapse-repository");
     }
 
     public void testAddressingProcessor() throws Exception {
         SynapseEnvironment env = new Axis2SynapseEnvironment(
-                Axis2EvnSetup.getSynapseConfigElement(synapsexml),
+                Axis2EnvSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);

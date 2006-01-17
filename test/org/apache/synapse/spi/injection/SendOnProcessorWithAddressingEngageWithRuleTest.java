@@ -5,7 +5,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.om.OMElement;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 
 
 import junit.framework.TestCase;
@@ -52,13 +52,13 @@ public class SendOnProcessorWithAddressingEngageWithRuleTest extends TestCase {
 
     public void testSendProcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-sendon"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
         OMElement response = serviceClient
-                .sendReceive(Axis2EvnSetup.payloadNamedAdddressing());
+                .sendReceive(Axis2EnvSetup.payloadNamedAdddressing());
         assertEquals("Synapse Testing String_Response_With_Addressing",
                 response.getText());
 

@@ -3,7 +3,7 @@ package org.apache.synapse.spi.processors;
 import junit.framework.TestCase;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.processors.builtin.LogProcessor;
 /*
@@ -26,7 +26,7 @@ import org.apache.synapse.processors.builtin.LogProcessor;
 public class BulitinProcessorTest extends TestCase {
     public void testLogProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
         Processor log = new LogProcessor();
         boolean result = log.process(null,sm);
         assertTrue(result);

@@ -36,7 +36,7 @@ import java.io.ByteArrayInputStream;
 *
 */
 
-public class Axis2EvnSetup {
+public class Axis2EnvSetup {
     public static MessageContext axis2Deployment(String testingRepository)
             throws AxisFault {
         ConfigurationContextFactory conFac = new ConfigurationContextFactory();

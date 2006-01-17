@@ -3,7 +3,7 @@ package org.apache.synapse.spi.processors;
 import junit.framework.TestCase;
 import org.apache.synapse.processors.InProcessor;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -26,7 +26,7 @@ public class InProcessorTest extends TestCase {
 
     public void testInProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
         InProcessor pro = new InProcessor();
         boolean retrun = pro.process(null,sm);
         assertTrue(retrun);

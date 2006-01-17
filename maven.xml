@@ -349,7 +349,7 @@
 
     <goal name="dist-bin" prereqs="war,samples_userguide,javadocs">
         <property name="bin.dist.dir"
-                  value="target/dist-bin/${pom.artifactId}-${pom.currentVersion}-bin"/>
+                  value="target/dist-bin/synapse"/>
         <ant:mkdir dir="${bin.dist.dir}"/>
         <ant:mkdir dir="${dist.dir}"/>
         <ant:mkdir dir="${bin.dist.dir}/docs"/>
@@ -358,6 +358,8 @@
         <ant:mkdir dir="${bin.dist.dir}/lib"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
+
+        <ant:mkdir dir="target/temp/"/>
 
 
         <ant:copy todir="${bin.dist.dir}/docs">
@@ -414,13 +416,20 @@
             </ant:fileset>
         </ant:copy>
 
+        <ant:copy todir="target/temp/">
+            <ant:fileset dir="target/dist-bin/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
         <ant:zip file="${dist.dir}/${dist.name}-bin.zip"
-                 basedir="target/dist-bin"/>
+                 basedir="target/temp"/>
         <ant:tar tarfile="target/${dist.name}-bin.tar"
-                 basedir="target/dist-bin"/>
+                 basedir="target/temp"/>
         <gzip src="target/${dist.name}-bin.tar"
               zipfile="${dist.dir}/${dist.name}-bin.tar.gz"/>
         <ant:delete dir="target/dist-bin"/>
+        <ant:delete dir="target/temp"/>
         <ant:delete dir="target/samples/"/>
         <ant:delete file="target/${dist.name}-bin.tar"/>
     </goal>

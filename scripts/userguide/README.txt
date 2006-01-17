@@ -11,8 +11,8 @@ The above will start Synapse as a server on port 8080.
 
 Using the following combinations, User will be able to run StockQuoteClient sample as stated in User guide. 
 
-1.ant -Darg1=IBM -Darg2=http://64.124.140.30:9090/soap -Darg3=http://localhost:8080
-2.ant -Darg1=IBM -Darg2=http://64.124.140.30:9090/soap -Darg3=http://64.124.140.30:9090/soap
+1.ant -Darg1=IBM -Darg2=http://www.webservicex.net/stockquote.asmx -Darg3=http://localhost:8080
+2.ant -Darg1=IBM -Darg2=http://www.webservicex.net/stockquote.asmx -Darg3=http://www.webservicex.net/stockquote.asmx
 3.ant 
 4.ant -Darg1=IBM -Darg2=urn:xmethods-delayed-quotes
 5.ant -Darg1=MSFT

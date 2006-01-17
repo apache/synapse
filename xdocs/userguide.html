@@ -38,17 +38,23 @@ requests. There are two ways to set up the Synapse server.</p>
   <li><p>A lightweight server which runs with its own HTTP server : This uses
     Axis2's SimpleHTTPServer which is a simple lightweight HTTP server option
     that does not require a Servlet Engine. First unzip the
-    Synapse-M1-SNAPSHOT.zip. In the bin directory you will find a script
+    Synapse-M1.zip. In the bin directory you will find scripts
     called:</p>
     <pre>synapse [.sh or .bat]</pre>
     <p>You should also see a directory called <tt>synapse-repository</tt>.
     There you will find the axis2.xml and synapse.xml config files. The
     axis2.xml need not be modified, but you can do so if you want to.</p>
     <p>The command line for synapse-lightweight takes the repository
-    directory and listening port:</p>
-    <pre>sh bin/synapse.sh synapse-repository 8080 [Linux]
+    directory and listening port. Change directory to bin/</p>
+    <pre>sh synapse.sh ../synapse-repository -p [Linux]
 
-bin\synapse synapse-repository 8080 [Win]</pre>
+synapse ../synapse-repository -p [Win]</pre>
+      <p>which will start the SimpleHTTPServer at port 8080. If it's needed
+      to be started at any other port use -p[port_number]. Ex:
+      </p>
+      <pre>
+      ./synapse.sh ../synapse-repository -p5043
+      </pre>
   </li>
 </ol>
 

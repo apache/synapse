@@ -45,7 +45,7 @@ public class EnvironmentAwareTest extends TestCase {
         // this test case throws exceptions if fail
         // exceptions are propergated from Synapes Server
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.getConfigurationContextFromFileSystem(
+                Axis2EvnSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-environmentaware"), null);
         Options options = new Options();
         options.setTo(targetEpr);

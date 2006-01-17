@@ -7,7 +7,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.om.OMElement;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -51,12 +51,12 @@ public class HTTPToTCPMessageMediationTest extends TestCase {
 
     public void testSendProcessor() throws Exception {
         ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-httptcp"), null);
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
-        OMElement response = serviceClient.sendReceive(Axis2EvnSetup.payload());
+        OMElement response = serviceClient.sendReceive(Axis2EnvSetup.payload());
         assertEquals("Synapse Testing String_Response", response.getText());
 
     }

@@ -24,7 +24,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 
 import javax.xml.namespace.QName;
 
@@ -55,7 +55,7 @@ public class FaultProcessorTest extends TestCase {
 			options.setTo(targetEpr);
 			sc.setOptions(options);
 
-			sc.sendReceive(operation, Axis2EvnSetup.payload());
+			sc.sendReceive(operation, Axis2EnvSetup.payload());
 			fail(null);
 		} catch (AxisFault e) {
 		}

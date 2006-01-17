@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import org.apache.synapse.SynapseEnvironment;
 
 import org.apache.synapse.Constants;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseEnvironmentFinder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -29,7 +29,7 @@ import org.apache.axis2.description.Parameter;
 
 public class SynapseConfiguratorTest extends TestCase {
     public void testSynapseEnvironmentFinder() throws Exception {
-        MessageContext mc = Axis2EvnSetup.axis2Deployment("target/synapse-repository");
+        MessageContext mc = Axis2EnvSetup.axis2Deployment("target/synapse-repository");
         SynapseEnvironment env = Axis2SynapseEnvironmentFinder
 				.getSynapseEnvironment(mc);
         assertNotNull(env);

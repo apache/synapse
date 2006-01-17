@@ -5,7 +5,7 @@ import org.apache.synapse.processors.StageProcessor;
 import org.apache.synapse.processors.rules.RegexProcessor;
 import org.apache.synapse.processors.rules.XPathProcessor;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.util.Axis2EvnSetup;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.LinkedList;
 public class StageProcessorTest extends TestCase {
     public void testStageProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EvnSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
         StageProcessor pro = new StageProcessor();
         boolean result = pro.process(null, sm);
         assertTrue(result);

@@ -468,14 +468,14 @@ transport address from the Web Services Addressing TO header. In other words,
 the SOAP envelope is addressed to the XMethods service, but the actual HTTP
 request goes to Synapse. The sample client has three (optional)
 parameters:</p>
-<pre>StockQuoteClient SYMBOL XmethodsURL TransportURL</pre>
+<pre>StockQuoteClient SYMBOL webservicexURL TransportURL</pre>
 
 <p>e.g.</p>
-<pre>StockQuoteClient IBM http://64.124.140.30:9090/soap http://localhost:8080</pre>
+<pre>StockQuoteClient IBM http://www.webservicex.net/stockquote.asmx http://localhost:8080</pre>
 
 <p>The sample synapse.xml can be used to demonstrate a few simple behaviours.
 1) Firstly try this:</p>
-<pre>StockQuoteClient IBM http://64.124.140.30:9090/soap http://64.124.140.30:9090/soap</pre>
+<pre>StockQuoteClient IBM http://www.webservicex.net/stockquote.asmx http://www.webservicex.net/stockquote.asmx</pre>
 
 <p>This will bypass Synapse and simply call XMethods.</p>
 

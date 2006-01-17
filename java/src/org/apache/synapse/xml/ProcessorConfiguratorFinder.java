@@ -106,7 +106,7 @@ public class ProcessorConfiguratorFinder {
 	 */
 	public static Processor getProcessor(SynapseEnvironment synapseEnv, OMElement element) {
 		OMNamespace n = element.getNamespace();
-		System.out.println(element.getLocalName());
+		
 		Class cls = find(new QName(n.getName(), element
 				.getLocalName()));
 		try {

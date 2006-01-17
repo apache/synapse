@@ -66,7 +66,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     public void testSendProcessorMultipleTimes() throws Exception {
         for (int i = 0; i < 10; i++) {
             ServiceClient serviceClient = new ServiceClient(
-                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-sendon"), null);
             Options options = new Options();
             options.setTo(targetEpr);

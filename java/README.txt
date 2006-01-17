@@ -1,5 +1,5 @@
 ======================================================
-Apache Synapse M1 build  (Month xx, 200X)
+Apache Synapse M1 build  (January, 2006)
 
 http://incubator.apache.org/synapse/
 ------------------------------------------------------
@@ -13,20 +13,23 @@ binary distribution and in the 'xdocs' directory in the source
 distribution.
 
 -------------------
-Rule Configuration
+Getting Started
 ===================
 
-To configure rules related to an incoming messages in to Synapse, 
-following step must be performed. 
+Synapse is configured using the synapse.xml file in the repository directory. 
+In the binary distribution this is the <SYNAPSE>\synapse_repository directory, where
+<SYNAPSE> is the directory you installed SYNAPSE to. 
 
-Edit synapse.xml, which will be located in $SYNAPSE_HOME, 
-where $SYNAPSE _HOME represents the install directory of your 
-Synapseruntime. (In the case of a servelet container this would be the
-"synapse" directory inside "webapps".) 
+You can start Synapse using the bin\synapse command (bat or sh)
 
-For more information please refer to the User's Guide.
+Synapse allows you to mediate Web Service messages. For examples please see the User Guide
+(http://wiki.apache.org/ws/Synapse/UserGuide). 
 
-___________________
+There are three simple stockquote clients that demonstrate Synapse as a mediation engine 
+in the samples\userguide directory.
+
+
+
 Support
 ===================
  
@@ -38,7 +41,6 @@ Mailing list subscription:
 
 Jira:
     http://issues.apache.org/jira/browse/Synapse
-
 
 Thank you for using Synapse!
 

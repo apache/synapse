@@ -228,6 +228,13 @@
                 <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
             <!--</excludes>-->
         </unitTest>
+        <resources>
+            <resource>
+                <includes>
+                    <include>log4j.properties</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <!-- ======= -->

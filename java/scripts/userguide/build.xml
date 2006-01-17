@@ -1,6 +1,6 @@
 <project name="samples" default="StockQuoteClient">
     <property name="arg1" value="IBM"/>
-    <property name="arg2" value="http://64.124.140.30:9090/soap"/>
+    <property name="arg2" value="http://www.webservicex.net/stockquote.asmx"/>
     <property name="arg3" value="http://localhost:8080"/>
 
     <path id="axis.classpath">

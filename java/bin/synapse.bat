@@ -66,7 +66,7 @@ if  "%SYNAPSE_CMD_LINE_ARGS%" == "" goto defaultParams
 goto runSynapse
 
 :defaultParams
-set SYNAPSE_CMD_LINE_ARGS=synapse_repository 8080
+set SYNAPSE_CMD_LINE_ARGS=-p 8080 synapse_repository
 goto runSynapse
 
 :noJavaHome

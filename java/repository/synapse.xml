@@ -3,16 +3,28 @@
         <engage-addressing-in/>
 		<log/>
     </stage>
-    <stage name="service-specific" >
-		<regex message-address="to" pattern="http://xmethods.*">
-			<header type="to" value="http://64.124.140.30:9090/soap"/>
-			<xpath expr="//*[Symbol='MSFT']">
-				<fault/>
-			</xpath>
+    <stage name="service-specific">
+		<!-- this matches the gateway case -->
+		<regex message-address="to" pattern="/StockQuote.*">
+			<ref ref="stockquote"/>				
+		</regex>	
+		<!-- this matches the virtual url case for either the proxy or ws-add case -->
+		<regex message-address="to" pattern="http://stockquote.*">
+			<ref ref="stockquote"/>
 		</regex>	
 	</stage>
 	<stage name="sender">
 		<send/>
 	</stage>	
+	
+	<!-- these are only called if referenced above-->
+	<never>
+		<stage name="stockquote">
+			<header type="to" value="http://localhost:6060/stockquote.asmx"/>
+			<xpath expr="//*[Symbol='MSFT']">
+				<fault/>
+			</xpath>
+		</stage>
+	</never>
 </synapse>
 

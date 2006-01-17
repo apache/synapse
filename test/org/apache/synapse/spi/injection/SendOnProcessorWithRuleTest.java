@@ -65,14 +65,15 @@ public class SendOnProcessorWithRuleTest extends TestCase {
 
     public void testSendProcessorMultipleTimes() throws Exception {
         for (int i = 0; i < 10; i++) {
-            ServiceClient serviceClient = new ServiceClient();
+            ServiceClient serviceClient = new ServiceClient(
+                Axis2EvnSetup.createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendon"), null);
             Options options = new Options();
             options.setTo(targetEpr);
             serviceClient.setOptions(options);
             OMElement response =
                     serviceClient.sendReceive(Axis2EvnSetup.payload());
             assertEquals("Synapse Testing String_Response", response.getText());
-            //serviceClient.finalizeInvoke();
         }
     }
 

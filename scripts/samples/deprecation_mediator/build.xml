@@ -1,22 +1,64 @@
-<project name="samples" default="StockQuoteClient">
-    <property name="arg1" value="IBM"/>
-    <property name="arg2" value="http://64.124.140.30:9090/soap"/>
-    <property name="arg3" value="http://localhost:8080"/>
+<project name="samples" default="help">
+    <target name="help">
+        <echo>
+            This script requires Ant 1.5 or higher
+
+            usage:
+            ant -help display ant help screen
+            ant help display this message
+            ant clean delete the built directory
+
+            ant compile build the deprecation_mediator sample
+
+            ant StockQuote [Symbol] [webserviceurl] [synapseurl]
+            Use the smart client - Synapse in WS-Addressing router mode
+
+        </echo>
+    </target>
+
+    <property name="symbol" value="IBM"/>
+    <property name="url" value="http://www.webservicex.net/stockquote.asmx"/>
+    <property name="synapseurl" value="http://localhost:8080"/>
+
+    <property name="class.dir" value="target/classes"/>
 
     <path id="axis.classpath">
-        <fileset dir="../../../lib">
+        <fileset dir="../../lib">
             <include name="*.jar"/>
         </fileset>
-        <pathelement location="sample_deprecation_mediator.jar"/>
     </path>
 
-    <target name="StockQuoteClient">
+    <target name="clean">
+        <delete dir="target" quiet="true"/>
+        <delete dir="${class.dir}" quiet="true"/>
+    </target>
+
+
+    <target name="StockQuote" depends="compile">
         <java classname="samples.userguide.StockQuoteClient"
               classpathref="axis.classpath" fork="true">
-            <arg value="${arg1}"/>
-            <arg value="${arg2}"/>
-            <arg value="${arg3}"/>
+            <arg value="${symbol}"/>
+            <arg value="${url}"/>
+            <arg value="${synapseurl}"/>
         </java>
+    </target>
+
+    <target name="init">
+        <mkdir dir="${class.dir}"/>
+        <mkdir dir="src/ddl"/>
+
+        <path id="javac.classpath">
+            <pathelement path="${class.dir}"/>
+            <fileset dir="../../lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+    </target>
+
+    <target name="compile" depends="init" description="Compile all Java">
+        <javac srcdir="src" destdir="${class.dir}">
+            <classpath refid="javac.classpath"/>
+        </javac>
     </target>
 
     <target name="synapse">
@@ -26,4 +68,5 @@
             <arg value="8080"/>
         </java>
     </target>
+
 </project>

@@ -240,7 +240,7 @@
         </jar>
 
         <copy file="target/DeprecationMediator.aar"
-              tofile="target/samples/samples/deprecation_mediator/DeprecationMediator.aar"/>
+              tofile="target/samples/deprecation_mediator/DeprecationMediator.aar"/>
 
         <!-- Deleteing helper stuff-->
 
@@ -259,30 +259,20 @@
     <goal name="samples_userguide">
         <mkdir dir="target/samples"/>
         <mkdir dir="${samples.dir}/userguide"/>
-        <mkdir dir="${samples.dir}/samples/deprecation_mediator"/>
+        <mkdir dir="${samples.dir}/deprecation_mediator"/>
         <mkdir dir="${samples.dir}/userguide/src"/>
-        <mkdir dir="${samples.dir}/samples/deprecation_mediator/src"/>
+        <mkdir dir="${samples.dir}/deprecation_mediator/src"/>
         <ant:copy todir="${samples.dir}/userguide/src">
             <ant:fileset dir="src">
                 <ant:include name="**/userguide/**"/>
             </ant:fileset>
         </ant:copy>
-        <ant:copy todir="${samples.dir}/samples/deprecation_mediator/src">
+        <ant:copy todir="${samples.dir}/deprecation_mediator/src">
             <ant:fileset dir="src">
                 <ant:include name="**/deprecation/**"/>
             </ant:fileset>
         </ant:copy>
 
-        <jar destfile="${samples.dir}/userguide/sample_userguide.jar">
-            <fileset dir="target/classes">
-                <include name="**/userguide/**"/>
-            </fileset>
-        </jar>
-        <jar destfile="${samples.dir}/samples/deprecation_mediator/sample_deprecation_mediator.jar">
-            <fileset dir="target/classes">
-                <include name="**/deprecation/**"/>
-            </fileset>
-        </jar>
     </goal>
 
     <!-- ================================================================ -->
@@ -396,11 +386,11 @@
                   tofile="${bin.dist.dir}/samples/userguide/README.txt"/>
 
         <ant:copy file="scripts/samples/deprecation_mediator/synapse.xml"
-                  tofile="${bin.dist.dir}/samples/samples/deprecation_mediator/synapse.xml"/>
+                  tofile="${bin.dist.dir}/samples/deprecation_mediator/synapse.xml"/>
         <ant:copy file="scripts/samples/deprecation_mediator/README.txt"
-                  tofile="${bin.dist.dir}/samples/samples/deprecation_mediator/README.txt"/>
+                  tofile="${bin.dist.dir}/samples/deprecation_mediator/README.txt"/>
         <ant:copy file="scripts/samples/deprecation_mediator/build.xml"
-                  tofile="${bin.dist.dir}/samples/samples/deprecation_mediator/build.xml"/>
+                  tofile="${bin.dist.dir}/samples/deprecation_mediator/build.xml"/>
 
         <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="target/samples/">
@@ -416,14 +406,9 @@
 
         <ant:zip file="${dist.dir}/${dist.name}-bin.zip"
                  basedir="target/temp"/>
-        <ant:tar tarfile="target/${dist.name}-bin.tar"
-                 basedir="target/temp"/>
-        <gzip src="target/${dist.name}-bin.tar"
-              zipfile="${dist.dir}/${dist.name}-bin.tar.gz"/>
         <ant:delete dir="target/dist-bin"/>
         <ant:delete dir="target/temp"/>
         <ant:delete dir="target/samples/"/>
-        <ant:delete file="target/${dist.name}-bin.tar"/>
     </goal>
     <!-- ================================================================ -->
     <!--- dist-src -->

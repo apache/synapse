@@ -2,9 +2,13 @@ package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.xml.ProcessorConfiguratorFinder;
 import org.apache.synapse.processors.builtin.xslt.XSLTProcessor;
+import org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator;
 import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 
 import java.io.ByteArrayInputStream;
 /*
@@ -35,6 +39,12 @@ public class XSLTProcessorTest extends TestCase {
             "    </xsl:template>\n" +
             "</xsl:stylesheet>";
 
+    private String synapsexml =
+            "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
+                    "<xslt name=\"stlt_test_name\" xsl=\"./tranformation/simple_transformation.xsl\" type=\"body\"/>" +
+                    "</synapse>";
+
+
     public void testXSLTProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
@@ -43,5 +53,28 @@ public class XSLTProcessorTest extends TestCase {
         pro.setIsBody(true);
         boolean result = pro.process(null, sm);
         assertTrue(result);
+    }
+
+    public void testXSLTProcessorConfigurator() throws Exception {
+        XSLTProcessorConfigurator xsltProcessorConfigurator =
+                new XSLTProcessorConfigurator();
+        Class clazz = ProcessorConfiguratorFinder
+                .find(xsltProcessorConfigurator.getTagQName());
+        assertNotNull(clazz);
+        Object processorObject = clazz.newInstance();
+        if (!(processorObject instanceof XSLTProcessorConfigurator)) {
+            throw new Exception(
+                    "XSLTProcessorConfigurator initialization falied");
+        }
+        SynapseEnvironment env = new Axis2SynapseEnvironment(
+                Axis2EnvSetup.getSynapseConfigElement(synapsexml),
+                Thread.currentThread().getContextClassLoader());
+        assertNotNull(env.getMasterProcessor());
+
+        SynapseMessage sm = new Axis2SynapseMessage(
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+        // throws exceptions if anything goes wrong
+        env.injectMessage(sm);
+
     }
 }

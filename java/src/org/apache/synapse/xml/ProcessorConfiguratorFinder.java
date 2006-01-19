@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator;
 
 import sun.misc.Service;
 
@@ -59,7 +60,8 @@ public class ProcessorConfiguratorFinder {
 			FaultProcessorConfigurator.class,
 			AddressingProcessorConfigurator.class,
 			InProcessorConfigurator.class, OutProcessorConfigurator.class,
-			NeverProcessorConfigurator.class, RefProcessorConfigurator.class};
+			NeverProcessorConfigurator.class, RefProcessorConfigurator.class,
+            XSLTProcessorConfigurator.class};
 
 	private static void initialise() {
 

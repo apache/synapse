@@ -3,6 +3,7 @@
     <xsl:template match="/">
         <transformedText>
             <xsl:value-of select="//text"/>
+            <xsl:text>Test Being Transformed</xsl:text>
         </transformedText>
     </xsl:template>
 </xsl:stylesheet>

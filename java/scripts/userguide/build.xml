@@ -29,7 +29,7 @@
     <property name="class.dir" value="target/classes"/>
 
     <path id="axis.classpath">
-        <fileset dir="../../lib">
+        <fileset dir="../lib">
             <include name="*.jar"/>
         </fileset>
     </path>

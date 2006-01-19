@@ -78,7 +78,7 @@
 
         <path id="javac.classpath">
             <pathelement path="${class.dir}"/>
-            <fileset dir="../../lib">
+            <fileset dir="../lib">
                 <include name="**/*.jar"/>
             </fileset>
         </path>

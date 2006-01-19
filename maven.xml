@@ -258,11 +258,10 @@
 
     <goal name="samples_userguide">
         <mkdir dir="target/samples"/>
-        <mkdir dir="${samples.dir}/userguide"/>
         <mkdir dir="${samples.dir}/deprecation_mediator"/>
-        <mkdir dir="${samples.dir}/userguide/src"/>
+        <mkdir dir="${samples.dir}/src"/>
         <mkdir dir="${samples.dir}/deprecation_mediator/src"/>
-        <ant:copy todir="${samples.dir}/userguide/src">
+        <ant:copy todir="${samples.dir}/src">
             <ant:fileset dir="src">
                 <ant:include name="**/userguide/**"/>
             </ant:fileset>
@@ -381,9 +380,9 @@
         </ant:copy>
 
         <ant:copy file="scripts/userguide/build.xml"
-                  tofile="${bin.dist.dir}/samples/userguide/build.xml"/>
+                  tofile="${bin.dist.dir}/samples/build.xml"/>
         <ant:copy file="scripts/userguide/README.txt"
-                  tofile="${bin.dist.dir}/samples/userguide/README.txt"/>
+                  tofile="${bin.dist.dir}/samples/README.txt"/>
 
         <ant:copy file="scripts/samples/deprecation_mediator/synapse.xml"
                   tofile="${bin.dist.dir}/samples/deprecation_mediator/synapse.xml"/>

@@ -23,21 +23,22 @@
         framework based on Web services specifications.</description>
 
     <url>http://ws.apache.org/synapse/</url>
-    <issueTrackingUrl>http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
+    <issueTrackingUrl>
+        http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
     <siteAddress>ws.apache.org</siteAddress>
     <siteDirectory>/synapse/</siteDirectory>
     <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
 
 
-     <!--any mailing lists for the project -->
+    <!--any mailing lists for the project -->
 
     <mailingLists>
-    <mailingList>
-    <name>Synpase Developer List</name>
-    <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
-    <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
-    <archive></archive>
-    </mailingList>
+        <mailingList>
+            <name>Synpase Developer List</name>
+            <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
+            <archive></archive>
+        </mailingList>
     </mailingLists>
 
     <!-- who the developers are for the project -->
@@ -225,8 +226,13 @@
                 <include>**/*Test.java</include>
             </includes>
             <!--<excludes>-->
-                <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
+            <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
             <!--</excludes>-->
+            <resources>
+                <resource>
+                    <directory>./synapse-test-resources</directory>
+                </resource>
+            </resources>
         </unitTest>
         <resources>
             <resource>

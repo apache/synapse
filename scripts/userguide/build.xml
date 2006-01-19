@@ -1,4 +1,4 @@
-<project name="samples" default="help">
+<project name="samples" default="help" basedir=".">
     <target name="help">
         <echo>
             This script requires Ant 1.5 or higher
@@ -10,13 +10,13 @@
 
             ant compile build the samples
 
-            ant StockQuote [Symbol] [webserviceurl] [synapseurl]
+            ant StockQuote [Symbol] [webserviceurl] [synapseurl] {optional[repository]}
             Use the smart client - Synapse in WS-Addressing router mode
 
-            ant ProxyStockQuote [Symbol] [webserviceurl] [synapseurl]
+            ant ProxyStockQuote [Symbol] [webserviceurl] [synapseurl] {optional[repository]}
             Use the http proxy client - Synapse in "transparent mode"
 
-            ant DumbStockQuote [Symbol] [synapseurl]
+            ant DumbStockQuote [Symbol] [synapseurl] {optional[repository]}
             Use the dumb soap client - Synapse in "gateway" mode
 
         </echo>
@@ -25,6 +25,7 @@
     <property name="symbol" value="IBM"/>
     <property name="url" value="http://www.webservicex.net/stockquote.asmx"/>
     <property name="synapseurl" value="http://localhost:8080"/>
+    <property name="repository" value="../synapse_repository"/>
 
     <property name="class.dir" value="target/classes"/>
 
@@ -46,6 +47,7 @@
             <arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
+            <arg value="${repository}"/>
         </java>
     </target>
 
@@ -55,14 +57,16 @@
             <arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
+            <arg value="${repository}"/>
         </java>
     </target>
 
-    <target name="DumbQuoteClient" depends="compile">
+    <target name="DumbStockQuote" depends="compile">
         <java classname="samples.userguide.DumbStockQuoteClient"
               classpathref="axis.classpath" fork="true">
             <arg value="${symbol}"/>
             <arg value="${url}"/>
+            <arg value="${repository}"/>
         </java>
     </target>
 

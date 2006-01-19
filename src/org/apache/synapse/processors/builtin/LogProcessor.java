@@ -38,6 +38,7 @@ public class LogProcessor extends AbstractProcessor {
 	private Log log = LogFactory.getLog(getClass());
 
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+		log.info("---------------------------------------");
 		if (smc.getTo() != null)
 			log.info("To: " + smc.getTo().getAddress());
 		if (smc.getFrom() != null)
@@ -46,6 +47,7 @@ public class LogProcessor extends AbstractProcessor {
 			log.info("ReplyTo: " + smc.getReplyTo().getAddress());
 		if (smc.getEnvelope() != null)
 			log.info("Envelope: " + smc.getEnvelope().toString());
+		log.info("---------------------------------------");
 		return true;
 	}
 

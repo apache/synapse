@@ -1,7 +1,6 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
     <engage-addressing-in/>
 	<log/>
-    </stage>
     <!-- this matches the gateway case -->
 	<regex message-address="to" pattern="/StockQuote.*">
 		<ref ref="stockquote"/>				

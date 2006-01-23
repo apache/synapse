@@ -5,12 +5,12 @@
     <menu name="Synapse">
       <item name="Home" href="index.html"/>
       <item name="Download Synapse">
-        <item name="Releases" href="download.cgi"/>
+        <item name="Releases" href="download.html"/>
         <item name="Source Code"
               href="http://svn.apache.org/viewcvs.cgi/incubator/synapse/trunk/java/"/>
       </item>
       <item name="Documentation">
-        <item name="User Guide" href="userguide.html"/>
+        <item name="User Guide" href="http://wiki.apache.org/ws/Synapse/UserGuide"/>
         <item name="Writing Processors" href="extension_processor_writing.html"/>
       </item>
       <item name="Get Involved" href="getInvolved.html" />

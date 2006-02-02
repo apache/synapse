@@ -68,6 +68,8 @@
             <version>${axis2.version}</version>
         </dependency>
 
+
+
         <!-- external JARs -->
         <dependency>
             <groupId>commons-logging</groupId>
@@ -197,8 +199,16 @@
         </dependency>
         <dependency>
             <groupId>ws-commons</groupId>
-            <artifactId>ws-policy</artifactId>
-            <version>${ws_policy.version}</version>
+            <artifactId>policy</artifactId>
+            <version>${policy.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom</artifactId>
+            <version>${axiom.version}</version>
             <properties>
                 <module>false</module>
             </properties>

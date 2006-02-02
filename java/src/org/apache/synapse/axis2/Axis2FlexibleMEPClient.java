@@ -27,9 +27,11 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.soap.SOAPHeader;
 import org.apache.axis2.soap.SOAPHeaderBlock;
+import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 
@@ -39,6 +41,7 @@ import org.apache.wsdl.WSDLConstants;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 
 /**
@@ -49,14 +52,31 @@ public class Axis2FlexibleMEPClient {
     private static SOAPEnvelope outEnvelopeConfiguration(MessageContext smc) {
         SOAPEnvelope env = smc.getEnvelope();
         SOAPHeader soapHeader = env.getHeader();
+        ArrayList addressingHeaders;
         if (soapHeader != null) {
-            Iterator iterator = soapHeader.getChildren();
-            while (iterator.hasNext()) {
-                SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) iterator.next();
-                headerBlock.detach();
+            addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
+                    AddressingConstants.Submission.WSA_NAMESPACE);
+            if (addressingHeaders != null) {
+                detachAddressingInformation(addressingHeaders);
+
+            } else {
+                addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
+                        AddressingConstants.Final.WSA_NAMESPACE);
+                if (addressingHeaders != null) {
+                    detachAddressingInformation(addressingHeaders);
+                }
             }
         }
         return env;
+    }
+
+    private static void detachAddressingInformation(ArrayList headerInformation) {
+        Iterator iterator = headerInformation.iterator();
+        while (iterator.hasNext()) {
+            SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) iterator.next();
+            headerBlock.detach();
+        }
+
     }
 
     // Following code is based on Axis2 Client code.
@@ -132,7 +152,6 @@ public class Axis2FlexibleMEPClient {
 
         //Options class from Axis2 holds client side settings
         Options options = new Options();
-
         OperationClient mepClient =
                 axisAnonymousOperation.createClient(sc, options);
         mepClient.addMessageContext(mc);

@@ -54,4 +54,8 @@ public interface Constants {
     // addressing properites handling
 
     String ADDRESSING_PROCESSED = "__ADDRESSING_PROCESSED";
+
+    // transport header selection
+
+    String OK_200 = "200_OK";
 }

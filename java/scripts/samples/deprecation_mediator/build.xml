@@ -19,7 +19,7 @@
     <property name="symbol" value="IBM"/>
     <property name="url" value="http://www.webservicex.net/stockquote.asmx"/>
     <property name="synapseurl" value="http://localhost:8080"/>
-    <property name="repository" value="../synapse_repository"/>
+    <property name="repository" value="../../synapse_repository"/>
 
     <property name="class.dir" value="target/classes"/>
 

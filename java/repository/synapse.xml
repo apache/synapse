@@ -19,18 +19,16 @@
 	<send/>
 	
 	<!-- these are only called if referenced above-->
-	<never>
-	
-		<stage name="stockquote">
-			<!-- set the To address to the real endpoint -->
-			<header type="to" value="http://www.webservicex.net/stockquote.asmx" />
-			<!-- check if the symbol is MSFT -->
-			<xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
-				<!-- if it is throw a fault -->
-				<fault/>
-			</xpath>
-		</stage>
-		
-	</never>
+	<define name="stockquote">    
+
+        <!-- set the To address to the real endpoint -->
+        <header type="to" value="http://www.webservicex.net/stockquote.asmx" />
+        <!-- check if the symbol is MSFT -->
+        <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+            <!-- if it is throw a fault -->
+            <fault/>
+        </xpath>
+
+	</define>
 </synapse>
 

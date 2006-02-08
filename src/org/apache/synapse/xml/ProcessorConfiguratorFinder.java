@@ -61,7 +61,7 @@ public class ProcessorConfiguratorFinder {
 			AddressingProcessorConfigurator.class,
 			InProcessorConfigurator.class, OutProcessorConfigurator.class,
 			NeverProcessorConfigurator.class, RefProcessorConfigurator.class,
-            XSLTProcessorConfigurator.class};
+            XSLTProcessorConfigurator.class,DefineProcessorConfigurator.class};
 
 	private static void initialise() {
 

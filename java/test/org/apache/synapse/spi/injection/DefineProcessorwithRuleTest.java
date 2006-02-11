@@ -35,9 +35,15 @@ public class DefineProcessorwithRuleTest extends TestCase {
     private MessageContext mc;
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
+                    "<refdefine ref=\"test_define\"/>\n" +
+                    "<refdefine ref=\"test_define_addressing\"/>\n" +
                     "<define name=\"test_define\">\n" +
                     "    <log/>" +
                     "    <regex message-address=\"to\" pattern=\"http://xmethods..\\*\"/>\n" +
+                    "</define>\n" +
+
+                    "<define name=\"test_define_addressing\">\n" +
+                    "    <engage-addressing-in/>" +
                     "</define>\n" +
             "</synapse>";
     public void setUp() throws Exception{
@@ -52,9 +58,12 @@ public class DefineProcessorwithRuleTest extends TestCase {
         SynapseMessage smc = new Axis2SynapseMessage(mc);
         env.injectMessage(smc);
         assertEquals("test_define", env.lookupProcessor("test_define").getName());
+        assertEquals("test_define_addressing", env.lookupProcessor("test_define_addressing").getName());
         List embededProcessors = ((ListProcessor)env.lookupProcessor("test_define")).getList();
         assertEquals(2,embededProcessors.size());
-
+        ListProcessor masterProcessor = (ListProcessor)env.getMasterProcessor();
+        List masterProcessorList = masterProcessor.getList();
+        assertEquals(4,masterProcessorList.size());
     }
 
 }

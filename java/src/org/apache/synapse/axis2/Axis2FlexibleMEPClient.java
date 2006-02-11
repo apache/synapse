@@ -49,7 +49,7 @@ import java.util.ArrayList;
  */
 public class Axis2FlexibleMEPClient {
 
-    private static SOAPEnvelope outEnvelopeConfiguration(MessageContext smc) {
+    public static SOAPEnvelope outEnvelopeConfiguration(MessageContext smc) {
         SOAPEnvelope env = smc.getEnvelope();
         SOAPHeader soapHeader = env.getHeader();
         ArrayList addressingHeaders;

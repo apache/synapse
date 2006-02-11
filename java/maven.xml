@@ -113,6 +113,22 @@
             <copy file="test/rules/synapse-sendon.xml"
                   tofile="target/synapse-repository-sendon/synapse.xml"/>
 
+            <echo message="-----------Creating Testing Repository - SendNow ----------"/>
+            <mkdir dir="target/synapse-repository-sendnow"/>
+            <copy file="target/synapse.aar"
+                  tofile="target/synapse-repository-sendnow/services/synapse.aar"/>
+            <copy file="target/npe.aar"
+                  tofile="target/synapse-repository-sendnow/services/npe.aar"/>
+            <copy file="target/emptymediator.aar"
+                  tofile="target/synapse-repository-sendnow/services/emptymediator.aar"/>
+            <mkdir dir="target/synapse-repository-sendnow/modules"/>
+            <copy file="synapse-test-resources/axis2/modules/addressing-0.94.mar"
+                  tofile="target/synapse-repository-sendnow/modules/addressing-0.94.mar"/>
+            <copy file="synapse-test-resources/axis2/axis2.xml"
+                  tofile="target/synapse-repository-sendnow/axis2.xml"/>
+            <copy file="test/rules/synapse-sendnow.xml"
+                  tofile="target/synapse-repository-sendnow/synapse.xml"/>
+
             <echo message="-----------Creating Testing Repository - SendOnAxis2 ----------"/>
             <mkdir dir="target/synapse-repository-sendonAxis2"/>
 

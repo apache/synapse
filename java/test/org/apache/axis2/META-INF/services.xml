@@ -15,4 +15,8 @@
     <operation name="echo_addressing" locked="false">
         <parameter name="wsamapping">urn:synapse/sendon-addressing-engage</parameter>
     </operation>
+    <operation name="ping">
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+        <parameter name="wsamapping">urn:synapse/ping</parameter>
+    </operation>
 </service>

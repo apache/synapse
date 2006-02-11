@@ -52,4 +52,10 @@ public class Echo {
                 fac.createText(responseText, "Synapse Testing String_Response_With_Addressing"));
         return responseText;
     }
+
+    public void ping(OMElement element) {
+        System.out.println(
+                "This is the actual service which has been pinged");
+    }
+
 }

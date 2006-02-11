@@ -110,6 +110,18 @@ public class Axis2EnvSetup {
         return method;
     }
 
+    public static OMElement payloadNamedPing() {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace(
+                "urn:text-body", "ns");
+        OMElement method = fac.createOMElement("service", omNs);
+        OMElement value = fac.createOMElement("text_ping", omNs);
+        value.addChild(
+                fac.createText(value, "Synapse Testing String for Ping"));
+        method.addChild(value);
+        return method;
+    }
+
     public static ConfigurationContext createConfigurationContextFromFileSystem(String repository) throws AxisFault {
         ConfigurationContextFactory fac = new ConfigurationContextFactory();
         ConfigurationContext configContext =

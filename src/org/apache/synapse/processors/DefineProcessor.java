@@ -22,11 +22,23 @@ import org.apache.synapse.SynapseMessage;
  *
  */
 public class DefineProcessor extends ListProcessor {
-    /*
-    <define/> tag will not execute in-line. It has to be refernced with
-    <ref/>
-    */
+
     public boolean process(SynapseEnvironment se, SynapseMessage sm) {
         return true;
+    }
+
+    /*
+    Thre Processor.process() is common to every one. Define Processor is a unique
+    mediator that is not run in-line. It should always reference by some entity. This
+    Entity is "<refdefine/>. <refdefine/> has the @ref which will reference to the
+    <define/>.
+
+    The Following method processRef(SynapseEnvironment se, SynapseMessage sm); will
+    allow to refernce the <define/> process and, will not allow the <define/> to be a inline
+    process either.
+    */
+
+    public boolean processRef(SynapseEnvironment se, SynapseMessage sm) {
+        return super.process(se,sm);
     }
 }

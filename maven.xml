@@ -258,6 +258,30 @@
         <copy file="target/DeprecationMediator.aar"
               tofile="target/samples/deprecation_mediator/DeprecationMediator.aar"/>
 
+        <echo message="----------------Creating SLAMediator aar----------------"/>
+        <mkdir dir="target/sample-sla/META-INF"/>
+        <mkdir dir="target/sample-sla/sampleMediators/sla"/>
+        <copy file="src/sampleMediators/sla/META-INF/services.xml"
+              tofile="target/sample-sla/META-INF/services.xml"/>
+        <copy file="src/sampleMediators/sla/META-INF/sla.xml"
+              tofile="target/sample-sla/META-INF/sla.xml"/>
+
+        <ant:copy todir="target/sample-sla">
+            <ant:fileset dir="target/classes">
+                <ant:include name="sampleMediators/sla/**"/>
+                <ant:exclude name="sampleMediators/sla/**/*.xml"/>
+            </ant:fileset>
+        </ant:copy>
+
+        <mkdir dir="target/samples"/>
+        <jar jarfile="target/SLAMediator.aar"
+             basedir="target/sample-sla">
+            <include name="**"/>
+        </jar>
+
+        <copy file="target/SLAMediator.aar"
+              tofile="target/samples/sla_mediator/SLAMediator.aar"/>
+
         <!-- Deleteing helper stuff-->
 
         <ant:delete dir="target/modules"/>
@@ -266,6 +290,8 @@
         <ant:delete file="target/synapse.aar"/>
         <ant:delete dir="target/sample-deprecation"/>
         <ant:delete file="target/DeprecationMediator.aar"/>
+        <ant:delete dir="target/sample-sla"/>
+        <ant:delete file="target/SLAMediator.aar"/>
 
         <ant:path id="classes_test.dir" location="${class_test.dir}"/>
         <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
@@ -275,8 +301,10 @@
     <goal name="samples_userguide">
         <mkdir dir="target/samples"/>
         <mkdir dir="${samples.dir}/deprecation_mediator"/>
+        <mkdir dir="${samples.dir}/sla_mediator"/>
         <mkdir dir="${samples.dir}/src"/>
         <mkdir dir="${samples.dir}/deprecation_mediator/src"/>
+        <mkdir dir="${samples.dir}/sla_mediator/src"/>
         <ant:copy todir="${samples.dir}/src">
             <ant:fileset dir="src">
                 <ant:include name="**/userguide/**"/>
@@ -285,6 +313,11 @@
         <ant:copy todir="${samples.dir}/deprecation_mediator/src">
             <ant:fileset dir="src">
                 <ant:include name="**/deprecation/**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:copy todir="${samples.dir}/sla_mediator/src">
+            <ant:fileset dir="src">
+                <ant:include name="**/sla/**"/>
             </ant:fileset>
         </ant:copy>
 
@@ -406,6 +439,13 @@
                   tofile="${bin.dist.dir}/samples/deprecation_mediator/README.txt"/>
         <ant:copy file="scripts/samples/deprecation_mediator/build.xml"
                   tofile="${bin.dist.dir}/samples/deprecation_mediator/build.xml"/>
+
+        <ant:copy file="scripts/samples/sla_mediator/synapse.xml"
+                  tofile="${bin.dist.dir}/samples/sla_mediator/synapse.xml"/>
+        <ant:copy file="scripts/samples/sla_mediator/README.txt"
+                  tofile="${bin.dist.dir}/samples/sla_mediator/README.txt"/>
+        <ant:copy file="scripts/samples/sla_mediator/build.xml"
+                  tofile="${bin.dist.dir}/samples/sla_mediator/build.xml"/>
 
         <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="target/samples/">

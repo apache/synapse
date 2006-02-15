@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+       "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <title>Writing Processors</title>
+  <meta name="generator" content="amaya 9.2.1, see http://www.w3.org/Amaya/"
+  />
+</head>
+
+<body>
+<h1>Writing a Processor</h1>
+
+<p>This section of the guide covers aspects of SPI.</p>
+
+<p>There are two types of Processors in Synapse: </p>
+<ol>
+  <li>Node Processors
+    <p>These can contain sub-processors in its processor map. Ex:
+    RegexProcessor, XpathProcessor etc.</p>
+  </li>
+  <li>Leaf Processors
+    <p>This does not contain any sub-processors. Their soul purpose is to
+    contain configuration infromation. Ex: AddressinInProcessor Core of
+    Synapse contain Group and Referencing Processors, Rule Processors,
+    Built-in Processors and User Mediator Type Processors.</p>
+  </li>
+</ol>
+
+<p> Apart from the above, Synapse considers all other processors as
+extensions. Ex: SpringMediator etc. As mentioned in the Userguide every
+element in synapse.xml maps to a Processor. Every Processor has its
+ProcessorConfigurator. ProcessorConfigurator is the one which decides whether
+the corresponding Processor is a Node or Leaf Processor. So any Processor
+that has been written to Synapse should come as a extension and should go
+under the SVN folder "extensions". </p>
+
+<h2>Writing a Node Processor</h2>
+
+<p>Following XML shows the semantics of a Node Processor.</p>
+<pre>&lt;foo attr="value"&gt;
+     &lt;bar/&gt;
+     &lt;car/&gt;
+&lt;/foo&gt;
+ 
+</pre>
+
+<p>&lt;foo/&gt; should map to FooProcessor which is a Node and there should
+be corresponding FooProcessorConfiguratator. So FooProcessor should contain a
+map to hold down the other Processors coming under it (BarProcessor and
+CarProcessor, these will be explained later on). To be a Node,
+FooProcessorConfigurator should extend from abstract
+AbstractListProcessorConfigurator. FooProcessorConfigurator contains all the
+configuration information of the Processor. It will hold the QName of
+element. All elements comes under the namespace of
+http://ws.apache.org/ns/synapse. If there are other attributes pertaining to
+the elements they should also come under the prior namespace and it should be
+defined in the ProcesssorConfigurator. Ultimately you will have following
+code.</p>
+<pre><source>
+public class FooProcessorConfigurator extends AbstractListProcessorConfigurator {
+
+       private static final String FOO = "foo";
+       private static final QName FOO_Q = new QN'ame (http://ws.apache.org/ns/synapse , FOO);
+       private static final QName ATTR = new QName("attr");
+        
+       ...
+
+}</source></pre>
+
+<p>Now you have to implement the following methods,</p>
+<pre>public Processor createProcessor(SynapseEnvironment se, OMElement el);public QName getTagQName();</pre>
+
+<p></p>
+<pre>public Processor createProcessor(SynapseEnvironment se, OMElement el),</pre>
+
+<p>This will deal with the FooProcessor creation. The following is a specific
+way to write this method</p>
+<pre><source>
+public class FooProcessorConfigurator extends AbstractListProcessorConfigurator {
+       ...
+       public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+                FooProcessor fooProcessor = new FooProcessor();
+                super.addChildrenAndSetName(se, el, fooProcessor);
+
+                OMAttribute attr= el.getAttribute(ATTR);
+                if (patt == null) {
+                        throw new SynapseException(FOO + " must have "
+                                        + ATTR+ " attribute: " + el.toString());
+                }
+
+                fooProcessor.setAttr(attr.getAttributeValue());
+                return fooProcessor;
+        }
+
+        public QName getTagQName() {
+                return FOO_Q;
+        }
+
+} </source></pre>
+
+<p>Now lets look at the FooProcessor implementation. Remember it's a Node,
+and it should contain a place to hold the value of "attr". As this is a Node,
+it should extend from ListProcessor.</p>
+<pre><source>
+public class RegexProcessor extends ListProcessor {
+        
+        private Log log = LogFactory.getLog(getClass());
+
+        private String attr  = null;
+
+        public void setAttr(String attr) {
+                this.attr = attr;
+        }
+
+        public String getAttr() {
+                return this.attr;
+        }
+
+        
+        public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+                       // Processing logic goes here
+                // there be any processing condition, at the you should call
+                return super.process(se, smc);
+                // or
+                return true;
+        } 
+
+}</source></pre>
+<pre>public boolean process(SynapseEnvironment se, SynapseMessage smc) </pre>
+
+<p>handle the processing logic. So there be any condition, and if the logic
+is "true" call "super.process(se, smc)" . If the processing logic is fault
+through make sure that you will call "return true". So writing a extension is
+as easy as prior. </p>
+
+<h2>Writing a Leaf Processor</h2>
+
+<p>&lt;bar/&gt; is leaf element and it will map to a Leaf Node. So let the
+mapping be BarProcessor and there should be the corresponding
+BarProcessorConfigurator. So the symantics of BarProcessorConfigurator is as
+follows,</p>
+<pre><source>
+public class BarProcessorConfigurator extends AbstractProcessorConfigurator {
+        private static final QName BAR_Q = new QName(http://ws.apache.org/ns/synapse,"bar");
+
+
+        public QName getTagQName() {
+                return BAR_Q;
+        }
+
+
+        public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+                BarProcessor barProcessor = new BarProcessor();
+                super.setNameOnProcessor(se,el,barProcessor);
+                return barProcessor;
+        }
+
+} </source></pre>
+
+<p>If there are attributes, let them be handle as shown in "Writing a Node
+Processor" . Leaf ProcessorConfigurators should extend from
+AbstractProcessorConfigurator. Now lets see the semantics of BarProcessor.
+</p>
+<pre><source>
+public class BarProcessor extends AbstractProcessor {
+        
+        private Log log = LogFactory.getLog(getClass());
+
+        public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+                // Processing logic goes here
+                return true;
+        }
+} </source></pre>
+
+<p>Leaf Processors should extend from AbstractProcessor. So "Let there be
+Processors". But we are not quite there. We need to do one more
+configuration, Plunging the extension to the core. </p>
+<p><i>First Method:</i></p>
+
+<p>This is based on Service Provider funtionality that comes with JDK1.3 above. For more
+information click <a href="http://java.sun.com/j2se/1.4.2/docs/guide/jar/jar.html#Service%20Provider" target="_blank">here</a>
+</p>
+<ol>
+<li>Create a META-INF folder somewhere in your System</li>
+<li>Create services folder inside {META-INF/services}</li>
+<li>Create a text file with the QName of interface a.b.c.d.ProcessorConfigurator </li>
+<li>So you will have a text file in the this structure as META-INF/services/a.b.c.d.ProcessorConfigurator</li>
+<li>Inside the text file write the entry of the QName of implementation class of the interface a.b.c.d.BarProcessorConfigurator </li>
+<li>Now create a Jar file using the structure. Make sure the class a.b.c.d.BarProcessorConfigurator inside the Jar or in the classpaht and make sure that Jar is in your classpath when running the Synapse server
+<p>JAR structure is as follows
+<pre>
+    META-INF
+           +-services
+                    +-a.b.c.d.ProcessorConfigurator {this is a text file, which has a QName entry a.b.c.d.BarProcessorConfigurator }
+    a
+     +-b
+       +-c
+         +-d
+           +-BarProcessorConfigurator
+</pre>
+
+</p>
+</li>
+</ol>
+<p></p>
+<p><i>Second Method</i></p>
+<p>Go to the class</p>
+<pre>org.apache.synapse.xml.ProcessorConfiguratorFinder  </pre>
+
+<p> there one will find the following static variable. </p>
+<pre>private static Class[] processorConfigurators = {...}</pre>
+
+<p>You have to fill it with your extensions as follows,</p>
+<pre>private static Class[] processorConfigurators = {..., FooProcessorConfigurator.class,BarProcessorConfigurator.class} </pre>
+
+<p></p>
+<p>Now you have successfully plugged your processor into Synapse. Finally
+"Let there be Processors". </p>
+
+<p></p>
+</body>
+</html>

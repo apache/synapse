@@ -1,0 +1,22 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+  <engage-addressing-in/>
+
+    <refdefine ref="ping"/>
+    <refdefine ref="addressing"/>
+
+      <define name="addressing">
+        <xpath expr="//ns:text_addressing" xmlns:ns="urn:text-body">
+            <header type="to" value="http://localhost:8090/axis2/services/npe"/>
+            <header type="action" value="urn:synapse/sendon-addressing-engage"/>
+            <sendnow/>
+        </xpath>
+      </define>
+
+    <define name="ping">
+        <xpath expr="//ns:text_ping" xmlns:ns="urn:text-body">
+            <header type="to" value="http://localhost:8090/axis2/services/npe"/>
+            <header type="action" value="urn:synapse/ping"/>
+            <sendnow/>
+        </xpath>
+      </define>
+  </synapse>

@@ -1,0 +1,17 @@
+<slaConfig>
+    <slaRequest ip="192.168.6.71" enabled="true">
+        <serviceURL url="http://www.webservicex.net/stockquote.asmx" enabled="true" >
+            <priority>0</priority>
+        </serviceURL>    
+    </slaRequest>
+    <slaRequest ip="192.168.6.81" enabled="true">
+        <serviceURL url="http://www.webservicex.net/stockquote.asmx" enabled="true" >
+            <priority>0</priority>
+        </serviceURL>    
+    </slaRequest>    
+    <slaRequest ip="192.168.6.127" enabled="true">
+        <serviceURL url="http://www.webservicex.net/stockquote.asmx" enabled="true" >
+            <priority>1</priority>
+        </serviceURL>    
+    </slaRequest>
+</slaConfig>

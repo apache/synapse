@@ -37,7 +37,7 @@
 
     <target name="StockQuote" depends="compile">
         <java classname="samples.userguide.StockQuoteClient"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
             <arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>

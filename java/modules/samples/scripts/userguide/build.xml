@@ -64,7 +64,7 @@
 
     <target name="stockquote" depends="compile">
         <java classname="samples.userguide.StockQuoteClient"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
             <arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
@@ -74,7 +74,7 @@
 
     <target name="proxystockquote" depends="compile">
         <java classname="samples.userguide.ProxyStockQuoteClient"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
             <arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
@@ -84,7 +84,7 @@
 
     <target name="dumbstockquote" depends="compile">
         <java classname="samples.userguide.DumbStockQuoteClient"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
             <arg value="${symbol}"/>
             <arg value="${gatewayurl}"/>
             <arg value="${repository}"/>
@@ -93,7 +93,7 @@
 
     <target name="log_with_addressing" depends="compile">
         <java classname="samples.userguide.log.LoggingClient"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
         </java>
     </target>
 

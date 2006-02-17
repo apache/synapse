@@ -41,7 +41,7 @@ public class XSLTProcessorTest extends TestCase {
 
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-                    "<xslt name=\"stlt_test_name\" xsl=\"./tranformation/simple_transformation.xsl\" type=\"body\"/>" +
+                    "<xslt name=\"stlt_test_name\" xsl=\"./transformation/simple_transformation.xsl\" type=\"body\"/>" +
                     "</synapse>";
 
 

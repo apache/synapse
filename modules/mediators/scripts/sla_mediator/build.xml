@@ -42,7 +42,7 @@
 
     <target name="StockQuote" depends="compile">
         <java classname="samples.userguide.StockQuoteClient"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
             <arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
@@ -71,7 +71,7 @@
     <target name="synapse">
         <property name="port" value="8080"/>
         <java classname="org.apache.axis2.transport.http.SimpleHTTPServer"
-              classpathref="axis.classpath" fork="true">
+              classpathref="javac.classpath" fork="true">
             <arg value="../../synapse_repository"/>
             <arg value="-p${port}"/>
         </java>

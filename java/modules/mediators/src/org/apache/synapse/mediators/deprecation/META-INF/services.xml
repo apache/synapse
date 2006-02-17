@@ -1,7 +1,7 @@
 <!-- Can be used if the mediator is to be provided as an axis2 service-->
 <service name="DeprecationMediator">
     <parameter name="ServiceClass" locked="false">
-        sampleMediators.deprecation.DeprecationMediator</parameter>
+        org.apache.synapse.mediators.deprecation.DeprecationMediator</parameter>
     <operation name="mediate">
         <messageReceiver
                 class="org.apache.synapse.axis2.ServiceMediatorMessageReceiver"/>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sampleMediators.deprecation;
+package org.apache.synapse.mediators.deprecation;
 
 public interface DeprecationConstants {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sampleMediators.deprecation;
+package org.apache.synapse.mediators.deprecation;
 
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseEnvironment;

@@ -1,7 +1,7 @@
 <!-- Can be used if the mediator is to be provided as an axis2 service-->
 <service name="SLAMediator">
     <parameter name="ServiceClass" locked="false">
-        sampleMediators.sla.SLAMediator</parameter>
+        org.apache.synapse.mediators.sla.SLAMediator</parameter>
     <operation name="mediate">
         <messageReceiver
                 class="org.apache.synapse.axis2.ServiceMediatorMessageReceiver"/>

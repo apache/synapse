@@ -28,7 +28,7 @@ To try out the mediator
 
  - Modify the deprecation.xml present in the 
       * aar (in case you are using the binary)
-      * src\sampleMediators\deprecation\META-INF (in case you are working with the source)
+      * src/org/apache/synapse/mediators/deprection/META-INF (in case you are working with the source)
    to suit the configuration you want.
  - Send in a request to Synapse and see it work/get rejected depending on the settings.
 

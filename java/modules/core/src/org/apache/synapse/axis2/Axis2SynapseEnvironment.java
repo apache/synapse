@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.axis2.utils.ResourcesHandler;
 
 import org.apache.synapse.xml.ProcessorConfiguratorFinder;
 
@@ -91,4 +92,8 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
 	public void setMasterProcessor(Processor p) {
 		mainprocessor = p;
 	}
+
+    public OMElement get(String url) {
+        return ResourcesHandler.simpleGETRquest(url);        
+    }
 }

@@ -58,4 +58,22 @@ public class Echo {
                 "This is the actual service which has been pinged");
     }
 
+
+    public OMElement simple_resources(OMElement element){
+        System.out.println("This is the actual resource provider");
+        element.build();
+        element.detach();
+
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+
+        OMElement ele1 = fac.createOMElement("ele1","","");
+        OMElement ele2 = fac.createOMElement("ele2","","");
+        OMElement ele3 = fac.createOMElement("ele3","","");
+        element.addChild(ele1);
+        element.addChild(ele2);
+        element.addChild(ele3);
+        return element;
+
+    }
+
 }

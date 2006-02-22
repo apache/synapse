@@ -20,6 +20,11 @@
             <artifactId>synapse-core</artifactId>
             <version>${pom.currentVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>synapse</groupId>
+            <artifactId>synapse-extensions</artifactId>
+            <version>${pom.currentVersion}</version>
+        </dependency>
 
 
 

@@ -38,7 +38,7 @@ public abstract class ListProcessor extends AbstractProcessor {
 	
 	private Log log = LogFactory.getLog(getClass());
 
-	List processors = null;
+	protected List processors = null;
 	
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		log.debug("process");

@@ -32,6 +32,8 @@ import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator;
+import org.apache.synapse.processors.conditions.ExactlyOneProcessorConfigurator;
+import org.apache.synapse.processors.conditions.DefaultProcessorConfigurator;
 
 import sun.misc.Service;
 
@@ -63,7 +65,8 @@ public class ProcessorConfiguratorFinder {
 			NeverProcessorConfigurator.class, RefProcessorConfigurator.class,
             XSLTProcessorConfigurator.class,DefineProcessorConfigurator.class,
             SendNowProcessorConfigurator.class,DropProcessorConfigurator.class,
-            RefDefineProcessorConfigurator.class};
+            RefDefineProcessorConfigurator.class, ExactlyOneProcessorConfigurator.class,
+            DefaultProcessorConfigurator.class};
 
 	private static void initialise() {
 

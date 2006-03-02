@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseMessageConstants;
 import org.apache.synapse.processors.ListProcessor;
 import org.jaxen.JaxenException;
 
@@ -41,7 +42,7 @@ public class XPathProcessor extends ListProcessor {
 
 	private AXIOMXPath xp = null;
 
-	
+
 	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
 		if (xp == null) {
 			log.debug("trying to process xpath without being set");
@@ -51,7 +52,8 @@ public class XPathProcessor extends ListProcessor {
 			if (xp.booleanValueOf(smc.getEnvelope())) {
 				log.debug("matched xpath: " + xp.toString());
 				// now do "all"
-				return super.process(se, smc);
+                smc.setProperty(SynapseMessageConstants.MATCHED,Boolean.TRUE);
+                return super.process(se, smc);
 			}
 
 		} catch (JaxenException je) {

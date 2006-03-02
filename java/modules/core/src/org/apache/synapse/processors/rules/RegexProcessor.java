@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.HeaderType;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseMessageConstants;
 
 import org.apache.synapse.processors.ListProcessor;
 
@@ -81,13 +82,14 @@ public class RegexProcessor extends ListProcessor {
 		} else {
 			toMatch = headerType.getHeader(smc);
 		}
-		
+
 		if (toMatch==null) return true;
-		
+
 		if (pattern.matcher(toMatch).matches()) {
 			log.debug("Regex pattern " + pattern.toString() + " matched "
 					+ toMatch);
-			return super.process(se, smc);
+            smc.setProperty(SynapseMessageConstants.MATCHED,Boolean.TRUE);
+            return super.process(se, smc);
 		}
 		return true;
 	}

@@ -63,8 +63,10 @@ public class SpringMediatorProcessorConfigurator extends AbstractProcessorConfig
 				}
 			}
 			if (beans==null) throw new SynapseException("<beans> element not found in "+el.toString());
-			xsw.setDefaultNamespace(beans.getNamespace().getName());
-			beans.serialize(xsw);
+            if (beans.getNamespace() != null)
+                xsw.setDefaultNamespace(beans.getNamespace().getName());
+
+            beans.serialize(xsw);
 		} catch (Exception e) {
 			throw new SynapseException(e);
 		} 

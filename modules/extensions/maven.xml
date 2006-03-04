@@ -11,31 +11,44 @@
     <!--<j:set var="dist.dir" value="target/dist"/>-->
     <j:set var="extensions.dir" value="target/extensions"/>
 
-    <postGoal name="test:test">
-        <j:if test="${context.getVariable('maven.test.skip') != 'true'}">
-            <attainGoal name="extensions"/>
-        </j:if>
+    <postGoal name="test:compile">
+        <mkdir dir="${extensions.dir}"/>
+        <attainGoal name="synapse_extensions"/>
+        <attainGoal name="extensions"/>
     </postGoal>
+    <goal name="synapse_extensions">
+        <j:set var="class_test.dir" value="target/test-classes"/>
+
+        <mkdir dir="target/synapse-repository"/>
+        <ant:copy todir="target/synapse-repository">
+            <ant:fileset dir="../core/target/synapse-repository">
+                <ant:include name="**/**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:path id="classes_test.dir" location="${class_test.dir}"/>
+        <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
+    </goal>
 
 
     <goal name="extensions">
-        <mkdir dir="${extensions.dir}/spring"/>
-        <mkdir dir="${extensions.dir}/spring/META-INF"/>
-        <ant:copy todir="${extensions.dir}/spring">
+        <mkdir dir="${extensions.dir}"/>
+        <mkdir dir="target/dist"/>
+        <mkdir dir="${extensions.dir}/META-INF"/>
+        <ant:copy todir="${extensions.dir}">
             <ant:fileset dir="target/classes">
-                <ant:include name="**/spring/**"/>
+                <ant:include name="**/**"/>
             </ant:fileset>
         </ant:copy>
-        <ant:copy todir="${extensions.dir}/spring/META-INF">
+        <ant:copy todir="${extensions.dir}/META-INF">
             <ant:fileset dir="src/META-INF">
-                <ant:include name="**"/>
+                <ant:include name="**/**"/>
             </ant:fileset>
         </ant:copy>
 
-        <jar jarfile="${extensions.dir}/spring_mediator.jar"
-             basedir="${extensions.dir}/spring">
-            <include name="**"/>
+        <jar jarfile="target/dist/extension_mediators.jar"
+             basedir="${extensions.dir}">
+            <include name="**/**"/>
         </jar>
-        <ant:delete dir="${extensions.dir}/spring"/>
+        <ant:delete dir="${extensions.dir}"/>
     </goal>
 </project>

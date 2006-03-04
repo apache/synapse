@@ -184,5 +184,28 @@
             </properties>
         </dependency>
     </dependencies>
+
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <!--<excludes>-->
+                <!--<exclude>**/*Test.java</exclude>-->
+            <!--</excludes>-->
+            <resources>
+                <resource>
+                    <directory>src</directory>
+                    <includes>
+                        <include>**/org.apache.synapse.xml.ProcessorConfigurator</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+
+    </build>
 </project>
 

@@ -26,15 +26,17 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.axis2.utils.ResourcesHandler;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.resources.ResourceHelperFactory;
+import org.apache.synapse.resources.ResourceHelper;
 
 import org.apache.synapse.xml.ProcessorConfiguratorFinder;
 
 /**
  *
  *
- * 
- * <p> This is the Axis2 implementation of the SynapseEnvironment 
+ *
+ * <p> This is the Axis2 implementation of the SynapseEnvironment
  *
  */
 public class Axis2SynapseEnvironment extends SynapseEnvironment {
@@ -46,7 +48,10 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
 
     private Log log = LogFactory.getLog(getClass());
 
-	public Axis2SynapseEnvironment(OMElement synapseConfiguration,
+    //resourceProcessors keeps track of all <resources/>
+    private HashMap resourceProcessors = new HashMap();
+
+    public Axis2SynapseEnvironment(OMElement synapseConfiguration,
 			ClassLoader cl) {
 		super(null);
 		this.cl = cl;
@@ -67,13 +72,13 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
 	}
 
 	public void send(SynapseMessage sm, SynapseEnvironment se) {
-		if (sm.isResponse()) 
+		if (sm.isResponse())
 			Axis2Sender.sendBack(sm);
-		else 
+		else
 			Axis2Sender.sendOn(sm, se);
 	}
 
-	
+
 	public Processor lookupProcessor(String name) {
 		return (Processor) processors.get(name);
 	}
@@ -88,12 +93,27 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
 	public Processor getMasterProcessor() {
 		return mainprocessor;
 	}
-	
+
 	public void setMasterProcessor(Processor p) {
 		mainprocessor = p;
 	}
 
-    public OMElement get(String url) {
-        return ResourcesHandler.simpleGETRquest(url);        
+    // lookup methods for resources handling
+    public Processor lookupResourceProcessor(String uriRoot) {
+        return (Processor) resourceProcessors.get(uriRoot);
+    }
+
+    public void addResourceProcessor(Processor p) {
+        if (resourceProcessors.containsKey(p.getName())) {
+            throw new SynapseException(
+                    "Uri Root is already exists. Not acceptable");
+        }
+        resourceProcessors.put(p.getName(), p);
+    }
+
+    public ResourceHelper getResourceHelper() {
+        ResourceHelperFactory fac = ResourceHelperFactory.newInstance();
+        fac.setResourceProcessorsMap(this.resourceProcessors);
+        return fac.createResourceHelper();
     }
 }

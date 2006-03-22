@@ -1,0 +1,26 @@
+<!--
+<SynapseObject name="deprecation">
+    <SynapseObject name="Stock1">
+        <Attribute name="url" type="STRING" >http://somehost:8080/failoverService</Attribute>
+        <SynapseObject name="rule1">
+            <Attribute name="fromDate" type="DATE" >06/09/2005:00:00</Attribute>
+            <Attribute name="toDate" type="DATE" >17/12/2005:00:00</Attribute>
+            <Attribute name="enabled" type="BOOLEAN">TRUE</Attribute>
+        </SynapseObject>
+        <SynapseObject name="rule2">
+            <Attribute name="fromDate" type="DATE" >06/09/2005:00:00</Attribute>
+            <Attribute name="toDate" type="DATE" >07/03/2006:00:00</Attribute>
+            <Attribute name="enabled" type="BOOLEAN">TRUE</Attribute>
+        </SynapseObject>
+    </SynapseObject>
+</SynapseObject>
+-->
+<deprecation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Softwares\axis2-0.94\axis2-std-0.94-bin\xsd\deprecation.xsd">
+	<service url="http://somehost:8080/failoverService">
+		<rule name="rule1">
+			<fromDate>abc</fromDate>
+			<toDate>abd</toDate>
+			<enabled>TRUE</enabled>
+		</rule>
+	</service>
+</deprecation>

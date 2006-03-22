@@ -1,0 +1,9 @@
+<!-- Can be used if the mediator is to be provided as an axis2 service-->
+<service name="DeprecationMediator">
+    <parameter name="ServiceClass" locked="false">
+        sampleMediators.failover.FailoverMediator</parameter>
+    <operation name="mediate">
+        <messageReceiver
+                class="org.apache.synapse.axis2.ServiceMediatorMessageReceiver"/>
+    </operation>
+</service>

@@ -1,0 +1,50 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+        <engage-addressing-in/>
+        <log/>
+
+
+        <!-- this matches the gateway case -->
+        <regex message-address="to" pattern="/StockQuote.*">
+            <ref ref="stockquote"/>
+        </regex>
+        <!-- this matches the virtual url case for either the proxy or ws-add case -->
+        <regex message-address="to" pattern="http://stockquote.*">
+            <ref ref="stockquote"/>
+        </regex>
+
+
+        <regex message-address="to" pattern="http://somehost:8080/failoverService">
+<!--            <servicemediator name="Deprecation" service="DeprecationMediator"/> -->
+            <servicemediator name="Failover" service="FailoverMediator">
+              <ParameterObject>
+                <SynapseObject name="service1">
+                    <Attribute name="url" type="STRING">http://www.webservicex.net/stockquote.asmx</Attribute>
+                    <Attribute name="active" type="BOOLEAN">true</Attribute>
+                    <Attribute name="timeout" type="LONG">10000</Attribute>
+                </SynapseObject>
+              </ParameterObject>
+            </servicemediator>
+            <classmediator name="Management" class="org.apache.synapse.mediators.resource.ResourceMediator">
+                <ParameterObject>
+                    <SynapseObject name="consumer0">
+                        <Attribute name="identifier" type="STRING">someID</Attribute>
+                        <Attribute name="priority" type="INTEGER">2</Attribute>
+                    </SynapseObject>
+                </ParameterObject>
+            </classmediator>
+        </regex>
+
+<!--        <send/>-->
+
+    <!-- these are only called if referenced above-->
+    <never>
+        <stage name="stockquote">
+            <header type="to" value="http://www.webservicex.net/stockquote.asmx" />
+            <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+                <fault/>
+            </xpath>
+        </stage>
+    </never>
+</synapse>
+

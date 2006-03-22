@@ -16,6 +16,7 @@
 package org.apache.synapse;
 
 import org.apache.axis2.om.OMElement;
+import org.apache.synapse.resources.ResourceHelper;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -130,5 +131,8 @@ public abstract class SynapseEnvironment {
     /**
      * This method is responsible for updating resources via simple GET interface.
      */
-    abstract public OMElement get(String url);
+   
+    abstract public ResourceHelper getResourceHelper();
+
+    abstract  public void addResourceProcessor(Processor p);
 }

@@ -1,0 +1,38 @@
+<!--
+    <failoverService Id="ServiceEPR to distnguish this set when the request comes in">
+        <timeoutEnabled>
+            A boolean to denote if failover happens on Timeout
+        </timeoutEnabled>
+        <soapFaultEnabled>
+            A boolean to denote if failover happens on soapFault
+        </soapFaultEnabled>
+        <networkErrorEnabled>
+            A boolean, denotes if failover happens on networkError
+        </networkErrorEnabled>
+        <parameterSet>
+            <service>SomeServiceEPR</service>
+            <primary>A boolean to denote if this the primary service</primary>
+            <active>A boolean to denote if the service is active</active>
+            <timeout>Timeout Value for the service in milliseconds</timeout>
+        </parameterSet>
+    </failoverService>
+-->
+<failoverConfig>
+    <failoverService Id="http://somehost:8080/failoverService">
+        <timeoutEnabled>true</timeoutEnabled>
+        <!--<soapFaultEnabled>true</soapFaultEnabled>-->
+        <errorEnabled>true</errorEnabled>
+        <parameterSet>
+            <service>http://ost:8080/service1</service>
+            <primary>true</primary>
+            <active>true</active>
+            <timeout>5000</timeout>
+        </parameterSet>
+        <parameterSet>
+            <service>http://www.webservicex.net/stockquote.asmx</service>
+            <primary>false</primary>
+            <active>true</active>
+            <timeout>10000</timeout>
+        </parameterSet>
+    </failoverService>
+</failoverConfig>

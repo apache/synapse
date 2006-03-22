@@ -1,0 +1,23 @@
+<SynapseObject name="ConsumerIdentification">
+ <SynapseObject name="consumer0">
+   <Attribute name="CONSUMER_TYPE" type="STRING">GOLD</Attribute>
+   <Attribute name="IP_ADDRESS_FROM" type="STRING">192.167.6.0</Attribute>
+   <Attribute name="IP_ADDRESS_TO" type="STRING">192.168.6.255</Attribute>
+   <Attribute name="HTTP_AUTH_USERNAME" type="STRING">john</Attribute>
+   <Attribute name="WS_SEC_USERNAME" type="STRING">john</Attribute>
+   <SynapseObject name="assignedService">
+    <Attribute name="serviceid1" type="STRING">stockQuote1</Attribute>
+   </SynapseObject>
+ </SynapseObject>
+ <SynapseObject name="consumer1">
+   <Attribute name="CONSUMER_TYPE" type="STRING">SILVER</Attribute>
+   <Attribute name="IP_ADDRESS_FROM" type="STRING">192.168.6.255</Attribute>
+   <Attribute name="IP_ADDRESS_TO" type="STRING">192.167.6.255</Attribute>
+   <Attribute name="HTTP_AUTH_USERNAME" type="STRING">mary</Attribute>
+   <Attribute name="WS_SEC_USERNAME" type="STRING">mary</Attribute>
+   <SynapseObject name="assignedService">
+    <Attribute name="serviceid1" type="STRING">stockQuote</Attribute>
+    <Attribute name="ip" type="STRING">192</Attribute>
+   </SynapseObject>
+ </SynapseObject>
+</SynapseObject>

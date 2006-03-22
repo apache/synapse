@@ -31,6 +31,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.resources.xml.PropertyMediatorFactory;
+import org.apache.synapse.resources.xml.ResourceMediatorFactory;
 import org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator;
 import org.apache.synapse.processors.conditions.ExactlyOneProcessorConfigurator;
 import org.apache.synapse.processors.conditions.DefaultProcessorConfigurator;
@@ -66,7 +68,8 @@ public class ProcessorConfiguratorFinder {
             XSLTProcessorConfigurator.class,DefineProcessorConfigurator.class,
             SendNowProcessorConfigurator.class,DropProcessorConfigurator.class,
             RefDefineProcessorConfigurator.class, ExactlyOneProcessorConfigurator.class,
-            DefaultProcessorConfigurator.class};
+            DefaultProcessorConfigurator.class,
+            PropertyMediatorFactory.class, ResourceMediatorFactory.class};
 
 	private static void initialise() {
 

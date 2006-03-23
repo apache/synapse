@@ -8,19 +8,30 @@ public class Sample {
     }
 
     public static void main(String[] args) {
-        SynapseObject slaConfig = new SynapseObject("slaConfig");
-        SynapseObject slaRequest = new SynapseObject("slaRequest");
-        SynapseObject serviceURL = new SynapseObject("serviceURL");
-        slaRequest.setString("ip", "192.168.1.127");
-        slaRequest.setBoolean("enabled", "true");
-        serviceURL.setString("url", "http://www.webservicex.net/stockquote.asmx");
-        serviceURL.setBoolean("enabled", "true");
-        serviceURL.setInteger("priority", "0");
-        slaConfig.addChild(slaRequest);
-        slaRequest.addChild(serviceURL);
-        SynapseObject serviceURL1 = new SynapseObject("serviceURL1");
-        serviceURL1.setString("url", "http://www.webservicex.net/stockquote.asmx");
-        slaRequest.addChild(serviceURL1);
+
+        String sla = "<Consumer_Identification>\n" +
+                " <Consumer>\n" +
+                "   <CONSUMER_TYPE type=\"xsd:String\">GOLD</CONSUMER_TYPE>\n" +
+                "   <IP_ADDRESS_FROM type=\"xsd:String\">192.167.6.0</IP_ADDRESS_FROM>\n" +
+                "   <IP_ADDRESS_TO type=\"xsd:String\">192.168.6.255</IP_ADDRESS_TO>\n" +
+                "   <HTTP_AUTH_USERNAME type=\"xsd:String\">john</HTTP_AUTH_USERNAME>\n" +
+                "   <WS_SEC_USERNAME type=\"xsd:String\">john</WS_SEC_USERNAME>\n" +
+                "   <Assigned_Service>\n" +
+                "    <Service_ID type=\"xsd:String\">stockQuote1</Service_ID>\n" +
+                "   </Assigned_Service>\n" +
+                " </Consumer>\n" +
+                " <Consumer>\n" +
+                "   <CONSUMER_TYPE type=\"xsd:String\">SILVER</CONSUMER_TYPE>\n" +
+                "   <IP_ADDRESS_FROM type=\"xsd:String\">192.168.6.255</IP_ADDRESS_FROM>\n" +
+                "   <IP_ADDRESS_TO type=\"xsd:String\">192.168.6.255</IP_ADDRESS_TO>\n" +
+                "   <HTTP_AUTH_USERNAME type=\"xsd:String\">mary</HTTP_AUTH_USERNAME>\n" +
+                "   <WS_SEC_USERNAME type=\"xsd:String\">mary</WS_SEC_USERNAME>\n" +
+                "   <Assigned_Service>\n" +
+                "    <Service_ID type=\"xsd:String\">stockQuote1</Service_ID>\n" +
+                "   </Assigned_Service>\n" +
+                " </Consumer>\n" +
+                "</Consumer_Identification>";
+        SynapseObject slaConfig = Utils.xmlToSynapseObject(sla);
         //String xsl = "XSL";
         //String xml = slaConfig.translate(xsl);
         //System.out.println("XML****\n" + xml);

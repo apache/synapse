@@ -65,46 +65,67 @@ public class Utils {
 
         for (i = 0; i < len; i++) {
 
-            String nodeName = node.item(i).getNodeName();
-            if (nodeName.equalsIgnoreCase(UtilConstants.NODE)) {
+            if (isObjectNode(node.item(i))) {
                 businessObj = processBONode(node.item(i));
             }
         }
         return businessObj;
     }
 
+    private static boolean isObjectNode(Node node) {
+
+        if(node.hasAttributes()){
+            NamedNodeMap attributes = node.getAttributes();
+            int attribCount = attributes.getLength();
+            int index;
+            for(index=0; index<attribCount;index++){
+                if(attributes.item(index).getNodeName().equals("type")){
+                    return false;
+                }
+            }
+
+        }
+        if(!(node.getNodeType()==Node.ELEMENT_NODE))
+            return false;
+
+        return true;
+    }
+
     private static SynapseObject processBONode(Node boNode) {
 
         String name = "";
         SynapseObject tempObj;
-        NamedNodeMap namedNodeMap = boNode.getAttributes();
+        name = boNode.getNodeName();
+    /*    NamedNodeMap namedNodeMap = boNode.getAttributes();
         int attributeCount = namedNodeMap.getLength();
         for (int counter = 0; counter < attributeCount; counter++) {
             Node attribName = namedNodeMap.item(counter);
-            if (attribName.getNodeName().equals(UtilConstants.NAME_ATTRIB)) {
-                name = namedNodeMap.getNamedItem(UtilConstants.NAME_ATTRIB).getNodeValue();
+            if (!isObjectNode(attribName)) {
+                name = attribName.getNodeName();
             }
 
         }
+    */
         tempObj = new SynapseObject(name);
         NodeList nodeList = boNode.getChildNodes();
         int len = nodeList.getLength();
         int i;
 
         for (i = 0; i < len; i++) {
-            String nodeName = nodeList.item(i).getNodeName();
-            if (nodeName.equalsIgnoreCase(UtilConstants.LEAF)) {
+            if(nodeList.item(i).getNodeType() == Node.ELEMENT_NODE){
+            if(isObjectNode(nodeList.item(i))) {
+                SynapseObject bObj = processBONode(nodeList.item(i));
+                tempObj.addChild(bObj);
+            }
+            else if (!isObjectNode(nodeList.item(i))) {
                 try {
                     tempObj = processGONode(nodeList.item(i), tempObj);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            if (nodeName.equalsIgnoreCase(UtilConstants.NODE)) {
-                SynapseObject bObj = processBONode(nodeList.item(i));
-                tempObj.addChild(bObj);
-            }
         }
+        }     
         return tempObj;
     }
 
@@ -113,11 +134,10 @@ public class Utils {
         String goName = "", goType = "", goValue = "";
         NamedNodeMap namedNodeMap = goNode.getAttributes();
         int attributeCount = namedNodeMap.getLength();
+        goName = goNode.getNodeName();
         for (int counter = 0; counter < attributeCount; counter++) {
             Node attribName = namedNodeMap.item(counter);
-            if (attribName.getNodeName().equals(UtilConstants.NAME_ATTRIB)) {
-                goName = namedNodeMap.getNamedItem(UtilConstants.NAME_ATTRIB).getNodeValue();
-            } else if (attribName.getNodeName().equals(UtilConstants.TYPE_ATTRIB)) {
+            if (attribName.getNodeName().equals(UtilConstants.TYPE_ATTRIB)) {
                 goType = namedNodeMap.getNamedItem(UtilConstants.TYPE_ATTRIB).getNodeValue();
             }
         }
@@ -126,6 +146,7 @@ public class Utils {
                 goValue = goNode.getFirstChild().getNodeValue();
             }
         }
+        goType = "String";
         if (goType.equalsIgnoreCase("Boolean")) {
             parent.setBoolean(goName, goValue.toLowerCase());
         } else if (goType.equalsIgnoreCase("Float")) {

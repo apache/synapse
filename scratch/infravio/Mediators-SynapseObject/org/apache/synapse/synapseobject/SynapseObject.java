@@ -165,21 +165,19 @@ public class SynapseObject extends Hashtable implements Serializable {
    */
     public String getXMLFragment() {
         String xmlFragStart = "";
-        String xmlFragEnd = "</SynapseObject>";
         String x3 = recurse(this, xmlFragStart);
-        xmlFragStart += xmlFragEnd;
         return x3;
     }
     private String recurse(SynapseObject bo, String xmlFrag) {
 
-        xmlFrag = xmlFrag + "<SynapseObject name=\"" + bo.getSynapseObjectName() + "\">\n";
+        xmlFrag = xmlFrag + "<" + bo.getSynapseObjectName() + ">\n";
         xmlFrag = bo.getAttributes(bo, xmlFrag);
         Enumeration enumeration = bo.object.elements();
         while (enumeration.hasMoreElements()) {
             SynapseObject boj = (SynapseObject)enumeration.nextElement();
             xmlFrag = boj.recurse(boj, xmlFrag);
         }
-        xmlFrag += "</SynapseObject>\n";
+        xmlFrag += "</" + bo.getSynapseObjectName()+">\n";
         return xmlFrag;
     }
     private String getAttributes(SynapseObject bo, String xmlReturn) {
@@ -190,7 +188,7 @@ public class SynapseObject extends Hashtable implements Serializable {
             String name = go.getName();
             String type = go.getType();
             String value = go.getValue();
-            xmlReturn += "<attribute name=\"" + name + "\" " + "type=\"" + type + "\">" + value + "</attribute>\n";
+            xmlReturn += "<" + name + " type=\"" + type + "\">" + value + "</" + name + ">\n";
         }
         return xmlReturn;
     }

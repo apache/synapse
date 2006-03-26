@@ -18,12 +18,12 @@ package org.apache.synapse.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
+import org.apache.axiom.om.OMElement;
 
 public interface ProcessorConfigurator {
-	public Processor createProcessor(SynapseEnvironment se, OMElement el);
-	public QName getTagQName();
+    public Processor createProcessor(SynapseEnvironment se, OMElement el);
+    public QName getTagQName();
 
 }

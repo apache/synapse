@@ -21,6 +21,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.*;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisModule;
 
 
 import org.apache.axis2.engine.AxisConfiguration;
@@ -40,6 +41,8 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 import org.apache.synapse.processors.AbstractProcessor;
 
+import javax.xml.namespace.QName;
+
 
 /**
  * <p/>
@@ -54,7 +57,10 @@ public class AddressingInProcessor extends AbstractProcessor {
         log.debug("Processing __AddressingInHandler__");
         try {
             MessageContext mc = ((Axis2SynapseMessage)smc).getMessageContext();
-            se.setProperty(Constants.ADDRESSING_PROCESSED,Boolean.TRUE);
+
+            // for this execution chain set Addressing as processed
+            smc.setProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE,Boolean.TRUE);
+
             // default configuration_contex and axis_configuration
             ConfigurationContext cc = mc.getConfigurationContext();
             AxisConfiguration ac = cc.getAxisConfiguration();
@@ -62,6 +68,18 @@ public class AddressingInProcessor extends AbstractProcessor {
             if (as == null)
                 throw new SynapseException("cannot locate service "
                         + Constants.EMPTYMEDIATOR);
+            // Engagin addressing
+
+
+            AxisModule module = ac.getModule(new QName("addressing"));
+            if (module == null)
+                throw new SynapseException("cannot locate addressing module in the repository ");
+
+            if (!as.isEngaged(module.getName())) {
+                as.engageModule(module, ac);
+            }
+
+//            ac.engageModule(new QName("addressing"));
 
             AxisEngine ae = new AxisEngine(cc);
             AxisOperation ao = as
@@ -69,11 +87,17 @@ public class AddressingInProcessor extends AbstractProcessor {
             OperationContext oc = OperationContextFactory
                     .createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
             ao.registerOperationContext(mc,oc);
-            ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+            ServiceContext sc = Utils.fillContextInformation(as, cc);
             oc.setParent(sc);
             mc.setAxisOperation(ao);
             mc.setAxisService(as);
             ae.receive(mc);
+            // purpose of addressing is over now disengage addressing
+//            ac.disEngageModule(addressingModule);
+            if (as.isEngaged(module.getName())) {
+                ac.disEngageModule(ac.getModule(module.getName()));
+            }
+
 
         } catch (AxisFault axisFault) {
             throw new SynapseException(

@@ -16,8 +16,8 @@
 
 package org.apache.synapse.resources;
 
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.api.ResourceUpdateAware;
+import org.apache.axiom.om.OMElement;
 
 /**
  *

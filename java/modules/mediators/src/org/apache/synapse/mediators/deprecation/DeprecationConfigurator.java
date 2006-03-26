@@ -17,8 +17,8 @@
 package org.apache.synapse.mediators.deprecation;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;

@@ -23,6 +23,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 
 import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.util.Axis2EnvSetup;
 
 
@@ -37,8 +39,11 @@ public class FaultProcessorWithRuleTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
+        ConfigurationContext context = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-fault", null);
         synapseServer =
-                new SimpleHTTPServer("target/synapse-repository-fault", 5043);
+                new SimpleHTTPServer(context, 5043);
         synapseServer.start();
     }
 

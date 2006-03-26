@@ -56,7 +56,7 @@ public class SecurityProcessor extends AbstractProcessor {
 					.createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
 			ao.registerOperationContext(mc, oc);
 
-			ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+			ServiceContext sc = Utils.fillContextInformation(as, cc);
 			oc.setParent(sc);
 
 			mc.setOperationContext(oc);

@@ -134,8 +134,7 @@ class DynamicOperationClient implements OperationClient {
                 TransportInDescription transportIn = options.getTransportIn();
                 if (transportIn == null) {
                     mc.setTransportIn(ClientUtils.inferInTransport(cc
-                            .getAxisConfiguration(), options, mc
-                            .getServiceContext()));
+                            .getAxisConfiguration(), options, mc));
                 } else {
                     mc.setTransportIn(transportIn);
                 }

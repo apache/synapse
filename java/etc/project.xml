@@ -58,8 +58,44 @@
     <dependencies>
         <dependency>
             <groupId>axis2</groupId>
-            <artifactId>axis2-core</artifactId>
+            <artifactId>axis2</artifactId>
             <version>${axis2.version}</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>axis2</groupId>-->
+            <!--<artifactId>axis2-common</artifactId>-->
+            <!--<version>${axis2.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>axis2</groupId>-->
+            <!--<artifactId>axis2-wsdl</artifactId>-->
+            <!--<version>${axis2.version}</version>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${XmlSchema.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>policy</artifactId>
+            <version>${policy.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom</artifactId>
+            <version>${axiom.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
         </dependency>
 
 
@@ -186,27 +222,7 @@
                 <module>true</module>
             </properties>
         </dependency>
-        <dependency>
-            <groupId>ws-commons</groupId>
-            <artifactId>XmlSchema</artifactId>
-            <version>${XmlSchema.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ws-commons</groupId>
-            <artifactId>policy</artifactId>
-            <version>${policy.version}</version>
-            <properties>
-                <module>false</module>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>ws-commons</groupId>
-            <artifactId>axiom</artifactId>
-            <version>${axiom.version}</version>
-            <properties>
-                <module>false</module>
-            </properties>
-        </dependency>
+
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>

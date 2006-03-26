@@ -7,17 +7,17 @@
     <operation name="echo">
         <messageReceiver
                 class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
-        <parameter name="wsamapping">urn:synapse/sendon</parameter>
+        <actionMapping>urn:synapse/sendon</actionMapping>
     </operation>
     <operation name="fault" locked="false">
-        <parameter name="wsamapping">urn:synapse/sendon-fault</parameter>
+        <actionMapping>urn:synapse/sendon-fault</actionMapping>
     </operation>
     <operation name="echo_addressing" locked="false">
-        <parameter name="wsamapping">urn:synapse/sendon-addressing-engage</parameter>
+        <actionMapping>urn:synapse/sendon-addressing-engage</actionMapping>
     </operation>
     <operation name="ping">
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
-        <parameter name="wsamapping">urn:synapse/ping</parameter>
+        <actionMapping>urn:synapse/ping</actionMapping>
     </operation>
     <operation name="simple_resources"/>
 </service>

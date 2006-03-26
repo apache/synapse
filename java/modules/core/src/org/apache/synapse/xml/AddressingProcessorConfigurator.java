@@ -18,11 +18,10 @@ package org.apache.synapse.xml;
 import javax.xml.namespace.QName;
 
 
-import org.apache.axis2.om.OMElement;
-import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.builtin.axis2.AddressingInProcessor;
+import org.apache.axiom.om.OMElement;
 
 /**
  *
@@ -33,19 +32,19 @@ import org.apache.synapse.processors.builtin.axis2.AddressingInProcessor;
  * 
  */
 public class AddressingProcessorConfigurator extends AbstractProcessorConfigurator {
-	private static final QName ADD_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"engage-addressing-in");
+    private static final QName ADD_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+            "engage-addressing-in");
 
 
-	public QName getTagQName() {
-		return ADD_Q;
-	}
+    public QName getTagQName() {
+        return ADD_Q;
+    }
 
 
-	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-		AddressingInProcessor ap = new AddressingInProcessor();
-		super.setNameOnProcessor(se,el,ap);
-		return ap;
-	}
+    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+        AddressingInProcessor ap = new AddressingInProcessor();
+        super.setNameOnProcessor(se,el,ap);
+        return ap;
+    }
 
 }

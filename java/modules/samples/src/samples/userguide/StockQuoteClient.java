@@ -6,8 +6,8 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axiom.om.OMElement;
 
-import org.apache.axis2.om.OMElement;
 
 public class StockQuoteClient {
 
@@ -71,10 +71,9 @@ public class StockQuoteClient {
 
             ServiceClient serviceClient;
             if (repository) {
-                ConfigurationContextFactory fac =
-                        new ConfigurationContextFactory();
+                
                 ConfigurationContext configContext =
-                        fac.createConfigurationContextFromFileSystem(args[3]);
+                        ConfigurationContextFactory.createConfigurationContextFromFileSystem(args[3],null);
                 serviceClient = new ServiceClient(configContext, null);
             } else {
                 serviceClient = new ServiceClient();

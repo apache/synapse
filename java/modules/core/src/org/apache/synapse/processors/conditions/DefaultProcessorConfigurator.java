@@ -4,7 +4,7 @@ import org.apache.synapse.xml.AbstractListProcessorConfigurator;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.axis2.om.OMElement;
+import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 /*

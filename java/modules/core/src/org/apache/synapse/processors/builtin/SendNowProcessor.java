@@ -29,17 +29,18 @@ import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.wsdl.WSDLConstants;
+import org.apache.axiom.soap.SOAPEnvelope;
 
 import javax.xml.namespace.QName;
 
@@ -85,7 +86,7 @@ public class SendNowProcessor extends AbstractProcessor {
             phasesInfo.setOperationPhases(operation);
         }
         ServiceGroupContext sgc = new ServiceGroupContext(cc,
-                ac.getService("__ANONYMOUS_SERVICE__").getParent());
+                (AxisServiceGroup)ac.getService("__ANONYMOUS_SERVICE__").getParent());
         ServiceContext sc =
                 sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
 

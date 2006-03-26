@@ -18,29 +18,29 @@ package org.apache.synapse.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.StageProcessor;
+import org.apache.axiom.om.OMElement;
 
 /**
  *
  *<xmp><synapse:stage name="optional"> do everything in here </synapse:stage></xmp>
  */
 public class StageProcessorConfigurator extends
-		AbstractListProcessorConfigurator {
-	private static final QName STAGE_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"stage");
+        AbstractListProcessorConfigurator {
+    private static final QName STAGE_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+            "stage");
 
-	public QName getTagQName() {
-		return STAGE_Q;
-	}
+    public QName getTagQName() {
+        return STAGE_Q;
+    }
 
-	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-		StageProcessor sp = new StageProcessor();
-		super.addChildrenAndSetName(se, el, sp);
-		return sp;
-	}
+    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+        StageProcessor sp = new StageProcessor();
+        super.addChildrenAndSetName(se, el, sp);
+        return sp;
+    }
 
 }

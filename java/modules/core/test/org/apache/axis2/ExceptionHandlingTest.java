@@ -2,12 +2,14 @@ package org.apache.axis2;
 
 import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.om.OMElement;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.axiom.om.OMElement;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -46,8 +48,10 @@ public class ExceptionHandlingTest extends TestCase {
         config = Axis2EnvSetup.getSynapseConfigElement(synapsexml);
         env = new Axis2SynapseEnvironment(config,
                 Thread.currentThread().getContextClassLoader());
-        targetServer = new SimpleHTTPServer(
-                "target/synapse-repository-sendonAxis2", 5043);
+        ConfigurationContext context = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendonAxis2", null);
+        targetServer = new SimpleHTTPServer(context,5043);
         targetServer.start();
     }
 

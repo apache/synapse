@@ -5,8 +5,8 @@ import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
 
 import javax.xml.namespace.QName;
 /*

@@ -23,8 +23,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,6 +34,8 @@ import org.apache.synapse.resources.xml.ResourceMediatorFactory;
 import org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator;
 import org.apache.synapse.processors.conditions.ExactlyOneProcessorConfigurator;
 import org.apache.synapse.processors.conditions.DefaultProcessorConfigurator;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 
 import sun.misc.Service;
 
@@ -69,7 +69,8 @@ public class ProcessorConfiguratorFinder {
             SendNowProcessorConfigurator.class,DropProcessorConfigurator.class,
             RefDefineProcessorConfigurator.class, ExactlyOneProcessorConfigurator.class,
             DefaultProcessorConfigurator.class,
-            PropertyMediatorFactory.class, ResourceMediatorFactory.class};
+            PropertyMediatorFactory.class, ResourceMediatorFactory.class,
+            AddressingOutMediatorFactory.class};
 
 	private static void initialise() {
 

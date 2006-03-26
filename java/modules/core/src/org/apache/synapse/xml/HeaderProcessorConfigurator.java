@@ -18,13 +18,12 @@ package org.apache.synapse.xml;
 import javax.xml.namespace.QName;
 
 
-import org.apache.axis2.om.OMAttribute;
-import org.apache.axis2.om.OMElement;
-import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.builtin.HeaderProcessor;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
 
 /**
  *
@@ -35,30 +34,30 @@ import org.apache.synapse.processors.builtin.HeaderProcessor;
  * 
  */
 public class HeaderProcessorConfigurator extends AbstractProcessorConfigurator{
-	private static final QName HEADER_Q = new QName(
-			Constants.SYNAPSE_NAMESPACE, "header");
+    private static final QName HEADER_Q = new QName(
+            Constants.SYNAPSE_NAMESPACE, "header");
 
-	
 
-		private static final QName TYPE_ATT_Q = new QName("type"),
-			VALUE_ATT_Q = new QName("value");
 
-		public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-			HeaderProcessor hp = new HeaderProcessor();
-			super.setNameOnProcessor(se, el, hp);
-			OMAttribute val = el.getAttribute(VALUE_ATT_Q);
-			OMAttribute type = el.getAttribute(TYPE_ATT_Q);
-			if (val == null || type == null) {
-				throw new SynapseException("<header> must have both " + VALUE_ATT_Q
-					+ " and " + TYPE_ATT_Q + " attributes: " + el.toString());
-			}
-			hp.setHeaderType(type.getAttributeValue());
-			hp.setValue( val.getAttributeValue());
-			return hp;
-	}
+        private static final QName TYPE_ATT_Q = new QName("type"),
+            VALUE_ATT_Q = new QName("value");
 
-	public QName getTagQName() {
-		return HEADER_Q;
-	}
+        public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+            HeaderProcessor hp = new HeaderProcessor();
+            super.setNameOnProcessor(se, el, hp);
+            OMAttribute val = el.getAttribute(VALUE_ATT_Q);
+            OMAttribute type = el.getAttribute(TYPE_ATT_Q);
+            if (val == null || type == null) {
+                throw new SynapseException("<header> must have both " + VALUE_ATT_Q
+                    + " and " + TYPE_ATT_Q + " attributes: " + el.toString());
+            }
+            hp.setHeaderType(type.getAttributeValue());
+            hp.setValue( val.getAttributeValue());
+            return hp;
+    }
+
+    public QName getTagQName() {
+        return HEADER_Q;
+    }
 
 }

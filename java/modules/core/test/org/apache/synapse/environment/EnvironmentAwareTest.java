@@ -5,6 +5,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.util.Axis2EnvSetup;
 import junit.framework.TestCase;
 
@@ -31,9 +33,10 @@ public class EnvironmentAwareTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
-        synapseServer = new SimpleHTTPServer(
-                "target/synapse-repository-environmentaware",
-                5043);
+        ConfigurationContext context = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-environmentaware", null);
+        synapseServer = new SimpleHTTPServer(context, 5043);
         synapseServer.start();
     }
 

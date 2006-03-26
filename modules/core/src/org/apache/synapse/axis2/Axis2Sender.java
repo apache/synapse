@@ -17,23 +17,22 @@
 package org.apache.synapse.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAP12Constants;
-import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.soap.SOAP11Constants;
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.TransportInDescription;
 
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMNamespace;
 
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseEnvironment;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMNamespace;
 
 import java.util.Iterator;
 
@@ -49,15 +48,24 @@ public class Axis2Sender {
 
             MessageContext messageContext = ((Axis2SynapseMessage) smc)
                     .getMessageContext();
-            // runtime switch between AddressingOutProcessor.
-            // By default addressing is engaged. At runtime we check
-            // SynapseEnvironemnt, whether Addressing engaged. If not using the following code
-            // ar runtime Synapse will desable Axis2's AddressingOutHandler
-            if (se.getProperty(Constants.ADDRESSING_PROCESSED) == null) {
-                messageContext
-                        .setProperty(
-                                org.apache.axis2.Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
-                                Boolean.TRUE);
+            // At any time any QOS is disengaged. It's engaged iff, a flag is
+            // set in execution chain.
+            // ex: addressing will be engage in outpath iff ADDRESSING_PROCESSED
+            // is set.
+
+            if (smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null)
+            {
+                messageContext.setProperty(
+                        Constants.ENGAGE_ADDRESSING_IN_MESSAGE, Boolean.TRUE);
+
+            }
+            //Now hadle the outbound message with addressing
+            if (smc.getProperty(
+                    Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null) {
+                messageContext.setProperty(
+                        Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE,
+                        Boolean.TRUE);
+
             }
 
             MessageContext outMsgContext = Axis2FlexibleMEPClient
@@ -65,19 +73,18 @@ public class Axis2Sender {
 
             // run all rules on response
 
-            // todo: this logic need to be imporved with sendNow() and drop()
             smc.setResponse(true);
-            ///////////////////////////////////////////////////////////////////
-            // special treat for Module Engagement
-            ConfigurationContext configContext = (ConfigurationContext) smc
-                    .getProperty(
-                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
-            if (configContext != null) {
-                outMsgContext.setProperty(
-                        Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT,
-                        configContext);
-            }
-            //////////////////////////////////////////////////////////////////
+//            ///////////////////////////////////////////////////////////////////
+//            // special treat for Module Engagement
+//            ConfigurationContext configContext = (ConfigurationContext) smc
+//                    .getProperty(
+//                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
+//            if (configContext != null) {
+//                outMsgContext.setProperty(
+//                        Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT,
+//                        configContext);
+//            }
+//            //////////////////////////////////////////////////////////////////
 
             outMsgContext.setServerSide(true);
 
@@ -148,19 +155,18 @@ public class Axis2Sender {
                                 .getHeader());
 
             }
-            
+
 
             messageContext
-                    .setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
-                            true));
+                    .setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check for addressing is alredy engaged for this message.
             // if engage we should use the address enable Configuraion context.
-            ConfigurationContext configContext = (ConfigurationContext) smc
-                    .getProperty(
-                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
-            if (configContext != null) {
-                messageContext.setConfigurationContext(configContext);
-            }
+//            ConfigurationContext configContext = (ConfigurationContext) smc
+//                    .getProperty(
+//                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
+//            if (configContext != null) {
+//                messageContext.setConfigurationContext(configContext);
+//            }
 
             ae.send(messageContext);
         } catch (AxisFault e) {

@@ -15,9 +15,9 @@
  */
 package sampleMediators;
 
-import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
+import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
  *
@@ -27,26 +27,26 @@ import org.apache.synapse.api.Mediator;
  */
 public class Logger implements Mediator {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.synapse.mediator.Mediator#mediate(org.apache.axis2.context.MessageContext)
-	 */
-	public boolean mediate(SynapseMessage mc) {
-		System.out.println("Logger.mediate:");
-		if (mc.getTo() != null && mc.getTo().getAddress() != null)
-			System.out.println("Logger.mediate to:" + mc.getTo().getAddress());
-		else
-			System.out.println("Empty To");
-		if (mc.getReplyTo() != null && mc.getReplyTo().getAddress() != null)
-			System.out.println("Logger.mediate ReplyTo:"
-					+ mc.getReplyTo().getAddress());
-		else
-			System.out.println("Empty ReplyTo");
-		SOAPEnvelope env = mc.getEnvelope();
-		System.out.println(env.toString());
-		System.out.println();
-		return true;
-	}
+    /*
+      * (non-Javadoc)
+      *
+      * @see org.apache.synapse.mediator.Mediator#mediate(org.apache.axis2.context.MessageContext)
+      */
+    public boolean mediate(SynapseMessage mc) {
+        System.out.println("Logger.mediate:");
+        if (mc.getTo() != null && mc.getTo().getAddress() != null)
+            System.out.println("Logger.mediate to:" + mc.getTo().getAddress());
+        else
+            System.out.println("Empty To");
+        if (mc.getReplyTo() != null && mc.getReplyTo().getAddress() != null)
+            System.out.println("Logger.mediate ReplyTo:"
+                    + mc.getReplyTo().getAddress());
+        else
+            System.out.println("Empty ReplyTo");
+        SOAPEnvelope env = mc.getEnvelope();
+        System.out.println(env.toString());
+        System.out.println();
+        return true;
+    }
 
 }

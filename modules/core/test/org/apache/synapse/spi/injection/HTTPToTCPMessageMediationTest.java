@@ -6,8 +6,10 @@ import org.apache.axis2.transport.tcp.TCPServer;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.om.OMElement;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.axiom.om.OMElement;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -32,9 +34,12 @@ public class HTTPToTCPMessageMediationTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
+        ConfigurationContext synapseServerContext = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-httptcp", null);
+
         synapseServer =
-                new SimpleHTTPServer("target/synapse-repository-httptcp",
-                        5043);
+                new SimpleHTTPServer(synapseServerContext,5043);
         /**
          * axis2TcpServer is the one who holds the actual service
          */

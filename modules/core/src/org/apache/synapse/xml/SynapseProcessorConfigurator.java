@@ -18,26 +18,25 @@ package org.apache.synapse.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMElement;
-import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.SynapseProcessor;
+import org.apache.axiom.om.OMElement;
 
 public class SynapseProcessorConfigurator extends
-		AbstractListProcessorConfigurator {
+        AbstractListProcessorConfigurator {
 
-	private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE,
-			"synapse");
+    private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE,
+            "synapse");
 
-	public QName getTagQName() {
-		return tagname;
-	}
+    public QName getTagQName() {
+        return tagname;
+    }
 
-	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-		SynapseProcessor sp = new SynapseProcessor();
-		super.addChildrenAndSetName(se, el, sp);
-		return sp;
-	}
+    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+        SynapseProcessor sp = new SynapseProcessor();
+        super.addChildrenAndSetName(se, el, sp);
+        return sp;
+    }
 
 }

@@ -19,7 +19,7 @@ package org.apache.synapse.xml;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.processors.builtin.DropProcessor;
-import org.apache.axis2.om.OMElement;
+import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 

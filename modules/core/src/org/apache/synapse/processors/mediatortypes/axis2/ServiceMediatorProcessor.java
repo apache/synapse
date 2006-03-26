@@ -81,7 +81,7 @@ public class ServiceMediatorProcessor extends AbstractProcessor {
 					.createOperationContext(ao.getAxisSpecifMEPConstant(), ao);
 			ao.registerOperationContext(messageContext, oc);
 
-			ServiceContext sc = Utils.fillContextInformation(ao, as, cc);
+			ServiceContext sc = Utils.fillContextInformation(as, cc);
 			oc.setParent(sc);
 
 			messageContext.setOperationContext(oc);

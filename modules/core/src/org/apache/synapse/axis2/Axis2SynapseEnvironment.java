@@ -19,7 +19,6 @@ package org.apache.synapse.axis2;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.axis2.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,6 +30,7 @@ import org.apache.synapse.resources.ResourceHelperFactory;
 import org.apache.synapse.resources.ResourceHelper;
 
 import org.apache.synapse.xml.ProcessorConfiguratorFinder;
+import org.apache.axiom.om.OMElement;
 
 /**
  *
@@ -40,11 +40,11 @@ import org.apache.synapse.xml.ProcessorConfiguratorFinder;
  *
  */
 public class Axis2SynapseEnvironment extends SynapseEnvironment {
-	private Processor mainprocessor = null;
+    private Processor mainprocessor = null;
 
-	private ClassLoader cl = null;
+    private ClassLoader cl = null;
 
-	private Map processors = new HashMap();
+    private Map processors = new HashMap();
 
     private Log log = LogFactory.getLog(getClass());
 
@@ -52,51 +52,51 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
     private HashMap resourceProcessors = new HashMap();
 
     public Axis2SynapseEnvironment(OMElement synapseConfiguration,
-			ClassLoader cl) {
-		super(null);
-		this.cl = cl;
-		if (synapseConfiguration!=null)
-			mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
-	}
+                                   ClassLoader cl) {
+        super(null);
+        this.cl = cl;
+        if (synapseConfiguration!=null)
+            mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
+    }
 
-	public void injectMessage(SynapseMessage smc) {
-		mainprocessor.process(this, smc);
-	}
+    public void injectMessage(SynapseMessage smc) {
+        mainprocessor.process(this, smc);
+    }
 
-	public ClassLoader getClassLoader() {
-		return cl;
-	}
+    public ClassLoader getClassLoader() {
+        return cl;
+    }
 
-	public void setClassLoader(ClassLoader cl) {
-		this.cl = cl;
-	}
+    public void setClassLoader(ClassLoader cl) {
+        this.cl = cl;
+    }
 
-	public void send(SynapseMessage sm, SynapseEnvironment se) {
-		if (sm.isResponse())
-			Axis2Sender.sendBack(sm);
-		else
-			Axis2Sender.sendOn(sm, se);
-	}
+    public void send(SynapseMessage sm, SynapseEnvironment se) {
+        if (sm.isResponse())
+            Axis2Sender.sendBack(sm);
+        else
+            Axis2Sender.sendOn(sm, se);
+    }
 
 
-	public Processor lookupProcessor(String name) {
-		return (Processor) processors.get(name);
-	}
+    public Processor lookupProcessor(String name) {
+        return (Processor) processors.get(name);
+    }
 
-	public void addProcessor(Processor p) {
-		log.debug("adding processor with name " + p.getName());
-		if (processors.containsKey(p.getName()))
-			log.warn("name " + p.getName() + "already present");
-		processors.put(p.getName(), p);
-	}
+    public void addProcessor(Processor p) {
+        log.debug("adding processor with name " + p.getName());
+        if (processors.containsKey(p.getName()))
+            log.warn("name " + p.getName() + "already present");
+        processors.put(p.getName(), p);
+    }
 
-	public Processor getMasterProcessor() {
-		return mainprocessor;
-	}
+    public Processor getMasterProcessor() {
+        return mainprocessor;
+    }
 
-	public void setMasterProcessor(Processor p) {
-		mainprocessor = p;
-	}
+    public void setMasterProcessor(Processor p) {
+        mainprocessor = p;
+    }
 
     // lookup methods for resources handling
     public Processor lookupResourceProcessor(String uriRoot) {

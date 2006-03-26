@@ -24,10 +24,6 @@ import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPHeader;
-import org.apache.axis2.soap.SOAPHeaderBlock;
-import org.apache.axis2.soap.SOAP11Constants;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.AxisFault;
@@ -37,6 +33,9 @@ import org.apache.axis2.client.Options;
 
 import org.apache.synapse.Constants;
 import org.apache.wsdl.WSDLConstants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 
 
 import javax.xml.namespace.QName;
@@ -103,7 +102,7 @@ public class Axis2FlexibleMEPClient {
             phasesInfo.setOperationPhases(outInOperation);
         }
         ServiceGroupContext sgc = new ServiceGroupContext(cc,
-                ac.getService("__ANONYMOUS_SERVICE__").getParent());
+                (AxisServiceGroup)ac.getService("__ANONYMOUS_SERVICE__").getParent());
         ServiceContext sc =
                 sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
 
@@ -135,13 +134,24 @@ public class Axis2FlexibleMEPClient {
         if (smc.isDoingREST()) {
             mc.setDoingREST(true);
         }
-        if (smc.getProperty(
-                org.apache.axis2.Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES) !=
-                null) {
-            mc.setProperty(
-                    org.apache.axis2.Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
-                    Boolean.TRUE);
+
+        // handling the outbound message with addressing
+        AxisModule module = ac.getModule(new QName("addressing"))  ;
+        if ((smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) ||
+                (smc.getProperty(
+                        Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null)){
+//            if (!ac.isEngaged(new QName("addressing")))
+//                ac.engageModule(new QName("addressing"));
+
+            if (!ac.getService("__ANONYMOUS_SERVICE__")
+                    .isEngaged(module.getName())) {
+                ac.getService("__ANONYMOUS_SERVICE__").engageModule(module, ac);
+            }
+//
         }
+
+
+        //TODO; following line needed to be removed
         mc.setEnvelope(outEnvelopeConfiguration(smc));
         ///////////////////////////////////////////////////////////////////////
 
@@ -167,8 +177,18 @@ public class Axis2FlexibleMEPClient {
         // If request is REST we assume the response is REST, so set the
         // variable
         response.setDoingREST(smc.isDoingREST());
-        response.setProperty(Constants.ISRESPONSE_PROPERTY, new Boolean(
-                true));
+        response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+
+        // disengae addressing if engage - mandatory
+        //TODO: temporary solution
+//        if (ac.isEngaged(new QName("addressing"))) {
+//            ac.disEngageModule(ac.getModule(new QName("addressing")));
+//        }
+        if (ac.getService("__ANONYMOUS_SERVICE__")
+                .isEngaged(module.getName())) {
+            ac.getService("__ANONYMOUS_SERVICE__")
+                    .disEngageModule(ac.getModule(module.getName()));
+        }
         return response;
     }
 

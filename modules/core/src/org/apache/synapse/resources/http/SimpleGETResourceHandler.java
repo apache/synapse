@@ -2,18 +2,17 @@ package org.apache.synapse.resources.http;
 
 import org.apache.synapse.resources.ResourceHandler;
 import org.apache.synapse.SynapseException;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.util.HashMap;
-import java.util.Set;
 import java.io.IOException;
 import java.io.InputStream;
 /*

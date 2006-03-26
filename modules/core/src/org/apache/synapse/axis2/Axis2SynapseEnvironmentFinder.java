@@ -23,14 +23,13 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.ParameterImpl;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.OMElement;
 
 /**
  * <p/>
@@ -69,7 +68,7 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
             Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc
                     .getAxisService().getClassLoader());
 
-            synapseEnvParam = new ParameterImpl(SYNAPSE_ENVIRONMENT, null);
+            synapseEnvParam = new Parameter(SYNAPSE_ENVIRONMENT, null);
             synapseEnvParam.setValue(se);
             try {
                 ac.addParameter(synapseEnvParam);

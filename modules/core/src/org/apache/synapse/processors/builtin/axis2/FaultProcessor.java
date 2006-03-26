@@ -17,11 +17,6 @@
 package org.apache.synapse.processors.builtin.axis2;
 
 
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMDocument;
-import org.apache.axis2.soap.SOAPEnvelope;
-import org.apache.axis2.soap.SOAPFactory;
-import org.apache.axis2.soap.SOAP12Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +25,11 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 
 import org.apache.synapse.processors.AbstractProcessor;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMDocument;
 
 
 /**
@@ -70,7 +70,7 @@ public class FaultProcessor extends AbstractProcessor {
         EndpointReference tempEPR = smc.getTo();
         smc.setTo(smc.getReplyTo());
         smc.setReplyTo(tempEPR);
-        
+
         se.injectMessage(smc);
 
 

@@ -3,7 +3,6 @@ package org.apache.synapse.spi.injection;
 import junit.framework.TestCase;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Processor;
@@ -12,6 +11,7 @@ import org.apache.synapse.xml.RegexProcessorConfigurator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.axiom.om.OMElement;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *

@@ -10,8 +10,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
+import org.apache.axiom.om.OMElement;
 
-import org.apache.axis2.om.OMElement;
 
 public class ProxyStockQuoteClient {
 
@@ -68,7 +68,7 @@ public class ProxyStockQuoteClient {
                 ConfigurationContextFactory fac =
                         new ConfigurationContextFactory();
                 ConfigurationContext configContext =
-                        fac.createConfigurationContextFromFileSystem(args[3]);
+                        fac.createConfigurationContextFromFileSystem(args[3],null);
                 serviceClient = new ServiceClient(configContext, null);
             } else {
                 serviceClient = new ServiceClient();

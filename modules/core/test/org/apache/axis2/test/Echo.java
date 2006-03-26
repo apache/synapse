@@ -1,10 +1,10 @@
 package org.apache.axis2.test;
 
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMNamespace;
 import org.apache.axis2.AxisFault;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMFactory;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *

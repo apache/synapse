@@ -5,7 +5,7 @@ import org.apache.synapse.api.EnvironmentAware;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.axis2.om.OMElement;
+import org.apache.axiom.om.OMElement;
 import junit.framework.TestCase;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.

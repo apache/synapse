@@ -7,10 +7,10 @@ import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.processors.ListProcessor;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMAttribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

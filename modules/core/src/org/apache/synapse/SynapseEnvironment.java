@@ -15,7 +15,6 @@
  */
 package org.apache.synapse;
 
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.resources.ResourceHelper;
 
 import java.util.Map;

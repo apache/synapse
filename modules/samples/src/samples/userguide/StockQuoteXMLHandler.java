@@ -1,17 +1,14 @@
 package samples.userguide;
 
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+
 import java.io.ByteArrayInputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 
-import org.apache.axis2.om.OMAbstractFactory;
-import org.apache.axis2.om.OMElement;
-import org.apache.axis2.om.OMFactory;
-import org.apache.axis2.om.OMNamespace;
-import org.apache.axis2.om.OMText;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
 
 
 public class StockQuoteXMLHandler {
@@ -41,7 +38,7 @@ public class StockQuoteXMLHandler {
 
 		
 			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(
-					text.getBytes()));
+                    text.getBytes()));
 
 			OMElement parse = builder.getDocumentElement();
 		

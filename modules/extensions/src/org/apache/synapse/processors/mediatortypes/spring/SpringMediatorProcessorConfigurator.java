@@ -7,8 +7,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.axis2.om.OMAttribute;
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
@@ -17,6 +15,8 @@ import org.apache.synapse.SynapseException;
 
 
 import org.apache.synapse.xml.AbstractProcessorConfigurator;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ByteArrayResource;

@@ -23,9 +23,9 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseMessage;
+import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
  *
@@ -36,180 +36,180 @@ import org.apache.synapse.SynapseMessage;
  */
 public class Axis2SynapseMessage implements SynapseMessage {
 
-	private MessageContext mc = null;
+    private MessageContext mc = null;
 
-	private Map props = new HashMap();
+    private Map props = new HashMap();
 
-	private boolean response = false;
+    private boolean response = false;
 
     private boolean faultResponse = false;
 
     public Axis2SynapseMessage(MessageContext mc) {
-		setMessageContext(mc);
-	}
+        setMessageContext(mc);
+    }
 
-	public EndpointReference getFaultTo() {
-		return mc.getFaultTo();
-	}
+    public EndpointReference getFaultTo() {
+        return mc.getFaultTo();
+    }
 
-	public void setFaultTo(EndpointReference reference) {
-		mc.setFaultTo(reference);
-	}
+    public void setFaultTo(EndpointReference reference) {
+        mc.setFaultTo(reference);
+    }
 
-	public EndpointReference getFrom() {
-		return mc.getFrom();
-	}
+    public EndpointReference getFrom() {
+        return mc.getFrom();
+    }
 
-	public void setFrom(EndpointReference reference) {
-		mc.setFrom(reference);
+    public void setFrom(EndpointReference reference) {
+        mc.setFrom(reference);
 
-	}
+    }
 
-	public SOAPEnvelope getEnvelope() {
+    public SOAPEnvelope getEnvelope() {
 
-		return mc.getEnvelope();
-	}
+        return mc.getEnvelope();
+    }
 
-	public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
-		mc.setEnvelope(envelope);
+    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
+        mc.setEnvelope(envelope);
 
-	}
+    }
 
-	public String getMessageID() {
-		return mc.getMessageID();
-	}
+    public String getMessageID() {
+        return mc.getMessageID();
+    }
 
-	public void setMessageID(String string) {
-		mc.setMessageID(string);
+    public void setMessageID(String string) {
+        mc.setMessageID(string);
 
-	}
+    }
 
-	public RelatesTo getRelatesTo() {
-		return mc.getRelatesTo();
+    public RelatesTo getRelatesTo() {
+        return mc.getRelatesTo();
 
-	}
+    }
 
-	public void setRelatesTo(RelatesTo reference) {
-		mc.setRelatesTo(reference);
+    public void setRelatesTo(RelatesTo reference) {
+        mc.setRelatesTo(reference);
 
-	}
+    }
 
-	public EndpointReference getReplyTo() {
-		return mc.getReplyTo();
+    public EndpointReference getReplyTo() {
+        return mc.getReplyTo();
 
-	}
+    }
 
-	public void setReplyTo(EndpointReference reference) {
-		mc.setReplyTo(reference);
+    public void setReplyTo(EndpointReference reference) {
+        mc.setReplyTo(reference);
 
-	}
+    }
 
-	public EndpointReference getTo() {
-		return mc.getTo();
+    public EndpointReference getTo() {
+        return mc.getTo();
 
-	}
+    }
 
-	public void setTo(EndpointReference reference) {
-		mc.setTo(reference);
+    public void setTo(EndpointReference reference) {
+        mc.setTo(reference);
 
-	}
+    }
 
-	public void setWSAAction(String actionURI) {
-		mc.setWSAAction(actionURI);
+    public void setWSAAction(String actionURI) {
+        mc.setWSAAction(actionURI);
 
-	}
+    }
 
-	public String getWSAAction() {
+    public String getWSAAction() {
 
-		return mc.getWSAAction();
-	}
+        return mc.getWSAAction();
+    }
 
-	public void setMessageId(String messageID) {
-		mc.setWSAMessageId(messageID);
+    public void setMessageId(String messageID) {
+        mc.setWSAMessageId(messageID);
 
-	}
+    }
 
-	public String getMessageId() {
-		return mc.getMessageID();
-	}
+    public String getMessageId() {
+        return mc.getMessageID();
+    }
 
-	public Object getProperty(String key) {
+    public Object getProperty(String key) {
         Object obj = props.get(key);
         if ( obj == null) {
             obj = mc.getProperty(key);
-        }        
+        }
         return obj;
 
-	}
+    }
 
-	public void setProperty(String key, Object value) {
-		props.put(key, value);
-	}
+    public void setProperty(String key, Object value) {
+        props.put(key, value);
+    }
 
-	public Iterator getPropertyNames() {
-		return props.keySet().iterator();
-	}
+    public Iterator getPropertyNames() {
+        return props.keySet().iterator();
+    }
 
-	public String getSoapAction() {
-		return mc.getSoapAction();
-	}
+    public String getSoapAction() {
+        return mc.getSoapAction();
+    }
 
-	public void setSoapAction(String string) {
-		mc.setSoapAction(string);
+    public void setSoapAction(String string) {
+        mc.setSoapAction(string);
 
-	}
+    }
 
-	public boolean isDoingMTOM() {
+    public boolean isDoingMTOM() {
 
-		return mc.isDoingMTOM();
-	}
+        return mc.isDoingMTOM();
+    }
 
-	public void setDoingMTOM(boolean b) {
-		mc.setDoingMTOM(b);
+    public void setDoingMTOM(boolean b) {
+        mc.setDoingMTOM(b);
 
-	}
+    }
 
-	public boolean isDoingREST() {
+    public boolean isDoingREST() {
 
-		return mc.isDoingREST();
-	}
+        return mc.isDoingREST();
+    }
 
-	public void setDoingREST(boolean b) {
-		mc.setDoingREST(b);
+    public void setDoingREST(boolean b) {
+        mc.setDoingREST(b);
 
-	}
+    }
 
-	public boolean isSOAP11() {
+    public boolean isSOAP11() {
 
-		return mc.isSOAP11();
-	}
+        return mc.isSOAP11();
+    }
 
-	public MessageContext getMessageContext() {
-		return mc;
-	}
+    public MessageContext getMessageContext() {
+        return mc;
+    }
 
-	public void setMessageContext(MessageContext mc) {
-		this.mc = mc;
-		Boolean resp = (Boolean) mc.getProperty(Constants.ISRESPONSE_PROPERTY);
-		if (resp != null)
-			response = resp.booleanValue();
-	}
+    public void setMessageContext(MessageContext mc) {
+        this.mc = mc;
+        Boolean resp = (Boolean) mc.getProperty(Constants.ISRESPONSE_PROPERTY);
+        if (resp != null)
+            response = resp.booleanValue();
+    }
 
-	public void setResponse(boolean b) {
-		response = b;
-		mc.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
-	}
+    public void setResponse(boolean b) {
+        response = b;
+        mc.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
+    }
 
-	public boolean isResponse() {
-		return response;
-	}
+    public boolean isResponse() {
+        return response;
+    }
 
     public void setFaultResponse(boolean b) {
         this.faultResponse = b;
     }
 
     public boolean isFaultResponse() {
-        return this.faultResponse;  
+        return this.faultResponse;
     }
 
 }

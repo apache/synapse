@@ -9,10 +9,10 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.om.*;
-import org.apache.axis2.om.impl.llom.builder.StAXOMBuilder;
-import org.apache.axis2.soap.SOAPEnvelope;
 import org.apache.synapse.axis2.SynapseMessageReceiver;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -39,9 +39,9 @@ import java.io.ByteArrayInputStream;
 public class Axis2EnvSetup {
     public static MessageContext axis2Deployment(String testingRepository)
             throws AxisFault {
-        ConfigurationContextFactory conFac = new ConfigurationContextFactory();
-        ConfigurationContext configCtx = conFac
-                .createConfigurationContextFromFileSystem(testingRepository);
+        final ConfigurationContext configCtx = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(testingRepository,
+                        null);
         MessageContext msgCtx = new MessageContext();
         msgCtx.setConfigurationContext(configCtx);
         msgCtx.setEnvelope(testEnvSetup());
@@ -98,14 +98,16 @@ public class Axis2EnvSetup {
         method.addChild(value);
         return method;
     }
-     public static OMElement payloadNamedAdddressing() {
+
+    public static OMElement payloadNamedAdddressing() {
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace(
                 "urn:text-body", "ns");
         OMElement method = fac.createOMElement("service", omNs);
         OMElement value = fac.createOMElement("text_addressing", omNs);
         value.addChild(
-                fac.createText(value, "Synapse Testing String Through Addressing"));
+                fac.createText(value,
+                        "Synapse Testing String Through Addressing"));
         method.addChild(value);
         return method;
     }
@@ -122,10 +124,10 @@ public class Axis2EnvSetup {
         return method;
     }
 
-    public static ConfigurationContext createConfigurationContextFromFileSystem(String repository) throws AxisFault {
-        ConfigurationContextFactory fac = new ConfigurationContextFactory();
-        ConfigurationContext configContext =
-                fac.createConfigurationContextFromFileSystem(repository);
-        return configContext;
+    public static ConfigurationContext createConfigurationContextFromFileSystem(
+            String repository) throws AxisFault {
+
+        return ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(repository, null);
     }
 }

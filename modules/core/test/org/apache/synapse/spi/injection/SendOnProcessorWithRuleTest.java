@@ -22,8 +22,12 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.om.OMElement;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.axiom.om.OMElement;
+
+import javax.xml.namespace.QName;
 
 
 public class SendOnProcessorWithRuleTest extends TestCase {
@@ -34,14 +38,18 @@ public class SendOnProcessorWithRuleTest extends TestCase {
             "http://127.0.0.1:5043/axis2/services/anonymous");
 
     public void setUp() throws Exception {
-        synapseServer = new SimpleHTTPServer("target/synapse-repository-sendon",
-                5043);
+        ConfigurationContext synapseServerContext = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendon", null);
+        ConfigurationContext serverContext = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendonAxis2", null);
+        synapseServer = new SimpleHTTPServer(synapseServerContext, 5043);
         /**
          * axis2Server is the one who holds the actual service
          */
         axis2Server =
-                new SimpleHTTPServer("target/synapse-repository-sendonAxis2",
-                        8090);
+                new SimpleHTTPServer(serverContext, 8090);
         synapseServer.start();
         axis2Server.start();
     }
@@ -58,6 +66,7 @@ public class SendOnProcessorWithRuleTest extends TestCase {
         Options options = new Options();
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
+        serviceClient.disEngageModule(new QName("addressing"));
         OMElement response = serviceClient.sendReceive(Axis2EnvSetup.payload());
         assertEquals("Synapse Testing String_Response", response.getText());
 
@@ -66,11 +75,12 @@ public class SendOnProcessorWithRuleTest extends TestCase {
     public void testSendProcessorMultipleTimes() throws Exception {
         for (int i = 0; i < 10; i++) {
             ServiceClient serviceClient = new ServiceClient(
-                Axis2EnvSetup.createConfigurationContextFromFileSystem(
-                        "target/synapse-repository-sendon"), null);
+                    Axis2EnvSetup.createConfigurationContextFromFileSystem(
+                            "target/synapse-repository-sendon"), null);
             Options options = new Options();
             options.setTo(targetEpr);
             serviceClient.setOptions(options);
+            serviceClient.disEngageModule(new QName("addressing"));
             OMElement response =
                     serviceClient.sendReceive(Axis2EnvSetup.payload());
             assertEquals("Synapse Testing String_Response", response.getText());

@@ -8,7 +8,7 @@ import org.apache.axis2.addressing.EndpointReference;
 
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.om.OMElement;
+import org.apache.axiom.om.OMElement;
 
 public class DumbStockQuoteClient {
 
@@ -45,10 +45,9 @@ public class DumbStockQuoteClient {
         try {
             ServiceClient serviceClient;
             if (repository) {
-                ConfigurationContextFactory fac =
-                        new ConfigurationContextFactory();
+
                 ConfigurationContext configContext =
-                        fac.createConfigurationContextFromFileSystem(args[2]);
+                        ConfigurationContextFactory.createConfigurationContextFromFileSystem(args[2],null);
                 serviceClient = new ServiceClient(configContext, null);
             } else {
                 serviceClient = new ServiceClient();
@@ -66,7 +65,7 @@ public class DumbStockQuoteClient {
             Options options = new Options();
             options.setTo(targetEPR);
 
-            options.setSoapAction("http://www.webserviceX.NET/GetQuote");
+            options.setAction("http://www.webserviceX.NET/GetQuote");
             // create a lightweight Axis Config with no addressing to
             // demonstrate "dumb" SOAP
 
@@ -76,7 +75,7 @@ public class DumbStockQuoteClient {
 
             options.setProperty(
                     Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
-                    new Boolean(true));
+                    Boolean.TRUE);
             serviceClient.setOptions(options);
 
             // step 3 - Blocking invocation

@@ -16,7 +16,6 @@
 
 package org.apache.synapse.processors.rules;
 
-import org.apache.axis2.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
@@ -24,6 +23,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseMessageConstants;
 import org.apache.synapse.processors.ListProcessor;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.jaxen.JaxenException;
 
 /**

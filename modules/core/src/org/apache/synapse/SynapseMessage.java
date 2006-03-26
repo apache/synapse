@@ -19,7 +19,7 @@ package org.apache.synapse;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.axis2.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
  *
@@ -35,63 +35,63 @@ import org.apache.axis2.soap.SOAPEnvelope;
  */
 public interface SynapseMessage {
 
-	public EndpointReference getFaultTo();
+    public EndpointReference getFaultTo();
 
-	public void setFaultTo(EndpointReference reference);
+    public void setFaultTo(EndpointReference reference);
 
-	public EndpointReference getFrom();
+    public EndpointReference getFrom();
 
-	public void setFrom(EndpointReference reference);
+    public void setFrom(EndpointReference reference);
 
-	public SOAPEnvelope getEnvelope();
+    public SOAPEnvelope getEnvelope();
 
-	public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;
+    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;
 
-	public String getMessageID();
+    public String getMessageID();
 
-	public void setMessageID(String string);
+    public void setMessageID(String string);
 
-	public RelatesTo getRelatesTo();
+    public RelatesTo getRelatesTo();
 
-	public void setRelatesTo(RelatesTo reference);
+    public void setRelatesTo(RelatesTo reference);
 
-	public EndpointReference getReplyTo();
+    public EndpointReference getReplyTo();
 
-	public void setReplyTo(EndpointReference reference);
+    public void setReplyTo(EndpointReference reference);
 
-	public EndpointReference getTo();
+    public EndpointReference getTo();
 
-	public void setTo(EndpointReference reference);
+    public void setTo(EndpointReference reference);
 
-	public void setWSAAction(String actionURI);
+    public void setWSAAction(String actionURI);
 
-	public String getWSAAction();
+    public String getWSAAction();
 
-	public void setMessageId(String messageID);
+    public void setMessageId(String messageID);
 
-	public String getMessageId();
+    public String getMessageId();
 
-	public Object getProperty(String key);
+    public Object getProperty(String key);
 
-	public void setProperty(String key, Object value);
+    public void setProperty(String key, Object value);
 
-	public String getSoapAction();
+    public String getSoapAction();
 
-	public void setSoapAction(String string);
+    public void setSoapAction(String string);
 
-	public boolean isDoingMTOM();
+    public boolean isDoingMTOM();
 
-	public void setDoingMTOM(boolean b);
+    public void setDoingMTOM(boolean b);
 
-	public boolean isDoingREST();
+    public boolean isDoingREST();
 
-	public void setDoingREST(boolean b);
+    public void setDoingREST(boolean b);
 
-	public boolean isSOAP11();
+    public boolean isSOAP11();
 
-	public void setResponse(boolean b);
+    public void setResponse(boolean b);
 
-	public boolean isResponse();
+    public boolean isResponse();
 
     public void setFaultResponse(boolean b);
 

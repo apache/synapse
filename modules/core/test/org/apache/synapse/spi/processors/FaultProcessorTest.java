@@ -24,6 +24,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.util.Axis2EnvSetup;
 
 import javax.xml.namespace.QName;
@@ -38,8 +40,8 @@ public class FaultProcessorTest extends TestCase {
 	private QName operation = new QName("anonymous");
 
 	public void setUp() throws Exception {
-		synapseServer = new SimpleHTTPServer("target/synapse-repository-fault",
-				5043);
+        ConfigurationContext context = ConfigurationContextFactory.createConfigurationContextFromFileSystem("target/synapse-repository-fault",null);
+        synapseServer = new SimpleHTTPServer(context,5043);
 		synapseServer.start();
 	}
 

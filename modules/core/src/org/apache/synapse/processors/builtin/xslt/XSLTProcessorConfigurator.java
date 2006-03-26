@@ -4,8 +4,6 @@ import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.om.OMAttribute;
-import org.apache.axis2.om.OMElement;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
@@ -14,7 +12,8 @@ import org.apache.synapse.SynapseException;
 
 
 import org.apache.synapse.xml.AbstractProcessorConfigurator;
-
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
 
 
 /**
@@ -27,31 +26,31 @@ import org.apache.synapse.xml.AbstractProcessorConfigurator;
  *  <p>If type is not present, assumed to be body
  */
 public class XSLTProcessorConfigurator extends AbstractProcessorConfigurator {
-	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
-	
-	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-		XSLTProcessor xp = new XSLTProcessor();
-		super.setNameOnProcessor(se,el,xp);
-		
-		OMAttribute type = el.getAttribute(new QName("type"));
-		if (type != null && type.getAttributeValue().trim().toLowerCase().equals("envelope")) xp.setIsBody(false); 
-		else xp.setIsBody(true);
-		
-		OMAttribute xsl = el.getAttribute(new QName("xsl"));
-		if (xsl == null) throw new SynapseException("no xsl attribute on: "+el.toString());
-		
-		InputStream xslStream =  se.getClassLoader().getResourceAsStream(xsl.getAttributeValue());
-		xp.setXSLInputStream(xslStream);
-		
-		return xp;
-		
-		
-		
-	}
+    private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
 
-	public QName getTagQName() {
-		
-		return tagName;
-	}
+    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+        XSLTProcessor xp = new XSLTProcessor();
+        super.setNameOnProcessor(se,el,xp);
+
+        OMAttribute type = el.getAttribute(new QName("type"));
+        if (type != null && type.getAttributeValue().trim().toLowerCase().equals("envelope")) xp.setIsBody(false);
+        else xp.setIsBody(true);
+
+        OMAttribute xsl = el.getAttribute(new QName("xsl"));
+        if (xsl == null) throw new SynapseException("no xsl attribute on: "+el.toString());
+
+        InputStream xslStream =  se.getClassLoader().getResourceAsStream(xsl.getAttributeValue());
+        xp.setXSLInputStream(xslStream);
+
+        return xp;
+
+
+
+    }
+
+    public QName getTagQName() {
+
+        return tagName;
+    }
 
 }

@@ -53,9 +53,9 @@ public interface Constants {
 
     // addressing properites handling
 
-    String ADDRESSING_PROCESSED = "__ADDRESSING_PROCESSED";
+    String ENGAGE_ADDRESSING_IN_MESSAGE = "__ENGAGE_ADDRESSING_IN_MESSAGE__";
 
-    // transport header selection
+    String  ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
 
-    String OK_200 = "200_OK";
+
 }

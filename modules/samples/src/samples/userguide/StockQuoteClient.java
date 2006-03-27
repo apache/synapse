@@ -8,6 +8,8 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axiom.om.OMElement;
 
+import javax.xml.namespace.QName;
+
 
 public class StockQuoteClient {
 
@@ -66,12 +68,11 @@ public class StockQuoteClient {
             // step 1 - create a request payload
             OMElement getQuote = StockQuoteXMLHandler
                     .createRequestPayload(symb);
-            // step 2 - set up the call object
-            // the wsa:To
+
 
             ServiceClient serviceClient;
             if (repository) {
-                
+
                 ConfigurationContext configContext =
                         ConfigurationContextFactory.createConfigurationContextFromFileSystem(args[3],null);
                 serviceClient = new ServiceClient(configContext, null);
@@ -83,12 +84,16 @@ public class StockQuoteClient {
             EndpointReference targetEPR = new EndpointReference(xurl);
             options.setTo(targetEPR);
 
+            // step 2 - set up the call object
+            // the wsa:To
             options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
 
             options.setAction("http://www.webserviceX.NET/GetQuote");
 
             //options.setSoapAction("http://www.webserviceX.NET/GetQuote");
 
+            //Engage Addressing on  outgoing message.
+            serviceClient.engageModule(new QName("addressing"));
 
             serviceClient.setOptions(options);
             // step 3 - Blocking invocation

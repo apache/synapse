@@ -65,10 +65,8 @@ public class ProxyStockQuoteClient {
         try {
             ServiceClient serviceClient;
             if (repository) {
-                ConfigurationContextFactory fac =
-                        new ConfigurationContextFactory();
                 ConfigurationContext configContext =
-                        fac.createConfigurationContextFromFileSystem(args[3],null);
+                        ConfigurationContextFactory.createConfigurationContextFromFileSystem(args[3],null);
                 serviceClient = new ServiceClient(configContext, null);
             } else {
                 serviceClient = new ServiceClient();
@@ -103,13 +101,7 @@ public class ProxyStockQuoteClient {
             options.setProperty(HTTPConstants.PROXY, proxyProperties);
 
             options.setAction("http://www.webserviceX.NET/GetQuote");
-            // create a lightweight Axis Config with no addressing to
-            // demonstrate "dumb" SOAP
-            options.setProperty(
-                    Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
-                    new Boolean(true));
-
-
+            
             serviceClient.setOptions(options);
 
             // step 3 - Blocking invocation

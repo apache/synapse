@@ -66,16 +66,7 @@ public class DumbStockQuoteClient {
             options.setTo(targetEPR);
 
             options.setAction("http://www.webserviceX.NET/GetQuote");
-            // create a lightweight Axis Config with no addressing to
-            // demonstrate "dumb" SOAP
-
-            //ServiceClient serviceClient = StockQuoteXMLHandler
-            //		.createServiceClient();
-            // make the ServiceClient
-
-            options.setProperty(
-                    Constants.Configuration.DISABLE_ADDRESSING_FOR_OUT_MESSAGES,
-                    Boolean.TRUE);
+                        
             serviceClient.setOptions(options);
 
             // step 3 - Blocking invocation

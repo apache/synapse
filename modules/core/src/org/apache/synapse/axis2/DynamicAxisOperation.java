@@ -124,7 +124,7 @@ class DynamicOperationClient implements OperationClient {
             EndpointReference toEPR = mc.getTo();
 
             TransportOutDescription transportOut = ClientUtils.inferOutTransport(cc
-                    .getAxisConfiguration(), toEPR);
+                    .getAxisConfiguration(), toEPR, mc);
             mc.setTransportOut(transportOut);
 
             /*

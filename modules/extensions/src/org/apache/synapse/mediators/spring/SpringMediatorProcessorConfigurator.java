@@ -1,4 +1,4 @@
-package org.apache.synapse.processors.mediatortypes.spring;
+package org.apache.synapse.mediators.spring;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
@@ -7,6 +7,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.synapse.api.Mediator;
+import org.apache.synapse.xml.AbstractMediatorFactory;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
@@ -25,7 +27,7 @@ import org.springframework.core.io.ByteArrayResource;
 
 /**
  *
- * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessor
+ * @see org.apache.synapse.mediators.base.builtin.xslt.XSLTProcessor
  * <p> This class configures the Spring mediator type. 
  * <p> The tag looks like this
  * <xmp>
@@ -37,16 +39,16 @@ import org.springframework.core.io.ByteArrayResource;
  * The spring config is inlined (future work to let it be pointed to with an attribute). The bean attribute identifies
  * the bean inside the spring assembly to be used. 
  */
-public class SpringMediatorProcessorConfigurator extends AbstractProcessorConfigurator {
+public class SpringMediatorFactory extends AbstractMediatorFactory {
 	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE+"/spring", "springmediator");
-	public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-		SpringMediatorProcessor smp = new SpringMediatorProcessor();
+	public Mediator createProcessor(SynapseEnvironment se, OMElement el) {
+		SpringMediator sm = new SpringMediator();
 		super.setNameOnProcessor(se,el,smp);
 		
 		OMAttribute bean = el.getAttribute(new QName("bean"));
 		if (bean == null) throw new SynapseException("missing bean attribute on "+el.toString());
 		
-		smp.setBeanName(bean.getAttributeValue().trim());
+		sm.setBeanName(bean.getAttributeValue().trim());
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {

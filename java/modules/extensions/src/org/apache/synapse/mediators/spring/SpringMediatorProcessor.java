@@ -1,16 +1,15 @@
-package org.apache.synapse.processors.mediatortypes.spring;
+package org.apache.synapse.mediators.spring;
 
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
-import org.apache.synapse.api.EnvironmentAware;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.processors.AbstractProcessor;
+import org.apache.synapse.mediators.base.AbstractMediator;
 import org.springframework.context.support.GenericApplicationContext;
 
 /**
  *
- * @see org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator
+ * @see org.apache.synapse.mediators.base.builtin.xslt.XSLTProcessorConfigurator
  * <p> This class is the class that "plugs" Spring-based mediators into Synapse. 
  * <p> A spring based mediator is any object that implements mediator and can be instantiated by
  * Spring (see www.springframework.org). The mediator definition is set up using the 
@@ -20,17 +19,17 @@ import org.springframework.context.support.GenericApplicationContext;
  * a BeanName property, which is set with the name of the bean  
  *
  */
-public class SpringMediatorProcessor extends AbstractProcessor {
+public class SpringMediator extends AbstractMediator {
 	
 	private GenericApplicationContext ctx = null;
 
 	private String beanName = null;
 
-	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+	public boolean mediate(SynapseMessage smc) {
 		Mediator m = (Mediator) getContext().getBean(getBeanName());
-		if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
+/*		if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
 			((EnvironmentAware) m).setSynapseEnvironment(se);
-		}
+		}*/
 		return m.mediate(smc);
 
 	}

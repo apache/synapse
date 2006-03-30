@@ -5,7 +5,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 
 import java.util.HashMap;
-import java.util.Map;
+
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *

@@ -19,16 +19,15 @@ package org.apache.synapse.mediators.deprecation;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.api.EnvironmentAware;
 
 import java.util.Map;
 import java.io.InputStream;
 
-public class DeprecationMediator implements Mediator, EnvironmentAware {
+public class DeprecationMediator implements Mediator {
 
     DeprecationConfiguration configuration;
     private ClassLoader classLoader;
-
+    
     public DeprecationMediator() {
     }
 

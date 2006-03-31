@@ -41,13 +41,12 @@ public class SynapseMessageReceiver implements MessageReceiver {
                 .getSynapseEnvironment(mc);
         ////////////////////////////////////////////////////////////////////////
         // SynapseEnvironment is set as a property in MessageContext. This is due
-        // use we can expect in ServiceMeidatorProcessor and many extensions yet to come
+        // use we can expect in ServiceMediatorProcessor and many extensions yet to come
         // So it a mediator uses EnvironmentAware, that mediator will be injected with the correct environment
-        mc.setProperty(
-                org.apache.synapse.Constants.MEDIATOR_SYNAPSE_ENV_PROPERTY,
-                env);
+        
         ////////////////////////////////////////////////////////////////////////
         SynapseMessage smc = new Axis2SynapseMessage(mc);
+        smc.setSynapseEnvironment(env);
         env.injectMessage(smc);
 
         ///////////////////////////////////////////////////////////////////////

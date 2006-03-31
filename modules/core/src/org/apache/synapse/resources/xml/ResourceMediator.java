@@ -1,6 +1,6 @@
 package org.apache.synapse.resources.xml;
 
-import org.apache.synapse.processors.ListProcessor;
+import org.apache.synapse.mediators.base.ListMediator;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 /*
@@ -19,11 +19,11 @@ import org.apache.synapse.SynapseMessage;
  * limitations under the License.
  */
 
-public class ResourceMediator extends ListProcessor {
+public class ResourceMediator extends ListMediator {
     protected String type;
     protected String uriRoot;
     public boolean process(SynapseEnvironment se, SynapseMessage smc) {
-        // this is not a inline mediator, It's soule purpose of existance is to populate the ResourceHandler
+        // this is not a inline mediator, It's soule purpose of existence is to populate the ResourceHandler
         return true;
     }
 
@@ -42,11 +42,5 @@ public class ResourceMediator extends ListProcessor {
         return uriRoot;
     }
 
-    // From Interface
-	public String getName() {
-		return getURIRoot();
-	}
-	public void setName(String uriRoot) {
-		setURIRoot(uriRoot);
-	}
+    
 }

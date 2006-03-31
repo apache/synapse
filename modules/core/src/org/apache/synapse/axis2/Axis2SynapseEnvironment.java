@@ -22,14 +22,15 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.synapse.Processor;
+
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.resources.ResourceHelperFactory;
 import org.apache.synapse.resources.ResourceHelper;
+import org.apache.synapse.resources.xml.ResourceMediator;
 
-import org.apache.synapse.xml.ProcessorConfiguratorFinder;
+import org.apache.synapse.xml.MediatorFactoryFinder;
 import org.apache.axiom.om.OMElement;
 
 /**
@@ -40,27 +41,27 @@ import org.apache.axiom.om.OMElement;
  *
  */
 public class Axis2SynapseEnvironment extends SynapseEnvironment {
-    private Processor mainprocessor = null;
+    private Mediator mainmediator = null;
 
     private ClassLoader cl = null;
 
-    private Map processors = new HashMap();
+    private Map mediators = new HashMap();
 
     private Log log = LogFactory.getLog(getClass());
-
+    private ResourceHelperFactory fac = ResourceHelperFactory.newInstance();
     //resourceProcessors keeps track of all <resources/>
-    private HashMap resourceProcessors = new HashMap();
+    //private HashMap resourceMediators = new HashMap();
 
     public Axis2SynapseEnvironment(OMElement synapseConfiguration,
                                    ClassLoader cl) {
         super(null);
         this.cl = cl;
         if (synapseConfiguration!=null)
-            mainprocessor = ProcessorConfiguratorFinder.getProcessor(this, synapseConfiguration);
+            mainmediator = MediatorFactoryFinder.getMediator(this, synapseConfiguration);
     }
 
     public void injectMessage(SynapseMessage smc) {
-        mainprocessor.process(this, smc);
+    	mainmediator.mediate(smc);
     }
 
     public ClassLoader getClassLoader() {
@@ -71,49 +72,55 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
         this.cl = cl;
     }
 
-    public void send(SynapseMessage sm, SynapseEnvironment se) {
+    public void send(SynapseMessage sm) {
         if (sm.isResponse())
             Axis2Sender.sendBack(sm);
         else
-            Axis2Sender.sendOn(sm, se);
+            Axis2Sender.sendOn(sm);
     }
 
 
-    public Processor lookupProcessor(String name) {
-        return (Processor) processors.get(name);
+    public Mediator lookupMediator(String name) {
+        return (Mediator) mediators.get(name);
     }
 
-    public void addProcessor(Processor p) {
-        log.debug("adding processor with name " + p.getName());
-        if (processors.containsKey(p.getName()))
-            log.warn("name " + p.getName() + "already present");
-        processors.put(p.getName(), p);
+    public void addMediator(String name, Mediator m) {
+        log.debug("adding mediator with name " + name);
+        if (mediators.containsKey(name))
+            log.warn("name " + name + "already present");
+        mediators.put(name, m);
     }
 
-    public Processor getMasterProcessor() {
-        return mainprocessor;
+    public Mediator getMasterMediator() {
+        return mainmediator;
     }
 
-    public void setMasterProcessor(Processor p) {
-        mainprocessor = p;
+    public void setMasterMediator(Mediator m) {
+        mainmediator = m;
     }
 
     // lookup methods for resources handling
-    public Processor lookupResourceProcessor(String uriRoot) {
-        return (Processor) resourceProcessors.get(uriRoot);
+    public Mediator lookupResourceMediator(String uriRoot) {
+        return (Mediator) fac.getResourceMediator(uriRoot);
     }
 
-    public void addResourceProcessor(Processor p) {
-        if (resourceProcessors.containsKey(p.getName())) {
+    public void addResourceMediator(String uri, Mediator m) {
+        log.debug("adding "+uri+" with "+m.getClass());
+    	
+    	/*if (resourceMediators.containsKey(uri)) {
             throw new SynapseException(
                     "Uri Root is already exists. Not acceptable");
-        }
-        resourceProcessors.put(p.getName(), p);
+        }*/
+        
+        fac.addResourceMediator(uri, (ResourceMediator)m);
     }
 
     public ResourceHelper getResourceHelper() {
-        ResourceHelperFactory fac = ResourceHelperFactory.newInstance();
-        fac.setResourceProcessorsMap(this.resourceProcessors);
+        //ResourceHelperFactory fac = ResourceHelperFactory.newInstance();
+        //fac.setResourceProcessorsMap(this.resourceMediators);
+        //log.debug("size in env is "+this.resourceMediators.size());
         return fac.createResourceHelper();
     }
+
+	
 }

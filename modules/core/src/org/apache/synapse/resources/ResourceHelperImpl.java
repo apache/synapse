@@ -3,6 +3,8 @@ package org.apache.synapse.resources;
 import org.apache.synapse.api.ResourceUpdateAware;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 
@@ -24,6 +26,7 @@ import java.util.HashMap;
 
 public class ResourceHelperImpl implements ResourceHelper {
 
+	private Log log = LogFactory.getLog(getClass());
     protected HashMap resourceHandlers = new HashMap();
 
 
@@ -39,7 +42,7 @@ public class ResourceHelperImpl implements ResourceHelper {
                     throw new SynapseException("Unsupported uri");
                 }
             } else {
-                throw new SynapseException("Map doesnt contain the requested ResourceHandler");
+                throw new SynapseException("Map doesnt contain the requested ResourceHandler "+uri);
 
             }
         } else {
@@ -56,6 +59,7 @@ public class ResourceHelperImpl implements ResourceHelper {
     }
 
     public void registerResourceHandler(ResourceHandler rh, String urlRoot) {
+    	log.debug("registering resource handler for "+urlRoot);
         //runtime null pointer setting if neeeded, otherwise it has already been checked.
         if (rh != null && (urlRoot != null)) {
             if (resourceHandlers.containsKey(urlRoot)) {

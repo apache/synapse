@@ -1,10 +1,9 @@
 package org.apache.synapse.mediators.spring;
 
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.base.AbstractMediator;
+
 import org.springframework.context.support.GenericApplicationContext;
 
 /**
@@ -19,7 +18,7 @@ import org.springframework.context.support.GenericApplicationContext;
  * a BeanName property, which is set with the name of the bean  
  *
  */
-public class SpringMediator extends AbstractMediator {
+public class SpringMediator implements Mediator {
 	
 	private GenericApplicationContext ctx = null;
 

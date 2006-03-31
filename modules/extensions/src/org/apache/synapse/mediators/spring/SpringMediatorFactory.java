@@ -10,13 +10,9 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.xml.AbstractMediatorFactory;
 import org.apache.synapse.xml.Constants;
-import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 
-
-
-import org.apache.synapse.xml.AbstractProcessorConfigurator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -41,9 +37,9 @@ import org.springframework.core.io.ByteArrayResource;
  */
 public class SpringMediatorFactory extends AbstractMediatorFactory {
 	private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE+"/spring", "springmediator");
-	public Mediator createProcessor(SynapseEnvironment se, OMElement el) {
+	public Mediator createMediator(SynapseEnvironment se, OMElement el) {
 		SpringMediator sm = new SpringMediator();
-		super.setNameOnProcessor(se,el,smp);
+		super.setNameOnMediator(se,el,sm);
 		
 		OMAttribute bean = el.getAttribute(new QName("bean"));
 		if (bean == null) throw new SynapseException("missing bean attribute on "+el.toString());
@@ -81,8 +77,8 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
 		xbdr.loadBeanDefinitions(new ByteArrayResource(baos.toByteArray()));
 		ctx.setClassLoader(se.getClassLoader());
 		ctx.refresh();
-		smp.setContext(ctx);
-		return smp;
+		sm.setContext(ctx);
+		return sm;
 		
 		
 		

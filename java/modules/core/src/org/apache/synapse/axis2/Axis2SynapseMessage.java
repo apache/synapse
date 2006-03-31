@@ -47,6 +47,7 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     public Axis2SynapseMessage(MessageContext mc) {
         setMessageContext(mc);
+        setSynapseEnvironment(Axis2SynapseEnvironmentFinder.getSynapseEnvironment(mc));
     }
 
     public EndpointReference getFaultTo() {
@@ -218,10 +219,8 @@ public class Axis2SynapseMessage implements SynapseMessage {
 	}
 
 	public void setSynapseEnvironment(SynapseEnvironment env) {
-		mc.setProperty(
-                org.apache.synapse.Constants.MEDIATOR_SYNAPSE_ENV_PROPERTY,env
-                );
-		
+		Axis2SynapseEnvironmentFinder.setSynapseEnvironment(mc, env);
+		return;
 	}
 	
 	

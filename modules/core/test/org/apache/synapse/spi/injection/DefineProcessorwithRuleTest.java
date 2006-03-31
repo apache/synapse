@@ -18,7 +18,7 @@ package org.apache.synapse.spi.injection;
 import junit.framework.TestCase;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.processors.ListProcessor;
+import org.apache.synapse.mediators.base.ListMediator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;
@@ -57,13 +57,13 @@ public class DefineProcessorwithRuleTest extends TestCase {
     public void testRegexProcessor() throws Exception {
         SynapseMessage smc = new Axis2SynapseMessage(mc);
         env.injectMessage(smc);
-        assertEquals("test_define", env.lookupProcessor("test_define").getName());
-        assertEquals("test_define_addressing", env.lookupProcessor("test_define_addressing").getName());
-        List embededProcessors = ((ListProcessor)env.lookupProcessor("test_define")).getList();
-        assertEquals(2,embededProcessors.size());
-        ListProcessor masterProcessor = (ListProcessor)env.getMasterProcessor();
-        List masterProcessorList = masterProcessor.getList();
-        assertEquals(4,masterProcessorList.size());
+        //assertEquals("test_define", env.lookupMediator("test_define").getName());
+        //assertEquals("test_define_addressing", env.lookupMediator("test_define_addressing").getName());
+        List embeddedProcessors = ((ListMediator)env.lookupMediator("test_define")).getList();
+        assertEquals(2,embeddedProcessors.size());
+        ListMediator masterMediator = (ListMediator)env.getMasterMediator();
+        List masterMediatorList = masterMediator.getList();
+        assertEquals(4,masterMediatorList.size());
     }
 
 }

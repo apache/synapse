@@ -3,7 +3,7 @@ package org.apache.synapse.spi.processors;
 import junit.framework.TestCase;
 import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.processors.rules.RegexProcessor;
+import org.apache.synapse.mediators.rules.RegexMediator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.axis2.addressing.EndpointReference;
 /*
@@ -27,9 +27,9 @@ public class RegexProcessorTest extends TestCase {
     public void testRegexProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
         sm.setTo(new EndpointReference("http://xmethods.org"));
-        RegexProcessor pro = new RegexProcessor();
-        pro.setPattern("http://xmethods..\\*");
-        boolean result = pro.process(null,sm);
+        RegexMediator med = new RegexMediator();
+        med.setPattern("http://xmethods..\\*");
+        boolean result = med.mediate(sm);
         assertTrue(result);
 
     }

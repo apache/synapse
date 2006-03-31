@@ -36,7 +36,7 @@ public class BuiltInProcessorWithRuleTest extends TestCase {
         env = new Axis2SynapseEnvironment(
                 Axis2EnvSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-        assertNotNull(env.getMasterProcessor());
+        assertNotNull(env.getMasterMediator());
      }
 
 }

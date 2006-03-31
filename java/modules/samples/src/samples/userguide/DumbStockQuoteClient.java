@@ -1,7 +1,7 @@
 package samples.userguide;
 
 
-import org.apache.axis2.Constants;
+
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.addressing.EndpointReference;

@@ -63,7 +63,7 @@
             <include name="**"/>
         </jar>
 
-        <echo message="----------------Creating EnvironmentAware-Mediator aar----------------"/>
+        <!--echo message="Creating EnvironmentAware-Mediator aar"/>
         <mkdir dir="target/services/environmentaware-mediator/META-INF"/>
         <mkdir dir="target/services/environmentaware-mediator/org/apache/axis2/test"/>
         <copy file="test-resources/org/apache/axis2/META-INF/environmentaware-service.xml"
@@ -73,7 +73,7 @@
         <jar jarfile="target/environmentaware-mediator.aar"
              basedir="target/services/environmentaware-mediator">
             <include name="**"/>
-        </jar>
+        </jar-->
 
         <echo message="-----------Creating Testing Repository - SendOn ----------"/>
         <mkdir dir="target/synapse-repository-sendon"/>
@@ -147,7 +147,7 @@
               tofile="target/synapse-repository-httptcp/conf/synapse.xml"/>
 
         <echo message="-----------Creating Testing Repository - EnvironmentAware ----------"/>
-        <mkdir dir="target/synapse-repository-environmentaware"/>
+        <!--mkdir dir="target/synapse-repository-environmentaware"/>
 
         <copy file="target/environmentaware-mediator.aar"
               tofile="target/synapse-repository-environmentaware/services/environmentaware-mediator.aar"/>
@@ -160,7 +160,7 @@
         <copy file="../../repository/conf/axis2.xml"
               tofile="target/synapse-repository-environmentaware/conf/axis2.xml"/>
         <copy file="test/rules/synapse-environmentaware.xml"
-              tofile="target/synapse-repository-environmentaware/conf/synapse.xml"/>
+              tofile="target/synapse-repository-environmentaware/conf/synapse.xml"/-->
 
         <echo message="-----------Creating Testing Repository - Simple REST Repository ----------"/>
         <mkdir dir="target/synapse-repository-resources"/>

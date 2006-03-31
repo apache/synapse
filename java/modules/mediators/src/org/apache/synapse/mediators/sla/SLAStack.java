@@ -20,7 +20,12 @@ import java.util.ArrayList;
 
 public class SLAStack extends ArrayList
 {
-  public SLAStack()
+  /**
+	 * Needs a serialVersionUID as ArrayList is serializable. 
+	 */
+	private static final long serialVersionUID = 2705084012795071404L;
+	
+public SLAStack()
   {
   }
   public void addRequest(SLAObject slaObject)

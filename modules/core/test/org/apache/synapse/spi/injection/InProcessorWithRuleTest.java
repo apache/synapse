@@ -30,13 +30,8 @@ public class InProcessorWithRuleTest extends TestCase {
     private String synapsexml =
             "<synapse xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
                     "<in>" +
-                    "    <ref ref=\"add\"/>\n" +
+                    "    <engage-addressing-in/>\n" +
                     "</in>\n" +
-                    "<never>\n"+
-                        "<stage name=\"add\">\n"+
-                            "<engage-addressing-in/>\n" +
-                        "</stage>\n"+
-                    "</never>\n" +
             "</synapse>\n";
 
     public void setUp() throws Exception {
@@ -48,10 +43,11 @@ public class InProcessorWithRuleTest extends TestCase {
                 Axis2EnvSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        smc.setSynapseEnvironment(env);
         env.injectMessage(smc);
         assertTrue(((Boolean) smc.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
-        assertEquals("add",env.lookupProcessor("add").getName());
+        //assertEquals("add",env.lookupMediator("add").getName());
     }
 
 }

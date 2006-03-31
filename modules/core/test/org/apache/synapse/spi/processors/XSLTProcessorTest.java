@@ -1,16 +1,3 @@
-package org.apache.synapse.spi.processors;
-
-import junit.framework.TestCase;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.xml.ProcessorConfiguratorFinder;
-import org.apache.synapse.processors.builtin.xslt.XSLTProcessor;
-import org.apache.synapse.processors.builtin.xslt.XSLTProcessorConfigurator;
-import org.apache.synapse.util.Axis2EnvSetup;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.axis2.Axis2SynapseEnvironment;
-
-import java.io.ByteArrayInputStream;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -27,6 +14,19 @@ import java.io.ByteArrayInputStream;
 * limitations under the License.
 *
 */
+package org.apache.synapse.spi.processors;
+
+import junit.framework.TestCase;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.mediators.builtin.xslt.XSLTMediator;
+import org.apache.synapse.mediators.builtin.xslt.XSLTMediatorFactory;
+import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.synapse.xml.MediatorFactoryFinder;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
+
+import java.io.ByteArrayInputStream;
 
 public class XSLTProcessorTest extends TestCase {
     private String xsl = "<xsl:stylesheet version='1.0'\n" +
@@ -48,28 +48,28 @@ public class XSLTProcessorTest extends TestCase {
     public void testXSLTProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
-        XSLTProcessor pro = new XSLTProcessor();
-        pro.setXSLInputStream(new ByteArrayInputStream(xsl.getBytes()));
-        pro.setIsBody(true);
-        boolean result = pro.process(null, sm);
+        XSLTMediator med = new XSLTMediator();
+        med.setXSLInputStream(new ByteArrayInputStream(xsl.getBytes()));
+        med.setIsBody(true);
+        boolean result = med.mediate(sm);
         assertTrue(result);
     }
 
     public void testXSLTProcessorConfigurator() throws Exception {
-        XSLTProcessorConfigurator xsltProcessorConfigurator =
-                new XSLTProcessorConfigurator();
-        Class clazz = ProcessorConfiguratorFinder
-                .find(xsltProcessorConfigurator.getTagQName());
+        XSLTMediatorFactory fac =
+                new XSLTMediatorFactory();
+        Class clazz = MediatorFactoryFinder
+                .find(fac.getTagQName());
         assertNotNull(clazz);
-        Object processorObject = clazz.newInstance();
-        if (!(processorObject instanceof XSLTProcessorConfigurator)) {
+        Object mediatorObject = clazz.newInstance();
+        if (!(mediatorObject instanceof XSLTMediatorFactory)) {
             throw new Exception(
                     "XSLTProcessorConfigurator initialization falied");
         }
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EnvSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-        assertNotNull(env.getMasterProcessor());
+        assertNotNull(env.getMasterMediator());
 
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EnvSetup.axis2Deployment("target/synapse-repository"));

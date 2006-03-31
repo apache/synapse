@@ -47,6 +47,6 @@ public class ServiceMediatorProcessorWithAddressingEnageWithRuleTest extends Tes
 
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
-        assertNotNull(env.lookupProcessor("service-mediator"));
+        assertNotNull(env.lookupMediator("service-mediator"));
     }
 }

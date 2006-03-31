@@ -17,12 +17,11 @@
 package org.apache.synapse.processors.mediatortypes;
 
 
-import org.apache.synapse.SynapseEnvironment;
+
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.api.EnvironmentAware;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.processors.AbstractProcessor;
+
 
 /**
  *
@@ -32,13 +31,13 @@ import org.apache.synapse.processors.AbstractProcessor;
  * TODO add support for simple properties to be set
  *
  */
-public class ClassMediatorProcessor extends AbstractProcessor {
+public class ClassMediator implements Mediator{
 
 	private Class clazz = null;
 
 	
 
-	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+	public boolean mediate(SynapseMessage smc) {
 		Mediator m = null;
 
 		try {
@@ -46,9 +45,9 @@ public class ClassMediatorProcessor extends AbstractProcessor {
 		} catch (Exception e) {
 			throw new SynapseException(e);
 		}
-		if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
+		/*if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
 			((EnvironmentAware) m).setSynapseEnvironment(se);
-		}
+		}*/
 		return m.mediate(smc);
 
 	}

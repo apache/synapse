@@ -4,9 +4,9 @@ import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Processor;
-import org.apache.synapse.processors.mediatortypes.axis2.ServiceMediatorProcessor;
-import org.apache.synapse.xml.ServiceMediatorProcessorConfigurator;
+import org.apache.synapse.mediators.types.axis2.ServiceMediator;
+import org.apache.synapse.xml.ServiceMediatorFactory;
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;
@@ -50,14 +50,14 @@ public class ServiceMediatorProcessorWithRuleTest extends TestCase {
 
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
-        assertNotNull(env.lookupProcessor("service-mediator"));
+        assertNotNull(env.lookupMediator("service-mediator"));
     }
 
-    public void testAxis2MediagtorConfigurator() throws Exception {
-        ServiceMediatorProcessorConfigurator conf = new ServiceMediatorProcessorConfigurator();
+    public void testAxis2MediatorConfigurator() throws Exception {
+        ServiceMediatorFactory fac = new ServiceMediatorFactory();
 
-        Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
-        assertTrue(pro instanceof ServiceMediatorProcessor);
-        assertNotNull(pro.getName());
+        Mediator med = fac.createMediator(env,config.getFirstElement().getFirstElement());
+        assertTrue(med instanceof ServiceMediator);
+        //assertNotNull(pro.getName());
     }
 }

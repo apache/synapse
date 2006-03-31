@@ -1,11 +1,11 @@
 package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
-import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.processors.builtin.LogProcessor;
+import org.apache.synapse.mediators.builtin.LogMediator;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -27,8 +27,8 @@ public class BulitinProcessorTest extends TestCase {
     public void testLogProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
-        Processor log = new LogProcessor();
-        boolean result = log.process(null,sm);
+        Mediator log = new LogMediator();
+        boolean result = log.mediate(sm);
         assertTrue(result);
     }
     public void testSendProcessorTest() throws Exception {

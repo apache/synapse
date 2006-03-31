@@ -54,7 +54,7 @@ public class MediatorFalseReturnTest extends TestCase {
 
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
-        assertNotNull(env.lookupProcessor("mediator_false"));
+        assertNotNull(env.lookupMediator("mediator_false"));
         assertNull(smc.getProperty("test_string"));
     }
 

@@ -6,7 +6,9 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -44,8 +46,8 @@ public class TestSynapseMessage {
         } catch (AxisFault e) {
             throw new SynapseException(e);
         }
-
-        return new Axis2SynapseMessage(msgCtx);
+        
+        return new Axis2SynapseMessage(msgCtx,null);
     }
 
     public static Axis2SynapseMessage createSampleSOAP11MessageWithAddressing(

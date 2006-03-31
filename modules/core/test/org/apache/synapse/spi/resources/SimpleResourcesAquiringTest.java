@@ -59,8 +59,8 @@ public class SimpleResourcesAquiringTest extends TestCase {
     }
 
     public void testSimpleResourcesHandler() throws Exception {
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
-        //env.injectMessage(smc);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
+        env.injectMessage(smc);
 
     }
 }

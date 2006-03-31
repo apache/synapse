@@ -55,7 +55,7 @@ public class DefineProcessorwithRuleTest extends TestCase {
     }
 
     public void testRegexProcessor() throws Exception {
-        SynapseMessage smc = new Axis2SynapseMessage(mc);
+        SynapseMessage smc = new Axis2SynapseMessage(mc,env);
         env.injectMessage(smc);
         //assertEquals("test_define", env.lookupMediator("test_define").getName());
         //assertEquals("test_define_addressing", env.lookupMediator("test_define_addressing").getName());

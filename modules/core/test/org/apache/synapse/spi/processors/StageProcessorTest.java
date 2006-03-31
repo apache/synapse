@@ -21,8 +21,10 @@ import junit.framework.TestCase;
 import org.apache.synapse.mediators.base.StageMediator;
 import org.apache.synapse.mediators.rules.RegexMediator;
 import org.apache.synapse.mediators.rules.XPathMediator;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 import java.util.List;
@@ -30,8 +32,9 @@ import java.util.LinkedList;
 
 public class StageProcessorTest extends TestCase {
     public void testStageProcessor() throws Exception {
+    	SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"),env);
         StageMediator med = new StageMediator();
         boolean result = med.mediate(sm);
         assertTrue(result);

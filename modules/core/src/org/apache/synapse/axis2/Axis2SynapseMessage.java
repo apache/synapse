@@ -45,9 +45,9 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     private boolean faultResponse = false;
 
-    public Axis2SynapseMessage(MessageContext mc) {
+    public Axis2SynapseMessage(MessageContext mc, SynapseEnvironment se) {
         setMessageContext(mc);
-        setSynapseEnvironment(Axis2SynapseEnvironmentFinder.getSynapseEnvironment(mc));
+        setSynapseEnvironment(se);
     }
 
     public EndpointReference getFaultTo() {

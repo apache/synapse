@@ -57,7 +57,7 @@ public class ExceptionHandlingTest extends TestCase {
 
     public void testFaultScenario() {
         try {
-            env.injectMessage(new Axis2SynapseMessage(msgCtx));
+            env.injectMessage(new Axis2SynapseMessage(msgCtx, env));
             fail("Native End Point Throws an Exception");
         } catch (Exception e) {
         }

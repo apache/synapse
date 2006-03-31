@@ -1,8 +1,9 @@
 package org.apache.synapse.xml;
 
-import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.processors.builtin.axis2.AddressingOutMediator;
+import org.apache.synapse.api.Mediator;
+
+import org.apache.synapse.mediators.builtin.axis2.AddressingOutMediator;
 import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
@@ -22,15 +23,15 @@ import javax.xml.namespace.QName;
  * limitations under the License.
  */
 
-public class AddressingOutMediatorFactory extends AbstractProcessorConfigurator {
+public class AddressingOutMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName ADD_Q = new QName(Constants.SYNAPSE_NAMESPACE,
             "engage-addressing-out");
 
 
-    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
         AddressingOutMediator aom = new AddressingOutMediator();
-        super.setNameOnProcessor(se,el,aom);
+        super.setNameOnMediator(se,el,aom);
         return aom;
     }
 

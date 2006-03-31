@@ -15,7 +15,9 @@
  */
 package org.apache.synapse;
 
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.resources.ResourceHelper;
+import org.apache.synapse.resources.xml.ResourceMediator;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ import java.util.HashMap;
  *
  * 
  * <p>Common stuff needed to embed Synapse into a given runtime (e.g. Axis2) 
- * <p>This interface is used by the processors, and also by EnvironmentAware mediators
+ * <p>This interface is used by the mediators, and also by EnvironmentAware mediators
  * 
  *
  */
@@ -87,7 +89,7 @@ public abstract class SynapseEnvironment {
     abstract public void injectMessage(SynapseMessage smc);
 
     /*
-      * Processors or Mediators that wish to load classes should use the ClassLoader given here
+      * Mediators that wish to load classes should use the ClassLoader given here
       */
     abstract public ClassLoader getClassLoader();
 
@@ -98,34 +100,34 @@ public abstract class SynapseEnvironment {
      * <p>
      * This will send request messages on, and send response messages back to the client
      */
-    abstract public void send(SynapseMessage smc, SynapseEnvironment se);
+    abstract public void send(SynapseMessage smc);
 
 
     /**
      * This is used by the references to find a processor with a given name
      *
      */
-    abstract public Processor lookupProcessor(String name);
+    abstract public Mediator lookupMediator(String name);
 
 
     /**
      * This is how you add a processor to the list of processors. The name which it can be
      * retrieved by is the processor.getName()
      */
-    abstract public void addProcessor(Processor p);
+    abstract public void addMediator(String name, Mediator m);
 
 
     /**
      * This returns the "Master Processor" which is the root processor for this instance of
      * Synapse. Usually this would be the processor derived from &ltsynapse>.
      */
-    abstract public Processor getMasterProcessor();
+    abstract public Mediator getMasterMediator();
 
 
     /**
      * This sets the root processor for the engine.
      */
-    abstract public void setMasterProcessor(Processor p);
+    abstract public void setMasterMediator(Mediator p);
 
     /**
      * This method is responsible for updating resources via simple GET interface.
@@ -133,5 +135,5 @@ public abstract class SynapseEnvironment {
    
     abstract public ResourceHelper getResourceHelper();
 
-    abstract  public void addResourceProcessor(Processor p);
+    abstract  public void addResourceMediator(String name, Mediator p);
 }

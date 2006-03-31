@@ -24,6 +24,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.axiom.soap.SOAPEnvelope;
 
@@ -211,5 +212,18 @@ public class Axis2SynapseMessage implements SynapseMessage {
     public boolean isFaultResponse() {
         return this.faultResponse;
     }
+
+	public SynapseEnvironment getSynapseEnvironment() {
+		return Axis2SynapseEnvironmentFinder.getSynapseEnvironment(mc);
+	}
+
+	public void setSynapseEnvironment(SynapseEnvironment env) {
+		mc.setProperty(
+                org.apache.synapse.Constants.MEDIATOR_SYNAPSE_ENV_PROPERTY,env
+                );
+		
+	}
+	
+	
 
 }

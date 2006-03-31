@@ -16,4 +16,5 @@ package org.apache.synapse.api;
  */
 
 public interface ResourceUpdateAware {
+	
 }

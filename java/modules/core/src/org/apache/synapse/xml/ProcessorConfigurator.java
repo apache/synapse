@@ -22,6 +22,10 @@ import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.axiom.om.OMElement;
 
+/**
+ * @deprecated
+ *
+ */
 public interface ProcessorConfigurator {
     public Processor createProcessor(SynapseEnvironment se, OMElement el);
     public QName getTagQName();

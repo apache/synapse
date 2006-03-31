@@ -19,11 +19,11 @@ package org.apache.synapse.api;
 import org.apache.synapse.SynapseEnvironment;
 
 /**
- *
+ * @deprecated
  * <p>API for Mediators to get access to the Synapse Environment
  *
  */
-public interface EnvironmentAware {
+public interface EnvironmentAware  {
 	public void setSynapseEnvironment(SynapseEnvironment se);
 	public void setClassLoader(ClassLoader cl);
 

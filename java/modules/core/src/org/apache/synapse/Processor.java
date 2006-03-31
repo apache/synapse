@@ -18,6 +18,8 @@ package org.apache.synapse;
 
 
 /**
+ * @deprecated
+ * 
  * Processors are the main extension mechanism for Synapse. 
  * <p>
  * A Processor together with the XML ProcessorConfigurator extends both the synapse.xml 

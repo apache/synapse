@@ -26,7 +26,6 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -42,7 +41,7 @@ import java.util.Iterator;
  */
 public class Axis2Sender {
 
-    public static void sendOn(SynapseMessage smc, SynapseEnvironment se) {
+    public static void sendOn(SynapseMessage smc) {
 
         try {
 
@@ -135,7 +134,7 @@ public class Axis2Sender {
             TransportInDescription ti = messageContext.getTransportIn();
 
             outMsgContext.setTransportIn(ti);
-            se.injectMessage(new Axis2SynapseMessage(outMsgContext));
+            smc.getSynapseEnvironment().injectMessage(new Axis2SynapseMessage(outMsgContext));
 
         } catch (Exception e) {
             throw new SynapseException(e);

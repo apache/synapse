@@ -1,12 +1,11 @@
 package org.apache.synapse.resources.xml;
 
 import org.apache.synapse.xml.Constants;
-import org.apache.synapse.xml.ProcessorConfigurator;
-import org.apache.synapse.xml.ProcessorConfiguratorFinder;
-import org.apache.synapse.Processor;
+import org.apache.synapse.xml.MediatorFactory;
+import org.apache.synapse.xml.MediatorFactoryFinder;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.processors.ListProcessor;
+import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMAttribute;
@@ -32,7 +31,7 @@ import java.util.LinkedList;
  * limitations under the License.
  */
 
-public class ResourceMediatorFactory implements ProcessorConfigurator {
+public class ResourceMediatorFactory implements MediatorFactory {
 
     private Log log = LogFactory.getLog(getClass());
 
@@ -45,7 +44,7 @@ public class ResourceMediatorFactory implements ProcessorConfigurator {
 
 	private static final QName RESOURCE_URI_ROOT_ATT_Q = new QName("uri-root");
 
-    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
+    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
 
         ResourceMediator rp = new ResourceMediator();
 
@@ -77,38 +76,39 @@ public class ResourceMediatorFactory implements ProcessorConfigurator {
 
 
     public void addPropertiesMediatorsAndURIRoot(SynapseEnvironment se, OMElement el,
-                                       ListProcessor p) {
-        this.setRUIRoot(se,el,p);
+                                       ResourceMediator m) {
+        this.setURIRoot(se,el,m);
 
         Iterator it = el.getChildElements();
-        List processors = new LinkedList();
+        List mediators = new LinkedList();
         while (it.hasNext()) {
             OMElement child = (OMElement) it.next();
-            Processor proc =
-                    ProcessorConfiguratorFinder.getProcessor(se, child);
+            Mediator mediator=
+                    MediatorFactoryFinder.getMediator(se, child);
 
-            if (proc != null) {
-                if (proc instanceof PropertyMediator)
-                    processors.add(proc);
+            if (mediator != null) {
+                if (mediator instanceof PropertyMediator)
+                    mediators.add(mediator);
                 else
                     throw new SynapseException(
-                            "List contains an invalid Processsor" +
-                                    proc.getClass().getName());
+                            "List contains an invalid Mediator" +
+                                    mediator.getClass().getName());
             } else
                 log.info("Unknown child of all" + child.getLocalName());
         }
-        p.setList(processors);
+        m.setList(mediators);
 
     }
 
-    public void setRUIRoot(SynapseEnvironment se, OMElement el, Processor p) {
+    public void setURIRoot(SynapseEnvironment se, OMElement el, ResourceMediator m) {
 
 		OMAttribute uriRoot = el.getAttribute(RESOURCE_URI_ROOT_ATT_Q);
 		if (uriRoot != null) {
             // uri-root has already set
-            se.addResourceProcessor(p);
+            se.addResourceMediator(uriRoot.getAttributeValue(), m);
+            m.setURIRoot(uriRoot.getAttributeValue());
 		}
-		log.debug("compile "+el.getLocalName()+" with uri-root '"+p.getName() +"' on "+p.getClass());
+		log.debug("compile "+el.getLocalName()+" with uri-root '"+uriRoot.getAttributeValue() +"' on "+m.getClass());
 
 	}
 

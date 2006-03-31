@@ -96,4 +96,7 @@ public interface SynapseMessage {
     public void setFaultResponse(boolean b);
 
     public boolean isFaultResponse();
+    
+    public SynapseEnvironment getSynapseEnvironment();
+    public void setSynapseEnvironment(SynapseEnvironment env);
 }

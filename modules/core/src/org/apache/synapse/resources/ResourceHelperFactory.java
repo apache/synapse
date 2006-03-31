@@ -35,7 +35,7 @@ public class ResourceHelperFactory {
 
     private static boolean created = false;
 
-    private HashMap resourcesProcessorsMap;
+    private HashMap resourcesProcessorsMap = new HashMap();
 
     private ResourceHelperFactory() {
     }
@@ -52,7 +52,8 @@ public class ResourceHelperFactory {
     public ResourceHelper createResourceHelper() {
         log.debug("Creating resources helper");
         ResourceHelperImpl helper = new ResourceHelperImpl();
-
+        if (resourcesProcessorsMap==null) {throw new SynapseException("null resources map");}
+        log.debug("size of resources list "+resourcesProcessorsMap.size());
         for (Iterator ite = resourcesProcessorsMap.keySet().iterator();
              ite.hasNext();) {
 
@@ -67,18 +68,19 @@ public class ResourceHelperFactory {
                 //filling the propertybags of ResourceHanlder
                 fillResourceHandler(rp,rh);
                 helper.registerResourceHandler(rh,rp.getURIRoot());
+                log.debug(">created helper for "+rp.getURIRoot());
             } else {
                 throw new SynapseException(
-                        "Should be found only ResourceHandler implementaions");
+                        "Should be found only ResourceHandler implementations");
             }
 
         }
         return helper;
     }
 
-    private void fillResourceHandler(ResourceMediator rp, ResourceHandler rh) {
+    private void fillResourceHandler(ResourceMediator rm, ResourceHandler rh) {
         //filling the ResourcesHandlers properties
-        List rms = rp.getList();
+        List rms = rm.getList();
 
         for (Iterator ite = rms.iterator();ite.hasNext();) {
             Object obj = ite.next();
@@ -94,6 +96,12 @@ public class ResourceHelperFactory {
 
     }
 
+    public void addResourceMediator(String uri, ResourceMediator rm) {
+    	resourcesProcessorsMap.put(uri, rm);
+    }
+    public ResourceMediator getResourceMediator(String uri) {
+    	return (ResourceMediator)resourcesProcessorsMap.get(uri);
+    }
     public void setResourceProcessorsMap(HashMap resourceProcessorsMap) {
         this.resourcesProcessorsMap = resourceProcessorsMap;
     }

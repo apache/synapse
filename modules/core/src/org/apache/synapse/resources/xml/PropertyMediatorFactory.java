@@ -1,8 +1,8 @@
 package org.apache.synapse.resources.xml;
 
-import org.apache.synapse.xml.ProcessorConfigurator;
+import org.apache.synapse.api.Mediator;
+import org.apache.synapse.xml.MediatorFactory;
 import org.apache.synapse.xml.Constants;
-import org.apache.synapse.Processor;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
  * limitations under the License.
  */
 
-public class PropertyMediatorFactory implements ProcessorConfigurator {
+public class PropertyMediatorFactory implements MediatorFactory {
 
     private static final String PROPERTY = "property";
 
@@ -35,8 +35,8 @@ public class PropertyMediatorFactory implements ProcessorConfigurator {
 
     private static final QName PROPERTY_NAME_ATT_Q = new QName("name");
 
-    public Processor createProcessor(SynapseEnvironment se, OMElement el) {
-        PropertyMediator pp = new PropertyMediator();
+    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+        PropertyMediator pm = new PropertyMediator();
 
         OMAttribute name = el.getAttribute(PROPERTY_NAME_ATT_Q);
         if (name == null) {
@@ -45,10 +45,10 @@ public class PropertyMediatorFactory implements ProcessorConfigurator {
         }
 
         String value = el.getText();
-        pp.setName(name.getAttributeValue());
-        pp.setValue(value);
+        pm.setName(name.getAttributeValue());
+        pm.setValue(value);
 
-        return pp;  
+        return pm;  
     }
 
     public QName getTagQName() {

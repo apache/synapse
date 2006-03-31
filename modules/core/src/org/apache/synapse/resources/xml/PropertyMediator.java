@@ -1,8 +1,7 @@
 package org.apache.synapse.resources.xml;
 
-import org.apache.synapse.Processor;
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.api.Mediator;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *
@@ -19,11 +18,11 @@ import org.apache.synapse.SynapseMessage;
  * limitations under the License.
  */
 
-public class PropertyMediator implements Processor {
+public class PropertyMediator implements Mediator {
 
     protected String name;
     protected String value;
-    public boolean process(SynapseEnvironment se, SynapseMessage sm) {
+    public boolean mediate(SynapseMessage sm) {
         // this is not a inline mediator. Its soule purpose is to provide properties from Synapse.xml
         return true;
     }

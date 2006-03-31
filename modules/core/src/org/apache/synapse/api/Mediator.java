@@ -24,4 +24,6 @@ import org.apache.synapse.SynapseMessage;
  */
 public interface Mediator {
 	public boolean mediate(SynapseMessage smc);
+	//public String getName();
+	//public void setName(String name);
 }

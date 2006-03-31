@@ -48,7 +48,7 @@ public class ExactlyOneProcessorWithRuleTest extends TestCase {
             config = Axis2EnvSetup.getSynapseConfigElement(synapsexml1);
             env = new Axis2SynapseEnvironment(config,
                     Thread.currentThread().getContextClassLoader());
-            SynapseMessage smc = new Axis2SynapseMessage(mc);
+            SynapseMessage smc = new Axis2SynapseMessage(mc,env);
             env.injectMessage(smc);
             assertTrue(((Boolean) smc.getProperty(
                     Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());
@@ -60,7 +60,7 @@ public class ExactlyOneProcessorWithRuleTest extends TestCase {
             config = Axis2EnvSetup.getSynapseConfigElement(synapsexml2);
             env = new Axis2SynapseEnvironment(config,
                     Thread.currentThread().getContextClassLoader());
-            SynapseMessage smc = new Axis2SynapseMessage(mc);
+            SynapseMessage smc = new Axis2SynapseMessage(mc,env);
             env.injectMessage(smc);
             assertTrue(((Boolean) smc.getProperty(
                     Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());

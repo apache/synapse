@@ -45,7 +45,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
         // So it a mediator uses EnvironmentAware, that mediator will be injected with the correct environment
         
         ////////////////////////////////////////////////////////////////////////
-        SynapseMessage smc = new Axis2SynapseMessage(mc);
+        SynapseMessage smc = new Axis2SynapseMessage(mc,env);
         smc.setSynapseEnvironment(env);
         env.injectMessage(smc);
 

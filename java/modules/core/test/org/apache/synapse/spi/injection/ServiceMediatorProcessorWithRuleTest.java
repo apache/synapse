@@ -48,7 +48,7 @@ public class ServiceMediatorProcessorWithRuleTest extends TestCase {
 
     public void testAxis2MediatorProcessor() throws Exception {
 
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
         env.injectMessage(smc);
         assertNotNull(env.lookupMediator("service-mediator"));
     }

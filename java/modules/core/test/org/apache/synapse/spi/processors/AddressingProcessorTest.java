@@ -29,11 +29,12 @@ import junit.framework.TestCase;
 public class AddressingProcessorTest extends TestCase {
 
     public void testAddressingProcessor() throws Exception {
+    	SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"),env);
         Mediator addressingMediator = new AddressingInMediator();
-        SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
-        sm.setSynapseEnvironment(env);
+        
+      
         boolean result = addressingMediator.mediate(sm);
         assertTrue(((Boolean) sm.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());

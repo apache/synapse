@@ -50,7 +50,7 @@ public class SpringMediatorProcessorWithRuleTest extends TestCase {
 
         public void testSpringProcessor() throws Exception {
 
-            SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+            SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
             env.injectMessage(smc);
 
         }

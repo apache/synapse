@@ -48,7 +48,7 @@ public class ClassMediatorWithRuleTest extends TestCase {
 
     public void testClassMediatorProcessor() throws Exception {
 
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
         env.injectMessage(smc);
         assertNotNull(env.lookupMediator("mediation"));
     }

@@ -53,7 +53,7 @@ public class MultipleAddressingModuleEngagementTest extends TestCase {
         /**
          * Test case return an excetion if Something goes wrong in AddressingINProcessor
          */
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
         env.injectMessage(smc);
         assertNotNull(env.lookupMediator("mediation"));
     }

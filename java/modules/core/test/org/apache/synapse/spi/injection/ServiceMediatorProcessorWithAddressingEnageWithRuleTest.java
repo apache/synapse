@@ -45,7 +45,7 @@ public class ServiceMediatorProcessorWithAddressingEnageWithRuleTest extends Tes
 
     public void testServiceMediatorWithAddressingEngage() throws Exception {
 
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
         env.injectMessage(smc);
         assertNotNull(env.lookupMediator("service-mediator"));
     }

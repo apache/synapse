@@ -30,12 +30,12 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
 import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.processors.AbstractProcessor;
+
 
 /**
  *
@@ -45,12 +45,12 @@ import org.apache.synapse.processors.AbstractProcessor;
  * 
  *
  */
-public class ServiceMediatorProcessor extends AbstractProcessor {
+public class ServiceMediator implements Mediator {
 	
 
 	private String serviceName = null;
 
-	public boolean process(SynapseEnvironment se, SynapseMessage smc) {
+	public boolean mediate(SynapseMessage smc) {
 		MessageContext messageContext = null;
 		try {
 			messageContext = ((Axis2SynapseMessage) smc)

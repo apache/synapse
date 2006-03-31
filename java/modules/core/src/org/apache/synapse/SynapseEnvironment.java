@@ -17,7 +17,7 @@ package org.apache.synapse;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.resources.ResourceHelper;
-import org.apache.synapse.resources.xml.ResourceMediator;
+
 
 import java.util.Map;
 import java.util.HashMap;

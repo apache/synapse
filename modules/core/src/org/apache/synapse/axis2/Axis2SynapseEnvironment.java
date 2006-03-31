@@ -41,6 +41,8 @@ import org.apache.axiom.om.OMElement;
  *
  */
 public class Axis2SynapseEnvironment extends SynapseEnvironment {
+	
+	
     private Mediator mainmediator = null;
 
     private ClassLoader cl = null;

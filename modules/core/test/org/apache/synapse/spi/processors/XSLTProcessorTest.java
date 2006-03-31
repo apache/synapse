@@ -46,8 +46,9 @@ public class XSLTProcessorTest extends TestCase {
 
 
     public void testXSLTProcessor() throws Exception {
+    	SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"),env);
         XSLTMediator med = new XSLTMediator();
         med.setXSLInputStream(new ByteArrayInputStream(xsl.getBytes()));
         med.setIsBody(true);
@@ -72,7 +73,7 @@ public class XSLTProcessorTest extends TestCase {
         assertNotNull(env.getMasterMediator());
 
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"),env);
         // throws exceptions if anything goes wrong
         env.injectMessage(sm);
 

@@ -1,9 +1,12 @@
 package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
+
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.types.ClassMediator;
 import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
@@ -24,8 +27,9 @@ import org.apache.synapse.axis2.Axis2SynapseMessage;
 
 public class ClassMediatorProcessorTest extends TestCase {
     public void testClassMediatorProcessor() throws Exception {
+    	SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"),env);
         ClassMediator med = new ClassMediator();
         med.setClazz(Class.forName("org.apache.synapse.mediators.LoggerTestSample"));
         boolean result = med.mediate(sm);

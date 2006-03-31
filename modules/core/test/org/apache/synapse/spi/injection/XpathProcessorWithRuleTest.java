@@ -48,7 +48,7 @@ public class XpathProcessorWithRuleTest extends TestCase {
     }
 
     public void testXpathProcessor() throws Exception {
-        SynapseMessage smc = new Axis2SynapseMessage(mc);
+        SynapseMessage smc = new Axis2SynapseMessage(mc,env);
         env.injectMessage(smc);
         //assertEquals("xpath", env.lookupProcessor("xpath").getName());
     }

@@ -1,9 +1,12 @@
 package org.apache.synapse.spi.processors;
 
 import junit.framework.TestCase;
+
+import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.mediators.builtin.LogMediator;
 /*
@@ -25,8 +28,9 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 
 public class BulitinProcessorTest extends TestCase {
     public void testLogProcessor() throws Exception {
+    	SynapseEnvironment env = new Axis2SynapseEnvironment(null,null);
         SynapseMessage sm = new Axis2SynapseMessage(
-                Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
+                Axis2EnvSetup.axis2Deployment("target/synapse-repository"),env);
         Mediator log = new LogMediator();
         boolean result = log.mediate(sm);
         assertTrue(result);

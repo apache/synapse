@@ -42,7 +42,7 @@ public class InProcessorWithRuleTest extends TestCase {
         SynapseEnvironment env = new Axis2SynapseEnvironment(
                 Axis2EnvSetup.getSynapseConfigElement(synapsexml),
                 Thread.currentThread().getContextClassLoader());
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
         smc.setSynapseEnvironment(env);
         env.injectMessage(smc);
         assertTrue(((Boolean) smc.getProperty(

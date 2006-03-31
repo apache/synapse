@@ -50,7 +50,7 @@ public class AddressingProcessorWithRuleTest extends TestCase {
 
     public void testAddressingProcessor() throws Exception {
 
-        SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
+        SynapseMessage smc = new Axis2SynapseMessage(msgCtx,env);
         env.injectMessage(smc);
         assertTrue(((Boolean) smc.getProperty(
                 Constants.MEDIATOR_RESPONSE_PROPERTY)).booleanValue());

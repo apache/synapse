@@ -48,7 +48,7 @@ public class RegexProcessorWithRuleTest extends TestCase {
     }
 
     public void testRegexProcessor() throws Exception {
-        SynapseMessage smc = new Axis2SynapseMessage(mc);
+        SynapseMessage smc = new Axis2SynapseMessage(mc,env);
         env.injectMessage(smc);
         //assertEquals("regex", env.lookupProcessor("regex").getName());
 

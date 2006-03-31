@@ -55,7 +55,7 @@ public class MultipleAddressingModuleEngagementTest extends TestCase {
          */
         SynapseMessage smc = new Axis2SynapseMessage(msgCtx);
         env.injectMessage(smc);
-        assertNotNull(env.lookupProcessor("mediation"));
+        assertNotNull(env.lookupMediator("mediation"));
     }
 
 }

@@ -1,10 +1,3 @@
-package org.apache.synapse.spi.processors;
-
-import junit.framework.TestCase;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.synapse.processors.rules.XPathProcessor;
-import org.apache.synapse.util.Axis2EnvSetup;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -21,15 +14,22 @@ import org.apache.synapse.util.Axis2EnvSetup;
 * limitations under the License.
 *
 */
+package org.apache.synapse.spi.processors;
+
+import junit.framework.TestCase;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
+import org.apache.synapse.mediators.rules.XPathMediator;
+import org.apache.synapse.util.Axis2EnvSetup;
 
 public class XpathProcessorTest extends TestCase {
     public void testXpathProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
-        XPathProcessor pro = new XPathProcessor();
-        pro.setXPathExpr("//ns:text");
-        pro.addXPathNamespace("ns", "urn:text-body");
-        boolean result = pro.process(null, sm);
+        XPathMediator med  = new XPathMediator();
+        med.setXPathExpr("//ns:text");
+        med.addXPathNamespace("ns", "urn:text-body");
+        boolean result = med.mediate(sm);
         assertTrue(result);
 
     }

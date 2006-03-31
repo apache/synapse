@@ -1,15 +1,3 @@
-package org.apache.synapse.spi.processors;
-
-import junit.framework.TestCase;
-import org.apache.synapse.processors.StageProcessor;
-import org.apache.synapse.processors.rules.RegexProcessor;
-import org.apache.synapse.processors.rules.XPathProcessor;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.util.Axis2EnvSetup;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
-
-import java.util.List;
-import java.util.LinkedList;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -26,21 +14,34 @@ import java.util.LinkedList;
 * limitations under the License.
 *
 */
+package org.apache.synapse.spi.processors;
+
+import junit.framework.TestCase;
+
+import org.apache.synapse.mediators.base.StageMediator;
+import org.apache.synapse.mediators.rules.RegexMediator;
+import org.apache.synapse.mediators.rules.XPathMediator;
+import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.util.Axis2EnvSetup;
+import org.apache.synapse.axis2.Axis2SynapseMessage;
+
+import java.util.List;
+import java.util.LinkedList;
 
 public class StageProcessorTest extends TestCase {
     public void testStageProcessor() throws Exception {
         SynapseMessage sm = new Axis2SynapseMessage(
                 Axis2EnvSetup.axis2Deployment("target/synapse-repository"));
-        StageProcessor pro = new StageProcessor();
-        boolean result = pro.process(null, sm);
+        StageMediator med = new StageMediator();
+        boolean result = med.mediate(sm);
         assertTrue(result);
 
         List list = new LinkedList();
-        list.add(new RegexProcessor());
-        list.add(new XPathProcessor());
-        pro.setList(list);
+        list.add(new RegexMediator());
+        list.add(new XPathMediator());
+        med.setList(list);
 
-        boolean ret = pro.process(null,sm);
+        boolean ret = med.mediate(sm);
 
         assertTrue(ret);
 

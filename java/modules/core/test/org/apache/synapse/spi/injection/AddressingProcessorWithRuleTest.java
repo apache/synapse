@@ -5,9 +5,10 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.Processor;
-import org.apache.synapse.processors.builtin.axis2.AddressingInProcessor;
-import org.apache.synapse.xml.AddressingProcessorConfigurator;
+
+import org.apache.synapse.mediators.builtin.axis2.AddressingInMediator;
+import org.apache.synapse.xml.AddressingInMediatorFactory;
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.util.Axis2EnvSetup;
@@ -56,10 +57,10 @@ public class AddressingProcessorWithRuleTest extends TestCase {
     }
 
     public void testAddressingConfigurator() throws Exception {
-        AddressingProcessorConfigurator conf = new AddressingProcessorConfigurator();
+        AddressingInMediatorFactory fac = new AddressingInMediatorFactory();
 
-        Processor pro = conf.createProcessor(env,config.getFirstElement().getFirstElement());
-        assertTrue(pro instanceof AddressingInProcessor);
-        assertNull(pro.getName());
+        Mediator pro = fac.createMediator(env,config.getFirstElement().getFirstElement());
+        assertTrue(pro instanceof AddressingInMediator);
+        
     }
 }

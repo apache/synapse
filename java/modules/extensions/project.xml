@@ -44,7 +44,7 @@
                 <resource>
                     <directory>src</directory>
                     <includes>
-                        <include>**/org.apache.synapse.xml.ProcessorConfigurator</include>
+                        <include>**/org.apache.synapse.xml.MediatorFactory</include>
                     </includes>
                 </resource>
             </resources>

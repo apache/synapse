@@ -134,9 +134,13 @@ public class Axis2Sender {
             TransportInDescription ti = messageContext.getTransportIn();
 
             outMsgContext.setTransportIn(ti);
+            
+            if (smc.getSynapseEnvironment()==null) {
+            	throw new SynapseException("no Synapse Env set on message");
+            }
             smc.getSynapseEnvironment().injectMessage(new Axis2SynapseMessage(outMsgContext));
-
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new SynapseException(e);
         }
     }

@@ -30,6 +30,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p/>
@@ -37,14 +39,14 @@ import org.apache.axiom.om.OMElement;
  * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
  */
 public class Axis2SynapseEnvironmentFinder implements Constants {
-
+	private static Log log = LogFactory.getLog(Axis2SynapseEnvironmentFinder.class);
     public static synchronized SynapseEnvironment getSynapseEnvironment(
             MessageContext mc) {
         AxisConfiguration ac =
                 mc.getConfigurationContext().getAxisConfiguration();
         Parameter synapseEnvParam = ac.getParameter(SYNAPSE_ENVIRONMENT);
         if (synapseEnvParam == null) {
-
+        	log.debug("synapse env not available - creating");
             Parameter param = ac.getParameter(SYNAPSECONFIGURATION);
             if (param == null) {
                 throw new SynapseException("no parameter '"
@@ -78,6 +80,18 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
         }
         return (SynapseEnvironment) synapseEnvParam.getValue();
 
+    }
+    public static synchronized void setSynapseEnvironment(MessageContext mc, SynapseEnvironment se) {
+    	  AxisConfiguration ac =
+              mc.getConfigurationContext().getAxisConfiguration();
+    	  Parameter synapseEnvParam = new Parameter(SYNAPSE_ENVIRONMENT, null);
+          synapseEnvParam.setValue(se);
+    	  try {
+			ac.addParameter(synapseEnvParam);
+		} catch (AxisFault e) {
+			throw new SynapseException(e);
+		}
+    	
     }
 
 }

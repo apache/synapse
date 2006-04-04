@@ -54,6 +54,7 @@ public class Axis2Sender {
 
             if (smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null)
             {
+
                 messageContext.setProperty(
                         Constants.ENGAGE_ADDRESSING_IN_MESSAGE, Boolean.TRUE);
 
@@ -72,61 +73,9 @@ public class Axis2Sender {
 
             // run all rules on response
 
-            smc.setResponse(true);
-//            ///////////////////////////////////////////////////////////////////
-//            // special treat for Module Engagement
-//            ConfigurationContext configContext = (ConfigurationContext) smc
-//                    .getProperty(
-//                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
-//            if (configContext != null) {
-//                outMsgContext.setProperty(
-//                        Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT,
-//                        configContext);
-//            }
-//            //////////////////////////////////////////////////////////////////
+            smc.setResponse(true);//
 
             outMsgContext.setServerSide(true);
-
-            // deal with the fact that AddressingOutHandler has a bug if
-            // there is no header at all.        
-            // fixed in axis 0.9652 
-            SOAPEnvelope envelope = outMsgContext.getEnvelope();
-            // temporarty hack
-            SOAPEnvelope newEnvelope;
-            if (envelope.getHeader() == null) {
-                SOAPFactory soapFactory;
-                if (envelope.getNamespace().getName()
-                        .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-                    soapFactory = OMAbstractFactory.getSOAP12Factory();
-                    newEnvelope = soapFactory.getDefaultEnvelope();
-                } else {
-                    soapFactory = OMAbstractFactory.getSOAP11Factory();
-                    newEnvelope = soapFactory.getDefaultEnvelope();
-
-                }
-                /**
-                 * Need a big fix here. Axis2 folks should fix this
-                 */
-                //envelope.addChild(soapFactory.createSOAPHeader(envelope));
-                //todo: bug in Axiom when another tree is declared and copy some elements from one tree to other
-                //todo: the second tree doesn't serialize attribute aware namespaces properly
-                //todo: as a temporartory hack this was taken into account
-                Iterator iterator = envelope.getAllDeclaredNamespaces();
-                while (iterator.hasNext()) {
-                    OMNamespace namespace = (OMNamespace) iterator.next();
-                    if (namespace.getName()
-                            .equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI) ||
-                            namespace.getName()
-                                    .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
-                    {
-                        continue;
-                    }
-                    newEnvelope.declareNamespace(namespace);
-                }
-                newEnvelope.getBody()
-                        .addChild(envelope.getBody().getFirstElement());
-                outMsgContext.setEnvelope(newEnvelope);
-            }
 
             Object os = messageContext
                     .getProperty(MessageContext.TRANSPORT_OUT);
@@ -134,13 +83,14 @@ public class Axis2Sender {
             TransportInDescription ti = messageContext.getTransportIn();
 
             outMsgContext.setTransportIn(ti);
-            
-            if (smc.getSynapseEnvironment()==null) {
-            	throw new SynapseException("no Synapse Env set on message");
+
+            if (smc.getSynapseEnvironment() == null) {
+                throw new SynapseException("no Synapse Env set on message");
             }
-            smc.getSynapseEnvironment().injectMessage(new Axis2SynapseMessage(outMsgContext, smc.getSynapseEnvironment()));
+            smc.getSynapseEnvironment().injectMessage(new Axis2SynapseMessage(
+                    outMsgContext, smc.getSynapseEnvironment()));
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             throw new SynapseException(e);
         }
     }
@@ -151,25 +101,14 @@ public class Axis2Sender {
         AxisEngine ae =
                 new AxisEngine(messageContext.getConfigurationContext());
         try {
-            if (messageContext.getEnvelope().getHeader() == null) {
-                messageContext.getEnvelope().getBody().insertSiblingBefore(
-                        OMAbstractFactory.getSOAP11Factory()
-                                .getDefaultEnvelope()
-                                .getHeader());
-
-            }
+//
 
 
             messageContext
                     .setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check for addressing is alredy engaged for this message.
             // if engage we should use the address enable Configuraion context.
-//            ConfigurationContext configContext = (ConfigurationContext) smc
-//                    .getProperty(
-//                            Constants.ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT);
-//            if (configContext != null) {
-//                messageContext.setConfigurationContext(configContext);
-//            }
+//
 
             ae.send(messageContext);
         } catch (AxisFault e) {

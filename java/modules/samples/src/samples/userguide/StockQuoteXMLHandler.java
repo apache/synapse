@@ -25,29 +25,27 @@ public class StockQuoteXMLHandler {
 		return getQuote;
 	}
 
-	public static String parseResponse(OMElement result) throws XMLStreamException {
-		QName gQR = new QName("http://www.webserviceX.NET/", "GetQuoteResponse");
+    public static String parseResponse(OMElement result)
+            throws XMLStreamException {
+        QName gQR =
+                new QName("http://www.webserviceX.NET/", "GetQuoteResponse");
 
-		OMElement qResp = (OMElement) result.getChildrenWithName(gQR).next();
+        OMElement qResp = (OMElement) result.getChildrenWithName(gQR).next();
 
-		String text = ((OMText) qResp.getFirstOMChild()).getText();
-		// this odd webservice embeds XML as a string inside other XML
-		// hmmmm can't say its useful!
+        String text = qResp.getText();
 
-		
 
-		
-			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(
-                    text.getBytes()));
+        StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(
+                text.getBytes()));
 
-			OMElement parse = builder.getDocumentElement();
-		
-		OMElement last = (OMElement) parse.getFirstElement().getFirstElement()
-				.getNextOMSibling();
-		OMText lastText = (OMText) last.getFirstOMChild();
-		return lastText.getText();
-		
-	}
+        OMElement parse = builder.getDocumentElement();
+
+        OMElement last = (OMElement) parse.getFirstElement().getFirstElement()
+                .getNextOMSibling();
+        OMText lastText = (OMText) last.getFirstOMChild();
+        return lastText.getText();
+
+    }
 	
 
 

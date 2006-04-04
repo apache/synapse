@@ -81,7 +81,7 @@ public class RegexMediator extends AbstractConditionMediator{
 			toMatch = headerType.getHeader(smc);
 		}
 
-		if (toMatch==null) return true;
+		if (toMatch==null) return false;  
 
 		if (pattern.matcher(toMatch).matches()) {
 			log.debug("Regex pattern " + pattern.toString() + " matched "

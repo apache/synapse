@@ -74,7 +74,6 @@ public class DumbStockQuoteClient {
             // System.out.println(result);
 
             // step 4 - parse result
-
             System.out.println("Stock price = $"
                     + StockQuoteXMLHandler.parseResponse(result));
 

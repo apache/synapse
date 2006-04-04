@@ -174,6 +174,8 @@ public class Axis2FlexibleMEPClient {
                 smc.getProperty(
                         org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
 
+        System.out.println("################# getTo of response :" + response.getTo());
+
         // If request is REST we assume the response is REST, so set the
         // variable
         response.setDoingREST(smc.isDoingREST());

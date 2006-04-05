@@ -26,14 +26,7 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMNamespace;
 
-import java.util.Iterator;
 
 
 /**

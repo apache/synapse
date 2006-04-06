@@ -37,10 +37,10 @@ public class SendOnProcessorWithAddressingEngageWithRuleTest extends TestCase {
     public void setUp() throws Exception {
         ConfigurationContext synapseServerContext = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
-                        "target/synapse-repository-sendon", null);
+                        "target/synapse-repository-sendon", "target/synapse-repository-sendon/conf/axis2.xml");
         ConfigurationContext serverContext = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
-                        "target/synapse-repository-sendonAxis2", null);
+                        "target/synapse-repository-sendonAxis2", "target/synapse-repository-sendonAxis2/conf/axis2.xml");
         synapseServer = new SimpleHTTPServer(synapseServerContext,5043);
         /**
          * axis2Server is the one who holds the actual service

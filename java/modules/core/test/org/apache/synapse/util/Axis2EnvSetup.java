@@ -19,6 +19,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -41,7 +42,7 @@ public class Axis2EnvSetup {
             throws AxisFault {
         final ConfigurationContext configCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(testingRepository,
-                        null);
+                        testingRepository + File.separator + "conf" + File.separator + "axis2.xml");
         MessageContext msgCtx = new MessageContext();
         msgCtx.setConfigurationContext(configCtx);
         msgCtx.setEnvelope(testEnvSetup());

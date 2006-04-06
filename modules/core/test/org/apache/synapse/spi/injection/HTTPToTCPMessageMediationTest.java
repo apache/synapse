@@ -36,15 +36,18 @@ public class HTTPToTCPMessageMediationTest extends TestCase {
     public void setUp() throws Exception {
         ConfigurationContext synapseServerContext = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
-                        "target/synapse-repository-httptcp", null);
+                        "target/synapse-repository-httptcp", "target/synapse-repository-httptcp/conf/axis2.xml");
 
         synapseServer =
                 new SimpleHTTPServer(synapseServerContext,5043);
         /**
          * axis2TcpServer is the one who holds the actual service
          */
+        ConfigurationContext serverContext = ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem(
+                        "target/synapse-repository-sendonAxis2Tcp", "target/synapse-repository-sendonAxis2Tcp/conf/axis2.xml");
         axis2TcpServer =
-                new TCPServer(8090, "target/synapse-repository-sendonAxis2Tcp");
+                new TCPServer(8090, serverContext);
         synapseServer.start();
         axis2TcpServer.start();
     }

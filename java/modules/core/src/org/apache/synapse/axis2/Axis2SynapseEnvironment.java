@@ -63,6 +63,7 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
     }
 
     public void injectMessage(SynapseMessage smc) {
+    	smc.setSynapseEnvironment(this);
     	mainmediator.mediate(smc);
     }
 

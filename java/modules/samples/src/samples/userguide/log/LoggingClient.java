@@ -50,7 +50,7 @@ public class LoggingClient {
         OMElement method = fac.createOMElement("service", omNs);
         OMElement value = fac.createOMElement("text", omNs);
         value.addChild(
-                fac.createText(value, "Synapse Sample String"));
+                fac.createOMText(value, "Synapse Sample String"));
         method.addChild(value);
         return method;
     }

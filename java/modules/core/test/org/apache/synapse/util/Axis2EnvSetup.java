@@ -95,7 +95,7 @@ public class Axis2EnvSetup {
         OMElement method = fac.createOMElement("service", omNs);
         OMElement value = fac.createOMElement("text", omNs);
         value.addChild(
-                fac.createText(value, "Synapse Testing String"));
+                fac.createOMText(value, "Synapse Testing String"));
         method.addChild(value);
         return method;
     }
@@ -107,7 +107,7 @@ public class Axis2EnvSetup {
         OMElement method = fac.createOMElement("service", omNs);
         OMElement value = fac.createOMElement("text_addressing", omNs);
         value.addChild(
-                fac.createText(value,
+                fac.createOMText(value,
                         "Synapse Testing String Through Addressing"));
         method.addChild(value);
         return method;
@@ -120,7 +120,7 @@ public class Axis2EnvSetup {
         OMElement method = fac.createOMElement("service", omNs);
         OMElement value = fac.createOMElement("text_ping", omNs);
         value.addChild(
-                fac.createText(value, "Synapse Testing String for Ping"));
+                fac.createOMText(value, "Synapse Testing String for Ping"));
         method.addChild(value);
         return method;
     }

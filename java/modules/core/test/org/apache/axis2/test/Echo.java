@@ -33,7 +33,7 @@ public class Echo {
                 "urn:text-body", "ns");
         OMElement responseText = fac.createOMElement("response_text", omNs);
         responseText.addChild(
-                fac.createText(responseText, "Synapse Testing String_Response"));
+                fac.createOMText(responseText, "Synapse Testing String_Response"));
         return responseText;
     }
     public OMElement fault(OMElement element) throws AxisFault {
@@ -49,7 +49,7 @@ public class Echo {
                 "urn:text-body", "ns");
         OMElement responseText = fac.createOMElement("response_text_addressing", omNs);
         responseText.addChild(
-                fac.createText(responseText, "Synapse Testing String_Response_With_Addressing"));
+                fac.createOMText(responseText, "Synapse Testing String_Response_With_Addressing"));
         return responseText;
     }
 

@@ -66,11 +66,11 @@
             <!--<artifactId>axis2-common</artifactId>-->
             <!--<version>${axis2.version}</version>-->
         <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>axis2</groupId>-->
-            <!--<artifactId>axis2-wsdl</artifactId>-->
-            <!--<version>${axis2.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2-wsdl</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>ws-commons</groupId>

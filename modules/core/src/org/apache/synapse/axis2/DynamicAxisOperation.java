@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
 import java.util.HashMap;
 
 /**
- * DynamicAxisOperation which switch dyamcially between MEPs
+ * DynamicAxisOperation which switch dynamically between MEPs
  */
 public class DynamicAxisOperation extends InOutAxisOperation {
     public DynamicAxisOperation() {
@@ -153,6 +153,9 @@ class DynamicOperationClient implements OperationClient {
             engine.send(mc);
         }
 
+    }
+    public OperationContext getOperationContext() {
+    	return oc;
     }
 
     public void reset() throws AxisFault {

@@ -38,7 +38,7 @@ public class TestSynapseMessage {
 
             OMElement body = OMAbstractFactory.getOMFactory().createOMElement(
                     "test-body", "urn:test", "test");
-            OMAbstractFactory.getOMFactory().createText(body,
+            OMAbstractFactory.getOMFactory().createOMText(body,
                     "Do not be alarmed, this is just a test");
 
             env.getBody().addChild(body);

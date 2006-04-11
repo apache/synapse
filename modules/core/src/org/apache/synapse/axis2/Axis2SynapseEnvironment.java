@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.registry.Registry;
 import org.apache.synapse.resources.ResourceHelperFactory;
 import org.apache.synapse.resources.ResourceHelper;
 import org.apache.synapse.resources.xml.ResourceMediator;
@@ -40,28 +41,51 @@ import org.apache.axiom.om.OMElement;
  * <p> This is the Axis2 implementation of the SynapseEnvironment
  *
  */
-public class Axis2SynapseEnvironment extends SynapseEnvironment {
-	
+public class Axis2SynapseEnvironment implements SynapseEnvironment {
 	
     private Mediator mainmediator = null;
 
     private ClassLoader cl = null;
-
+    private Map properties = new HashMap();
     private Map mediators = new HashMap();
 
     private Log log = LogFactory.getLog(getClass());
-    private ResourceHelperFactory fac = ResourceHelperFactory.newInstance();
-    //resourceProcessors keeps track of all <resources/>
-    //private HashMap resourceMediators = new HashMap();
 
     public Axis2SynapseEnvironment(OMElement synapseConfiguration,
                                    ClassLoader cl) {
-        super(null);
+        super();
         this.cl = cl;
         if (synapseConfiguration!=null)
             mainmediator = MediatorFactoryFinder.getMediator(this, synapseConfiguration);
     }
 
+    /**
+     * Retrieves an object given a key.
+     *
+     * @param key - if not found, will return null
+     * @return Returns the property.
+     */
+
+    public Object getProperty(String key) {
+        Object obj = null;
+
+        obj = properties.get(key);
+
+
+        return obj;
+    }
+    
+    /**
+     * Store a property for message context
+     *
+     * @param key
+     * @param value
+     */
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+
+    
     public void injectMessage(SynapseMessage smc) {
     	smc.setSynapseEnvironment(this);
     	mainmediator.mediate(smc);
@@ -103,27 +127,37 @@ public class Axis2SynapseEnvironment extends SynapseEnvironment {
     }
 
     // lookup methods for resources handling
-    public Mediator lookupResourceMediator(String uriRoot) {
-        return (Mediator) fac.getResourceMediator(uriRoot);
-    }
+ //   public Mediator lookupResourceMediator(String uriRoot) {
+   //     return (Mediator) fac.getResourceMediator(uriRoot);
+   // }
 
-    public void addResourceMediator(String uri, Mediator m) {
-        log.debug("adding "+uri+" with "+m.getClass());
+  //  public void addResourceMediator(String uri, Mediator m) {
+   //     log.debug("adding "+uri+" with "+m.getClass());
     	
     	/*if (resourceMediators.containsKey(uri)) {
             throw new SynapseException(
                     "Uri Root is already exists. Not acceptable");
         }*/
         
-        fac.addResourceMediator(uri, (ResourceMediator)m);
-    }
+   //     fac.addResourceMediator(uri, (ResourceMediator)m);
+   // }
 
-    public ResourceHelper getResourceHelper() {
+   // public ResourceHelper getResourceHelper() {
         //ResourceHelperFactory fac = ResourceHelperFactory.newInstance();
         //fac.setResourceProcessorsMap(this.resourceMediators);
         //log.debug("size in env is "+this.resourceMediators.size());
-        return fac.createResourceHelper();
-    }
+    //    return fac.createResourceHelper();
+   // }
+
+	public Registry getRegistry() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Registry getRegistry(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	
 }

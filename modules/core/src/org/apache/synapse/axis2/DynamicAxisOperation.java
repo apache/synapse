@@ -16,7 +16,7 @@
 
 package org.apache.synapse.axis2;
 
-import org.apache.axis2.description.*;
+
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -27,8 +27,15 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.ClientUtils;
+import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.synapse.SynapseException;
 import org.apache.wsdl.WSDLConstants;
+
 
 import javax.xml.namespace.QName;
 import java.util.HashMap;

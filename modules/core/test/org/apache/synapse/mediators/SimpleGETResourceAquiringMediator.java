@@ -3,8 +3,8 @@ package org.apache.synapse.mediators;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.axiom.om.OMElement;
-import junit.framework.TestCase;
+//import org.apache.axiom.om.OMElement;
+//import junit.framework.TestCase;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *
@@ -33,10 +33,10 @@ public class SimpleGETResourceAquiringMediator
     }
 
     public boolean mediate(SynapseMessage smc) {
-        OMElement resourcesElement = smc.getSynapseEnvironment().getResourceHelper()
-                .get("http://127.0.0.1:8090/axis2/services/npe/simple_resources");
+   //     OMElement resourcesElement = smc.getSynapseEnvironment().getResourceHelper()
+     //           .get("http://127.0.0.1:8090/axis2/services/npe/simple_resources");
         // test for resources being not null
-        TestCase.assertNotNull(resourcesElement);
+   //     TestCase.assertNotNull(resourcesElement);
         return true;
     }
 }

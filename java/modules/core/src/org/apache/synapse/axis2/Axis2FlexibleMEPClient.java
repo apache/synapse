@@ -25,6 +25,7 @@ import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -32,7 +33,6 @@ import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 
 import org.apache.synapse.Constants;
-import org.apache.wsdl.WSDLConstants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;

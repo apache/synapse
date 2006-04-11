@@ -105,7 +105,7 @@ public class ResourceMediatorFactory implements MediatorFactory {
 		OMAttribute uriRoot = el.getAttribute(RESOURCE_URI_ROOT_ATT_Q);
 		if (uriRoot != null) {
             // uri-root has already set
-            se.addResourceMediator(uriRoot.getAttributeValue(), m);
+       //     se.addResourceMediator(uriRoot.getAttributeValue(), m);
             m.setURIRoot(uriRoot.getAttributeValue());
 		}
 		log.debug("compile "+el.getLocalName()+" with uri-root '"+uriRoot.getAttributeValue() +"' on "+m.getClass());

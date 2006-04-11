@@ -16,11 +16,7 @@
 package org.apache.synapse;
 
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.resources.ResourceHelper;
-
-
-import java.util.Map;
-import java.util.HashMap;
+import org.apache.synapse.registry.Registry;
 
 
 /**
@@ -31,51 +27,9 @@ import java.util.HashMap;
  * 
  *
  */
-public abstract class SynapseEnvironment {
+public interface SynapseEnvironment {
 
-    protected SynapseEnvironment parent;
-    protected Map properties;
 
-    protected SynapseEnvironment(SynapseEnvironment parent) {
-        this.properties = new HashMap();
-        this.parent = parent;
-    }
-
-    public SynapseEnvironment getParent() {
-        return this.parent;
-    }
-
-    public void setParent(SynapseEnvironment parent) {
-        this.parent = parent;
-    }
-
-    /**
-     * Retrieves an object given a key.
-     *
-     * @param key - if not found, will return null
-     * @return Returns the property.
-     */
-    public Object getProperty(String key) {
-        Object obj = null;
-
-        obj = properties.get(key);
-
-        if ((obj == null) && (parent != null)) {
-            obj = parent.getProperty(key);
-        }
-
-        return obj;
-    }
-
-    /**
-     * Store a property for message context
-     *
-     * @param key
-     * @param value
-     */
-    public void setProperty(String key, Object value) {
-        properties.put(key, value);
-    }
     
     /*
       * This method injects a new message into the Synapse engine
@@ -86,12 +40,12 @@ public abstract class SynapseEnvironment {
       * <p>For example if you want to send a copy of a message somewhere, you can clone it and then
       * injectMessage()
       */
-    abstract public void injectMessage(SynapseMessage smc);
+    public void injectMessage(SynapseMessage smc);
 
     /*
       * Mediators that wish to load classes should use the ClassLoader given here
       */
-    abstract public ClassLoader getClassLoader();
+    public ClassLoader getClassLoader();
 
 
     /**
@@ -100,40 +54,43 @@ public abstract class SynapseEnvironment {
      * <p>
      * This will send request messages on, and send response messages back to the client
      */
-    abstract public void send(SynapseMessage smc);
+    public void send(SynapseMessage smc);
 
 
     /**
      * This is used by the references to find a processor with a given name
      *
      */
-    abstract public Mediator lookupMediator(String name);
+    public Mediator lookupMediator(String name);
 
 
     /**
      * This is how you add a processor to the list of processors. The name which it can be
      * retrieved by is the processor.getName()
      */
-    abstract public void addMediator(String name, Mediator m);
+    public void addMediator(String name, Mediator m);
 
 
     /**
      * This returns the "Master Processor" which is the root processor for this instance of
      * Synapse. Usually this would be the processor derived from &ltsynapse>.
      */
-    abstract public Mediator getMasterMediator();
+    public Mediator getMasterMediator();
 
 
     /**
      * This sets the root processor for the engine.
      */
-    abstract public void setMasterMediator(Mediator p);
+    public void setMasterMediator(Mediator p);
 
-    /**
-     * This method is responsible for updating resources via simple GET interface.
-     */
-   
-    abstract public ResourceHelper getResourceHelper();
+	public Object getProperty(String string);
 
-    abstract  public void addResourceMediator(String name, Mediator p);
+	public void setProperty(String string, Object object);
+
+	public Registry getRegistry();
+	public Registry getRegistry(String name);
+	
+    //public ResourceHelper getResourceHelper();
+
+    //public void addResourceMediator(String name, Mediator p);
 }

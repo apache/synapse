@@ -25,7 +25,7 @@ import org.apache.synapse.SynapseMessage;
  * Only processes if this is not a response
  *
  */
-public class InMediator extends ListMediator{
+public class InMediator extends AbstractListMediator {
 
 	public boolean mediate(SynapseMessage sm) {
 		if (!sm.isResponse()) return super.mediate(sm);

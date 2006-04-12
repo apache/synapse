@@ -23,7 +23,7 @@ import org.apache.synapse.SynapseMessage;
  * This only executes on response messages
  *
  */
-public class OutMediator extends ListMediator{
+public class OutMediator extends AbstractListMediator{
 
 	public boolean mediate(SynapseMessage sm) {
 		if (sm.isResponse()) return super.mediate(sm);

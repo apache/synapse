@@ -18,7 +18,7 @@ package org.apache.synapse.spi.injection;
 import junit.framework.TestCase;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.mediators.base.ListMediator;
+import org.apache.synapse.api.ListMediator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.synapse.util.Axis2EnvSetup;

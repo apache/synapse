@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.rules.XPathMediator;
+import org.apache.synapse.mediators.filters.XPathMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNamespace;

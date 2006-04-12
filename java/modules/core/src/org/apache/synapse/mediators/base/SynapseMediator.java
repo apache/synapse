@@ -23,5 +23,5 @@ package org.apache.synapse.mediators.base;
  * Here in case we need the main <synapse> to do anything special
  *
  */
-public class SynapseMediator extends ListMediator {
+public class SynapseMediator extends AbstractListMediator {
 }

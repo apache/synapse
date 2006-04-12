@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.api.ListMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseMessage;
 
@@ -33,7 +34,7 @@ import org.apache.synapse.SynapseMessage;
  *         stuff.
  * 
  */
-public abstract class ListMediator implements Mediator {
+public abstract class AbstractListMediator implements ListMediator {
 	
 	private Log log = LogFactory.getLog(getClass());
 

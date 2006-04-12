@@ -5,7 +5,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.mediators.rules.RegexMediator;
+import org.apache.synapse.mediators.filters.RegexMediator;
 import org.apache.synapse.xml.RegexMediatorFactory;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.axis2.Axis2SynapseMessage;

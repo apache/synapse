@@ -1,6 +1,5 @@
-package org.apache.synapse.mediators.conditions;
+package org.apache.synapse.mediators.filters;
 
-import org.apache.synapse.mediators.base.AbstractConditionMediator;
 import org.apache.synapse.SynapseMessage;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
@@ -18,7 +17,7 @@ import org.apache.synapse.SynapseMessage;
  * limitations under the License.
  */
 
-public class DefaultMediator extends AbstractConditionMediator {
+public class DefaultMediator extends AbstractFilterMediator {
    
 	public boolean test(SynapseMessage sm) {
 		return true;

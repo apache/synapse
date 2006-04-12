@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.apache.synapse.util.Axis2EnvSetup;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.mediators.rules.RegexMediator;
+import org.apache.synapse.mediators.filters.RegexMediator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.axis2.Axis2SynapseMessage;
 import org.apache.axis2.addressing.EndpointReference;

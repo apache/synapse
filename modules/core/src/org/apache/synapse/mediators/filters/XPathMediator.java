@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.mediators.rules;
+package org.apache.synapse.mediators.filters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseMessageConstants;
-import org.apache.synapse.mediators.base.AbstractConditionMediator;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.jaxen.JaxenException;
 
@@ -35,7 +34,7 @@ import org.jaxen.JaxenException;
  * TODO add the context into the XPath matching space
  * 
  */
-public class XPathMediator extends AbstractConditionMediator {
+public class XPathMediator extends AbstractFilterMediator {
 
 	private Log log = LogFactory.getLog(getClass());
 

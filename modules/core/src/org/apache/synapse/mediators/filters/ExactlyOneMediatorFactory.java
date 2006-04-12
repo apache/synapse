@@ -1,8 +1,8 @@
-package org.apache.synapse.mediators.conditions;
+package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.mediators.filters.ExactlyOneMediator;
 import org.apache.synapse.xml.AbstractListMediatorFactory;
-import org.apache.synapse.xml.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.axiom.om.OMElement;
 import javax.xml.namespace.QName;
@@ -20,7 +20,7 @@ public class ExactlyOneMediatorFactory extends AbstractListMediatorFactory {
 
     private static final String EXACTLYONE = "exactlyone";
 
-	private static final QName SWITCH_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+	private static final QName SWITCH_Q = new QName(org.apache.synapse.xml.Constants.SYNAPSE_NAMESPACE,
 			EXACTLYONE);
 
 

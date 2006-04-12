@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.mediators.rules.XPathMediator;
+import org.apache.synapse.mediators.filters.XPathMediator;
 import org.apache.synapse.xml.XPathMediatorFactory;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.axis2.Axis2SynapseEnvironment;

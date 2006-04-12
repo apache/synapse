@@ -24,8 +24,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.api.ListMediator;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.base.ListMediator;
 import org.apache.axiom.om.OMElement;
 
 /**

@@ -1,25 +1,28 @@
-package org.apache.synapse.mediators.conditions;
+package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseMessageConstants;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.base.ListMediator;
+import org.apache.synapse.mediators.base.AbstractListMediator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Corresponding to <exactly/> This conatins conditional mediators such as
  * <regex/> and <xpath/> It will look for the first match, if the first match is
  * true then all the other mediators listed thereafter will be ingnored
  */
-public class ExactlyOneMediator extends ListMediator {
+public class ExactlyOneMediator extends AbstractListMediator {
 
 	private Log log = LogFactory.getLog(getClass());
 
 public boolean mediate( SynapseMessage smc) {
         log.debug("ExactlyOneMediator");
+        List mediators = getList(); // from parent
         if (mediators == null || mediators.size()==0) {
             log.info("no mediators called -  empty list");
             return true;

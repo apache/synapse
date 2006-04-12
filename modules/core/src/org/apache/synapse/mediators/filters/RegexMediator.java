@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.mediators.rules;
+package org.apache.synapse.mediators.filters;
 
 import java.util.regex.Pattern;
 
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.synapse.HeaderType;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.mediators.base.AbstractConditionMediator;
+
 
 
 /**
@@ -35,7 +35,7 @@ import org.apache.synapse.mediators.base.AbstractConditionMediator;
  * 
  * 
  */
-public class RegexMediator extends AbstractConditionMediator{
+public class RegexMediator extends AbstractFilterMediator {
 	private Pattern pattern = null;
 
 	private Log log = LogFactory.getLog(getClass());

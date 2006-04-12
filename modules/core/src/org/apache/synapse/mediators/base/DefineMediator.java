@@ -20,7 +20,7 @@ import org.apache.synapse.SynapseMessage;
 /**
  *
  */
-public class DefineMediator extends ListMediator {
+public class DefineMediator extends AbstractListMediator {
 
     public boolean mediate(SynapseMessage sm) {
         return true;

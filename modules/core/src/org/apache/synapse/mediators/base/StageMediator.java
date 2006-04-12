@@ -22,5 +22,5 @@ package org.apache.synapse.mediators.base;
  * 
  * 
  */
-public class StageMediator extends ListMediator {
+public class StageMediator extends AbstractListMediator {
 }

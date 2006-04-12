@@ -24,7 +24,7 @@ import org.apache.synapse.SynapseMessage;
  * This never executes its children. Used as a holder (for references)
  *
  */
-public class NeverMediator extends ListMediator {
+public class NeverMediator extends AbstractListMediator {
 
 	public boolean mediate(SynapseMessage sm) {
 		return true;

@@ -1,6 +1,7 @@
-package org.apache.synapse.mediators.conditions;
+package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.mediators.filters.DefaultMediator;
 import org.apache.synapse.xml.AbstractListMediatorFactory;
 import org.apache.synapse.xml.Constants;
 import org.apache.synapse.SynapseEnvironment;
@@ -24,7 +25,8 @@ import javax.xml.namespace.QName;
  */
 
 public class DefaultMediatorFactory
-        extends AbstractListMediatorFactory {
+        extends AbstractListMediatorFactory
+        {
 
     private static final QName DEFAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE,
 			"default");

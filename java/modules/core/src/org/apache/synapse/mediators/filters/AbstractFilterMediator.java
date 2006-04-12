@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.mediators.base;
+package org.apache.synapse.mediators.filters;
 
 
 
 
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseMessageConstants;
+import org.apache.synapse.mediators.base.AbstractListMediator;
 
 
 /**
@@ -29,7 +30,7 @@ import org.apache.synapse.SynapseMessageConstants;
  *  
  *        
  */
-public abstract class AbstractConditionMediator  extends ListMediator {
+public abstract class AbstractFilterMediator extends AbstractListMediator {
 
 	//private Log log = LogFactory.getLog(getClass());
 
@@ -44,6 +45,7 @@ public abstract class AbstractConditionMediator  extends ListMediator {
 			 return true;
 		}
 	}
+	
 	public abstract boolean test(SynapseMessage sm);
 	
 

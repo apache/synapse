@@ -1,6 +1,6 @@
 package org.apache.synapse.resources.xml;
 
-import org.apache.synapse.mediators.base.ListMediator;
+import org.apache.synapse.mediators.base.AbstractListMediator;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 /*
@@ -19,7 +19,7 @@ import org.apache.synapse.SynapseMessage;
  * limitations under the License.
  */
 
-public class ResourceMediator extends ListMediator {
+public class ResourceMediator extends AbstractListMediator {
     protected String type;
     protected String uriRoot;
     public boolean process(SynapseEnvironment se, SynapseMessage smc) {

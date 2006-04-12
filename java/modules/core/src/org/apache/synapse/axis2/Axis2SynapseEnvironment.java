@@ -23,16 +23,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
+import org.apache.synapse.Metrics;
+import org.apache.synapse.MetricsFactory;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.registry.Registry;
-import org.apache.synapse.resources.ResourceHelperFactory;
-import org.apache.synapse.resources.ResourceHelper;
-import org.apache.synapse.resources.xml.ResourceMediator;
+//import org.apache.synapse.resources.ResourceHelperFactory;
+//import org.apache.synapse.resources.ResourceHelper;
+//import org.apache.synapse.resources.xml.ResourceMediator;
 
 import org.apache.synapse.xml.MediatorFactoryFinder;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.addressing.EndpointReference;
 
 /**
  *
@@ -157,6 +160,36 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 	public Registry getRegistry(String name) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void setMetricsFactory(String URIPrefix, MetricsFactory mf) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Metrics getMetrics(String URI) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Metrics getMetrics(EndpointReference epr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void addRegistry(String name, Registry reg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addRegistry(Registry reg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addMetricsFactory(String URIPrefix, MetricsFactory mf) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

@@ -17,6 +17,7 @@
 package org.apache.synapse.axis2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -129,6 +130,36 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         mainmediator = m;
     }
 
+	public Registry getRegistry() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setRegistry(Registry reg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Metrics getMetrics(String URI) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Metrics getMetrics(EndpointReference epr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setMetricsFactory(MetricsFactory mf) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void publish(OMElement element) {
+		// TODO Auto-generated method stub
+		
+	}
+
     // lookup methods for resources handling
  //   public Mediator lookupResourceMediator(String uriRoot) {
    //     return (Mediator) fac.getResourceMediator(uriRoot);
@@ -152,45 +183,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     //    return fac.createResourceHelper();
    // }
 
-	public Registry getRegistry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	public Registry getRegistry(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setMetricsFactory(String URIPrefix, MetricsFactory mf) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public Metrics getMetrics(String URI) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public Metrics getMetrics(EndpointReference epr) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void addRegistry(String name, Registry reg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addRegistry(Registry reg) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addMetricsFactory(String URIPrefix, MetricsFactory mf) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	
 }

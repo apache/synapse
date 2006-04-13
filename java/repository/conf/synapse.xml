@@ -6,7 +6,7 @@
 	<log/>
 	
     <!-- Check if the URL matches the stockquote gateway/dumb case -->
-	<regex message-address="to" pattern="/StockQuote.*">
+	<regex message-address="to" pattern=".*/StockQuote.*">
 		<ref ref="stockquote"/>				
 	</regex>	
 	
@@ -26,7 +26,9 @@
             <!-- check if the symbol is MSFT -->
             <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
                 <!-- if it is throw a fault -->
-                <fault/>
+                <fault>
+                    <reason>Isn't there a Windows API for that?</reason>
+                </fault>
             </xpath>
         </stage>
 

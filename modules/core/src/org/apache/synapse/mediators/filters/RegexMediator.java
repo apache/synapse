@@ -74,7 +74,8 @@ public class RegexMediator extends AbstractFilterMediator {
 			log.debug("trying to process with empty pattern");
 			return true;
 		}
-		String toMatch = null;
+
+        String toMatch;
 		if (property != null) {
 			toMatch = smc.getProperty(property).toString();
 		} else {
@@ -84,11 +85,18 @@ public class RegexMediator extends AbstractFilterMediator {
 		if (toMatch==null) return false;  
 
 		if (pattern.matcher(toMatch).matches()) {
-			log.debug("Regex pattern " + pattern.toString() + " matched "
-					+ toMatch);
+            if (log.isDebugEnabled()) {
+                log.debug("Regex pattern " + pattern.pattern() + " matched "
+                        + toMatch);
+            }
             return true;
 		}
-		return false;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Regex pattern '" + pattern.pattern() +
+                    "' failed to match '" + toMatch);
+        }
+        return false;
 	}
 
 }

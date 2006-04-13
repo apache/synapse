@@ -33,16 +33,27 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
     private static final QName HEADER_Q = new QName(
             Constants.SYNAPSE_NAMESPACE, "fault");
 
-
-
+    private static final QName FAULTCODE = new QName(
+            Constants.SYNAPSE_NAMESPACE, "faultCode");
+    private static final QName REASON = new QName(
+            Constants.SYNAPSE_NAMESPACE, "reason");
 
     public Mediator createMediator(SynapseEnvironment se, OMElement el) {
         FaultMediator fp = new FaultMediator();
+
+        OMElement code = el.getFirstChildWithName(FAULTCODE);
+        if (code != null) {
+            fp.setFaultCode(code.getTextAsQName());
+        }
+        OMElement reason = el.getFirstChildWithName(REASON);
+        if (reason != null) {
+            fp.setReason(reason.getText());
+        }
         super.setNameOnMediator(se, el, fp);
         return fp;
     }
 
-        public QName getTagQName() {
+    public QName getTagQName() {
         return HEADER_Q;
     }
 

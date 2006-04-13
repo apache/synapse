@@ -28,47 +28,71 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 
+import javax.xml.namespace.QName;
+
 /**
  * <p/> This returns a fault in response to this message
  */
 public class FaultMediator implements Mediator{
 
-	private Log log = LogFactory.getLog(getClass());
+    private Log log = LogFactory.getLog(getClass());
 
-	public boolean mediate(SynapseMessage smc) {
-		log.debug("process");
+    private QName faultCode;
+    private String reason;
 
-		SOAPEnvelope envelop = smc.getEnvelope();
-		SOAPFactory factory;
-		if (envelop != null) {
-			if (envelop.getNamespace().getName().equals(
-					SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-				factory = OMAbstractFactory.getSOAP12Factory();
-			} else {
-				factory = OMAbstractFactory.getSOAP11Factory();
-			}
+    public boolean mediate(SynapseMessage smc) {
+        log.debug("process");
 
-		} else {
-			factory = OMAbstractFactory.getSOAP11Factory();
-		}
-		try {
-			OMDocument soapFaultDocument = factory.createOMDocument();
-			SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
-			soapFaultDocument.addChild(faultEnvelope);
-			smc.setEnvelope(faultEnvelope);
-		} catch (Exception e) {
-			throw new SynapseException(e);
-		}
-		smc.setResponse(true);
+        SOAPEnvelope envelop = smc.getEnvelope();
+        SOAPFactory factory;
+        if (envelop != null) {
+            if (envelop.getNamespace().getName().equals(
+                    SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
+                factory = OMAbstractFactory.getSOAP12Factory();
+            } else {
+                factory = OMAbstractFactory.getSOAP11Factory();
+            }
 
-		// Flipping the headers
-		EndpointReference tempEPR = smc.getTo();
-		smc.setTo(smc.getReplyTo());
-		smc.setReplyTo(tempEPR);
+        } else {
+            factory = OMAbstractFactory.getSOAP11Factory();
+        }
+        try {
+            // TODO : Figure out how to easily gen the correct fault
 
-		smc.getSynapseEnvironment().injectMessage(smc);
+            // Replace this
+            OMDocument soapFaultDocument = factory.createOMDocument();
+            SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
+            soapFaultDocument.addChild(faultEnvelope);
 
-		return false;
-	}
+            smc.setEnvelope(faultEnvelope);
+        } catch (Exception e) {
+            throw new SynapseException(e);
+        }
+        smc.setResponse(true);
 
+        // Flipping the headers
+        EndpointReference tempEPR = smc.getTo();
+        smc.setTo(smc.getReplyTo());
+        smc.setReplyTo(tempEPR);
+
+        smc.getSynapseEnvironment().injectMessage(smc);
+
+        return false;
+    }
+
+    public QName getFaultCode() {
+        return faultCode;
+    }
+
+    public void setFaultCode(QName faultCode) {
+        this.faultCode = faultCode;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 }

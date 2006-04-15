@@ -11,6 +11,8 @@ import org.apache.axiom.om.OMElement;
 
 
 import junit.framework.TestCase;
+
+import javax.xml.namespace.QName;
 /*
 * Copyright 2004,2005 The Apache Software Foundation.
 *
@@ -61,12 +63,36 @@ public class SendOnProcessorWithAddressingEngageWithRuleTest extends TestCase {
                 Axis2EnvSetup.createConfigurationContextFromFileSystem(
                         "target/synapse-repository-sendon"), null);
         Options options = new Options();
+        options.setAction("urn:anonymous");
         options.setTo(targetEpr);
         serviceClient.setOptions(options);
+        serviceClient.engageModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
         OMElement response = serviceClient
                 .sendReceive(Axis2EnvSetup.payloadNamedAdddressing());
         assertEquals("Synapse Testing String_Response_With_Addressing",
                 response.getText());
+
+    }
+
+    public void testSendProcessorMultiple() {
+        try {
+            for (int i = 0; i < 8; i++) {
+                ServiceClient serviceClient = new ServiceClient(
+                        Axis2EnvSetup.createConfigurationContextFromFileSystem(
+                                "target/synapse-repository-sendon"), null);
+                Options options = new Options();
+                options.setTo(targetEpr);
+                options.setAction("urn:anonymous");
+                serviceClient.setOptions(options);
+                serviceClient.engageModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
+                OMElement response = serviceClient
+                        .sendReceive(Axis2EnvSetup.payloadNamedAdddressing());
+                assertEquals("Synapse Testing String_Response_With_Addressing",
+                        response.getText());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

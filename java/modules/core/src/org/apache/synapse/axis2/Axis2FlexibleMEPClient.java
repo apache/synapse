@@ -55,13 +55,13 @@ public class Axis2FlexibleMEPClient {
         if (soapHeader != null) {
             addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
                     AddressingConstants.Submission.WSA_NAMESPACE);
-            if (addressingHeaders != null) {
+            if (addressingHeaders != null && addressingHeaders.size() != 0) {
                 detachAddressingInformation(addressingHeaders);
 
             } else {
                 addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
                         AddressingConstants.Final.WSA_NAMESPACE);
-                if (addressingHeaders != null) {
+                if (addressingHeaders != null && addressingHeaders.size() != 0) {
                     detachAddressingInformation(addressingHeaders);
                 }
             }
@@ -69,6 +69,10 @@ public class Axis2FlexibleMEPClient {
         return env;
     }
 
+    /**
+     *
+     * @param headerInformation
+     */
     private static void detachAddressingInformation(ArrayList headerInformation) {
         Iterator iterator = headerInformation.iterator();
         while (iterator.hasNext()) {
@@ -136,25 +140,20 @@ public class Axis2FlexibleMEPClient {
         }
 
         // handling the outbound message with addressing
-        AxisModule module = ac.getModule(new QName("addressing"))  ;
+        AxisModule module = ac.getModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
         if ((smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) ||
                 (smc.getProperty(
                         Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null)){
-//            if (!ac.isEngaged(new QName("addressing")))
-//                ac.engageModule(new QName("addressing"));
-
             if (!ac.getService("__ANONYMOUS_SERVICE__")
                     .isEngaged(module.getName())) {
                 ac.getService("__ANONYMOUS_SERVICE__").engageModule(module, ac);
             }
-//
         }
 
 
         //TODO; following line needed to be removed
-        mc.setEnvelope(outEnvelopeConfiguration(smc));
-        ///////////////////////////////////////////////////////////////////////
 
+        mc.setEnvelope(outEnvelopeConfiguration(smc));
 
         AxisOperation axisAnonymousOperation =
                 ac.getService("__ANONYMOUS_SERVICE__")
@@ -174,18 +173,12 @@ public class Axis2FlexibleMEPClient {
                 smc.getProperty(
                         org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
 
-        System.out.println("################# getTo of response :" + response.getTo());
 
         // If request is REST we assume the response is REST, so set the
         // variable
         response.setDoingREST(smc.isDoingREST());
         response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
 
-        // disengae addressing if engage - mandatory
-        //TODO: temporary solution
-//        if (ac.isEngaged(new QName("addressing"))) {
-//            ac.disEngageModule(ac.getModule(new QName("addressing")));
-//        }
         if (ac.getService("__ANONYMOUS_SERVICE__")
                 .isEngaged(module.getName())) {
             ac.getService("__ANONYMOUS_SERVICE__")

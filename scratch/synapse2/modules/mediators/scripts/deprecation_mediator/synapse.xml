@@ -1,0 +1,36 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+    <engage-addressing-in/>
+    <log/>
+
+    <!-- this matches the gateway case -->
+    <regex message-address="to" pattern="/StockQuote.*">
+        <ref ref="stockquote"/>
+    </regex>
+    <!-- this matches the virtual url case for either the proxy or ws-add case -->
+    <regex message-address="to" pattern="http://stockquote.*">
+        <ref ref="stockquote"/>
+    </regex>
+
+
+    <regex message-address="to"
+           pattern="http://www.webservicex.net/stockquote.asmx">
+        <servicemediator name="Deprecation" service="DeprecationMediator"/>
+    </regex>
+
+    <send/>
+
+    <never>
+        <stage name="stockquote">
+            <!-- set the To address to the real endpoint -->
+            <header type="to" value="http://www.webservicex.net/stockquote.asmx"/>
+            <!-- check if the symbol is MSFT -->
+            <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+                <!-- if it is throw a fault -->
+                <fault/>
+            </xpath>
+        </stage>
+
+    </never>
+</synapse>
+

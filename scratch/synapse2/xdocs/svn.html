@@ -1,0 +1,67 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="">
+  <title></title>
+</head>
+
+<body>
+<h1>Developing Apache Synapse</h1>
+
+<h2>Working with Subversion</h2>
+
+<p>The Synapse development uses Subversion for source control. To learn
+more about Subversion or to download the latest distribution, visit the <a
+href="http:///subversion.tigris.org">Subversion project site</a>.  If you are
+looking for guidance on setting up and installing Subversion, please read the
+ASF <a href="http://www.apache.org/dev/version-control.html">Source Code
+Repositories page</a>.</p>
+
+<h2>Checkout</h2>
+
+<p>Use the following URL to download latest source code of Synapse:</p>
+<ul>
+  <li><b>Use</b> <a
+    href="https://svn.apache.org/repos/asf/incubator/synapse/trunk/java">
+    https://svn.apache.org/repos/asf/incubator/synapse/trunk/java</a></li>
+</ul>
+
+<p>Once you have successfully installed Subversion, you can check out Synapse
+trunk by following these steps:</p>
+<ol type="1">
+  <li>Run <strong>svn co &lt;repository URL&gt; synapse</strong> where
+    repository URL is one of the URLs from the previous list.</li>
+  <li>This step will check out the latest version of the Synapse Java codebase
+    to a directory named "synapse".  The second parameter to the svn co selects
+    a directory to create on your local machine.  If you want to checkout
+    Synapse to a different directory, feel free to change synapse to any other
+    directory name.</li>
+  <li>To update your working copy to the latest version from the repository.
+    Execute the <strong>svn update</strong> command.</li>
+  <li>If you would like to submit a patch, you can execute <strong>svn
+    diff</strong> to create a unified diff for submission to the Synapse JIRA
+    issue tracker.</li>
+</ol>
+
+<h2>Installing Maven 1</h2>
+
+<p>Synapse build is based on Maven 1.  Maven is a build system that allows
+for the reuse of common build projects across multiple projects.  For
+information about obtaining, installing, and configuring Maven 1, please see
+the <a href="http://maven.apache.org">Maven project page</a>.  To use Maven
+to build the Synapse project, follow these simple steps:</p>
+<ol type="1">
+  <li>Install <a href="http://maven.apache.org/">Maven</a>. See <a
+    href="http://maven.apache.org/start/install.html">here</a> for
+    instructions.
+    <ul>
+      <li>Create a MAVEN_HOME environment variable.</li>
+      <li>Add MAVEN_HOME/bin to your PATH</li>
+    </ul>
+  </li>
+  <li>Go to the synapse folder in the command prompt and type
+    <strong>maven<strong>.</strong></strong></li>
+  <li>Maven will then automatically download all the jars, compile, test and
+    build the Synapse deliverables.</li>
+</ol>
+</body>
+</html>

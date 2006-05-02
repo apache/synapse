@@ -25,6 +25,6 @@ public class ServiceMediatorMessageReceiver extends AbstractMessageReceiver {
         SynapseMessage smc = new Axis2SynapseMessage(messageContext, Axis2SynapseEnvironmentFinder.getSynapseEnvironment(messageContext));
         boolean returnValue = mediator.mediate(smc);
         messageContext.setProperty(Constants.MEDIATOR_RESPONSE_PROPERTY,
-                new Boolean(returnValue));
+            new Boolean(returnValue));
     }
 }

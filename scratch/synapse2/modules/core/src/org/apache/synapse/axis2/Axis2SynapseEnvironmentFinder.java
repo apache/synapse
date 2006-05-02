@@ -16,22 +16,20 @@
 
 package org.apache.synapse.axis2;
 
-import java.io.InputStream;
-
-import javax.xml.stream.XMLStreamException;
-
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
-
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseException;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.InputStream;
 
 /**
  * <p/>
@@ -39,22 +37,23 @@ import org.apache.commons.logging.LogFactory;
  * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
  */
 public class Axis2SynapseEnvironmentFinder implements Constants {
-	private static Log log = LogFactory.getLog(Axis2SynapseEnvironmentFinder.class);
+    private static Log log = LogFactory.getLog(Axis2SynapseEnvironmentFinder.class);
+
     public static synchronized SynapseEnvironment getSynapseEnvironment(
-            MessageContext mc) {
+        MessageContext mc) {
         AxisConfiguration ac =
-                mc.getConfigurationContext().getAxisConfiguration();
+            mc.getConfigurationContext().getAxisConfiguration();
         Parameter synapseEnvParam = ac.getParameter(SYNAPSE_ENVIRONMENT);
         if (synapseEnvParam == null) {
-        	log.debug("synapse env not available - creating");
+            log.debug("synapse env not available - creating");
             Parameter param = ac.getParameter(SYNAPSECONFIGURATION);
             if (param == null) {
                 throw new SynapseException("no parameter '"
-                        + SYNAPSECONFIGURATION + "' in axis2.xml");
+                    + SYNAPSECONFIGURATION + "' in axis2.config");
             }
             String synapseConfig = (String) param.getValue();
             InputStream is = mc.getAxisService().getClassLoader()
-                    .getResourceAsStream(synapseConfig.trim());
+                .getResourceAsStream(synapseConfig.trim());
 
             StAXOMBuilder builder;
             try {
@@ -62,13 +61,13 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
 
             } catch (XMLStreamException e1) {
                 throw new SynapseException(
-                        "Trouble parsing Synapse Configuration ", e1);
+                    "Trouble parsing Synapse Configuration ", e1);
 
             }
             OMElement config = builder.getDocumentElement();
             config.build();
             Axis2SynapseEnvironment se = new Axis2SynapseEnvironment(config, mc
-                    .getAxisService().getClassLoader());
+                .getAxisService().getClassLoader());
 
             synapseEnvParam = new Parameter(SYNAPSE_ENVIRONMENT, null);
             synapseEnvParam.setValue(se);
@@ -81,17 +80,18 @@ public class Axis2SynapseEnvironmentFinder implements Constants {
         return (SynapseEnvironment) synapseEnvParam.getValue();
 
     }
+
     public static synchronized void setSynapseEnvironment(MessageContext mc, SynapseEnvironment se) {
-    	  AxisConfiguration ac =
-              mc.getConfigurationContext().getAxisConfiguration();
-    	  Parameter synapseEnvParam = new Parameter(SYNAPSE_ENVIRONMENT, null);
-          synapseEnvParam.setValue(se);
-    	  try {
-			ac.addParameter(synapseEnvParam);
-		} catch (AxisFault e) {
-			throw new SynapseException(e);
-		}
-    	
+        AxisConfiguration ac =
+            mc.getConfigurationContext().getAxisConfiguration();
+        Parameter synapseEnvParam = new Parameter(SYNAPSE_ENVIRONMENT, null);
+        synapseEnvParam.setValue(se);
+        try {
+            ac.addParameter(synapseEnvParam);
+        } catch (AxisFault e) {
+            throw new SynapseException(e);
+        }
+
     }
 
 }

@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.mediators.builtin;
+package org.apache.synapse.xml;
 
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.config.Constants;
+import org.apache.synapse.api.Mediator;
+import org.apache.synapse.mediators.builtin.DropMediator;
+import org.apache.axiom.om.OMElement;
 
-/**
- * Halts further processing/mediation of the current message.
- */
-public class DropMediator extends AbstractMediator {
+import javax.xml.namespace.QName;
 
-    public boolean mediate(SynapseMessage synMsg) {
-        if (synMsg.getTo() == null) {
-            return false;
-        } else {
-            synMsg.setTo(null);
-            return false;
-        }
+
+public class DropMediatorFactory extends AbstractMediatorFactory {
+
+    private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+			"drop");
+    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+        return new DropMediator();
+    }
+
+    public QName getTagQName() {
+        return DROP_Q;
     }
 }

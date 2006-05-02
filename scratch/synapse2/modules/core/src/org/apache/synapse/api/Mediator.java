@@ -18,12 +18,11 @@ package org.apache.synapse.api;
 import org.apache.synapse.SynapseMessage;
 
 /**
- *
- * <p>API interface for pluggable mediators
- *
+ * All Synapse mediators must implement this Mediator interface. As a message passes
+ * through the synapse system, each mediator's mediate() method is invoked.
  */
 public interface Mediator {
-	public boolean mediate(SynapseMessage smc);
-	//public String getName();
-	//public void setName(String name);
+    public boolean mediate(SynapseMessage smc);
+
+    public String getName();
 }

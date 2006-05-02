@@ -17,30 +17,27 @@
 package org.apache.synapse.axis2;
 
 
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.ServiceGroupContext;
-import org.apache.axis2.description.*;
-import org.apache.axis2.engine.AxisConfiguration;
-
-import org.apache.axis2.util.UUIDGenerator;
-import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axis2.deployment.util.PhasesInfo;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
-
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ServiceGroupContext;
+import org.apache.axis2.deployment.util.PhasesInfo;
+import org.apache.axis2.description.*;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.soap.SOAPHeaderBlock;
-
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -54,13 +51,13 @@ public class Axis2FlexibleMEPClient {
         ArrayList addressingHeaders;
         if (soapHeader != null) {
             addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
-                    AddressingConstants.Submission.WSA_NAMESPACE);
+                AddressingConstants.Submission.WSA_NAMESPACE);
             if (addressingHeaders != null && addressingHeaders.size() != 0) {
                 detachAddressingInformation(addressingHeaders);
 
             } else {
                 addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
-                        AddressingConstants.Final.WSA_NAMESPACE);
+                    AddressingConstants.Final.WSA_NAMESPACE);
                 if (addressingHeaders != null && addressingHeaders.size() != 0) {
                     detachAddressingInformation(addressingHeaders);
                 }
@@ -70,7 +67,6 @@ public class Axis2FlexibleMEPClient {
     }
 
     /**
-     *
      * @param headerInformation
      */
     private static void detachAddressingInformation(ArrayList headerInformation) {
@@ -97,18 +93,18 @@ public class Axis2FlexibleMEPClient {
         if (ac.getService("__ANONYMOUS_SERVICE__") == null) {
             // Lets default be OUT_IN
             OutInAxisOperation outInOperation =
-                    new OutInAxisOperation(new QName(
-                            "__OPERATION_OUT_IN__"));
+                new OutInAxisOperation(new QName(
+                    "__OPERATION_OUT_IN__"));
             AxisService axisAnonymousService =
-                    new AxisService("__ANONYMOUS_SERVICE__");
+                new AxisService("__ANONYMOUS_SERVICE__");
             axisAnonymousService.addOperation(outInOperation);
             ac.addService(axisAnonymousService);
             phasesInfo.setOperationPhases(outInOperation);
         }
         ServiceGroupContext sgc = new ServiceGroupContext(cc,
-                (AxisServiceGroup)ac.getService("__ANONYMOUS_SERVICE__").getParent());
+            (AxisServiceGroup) ac.getService("__ANONYMOUS_SERVICE__").getParent());
         ServiceContext sc =
-                sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
+            sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
 
         MessageContext mc = new MessageContext();
         mc.setConfigurationContext(sc.getConfigurationContext());
@@ -124,17 +120,17 @@ public class Axis2FlexibleMEPClient {
             mc.setMessageID(smc.getMessageID());
         else
             mc.setMessageID(String.valueOf("uuid:"
-                    + UUIDGenerator.getUUID()));
+                + UUIDGenerator.getUUID()));
         if (smc.getReplyTo() != null)
             mc.setReplyTo(smc.getReplyTo());
         if (smc.getRelatesTo() != null)
-            mc.setRelatesTo(smc.getRelatesTo());
-        if (smc.getTo() != null) {
-            mc.setTo(smc.getTo());
-        } else {
-            throw new AxisFault(
+            //mc.setRelatesTo(smc.getRelatesTo());
+            if (smc.getTo() != null) {
+                mc.setTo(smc.getTo());
+            } else {
+                throw new AxisFault(
                     "To canno't be null, if null Synapse can't infer the transport");
-        }
+            }
         if (smc.isDoingREST()) {
             mc.setDoingREST(true);
         }
@@ -142,37 +138,35 @@ public class Axis2FlexibleMEPClient {
         // handling the outbound message with addressing
         AxisModule module = ac.getModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
         if ((smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) ||
-                (smc.getProperty(
-                        Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null)){
+            (smc.getProperty(
+                Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null)) {
             if (!ac.getService("__ANONYMOUS_SERVICE__")
-                    .isEngaged(module.getName())) {
+                .isEngaged(module.getName())) {
                 ac.getService("__ANONYMOUS_SERVICE__").engageModule(module, ac);
             }
         }
-
 
         //TODO; following line needed to be removed
 
         mc.setEnvelope(outEnvelopeConfiguration(smc));
 
         AxisOperation axisAnonymousOperation =
-                ac.getService("__ANONYMOUS_SERVICE__")
-                        .getOperation(new QName("__OPERATION_OUT_IN__"));
+            ac.getService("__ANONYMOUS_SERVICE__")
+                .getOperation(new QName("__OPERATION_OUT_IN__"));
 
         //Options class from Axis2 holds client side settings
         Options options = new Options();
         OperationClient mepClient =
-                axisAnonymousOperation.createClient(sc, options);
+            axisAnonymousOperation.createClient(sc, options);
         mepClient.addMessageContext(mc);
         mepClient.execute(true);
         MessageContext response = mepClient
-                .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         response.setProperty(MessageContext.TRANSPORT_OUT,
-                smc.getProperty(MessageContext.TRANSPORT_OUT));
+            smc.getProperty(MessageContext.TRANSPORT_OUT));
         response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-                smc.getProperty(
-                        org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-
+            smc.getProperty(
+                org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
 
         // If request is REST we assume the response is REST, so set the
         // variable
@@ -180,9 +174,9 @@ public class Axis2FlexibleMEPClient {
         response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
 
         if (ac.getService("__ANONYMOUS_SERVICE__")
-                .isEngaged(module.getName())) {
+            .isEngaged(module.getName())) {
             ac.getService("__ANONYMOUS_SERVICE__")
-                    .disEngageModule(ac.getModule(module.getName()));
+                .disEngageModule(ac.getModule(module.getName()));
         }
         return response;
     }

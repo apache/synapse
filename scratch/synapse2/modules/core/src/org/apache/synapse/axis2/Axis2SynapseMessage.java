@@ -16,9 +16,7 @@
 
 package org.apache.synapse.axis2;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -26,14 +24,14 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
-import org.apache.axiom.soap.SOAPEnvelope;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- *
- * 
- * <p>
+ * <p/>
  * A wrapper on Axis2's Message Context that implements the SynapseMessage interface
- *
  */
 public class Axis2SynapseMessage implements SynapseMessage {
 
@@ -92,8 +90,7 @@ public class Axis2SynapseMessage implements SynapseMessage {
     }
 
     public void setRelatesTo(RelatesTo reference) {
-        mc.setRelatesTo(reference);
-
+        //TODO mc.setRelatesTo(reference);
     }
 
     public EndpointReference getReplyTo() {
@@ -137,7 +134,7 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     public Object getProperty(String key) {
         Object obj = props.get(key);
-        if ( obj == null) {
+        if (obj == null) {
             obj = mc.getProperty(key);
         }
         return obj;
@@ -214,15 +211,14 @@ public class Axis2SynapseMessage implements SynapseMessage {
         return this.faultResponse;
     }
 
-	public SynapseEnvironment getSynapseEnvironment() {
-		return Axis2SynapseEnvironmentFinder.getSynapseEnvironment(mc);
-	}
+    public SynapseEnvironment getSynapseEnvironment() {
+        return Axis2SynapseEnvironmentFinder.getSynapseEnvironment(mc);
+    }
 
-	public void setSynapseEnvironment(SynapseEnvironment env) {
-		Axis2SynapseEnvironmentFinder.setSynapseEnvironment(mc, env);
-		return;
-	}
-	
-	
+    public void setSynapseEnvironment(SynapseEnvironment env) {
+        Axis2SynapseEnvironmentFinder.setSynapseEnvironment(mc, env);
+        return;
+    }
+
 
 }

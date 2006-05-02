@@ -16,31 +16,27 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
- *
- * <p>
- * 
- * This sends the message on (or back)
- *
+ * The Send mediator sends the message using the following semantics.
+ * <p/>
+ * This is a leaf mediator (i.e. further processing does not continue after this is invoked)
+ * <p/>
+ * TODO support endpoints, loadbalancing and failover
  */
-public class SendMediator implements Mediator {
-	
+public class SendMediator extends AbstractMediator {
 
-	private Log log = LogFactory.getLog(getClass());
-
-	
-	public boolean mediate(SynapseMessage smc) {
-		log.debug("mediate");
-		smc.getSynapseEnvironment().send(smc);
-		return false;
-
-	}
-
-	
-
+    /**
+     * This is a leaf mediator. i.e. processing stops once send is invoked.
+     *
+     * @param synMsg
+     * @return false always as this is a leaf mediator
+     */
+    public boolean mediate(SynapseMessage synMsg) {
+        log.debug(getName() + " mediate()");
+        synMsg.getSynapseEnvironment().send(synMsg);
+        return false;
+    }
 }

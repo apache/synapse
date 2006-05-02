@@ -18,33 +18,29 @@ package org.apache.synapse;
 import javax.xml.namespace.QName;
 
 
-
 /**
- *
- * 
  * <p> Global constants for the Synapse project
- *
  */
 public interface Constants {
-	
 
-	String CLASSMEDIATOR = "classmediator";
 
-	QName MEDIATE_OPERATION_NAME = new QName("mediate");
+    String CLASSMEDIATOR = "classmediator";
 
-	String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
-	String MEDIATOR_SYNAPSE_ENV_PROPERTY = "synapse.mediator.environment";
+    QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
-	String ISRESPONSE_PROPERTY = "synapse.isresponse";
+    String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
+    String MEDIATOR_SYNAPSE_ENV_PROPERTY = "synapse.mediator.environment";
 
-	String EMPTYMEDIATOR = "emptymediator";
+    String ISRESPONSE_PROPERTY = "synapse.isresponse";
 
-    //this is for the synapse.xml config
+    String EMPTYMEDIATOR = "emptymediator";
+
+    //this is for the synapse.config config
     String SYNAPSECONFIGURATION = "SynapseConfiguration";
 
-	String SYNAPSE_ENVIRONMENT = "synapse.environment";
+    String SYNAPSE_ENVIRONMENT = "synapse.environment";
 
-	String ADD_ADDRESSING = "synapse.send.useaddressing";
+    String ADD_ADDRESSING = "synapse.send.useaddressing";
 
     // for security supporting
 
@@ -55,7 +51,7 @@ public interface Constants {
 
     String ENGAGE_ADDRESSING_IN_MESSAGE = "__ENGAGE_ADDRESSING_IN_MESSAGE__";
 
-    String  ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
+    String ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
 
 
 }

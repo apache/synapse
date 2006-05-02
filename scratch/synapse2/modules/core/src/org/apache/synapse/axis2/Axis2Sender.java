@@ -17,16 +17,12 @@
 package org.apache.synapse.axis2;
 
 import org.apache.axis2.AxisFault;
-
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportInDescription;
-
 import org.apache.axis2.engine.AxisEngine;
-
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-
 
 
 /**
@@ -39,30 +35,29 @@ public class Axis2Sender {
         try {
 
             MessageContext messageContext = ((Axis2SynapseMessage) smc)
-                    .getMessageContext();
+                .getMessageContext();
             // At any time any QOS is disengaged. It's engaged iff, a flag is
             // set in execution chain.
             // ex: addressing will be engage in outpath iff ADDRESSING_PROCESSED
             // is set.
 
-            if (smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null)
-            {
+            if (smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) {
 
                 messageContext.setProperty(
-                        Constants.ENGAGE_ADDRESSING_IN_MESSAGE, Boolean.TRUE);
+                    Constants.ENGAGE_ADDRESSING_IN_MESSAGE, Boolean.TRUE);
 
             }
             //Now hadle the outbound message with addressing
             if (smc.getProperty(
-                    Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null) {
+                Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null) {
                 messageContext.setProperty(
-                        Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE,
-                        Boolean.TRUE);
+                    Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE,
+                    Boolean.TRUE);
 
             }
 
             MessageContext outMsgContext = Axis2FlexibleMEPClient
-                    .send(messageContext);
+                .send(messageContext);
 
             // run all rules on response
 
@@ -71,7 +66,7 @@ public class Axis2Sender {
             outMsgContext.setServerSide(true);
 
             Object os = messageContext
-                    .getProperty(MessageContext.TRANSPORT_OUT);
+                .getProperty(MessageContext.TRANSPORT_OUT);
             outMsgContext.setProperty(MessageContext.TRANSPORT_OUT, os);
             TransportInDescription ti = messageContext.getTransportIn();
 
@@ -81,7 +76,7 @@ public class Axis2Sender {
                 throw new SynapseException("no Synapse Env set on message");
             }
             smc.getSynapseEnvironment().injectMessage(new Axis2SynapseMessage(
-                    outMsgContext, smc.getSynapseEnvironment()));
+                outMsgContext, smc.getSynapseEnvironment()));
         } catch (Exception e) {
             e.printStackTrace();
             throw new SynapseException(e);
@@ -90,15 +85,15 @@ public class Axis2Sender {
 
     public static void sendBack(SynapseMessage smc) {
         MessageContext messageContext = ((Axis2SynapseMessage) smc)
-                .getMessageContext();
+            .getMessageContext();
         AxisEngine ae =
-                new AxisEngine(messageContext.getConfigurationContext());
+            new AxisEngine(messageContext.getConfigurationContext());
         try {
 //
 
 
             messageContext
-                    .setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+                .setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check for addressing is alredy engaged for this message.
             // if engage we should use the address enable Configuraion context.
 //

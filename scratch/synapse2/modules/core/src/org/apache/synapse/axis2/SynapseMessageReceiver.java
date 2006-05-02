@@ -18,11 +18,9 @@ package org.apache.synapse.axis2;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
-
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.synapse.SynapseEnvironment;
 import org.apache.synapse.SynapseMessage;
 
@@ -38,14 +36,14 @@ public class SynapseMessageReceiver implements MessageReceiver {
     public void receive(MessageContext mc) throws AxisFault {
         log.debug("receiving message");
         SynapseEnvironment env = Axis2SynapseEnvironmentFinder
-                .getSynapseEnvironment(mc);
+            .getSynapseEnvironment(mc);
         ////////////////////////////////////////////////////////////////////////
         // SynapseEnvironment is set as a property in MessageContext. This is due
         // use we can expect in ServiceMediatorProcessor and many extensions yet to come
         // So it a mediator uses EnvironmentAware, that mediator will be injected with the correct environment
-        
+
         ////////////////////////////////////////////////////////////////////////
-        SynapseMessage smc = new Axis2SynapseMessage(mc,env);
+        SynapseMessage smc = new Axis2SynapseMessage(mc, env);
         smc.setSynapseEnvironment(env);
         env.injectMessage(smc);
 
@@ -56,12 +54,12 @@ public class SynapseMessageReceiver implements MessageReceiver {
         // smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
         if (smc.isResponse()) {
             mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
-                    Constants.VALUE_TRUE);
+                Constants.VALUE_TRUE);
         }
         if (smc.isFaultResponse()) {
             // todo: a good way to inject faultSoapEnv to the Axis2 Transport 
             throw new AxisFault(
-                    "Synapse Encounters an Error - Please See Log for More Details");
+                "Synapse Encounters an Error - Please See Log for More Details");
         }
         ///////////////////////////////////////////////////////////////////////
     }

@@ -16,22 +16,20 @@
 
 package org.apache.synapse;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
- *
- * 
  * <p> The core definition of a message flowing thru Synapse.
  * <p> The aim of this is to capture the Message Addressing Properties
- * (aka Message Information Headers) and the SOAP Envelope. 
+ * (aka Message Information Headers) and the SOAP Envelope.
  * The core To/From/FaultTo/ReplyTo/MessageID/RelatesTo stuff is here. <p>
  * In addition this has get/setEnvelope.
- * <p>
- *  There is also a bag of properties<p>
- *  There are markers for whether we support REST, MTOM and also if this is a response or not
+ * <p/>
+ * There is also a bag of properties<p>
+ * There are markers for whether we support REST, MTOM and also if this is a response or not
  */
 public interface SynapseMessage {
 
@@ -67,10 +65,6 @@ public interface SynapseMessage {
 
     public String getWSAAction();
 
-    public void setMessageId(String messageID);
-
-    public String getMessageId();
-
     public Object getProperty(String key);
 
     public void setProperty(String key, Object value);
@@ -96,7 +90,8 @@ public interface SynapseMessage {
     public void setFaultResponse(boolean b);
 
     public boolean isFaultResponse();
-    
+
     public SynapseEnvironment getSynapseEnvironment();
+
     public void setSynapseEnvironment(SynapseEnvironment env);
 }

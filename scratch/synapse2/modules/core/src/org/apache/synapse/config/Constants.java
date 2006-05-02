@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse;
+package org.apache.synapse.config;
+
+import javax.xml.namespace.QName;
 
 /**
- * <p>Runtime exception for Synapse code to throw
+ * <p/>
+ * Constants used in the XML processing
  */
-public class SynapseException extends RuntimeException {
+public interface Constants {
+    public static final QName DEFINITIONS_ELT = new QName("definitions");
+    public static final QName SEQUENCE_ELT = new QName("sequence");
+    public static final QName ENDPOINT_ELT = new QName("endpoint");
+    public static final QName PROPERTY_ELT = new QName("set-property");
 
-    private static final long serialVersionUID = -7244032125641596311L;
-
-    public SynapseException(String string) {
-        super(string);
-
-    }
-
-    public SynapseException(String msg, Throwable e) {
-        super(msg, e);
-
-    }
-
-    public SynapseException(Throwable t) {
-        super(t);
-
-    }
-
+    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+    public static final String SYNAPSE = "synapse";
+    public static final String NULL_NAMESPACE = "";
 }

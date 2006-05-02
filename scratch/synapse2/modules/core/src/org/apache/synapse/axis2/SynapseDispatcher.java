@@ -15,8 +15,6 @@
  */
 package org.apache.synapse.axis2;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
@@ -25,39 +23,38 @@ import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AbstractDispatcher;
 import org.apache.axis2.engine.AxisConfiguration;
 
+import javax.xml.namespace.QName;
+
 /**
- *
- * 
  * This sends every message to the SynapseMessageReceiver so that it can pass them to Synapse
- *
  */
 public class SynapseDispatcher extends AbstractDispatcher {
-	// FOR EVERY REQUEST - ALWAYS DISPATH TO THE SYNAPSE SERVICE
+    // FOR EVERY REQUEST - ALWAYS DISPATH TO THE SYNAPSE SERVICE
 
-	private static final long serialVersionUID = -6970206989111592645L;
+    private static final long serialVersionUID = -6970206989111592645L;
 
-	private static final String SYNAPSE_SERVICE_NAME = "synapse";
+    private static final String SYNAPSE_SERVICE_NAME = "synapse";
 
-	private static final QName MEDIATE_OPERATION_NAME = new QName("mediate");
+    private static final QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
-	public void initDispatcher() {
-		QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");
-		HandlerDescription hd = new HandlerDescription(qn);
-		super.init(hd);
+    public void initDispatcher() {
+        QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");
+        HandlerDescription hd = new HandlerDescription(qn);
+        super.init(hd);
 
-	}
+    }
 
-	public AxisService findService(MessageContext mc) throws AxisFault {
-		AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
-		AxisService as = ac.getService(SYNAPSE_SERVICE_NAME);
-		return as;
-	}
+    public AxisService findService(MessageContext mc) throws AxisFault {
+        AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
+        AxisService as = ac.getService(SYNAPSE_SERVICE_NAME);
+        return as;
+    }
 
-	public AxisOperation findOperation(AxisService svc, MessageContext mc)
-			throws AxisFault {
+    public AxisOperation findOperation(AxisService svc, MessageContext mc)
+        throws AxisFault {
 
-		AxisOperation ao = svc.getOperation(MEDIATE_OPERATION_NAME);
-		return ao;
-	}
+        AxisOperation ao = svc.getOperation(MEDIATE_OPERATION_NAME);
+        return ao;
+    }
 
 }

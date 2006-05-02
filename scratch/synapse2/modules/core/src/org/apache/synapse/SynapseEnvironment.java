@@ -16,90 +16,53 @@
 package org.apache.synapse;
 
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.registry.Registry;
+import org.apache.synapse.config.SynapseConfiguration;
 
 
 /**
- *
- * 
- * <p>Common stuff needed to embed Synapse into a given runtime (e.g. Axis2) 
- * <p>This interface is used by the mediators, and also by EnvironmentAware mediators
- * 
- *
+ * The Synapse Environment is available to mediators through the SynapseMessage. It
+ * allows one to call to the underlying SOAP engine (such as Axis2) where required.
+ * e.g. send message, get classloader etc. It also holds a reference to the current
+ * SynapseConfiguration.
  */
 public interface SynapseEnvironment {
 
-
-    
     /*
-      * This method injects a new message into the Synapse engine
-      * It is used in a couple of ways. Firstly, this is how, for example,
-      * Axis2 kicks messages into Synapse to start with.
-      * <p>
-      * Also mediators can use this to send messages that they want to be mediated by Synapse
-      * <p>For example if you want to send a copy of a message somewhere, you can clone it and then
-      * injectMessage()
-      */
+    * This method injects a new message into the Synapse engine
+    * It is used in a couple of ways. Firstly, this is how, for example,
+    * Axis2 kicks messages into Synapse to start with.
+    * <p>
+    * Also mediators can use this to send messages that they want to be mediated by Synapse
+    * <p>For example if you want to send a copy of a message somewhere, you can clone it and then
+    * injectMessage()
+    */
     public void injectMessage(SynapseMessage smc);
 
     /*
-      * Mediators that wish to load classes should use the ClassLoader given here
-      */
+     * Mediators that wish to load classes should use the ClassLoader given here
+     */
     public ClassLoader getClassLoader();
-
 
     /**
      * This method allows you send messages on. As opposed to injectMessage send message does not
      * process these through Synapse.
-     * <p>
+     * <p/>
      * This will send request messages on, and send response messages back to the client
      */
     public void send(SynapseMessage smc);
 
-
     /**
-     * This is used by the references to find a processor with a given name
+     * Get a reference to the current SynapseConfiguration
      *
+     * @return the current synapse configuration
      */
-    public Mediator lookupMediator(String name);
-
+    public SynapseConfiguration getConfiguration();
 
     /**
-     * This is how you add a processor to the list of processors. The name which it can be
-     * retrieved by is the processor.getName()
+     * Set or replace the Synapse Configuration instance to be used
+     *
+     * @param cfg The new synapse configuration instance
      */
-    public void addMediator(String name, Mediator m);
+    public void setConfiguration(SynapseConfiguration cfg);
 
-
-    /**
-     * This returns the "Master Processor" which is the root processor for this instance of
-     * Synapse. Usually this would be the processor derived from &ltsynapse>.
-     */
-    public Mediator getMasterMediator();
-
-
-    /**
-     * This sets the root processor for the engine.
-     */
-    public void setMasterMediator(Mediator p);
-
-	public Object getProperty(String string);
-
-	public void setProperty(String string, Object object);
-
-	public Registry getRegistry();
-	public void setRegistry(Registry reg);
-	
-	public Metrics getMetrics(String URI);
-	public Metrics getMetrics(EndpointReference epr);
-	public void setMetricsFactory(MetricsFactory mf);
-		
-	public void publish(OMElement element);
-	
-    //public ResourceHelper getResourceHelper();
-
-    //public void addResourceMediator(String name, Mediator p);
 }

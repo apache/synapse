@@ -42,7 +42,7 @@ public class HeaderMediator extends AbstractMediator {
     }
 
     public boolean mediate(SynapseMessage sm) {
-
+        log.debug(getType() + " mediate()");
         headerType.setHeader(sm, getValue());
         return true;
     }

@@ -23,7 +23,7 @@ public abstract class AbstractMediator implements Mediator {
 
     protected final Log log = LogFactory.getLog(getClass());
 
-    public String getName() {
-        return getClass().getName();
+    public String getType() {
+        return getClass().getSimpleName();
     }
 }

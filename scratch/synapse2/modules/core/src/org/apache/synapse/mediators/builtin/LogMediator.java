@@ -19,9 +19,11 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 
 /**
@@ -36,10 +38,11 @@ public class LogMediator extends AbstractMediator {
     public static final int FULL = 3;
 
     private int logLevel = SIMPLE;
-    private String SEP = "\n";
-    private List properties = null;
+    private String SEP = ", ";
+    private List properties = new ArrayList();
 
     public boolean mediate(SynapseMessage synMsg) {
+        log.debug(getType() + " mediate()");
         log.info(getLogMessage(synMsg));
         return true;
     }
@@ -107,44 +110,31 @@ public class LogMediator extends AbstractMediator {
         if (properties != null && !properties.isEmpty()) {
             Iterator iter = properties.iterator();
             while (iter.hasNext()) {
-                Property prop = (Property) iter.next();
+                MediatorProperty prop = (MediatorProperty) iter.next();
                 sb.append(SEP + prop.getName() + " = " +
-                    prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression());
+                    (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression()));
             }
         }
     }
 
-    public class Property {
-        private String name;
-        private String value;
-        private String expression;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getExpression() {
-            return expression;
-        }
-
-        public void setExpression(String expression) {
-            this.expression = expression;
-        }
-
-        public String getEvaluatedExpression() {
-            return expression;  //TODO later use XPath xtention eval
-        }
+    public int getLogLevel() {
+        return logLevel;
     }
+
+    public void setLogLevel(int logLevel) {
+        this.logLevel = logLevel;
+    }
+
+    public String getSeperator() {
+        return SEP;
+    }
+
+    public void setSeperator(String SEP) {
+        this.SEP = SEP;
+    }
+
+    public void addProperty(MediatorProperty p) {
+        properties.add(p);
+    }
+
 }

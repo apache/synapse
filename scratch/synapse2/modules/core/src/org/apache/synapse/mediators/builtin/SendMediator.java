@@ -35,8 +35,8 @@ public class SendMediator extends AbstractMediator {
      * @return false always as this is a leaf mediator
      */
     public boolean mediate(SynapseMessage synMsg) {
-        log.debug(getName() + " mediate()");
-        synMsg.getSynapseEnvironment().send(synMsg);
+        log.debug(getType() + " mediate()");
+        synMsg.getSynapseContext().send(synMsg);
         return false;
     }
 }

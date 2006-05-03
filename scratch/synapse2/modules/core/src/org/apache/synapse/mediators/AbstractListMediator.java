@@ -18,22 +18,22 @@ package org.apache.synapse.mediators;
 
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.api.ListMediator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractListMediator extends AbstractMediator {
+public abstract class AbstractListMediator extends AbstractMediator implements ListMediator {
 
     protected List mediators = new ArrayList();
 
     public boolean mediate(SynapseMessage synMsg) {
-        log.debug("List mediator : mediate() " + getName());
+        log.debug(getType() + " mediate()");
 
         Iterator it = mediators.iterator();
         while (it.hasNext()) {
             Mediator m = (Mediator) it.next();
-            log.debug(m.getClass());
             if (!m.mediate(synMsg)) {
                 return false;
             }

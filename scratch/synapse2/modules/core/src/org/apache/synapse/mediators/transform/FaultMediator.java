@@ -18,10 +18,9 @@ package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
-import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.*;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -37,55 +36,80 @@ public class FaultMediator extends AbstractMediator {
 
     private Log log = LogFactory.getLog(getClass());
 
-    private QName faultCode;
+    public static final int SOAP11 = 1;
+    public static final int SOAP12 = 2;
+
+    private int soapVersion;
+
+    private QName code;
     private String reason;
+    //TODO support SOAP 1.2 fault stuff..
+    //Node, Role, detail etc
 
-    public boolean mediate(SynapseMessage smc) {
-        log.debug("process");
-
-        SOAPEnvelope envelop = smc.getEnvelope();
+    public boolean mediate(SynapseMessage synMsg) {
+        log.debug(getType() + " mediate()");
+        SOAPEnvelope envelop = synMsg.getEnvelope();
         SOAPFactory factory;
-        if (envelop != null) {
-            if (envelop.getNamespace().getName().equals(
-                SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
-                factory = OMAbstractFactory.getSOAP12Factory();
-            } else {
+
+        switch (soapVersion) {
+            case SOAP11:
                 factory = OMAbstractFactory.getSOAP11Factory();
+                break;
+            case SOAP12:
+                factory = OMAbstractFactory.getSOAP12Factory();
+                break;
+            default : {
+                if (envelop != null) {
+                    if (envelop.getNamespace().getName().equals(
+                        SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {
+                        factory = OMAbstractFactory.getSOAP12Factory();
+                    } else {
+                        factory = OMAbstractFactory.getSOAP11Factory();
+                    }
+                } else {
+                    factory = OMAbstractFactory.getSOAP11Factory();
+                }
             }
+        }
 
+        // TODO : Figure out how to easily gen the correct fault
+        // Replace this
+        OMDocument soapFaultDocument = factory.createOMDocument();
+        SOAPEnvelope faultEnvelope   = factory.getDefaultFaultEnvelope();
+        //SOAPFault fault = factory.createSOAPFault();
+        //faultEnvelope.setFirstChild(fault);
+        soapFaultDocument.addChild(faultEnvelope);
+
+        // set the fault message to the "faultTo" of the original message if it exists
+        // else to the "replyTo"
+        EndpointReference toEPR = synMsg.getTo();
+        EndpointReference faultToEPR = synMsg.getFaultTo();
+        if (faultToEPR != null) {
+            synMsg.setTo(faultToEPR);
+            synMsg.setReplyTo(toEPR);
         } else {
-            factory = OMAbstractFactory.getSOAP11Factory();
+            EndpointReference replyToEPR = synMsg.getReplyTo();
+            synMsg.setTo(replyToEPR);
+            synMsg.setReplyTo(toEPR);
         }
+        synMsg.setResponse(true);
+
         try {
-            // TODO : Figure out how to easily gen the correct fault
-
-            // Replace this
-            OMDocument soapFaultDocument = factory.createOMDocument();
-            SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
-            soapFaultDocument.addChild(faultEnvelope);
-
-            smc.setEnvelope(faultEnvelope);
-        } catch (Exception e) {
-            throw new SynapseException(e);
+            synMsg.setEnvelope(faultEnvelope);
+        } catch (AxisFault af) {
+            String msg = "Error replacing SOAP envelope with a fault envelope " + af.getMessage();
+            log.error(msg);
+            throw new SynapseException(af);
         }
-        smc.setResponse(true);
-
-        // Flipping the headers
-        EndpointReference tempEPR = smc.getTo();
-        smc.setTo(smc.getReplyTo());
-        smc.setReplyTo(tempEPR);
-
-        smc.getSynapseEnvironment().injectMessage(smc);
-
-        return false;
+        return true;
     }
 
-    public QName getFaultCode() {
-        return faultCode;
+    public QName getCode() {
+        return code;
     }
 
-    public void setFaultCode(QName faultCode) {
-        this.faultCode = faultCode;
+    public void setCode(QName code) {
+        this.code = code;
     }
 
     public String getReason() {
@@ -95,4 +119,14 @@ public class FaultMediator extends AbstractMediator {
     public void setReason(String reason) {
         this.reason = reason;
     }
+
+    public int getSoapVersion() {
+        return soapVersion;
+    }
+
+    public void setSoapVersion(int soapVersion) {
+        this.soapVersion = soapVersion;
+    }
+
+
 }

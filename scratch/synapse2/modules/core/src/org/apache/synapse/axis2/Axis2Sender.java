@@ -26,7 +26,7 @@ import org.apache.synapse.SynapseMessage;
 
 
 /**
- * This class helps the Axis2SynapseEnvironment implement the send method
+ * This class helps the Axis2SynapseContext implement the send method
  */
 public class Axis2Sender {
 
@@ -72,11 +72,11 @@ public class Axis2Sender {
 
             outMsgContext.setTransportIn(ti);
 
-            if (smc.getSynapseEnvironment() == null) {
+            if (smc.getSynapseContext() == null) {
                 throw new SynapseException("no Synapse Env set on message");
             }
-            smc.getSynapseEnvironment().injectMessage(new Axis2SynapseMessage(
-                outMsgContext, smc.getSynapseEnvironment()));
+            smc.getSynapseContext().injectMessage(new Axis2SynapseMessage(
+                outMsgContext, smc.getSynapseContext()));
         } catch (Exception e) {
             e.printStackTrace();
             throw new SynapseException(e);

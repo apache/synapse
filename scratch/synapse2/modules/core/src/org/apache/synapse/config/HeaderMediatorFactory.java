@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Constants;
 import org.apache.synapse.api.Mediator;
@@ -41,9 +41,8 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
         private static final QName TYPE_ATT_Q = new QName("type"),
             VALUE_ATT_Q = new QName("value");
 
-        public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+        public Mediator createMediator(SynapseContext se, OMElement el) {
             HeaderMediator hm = new HeaderMediator();
-            super.setNameOnMediator(se, el, hm);
             OMAttribute val = el.getAttribute(VALUE_ATT_Q);
             OMAttribute type = el.getAttribute(TYPE_ATT_Q);
             if (val == null || type == null) {

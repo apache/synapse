@@ -25,7 +25,7 @@ import org.apache.synapse.config.SynapseConfiguration;
  * e.g. send message, get classloader etc. It also holds a reference to the current
  * SynapseConfiguration.
  */
-public interface SynapseEnvironment {
+public interface SynapseContext {
 
     /*
     * This method injects a new message into the Synapse engine

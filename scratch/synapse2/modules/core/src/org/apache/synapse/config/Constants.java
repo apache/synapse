@@ -27,6 +27,8 @@ public interface Constants {
     public static final QName ENDPOINT_ELT = new QName("endpoint");
     public static final QName PROPERTY_ELT = new QName("set-property");
 
+    public static final QName RULES_ELT = new QName("rules");
+
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
     public static final String SYNAPSE = "synapse";
     public static final String NULL_NAMESPACE = "";

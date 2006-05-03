@@ -32,7 +32,7 @@ public class XSLTMediator extends AbstractMediator {
     private String source = null;
 
     public boolean mediate(SynapseMessage synMsg) {
-
+        log.debug(getType() + " mediate()");
         if (xsltUrl != null) {
             performXLST(synMsg);
             return true;

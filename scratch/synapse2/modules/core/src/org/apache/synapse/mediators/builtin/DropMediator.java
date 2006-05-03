@@ -25,6 +25,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class DropMediator extends AbstractMediator {
 
     public boolean mediate(SynapseMessage synMsg) {
+        log.debug(getType() + " mediate()");
         if (synMsg.getTo() == null) {
             return false;
         } else {

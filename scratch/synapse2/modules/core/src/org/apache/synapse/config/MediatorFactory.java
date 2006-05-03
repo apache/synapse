@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 
 public interface MediatorFactory {
-    public Mediator createMediator(SynapseEnvironment se, OMElement el);
+    public Mediator createMediator(SynapseContext se, OMElement el);
     public QName getTagQName();
 }

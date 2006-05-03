@@ -22,7 +22,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseMessage;
 
 import java.util.HashMap;
@@ -43,9 +43,9 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     private boolean faultResponse = false;
 
-    public Axis2SynapseMessage(MessageContext mc, SynapseEnvironment se) {
+    public Axis2SynapseMessage(MessageContext mc, SynapseContext se) {
         setMessageContext(mc);
-        setSynapseEnvironment(se);
+        setSynapseContext(se);
     }
 
     public EndpointReference getFaultTo() {
@@ -211,12 +211,12 @@ public class Axis2SynapseMessage implements SynapseMessage {
         return this.faultResponse;
     }
 
-    public SynapseEnvironment getSynapseEnvironment() {
-        return Axis2SynapseEnvironmentFinder.getSynapseEnvironment(mc);
+    public SynapseContext getSynapseContext() {
+        return Axis2SynapseContextFinder.getSynapseContext(mc);
     }
 
-    public void setSynapseEnvironment(SynapseEnvironment env) {
-        Axis2SynapseEnvironmentFinder.setSynapseEnvironment(mc, env);
+    public void setSynapseContext(SynapseContext synCtx) {
+        Axis2SynapseContextFinder.setSynapseContext(mc, synCtx);
         return;
     }
 

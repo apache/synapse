@@ -34,6 +34,7 @@ public class ClassMediator extends AbstractMediator {
 
 
     public boolean mediate(SynapseMessage smc) {
+        log.debug(getType() + " mediate()");
         Mediator m = null;
 
         try {
@@ -42,7 +43,7 @@ public class ClassMediator extends AbstractMediator {
             throw new SynapseException(e);
         }
         /*if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
-              ((EnvironmentAware) m).setSynapseEnvironment(se);
+              ((EnvironmentAware) m).setSynapseContext(se);
           }*/
         return m.mediate(smc);
 

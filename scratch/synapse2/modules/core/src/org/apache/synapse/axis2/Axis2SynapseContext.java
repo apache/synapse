@@ -16,33 +16,32 @@
 
 package org.apache.synapse.axis2;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapseConfigurationBuilder;
+
+import java.io.InputStream;
 
 /**
- * <p> This is the Axis2 implementation of the SynapseEnvironment
+ * <p> This is the Axis2 implementation of the SynapseContext
  */
-public class Axis2SynapseEnvironment implements SynapseEnvironment {
+public class Axis2SynapseContext implements SynapseContext {
 
     private ClassLoader cl = null;
     private SynapseConfiguration config = null;
     private Log log = LogFactory.getLog(getClass());
 
-    public Axis2SynapseEnvironment(OMElement synapseConfiguration,
-                                   ClassLoader cl) {
+    public Axis2SynapseContext(InputStream is, ClassLoader cl) {
         super();
         this.cl = cl;
-//        if (synapseConfiguration!=null)
-//            mainmediator = MediatorFactoryFinder.getMediator(this, synapseConfiguration);
-        // TODO set main mediator here
+        new SynapseConfigurationBuilder().setConfiguration(this, is);
     }
 
     public void injectMessage(SynapseMessage smc) {
-        smc.setSynapseEnvironment(this);
+        smc.setSynapseContext(this);
         getConfiguration().getMainMediator().mediate(smc);
     }
 

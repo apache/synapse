@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.ListMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
@@ -37,24 +34,20 @@ import org.apache.axiom.om.OMElement;
  */
 public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
 
-    Log log = LogFactory.getLog(getClass());
-
-    public void addChildrenAndSetName(SynapseEnvironment se, OMElement el, ListMediator m)
+    public void addChildren(SynapseContext synCtx, OMElement el, ListMediator m)
     {
-        super.setNameOnMediator(se, el, m);
-
         Iterator it = el.getChildElements();
-        List mediators = new LinkedList();
         while (it.hasNext()) {
             OMElement child = (OMElement) it.next();
-            Mediator med = MediatorFactoryFinder.getMediator(se, child);
-            if (med != null)
-                mediators.add(med);
-            else
-                log.info("Unknown child of all" + child.getLocalName());
+            Mediator med = MediatorFactoryFinder.getInstance().getMediator(synCtx, child);
+            if (med != null) {
+                m.addChild(med);
+            } else {
+                String msg = "Unknown mediator : " + child.getLocalName();
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
         }
-        m.setList(mediators);
-
     }
 
 

@@ -29,16 +29,16 @@ public interface Constants {
     QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
     String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
-    String MEDIATOR_SYNAPSE_ENV_PROPERTY = "synapse.mediator.environment";
+    String MEDIATOR_SYNAPSE_CTX_PROPERTY = "synapse.mediator.environment";
 
     String ISRESPONSE_PROPERTY = "synapse.isresponse";
 
     String EMPTYMEDIATOR = "emptymediator";
 
     //this is for the synapse.config config
-    String SYNAPSECONFIGURATION = "SynapseConfiguration";
+    String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
-    String SYNAPSE_ENVIRONMENT = "synapse.environment";
+    String SYNAPSE_CONTEXT = "synapse.context";
 
     String ADD_ADDRESSING = "synapse.send.useaddressing";
 

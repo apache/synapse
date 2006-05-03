@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.config.Constants;
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.ext.ClassMediator;
@@ -33,10 +33,8 @@ import org.apache.axiom.om.OMAttribute;
 public class ClassMediatorFactory extends AbstractMediatorFactory {
     private static final QName CLM_Q = new QName(Constants.SYNAPSE_NAMESPACE,
             "classmediator");
-    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+    public Mediator createMediator(SynapseContext se, OMElement el) {
         ClassMediator cmp = new ClassMediator();
-        super.setNameOnMediator(se, el, cmp);
-
         OMAttribute clsName = el.getAttribute(new QName("class"));
         if (clsName == null)
             throw new SynapseException("missing class attribute on element"

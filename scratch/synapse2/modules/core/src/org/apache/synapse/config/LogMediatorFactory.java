@@ -14,40 +14,103 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.config.Constants;
+import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
+
+import java.util.Iterator;
 
 /**
+ * Created a Log mediator that logs messages using commons-logging.
  *
- * 
- * <p>
- * Logs messages using Commons-logging. 
- * 
- * <xmp><log name="optional"/></xmp>
- * TODO add support for simple one-line log entry (doesn't cause body parsing)
- *
+ * <log [level="simple|headers|full"]>
+ *      <property> *
+ * </log>
  */
 public class LogMediatorFactory extends AbstractMediatorFactory {
-    private static final QName LOG_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-            "log");
 
+    private static final QName LOG_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "log");
+    private static final String SIMPLE  = "simple";
+    private static final String HEADERS = "headers";
+    private static final String FULL    = "full";
+    private static final String CUSTOM  = "custom";
 
     public QName getTagQName() {
         return LOG_Q;
     }
 
+    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
 
-    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
-        LogMediator lm = new LogMediator();
-        super.setNameOnMediator(se,el,lm);
-        return lm;
+        LogMediator logMediator = new LogMediator();
+
+        OMAttribute level = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "level"));
+        if (level != null) {
+            if (SIMPLE.equals(level)) {
+                logMediator.setLogLevel(LogMediator.SIMPLE);
+            } else if (HEADERS.equals(level)) {
+                logMediator.setLogLevel(LogMediator.HEADERS);
+            } else if (FULL.equals(level)) {
+                logMediator.setLogLevel(LogMediator.FULL);
+            } else if (CUSTOM.equals(level)) {
+                logMediator.setLogLevel(LogMediator.CUSTOM);
+            }
+        }
+
+        Iterator iter = elem.getChildrenWithName(new QName(Constants.NULL_NAMESPACE, "property"));
+        while (iter.hasNext()) {
+
+            OMElement propEle = (OMElement) iter.next();
+            OMAttribute attName  = propEle.getAttribute(MediatorProperty.ATT_NAME_Q);
+            OMAttribute attValue = propEle.getAttribute(MediatorProperty.ATT_VALUE_Q);
+            OMAttribute attExpr  = propEle.getAttribute(MediatorProperty.ATT_EXPR_Q);
+
+            MediatorProperty prop = new MediatorProperty();
+
+            if (attName == null || attName.getAttributeValue() == null || attName.getAttributeValue().trim().length() == 0) {
+                String msg = "Property name is a required attribute for a Log property";
+                log.error(msg);
+                throw new SynapseException(msg);
+            } else {
+                prop.setName(attName.getAttributeValue());
+            }
+
+            // if a value is specified, use it, else look for an expression
+            if (attValue != null) {
+                if (attValue.getAttributeValue() == null || attValue.getAttributeValue().trim().length() == 0) {
+                    String msg = "Property attribute value (if specified) is required for a Log property";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                } else {
+                    prop.setValue(attValue.getAttributeValue());
+                }
+
+            } else if (attExpr != null) {
+                if (attExpr.getAttributeValue() == null || attExpr.getAttributeValue().trim().length() == 0) {
+                    String msg = "Property attribute expression (if specified) is required for a Log property";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                } else {
+                    prop.setExpression(attValue.getAttributeValue());
+                }
+
+            } else {
+                String msg = "Property attribute value OR expression must be specified for a Log property";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+
+            logMediator.addProperty(prop);
+        }
+
+        return logMediator;
     }
 
 }

@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.xml;
-
-import javax.xml.namespace.QName;
+package org.apache.synapse.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseEnvironment;
-import org.apache.synapse.api.Mediator;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAttribute;
 
 /**
  *
@@ -34,20 +27,5 @@ import org.apache.axiom.om.OMAttribute;
  */
 public abstract class AbstractMediatorFactory implements MediatorFactory {
 
-    private Log log = LogFactory.getLog(getClass());
-   
-    public void setNameOnMediator(SynapseEnvironment se, OMElement el, Mediator m) {
-
-        OMAttribute nm = el.getAttribute(new QName("name"));
-        String name =null;
-        if (nm != null) {
-             name = nm.getAttributeValue().trim();
-            //m.setName(name);
-            //se.addMediator(name, m); TODO fix this later!
-        }
-        log.debug("compile "+el.getLocalName()+" with name '"+name+"' on "+m.getClass());
-
-    }
-
-
+    Log log = LogFactory.getLog(getClass());
 }

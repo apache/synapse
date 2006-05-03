@@ -15,12 +15,12 @@
  */
 
 
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import javax.xml.namespace.QName;
 
 
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Constants;
 import org.apache.synapse.api.Mediator;
@@ -31,9 +31,8 @@ import org.apache.axiom.om.OMAttribute;
 public class ServiceMediatorFactory extends AbstractMediatorFactory {
     private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE,
             "servicemediator");
-    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+    public Mediator createMediator(SynapseContext se, OMElement el) {
         ServiceMediator sm = new ServiceMediator();
-        super.setNameOnMediator(se,el,sm);
 
         OMAttribute attr = el.getAttribute(new QName("service"));
         if (attr == null)

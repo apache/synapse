@@ -15,7 +15,7 @@
  */
 
 
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,8 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.MediatorFactory;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -44,80 +45,97 @@ import sun.misc.Service;
 
 public class MediatorFactoryFinder {
 
-	private static Map lookup = null;
+    private static Map factoryMap = new HashMap();
+	private Log log = LogFactory.getLog(getClass());
 
-	private static Log log = LogFactory
-			.getLog(MediatorFactoryFinder.class);
+	private static final Class[] mediatorFactories = {
+        SequenceMediatorFactory.class,
+        LogMediatorFactory.class,
+        SendMediatorFactory.class,
+        FilterMediatorFactory.class,
+        SynapseMediatorFactory.class,
+        DropMediatorFactory.class
+      };
 
-	private static Class[] mediatorFactories = {
-			SynapseMediatorFactory.class,
-			HeaderMediatorFactory.class,
-			ClassMediatorFactory.class,
-			ServiceMediatorFactory.class,
-			LogMediatorFactory.class, SendMediatorFactory.class,
-			FaultMediatorFactory.class,
-            SendMediatorFactory.class,
-            DropMediatorFactory.class
-            };
+    private static MediatorFactoryFinder instance = null;
 
-	private static void initialise() {
+    public static synchronized MediatorFactoryFinder getInstance() {
+        if (instance == null) {
+            instance = new MediatorFactoryFinder();
+        }
+        return instance;
+    }
 
-		if (lookup != null)
-			return;
-		lookup = new HashMap();
+    /**
+     * Force re initialization next time
+     */
+    public synchronized void reset() {
+        factoryMap.clear();
+        instance = null;
+    }
 
+    private MediatorFactoryFinder() {
+
+		factoryMap = new HashMap();
 		for (int i = 0; i < mediatorFactories.length; i++) {
 			Class c = mediatorFactories[i];
 			try {
-				lookup.put(((MediatorFactory) c.newInstance())
-						.getTagQName(), c);
+				factoryMap.put(((MediatorFactory) c.newInstance()).getTagQName(), c);
 			} catch (Exception e) {
-				throw new SynapseException("problem instantiating "+c.getName(), e);
+				throw new SynapseException("Error instantiating " + c.getName(), e);
 			}
 		}
-		log.debug("registering extensions");
-		log.debug(System.getProperty("java.class.path"));
-		// now try additional processors
-		Iterator it = Service.providers(MediatorFactory.class);
-		while (it.hasNext()) {
-			MediatorFactory mf = (MediatorFactory) it.next();
-			QName tag = mf.getTagQName();
-			lookup.put(tag, mf.getClass());
-			log.debug("added MediatorFactory " + mf.getClass() + " to handle " + tag);
-		}
-	}
+        // TODO revisit later registerExtensions();
+    }
 
-                            	/**
-	 * @param qn
-	 * @return the class which implements the Processor for the given QName
-	 */
-	public static Class find(QName qn) {
-		initialise();
-		return (Class) lookup.get(qn);
-	}
-	
+    //TODO revist later
+    private void registerExtensions() {
+        log.debug("registering extensions");
+        log.debug(System.getProperty("java.class.path"));
+        // now try additional processors
+        Iterator it = Service.providers(MediatorFactory.class);
+        while (it.hasNext()) {
+            MediatorFactory mf = (MediatorFactory) it.next();
+            QName tag = mf.getTagQName();
+            factoryMap.put(tag, mf.getClass());
+            log.debug("added MediatorFactory " + mf.getClass() + " to handle " + tag);
+        }
+    }
+
 	/**
 	 * This method returns a Processor given an OMElement. This will be used
 	 * recursively by the elements which contain processor elements themselves
 	 * (e.g. rules)
 	 * 
-	 * @param synapseEnv
+	 * @param synapseCtx
 	 * @param element
 	 * @return Processor
 	 */
-	public static Mediator getMediator(SynapseEnvironment synapseEnv, OMElement element) {
-		OMNamespace n = element.getNamespace();
-		
-		Class cls = find(new QName(n.getName(), element
-				.getLocalName()));
-		try {
+	public Mediator getMediator(SynapseContext synapseCtx, OMElement element) {
+
+		QName qName = new QName(element.getNamespace().getName(), element.getLocalName());
+        log.debug("getMediator(" + qName + ")");
+        Class cls = (Class) factoryMap.get(qName);
+
+        if (cls == null) {
+            String msg = "Unknown mediator referenced by configuration element : " + qName;
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+
+        try {
 			MediatorFactory mf = (MediatorFactory) cls.newInstance();
-			Mediator m = mf.createMediator(synapseEnv, element);
-			return m;
-		} catch (InstantiationException e) {
-			throw new SynapseException(e);
-		} catch (IllegalAccessException e) {
-			throw new SynapseException(e);
+			return mf.createMediator(synapseCtx, element);
+
+        } catch (InstantiationException e) {
+            String msg = "Error initializing mediator factory : " + cls;
+            log.error(msg);
+            throw new SynapseException(msg, e);
+
+        } catch (IllegalAccessException e) {
+            String msg = "Error initializing mediator factory : " + cls;
+            log.error(msg);
+            throw new SynapseException(msg, e);
 		}
 	}
 }

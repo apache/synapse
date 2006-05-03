@@ -28,13 +28,14 @@ import java.util.regex.Pattern;
  * The filter mediator combines the regex and xpath filtering functionality. If an xpath
  * is set, it is evaluated; else the given regex is evaluated against the source xpath.
  */
-public class FilterMediator extends AbstractListMediator {
+public class FilterMediator extends AbstractListMediator implements org.apache.synapse.api.FilterMediator {
 
-    private String source = null;
-    private String regex = null;
-    private String xpath = null;
+    private AXIOMXPath source = null;
+    private Pattern regex = null;
+    private AXIOMXPath xpath = null;
 
     public boolean mediate(SynapseMessage synMsg) {
+        log.debug(getType() + " mediate()");
         if (test(synMsg)) {
             return super.mediate(synMsg);
         } else {
@@ -45,14 +46,11 @@ public class FilterMediator extends AbstractListMediator {
     public boolean test(SynapseMessage synMsg) {
         try {
             if (xpath != null) {
-                AXIOMXPath xp = new AXIOMXPath(xpath);
-                return xp.booleanValueOf(synMsg.getEnvelope());
+                return xpath.booleanValueOf(synMsg.getEnvelope());
 
             } else if (source != null && regex != null) {
-                Pattern pattern = Pattern.compile(regex);
-                AXIOMXPath xp = new AXIOMXPath(source);
-                Object result = xp.evaluate(synMsg.getEnvelope());
-                return pattern.matcher(result.toString()).matches();
+                Object result = source.evaluate(synMsg.getEnvelope());
+                return regex.matcher(result.toString()).matches();
 
             } else {
                 log.error("Invalid configuration specified");
@@ -66,27 +64,27 @@ public class FilterMediator extends AbstractListMediator {
     }
 
 
-    public String getSource() {
+    public AXIOMXPath getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(AXIOMXPath source) {
         this.source = source;
     }
 
-    public String getRegex() {
+    public Pattern getRegex() {
         return regex;
     }
 
-    public void setRegex(String regex) {
+    public void setRegex(Pattern regex) {
         this.regex = regex;
     }
 
-    public String getXpath() {
+    public AXIOMXPath getXpath() {
         return xpath;
     }
 
-    public void setXpath(String xpath) {
+    public void setXpath(AXIOMXPath xpath) {
         this.xpath = xpath;
     }
 

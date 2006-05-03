@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.config.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.axiom.om.OMElement;
 
-public class SynapseMediatorFactory extends
-        AbstractListMediatorFactory {
+public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
-    private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE,
-            "synapse");
+    private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
 
     public QName getTagQName() {
         return tagname;
     }
 
-    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
         SynapseMediator sm = new SynapseMediator();
-        //super.addChildrenAndSetName(se, el, sm); TODO fix this later
+        super.addChildren(synCtx, elem, sm);
         return sm;
     }
 

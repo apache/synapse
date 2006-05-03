@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.xml;
+package org.apache.synapse.config;
 
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.config.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
@@ -27,9 +27,9 @@ import javax.xml.namespace.QName;
 
 public class DropMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"drop");
-    public Mediator createMediator(SynapseEnvironment se, OMElement el) {
+    private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "drop");
+
+    public Mediator createMediator(SynapseContext se, OMElement el) {
         return new DropMediator();
     }
 

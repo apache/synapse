@@ -42,6 +42,7 @@ public class ServiceMediator extends AbstractMediator {
     private String serviceName = null;
 
     public boolean mediate(SynapseMessage smc) {
+        log.debug(getType() + " mediate()");
         MessageContext messageContext = null;
         try {
             messageContext = ((Axis2SynapseMessage) smc)

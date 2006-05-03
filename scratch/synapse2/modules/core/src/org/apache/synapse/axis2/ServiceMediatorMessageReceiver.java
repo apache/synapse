@@ -14,15 +14,15 @@ public class ServiceMediatorMessageReceiver extends AbstractMessageReceiver {
         Mediator mediator = (Mediator) obj;
 /*
         if (EnvironmentAware.class.isAssignableFrom(mediator.getClass())) {
-            SynapseEnvironment se = (SynapseEnvironment) messageContext
-                    .getProperty(Constants.MEDIATOR_SYNAPSE_ENV_PROPERTY);
-            ((EnvironmentAware) mediator).setSynapseEnvironment(se);
+            SynapseContext se = (SynapseContext) messageContext
+                    .getProperty(Constants.MEDIATOR_SYNAPSE_CTX_PROPERTY);
+            ((EnvironmentAware) mediator).setSynapseContext(se);
             ((EnvironmentAware) mediator).setClassLoader(
                     messageContext.getAxisService().getClassLoader());
         }
         
 */
-        SynapseMessage smc = new Axis2SynapseMessage(messageContext, Axis2SynapseEnvironmentFinder.getSynapseEnvironment(messageContext));
+        SynapseMessage smc = new Axis2SynapseMessage(messageContext, Axis2SynapseContextFinder.getSynapseContext(messageContext));
         boolean returnValue = mediator.mediate(smc);
         messageContext.setProperty(Constants.MEDIATOR_RESPONSE_PROPERTY,
             new Boolean(returnValue));

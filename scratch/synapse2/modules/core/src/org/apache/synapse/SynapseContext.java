@@ -20,34 +20,29 @@ import org.apache.synapse.config.SynapseConfiguration;
 
 
 /**
- * The Synapse Environment is available to mediators through the SynapseMessage. It
+ * The Synapse Context is available to mediators through the SynapseMessage. It
  * allows one to call to the underlying SOAP engine (such as Axis2) where required.
  * e.g. send message, get classloader etc. It also holds a reference to the current
  * SynapseConfiguration.
  */
 public interface SynapseContext {
 
-    /*
-    * This method injects a new message into the Synapse engine
-    * It is used in a couple of ways. Firstly, this is how, for example,
-    * Axis2 kicks messages into Synapse to start with.
-    * <p>
-    * Also mediators can use this to send messages that they want to be mediated by Synapse
-    * <p>For example if you want to send a copy of a message somewhere, you can clone it and then
-    * injectMessage()
-    */
+    /**
+     * This method injects a new message into the Synapse engine. This is used by
+     * the underlying SOAP engine to inject messages into Synapse for mediation.
+     * e.g. The SynapseMessageReceiver used by Axis2 invokes this to inject new messages
+     */
     public void injectMessage(SynapseMessage smc);
 
-    /*
-     * Mediators that wish to load classes should use the ClassLoader given here
+    /**
+     * Mediators may get access to the relevant classloader through this
      */
     public ClassLoader getClassLoader();
 
     /**
-     * This method allows you send messages on. As opposed to injectMessage send message does not
-     * process these through Synapse.
+     * This method allows a message to be sent through the underlying SOAP engine.
      * <p/>
-     * This will send request messages on, and send response messages back to the client
+     * This will send request messages on (forward), and send the response messages back to the client
      */
     public void send(SynapseMessage smc);
 
@@ -59,7 +54,8 @@ public interface SynapseContext {
     public SynapseConfiguration getConfiguration();
 
     /**
-     * Set or replace the Synapse Configuration instance to be used
+     * Set or replace the Synapse Configuration instance to be used. May be used to
+     * programatically change the configuration at runtime etc.
      *
      * @param cfg The new synapse configuration instance
      */

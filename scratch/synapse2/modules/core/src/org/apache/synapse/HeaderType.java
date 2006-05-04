@@ -17,19 +17,29 @@
 package org.apache.synapse;
 
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 
 /**
- * <p> This class encapsulates access to headers. It has a set of "logical names" (e.g. strings)
- * Once you have set the logical name you can read and write that header on a SynapseMessage
- * It is used by the RegexProcessor and the HeaderProcessor classes.
+ * This is a convenience class used to manipulate common headers. The convenience string names this defines could be
+ * used to configure the header mediator. Once an instance of this class exists, it could be given a value and
+ * a synapse message instance, and asked to set given value as the header value to the given message. i.e. setHeader()
+ *
+ * Support for additional headers may be added later
  */
 public class HeaderType {
 
-    private final static int TO = 1, FROM = 2, FAULT = 3, ACTION = 4,
-        REPLYTO = 5;
+    private final static int TO = 1, FROM = 2, FAULT = 3, ACTION = 4, REPLYTO = 5;
 
-    public final static String STRTO = "to", STRFROM = "from",
-        STRFAULT = "faultto", STRACTION = "action", STRREPLYTO = "replyto";
+    /** Refers the To header */
+    public final static String STRTO = "To";
+    /** Refers the From header */
+    public final static String STRFROM = "From";
+    /** Refers the FaultTo header */
+    public final static String STRFAULT = "FaultTo";
+    /** Refers the Action header */
+    public final static String STRACTION = "Action";
+    /** Refers the ReplyTo header */
+    public final static String STRREPLYTO = "ReplyTo";
 
     private int headerType = 0;
 
@@ -45,25 +55,7 @@ public class HeaderType {
         else if (header.equalsIgnoreCase(STRREPLYTO))
             headerType = REPLYTO;
         else
-            throw new SynapseException("Unknown header : " + header);
-    }
-
-    public String getHeaderType() {
-        switch (headerType) {
-
-            case TO:
-                return STRTO;
-            case FROM:
-                return STRFROM;
-            case FAULT:
-                return STRFAULT;
-            case ACTION:
-                return STRACTION;
-            case REPLYTO:
-                return STRREPLYTO;
-
-        }
-        return null;
+            throw new SynapseException("Unknown header type : " + header);
     }
 
     public String getHeader(SynapseMessage sm) {
@@ -98,7 +90,21 @@ public class HeaderType {
         return null;
     }
 
-    public void setHeader(SynapseMessage sm, String value) {
+    /**
+     * Removed the header indicated by this header type from the given message
+     * @param synMsg the current message from which the header should be removed
+     */
+    public void removeHeader(SynapseMessage synMsg) {
+        //TODO This is not yet implemented - revisit later
+        System.err.println("Unimplemented functionality - Needs to be fixed");
+    }
+
+    /**
+     * Sets the given value into the message's indicated header
+     * @param synMsg the current message on which to set the header
+     * @param value the value to be set
+     */
+    public void setHeader(SynapseMessage synMsg, String value) {
         switch (headerType) {
             case 0: {
                 throw new SynapseException(
@@ -107,22 +113,21 @@ public class HeaderType {
 
             case TO: {
 
-                sm.setTo(new EndpointReference(value));
+                synMsg.setTo(new EndpointReference(value));
                 break;
             }
             case FROM: {
-                sm.setFrom(new EndpointReference(value));
+                synMsg.setFrom(new EndpointReference(value));
                 break;
             }
             case REPLYTO: {
-                sm.setReplyTo(new EndpointReference(value));
+                synMsg.setReplyTo(new EndpointReference(value));
                 break;
             }
             case ACTION: {
-                sm.setWSAAction(value);
+                synMsg.setWSAAction(value);
                 break;
             }
-
         }
     }
 }

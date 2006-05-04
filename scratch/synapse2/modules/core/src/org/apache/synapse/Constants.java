@@ -17,18 +17,17 @@ package org.apache.synapse;
 
 import javax.xml.namespace.QName;
 
-
 /**
  * <p> Global constants for the Synapse project
  */
 public interface Constants {
-
 
     String CLASSMEDIATOR = "classmediator";
 
     QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
     String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
+
     String MEDIATOR_SYNAPSE_CTX_PROPERTY = "synapse.mediator.environment";
 
     String ISRESPONSE_PROPERTY = "synapse.isresponse";
@@ -43,15 +42,12 @@ public interface Constants {
     String ADD_ADDRESSING = "synapse.send.useaddressing";
 
     // for security supporting
-
     String SECURITY_QOS = "synapse_security";
+
     String ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT = "addressing_processed_configurationContext";
 
     // addressing properites handling
-
     String ENGAGE_ADDRESSING_IN_MESSAGE = "__ENGAGE_ADDRESSING_IN_MESSAGE__";
 
     String ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
-
-
 }

@@ -28,7 +28,10 @@ import java.util.ArrayList;
 
 /**
  * Logs the specified message into the configured logger. The log levels specify
- * which attributes would be logged, and is configurable.
+ * which attributes would be logged, and is configurable. Additionally custom
+ * properties may be defined to the logger, where literal values or expressions
+ * could be specified for logging. The custom properties are printed into the log
+ * using the defined seperator (\n, "," etc)
  */
 public class LogMediator extends AbstractMediator {
 
@@ -41,6 +44,11 @@ public class LogMediator extends AbstractMediator {
     private String SEP = ", ";
     private List properties = new ArrayList();
 
+    /**
+     * Logs the current message according to the supplied semantics
+     * @param synMsg (current) message to be logged
+     * @return true always
+     */
     public boolean mediate(SynapseMessage synMsg) {
         log.debug(getType() + " mediate()");
         log.info(getLogMessage(synMsg));
@@ -71,7 +79,7 @@ public class LogMediator extends AbstractMediator {
     private String getSimpleLogMessage(SynapseMessage synMsg) {
         StringBuffer sb = new StringBuffer();
         if (synMsg.getTo() != null)
-            sb.append(SEP + "To: " + synMsg.getTo().getAddress());
+            sb.append("To: " + synMsg.getTo().getAddress());
         if (synMsg.getFrom() != null)
             sb.append(SEP + "From: " + synMsg.getFrom().getAddress());
         if (synMsg.getWSAAction() != null)
@@ -112,7 +120,7 @@ public class LogMediator extends AbstractMediator {
             while (iter.hasNext()) {
                 MediatorProperty prop = (MediatorProperty) iter.next();
                 sb.append(SEP + prop.getName() + " = " +
-                    (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression()));
+                    (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synMsg)));
             }
         }
     }

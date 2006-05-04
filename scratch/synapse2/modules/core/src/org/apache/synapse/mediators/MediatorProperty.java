@@ -16,9 +16,17 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.config.Constants;
+import org.apache.synapse.Util;
+import org.apache.synapse.SynapseMessage;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 
 import javax.xml.namespace.QName;
 
+/**
+ * A mediator property is a name-value or name-expression pair which could be supplied
+ * for certain mediators. If expressions are supplied they are evaluated at the runtime
+ * against the current message into literal String values.
+ */
 public class MediatorProperty {
 
     public static final QName PROPERTY_Q  = new QName(Constants.SYNAPSE_NAMESPACE, "property");
@@ -28,7 +36,7 @@ public class MediatorProperty {
 
     private String name;
     private String value;
-    private String expression;
+    private AXIOMXPath expression;
 
     public MediatorProperty() {}
 
@@ -48,16 +56,16 @@ public class MediatorProperty {
         this.value = value;
     }
 
-    public String getExpression() {
+    public AXIOMXPath getExpression() {
         return expression;
     }
 
-    public void setExpression(String expression) {
+    public void setExpression(AXIOMXPath expression) {
         this.expression = expression;
     }
 
-    public String getEvaluatedExpression() {
-        return expression;  //TODO later use XPath xtention eval
+    public String getEvaluatedExpression(SynapseMessage synMsg) {
+        return Util.getStringValue(expression, synMsg);
     }
 
 }

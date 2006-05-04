@@ -25,6 +25,8 @@ import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.jaxen.JaxenException;
 
 /**
  *
@@ -63,8 +65,16 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
 
         if (value != null && value.getAttributeValue() != null) {
             headerMediator.setValue(value.getAttributeValue());
+
         } else if (exprn != null && exprn.getAttributeValue() != null) {
-            headerMediator.setExpression(exprn.getAttributeValue());
+            try {
+                headerMediator.setExpression(new AXIOMXPath(exprn.getAttributeValue()));
+            } catch (JaxenException je) {
+                String msg = "Invalid XPath expression : " + exprn.getAttributeValue();
+                log.error(msg);
+                throw new SynapseException(msg, je);
+            }
+            
         } else {
             String msg = "Invalid attribute value for the attribute 'expression' or 'value'";
             log.error(msg);

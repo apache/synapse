@@ -22,13 +22,37 @@ import java.util.List;
  */
 public interface ListMediator extends Mediator {
 
+    /**
+     * Appends the specified mediator to the end of this mediator's (children) list
+     * @param m the mediator to be added
+     * @return true (as per the general contract of the Collection.add method)
+     */
     public boolean addChild(Mediator m);
 
+    /**
+     * Returns the mediator at the specified position
+     * @param pos index of mediator to return
+     * @return the mediator at the specified position in this list
+     */
     public Mediator getChild(int pos);
 
+    /**
+     * Removes the first occurrence in this list of the specified mediator
+     * @param m mediator to be removed from this list, if present
+     * @return true if this list contained the specified mediator
+     */
     public boolean removeChild(Mediator m);
 
+    /**
+     * Removes the mediator at the specified position in this list
+     * @param pos the index of the mediator to remove
+     * @return the mediator previously at the specified position
+     */
     public Mediator removeChild(int pos);
 
+    /**
+     * Return the list of mediators of this List mediator instance
+     * @return the child/sub mediator list
+     */
     public List getList();
 }

@@ -23,23 +23,23 @@ import org.apache.synapse.mediators.AbstractMediator;
 /**
  * The Send mediator sends the message using the following semantics.
  * <p/>
- * This is a leaf mediator (i.e. further processing does not continue after this is invoked)
+ * This is a leaf mediator (i.e. further processing halts after this mediator completes)
  * <p/>
  * TODO support endpoints, loadbalancing and failover
  */
 public class SendMediator extends AbstractMediator {
 
     /**
-     * This is a leaf mediator. i.e. processing stops once send is invoked.
+     * This is a leaf mediator. i.e. processing stops once send is invoked,
+     * as it always returns false
      *
-     * @param synMsg
+     * @param synMsg the current message to be sent
      * @return false always as this is a leaf mediator
      */
     public boolean mediate(SynapseMessage synMsg) {
         log.debug(getType() + " mediate()");
         log.debug("Sending To: " + (synMsg.getTo() != null ? synMsg.getTo().getAddress() : "null"));
         log.debug("Body : \n" + synMsg.getEnvelope());
-        //synMsg.setProperty(Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE, Boolean.TRUE);
         synMsg.getSynapseContext().send(synMsg);
         return false;
     }

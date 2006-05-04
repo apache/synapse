@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.AbstractMediator;
  * This executes the "mediate" operation on a new instance of the specified class
  * <p/>
  * TODO add support for simple properties to be set
+ * TODO Requires refactoring and cleanup - revisit later
  */
 public class ClassMediator extends AbstractMediator {
 

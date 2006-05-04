@@ -30,19 +30,20 @@ import org.apache.synapse.mediators.AbstractMediator;
 import javax.xml.namespace.QName;
 
 /**
- * <p/> This returns a fault in response to this message
+ * This transforms the current message instance into a SOAP Fault message. If the
+ * original message was SOAP 1.1 the fault will also be SOAP 1.1 else, SOAP 1.2
+ *
+ * TODO this class needs more attention! - revisit later
  */
 public class FaultMediator extends AbstractMediator {
-
-    private Log log = LogFactory.getLog(getClass());
 
     public static final int SOAP11 = 1;
     public static final int SOAP12 = 2;
 
     private int soapVersion;
-
     private QName code;
     private String reason;
+
     //TODO support SOAP 1.2 fault stuff..
     //Node, Role, detail etc
 

@@ -21,13 +21,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.Util;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Pattern;
 import java.util.List;
 import java.util.Iterator;
-
 
 /**
  * The filter mediator combines the regex and xpath filtering functionality. If an xpath
@@ -39,6 +39,11 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
     private Pattern regex = null;
     private AXIOMXPath xpath = null;
 
+    /**
+     * Executes the list of sub/child mediators, if the filter condition is satisfied
+     * @param synMsg the current message
+     * @return true if filter condition fails. else returns as per List mediator semantics
+     */
     public boolean mediate(SynapseMessage synMsg) {
         log.debug(getType() + " mediate()");
         if (test(synMsg)) {
@@ -48,30 +53,21 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
         }
     }
 
+    /**
+     * Tests the supplied condition after evaluation against the given XPath
+     * or Regex (against a source XPath). When a regular expression is supplied
+     * the source XPath is evaluated into a String value, and matched against
+     * the given regex
+     * @param synMsg the current message for evaluation of the test condition
+     * @return true if evaluation of the XPath/Regex results in true
+     */
     public boolean test(SynapseMessage synMsg) {
         try {
             if (xpath != null) {
                 return xpath.booleanValueOf(synMsg.getEnvelope());
 
             } else if (source != null && regex != null) {
-
-                Object result = source.evaluate(synMsg.getEnvelope());
-                String textValue = "";
-
-                if (result instanceof List) {
-                    Iterator iter = ((List) result).iterator();
-                    while (iter.hasNext()) {
-                        Object o = iter.next();
-                        if (o instanceof OMTextImpl) {
-                            textValue += ((OMTextImpl) o).getText();
-                        } else if (o instanceof OMElementImpl) {
-                            textValue += ((OMElementImpl) o).getText();
-                        }
-                    }
-                } else {
-                    textValue = result.toString();
-                }
-                return regex.matcher(textValue).matches();
+                return regex.matcher(Util.getStringValue(source, synMsg)).matches();
 
             } else {
                 log.error("Invalid configuration specified");
@@ -109,6 +105,4 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
         this.xpath = xpath;
     }
 
-    //TODO name space addition support for xpath
-    // i.e. xp.addNamespace(prefix, uri);
 }

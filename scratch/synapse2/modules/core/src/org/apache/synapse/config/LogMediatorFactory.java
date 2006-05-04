@@ -25,6 +25,8 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.jaxen.JaxenException;
 
 import java.util.Iterator;
 
@@ -51,6 +53,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
 
         LogMediator logMediator = new LogMediator();
 
+        // Set the high level set of properties to be logged (i.e. log level)
         OMAttribute level = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "level"));
         if (level != null) {
             if (SIMPLE.equals(level)) {
@@ -64,6 +67,13 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
             }
         }
 
+        // check if a custom seperator has been supplied, if so use it
+        OMAttribute seperator = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "seperator"));
+        if (seperator != null) {
+            logMediator.setSeperator(seperator.getAttributeValue());
+        }
+
+        // parse custom properties and set them into the mediator
         Iterator iter = elem.getChildrenWithName(new QName(Constants.NULL_NAMESPACE, "property"));
         while (iter.hasNext()) {
 
@@ -93,12 +103,21 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
                 }
 
             } else if (attExpr != null) {
+
                 if (attExpr.getAttributeValue() == null || attExpr.getAttributeValue().trim().length() == 0) {
                     String msg = "Property attribute expression (if specified) is required for a Log property";
                     log.error(msg);
                     throw new SynapseException(msg);
+
                 } else {
-                    prop.setExpression(attValue.getAttributeValue());
+                    try {
+                        prop.setExpression(new AXIOMXPath(attExpr.getAttributeValue()));
+
+                    } catch (JaxenException e) {
+                        String msg = "Invalid XPapth expression : " + attExpr.getAttributeValue();
+                        log.error(msg);
+                        throw new SynapseException(msg, e);
+                    }
                 }
 
             } else {

@@ -19,10 +19,25 @@ import org.apache.synapse.SynapseMessage;
 
 /**
  * All Synapse mediators must implement this Mediator interface. As a message passes
- * through the synapse system, each mediator's mediate() method is invoked.
+ * through the synapse system, each mediator's mediate() method is invoked in the
+ * sequence/order defined in the SynapseConfiguration.
  */
 public interface Mediator {
+
+    /**
+     * Invokes the mediator passing the current message for mediation. Each
+     * mediator performs its mediation action, and returns true if mediation
+     * should continue, or false if further mediation should be aborted.
+     *
+     * @param smc the current message for mediation
+     * @return true if further mediation should continue
+     */
     public boolean mediate(SynapseMessage smc);
 
+    /**
+     * This is used for debugging purposes and exposes the type of the current
+     * mediator for logging and debugging purposes
+     * @return a String representation of the mediator type
+     */
     public String getType();
 }

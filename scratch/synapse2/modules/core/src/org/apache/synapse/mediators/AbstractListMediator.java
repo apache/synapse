@@ -24,6 +24,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This class implements the base functionality of a List mediator
+ *
+ * @see ListMediator
+ */
 public abstract class AbstractListMediator extends AbstractMediator implements ListMediator {
 
     protected List mediators = new ArrayList();

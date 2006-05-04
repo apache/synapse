@@ -31,7 +31,11 @@ public class SequenceMediator extends AbstractListMediator {
 
     /**
      * If this mediator refers to another named Sequence, execute that. Else
-     * execute the list of mediators (children) contained within this.
+     * execute the list of mediators (children) contained within this. If a referenced
+     * named sequence mediator instance cannot be found at runtime, an exception is
+     * thrown. This may occur due to invalid configuration of an erroneous runtime
+     * change of the synapse configuration. It is the responsibility of the
+     * SynapseConfiguration builder to ensure that dead references are not present.
      *
      * @param synMsg the synapse message
      * @return as per standard mediator result
@@ -40,6 +44,7 @@ public class SequenceMediator extends AbstractListMediator {
         log.debug(getType() + " mediate()");
         if (ref == null) {
             return super.mediate(synMsg);
+
         } else {
             Mediator m = synMsg.getSynapseContext().getConfiguration().getNamedMediator(ref);
             if (m == null) {

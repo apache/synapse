@@ -20,10 +20,15 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**
- * Halts further processing/mediation of the current message.
+ * Halts further processing/mediation of the current message. i.e. returns false
  */
 public class DropMediator extends AbstractMediator {
 
+    /**
+     * Halts further mediation of the current message by returning false.
+     * @param synMsg the current message
+     * @return false always
+     */
     public boolean mediate(SynapseMessage synMsg) {
         log.debug(getType() + " mediate()");
         if (synMsg.getTo() == null) {

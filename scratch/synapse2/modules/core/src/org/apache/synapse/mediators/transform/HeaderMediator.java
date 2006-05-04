@@ -18,7 +18,18 @@ package org.apache.synapse.mediators.transform;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.HeaderType;
+import org.apache.synapse.Util;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 
+/**
+ * The header mediator is able to set a given value as a SOAP header, or remove a given
+ * header from the current message instance. This supports the headers currently
+ * supported by the HeaderType class. If an expression is supplied, its runtime value
+ * is evaluated using the current message. Unless the action is set to remove, the
+ * default behaviour of this mediator is to set a header value.
+ *
+ * @see HeaderType
+ */
 public class HeaderMediator extends AbstractMediator {
 
     public static final int ACTION_SET = 0;
@@ -28,16 +39,24 @@ public class HeaderMediator extends AbstractMediator {
     private String value = null;
     private int action = ACTION_SET;
 
-    private String expression = null; //TODO handle this case later
+    private AXIOMXPath expression = null;
     private HeaderType headerType = new HeaderType();
 
+    /**
+     * Sets/Removes a SOAP header on the current message
+     *
+     * @param synMsg the current message which is altered as necessary
+     * @return true always
+     */
     public boolean mediate(SynapseMessage synMsg) {
         log.debug(getType() + " mediate()");
+
         if (action == ACTION_SET) {
-            headerType.setHeader(synMsg, getValue());
-            //TODO support exprns later
+            headerType.setHeader(synMsg,
+                (getValue() != null ? getValue() : Util.getStringValue(getExpression(), synMsg)));
+
         } else {
-            //TODO remove header later
+            headerType.removeHeader(synMsg);
         }
         return true;
     }
@@ -67,11 +86,11 @@ public class HeaderMediator extends AbstractMediator {
         this.value = value;
     }
 
-    public String getExpression() {
+    public AXIOMXPath getExpression() {
         return expression;
     }
 
-    public void setExpression(String expression) {
+    public void setExpression(AXIOMXPath expression) {
         this.expression = expression;
     }
 }

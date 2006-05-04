@@ -19,10 +19,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.api.Mediator;
 
+/**
+ * This class is an abstract Mediator, that defines the logging and debugging
+ * elements of a mediator class.
+ */
 public abstract class AbstractMediator implements Mediator {
 
     protected final Log log = LogFactory.getLog(getClass());
 
+    /**
+     * Returns the class name of the mediator
+     * @return the class name of the mediator
+     */
     public String getType() {
         return getClass().getSimpleName();
     }

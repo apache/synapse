@@ -24,17 +24,14 @@ public class SynapseException extends RuntimeException {
 
     public SynapseException(String string) {
         super(string);
-
     }
 
     public SynapseException(String msg, Throwable e) {
         super(msg, e);
-
     }
 
     public SynapseException(Throwable t) {
         super(t);
-
     }
 
 }

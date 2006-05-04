@@ -72,13 +72,18 @@ public class FaultMediator extends AbstractMediator {
             }
         }
 
-        // TODO : Figure out how to easily gen the correct fault
-        // Replace this
         OMDocument soapFaultDocument = factory.createOMDocument();
-        SOAPEnvelope faultEnvelope   = factory.getDefaultFaultEnvelope();
-        //SOAPFault fault = factory.createSOAPFault();
-        //faultEnvelope.setFirstChild(fault);
+        SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
         soapFaultDocument.addChild(faultEnvelope);
+
+        /*SOAPFaultReason reason = factory.createSOAPFaultReason();
+        reason.setText(getReason());
+
+        SOAPFault fault = factory.createSOAPFault();
+        fault.setReason(reason);
+
+        SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
+        faultEnvelope.getBody().addFault(fault);*/
 
         // set the fault message to the "faultTo" of the original message if it exists
         // else to the "replyTo"

@@ -34,7 +34,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
     private Log log = LogFactory.getLog(getClass());
 
     public void receive(MessageContext mc) throws AxisFault {
-        log.debug("receiving message");
+        log.debug("Synapse received message");
         SynapseContext synCtx = Axis2SynapseContextFinder
             .getSynapseContext(mc);
         ////////////////////////////////////////////////////////////////////////

@@ -123,7 +123,7 @@ public class Axis2FlexibleMEPClient {
                 + UUIDGenerator.getUUID()));
         if (smc.getReplyTo() != null)
             mc.setReplyTo(smc.getReplyTo());
-        if (smc.getRelatesTo() != null)
+        //if (smc.getRelatesTo() != null)
             //mc.setRelatesTo(smc.getRelatesTo());
             if (smc.getTo() != null) {
                 mc.setTo(smc.getTo());

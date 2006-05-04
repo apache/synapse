@@ -17,6 +17,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**
@@ -36,6 +37,9 @@ public class SendMediator extends AbstractMediator {
      */
     public boolean mediate(SynapseMessage synMsg) {
         log.debug(getType() + " mediate()");
+        log.debug("Sending To: " + (synMsg.getTo() != null ? synMsg.getTo().getAddress() : "null"));
+        log.debug("Body : \n" + synMsg.getEnvelope());
+        //synMsg.setProperty(Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE, Boolean.TRUE);
         synMsg.getSynapseContext().send(synMsg);
         return false;
     }

@@ -21,37 +21,57 @@ import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Constants;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.HeaderMediator;
+import org.apache.synapse.mediators.transform.HeaderMediator;
+import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 
 /**
  *
- *         <p>
- *         <xmp><synapse:header name="optional" type="to|from|faultto|replyto|action"
- *         value="newvalue"/> </xmp>
- * 
- * 
  */
 public class HeaderMediatorFactory extends AbstractMediatorFactory {
-    private static final QName HEADER_Q = new QName(
-            Constants.SYNAPSE_NAMESPACE, "header");
 
+    private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "header");
 
-        private static final QName TYPE_ATT_Q = new QName("type"),
-            VALUE_ATT_Q = new QName("value");
+    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
 
-        public Mediator createMediator(SynapseContext se, OMElement el) {
-            HeaderMediator hm = new HeaderMediator();
-            OMAttribute val = el.getAttribute(VALUE_ATT_Q);
-            OMAttribute type = el.getAttribute(TYPE_ATT_Q);
-            if (val == null || type == null) {
-                throw new SynapseException("<header> must have both " + VALUE_ATT_Q
-                    + " and " + TYPE_ATT_Q + " attributes: " + el.toString());
-            }
-            hm.setHeaderType(type.getAttributeValue());
-            hm.setValue( val.getAttributeValue());
-            return hm;
+        HeaderMediator headerMediator = new HeaderMediator();
+        OMAttribute name   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute value  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
+        OMAttribute exprn  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "expression"));
+        OMAttribute action = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "action"));
+
+        if (name == null || name.getAttributeValue() == null) {
+            String msg = "A valid name attribute is required for the header mediator";
+            log.error(msg);
+            throw new SynapseException(msg);
+        } else {
+            headerMediator.setName(name.getAttributeValue());
+        }
+
+        // The action attribute is optional, if provided and equals to 'remove' the
+        // header mediator will act as a header remove mediator
+        if (action != null && "remove".equals(action.getAttributeValue())) {
+            headerMediator.setAction(HeaderMediator.ACTION_REMOVE);
+        }
+
+        if (value == null && exprn == null) {
+            String msg = "A 'value' or 'expression' attribute is required for a header mediator";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+
+        if (value != null && value.getAttributeValue() != null) {
+            headerMediator.setValue(value.getAttributeValue());
+        } else if (exprn != null && exprn.getAttributeValue() != null) {
+            headerMediator.setExpression(exprn.getAttributeValue());
+        } else {
+            String msg = "Invalid attribute value for the attribute 'expression' or 'value'";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+
+        return headerMediator;
     }
 
     public QName getTagQName() {

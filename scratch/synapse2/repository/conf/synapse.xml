@@ -1,37 +1,41 @@
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-	<!-- start by reading ws-a headers if they exist -->
-    <engage-addressing-in/>
-    
-    <!-- now log the message using log4j -->
-	<log/>
-	
-    <!-- Check if the URL matches the stockquote gateway/dumb case -->
-	<regex message-address="to" pattern=".*/StockQuote.*">
-		<ref ref="stockquote"/>				
-	</regex>	
-	
-	<!-- check if the URL matches the virtual url - either the proxy or ws-add case -->
-	<regex message-address="to" pattern="http://stockquote.*">
-		<ref ref="stockquote"/>
-	</regex>	
-	
-	<!-- send the message on -->
-	<send/>
-	
-	<!-- these are only called if referenced above-->
-    <never>
-        <stage name="stockquote">
-            <!-- set the To address to the real endpoint -->
-            <header type="to" value="http://www.webservicex.net/stockquote.asmx"/>
-            <!-- check if the symbol is MSFT -->
-            <xpath expr="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
-                <!-- if it is throw a fault -->
-                <fault>
-                    <reason>Isn't there a Windows API for that?</reason>
-                </fault>
-            </xpath>
-        </stage>
-
-    </never>
-</synapse>
-
+  <synapse xmlns="http://ws.apache.org/ns/synapse">
+    <definitions>
+      <sequence name="registration_flow">
+        <filter xpath="//regRequest[@Category='GOLD']">
+           <log level="full">
+           		<property name="category" value="GOLD"/>
+           </log>
+           <drop/>
+        </filter>  
+        <sequence ref="fault_flow"/>
+      </sequence>
+  
+      <sequence name="fault_flow">
+        <log level="full">
+          <property name="application" value="Hello World"/>
+        </log>
+        <drop/>
+      </sequence>
+      
+      <sequence name="stockquote">
+        <log level="full">
+          <property name="application" value="StockQuote"/>
+        </log>
+        <filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+        	<makefault>
+        		<reason>Sorry the requested stock is no longer available</reason>
+        	</makefault>
+        </filter>
+        <header name="to" value="http://www.webservicex.net/stockquote.asmx"/>
+      </sequence>
+  
+    </definitions>
+  
+    <rules>
+    	<filter source="//wsa:To" regex=".*/StockQuote.*" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+    		<sequence ref="stockquote"/>
+    	</filter>
+    	<send/>
+    </rules>
+  
+  </synapse> 

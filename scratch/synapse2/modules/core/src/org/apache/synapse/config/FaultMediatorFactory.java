@@ -33,7 +33,7 @@ import org.apache.axiom.om.OMAttribute;
  */
 public class FaultMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "fault");
+    private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "makefault");
 
     private static final QName ATT_VERSION_Q = new QName(Constants.NULL_NAMESPACE, "version");
     private static final QName CODE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "code");

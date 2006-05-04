@@ -16,6 +16,7 @@
 package sampleMediators;
 
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.soap.SOAPEnvelope;
 
@@ -25,7 +26,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
  * <p>A sample Mediator that logs the message
  * 
  */
-public class Logger implements Mediator {
+public class Logger extends AbstractMediator {
 
     /*
       * (non-Javadoc)

@@ -17,11 +17,16 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Iterator;
 
 
 /**
@@ -49,8 +54,24 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
                 return xpath.booleanValueOf(synMsg.getEnvelope());
 
             } else if (source != null && regex != null) {
+
                 Object result = source.evaluate(synMsg.getEnvelope());
-                return regex.matcher(result.toString()).matches();
+                String textValue = "";
+
+                if (result instanceof List) {
+                    Iterator iter = ((List) result).iterator();
+                    while (iter.hasNext()) {
+                        Object o = iter.next();
+                        if (o instanceof OMTextImpl) {
+                            textValue += ((OMTextImpl) o).getText();
+                        } else if (o instanceof OMElementImpl) {
+                            textValue += ((OMElementImpl) o).getText();
+                        }
+                    }
+                } else {
+                    textValue = result.toString();
+                }
+                return regex.matcher(textValue).matches();
 
             } else {
                 log.error("Invalid configuration specified");

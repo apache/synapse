@@ -17,9 +17,10 @@ package sampleMediators;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.api.Mediator;
 
-public class InjectRedirect implements Mediator {
+public class InjectRedirect extends AbstractMediator {
 	private String uri = null;
 
 	public void setUri(String uri) {

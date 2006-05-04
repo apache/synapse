@@ -21,12 +21,14 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.filters.FilterMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.Iterator;
 
 public class FilterMediatorFactory extends AbstractListMediatorFactory {
 
@@ -55,6 +57,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
+            addNameSpaces(elem, filter.getXpath());
 
         } else if (attSource != null && attRegex != null) {
 
@@ -81,6 +84,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
+            addNameSpaces(elem, filter.getSource());
 
         } else {
             String msg = "An xpath or (source, regex) attributes are required for a filter";
@@ -92,5 +96,19 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
 
     public QName getTagQName() {
         return FILTER_Q;
+    }
+
+    private void addNameSpaces(OMElement elem, AXIOMXPath xp) {
+        try {
+            Iterator it = elem.getAllDeclaredNamespaces();
+            while (it.hasNext()) {
+                OMNamespace n = (OMNamespace) it.next();
+                xp.addNamespace(n.getPrefix(), n.getName());
+            }
+        } catch (JaxenException je) {
+            String msg = "Error adding declared name spaces " + elem;
+            log.error(msg);
+            throw new SynapseException(msg, je);
+        }
     }
 }

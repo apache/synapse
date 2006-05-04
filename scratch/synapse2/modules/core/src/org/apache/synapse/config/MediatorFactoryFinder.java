@@ -54,7 +54,9 @@ public class MediatorFactoryFinder {
         SendMediatorFactory.class,
         FilterMediatorFactory.class,
         SynapseMediatorFactory.class,
-        DropMediatorFactory.class
+        DropMediatorFactory.class,
+        HeaderMediatorFactory.class,
+        FaultMediatorFactory.class
       };
 
     private static MediatorFactoryFinder instance = null;

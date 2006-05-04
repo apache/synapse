@@ -45,7 +45,7 @@ public class HeaderType {
         else if (header.equalsIgnoreCase(STRREPLYTO))
             headerType = REPLYTO;
         else
-            throw new SynapseException("unknown header type");
+            throw new SynapseException("Unknown header : " + header);
     }
 
     public String getHeaderType() {

@@ -19,6 +19,8 @@ package org.apache.synapse.mediators;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.api.ListMediator;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,6 +32,8 @@ import java.util.List;
  * @see ListMediator
  */
 public abstract class AbstractListMediator extends AbstractMediator implements ListMediator {
+
+    private static final Log log = LogFactory.getLog(AbstractListMediator.class);
 
     protected List mediators = new ArrayList();
 

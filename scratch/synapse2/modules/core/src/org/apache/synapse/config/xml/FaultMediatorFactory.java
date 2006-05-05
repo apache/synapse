@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.SynapseContext;
-import org.apache.synapse.config.Constants;
+import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 
 /**
+ * Creates a fault mediator instance
  *
- *         <p>
- *         <xmp><synapse:fault name="optional"/> </xmp>
- * 	TODO add the ability to configure the fault codes, etc
- * 
+ * <makefault [version="soap11|soap12"]>
+ *   <code (value="literal" | expression="xpath")/>
+ *   <reason (value="literal" | expression="xpath")>
+ *   <node>?
+ *   <role>?
+ *   <detail>?
+ * </makefault>
  */
 public class FaultMediatorFactory extends AbstractMediatorFactory {
 

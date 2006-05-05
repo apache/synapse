@@ -19,6 +19,8 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The Send mediator sends the message using the following semantics.
@@ -29,6 +31,7 @@ import org.apache.synapse.mediators.AbstractMediator;
  */
 public class SendMediator extends AbstractMediator {
 
+    private static final Log log = LogFactory.getLog(SendMediator.class);
     /**
      * This is a leaf mediator. i.e. processing stops once send is invoked,
      * as it always returns false

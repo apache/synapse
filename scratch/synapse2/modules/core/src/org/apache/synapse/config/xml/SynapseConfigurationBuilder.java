@@ -13,13 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.commons.logging.Log;

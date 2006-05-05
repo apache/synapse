@@ -20,6 +20,8 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,8 @@ import java.util.ArrayList;
  * using the defined seperator (\n, "," etc)
  */
 public class LogMediator extends AbstractMediator {
+
+    private static final Log log = LogFactory.getLog(LogMediator.class);
 
     public static final int CUSTOM = 0;
     public static final int SIMPLE = 1;

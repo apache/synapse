@@ -2,11 +2,20 @@ package org.apache.synapse.mediators.transform;
 
 
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMDocument;
+import org.apache.axiom.om.OMContainer;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -20,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * The transform mediator performs an XSLT or XQuery transformation requested, using
@@ -29,9 +39,11 @@ import java.net.URL;
  */
 public class TransformMediator extends AbstractMediator {
 
+    private static final Log log = LogFactory.getLog(TransformMediator.class);
+
     private URL xsltUrl = null;
-    private URL xqUrl = null;
-    private String source = null;
+    private URL xQueryUrl = null;
+    private AXIOMXPath source = null;
 
     /**
      * Transforms this message (or its element specified as the source) using the
@@ -46,7 +58,7 @@ public class TransformMediator extends AbstractMediator {
             performXLST(synMsg);
             return true;
 
-        } else if (xqUrl != null) {
+        } else if (xQueryUrl != null) {
             //TODO later revisit later
             System.err.println("Unimplemented functionality..");
             return true;
@@ -67,17 +79,7 @@ public class TransformMediator extends AbstractMediator {
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
             XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
-            AXIOMXPath xp = new AXIOMXPath(source);
-            Object result = xp.evaluate(synMsg.getEnvelope());
-            OMNode sourceNode = null;
-
-            if (result instanceof OMNode) {
-                sourceNode = (OMNode) result;
-            } else {
-                String msg = "XPath evaluation of the source element did not return an OMNode";
-                log.error(msg);
-                throw new SynapseException(msg);
-            }
+            OMNode sourceNode = getTransformSource(synMsg);
             sourceNode.serialize(xsWriterForSource);
             Source transformSrc = new StreamSource(new ByteArrayInputStream(baosForSource.toByteArray()));
 
@@ -89,7 +91,15 @@ public class TransformMediator extends AbstractMediator {
             transformer.transform(transformSrc, transformTgt);
 
             StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(baosForTarget.toByteArray()));
-            sourceNode.getParent().addChild(builder.getDocumentElement());
+            OMContainer parent = sourceNode.getParent();
+
+            if (parent instanceof SOAPEnvelope) {
+                ((SOAPEnvelope) parent).getBody().getFirstOMChild().detach();
+                ((SOAPEnvelope) parent).getBody().setFirstChild(builder.getDocumentElement());
+            } else {
+                parent.getFirstOMChild().detach();
+                parent.addChild(builder.getDocumentElement());
+            }
 
         } catch (MalformedURLException mue) {
             handleException(mue);
@@ -97,8 +107,6 @@ public class TransformMediator extends AbstractMediator {
             handleException(tce);
         } catch (XMLStreamException xse) {
             handleException(xse);
-        } catch (JaxenException je) {
-            handleException(je);
         } catch (TransformerException te) {
             handleException(te);
         } catch (IOException ioe) {
@@ -106,10 +114,63 @@ public class TransformMediator extends AbstractMediator {
         }
     }
 
+    private OMNode getTransformSource(SynapseMessage synMsg) {
+
+        if (source == null) {
+            try {
+                source = new AXIOMXPath("//SOAP-ENV:Body");
+                source.addNamespace("SOAP-ENV", synMsg.isSOAP11() ?
+                    SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI : SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+            } catch (JaxenException e) {}
+        }
+
+        try {
+            Object o = source.evaluate(synMsg.getEnvelope());;
+            if (o instanceof OMNode) {
+                return (OMNode) o;
+            } else if (o instanceof List && !((List) o).isEmpty()) {
+                return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
+            } else {
+                String msg = "The evaluation of the XPath expression " + source + " must result in an OMNode";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+
+        } catch (JaxenException e) {
+            String msg = "Error evaluating XPath " + source + " on message";
+            log.error(msg);
+            throw new SynapseException(msg, e);
+        }
+    }
+
     private void handleException(Exception e) {
         String msg = "Error performing XSLT/XQ transformation " + e.getMessage();
         log.error(msg);
         throw new SynapseException(msg, e);
+    }
+
+    public AXIOMXPath getSource() {
+        return source;
+    }
+
+    public void setSource(AXIOMXPath source) {
+        this.source = source;
+    }
+
+    public URL getXsltUrl() {
+        return xsltUrl;
+    }
+
+    public void setXsltUrl(URL xsltUrl) {
+        this.xsltUrl = xsltUrl;
+    }
+
+    public URL getXQueryUrl() {
+        return xQueryUrl;
+    }
+
+    public void setXQueryUrl(URL xQueryUrl) {
+        this.xQueryUrl = xQueryUrl;
     }
 
 }

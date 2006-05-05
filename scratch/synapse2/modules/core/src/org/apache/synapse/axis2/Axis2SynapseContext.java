@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.SynapseConfigurationBuilder;
+import org.apache.synapse.config.xml.SynapseConfigurationBuilder;
 
 import java.io.InputStream;
 

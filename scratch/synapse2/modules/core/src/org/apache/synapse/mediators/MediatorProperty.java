@@ -15,7 +15,7 @@
 */
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.config.Constants;
+import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.Util;
 import org.apache.synapse.SynapseMessage;
 import org.apache.axiom.om.xpath.AXIOMXPath;

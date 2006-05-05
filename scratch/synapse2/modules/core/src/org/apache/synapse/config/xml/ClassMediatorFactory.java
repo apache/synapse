@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.config.Constants;
+import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;

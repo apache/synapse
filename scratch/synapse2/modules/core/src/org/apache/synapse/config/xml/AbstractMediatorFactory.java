@@ -13,19 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
- * 
- * <p> This is the abstract superclass of any tag that isn't a "node". I.e. mediators or builtin
- * mediators like log
- *
+ * Is the abstract superclass of MediatorFactory's
  */
 public abstract class AbstractMediatorFactory implements MediatorFactory {
-
-    Log log = LogFactory.getLog(getClass());
 }

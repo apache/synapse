@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
@@ -26,6 +26,8 @@ import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 import java.util.Iterator;
@@ -33,11 +35,13 @@ import java.util.Iterator;
 /**
  * Created a Log mediator that logs messages using commons-logging.
  *
- * <log [level="simple|headers|full"]>
+ * <log [level="simple|headers|full|custom"]>
  *      <property> *
  * </log>
  */
 public class LogMediatorFactory extends AbstractMediatorFactory {
+
+    private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
     private static final QName LOG_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "log");
     private static final String SIMPLE  = "simple";

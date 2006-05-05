@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.axis2;
+package org.apache.synapse.core.axis2;
 
 
 import org.apache.axiom.soap.SOAPEnvelope;

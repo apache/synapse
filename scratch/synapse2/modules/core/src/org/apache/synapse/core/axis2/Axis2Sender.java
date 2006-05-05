@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.axis2;
+package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
@@ -23,19 +23,19 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseContext;
 
 
 /**
- * This class helps the Axis2SynapseContext implement the send method
+ * This class helps the Axis2SynapseEnvironment implement the send method
  */
 public class Axis2Sender {
 
-    public static void sendOn(SynapseMessage smc) {
+    public static void sendOn(SynapseContext smc) {
 
         try {
 
-            MessageContext messageContext = ((Axis2SynapseMessage) smc)
-                .getMessageContext();
+            MessageContext messageContext = ((Axis2SynapseMessage) smc.getSynapseMessage()).getMessageContext();
             // At any time any QOS is disengaged. It's engaged iff, a flag is
             // set in execution chain.
             // ex: addressing will be engage in outpath iff ADDRESSING_PROCESSED
@@ -61,7 +61,7 @@ public class Axis2Sender {
 
             // run all rules on response
 
-            smc.setResponse(true);//
+            smc.getSynapseMessage().setResponse(true);//
 
             outMsgContext.setServerSide(true);
 
@@ -72,20 +72,17 @@ public class Axis2Sender {
 
             outMsgContext.setTransportIn(ti);
 
-            if (smc.getSynapseContext() == null) {
-                throw new SynapseException("no Synapse Env set on message");
-            }
-            smc.getSynapseContext().injectMessage(new Axis2SynapseMessage(
-                outMsgContext, smc.getSynapseContext()));
+            smc.setSynapseMessage(new Axis2SynapseMessage(outMsgContext, smc));
+            smc.getSynapseEnvironment().injectMessage(smc);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new SynapseException(e);
         }
     }
 
-    public static void sendBack(SynapseMessage smc) {
-        MessageContext messageContext = ((Axis2SynapseMessage) smc)
-            .getMessageContext();
+    public static void sendBack(SynapseContext smc) {
+        MessageContext messageContext = ((Axis2SynapseMessage) smc.getSynapseMessage()).getMessageContext();
         AxisEngine ae =
             new AxisEngine(messageContext.getConfigurationContext());
         try {

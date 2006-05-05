@@ -18,7 +18,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.transform.TransformMediator;
 import org.apache.synapse.api.Mediator;
@@ -46,7 +45,7 @@ public class TransformMediatorFactory extends AbstractMediatorFactory {
         return LOG_Q;
     }
 
-    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
+    public Mediator createMediator(OMElement elem) {
 
         TransformMediator transformMediator = new TransformMediator();
 

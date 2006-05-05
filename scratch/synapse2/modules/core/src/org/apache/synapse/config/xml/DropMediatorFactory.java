@@ -16,7 +16,6 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
@@ -33,7 +32,7 @@ public class DropMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "drop");
 
-    public Mediator createMediator(SynapseContext se, OMElement el) {
+    public Mediator createMediator(OMElement el) {
         return new DropMediator();
     }
 

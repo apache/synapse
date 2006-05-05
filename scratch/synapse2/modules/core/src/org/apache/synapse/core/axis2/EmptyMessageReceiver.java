@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.axis2;
+package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;

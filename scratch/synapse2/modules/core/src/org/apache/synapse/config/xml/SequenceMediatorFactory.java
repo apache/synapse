@@ -16,7 +16,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.axiom.om.OMElement;
@@ -47,15 +46,14 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return SEQUENCE_Q;
     }
 
-    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
+    public Mediator createMediator(OMElement elem) {
 
         SequenceMediator seqMediator = new SequenceMediator();
 
         OMAttribute n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         if (n != null) {
             seqMediator.setName(n.getAttributeValue());
-            super.addChildren(synCtx, elem, seqMediator);
-            synCtx.getConfiguration().addNamedMediator(n.getAttributeValue(), seqMediator);
+            super.addChildren(elem, seqMediator);
 
         } else {
             n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "ref"));

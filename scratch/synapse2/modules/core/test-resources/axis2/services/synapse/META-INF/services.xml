@@ -1,7 +1,7 @@
   <service name="synapse">
 
     <operation name="mediate" > 
-          <messageReceiver class="org.apache.synapse.axis2.SynapseMessageReceiver" />
+          <messageReceiver class="org.apache.synapse.core.axis2.SynapseMessageReceiver" />
     </operation>
     
   </service>

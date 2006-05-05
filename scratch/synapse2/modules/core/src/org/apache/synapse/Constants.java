@@ -37,7 +37,9 @@ public interface Constants {
     //this is for the synapse.config config
     String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
-    String SYNAPSE_CONTEXT = "synapse.context";
+    String SYNAPSE_CONFIG = "synapse.config";
+
+    String SYNAPSE_ENV = "synapse.env";
 
     String ADD_ADDRESSING = "synapse.send.useaddressing";
 

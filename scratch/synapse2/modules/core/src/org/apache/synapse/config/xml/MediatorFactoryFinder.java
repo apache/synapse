@@ -27,12 +27,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 
 import sun.misc.Service;
 
@@ -110,11 +108,10 @@ public class MediatorFactoryFinder {
 	 * recursively by the elements which contain processor elements themselves
 	 * (e.g. rules)
 	 * 
-	 * @param synapseCtx
 	 * @param element
-	 * @return Processor
+     * @return Processor
 	 */
-	public Mediator getMediator(SynapseContext synapseCtx, OMElement element) {
+	public Mediator getMediator(OMElement element) {
 
 		QName qName = new QName(element.getNamespace().getName(), element.getLocalName());
         log.debug("getMediator(" + qName + ")");
@@ -128,7 +125,7 @@ public class MediatorFactoryFinder {
 
         try {
 			MediatorFactory mf = (MediatorFactory) cls.newInstance();
-			return mf.createMediator(synapseCtx, element);
+			return mf.createMediator(element);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing mediator factory : " + cls;

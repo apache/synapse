@@ -47,7 +47,7 @@ public class ClassMediator extends AbstractMediator {
             throw new SynapseException(e);
         }
         /*if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
-              ((EnvironmentAware) m).setSynapseContext(se);
+              ((EnvironmentAware) m).initializeSynapse(se);
           }*/
         return m.mediate(smc);
 

@@ -18,7 +18,6 @@ package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
@@ -53,7 +52,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
         return LOG_Q;
     }
 
-    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
+    public Mediator createMediator(OMElement elem) {
 
         LogMediator logMediator = new LogMediator();
 

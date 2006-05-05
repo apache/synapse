@@ -19,7 +19,6 @@ import java.util.Iterator;
 
 
 
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.ListMediator;
 import org.apache.synapse.api.Mediator;
@@ -35,12 +34,12 @@ public abstract class AbstractListMediatorFactory extends AbstractMediatorFactor
 
     private static final Log log = LogFactory.getLog(AbstractListMediatorFactory.class);
 
-    public void addChildren(SynapseContext synCtx, OMElement el, ListMediator m)
+    public void addChildren(OMElement el, ListMediator m)
     {
         Iterator it = el.getChildElements();
         while (it.hasNext()) {
             OMElement child = (OMElement) it.next();
-            Mediator med = MediatorFactoryFinder.getInstance().getMediator(synCtx, child);
+            Mediator med = MediatorFactoryFinder.getInstance().getMediator(child);
             if (med != null) {
                 m.addChild(med);
             } else {

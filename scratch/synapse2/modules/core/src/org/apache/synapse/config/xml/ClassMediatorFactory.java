@@ -18,7 +18,6 @@ package org.apache.synapse.config.xml;
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.ext.ClassMediator;
@@ -33,14 +32,15 @@ import org.apache.axiom.om.OMAttribute;
 public class ClassMediatorFactory extends AbstractMediatorFactory {
     private static final QName CLM_Q = new QName(Constants.SYNAPSE_NAMESPACE,
             "classmediator");
-    public Mediator createMediator(SynapseContext se, OMElement el) {
+    public Mediator createMediator(OMElement el) {
         ClassMediator cmp = new ClassMediator();
         OMAttribute clsName = el.getAttribute(new QName("class"));
         if (clsName == null)
             throw new SynapseException("missing class attribute on element"
                     + el.toString());
         try {
-            Class clazz = se.getClassLoader().loadClass(clsName.getAttributeValue());
+            //TODO replace this hack to get the classloader from the synapse env - temp fix
+            Class clazz = getClass().getClassLoader().loadClass(clsName.getAttributeValue());
             cmp.setClazz(clazz);
         } catch (ClassNotFoundException e) {
             throw new SynapseException("class loading error", e);

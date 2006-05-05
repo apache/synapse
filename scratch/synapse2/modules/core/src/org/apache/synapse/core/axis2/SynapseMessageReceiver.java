@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.axis2;
+package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -25,18 +25,18 @@ import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseMessage;
 
 /**
- * <p/>
- * <p/>
- * This is used to "catch" messages in Axis2 and pass them to Synapse for processing.
+ * This message receiver should be configured in the Axis2 configuration as the
+ * default message receiver, which will handle all incoming messages through the
+ * synapse mediation
  */
 public class SynapseMessageReceiver implements MessageReceiver {
 
-    private Log log = LogFactory.getLog(getClass());
+    private static final Log log = LogFactory.getLog(SynapseMessageReceiver.class);
 
     public void receive(MessageContext mc) throws AxisFault {
+
         log.debug("Synapse received message");
-        SynapseContext synCtx = Axis2SynapseContextFinder
-            .getSynapseContext(mc);
+        SynapseContext synCtx = Axis2SynapseContextFinder.getSynapseContext(mc);
         ////////////////////////////////////////////////////////////////////////
         // SynapseContext is set as a property in MessageContext. This is due
         // use we can expect in ServiceMediatorProcessor and many extensions yet to come
@@ -44,8 +44,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
         ////////////////////////////////////////////////////////////////////////
         SynapseMessage smc = new Axis2SynapseMessage(mc, synCtx);
-        smc.setSynapseContext(synCtx);
-        synCtx.injectMessage(smc);
+        synCtx.getSynapseEnvironment().injectMessage(synCtx);
 
         ///////////////////////////////////////////////////////////////////////
         // Response handling mechanism for 200/202 and 5XX

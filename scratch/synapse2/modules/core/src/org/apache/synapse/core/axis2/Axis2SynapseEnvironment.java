@@ -14,42 +14,36 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.axis2;
+package org.apache.synapse.core.axis2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseContext;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.SynapseConfigurationBuilder;
-
-import java.io.InputStream;
+import org.apache.synapse.core.SynapseEnvironment;
 
 /**
  * <p> This is the Axis2 implementation of the SynapseContext
  */
-public class Axis2SynapseContext implements SynapseContext {
+public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     private ClassLoader cl = null;
-    private SynapseConfiguration config = null;
-    private Log log = LogFactory.getLog(getClass());
+    private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
 
-    public Axis2SynapseContext(InputStream is, ClassLoader cl) {
+    public Axis2SynapseEnvironment(ClassLoader cl) {
         super();
         this.cl = cl;
-        new SynapseConfigurationBuilder().setConfiguration(this, is);
     }
 
-    public void injectMessage(SynapseMessage smc) {
-        smc.setSynapseContext(this);
-        getConfiguration().getMainMediator().mediate(smc);
+    public void injectMessage(SynapseContext synCtx) {
+        synCtx.setSynapseEnvironment(this);
+        synCtx.getConfiguration().getMainMediator().mediate(synCtx.getSynapseMessage());
     }
 
-    public void send(SynapseMessage sm) {
-        if (sm.isResponse())
-            Axis2Sender.sendBack(sm);
+    public void send(SynapseContext synCtx) {
+        if (synCtx.getSynapseMessage().isResponse())
+            Axis2Sender.sendBack(synCtx);
         else
-            Axis2Sender.sendOn(sm);
+            Axis2Sender.sendOn(synCtx);
     }
 
     public ClassLoader getClassLoader() {
@@ -58,14 +52,6 @@ public class Axis2SynapseContext implements SynapseContext {
 
     public void setClassLoader(ClassLoader cl) {
         this.cl = cl;
-    }
-
-    public SynapseConfiguration getConfiguration() {
-        return config;
-    }
-
-    public void setConfiguration(SynapseConfiguration cfg) {
-        this.config = cfg;
     }
 
 }

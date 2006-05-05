@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.axis2;
+package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
@@ -35,17 +35,19 @@ import java.util.Map;
  */
 public class Axis2SynapseMessage implements SynapseMessage {
 
+    /** The Axis2 MessageContext reference */
     private MessageContext mc = null;
 
-    private Map props = new HashMap();
+    /** The Synapse Context reference*/
+    private SynapseContext synCtx = null;
 
     private boolean response = false;
 
     private boolean faultResponse = false;
 
-    public Axis2SynapseMessage(MessageContext mc, SynapseContext se) {
+    public Axis2SynapseMessage(MessageContext mc, SynapseContext synCtx) {
         setMessageContext(mc);
-        setSynapseContext(se);
+        setSynapseContext(synCtx);
     }
 
     public EndpointReference getFaultTo() {
@@ -62,17 +64,14 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     public void setFrom(EndpointReference reference) {
         mc.setFrom(reference);
-
     }
 
     public SOAPEnvelope getEnvelope() {
-
         return mc.getEnvelope();
     }
 
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
         mc.setEnvelope(envelope);
-
     }
 
     public String getMessageID() {
@@ -81,72 +80,46 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     public void setMessageID(String string) {
         mc.setMessageID(string);
-
     }
 
     public RelatesTo getRelatesTo() {
         return mc.getRelatesTo();
-
     }
 
-    public void setRelatesTo(RelatesTo reference) {
-        //TODO mc.setRelatesTo(reference);
+    public void setRelatesTo(RelatesTo[] reference) {
+        mc.setRelationships(reference);
     }
 
     public EndpointReference getReplyTo() {
         return mc.getReplyTo();
-
     }
 
     public void setReplyTo(EndpointReference reference) {
         mc.setReplyTo(reference);
-
     }
 
     public EndpointReference getTo() {
         return mc.getTo();
-
     }
 
     public void setTo(EndpointReference reference) {
         mc.setTo(reference);
-
     }
 
     public void setWSAAction(String actionURI) {
         mc.setWSAAction(actionURI);
-
     }
 
     public String getWSAAction() {
-
         return mc.getWSAAction();
     }
 
     public void setMessageId(String messageID) {
         mc.setWSAMessageId(messageID);
-
     }
 
     public String getMessageId() {
         return mc.getMessageID();
-    }
-
-    public Object getProperty(String key) {
-        Object obj = props.get(key);
-        if (obj == null) {
-            obj = mc.getProperty(key);
-        }
-        return obj;
-
-    }
-
-    public void setProperty(String key, Object value) {
-        props.put(key, value);
-    }
-
-    public Iterator getPropertyNames() {
-        return props.keySet().iterator();
     }
 
     public String getSoapAction() {
@@ -155,43 +128,26 @@ public class Axis2SynapseMessage implements SynapseMessage {
 
     public void setSoapAction(String string) {
         mc.setSoapAction(string);
-
     }
 
     public boolean isDoingMTOM() {
-
         return mc.isDoingMTOM();
     }
 
     public void setDoingMTOM(boolean b) {
         mc.setDoingMTOM(b);
-
     }
 
     public boolean isDoingREST() {
-
         return mc.isDoingREST();
     }
 
     public void setDoingREST(boolean b) {
         mc.setDoingREST(b);
-
     }
 
     public boolean isSOAP11() {
-
         return mc.isSOAP11();
-    }
-
-    public MessageContext getMessageContext() {
-        return mc;
-    }
-
-    public void setMessageContext(MessageContext mc) {
-        this.mc = mc;
-        Boolean resp = (Boolean) mc.getProperty(Constants.ISRESPONSE_PROPERTY);
-        if (resp != null)
-            response = resp.booleanValue();
     }
 
     public void setResponse(boolean b) {
@@ -212,13 +168,22 @@ public class Axis2SynapseMessage implements SynapseMessage {
     }
 
     public SynapseContext getSynapseContext() {
-        return Axis2SynapseContextFinder.getSynapseContext(mc);
+        return synCtx;
     }
 
     public void setSynapseContext(SynapseContext synCtx) {
-        Axis2SynapseContextFinder.setSynapseContext(mc, synCtx);
-        return;
+        this.synCtx = synCtx;
     }
 
+    public MessageContext getMessageContext() {
+        return mc;
+    }
+
+    public void setMessageContext(MessageContext mc) {
+        this.mc = mc;
+        Boolean resp = (Boolean) mc.getProperty(Constants.ISRESPONSE_PROPERTY);
+        if (resp != null)
+            response = resp.booleanValue();
+    }
 
 }

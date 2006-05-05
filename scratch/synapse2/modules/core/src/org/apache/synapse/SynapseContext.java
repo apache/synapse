@@ -17,34 +17,17 @@ package org.apache.synapse;
 
 
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
 
 
 /**
  * The Synapse Context is available to mediators through the SynapseMessage. It
- * allows one to call to the underlying SOAP engine (such as Axis2) where required.
- * e.g. send message, get classloader etc. It also holds a reference to the current
- * SynapseConfiguration.
+ * allows one to call to the underlying SynapseEnvironment (i.e. the SOAP engine
+ * - such as Axis2 - where required. It also allows one to access the current
+ * SynapseConfiguration. Additionally it holds per message properties (i.e. local
+ * properties valid for the lifetime of the message)
  */
 public interface SynapseContext {
-
-    /**
-     * This method injects a new message into the Synapse engine. This is used by
-     * the underlying SOAP engine to inject messages into Synapse for mediation.
-     * e.g. The SynapseMessageReceiver used by Axis2 invokes this to inject new messages
-     */
-    public void injectMessage(SynapseMessage smc);
-
-    /**
-     * Mediators may get access to the relevant classloader through this
-     */
-    public ClassLoader getClassLoader();
-
-    /**
-     * This method allows a message to be sent through the underlying SOAP engine.
-     * <p/>
-     * This will send request messages on (forward), and send the response messages back to the client
-     */
-    public void send(SynapseMessage smc);
 
     /**
      * Get a reference to the current SynapseConfiguration
@@ -60,5 +43,43 @@ public interface SynapseContext {
      * @param cfg The new synapse configuration instance
      */
     public void setConfiguration(SynapseConfiguration cfg);
+
+    /**
+     * Returns a reference to the host Synapse Environment
+     * @return the Synapse Environment
+     */
+    public SynapseEnvironment getSynapseEnvironment();
+
+    /**
+     * Sets the SynapseEnvironment reference to this context
+     * @param se the reference to the Synapse Environment
+     */
+    public void setSynapseEnvironment(SynapseEnvironment se);
+
+    /**
+     * Sets the associated Synapse message
+     * @param sm the synapse message associated with this context
+     */
+    public void setSynapseMessage(SynapseMessage sm);
+
+    /**
+     * Return the associated SynapseMessage
+     * @return the associated Synapse message
+     */
+    public SynapseMessage getSynapseMessage();
+
+    /**
+     * Get the value of a custom (local) property set on the message instance
+     * @param key key to look up property
+     * @return value for the given key
+     */
+    public Object getProperty(String key);
+
+    /**
+     * Set a custom (local) property with the given name on the message instance
+     * @param key key to be used
+     * @param value value to be saved
+     */
+    public void setProperty(String key, Object value);
 
 }

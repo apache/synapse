@@ -17,11 +17,9 @@ package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
@@ -45,7 +43,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "header");
 
-    public Mediator createMediator(SynapseContext synCtx, OMElement elem) {
+    public Mediator createMediator(OMElement elem) {
 
         HeaderMediator headerMediator = new HeaderMediator();
         OMAttribute name   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));

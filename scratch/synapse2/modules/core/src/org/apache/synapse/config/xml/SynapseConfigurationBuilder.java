@@ -18,7 +18,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -28,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -39,9 +37,11 @@ public class SynapseConfigurationBuilder {
 
     public SynapseConfigurationBuilder() {}
 
-    public void setConfiguration(SynapseContext synCtx, InputStream is) {
+    public SynapseConfiguration getConfig() {
+        return config;
+    }
 
-        synCtx.setConfiguration(config);
+    public void setConfiguration(InputStream is) {
 
         OMElement root = null;
         try {
@@ -58,7 +58,7 @@ public class SynapseConfigurationBuilder {
             Iterator iter = definitions.getChildrenWithName(Constants.SEQUENCE_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
-                defineSequence(synCtx, elt);
+                defineSequence(elt);
             }
         }
 
@@ -67,7 +67,7 @@ public class SynapseConfigurationBuilder {
             Iterator iter = endpoints.getChildrenWithName(Constants.ENDPOINT_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
-                //defineEndpoint(synCtx, elt); //TODO process Endpoints
+                //defineEndpoint(synCfg, elt); //TODO process Endpoints
             }
         }
 
@@ -76,7 +76,7 @@ public class SynapseConfigurationBuilder {
             Iterator iter = properties.getChildrenWithName(Constants.PROPERTY_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
-                //defineProperty(synCtx, elt); //TODO process Properties
+                //defineProperty(synCfg, elt); //TODO process Properties
             }
         }
 
@@ -86,7 +86,7 @@ public class SynapseConfigurationBuilder {
             log.error(msg);
             throw new SynapseException(msg);
         } else {
-            SynapseMediator sm = (SynapseMediator) MediatorFactoryFinder.getInstance().getMediator(synCtx, elem);
+            SynapseMediator sm = (SynapseMediator) MediatorFactoryFinder.getInstance().getMediator(elem);
             if (sm.getList().isEmpty()) {
                 String msg = "Invalid configuration, the main mediator specified by the <rules> element is empty";
                 log.error(msg);
@@ -103,16 +103,9 @@ public class SynapseConfigurationBuilder {
         }
     }
 
-    private void defineSequence(SynapseContext synCtx, OMElement ele) {
-        SequenceMediator seq = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(synCtx, ele);
+    private void defineSequence(OMElement ele) {
+        SequenceMediator seq = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(ele);
         config.addNamedMediator(seq.getName(), seq);
-    }
-
-    public static void main(String[] args) throws Exception {
-        SynapseConfigurationBuilder scb = new SynapseConfigurationBuilder();
-        InputStream is = new FileInputStream("/Temp/delete/simple.xml");
-        SynapseContext se = new org.apache.synapse.axis2.Axis2SynapseContext(is,null);
-        System.out.println(se.getConfiguration());
     }
 
 }

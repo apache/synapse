@@ -17,7 +17,6 @@ package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseContext;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
@@ -49,7 +48,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";
 
-    public Mediator createMediator(SynapseContext synMsg, OMElement elem) {
+    public Mediator createMediator(OMElement elem) {
 
         FaultMediator faultMediator = new FaultMediator();
 

@@ -91,7 +91,7 @@
         <phase name="PreDispatch"/>
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
             <handler name="SynapseDispatcher"
-                     class="org.apache.synapse.axis2.SynapseDispatcher">
+                     class="org.apache.synapse.core.axis2.SynapseDispatcher">
                 <order phase="Dispatch"/>
             </handler>
 
@@ -127,7 +127,7 @@
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
 
             <handler name="SynapseDispatcher"
-                     class="org.apache.synapse.axis2.SynapseDispatcher">
+                     class="org.apache.synapse.core.axis2.SynapseDispatcher">
                 <order phase="Dispatch"/>
             </handler>
 

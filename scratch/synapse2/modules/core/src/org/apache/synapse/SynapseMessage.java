@@ -60,7 +60,7 @@ public interface SynapseMessage {
 
     public RelatesTo getRelatesTo();
 
-    public void setRelatesTo(RelatesTo reference);
+    public void setRelatesTo(RelatesTo[] reference);
 
     public EndpointReference getReplyTo();
 
@@ -83,20 +83,6 @@ public interface SynapseMessage {
     public String getWSAAction();
 
     /**
-     * Get the value of a custom property set on the message instance
-     * @param key key to look up property
-     * @return value for the given key
-     */
-    public Object getProperty(String key);
-
-    /**
-     * Set a custom property with the given name on the message instance
-     * @param key key to be used
-     * @param value value to be saved
-     */
-    public void setProperty(String key, Object value);
-
-    /**
      * Returns the SOAPAction of the message
      * @return the SOAPAction
      */
@@ -107,6 +93,18 @@ public interface SynapseMessage {
      * @param string the SOAP Action
      */
     public void setSoapAction(String string);
+
+    /**
+     * Set the message if
+     * @param messageID
+     */
+    public void setMessageId(String messageID);
+
+    /**
+     * Gets the message id
+     * @return the message id
+     */
+    public String getMessageId();
 
     /**
      * If this message using MTOM?

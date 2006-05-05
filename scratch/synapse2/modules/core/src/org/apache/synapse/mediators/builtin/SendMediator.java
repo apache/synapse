@@ -43,7 +43,7 @@ public class SendMediator extends AbstractMediator {
         log.debug(getType() + " mediate()");
         log.debug("Sending To: " + (synMsg.getTo() != null ? synMsg.getTo().getAddress() : "null"));
         log.debug("Body : \n" + synMsg.getEnvelope());
-        synMsg.getSynapseContext().send(synMsg);
+        synMsg.getSynapseContext().getSynapseEnvironment().send(synMsg.getSynapseContext());
         return false;
     }
 }

@@ -19,6 +19,8 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The Sequence mediator either refers to another Sequence mediator instance
@@ -26,6 +28,7 @@ import org.apache.synapse.mediators.AbstractListMediator;
  */
 public class SequenceMediator extends AbstractListMediator {
 
+    private static final Log log = LogFactory.getLog(SequenceMediator.class);
     private String name = null;
     private String ref = null;
 

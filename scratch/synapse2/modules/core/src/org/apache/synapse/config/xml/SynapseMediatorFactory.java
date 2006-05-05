@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.SynapseContext;
-import org.apache.synapse.config.Constants;
+import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.axiom.om.OMElement;
 
+/**
+ * Builds the main mediator (@see SynapseConfiguration) of the Synapse instance
+ *
+ * <rules>
+ *   mediator+
+ * <rules>
+ */
 public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
     private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE, "rules");

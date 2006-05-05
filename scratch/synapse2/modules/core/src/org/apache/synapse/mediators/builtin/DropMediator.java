@@ -18,11 +18,15 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Halts further processing/mediation of the current message. i.e. returns false
  */
 public class DropMediator extends AbstractMediator {
+
+    private static final Log log = LogFactory.getLog(LogMediator.class);
 
     /**
      * Halts further mediation of the current message by returning false.

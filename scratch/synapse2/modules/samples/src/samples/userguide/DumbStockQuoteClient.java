@@ -63,7 +63,7 @@ public class DumbStockQuoteClient {
             EndpointReference targetEPR = new EndpointReference(url);
 
             Options options = new Options();
-            options.setTo(targetEPR);
+              options.setTo(targetEPR);
 
             options.setAction("http://www.webserviceX.NET/GetQuote");
                         

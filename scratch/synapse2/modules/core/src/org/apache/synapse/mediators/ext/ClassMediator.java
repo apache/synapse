@@ -21,6 +21,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -33,6 +35,7 @@ public class ClassMediator extends AbstractMediator {
 
     private Class clazz = null;
 
+    private static final Log log = LogFactory.getLog(ClassMediator.class);
 
     public boolean mediate(SynapseMessage smc) {
         log.debug(getType() + " mediate()");

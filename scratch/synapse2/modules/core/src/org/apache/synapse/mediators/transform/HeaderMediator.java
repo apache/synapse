@@ -20,6 +20,8 @@ import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.HeaderType;
 import org.apache.synapse.Util;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The header mediator is able to set a given value as a SOAP header, or remove a given
@@ -31,6 +33,8 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
  * @see HeaderType
  */
 public class HeaderMediator extends AbstractMediator {
+
+    private static final Log log = LogFactory.getLog(HeaderMediator.class);
 
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;

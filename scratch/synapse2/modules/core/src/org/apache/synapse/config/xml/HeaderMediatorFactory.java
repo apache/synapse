@@ -13,25 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Constants;
+import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 /**
+ * This builds a Header Mediator parsing the XML configuration supplied
  *
+ * Set header
+ *   <header name="qname" (value="literal" | expression="xpath")/>
+ *
+ * Remove header
+ *   <header name="qname" action="remove"/>
  */
 public class HeaderMediatorFactory extends AbstractMediatorFactory {
+
+    private static final Log log = LogFactory.getLog(HeaderMediatorFactory.class);
 
     private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "header");
 

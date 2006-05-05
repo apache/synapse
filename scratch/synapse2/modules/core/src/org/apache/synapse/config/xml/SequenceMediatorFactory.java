@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseContext;
@@ -21,14 +21,25 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import javax.xml.namespace.QName;
 
 /**
  * Builds an instance of a Sequence mediator through the Synapse configuration. It follows the following
- * <sequence (ref="name" | name="name")> mediator* </sequence>
+ *
+ * <sequence name="string">
+ *   mediator+
+ * </sequence>
+ *
+ * OR
+ *
+ * <sequence ref="name"/>
  */
 public class SequenceMediatorFactory extends AbstractListMediatorFactory {
+
+    private static final Log log = LogFactory.getLog(SequenceMediatorFactory.class);
 
     private static final QName SEQUENCE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
 

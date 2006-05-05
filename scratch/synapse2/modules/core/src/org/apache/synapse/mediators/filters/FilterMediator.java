@@ -23,6 +23,8 @@ import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Util;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Pattern;
@@ -35,6 +37,7 @@ import java.util.Iterator;
  */
 public class FilterMediator extends AbstractListMediator implements org.apache.synapse.api.FilterMediator {
 
+    private static final Log log = LogFactory.getLog(FilterMediator.class);
     private AXIOMXPath source = null;
     private Pattern regex = null;
     private AXIOMXPath xpath = null;

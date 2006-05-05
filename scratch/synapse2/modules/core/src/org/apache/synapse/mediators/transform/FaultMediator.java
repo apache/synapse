@@ -36,6 +36,8 @@ import javax.xml.namespace.QName;
  * TODO this class needs more attention! - revisit later
  */
 public class FaultMediator extends AbstractMediator {
+    
+    private static final Log log = LogFactory.getLog(FaultMediator.class);
 
     public static final int SOAP11 = 1;
     public static final int SOAP12 = 2;

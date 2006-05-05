@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import java.util.Iterator;
 
@@ -24,15 +24,16 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.ListMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- *
- * 
- * <p> This is the abstract parent of any tag which is a "Node" - so &ltstage>, &ltin>&ltout> and &ltnever> all fit this model
- * <p>It recursively creates a list of processors from the children. 
- *
+ * This implements the basic logic to build a list mediator from a given XML
+ * configuration. It recursively builds the child mediators of the list.
  */
 public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
+
+    private static final Log log = LogFactory.getLog(AbstractListMediatorFactory.class);
 
     public void addChildren(SynapseContext synCtx, OMElement el, ListMediator m)
     {
@@ -49,7 +50,4 @@ public abstract class AbstractListMediatorFactory extends AbstractMediatorFactor
             }
         }
     }
-
-
-
 }

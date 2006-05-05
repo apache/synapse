@@ -25,8 +25,6 @@ import org.apache.synapse.api.Mediator;
  */
 public abstract class AbstractMediator implements Mediator {
 
-    protected final Log log = LogFactory.getLog(getClass());
-
     /**
      * Returns the class name of the mediator
      * @return the class name of the mediator

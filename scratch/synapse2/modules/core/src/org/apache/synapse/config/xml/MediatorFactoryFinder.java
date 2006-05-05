@@ -15,7 +15,7 @@
  */
 
 
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.synapse.SynapseContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.MediatorFactory;
+import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -46,7 +46,7 @@ import sun.misc.Service;
 public class MediatorFactoryFinder {
 
     private static Map factoryMap = new HashMap();
-	private Log log = LogFactory.getLog(getClass());
+	private static final Log log = LogFactory.getLog(MediatorFactoryFinder.class);
 
 	private static final Class[] mediatorFactories = {
         SequenceMediatorFactory.class,
@@ -56,7 +56,8 @@ public class MediatorFactoryFinder {
         SynapseMediatorFactory.class,
         DropMediatorFactory.class,
         HeaderMediatorFactory.class,
-        FaultMediatorFactory.class
+        FaultMediatorFactory.class,
+        TransformMediatorFactory.class
       };
 
     private static MediatorFactoryFinder instance = null;

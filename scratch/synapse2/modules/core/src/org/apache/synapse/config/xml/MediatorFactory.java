@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.config;
+package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
-
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.SynapseContext;
+import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 
 /**
- * The Send mediator factory parses a Send element and creates an instance of the mediator
- *
- * //TODO support endpoints, failover and loadbalacing
+ * A mediator factory capable of creating an instance of a mediator through a given
+ * XML should implement this interface
  */
-public class SendMediatorFactory extends AbstractMediatorFactory {
+public interface MediatorFactory {
+    /**
+     * Creates an instance of the mediator using the OMElement
+     * @param se
+     * @param el
+     * @return the created mediator
+     */
+    public Mediator createMediator(SynapseContext se, OMElement el);
 
-    private static final QName SEND_Q = new QName(Constants.SYNAPSE_NAMESPACE, "send");
-
-    public Mediator createMediator(SynapseContext synMsg, OMElement el) {
-        SendMediator sm =  new SendMediator();
-        return sm;
-    }
-
-    public QName getTagQName() {
-        return SEND_Q;
-    }
-
+    /**
+     * The QName of this mediator element in the XML config
+     * @return QName of the mediator element
+     */
+    public QName getTagQName();
 }

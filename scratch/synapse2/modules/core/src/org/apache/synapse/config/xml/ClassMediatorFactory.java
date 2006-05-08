@@ -23,35 +23,51 @@ import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.ext.ClassMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.Iterator;
 
 /**
+ * Creates an instance of a Class mediator using XML configuration specified
  *
- * <xmp><synapse:classmediator name="nm" class="org.fremantle.mediator"</synapse:classmediator></xmp>
- * TODO add ability to configure properties with Strings/OMElements based on children.
+ * <class name="class-name">
+ *   <property name="string" (value="literal" | expression="xpath")/>*
+ * </class>
  */
 public class ClassMediatorFactory extends AbstractMediatorFactory {
-    private static final QName CLM_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-            "classmediator");
-    public Mediator createMediator(OMElement el) {
-        ClassMediator cmp = new ClassMediator();
-        OMAttribute clsName = el.getAttribute(new QName("class"));
-        if (clsName == null)
-            throw new SynapseException("missing class attribute on element"
-                    + el.toString());
-        try {
-            //TODO replace this hack to get the classloader from the synapse env - temp fix
-            Class clazz = getClass().getClassLoader().loadClass(clsName.getAttributeValue());
-            cmp.setClazz(clazz);
-        } catch (ClassNotFoundException e) {
-            throw new SynapseException("class loading error", e);
-        }
-        return cmp;
 
+    private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
+
+    private static final QName CLASS_Q = new QName(Constants.SYNAPSE_NAMESPACE, "class");
+
+    public Mediator createMediator(OMElement elem) {
+
+        ClassMediator classMediator = new ClassMediator();
+
+        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        if (name == null) {
+            String msg = "The name of the actual mediator class is a required attribute";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+
+        try {
+            Class clazz = getClass().getClassLoader().loadClass(name.getAttributeValue());
+            classMediator.setClazz(clazz);
+        } catch (ClassNotFoundException e) {
+            String msg = "Cannot find class : " + name.getAttributeValue();
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
+
+        classMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
+
+        return classMediator;
     }
 
 
     public QName getTagQName() {
-        return CLM_Q;
+        return CLASS_Q;
     }
-
 }

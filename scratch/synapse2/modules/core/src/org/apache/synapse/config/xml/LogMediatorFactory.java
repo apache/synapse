@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created a Log mediator that logs messages using commons-logging.
@@ -76,61 +77,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
             logMediator.setSeperator(seperator.getAttributeValue());
         }
 
-        // parse custom properties and set them into the mediator
-        Iterator iter = elem.getChildrenWithName(new QName(Constants.NULL_NAMESPACE, "property"));
-        while (iter.hasNext()) {
-
-            OMElement propEle = (OMElement) iter.next();
-            OMAttribute attName  = propEle.getAttribute(MediatorProperty.ATT_NAME_Q);
-            OMAttribute attValue = propEle.getAttribute(MediatorProperty.ATT_VALUE_Q);
-            OMAttribute attExpr  = propEle.getAttribute(MediatorProperty.ATT_EXPR_Q);
-
-            MediatorProperty prop = new MediatorProperty();
-
-            if (attName == null || attName.getAttributeValue() == null || attName.getAttributeValue().trim().length() == 0) {
-                String msg = "Property name is a required attribute for a Log property";
-                log.error(msg);
-                throw new SynapseException(msg);
-            } else {
-                prop.setName(attName.getAttributeValue());
-            }
-
-            // if a value is specified, use it, else look for an expression
-            if (attValue != null) {
-                if (attValue.getAttributeValue() == null || attValue.getAttributeValue().trim().length() == 0) {
-                    String msg = "Property attribute value (if specified) is required for a Log property";
-                    log.error(msg);
-                    throw new SynapseException(msg);
-                } else {
-                    prop.setValue(attValue.getAttributeValue());
-                }
-
-            } else if (attExpr != null) {
-
-                if (attExpr.getAttributeValue() == null || attExpr.getAttributeValue().trim().length() == 0) {
-                    String msg = "Property attribute expression (if specified) is required for a Log property";
-                    log.error(msg);
-                    throw new SynapseException(msg);
-
-                } else {
-                    try {
-                        prop.setExpression(new AXIOMXPath(attExpr.getAttributeValue()));
-
-                    } catch (JaxenException e) {
-                        String msg = "Invalid XPapth expression : " + attExpr.getAttributeValue();
-                        log.error(msg);
-                        throw new SynapseException(msg, e);
-                    }
-                }
-
-            } else {
-                String msg = "Property attribute value OR expression must be specified for a Log property";
-                log.error(msg);
-                throw new SynapseException(msg);
-            }
-
-            logMediator.addProperty(prop);
-        }
+        logMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
 
         return logMediator;
     }

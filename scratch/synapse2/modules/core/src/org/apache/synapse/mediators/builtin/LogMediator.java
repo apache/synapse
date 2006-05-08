@@ -153,4 +153,8 @@ public class LogMediator extends AbstractMediator {
         properties.add(p);
     }
 
+    public void addAllProperties(List list) {
+        properties.addAll(list);
+    }
+
 }

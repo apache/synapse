@@ -88,7 +88,7 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         try {
-            Object o = source.evaluate(synMsg.getEnvelope());;
+            Object o = source.evaluate(synMsg.getEnvelope());
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {

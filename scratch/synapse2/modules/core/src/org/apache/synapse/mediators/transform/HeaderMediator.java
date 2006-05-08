@@ -16,9 +16,9 @@
 package org.apache.synapse.mediators.transform;
 
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.HeaderType;
 import org.apache.synapse.Util;
+import org.apache.synapse.SynapseContext;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,18 +49,19 @@ public class HeaderMediator extends AbstractMediator {
     /**
      * Sets/Removes a SOAP header on the current message
      *
-     * @param synMsg the current message which is altered as necessary
+     * @param synCtx the current message which is altered as necessary
      * @return true always
      */
-    public boolean mediate(SynapseMessage synMsg) {
+    public boolean mediate(SynapseContext synCtx) {
         log.debug(getType() + " mediate()");
 
         if (action == ACTION_SET) {
-            headerType.setHeader(synMsg,
-                (getValue() != null ? getValue() : Util.getStringValue(getExpression(), synMsg)));
+            headerType.setHeader(synCtx.getSynapseMessage(),
+                (getValue() != null ? getValue() :
+                    Util.getStringValue(getExpression(), synCtx)));
 
         } else {
-            headerType.removeHeader(synMsg);
+            headerType.removeHeader(synCtx.getSynapseMessage());
         }
         return true;
     }

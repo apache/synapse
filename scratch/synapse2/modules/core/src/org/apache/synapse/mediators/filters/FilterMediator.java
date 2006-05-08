@@ -17,19 +17,14 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
-import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.Util;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Pattern;
-import java.util.List;
-import java.util.Iterator;
 
 /**
  * The filter mediator combines the regex and xpath filtering functionality. If an xpath
@@ -44,13 +39,13 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
 
     /**
      * Executes the list of sub/child mediators, if the filter condition is satisfied
-     * @param synMsg the current message
+     * @param synCtx the current message
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
-    public boolean mediate(SynapseMessage synMsg) {
+    public boolean mediate(SynapseContext synCtx) {
         log.debug(getType() + " mediate()");
-        if (test(synMsg)) {
-            return super.mediate(synMsg);
+        if (test(synCtx)) {
+            return super.mediate(synCtx);
         } else {
             return true;
         }
@@ -61,16 +56,16 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * or Regex (against a source XPath). When a regular expression is supplied
      * the source XPath is evaluated into a String value, and matched against
      * the given regex
-     * @param synMsg the current message for evaluation of the test condition
+     * @param synCtx the current message for evaluation of the test condition
      * @return true if evaluation of the XPath/Regex results in true
      */
-    public boolean test(SynapseMessage synMsg) {
+    public boolean test(SynapseContext synCtx) {
         try {
             if (xpath != null) {
-                return xpath.booleanValueOf(synMsg.getEnvelope());
+                return xpath.booleanValueOf(synCtx.getSynapseMessage().getEnvelope());
 
             } else if (source != null && regex != null) {
-                return regex.matcher(Util.getStringValue(source, synMsg)).matches();
+                return regex.matcher(Util.getStringValue(source, synCtx)).matches();
 
             } else {
                 log.error("Invalid configuration specified");

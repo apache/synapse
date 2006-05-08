@@ -15,8 +15,8 @@
 */
 package org.apache.synapse.mediators.base;
 
-import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
@@ -40,22 +40,22 @@ public class SequenceMediator extends AbstractListMediator {
      * change of the synapse configuration. It is the responsibility of the
      * SynapseConfiguration builder to ensure that dead references are not present.
      *
-     * @param synMsg the synapse message
+     * @param synCtx the synapse message
      * @return as per standard mediator result
      */
-    public boolean mediate(SynapseMessage synMsg) {
+    public boolean mediate(SynapseContext synCtx) {
         log.debug(getType() + " mediate()");
         if (ref == null) {
-            return super.mediate(synMsg);
+            return super.mediate(synCtx);
 
         } else {
-            Mediator m = synMsg.getSynapseContext().getConfiguration().getNamedMediator(ref);
+            Mediator m = synCtx.getConfiguration().getNamedMediator(ref);
             if (m == null) {
                 String msg = "Sequence mediator instance named " + ref + " cannot be found.";
                 log.error(msg);
                 throw new SynapseException(msg);
             } else {
-                return m.mediate(synMsg);
+                return m.mediate(synCtx);
             }
         }
     }

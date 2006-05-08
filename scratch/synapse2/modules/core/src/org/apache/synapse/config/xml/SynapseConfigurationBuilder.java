@@ -17,6 +17,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -26,10 +27,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
+
+/**
+ * Builds a Synapse Configuration model from an XML input stream.
+ */
 public class SynapseConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(SynapseConfigurationBuilder.class);
@@ -53,6 +59,7 @@ public class SynapseConfigurationBuilder {
         }
         root.build();
 
+        // digest defined Sequences
         OMContainer definitions = root.getFirstChildWithName(Constants.DEFINITIONS_ELT);
         if (definitions != null) {
             Iterator iter = definitions.getChildrenWithName(Constants.SEQUENCE_ELT);
@@ -62,6 +69,7 @@ public class SynapseConfigurationBuilder {
             }
         }
 
+        // digest defined Endpoints
         OMContainer endpoints = root.getFirstChildWithName(Constants.ENDPOINT_ELT);
         if (endpoints != null) {
             Iterator iter = endpoints.getChildrenWithName(Constants.ENDPOINT_ELT);
@@ -71,12 +79,13 @@ public class SynapseConfigurationBuilder {
             }
         }
 
+        // digest defined Global properties
         OMContainer properties = root.getFirstChildWithName(Constants.PROPERTY_ELT);
         if (properties != null) {
             Iterator iter = properties.getChildrenWithName(Constants.PROPERTY_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
-                //defineProperty(synCfg, elt); //TODO process Properties
+                defineProperty(elt);
             }
         }
 
@@ -101,6 +110,21 @@ public class SynapseConfigurationBuilder {
                 is.close();
             } catch (IOException e) {}
         }
+    }
+
+    /**
+     * <set-property name="string" value="string"/>
+     * @param elem
+     */
+    private void defineProperty(OMElement elem) {
+        OMAttribute name  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
+        if (name == null || value == null) {
+            String msg = "The 'name' and 'value' attributes are required";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+        config.addProperty(name.getAttributeValue(), value.getAttributeValue());
     }
 
     private void defineSequence(OMElement ele) {

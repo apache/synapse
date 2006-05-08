@@ -17,45 +17,39 @@ package org.apache.synapse;
 
 import javax.xml.namespace.QName;
 
-
-
 /**
- *
- * 
  * <p> Global constants for the Synapse project
- *
  */
 public interface Constants {
-	
 
-	String CLASSMEDIATOR = "classmediator";
+    String CLASSMEDIATOR = "classmediator";
 
-	QName MEDIATE_OPERATION_NAME = new QName("mediate");
+    QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
-	String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
-	String MEDIATOR_SYNAPSE_ENV_PROPERTY = "synapse.mediator.environment";
+    String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
 
-	String ISRESPONSE_PROPERTY = "synapse.isresponse";
+    String MEDIATOR_SYNAPSE_CTX_PROPERTY = "synapse.mediator.environment";
 
-	String EMPTYMEDIATOR = "emptymediator";
+    String ISRESPONSE_PROPERTY = "synapse.isresponse";
 
-    //this is for the synapse.xml config
-    String SYNAPSECONFIGURATION = "SynapseConfiguration";
+    String EMPTYMEDIATOR = "emptymediator";
 
-	String SYNAPSE_ENVIRONMENT = "synapse.environment";
+    //this is for the synapse.config config
+    String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
-	String ADD_ADDRESSING = "synapse.send.useaddressing";
+    String SYNAPSE_CONFIG = "synapse.config";
+
+    String SYNAPSE_ENV = "synapse.env";
+
+    String ADD_ADDRESSING = "synapse.send.useaddressing";
 
     // for security supporting
-
     String SECURITY_QOS = "synapse_security";
+
     String ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT = "addressing_processed_configurationContext";
 
     // addressing properites handling
-
     String ENGAGE_ADDRESSING_IN_MESSAGE = "__ENGAGE_ADDRESSING_IN_MESSAGE__";
 
-    String  ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
-
-
+    String ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
 }

@@ -86,7 +86,7 @@ fi
 
 cd $SYNAPSE_HOME
 echo "Starting Synapse/Java ..."
-echo "Using $SYNAPSE_HOME:   $SYNAPSE_HOME"
+echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 
 $JAVA_HOME/bin/java -Daxis2.xml=$SYNAPSE_HOME/synapse_repository/conf/axis2.xml -classpath $SYNAPSE_CLASSPATH org.apache.axis2.transport.http.SimpleHTTPServer $SYNAPSE_HOME/synapse_repository -p8080

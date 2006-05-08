@@ -4,7 +4,7 @@
     <!-- ================================================= -->
     <parameter name="hotdeployment" locked="false">true</parameter>
     <parameter name="hotupdate" locked="false">false</parameter>
-    <parameter name="enableMTOM" locked="false">true</parameter>
+    <parameter name="enableMTOM" locked="false">false</parameter>
     <parameter name="sendStacktraceDetailsWithFaults" locked="false">true</parameter>
 
     <!-- Uncomment this to enable REST support -->
@@ -16,6 +16,8 @@
 
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
+    
+    <module ref="addressing"/>
 
     <!-- ================================================= -->
     <!-- Message Receivers -->
@@ -89,7 +91,7 @@
         <phase name="PreDispatch"/>
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
             <handler name="SynapseDispatcher"
-                     class="org.apache.synapse.axis2.SynapseDispatcher">
+                     class="org.apache.synapse.core.axis2.SynapseDispatcher">
                 <order phase="Dispatch"/>
             </handler>
 
@@ -125,7 +127,7 @@
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
 
             <handler name="SynapseDispatcher"
-                     class="org.apache.synapse.axis2.SynapseDispatcher">
+                     class="org.apache.synapse.core.axis2.SynapseDispatcher">
                 <order phase="Dispatch"/>
             </handler>
 

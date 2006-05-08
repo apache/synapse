@@ -17,6 +17,7 @@
             <artifactId>synapse-core</artifactId>
             <version>${pom.currentVersion}</version>
         </dependency>
+<!--
         <dependency>
             <groupId>synapse</groupId>
             <artifactId>synapse-mediators</artifactId>
@@ -26,7 +27,7 @@
             <groupId>synapse</groupId>
             <artifactId>synapse-extensions</artifactId>
             <version>${pom.currentVersion}</version>
-        </dependency>
+        </dependency>-->
         <!-- external JARs -->
         <dependency>
             <groupId>axis2</groupId>

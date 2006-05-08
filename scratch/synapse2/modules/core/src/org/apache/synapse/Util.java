@@ -36,13 +36,13 @@ public class Util {
      * Evaluates the given XPath expression against the SOAPEnvelope of the
      * current message and returns a String representation of the result
      * @param xpath the expression to evaluate
-     * @param synMsg the source message which holds the SOAP envelope
+     * @param synCtx the source message which holds the SOAP envelope
      * @return a String representation of the result of evaluation
      */
-    public static String getStringValue(AXIOMXPath xpath, SynapseMessage synMsg) {
+    public static String getStringValue(AXIOMXPath xpath, SynapseContext synCtx) {
 
         try {
-            Object result = xpath.evaluate(synMsg.getEnvelope());
+            Object result = xpath.evaluate(synCtx.getSynapseMessage().getEnvelope());
             StringBuffer textValue = new StringBuffer();
 
             if (result instanceof List) {

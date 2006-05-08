@@ -55,7 +55,12 @@ public class MediatorFactoryFinder {
         DropMediatorFactory.class,
         HeaderMediatorFactory.class,
         FaultMediatorFactory.class,
-        TransformMediatorFactory.class
+        TransformMediatorFactory.class,
+        ValidateMediatorFactory.class,
+        PropertyMediatorFactory.class,
+        SwitchMediatorFactory.class,
+        SwitchCaseMediatorFactory.class,
+        SwitchCaseDefaultMediatorFactory.class
       };
 
     private static MediatorFactoryFinder instance = null;

@@ -18,6 +18,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.commons.logging.Log;
@@ -50,37 +51,38 @@ public class LogMediator extends AbstractMediator {
 
     /**
      * Logs the current message according to the supplied semantics
-     * @param synMsg (current) message to be logged
+     * @param synCtx (current) message to be logged
      * @return true always
      */
-    public boolean mediate(SynapseMessage synMsg) {
+    public boolean mediate(SynapseContext synCtx) {
         log.debug(getType() + " mediate()");
-        log.info(getLogMessage(synMsg));
+        log.info(getLogMessage(synCtx));
         return true;
     }
 
-    private String getLogMessage(SynapseMessage synMsg) {
+    private String getLogMessage(SynapseContext synCtx) {
         switch (logLevel) {
             case CUSTOM:
-                return getCustomLogMessage(synMsg);
+                return getCustomLogMessage(synCtx);
             case SIMPLE:
-                return getSimpleLogMessage(synMsg);
+                return getSimpleLogMessage(synCtx);
             case HEADERS:
-                return getHeadersLogMessage(synMsg);
+                return getHeadersLogMessage(synCtx);
             case FULL:
-                return getFullLogMessage(synMsg);
+                return getFullLogMessage(synCtx);
             default:
                 return "Invalid log level specified";
         }
     }
 
-    private String getCustomLogMessage(SynapseMessage synMsg) {
+    private String getCustomLogMessage(SynapseContext synCtx) {
         StringBuffer sb = new StringBuffer();
-        setCustomProperties(sb, synMsg);
+        setCustomProperties(sb, synCtx);
         return sb.toString();
     }
 
-    private String getSimpleLogMessage(SynapseMessage synMsg) {
+    private String getSimpleLogMessage(SynapseContext synCtx) {
+        SynapseMessage synMsg = synCtx.getSynapseMessage();
         StringBuffer sb = new StringBuffer();
         if (synMsg.getTo() != null)
             sb.append("To: " + synMsg.getTo().getAddress());
@@ -94,37 +96,39 @@ public class LogMediator extends AbstractMediator {
             sb.append(SEP + "ReplyTo: " + synMsg.getReplyTo().getAddress());
         if (synMsg.getMessageID() != null)
             sb.append(SEP + "MessageID: " + synMsg.getMessageID());
-        setCustomProperties(sb, synMsg);
+        setCustomProperties(sb, synCtx);
         return sb.toString();
     }
 
-    private String getHeadersLogMessage(SynapseMessage synMsg) {
+    private String getHeadersLogMessage(SynapseContext synCtx) {
+        SynapseMessage synMsg = synCtx.getSynapseMessage();
         StringBuffer sb = new StringBuffer();
         Iterator iter = synMsg.getEnvelope().getHeader().examineAllHeaderBlocks();
         while (iter.hasNext()) {
             SOAPHeader header = (SOAPHeader) iter.next();
             sb.append(SEP + header.getLocalName() + " : " + header.getText());
         }
-        setCustomProperties(sb, synMsg);
+        setCustomProperties(sb, synCtx);
         return sb.toString();
     }
 
-    private String getFullLogMessage(SynapseMessage synMsg) {
+    private String getFullLogMessage(SynapseContext synCtx) {
+        SynapseMessage synMsg = synCtx.getSynapseMessage();
         StringBuffer sb = new StringBuffer();
-        sb.append(getSimpleLogMessage(synMsg));
+        sb.append(getSimpleLogMessage(synCtx));
         if (synMsg.getEnvelope() != null)
             sb.append(SEP + "Envelope: " + synMsg.getEnvelope());
-        setCustomProperties(sb, synMsg);
+        setCustomProperties(sb, synCtx);
         return sb.toString();
     }
 
-    private void setCustomProperties(StringBuffer sb, SynapseMessage synMsg) {
+    private void setCustomProperties(StringBuffer sb, SynapseContext synCtx) {
         if (properties != null && !properties.isEmpty()) {
             Iterator iter = properties.iterator();
             while (iter.hasNext()) {
                 MediatorProperty prop = (MediatorProperty) iter.next();
                 sb.append(SEP + prop.getName() + " = " +
-                    (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synMsg)));
+                    (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synCtx)));
             }
         }
     }

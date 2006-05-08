@@ -30,10 +30,10 @@ import org.apache.axiom.om.OMElement;
 public interface MediatorFactory {
     /**
      * Creates an instance of the mediator using the OMElement
-     * @param el
+     * @param elem
      * @return the created mediator
      */
-    public Mediator createMediator(OMElement el);
+    public Mediator createMediator(OMElement elem);
 
     /**
      * The QName of this mediator element in the XML config

@@ -43,4 +43,12 @@ public class SynapseConfiguration {
     public void setMainMediator(Mediator mainMediator) {
         this.mainMediator = mainMediator;
     }
+
+    public void addProperty(String name, String value) {
+        globalProps.put(name, value);
+    }
+
+    public String getProperty(String name) {
+        return (String) globalProps.get(name);
+    }
 }

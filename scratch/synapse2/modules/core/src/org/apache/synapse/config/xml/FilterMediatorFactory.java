@@ -67,7 +67,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
-            addNameSpaces(elem, filter.getXpath());
+            addNameSpaces(elem, filter.getXpath(), log);
 
         } else if (attSource != null && attRegex != null) {
 
@@ -94,7 +94,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
-            addNameSpaces(elem, filter.getSource());
+            addNameSpaces(elem, filter.getSource(), log);
 
         } else {
             String msg = "An xpath or (source, regex) attributes are required for a filter";
@@ -108,17 +108,4 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
         return FILTER_Q;
     }
 
-    private void addNameSpaces(OMElement elem, AXIOMXPath xp) {
-        try {
-            Iterator it = elem.getAllDeclaredNamespaces();
-            while (it.hasNext()) {
-                OMNamespace n = (OMNamespace) it.next();
-                xp.addNamespace(n.getPrefix(), n.getName());
-            }
-        } catch (JaxenException je) {
-            String msg = "Error adding declared name spaces " + elem;
-            log.error(msg);
-            throw new SynapseException(msg, je);
-        }
-    }
 }

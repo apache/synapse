@@ -36,7 +36,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     public void injectMessage(SynapseContext synCtx) {
         synCtx.setSynapseEnvironment(this);
-        synCtx.getConfiguration().getMainMediator().mediate(synCtx.getSynapseMessage());
+        synCtx.getConfiguration().getMainMediator().mediate(synCtx);
     }
 
     public void send(SynapseContext synCtx) {

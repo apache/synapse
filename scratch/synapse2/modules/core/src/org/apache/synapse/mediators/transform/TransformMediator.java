@@ -2,17 +2,15 @@ package org.apache.synapse.mediators.transform;
 
 
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMContainer;
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,14 +46,14 @@ public class TransformMediator extends AbstractMediator {
     /**
      * Transforms this message (or its element specified as the source) using the
      * given XSLT or XQuery transformation
-     * @param synMsg the current message where the transformation will apply
+     * @param synCtx the current message where the transformation will apply
      * @return true always
      */
-    public boolean mediate(SynapseMessage synMsg) {
+    public boolean mediate(SynapseContext synCtx) {
         log.debug(getType() + " mediate()");
 
         if (xsltUrl != null) {
-            performXLST(synMsg);
+            performXLST(synCtx.getSynapseMessage());
             return true;
 
         } else if (xQueryUrl != null) {

@@ -335,7 +335,7 @@
         <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
-        <ant:mkdir dir="${bin.dist.dir}/mediators"/>
+        <!--<ant:mkdir dir="${bin.dist.dir}/mediators"/>-->
 
         <ant:mkdir dir="target/temp/"/>
 
@@ -360,13 +360,13 @@
             <ant:fileset dir="modules/core/target/synapse-repository"/>
         </ant:copy>
 
-        <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
+        <!--<ant:copy todir="${bin.dist.dir}/samples" flatten="false">
             <ant:fileset dir="modules/samples/target/dist-bin/samples"/>
         </ant:copy>
 
         <ant:copy todir="${bin.dist.dir}/mediators" flatten="false">
             <ant:fileset dir="modules/mediators/target/dist-bin/mediators"/>
-        </ant:copy>
+        </ant:copy>-->
 
         <ant:copy todir="target/temp/">
             <ant:fileset dir="target/dist-bin/">

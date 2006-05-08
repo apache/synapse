@@ -13,46 +13,85 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.synapse.mediators.ext;
 
-
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseContext;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
+import org.apache.synapse.api.Mediator;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.lang.reflect.Method;
 
 /**
- * This executes the "mediate" operation on a new instance of the specified class
- * <p/>
- * TODO add support for simple properties to be set
- * TODO Requires refactoring and cleanup - revisit later
+ * The class mediator delegates the mediation to a new instance of a specified class. The specified class
+ * must implement the Mediator interface
+ *
+ * @see Mediator
  */
 public class ClassMediator extends AbstractMediator {
 
-    private Class clazz = null;
-
     private static final Log log = LogFactory.getLog(ClassMediator.class);
 
-    public boolean mediate(SynapseContext smc) {
+    private Class clazz = null;
+    private List properties = new ArrayList();
+
+    /**
+     * Delegate mediation to a new instance of the specified class
+     * @param synCtx the message context
+     * @return as per standard semantics
+     */
+    public boolean mediate(SynapseContext synCtx) {
+
         log.debug(getType() + " mediate()");
         Mediator m = null;
-
         try {
-            m = (Mediator) getClazz().newInstance();
-        } catch (Exception e) {
-            throw new SynapseException(e);
-        }
-        /*if (EnvironmentAware.class.isAssignableFrom(m.getClass())) {
-              ((EnvironmentAware) m).initializeSynapse(se);
-          }*/
-        return m.mediate(smc);
+            m = (Mediator) clazz.newInstance();
 
+        } catch (Exception e) {
+            String msg = "Error while creating an instance of the specified mediator class : " + clazz.getName();
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
+
+        setProperties(m, synCtx);
+
+        return m.mediate(synCtx);
     }
 
+    /**
+     * Only String properties are supported
+     * @param m the mediator
+     */
+    private void setProperties(Mediator m, SynapseContext synCtx) {
+        Iterator iter = properties.iterator();
+        while (iter.hasNext()) {
+            MediatorProperty mProp = (MediatorProperty) iter.next();
+
+            String mName = "set" + Character.toUpperCase(mProp.getName().charAt(0)) + mProp.getName().substring(1);
+            String value = (mProp.getValue() != null ?
+                mProp.getValue() :
+                Util.getStringValue(mProp.getExpression(), synCtx));
+
+
+            try {
+                Method method = m.getClass().getMethod(mName, new Class[] {String.class});
+                method.invoke(m, new Object[] { value });
+
+            } catch (Exception e) {
+                String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
+                    " mediator : " + m.getClass() + " : " + e.getMessage();
+                log.error(msg);
+                throw new SynapseException(msg, e);
+            }
+        }
+    }
 
     public void setClazz(Class clazz) {
         this.clazz = clazz;
@@ -60,6 +99,14 @@ public class ClassMediator extends AbstractMediator {
 
     public Class getClazz() {
         return clazz;
+    }
+
+    public void addProperty(MediatorProperty p) {
+        properties.add(p);
+    }
+
+    public void addAllProperties(List list) {
+        properties.addAll(list);
     }
 
 }

@@ -1,69 +1,141 @@
+/*
+* Copyright 2004,2005 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.apache.synapse;
 
-import org.apache.axis2.AxisFault;
-
-import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.synapse.axis2.Axis2SynapseMessage;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 
-public class TestSynapseMessage {
-    public static final String URN_SAMPLE_TO_ADDRESS = "urn:sample-toAddress";
+public class TestSynapseMessage implements SynapseMessage {
 
+    SOAPEnvelope envelope = null;
 
-    public static Axis2SynapseMessage createSampleSOAP11MessageWithoutAddressing(
-            String testingRepository) {
-        // create a lightweight Axis Config with no addressing to demonstrate
-        // "dumb" SOAP
-        MessageContext msgCtx;
-
-        try {
-            ConfigurationContext configCtx = ConfigurationContextFactory
-                    .createConfigurationContextFromFileSystem(testingRepository,null);
-            msgCtx = new MessageContext();
-            msgCtx.setConfigurationContext(configCtx);
-            msgCtx.setServerSide(true);
-
-            SOAPEnvelope env = OMAbstractFactory.getSOAP11Factory()
-                    .getDefaultEnvelope();
-
-            OMElement body = OMAbstractFactory.getOMFactory().createOMElement(
-                    "test-body", "urn:test", "test");
-            OMAbstractFactory.getOMFactory().createOMText(body,
-                    "Do not be alarmed, this is just a test");
-
-            env.getBody().addChild(body);
-            msgCtx.setEnvelope(env);
-        } catch (AxisFault e) {
-            throw new SynapseException(e);
-        }
-        
-        return new Axis2SynapseMessage(msgCtx,null);
+    public SOAPEnvelope getEnvelope() {
+        if (envelope == null)
+            return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        else
+            return envelope;
     }
 
-    public static Axis2SynapseMessage createSampleSOAP11MessageWithAddressing(
-            String testingRepository) {
-        Axis2SynapseMessage sm =
-                createSampleSOAP11MessageWithoutAddressing(testingRepository);
-        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
-        OMNamespace wsaNS =
-                fac.createOMNamespace(AddressingConstants.Final.WSA_NAMESPACE, AddressingConstants.WSA_DEFAULT_PREFIX);
-        SOAPHeaderBlock addressingToHeaderBlock =
-                fac.createSOAPHeaderBlock(AddressingConstants.WSA_TO, wsaNS);
-        SOAPHeaderBlock addressingActionHeaderBlock =
-                fac.createSOAPHeaderBlock(AddressingConstants.WSA_ACTION, wsaNS);
-        addressingToHeaderBlock.setText(URN_SAMPLE_TO_ADDRESS);
-        sm.getEnvelope().getHeader().addChild(addressingToHeaderBlock);
-        sm.getEnvelope().getHeader().addChild(addressingActionHeaderBlock);
+    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
+        this.envelope = envelope;
+    }
 
-        return sm;
+    public EndpointReference getFaultTo() {
+        return null;
+    }
 
+    public void setFaultTo(EndpointReference reference) {
+    }
+
+    public EndpointReference getFrom() {
+        return null;
+    }
+
+    public void setFrom(EndpointReference reference) {
+    }
+
+    public String getMessageID() {
+        return null;
+    }
+
+    public void setMessageID(String string) {
+    }
+
+    public RelatesTo getRelatesTo() {
+        return null;
+    }
+
+    public void setRelatesTo(RelatesTo[] reference) {
+    }
+
+    public EndpointReference getReplyTo() {
+        return null;
+    }
+
+    public void setReplyTo(EndpointReference reference) {
+    }
+
+    public EndpointReference getTo() {
+        return null;
+    }
+
+    public void setTo(EndpointReference reference) {
+    }
+
+    public void setWSAAction(String actionURI) {
+    }
+
+    public String getWSAAction() {
+        return null;
+    }
+
+    public String getSoapAction() {
+        return null;
+    }
+
+    public void setSoapAction(String string) {
+    }
+
+    public void setMessageId(String messageID) {
+    }
+
+    public String getMessageId() {
+        return null;
+    }
+
+    public boolean isDoingMTOM() {
+        return false;
+    }
+
+    public void setDoingMTOM(boolean b) {
+    }
+
+    public boolean isDoingREST() {
+        return false;
+    }
+
+    public void setDoingREST(boolean b) {
+    }
+
+    public boolean isSOAP11() {
+        return false;
+    }
+
+    public void setResponse(boolean b) {
+    }
+
+    public boolean isResponse() {
+        return false;
+    }
+
+    public void setFaultResponse(boolean b) {
+    }
+
+    public boolean isFaultResponse() {
+        return false;
+    }
+
+    public SynapseContext getSynapseContext() {
+        return null;
+    }
+
+    public void setSynapseContext(SynapseContext env) {
     }
 }

@@ -16,20 +16,29 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.api.Mediator;
-
-import org.apache.synapse.SynapseMessage;
+import org.apache.synapse.SynapseContext;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * Implementaion of <drop/>
+ * Halts further processing/mediation of the current message. i.e. returns false
  */
-public class DropMediator implements Mediator  {
-    
-    public boolean mediate(SynapseMessage sm) {
-        if (sm.getTo() == null) {
+public class DropMediator extends AbstractMediator {
+
+    private static final Log log = LogFactory.getLog(LogMediator.class);
+
+    /**
+     * Halts further mediation of the current message by returning false.
+     * @param synCtx the current message
+     * @return false always
+     */
+    public boolean mediate(SynapseContext synCtx) {
+        log.debug(getType() + " mediate()");
+        if (synCtx.getSynapseMessage().getTo() == null) {
             return false;
-        }else{
-            sm.setTo(null);
+        } else {
+            synCtx.getSynapseMessage().setTo(null);
             return false;
         }
     }

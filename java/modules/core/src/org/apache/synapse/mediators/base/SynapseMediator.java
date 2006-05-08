@@ -16,12 +16,16 @@
 
 package org.apache.synapse.mediators.base;
 
+import org.apache.synapse.mediators.AbstractListMediator;
+
 /**
+ * The SynapseMediator is the "mainmediator" of the synapse engine. It is
+ * given each message on arrival at the synapse engine. The synapse configuration
+ * holds a reference to this special mediator instance. The SynapseMediator
+ * holds the list of mediators supplied within the <rules> element of an XML
+ * based Synapse configuration
  *
- * 
- * This implements the main processor. Delegates to ListProcessor
- * Here in case we need the main <synapse> to do anything special
- *
+ * @see org.apache.synapse.config.SynapseConfiguration#getMainMediator()
  */
 public class SynapseMediator extends AbstractListMediator {
 }

@@ -74,7 +74,7 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :runSynapse
 @echo on
-"%_JAVACMD%" -Djava.ext.dirs=%SYNAPSE_HOME%\lib;%SYNAPSE_HOME% -cp %SYNAPSE_HOME%\lib org.apache.axis2.transport.http.SimpleHTTPServer %SYNAPSE_CMD_LINE_ARGS%
+"%_JAVACMD%" -Daxis2.xml=%SYNAPSE_HOME%\synapse_repository\conf\axis2.xml -Djava.ext.dirs=%SYNAPSE_HOME%\lib;%SYNAPSE_HOME% -cp %SYNAPSE_HOME%\lib org.apache.axis2.transport.http.SimpleHTTPServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 
 :end

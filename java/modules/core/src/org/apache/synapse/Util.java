@@ -20,7 +20,10 @@ import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.synapse.mediators.GetPropertyFunction;
 import org.jaxen.JaxenException;
+import org.jaxen.SimpleFunctionContext;
+import org.jaxen.XPathFunctionContext;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +42,28 @@ public class Util {
      * @param synCtx the source message which holds the SOAP envelope
      * @return a String representation of the result of evaluation
      */
-    public static String getStringValue(AXIOMXPath xpath, SynapseContext synCtx) {
+    public static String getStringValue(AXIOMXPath xpath, SynapseMessageContext synCtx) {
+
+        if (xpath != null) {
+            try {
+                // create an instance of a synapse:get-property() function and set it to the xpath
+                GetPropertyFunction getPropertyFunc = new GetPropertyFunction();
+                getPropertyFunc.setSynCtx(synCtx);
+
+                // set function context into XPath
+                SimpleFunctionContext fc = new XPathFunctionContext();
+                fc.registerFunction(Constants.SYNAPSE_NAMESPACE, "get-property", getPropertyFunc);
+                xpath.setFunctionContext(fc);
+
+                // register namespace for XPath extension function
+                xpath.addNamespace("synapse", Constants.SYNAPSE_NAMESPACE);
+
+            } catch (JaxenException je) {
+                String msg = "Error setting up the Synapse XPath extension function for XPath : " + xpath;
+                log.error(msg, je);
+                throw new SynapseException(msg, je);
+            }
+        }
 
         try {
             Object result = xpath.evaluate(synCtx.getSynapseMessage().getEnvelope());
@@ -62,8 +86,8 @@ public class Util {
 
         } catch (JaxenException je) {
             String msg = "Evaluation of the XPath expression " + xpath.toString() + " resulted in an error";
-            log.error(msg);
-            throw new SynapseException(msg);
+            log.error(msg, je);
+            throw new SynapseException(msg, je);
         }
     }
 

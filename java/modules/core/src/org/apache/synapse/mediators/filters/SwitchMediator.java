@@ -16,15 +16,12 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.Util;
-import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 
-import java.util.regex.Pattern;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,7 +45,7 @@ public class SwitchMediator extends AbstractMediator {
      * @param synCtx current context
      * @return as per standard semantics
      */
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
 
         String sourceText = Util.getStringValue(source, synCtx);
         Iterator iter = cases.iterator();

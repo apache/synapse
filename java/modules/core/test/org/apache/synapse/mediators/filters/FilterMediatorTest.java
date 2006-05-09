@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 
 import java.util.regex.Pattern;
@@ -38,7 +38,7 @@ public class FilterMediatorTest extends TestCase {
         testMediator = new TestMediator();
         testMediator.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseContext synCtx) {
+                public void handle(SynapseMessageContext synCtx) {
                     setFilterConditionPassed(true);
                 }
             });

@@ -18,11 +18,11 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 
 /**
- * <p> This is the Axis2 implementation of the SynapseContext
+ * <p> This is the Axis2 implementation of the SynapseMessageContext
  */
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
@@ -34,12 +34,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         this.cl = cl;
     }
 
-    public void injectMessage(SynapseContext synCtx) {
+    public void injectMessage(SynapseMessageContext synCtx) {
         synCtx.setSynapseEnvironment(this);
         synCtx.getConfiguration().getMainMediator().mediate(synCtx);
     }
 
-    public void send(SynapseContext synCtx) {
+    public void send(SynapseMessageContext synCtx) {
         if (synCtx.getSynapseMessage().isResponse())
             Axis2Sender.sendBack(synCtx);
         else

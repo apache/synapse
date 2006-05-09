@@ -15,7 +15,7 @@
 */
 package org.apache.synapse.core;
 
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 
 /**
  * The SynapseEnvironment allows access into the the host SOAP engine. It allows
@@ -28,7 +28,7 @@ public interface SynapseEnvironment {
      * the underlying SOAP engine to inject messages into Synapse for mediation.
      * e.g. The SynapseMessageReceiver used by Axis2 invokes this to inject new messages
      */
-    public void injectMessage(SynapseContext smc);
+    public void injectMessage(SynapseMessageContext smc);
 
     /**
      * Mediators may get access to the relevant classloader through this
@@ -40,5 +40,5 @@ public interface SynapseEnvironment {
      * <p/>
      * This will send request messages on (forward), and send the response messages back to the client
      */
-    public void send(SynapseContext smc);
+    public void send(SynapseMessageContext smc);
 }

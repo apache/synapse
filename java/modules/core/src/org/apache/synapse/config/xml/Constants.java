@@ -29,7 +29,7 @@ public interface Constants {
 
     public static final QName RULES_ELT = new QName("rules");
 
-    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+    public static final String SYNAPSE_NAMESPACE = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
     public static final String SYNAPSE = "synapse";
     public static final String NULL_NAMESPACE = "";
 }

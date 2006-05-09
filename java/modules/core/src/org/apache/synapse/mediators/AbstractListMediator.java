@@ -58,6 +58,10 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
         return mediators.add(m);
     }
 
+    public boolean addAll(List c) {
+        return mediators.addAll(c);
+    }
+
     public Mediator getChild(int pos) {
         return (Mediator) mediators.get(pos);
     }

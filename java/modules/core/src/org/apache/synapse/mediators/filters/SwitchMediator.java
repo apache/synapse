@@ -75,4 +75,20 @@ public class SwitchMediator extends AbstractMediator {
     public void addCase(SwitchCaseMediator m) {
         cases.add(m);
     }
+
+    /**
+     * Return the source XPath expression set
+     * @return thje source XPath expression
+     */
+    public AXIOMXPath getSource() {
+        return source;
+    }
+
+    /**
+     * Sets the source XPath expression
+     * @param source the XPath expression to be used as the source
+     */
+    public void setSource(AXIOMXPath source) {
+        this.source = source;
+    }
 }

@@ -18,8 +18,6 @@ package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
 
-import org.apache.synapse.SynapseContext;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 

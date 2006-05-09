@@ -15,7 +15,7 @@
 */
 package org.apache.synapse.core.axis2;
 
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -23,7 +23,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import java.util.Map;
 import java.util.HashMap;
 
-public class Axis2SynapseMessageContext implements SynapseContext {
+public class Axis2SynapseMessageContext implements SynapseMessageContext {
 
     private SynapseConfiguration cfg = null;
     private SynapseEnvironment   env = null;
@@ -55,7 +55,14 @@ public class Axis2SynapseMessageContext implements SynapseContext {
     }
 
     public Object getProperty(String key) {
-        return properties.get(key);
+        Object ret = properties.get(key);
+        if (ret != null) {
+            return ret;
+        } else if (getConfiguration() != null) {
+            return getConfiguration().getProperty(key);
+        } else {
+            return null;
+        }
     }
 
     public void setProperty(String key, Object value) {

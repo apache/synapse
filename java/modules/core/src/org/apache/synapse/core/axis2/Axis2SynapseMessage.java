@@ -22,12 +22,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseMessage;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <p/>
@@ -39,13 +35,13 @@ public class Axis2SynapseMessage implements SynapseMessage {
     private MessageContext mc = null;
 
     /** The Synapse Context reference*/
-    private SynapseContext synCtx = null;
+    private SynapseMessageContext synCtx = null;
 
     private boolean response = false;
 
     private boolean faultResponse = false;
 
-    public Axis2SynapseMessage(MessageContext mc, SynapseContext synCtx) {
+    public Axis2SynapseMessage(MessageContext mc, SynapseMessageContext synCtx) {
         setMessageContext(mc);
         setSynapseContext(synCtx);
     }
@@ -167,11 +163,11 @@ public class Axis2SynapseMessage implements SynapseMessage {
         return this.faultResponse;
     }
 
-    public SynapseContext getSynapseContext() {
+    public SynapseMessageContext getSynapseContext() {
         return synCtx;
     }
 
-    public void setSynapseContext(SynapseContext synCtx) {
+    public void setSynapseContext(SynapseMessageContext synCtx) {
         this.synCtx = synCtx;
     }
 

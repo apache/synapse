@@ -163,14 +163,14 @@ public interface SynapseMessage {
     public boolean isFaultResponse();
 
     /**
-     * Return a reference to the SynapseContext
-     * @return the SynapseContext
+     * Return a reference to the SynapseMessageContext
+     * @return the SynapseMessageContext
      */
-    public SynapseContext getSynapseContext();
+    public SynapseMessageContext getSynapseContext();
 
     /**
-     * Set the reference to the SynapseContext
-     * @param env the SynapseContext
+     * Set the reference to the SynapseMessageContext
+     * @param env the SynapseMessageContext
      */
-    public void setSynapseContext(SynapseContext env);
+    public void setSynapseContext(SynapseMessageContext env);
 }

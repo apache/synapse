@@ -16,7 +16,7 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +33,7 @@ public class DropMediator extends AbstractMediator {
      * @param synCtx the current message
      * @return false always
      */
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
         if (synCtx.getSynapseMessage().getTo() == null) {
             return false;

@@ -15,9 +15,8 @@
 */
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -40,7 +39,6 @@ import javax.xml.stream.XMLOutputFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -106,7 +104,7 @@ public class ValidateMediator extends AbstractListMediator {
         }
     }
 
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
 
         ByteArrayInputStream baisFromSource = null;
         StringBuffer nsLocations = new StringBuffer();

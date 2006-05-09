@@ -18,7 +18,7 @@ package org.apache.synapse.mediators.transform;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.HeaderType;
 import org.apache.synapse.Util;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +52,7 @@ public class HeaderMediator extends AbstractMediator {
      * @param synCtx the current message which is altered as necessary
      * @return true always
      */
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
 
         if (action == ACTION_SET) {

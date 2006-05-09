@@ -23,7 +23,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.xml.SynapseConfigurationBuilder;
@@ -33,14 +33,14 @@ import java.io.InputStream;
 
 /**
  * <p/>
- * The SynapseContext needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
+ * The SynapseMessageContext needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
  * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
  */
 public class Axis2SynapseContextFinder implements Constants {
 
     private static Log log = LogFactory.getLog(Axis2SynapseContextFinder.class);
 
-    public static synchronized SynapseContext getSynapseContext(MessageContext mc) {
+    public static synchronized SynapseMessageContext getSynapseContext(MessageContext mc) {
 
         SynapseConfiguration synCfg = getSynapseConfig(mc);
         SynapseEnvironment   synEnv = getSynapseEnvironment(mc);
@@ -57,7 +57,7 @@ public class Axis2SynapseContextFinder implements Constants {
             throw new SynapseException(msg);
         }
 
-        SynapseContext synCtx = new Axis2SynapseMessageContext();
+        SynapseMessageContext synCtx = new Axis2SynapseMessageContext();
         synCtx.setSynapseEnvironment(synEnv);
         synCtx.setConfiguration(synCfg);
         synCtx.setSynapseMessage(new Axis2SynapseMessage(mc, synCtx));

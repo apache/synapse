@@ -27,7 +27,7 @@ import org.apache.synapse.core.SynapseEnvironment;
  * SynapseConfiguration. Additionally it holds per message properties (i.e. local
  * properties valid for the lifetime of the message)
  */
-public interface SynapseContext {
+public interface SynapseMessageContext {
 
     /**
      * Get a reference to the current SynapseConfiguration

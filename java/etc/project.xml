@@ -61,19 +61,9 @@
             <artifactId>axis2</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>axis2</groupId>-->
-            <!--<artifactId>axis2-common</artifactId>-->
-            <!--<version>${axis2.version}</version>-->
-        <!--</dependency>-->
+        
         <dependency>
-            <groupId>axis2</groupId>
-            <artifactId>axis2-wsdl</artifactId>
-            <version>${axis2.wsdl.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ws-commons</groupId>
+            <groupId>org.apache.ws.commons</groupId>
             <artifactId>XmlSchema</artifactId>
             <version>${XmlSchema.version}</version>
             <properties>
@@ -83,7 +73,7 @@
 
         <dependency>
             <groupId>ws-commons</groupId>
-            <artifactId>policy</artifactId>
+            <artifactId>neethi</artifactId>
             <version>${policy.version}</version>
             <properties>
                 <module>false</module>

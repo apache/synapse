@@ -25,13 +25,14 @@ import org.apache.synapse.TestSynapseMessage;
 import org.apache.synapse.TestSynapseMessageContext;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
+import org.apache.synapse.mediators.TestUtils;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.StringReader;
 import java.io.File;
 
-public class ValidateMediatorTest extends TestCase implements TestMediateHandler {
+public class ValidateMediatorTest extends TestCase {
 
     private static final String VALID_ENVELOPE =
             "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
@@ -43,16 +44,27 @@ public class ValidateMediatorTest extends TestCase implements TestMediateHandler
             "\t<m0:Codes>String</m0:Codes>\n" +
             "</m0:CheckPriceRequest>\n";
 
+    private static final String VALID_ENVELOPE_NO_NS =
+            "<CheckPriceRequest xmlns=\"http://www.apache-synapse.org/test\">\n" +
+            "\t<Code>String</Code>\n" +
+            "</CheckPriceRequest>\n";
+
+    private static final String IN_VALID_ENVELOPE_NO_NS =
+            "<CheckPriceRequest xmlns=\"http://www.apache-synapse.org/test\">\n" +
+            "\t<Code>String</Code>\n" +
+            "</CheckPriceRequest>\n";
+
     private boolean onFailInvoked = false;
     private TestMediator testMediator = null;
 
     public void setUp() {
         testMediator = new TestMediator();
-        testMediator.setHandler(this);
-    }
-
-    public void handle(SynapseContext synCtx) {
-        onFailInvoked = true;
+        testMediator.setHandler(
+            new TestMediateHandler() {
+                public void handle(SynapseContext synCtx) {
+                    setOnFailInvoked(true);
+                }
+            });
     }
 
     public void setOnFailInvoked(boolean onFailInvoked) {
@@ -66,7 +78,6 @@ public class ValidateMediatorTest extends TestCase implements TestMediateHandler
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        System.out.println("Current Dir : " + new File(".").getAbsolutePath());
         validate.setSchemaUrl("test-resources/misc/validate.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
@@ -76,7 +87,7 @@ public class ValidateMediatorTest extends TestCase implements TestMediateHandler
         validate.addChild(testMediator);
 
         // test validate mediator, with static enveope
-        validate.mediate(getTestContext(VALID_ENVELOPE));
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE));
 
         assertTrue(!onFailInvoked);
     }
@@ -97,31 +108,50 @@ public class ValidateMediatorTest extends TestCase implements TestMediateHandler
         validate.addChild(testMediator);
 
         // test validate mediator, with static enveope
-        validate.mediate(getTestContext(IN_VALID_ENVELOPE));
+        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE));
 
         assertTrue(onFailInvoked);
     }
 
-    private TestSynapseMessageContext getTestContext(String bodyText) throws Exception {
+    public void testValidateMedaitorValidCaseNoNS() throws Exception {
+        setOnFailInvoked(false);
 
-        // create a test synapse context
-        TestSynapseMessageContext synCtx = new TestSynapseMessageContext();
-        TestSynapseMessage synMsg = new TestSynapseMessage();
+        // create a validate mediator
+        ValidateMediator validate = new ValidateMediator();
 
-        SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
-        OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();
-        omDoc.addChild(envelope);
+        // set the schema url, source xpath and any name spaces
+        validate.setSchemaUrl("test-resources/misc/validate.xsd");
+        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        validate.setSource(source);
 
-        XMLStreamReader parser = XMLInputFactory.newInstance().
-            createXMLStreamReader(new StringReader(bodyText));
-        StAXOMBuilder builder = new StAXOMBuilder(parser);
+        // set dummy mediator to be called on fail
+        validate.addChild(testMediator);
 
-        // set a dummy static message
-        envelope.getBody().addChild(builder.getDocumentElement());
+        // test validate mediator, with static enveope
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_NO_NS));
 
-        synMsg.setEnvelope(envelope);
-        synCtx.setSynapseMessage(synMsg);
-        return synCtx;
+        assertTrue(!onFailInvoked);
     }
 
+    public void testValidateMedaitorInvalidCaseNoNS() throws Exception {
+        setOnFailInvoked(false);
+
+        // create a validate mediator
+        ValidateMediator validate = new ValidateMediator();
+
+        // set the schema url, source xpath and any name spaces
+        validate.setSchemaUrl("modules/core/test-resources/misc/validate.xsd");
+        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        validate.setSource(source);
+
+        // set dummy mediator to be called on fail
+        validate.addChild(testMediator);
+
+        // test validate mediator, with static enveope
+        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE_NO_NS));
+
+        assertTrue(onFailInvoked);
+    }
 }

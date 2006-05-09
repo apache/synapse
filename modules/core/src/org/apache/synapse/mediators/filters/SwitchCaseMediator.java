@@ -18,6 +18,7 @@ package org.apache.synapse.mediators.filters;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 import java.util.regex.Pattern;
+import java.util.List;
 
 /**
  * A SwitchCaseMediator is a list mediator which has a regex that is matched by
@@ -27,6 +28,14 @@ public class SwitchCaseMediator extends AbstractListMediator {
 
     private Pattern regex = null;
     private boolean defaultCase = false;
+
+    public SwitchCaseMediator() {}
+
+    public SwitchCaseMediator(Pattern regex, boolean defaultCase, List children) {
+        this.regex = regex;
+        this.defaultCase = defaultCase;
+        this.addAll(children);
+    }
 
     public Pattern getRegex() {
         return regex;
@@ -45,6 +54,8 @@ public class SwitchCaseMediator extends AbstractListMediator {
     }
 
     public boolean matches(String value) {
+        if (isDefaultCase())
+            return true;
         return regex.matcher(value).matches();
     }
 }

@@ -17,6 +17,7 @@ package org.apache.synapse;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -115,7 +116,7 @@ public class TestSynapseMessage implements SynapseMessage {
     }
 
     public boolean isSOAP11() {
-        return false;
+        return envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
     }
 
     public void setResponse(boolean b) {

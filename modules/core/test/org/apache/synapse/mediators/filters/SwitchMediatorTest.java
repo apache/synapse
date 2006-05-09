@@ -19,12 +19,11 @@ import junit.framework.TestCase;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 
 import java.util.regex.Pattern;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SwitchMediatorTest extends TestCase {
@@ -53,7 +52,7 @@ public class SwitchMediatorTest extends TestCase {
         ibmMediator = new TestMediator();
         ibmMediator.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseContext synCtx) {
+                public void handle(SynapseMessageContext synCtx) {
                     setExecutedCase("IBM");
                 }
             });
@@ -61,7 +60,7 @@ public class SwitchMediatorTest extends TestCase {
         msftMediator = new TestMediator();
         msftMediator.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseContext synCtx) {
+                public void handle(SynapseMessageContext synCtx) {
                     setExecutedCase("MSFT");
                 }
             });
@@ -69,7 +68,7 @@ public class SwitchMediatorTest extends TestCase {
         defaultMediator = new TestMediator();
         defaultMediator.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseContext synCtx) {
+                public void handle(SynapseMessageContext synCtx) {
                     setExecutedCase("DEFAULT");
                 }
             });

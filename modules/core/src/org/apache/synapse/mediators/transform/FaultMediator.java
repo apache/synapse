@@ -24,7 +24,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -50,7 +50,7 @@ public class FaultMediator extends AbstractMediator {
     //TODO support SOAP 1.2 fault stuff..
     //Node, Role, detail etc
 
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
         SynapseMessage synMsg = synCtx.getSynapseMessage();
         SOAPEnvelope envelop = synMsg.getEnvelope();

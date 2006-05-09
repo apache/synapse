@@ -16,7 +16,6 @@
 package org.apache.synapse;
 
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axis2.AxisFault;
@@ -133,10 +132,10 @@ public class TestSynapseMessage implements SynapseMessage {
         return false;
     }
 
-    public SynapseContext getSynapseContext() {
+    public SynapseMessageContext getSynapseContext() {
         return null;
     }
 
-    public void setSynapseContext(SynapseContext env) {
+    public void setSynapseContext(SynapseMessageContext env) {
     }
 }

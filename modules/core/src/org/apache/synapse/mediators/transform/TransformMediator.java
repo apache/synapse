@@ -10,7 +10,7 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +49,7 @@ public class TransformMediator extends AbstractMediator {
      * @param synCtx the current message where the transformation will apply
      * @return true always
      */
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
 
         if (xsltUrl != null) {

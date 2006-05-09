@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.base;
 
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
@@ -43,7 +43,7 @@ public class SequenceMediator extends AbstractListMediator {
      * @param synCtx the synapse message
      * @return as per standard mediator result
      */
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
         if (ref == null) {
             return super.mediate(synCtx);

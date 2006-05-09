@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.ext;
 
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 
 /**
  * Since the class mediator always "instantiates" a new instance of a class
@@ -29,7 +29,7 @@ public class ClassMediatorTestMediator implements Mediator {
 
     public static String testProp = null;
 
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
         invoked = true;
         return false;
     }

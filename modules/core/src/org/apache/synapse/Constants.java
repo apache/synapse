@@ -22,6 +22,8 @@ import javax.xml.namespace.QName;
  */
 public interface Constants {
 
+    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+
     String CLASSMEDIATOR = "classmediator";
 
     QName MEDIATE_OPERATION_NAME = new QName("mediate");

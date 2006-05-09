@@ -22,8 +22,7 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 
 
 /**
@@ -31,7 +30,7 @@ import org.apache.synapse.SynapseContext;
  */
 public class Axis2Sender {
 
-    public static void sendOn(SynapseContext smc) {
+    public static void sendOn(SynapseMessageContext smc) {
 
         try {
 
@@ -81,7 +80,7 @@ public class Axis2Sender {
         }
     }
 
-    public static void sendBack(SynapseContext smc) {
+    public static void sendBack(SynapseMessageContext smc) {
         MessageContext messageContext = ((Axis2SynapseMessage) smc.getSynapseMessage()).getMessageContext();
         AxisEngine ae =
             new AxisEngine(messageContext.getConfigurationContext());

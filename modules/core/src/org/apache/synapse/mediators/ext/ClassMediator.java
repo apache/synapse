@@ -17,7 +17,7 @@ package org.apache.synapse.mediators.ext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Util;
 import org.apache.synapse.api.Mediator;
@@ -47,7 +47,7 @@ public class ClassMediator extends AbstractMediator {
      * @param synCtx the message context
      * @return as per standard semantics
      */
-    public boolean mediate(SynapseContext synCtx) {
+    public boolean mediate(SynapseMessageContext synCtx) {
 
         log.debug(getType() + " mediate()");
         Mediator m = null;
@@ -69,7 +69,7 @@ public class ClassMediator extends AbstractMediator {
      * Only String properties are supported
      * @param m the mediator
      */
-    private void setProperties(Mediator m, SynapseContext synCtx) {
+    private void setProperties(Mediator m, SynapseMessageContext synCtx) {
         Iterator iter = properties.iterator();
         while (iter.hasNext()) {
             MediatorProperty mProp = (MediatorProperty) iter.next();

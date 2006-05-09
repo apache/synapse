@@ -18,15 +18,23 @@ package org.apache.synapse;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
-public class TestSynapseMessageContext implements SynapseContext {
+import java.util.Map;
+import java.util.HashMap;
+
+public class TestSynapseMessageContext implements SynapseMessageContext {
+
+    private Map properties = new HashMap();
 
     private SynapseMessage synMsg = null;
 
+    private SynapseConfiguration synCfg = null;
+
     public SynapseConfiguration getConfiguration() {
-        return null;
+        return synCfg;
     }
 
     public void setConfiguration(SynapseConfiguration cfg) {
+        this.synCfg = cfg;
     }
 
     public SynapseEnvironment getSynapseEnvironment() {
@@ -48,9 +56,16 @@ public class TestSynapseMessageContext implements SynapseContext {
     }
 
     public Object getProperty(String key) {
-        return null;
+        Object ret = properties.get(key);
+        if (ret != null) {
+            return ret;
+        } else if (getConfiguration() != null) {
+            return getConfiguration().getProperty(key);
+        } else {
+            return null;
+        }
     }
 
     public void setProperty(String key, Object value) {
-    }
-}
+        properties.put(key, value);
+    }}

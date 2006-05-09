@@ -17,7 +17,7 @@ package org.apache.synapse.mediators;
 
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.Util;
-import org.apache.synapse.SynapseContext;
+import org.apache.synapse.SynapseMessageContext;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 
 import javax.xml.namespace.QName;
@@ -64,7 +64,7 @@ public class MediatorProperty {
         this.expression = expression;
     }
 
-    public String getEvaluatedExpression(SynapseContext synCtx) {
+    public String getEvaluatedExpression(SynapseMessageContext synCtx) {
         return Util.getStringValue(expression, synCtx);
     }
 

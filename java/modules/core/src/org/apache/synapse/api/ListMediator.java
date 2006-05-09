@@ -30,6 +30,14 @@ public interface ListMediator extends Mediator {
     public boolean addChild(Mediator m);
 
     /**
+     * Appends all of the mediators in the specified collection to the end of this mediator's (children)
+     * list, in the order that they are returned by the specified collection's iterator
+     * @param c the list of mediators to be added
+     * @return true if this list changed as a result of the call
+     */
+    public boolean addAll(List c);
+
+    /**
      * Returns the mediator at the specified position
      * @param pos index of mediator to return
      * @return the mediator at the specified position in this list

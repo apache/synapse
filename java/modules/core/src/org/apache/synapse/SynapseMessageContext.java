@@ -18,14 +18,18 @@ package org.apache.synapse;
 
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 
 
 /**
- * The Synapse Context is available to mediators through the SynapseMessage. It
+ * The Synapse Message Context is available to all mediators through which it flows. It
  * allows one to call to the underlying SynapseEnvironment (i.e. the SOAP engine
- * - such as Axis2 - where required. It also allows one to access the current
+ * - such as Axis2) where required. It also allows one to access the current
  * SynapseConfiguration. Additionally it holds per message properties (i.e. local
- * properties valid for the lifetime of the message)
+ * properties valid for the lifetime of the message), and the current SOAPEnvelope
  */
 public interface SynapseMessageContext {
 
@@ -57,18 +61,6 @@ public interface SynapseMessageContext {
     public void setSynapseEnvironment(SynapseEnvironment se);
 
     /**
-     * Sets the associated Synapse message
-     * @param sm the synapse message associated with this context
-     */
-    public void setSynapseMessage(SynapseMessage sm);
-
-    /**
-     * Return the associated SynapseMessage
-     * @return the associated Synapse message
-     */
-    public SynapseMessage getSynapseMessage();
-
-    /**
      * Get the value of a custom (local) property set on the message instance
      * @param key key to look up property
      * @return value for the given key
@@ -81,5 +73,135 @@ public interface SynapseMessageContext {
      * @param value value to be saved
      */
     public void setProperty(String key, Object value);
+
+    /**
+     * Get the SOAP envelope of this message
+     * @return the SOAP envelope of the message
+     */
+    public SOAPEnvelope getEnvelope();
+
+    /**
+     * Sets the given envelope as the current SOAPEnvelope for this message
+     * @param envelope the envelope to be set
+     * @throws org.apache.axis2.AxisFault on exception
+     */
+    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;
+
+    // --- SOAP Message related methods ------
+    public EndpointReference getFaultTo();
+
+    public void setFaultTo(EndpointReference reference);
+
+    public EndpointReference getFrom();
+
+    public void setFrom(EndpointReference reference);
+
+    public String getMessageID();
+
+    public void setMessageID(String string);
+
+    public RelatesTo getRelatesTo();
+
+    public void setRelatesTo(RelatesTo[] reference);
+
+    public EndpointReference getReplyTo();
+
+    public void setReplyTo(EndpointReference reference);
+
+    public EndpointReference getTo();
+
+    public void setTo(EndpointReference reference);
+
+    /**
+     * Sets the WSAAction
+     * @param actionURI the WSAAction
+     */
+    public void setWSAAction(String actionURI);
+
+    /**
+     * Returns the WSAAction
+     * @return the WSAAction
+     */
+    public String getWSAAction();
+
+    /**
+     * Returns the SOAPAction of the message
+     * @return the SOAPAction
+     */
+    public String getSoapAction();
+
+    /**
+     * Set the SOAPAction
+     * @param string the SOAP Action
+     */
+    public void setSoapAction(String string);
+
+    /**
+     * Set the message if
+     * @param messageID
+     */
+    public void setMessageId(String messageID);
+
+    /**
+     * Gets the message id
+     * @return the message id
+     */
+    public String getMessageId();
+
+    /**
+     * If this message using MTOM?
+     * @return true if using MTOM
+     */
+    public boolean isDoingMTOM();
+
+    /**
+     * Marks as using MTOM
+     * @param b true to mark as using MTOM
+     */
+    public void setDoingMTOM(boolean b);
+
+    /**
+     * Is this message over REST?
+     * @return true if over REST
+     */
+    public boolean isDoingREST();
+
+    /**
+     * Marks this message as over REST
+     * @param b true to mark as REST
+     */
+    public void setDoingREST(boolean b);
+
+    /**
+     * Is this message a SOAP 1.1 message?
+     * @return true if this is a SOAP 1.1 message
+     */
+    public boolean isSOAP11();
+
+    /**
+     * Mark this message as a response or not.
+     * @see org.apache.synapse.SynapseMessageContext#isResponse()
+     * @param b true to set this as a response
+     */
+    public void setResponse(boolean b);
+
+    /**
+     * Is this message a response to a synchronous message sent out through Synapse?
+     * @return true if this message is a response message
+     */
+    public boolean isResponse();
+
+    /**
+     * Marks this message as a fault response
+     * @see org.apache.synapse.SynapseMessageContext#isFaultResponse()
+     * @param b true to mark this as a fault response
+     */
+    public void setFaultResponse(boolean b);
+
+    /**
+     * Is this message a response to a fault message?
+     * @return true if this is a response to a fault message
+     */
+    public boolean isFaultResponse();
 
 }

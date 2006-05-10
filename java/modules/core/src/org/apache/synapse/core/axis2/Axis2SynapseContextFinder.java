@@ -57,11 +57,10 @@ public class Axis2SynapseContextFinder implements Constants {
             throw new SynapseException(msg);
         }
 
-        SynapseMessageContext synCtx = new Axis2SynapseMessageContext();
+        SynapseMessageContext synCtx = new Axis2SynapseMessageContext(mc);
         synCtx.setSynapseEnvironment(synEnv);
         synCtx.setConfiguration(synCfg);
-        synCtx.setSynapseMessage(new Axis2SynapseMessage(mc, synCtx));
-        return synCtx;        
+        return synCtx;
     }
 
     /**

@@ -18,7 +18,6 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseMessage;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMElement;
@@ -75,18 +74,18 @@ public class ValidateMediator extends AbstractListMediator {
         this.source = source;
     }
 
-    private OMNode getValidateSource(SynapseMessage synMsg) {
+    private OMNode getValidateSource(SynapseMessageContext synCtx) {
 
         if (source == null) {
             try {
                 source = new AXIOMXPath("//SOAP-ENV:Body");
-                source.addNamespace("SOAP-ENV", synMsg.isSOAP11() ?
+                source.addNamespace("SOAP-ENV", synCtx.isSOAP11() ?
                     SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI : SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             } catch (JaxenException e) {}
         }
 
         try {
-            Object o = source.evaluate(synMsg.getEnvelope());
+            Object o = source.evaluate(synCtx.getEnvelope());
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {
@@ -115,7 +114,7 @@ public class ValidateMediator extends AbstractListMediator {
             XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
             // save the list of defined namespaces for validation against the schema
-            OMNode sourceNode = getValidateSource(synCtx.getSynapseMessage());
+            OMNode sourceNode = getValidateSource(synCtx);
             if (sourceNode instanceof OMElement) {
                 Iterator iter = ((OMElement) sourceNode).getAllDeclaredNamespaces();
                 while (iter.hasNext()) {

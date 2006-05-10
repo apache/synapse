@@ -62,7 +62,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
     public boolean test(SynapseMessageContext synCtx) {
         try {
             if (xpath != null) {
-                return xpath.booleanValueOf(synCtx.getSynapseMessage().getEnvelope());
+                return xpath.booleanValueOf(synCtx.getEnvelope());
 
             } else if (source != null && regex != null) {
                 return regex.matcher(Util.getStringValue(source, synCtx)).matches();

@@ -39,11 +39,15 @@ public class HeaderMediator extends AbstractMediator {
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
 
+    /** The name of the header @see HeaderType */
     private String name = null;
+    /** The literal value to be set as the header (if one was specified) */
     private String value = null;
+    /** Set the header (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
     private int action = ACTION_SET;
-
+    /** An expression which should be evaluated, and the result set as the header value */
     private AXIOMXPath expression = null;
+
     private HeaderType headerType = new HeaderType();
 
     /**
@@ -56,12 +60,13 @@ public class HeaderMediator extends AbstractMediator {
         log.debug(getType() + " mediate()");
 
         if (action == ACTION_SET) {
-            headerType.setHeader(synCtx.getSynapseMessage(),
+            headerType.setHeader(
+                synCtx,
                 (getValue() != null ? getValue() :
                     Util.getStringValue(getExpression(), synCtx)));
 
         } else {
-            headerType.removeHeader(synCtx.getSynapseMessage());
+            headerType.removeHeader(synCtx);
         }
         return true;
     }

@@ -30,7 +30,7 @@ public class InjectRedirect extends AbstractMediator {
 
         System.out.println("Redirect.mediate: " + uri);
 
-        mc.getSynapseMessage().setTo(new EndpointReference(uri));
+        mc.setTo(new EndpointReference(uri));
         return true;
     }
 }

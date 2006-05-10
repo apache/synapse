@@ -35,10 +35,10 @@ public class DropMediator extends AbstractMediator {
      */
     public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
-        if (synCtx.getSynapseMessage().getTo() == null) {
+        if (synCtx.getTo() == null) {
             return false;
         } else {
-            synCtx.getSynapseMessage().setTo(null);
+            synCtx.setTo(null);
             return false;
         }
     }

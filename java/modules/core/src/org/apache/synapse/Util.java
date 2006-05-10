@@ -66,7 +66,7 @@ public class Util {
         }
 
         try {
-            Object result = xpath.evaluate(synCtx.getSynapseMessage().getEnvelope());
+            Object result = xpath.evaluate(synCtx.getEnvelope());
             StringBuffer textValue = new StringBuffer();
 
             if (result instanceof List) {

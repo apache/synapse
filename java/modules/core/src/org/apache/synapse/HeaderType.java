@@ -17,7 +17,8 @@
 package org.apache.synapse;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This is a convenience class used to manipulate common headers. The convenience string names this defines could be
@@ -28,61 +29,75 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
  */
 public class HeaderType {
 
+    private static final Log log = LogFactory.getLog(HeaderType.class);
+
     private final static int TO = 1, FROM = 2, FAULT = 3, ACTION = 4, REPLYTO = 5;
 
     /** Refers the To header */
-    public final static String STRTO = "To";
+    public final static String STR_TO = "To";
     /** Refers the From header */
-    public final static String STRFROM = "From";
+    public final static String STR_FROM = "From";
     /** Refers the FaultTo header */
-    public final static String STRFAULT = "FaultTo";
+    public final static String STR_FAULT = "FaultTo";
     /** Refers the Action header */
-    public final static String STRACTION = "Action";
+    public final static String STR_ACTION = "Action";
     /** Refers the ReplyTo header */
-    public final static String STRREPLYTO = "ReplyTo";
+    public final static String STR_REPLY_TO = "ReplyTo";
 
+    /** The header type being internally reffered to */
     private int headerType = 0;
 
+    /**
+     * Sets the internal header type depending on the header identification string passed in
+     * @param header a string denoting a SOAP header
+     */
     public void setHeaderType(String header) {
-        if (header.equalsIgnoreCase(STRTO))
+        if (header.equalsIgnoreCase(STR_TO))
             headerType = TO;
-        else if (header.equalsIgnoreCase(STRFROM))
+        else if (header.equalsIgnoreCase(STR_FROM))
             headerType = FROM;
-        else if (header.equalsIgnoreCase(STRFAULT))
+        else if (header.equalsIgnoreCase(STR_FAULT))
             headerType = FAULT;
-        else if (header.equalsIgnoreCase(STRACTION))
+        else if (header.equalsIgnoreCase(STR_ACTION))
             headerType = ACTION;
-        else if (header.equalsIgnoreCase(STRREPLYTO))
+        else if (header.equalsIgnoreCase(STR_REPLY_TO))
             headerType = REPLYTO;
-        else
-            throw new SynapseException("Unknown header type : " + header);
+        else {
+            String msg = "Unknown header type : " + header;
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
     }
 
-    public String getHeader(SynapseMessage sm) {
+    /**
+     * Gets the value of this header from the given Synapse message
+     * @param synCtx the message where lookup should be performed
+     * @return the string value of the header
+     */
+    public String getHeader(SynapseMessageContext synCtx) {
         switch (headerType) {
             case TO: {
-                if (sm.getTo() != null)
-                    return sm.getTo().getAddress();
-
+                if (synCtx.getTo() != null)
+                    return synCtx.getTo().getAddress();
             }
             case FROM: {
-                if (sm.getFrom() != null)
-                    return sm.getFrom().getAddress();
+                if (synCtx.getFrom() != null)
+                    return synCtx.getFrom().getAddress();
                 break;
             }
             case FAULT: {
-                if (sm.getFaultTo() != null)
-                    return sm.getFaultTo().getAddress();
+                if (synCtx.getFaultTo() != null)
+                    return synCtx.getFaultTo().getAddress();
                 break;
             }
             case ACTION: {
-                if (sm.getWSAAction() != null)
-                    return sm.getWSAAction();
+                if (synCtx.getWSAAction() != null)
+                    return synCtx.getWSAAction();
                 break;
             }
             case REPLYTO: {
-                if (sm.getReplyTo() != null)
-                    return sm.getReplyTo().getAddress();
+                if (synCtx.getReplyTo() != null)
+                    return synCtx.getReplyTo().getAddress();
                 break;
             }
         }
@@ -91,42 +106,62 @@ public class HeaderType {
     }
 
     /**
-     * Removed the header indicated by this header type from the given message
-     * @param synMsg the current message from which the header should be removed
+     * Removed the header indicated by this header type from the given message. i.e. sets it as null
+     * @param synCtx the current message from which the header should be removed (set null)
      */
-    public void removeHeader(SynapseMessage synMsg) {
-        //TODO This is not yet implemented - revisit later
-        System.err.println("Unimplemented functionality - Needs to be fixed");
+    public void removeHeader(SynapseMessageContext synCtx) {
+        switch (headerType) {
+            case TO: {
+                synCtx.setTo(null);
+                break;
+            }
+            case FROM: {
+                synCtx.setFrom(null);
+                break;
+            }
+            case REPLYTO: {
+                synCtx.setReplyTo(null);
+                break;
+            }
+            case ACTION: {
+                synCtx.setWSAAction(null);
+                break;
+            }
+            default: {
+                String msg = "Unknown header type : " + headerType;
+                log.error(msg);
+                throw new SynapseException("Invalid header type");
+            }
+        }
     }
 
     /**
      * Sets the given value into the message's indicated header
-     * @param synMsg the current message on which to set the header
+     * @param synCtx the current message on which to set the header
      * @param value the value to be set
      */
-    public void setHeader(SynapseMessage synMsg, String value) {
+    public void setHeader(SynapseMessageContext synCtx, String value) {
         switch (headerType) {
-            case 0: {
-                throw new SynapseException(
-                    "headerType=0 in setHeader. Assume called setHeader before setHeaderType");
-            }
-
             case TO: {
-
-                synMsg.setTo(new EndpointReference(value));
+                synCtx.setTo(new EndpointReference(value));
                 break;
             }
             case FROM: {
-                synMsg.setFrom(new EndpointReference(value));
+                synCtx.setFrom(new EndpointReference(value));
                 break;
             }
             case REPLYTO: {
-                synMsg.setReplyTo(new EndpointReference(value));
+                synCtx.setReplyTo(new EndpointReference(value));
                 break;
             }
             case ACTION: {
-                synMsg.setWSAAction(value);
+                synCtx.setWSAAction(value);
                 break;
+            }
+            default: {
+                String msg = "Unknown header type : " + headerType;
+                log.error(msg);
+                throw new SynapseException(msg);
             }
         }
     }

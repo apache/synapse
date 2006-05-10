@@ -21,6 +21,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.commons.logging.Log;
@@ -31,6 +32,8 @@ import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 
 /**
@@ -75,7 +78,7 @@ public class SynapseConfigurationBuilder {
             Iterator iter = endpoints.getChildrenWithName(Constants.ENDPOINT_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
-                //defineEndpoint(synCfg, elt); //TODO process Endpoints
+                defineEndpoint(elt);
             }
         }
 
@@ -130,6 +133,39 @@ public class SynapseConfigurationBuilder {
     private void defineSequence(OMElement ele) {
         SequenceMediator seq = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(ele);
         config.addNamedMediator(seq.getName(), seq);
+    }
+
+    /**
+     * Create an endpoint definition digesting an XML fragment
+     *
+     * <endpoint name="string" [address="url"]>
+     *    .. extensibility ..
+     * </endpoint>
+     * @param ele the <endpoint> element
+     */
+    private void defineEndpoint(OMElement ele) {
+
+        OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        if (name == null) {
+            String msg = "The 'name' attribute is required for a named endpoint definition";
+            log.error(msg);
+            throw new SynapseException(msg);
+
+        } else {
+            Endpoint endpoint = new Endpoint();
+            endpoint.setName(name.getAttributeValue());
+
+            OMAttribute address = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "address"));
+            if (address != null) {
+                try {
+                    endpoint.setAddress(new URL(address.getAttributeValue()));
+                } catch (MalformedURLException e) {
+                    String msg = "Invalid URL specified for 'address' : " + address.getAttributeValue();
+                    log.error(msg, e);
+                    throw new SynapseException(msg, e);
+                }
+            }
+        }
     }
 
 }

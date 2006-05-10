@@ -40,9 +40,9 @@ public class SendMediator extends AbstractMediator {
      */
     public boolean mediate(SynapseMessageContext synCtx) {
         log.debug(getType() + " mediate()");
-        log.debug("Sending To: " + (synCtx.getSynapseMessage().getTo() != null ?
-            synCtx.getSynapseMessage().getTo().getAddress() : "null"));
-        log.debug("Body : \n" + synCtx.getSynapseMessage().getEnvelope());
+        log.debug("Sending To: " + (synCtx.getTo() != null ?
+            synCtx.getTo().getAddress() : "null"));
+        log.debug("Body : \n" + synCtx.getEnvelope());
         synCtx.getSynapseEnvironment().send(synCtx);
         return false;
     }

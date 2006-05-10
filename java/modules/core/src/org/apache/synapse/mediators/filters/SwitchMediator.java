@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +45,7 @@ public class SwitchMediator extends AbstractMediator {
      * @param synCtx current context
      * @return as per standard semantics
      */
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
 
         String sourceText = Util.getStringValue(source, synCtx);
         Iterator iter = cases.iterator();

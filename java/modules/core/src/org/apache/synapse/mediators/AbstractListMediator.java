@@ -16,7 +16,7 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.api.ListMediator;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +37,7 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
 
     protected List mediators = new ArrayList();
 
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
         log.debug(getType() + " mediate()");
 
         Iterator it = mediators.iterator();

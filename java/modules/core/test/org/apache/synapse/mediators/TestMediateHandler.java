@@ -15,9 +15,9 @@
 */
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 
 public interface TestMediateHandler {
 
-    public void handle(SynapseMessageContext synCtx);
+    public void handle(MessageContext synCtx);
 }

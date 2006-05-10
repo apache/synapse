@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 
@@ -30,29 +30,27 @@ public class FaultMediatorTest extends TestCase {
 
     private static final QName F_CODE = new QName("http://namespace", "somefaultcode");
     private static final String F_STRING = "Some fault string";
-    private static final String F_ACTOR_URI = "http://factor";
+    private static final String F_ACTOR_URI = "http://actor";
     private static final String F_DETAIL = "Some detail text";
 
     public void testSOAP11Fault() throws Exception {
 
         FaultMediator faultMediator = new FaultMediator();
         faultMediator.setSoapVersion(FaultMediator.SOAP11);
-        faultMediator.setFaultcode(F_CODE);
-        faultMediator.setFaultstring(F_STRING);
-        faultMediator.setFaultactor(new URI(F_ACTOR_URI));
-        faultMediator.setDetail(F_DETAIL);
+        faultMediator.setFaultCodeValue(F_CODE);
+        faultMediator.setFaultReasonValue(F_STRING);
+        faultMediator.setFaultRole(new URI(F_ACTOR_URI));
+        faultMediator.setFaultDetail(F_DETAIL);
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         faultMediator.mediate(synCtx);
 
         SOAPEnvelope envelope = synCtx.getEnvelope();
         SOAPFault fault = envelope.getBody().getFault();
         assertTrue(F_CODE.equals(fault.getCode().getValue().getTextAsQName()));
         assertTrue(F_STRING.equals(fault.getReason().getFirstSOAPText().getText()));
-        assertTrue(F_ACTOR_URI.equals(fault.getNode().getNodeValue()));
+        assertTrue(F_ACTOR_URI.equals(fault.getRole().getRoleValue()));
         assertTrue(F_DETAIL.equals(fault.getDetail().getText()));
-
-        System.out.println(envelope);
     }
 }

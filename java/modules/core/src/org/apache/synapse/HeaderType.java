@@ -74,7 +74,7 @@ public class HeaderType {
      * @param synCtx the message where lookup should be performed
      * @return the string value of the header
      */
-    public String getHeader(SynapseMessageContext synCtx) {
+    public String getHeader(MessageContext synCtx) {
         switch (headerType) {
             case TO: {
                 if (synCtx.getTo() != null)
@@ -109,7 +109,7 @@ public class HeaderType {
      * Removed the header indicated by this header type from the given message. i.e. sets it as null
      * @param synCtx the current message from which the header should be removed (set null)
      */
-    public void removeHeader(SynapseMessageContext synCtx) {
+    public void removeHeader(MessageContext synCtx) {
         switch (headerType) {
             case TO: {
                 synCtx.setTo(null);
@@ -140,7 +140,7 @@ public class HeaderType {
      * @param synCtx the current message on which to set the header
      * @param value the value to be set
      */
-    public void setHeader(SynapseMessageContext synCtx, String value) {
+    public void setHeader(MessageContext synCtx, String value) {
         switch (headerType) {
             case TO: {
                 synCtx.setTo(new EndpointReference(value));

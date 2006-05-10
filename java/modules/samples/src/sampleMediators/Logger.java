@@ -15,7 +15,7 @@
  */
 package sampleMediators;
 
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.axiom.soap.SOAPEnvelope;
 
@@ -32,7 +32,7 @@ public class Logger extends AbstractMediator {
       *
       * @see org.apache.synapse.mediator.Mediator#mediate(org.apache.axis2.context.MessageContext)
       */
-    public boolean mediate(SynapseMessageContext mctx) {
+    public boolean mediate(MessageContext mctx) {
         System.out.println("Logger.mediate:");
         if (mctx.getTo() != null && mctx.getTo().getAddress() != null)
             System.out.println("Logger.mediate to:" + mctx.getTo().getAddress());

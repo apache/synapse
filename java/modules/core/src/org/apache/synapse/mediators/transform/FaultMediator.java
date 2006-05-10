@@ -18,15 +18,17 @@ package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
-import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Util;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
@@ -50,36 +52,23 @@ public class FaultMediator extends AbstractMediator {
     /** Holds the SOAP version to be used to make the fault, if specified */
     private int soapVersion;
 
-    //--------- SOAP 1.1 elements ---------------
-    /** SOAP 1.1 faultcode (Required) */
-    private QName faultcode = null;
-    /** SOAP 1.1 faultstring (Required) */
-    private String faultstring = null;
-    /** SOAP 1.1 faultactor */
-    private URI faultactor = null;
-    /** SOAP 1.1 detail (Kept as String) */
-    private String detail = null;
+    // -- fault elements --
+    /** The fault code QName to be used */
+    private QName faultCodeValue = null;
+    /** An XPath expression that will give the fault code QName at runtime */
+    private AXIOMXPath faultCodeExpr = null;
+    /** The fault reason to be used */
+    private String faultReasonValue = null;
+    /** An XPath expression that will give the fault reason string at runtime */
+    private AXIOMXPath faultReasonExpr = null;
+    /** The fault node URI to be used */
+    private URI faultNode = null;
+    /** The fault role URI to be used - if applicable */
+    private URI faultRole = null;
+    /** The fault detail to be used */
+    private String faultDetail = null;
 
-    //--------- SOAP 1.2 elements ---------------
-    /**
-     * Hold the Code/Value of a SOAP 1.2 fault. (Required) Must be one of the following
-     * DataEncodingUnknown, MustUnderstand, Receiver, Sender, VersionMismatch
-     */
-    private QName codeValue = null;
-    /** Hold the Code/Subcode/Value of the SOAP 1.2 fault */
-    private QName codeSubcodeValue = null;
-    /** Holds the Reason of the SOAP 1.2 fault */
-    private String Reason = null;
-    /** The language attribute for the Reason text */
-    private String ReasonLang = null;
-    /** Hold the node for the SOAP 1.2 fault */
-    private URI Node = null;
-    /** Hold the role for the SOAP 1.2 fault */
-    private URI Role = null;
-    /** SOAP 1.2 detail (Kept as a String) */
-    private String Detail = null;
-
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
         log.debug(getType() + " mediate()");
         SOAPEnvelope envelop = synCtx.getEnvelope();
 
@@ -102,7 +91,7 @@ public class FaultMediator extends AbstractMediator {
         }
     }
 
-    private boolean makeSOAPFault(SynapseMessageContext synCtx, int soapVersion) {
+    private boolean makeSOAPFault(MessageContext synCtx, int soapVersion) {
 
         // get the correct SOAP factory to be used
         SOAPFactory factory = (
@@ -117,11 +106,11 @@ public class FaultMediator extends AbstractMediator {
         SOAPFault fault = factory.createSOAPFault();
 
         // populate it
-        setFaultCode(factory, fault, soapVersion);
-        setFaultResaon(factory, fault, soapVersion);
-        setFaultNode(factory, fault, soapVersion);
-        setFaultRole(factory, fault, soapVersion);
-        setFaultDetail(factory, fault, soapVersion);
+        setFaultCode(synCtx, factory, fault);
+        setFaultResaon(synCtx, factory, fault);
+        setFaultNode(factory, fault);
+        setFaultRole(factory, fault);
+        setFaultDetail(factory, fault);
 
         // set the fault element
         faultEnvelope.getBody().setFirstChild(fault);
@@ -153,67 +142,63 @@ public class FaultMediator extends AbstractMediator {
         return true;
     }
 
-    private void setFaultCode(SOAPFactory factory, SOAPFault fault, int soapVersion) {
-        QName fault_code = (soapVersion == SOAP11 ? faultcode : codeValue);
-        if (fault_code != null) {
-            SOAPFaultCode code = factory.createSOAPFaultCode();
-            SOAPFaultValue value = factory.createSOAPFaultValue(code);
-            value.setText(fault_code);
-            fault.setCode(code);
+    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
 
+        QName fault_code = null;
+
+        if (faultCodeValue == null && faultCodeExpr == null) {
+            handleException("A valid fault code QName value or expression is required");
+        } else if (faultCodeValue != null) {
+            fault_code = faultCodeValue;
         } else {
-            handleException(soapVersion == SOAP11 ?
-                "faultcode is required for a SOAP 1.1 fault message" :
-                "Code/Value is required for a SOAP 1.2 fault message"
-            );
+            fault_code = QName.valueOf(Util.getStringValue(faultCodeExpr, synCtx));
         }
+
+        SOAPFaultCode code = factory.createSOAPFaultCode();
+        SOAPFaultValue value = factory.createSOAPFaultValue(code);
+        value.setText(fault_code);
+        fault.setCode(code);
     }
 
-    private void setFaultResaon(SOAPFactory factory, SOAPFault fault, int soapVersion) {
-        String reasonString = (soapVersion == SOAP11 ? faultstring : Reason);
-        if (faultstring != null) {
-            SOAPFaultReason reason = factory.createSOAPFaultReason();
-            SOAPFaultText text = factory.createSOAPFaultText();
-            text.setText(reasonString);
-            if (soapVersion == SOAP12 && ReasonLang != null) {
-                text.setLang(ReasonLang);
-            }
-            reason.addSOAPText(text);
-            fault.setReason(reason);
+    private void setFaultResaon(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
+        String reasonString = null;
 
+        if (faultReasonValue == null && faultReasonExpr == null) {
+            handleException("A valid fault reason value or expression is required");
+        } else if (faultReasonValue != null) {
+            reasonString = faultReasonValue;
         } else {
-            handleException(soapVersion == SOAP11 ?
-                "faultstring is required for a SOAP 1.1 fault message" :
-                "Reason is required for a SOAP 1.2 fault message"
-            );
+            reasonString = Util.getStringValue(faultReasonExpr, synCtx);
         }
+
+        SOAPFaultReason reason = factory.createSOAPFaultReason();
+        SOAPFaultText text = factory.createSOAPFaultText();
+        text.setText(reasonString);
+        reason.addSOAPText(text);
+        fault.setReason(reason);
     }
 
-    private void setFaultNode(SOAPFactory factory, SOAPFault fault, int soapVersion) {
-        URI fActor = (soapVersion == SOAP11 ? faultactor : Node);
-        if (fActor != null) {
+    private void setFaultNode(SOAPFactory factory, SOAPFault fault) {
+        if (faultNode != null) {
             SOAPFaultNode faultNode = factory.createSOAPFaultNode();
-            faultNode.setNodeValue(fActor.toString());
+            faultNode.setNodeValue(faultNode.toString());
             fault.setNode(faultNode);
         }
     }
 
-    private void setFaultRole(SOAPFactory factory, SOAPFault fault, int soapVersion) {
-        if (soapVersion == SOAP12) {
-            if (Role != null) {
-                SOAPFaultRole faultRole = factory.createSOAPFaultRole();
-                faultRole.setRoleValue(Role.toString());
-                fault.setRole(faultRole);
-            }
+    private void setFaultRole(SOAPFactory factory, SOAPFault fault) {
+        if (faultRole != null) {
+            SOAPFaultRole soapFaultRole = factory.createSOAPFaultRole();
+            soapFaultRole.setRoleValue(faultRole.toString());
+            fault.setRole(soapFaultRole);
         }
     }
 
-    private void setFaultDetail(SOAPFactory factory, SOAPFault fault, int soapVersion) {
-        String detailText = (soapVersion == SOAP11 ? detail : Detail);
-        if (detailText != null) {
-            SOAPFaultDetail faultDetail = factory.createSOAPFaultDetail();
-            faultDetail.setText(detailText);
-            fault.setDetail(faultDetail);
+    private void setFaultDetail(SOAPFactory factory, SOAPFault fault) {
+        if (faultDetail != null) {
+            SOAPFaultDetail soapFaultDetail = factory.createSOAPFaultDetail();
+            soapFaultDetail.setText(faultDetail);
+            fault.setDetail(soapFaultDetail);
         }
     }
 
@@ -230,102 +215,83 @@ public class FaultMediator extends AbstractMediator {
         this.soapVersion = soapVersion;
     }
 
-    // -- SOAP 1.1 getters and setters --
-
-    public QName getFaultcode() {
-        return faultcode;
+    public QName getFaultCodeValue() {
+        return faultCodeValue;
     }
 
-    public void setFaultcode(QName faultcode) {
-        this.faultcode = faultcode;
-    }
+    public void setFaultCodeValue(QName faultCodeValue) {
 
-    public String getFaultstring() {
-        return faultstring;
-    }
-
-    public void setFaultstring(String faultstring) {
-        this.faultstring = faultstring;
-    }
-
-    public URI getFaultactor() {
-        return faultactor;
-    }
-
-    public void setFaultactor(URI faultactor) {
-        this.faultactor = faultactor;
-    }
-
-    public String getDetail() {
-        return detail;
-    }
-
-    public void setDetail(String detail) {
-        this.detail = detail;
-    }
-
-    // -- SOAP 1.2 getters and setters --
-
-    public QName getCodeValue() {
-        return codeValue;
-    }
-
-    public void setCodeValue(QName codeValue) {
-        if (
-            SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX.equals(codeValue.getNamespaceURI()) &&
-
-            (SOAP12Constants.FAULT_CODE_DATA_ENCODING_UNKNOWN.equals(codeValue.getLocalPart()) ||
-            SOAP12Constants.FAULT_CODE_MUST_UNDERSTAND.equals(codeValue.getLocalPart()) ||
-            SOAP12Constants.FAULT_CODE_RECEIVER.equals(codeValue.getLocalPart()) ||
-            SOAP12Constants.FAULT_CODE_SENDER.equals(codeValue.getLocalPart()) ||
-            SOAP12Constants.FAULT_CODE_VERSION_MISMATCH.equals(codeValue.getLocalPart())) ){
-
-            this.codeValue = codeValue;
+        if (soapVersion == SOAP11) {
+            this.faultCodeValue = faultCodeValue;
 
         } else {
-            String msg = "Invalid Fault code value for a SOAP 1.2 fault : " + codeValue;
-            log.error(msg);
-            throw new SynapseException(msg);
+            if (
+                SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX.equals(faultCodeValue.getNamespaceURI()) &&
+
+                (SOAP12Constants.FAULT_CODE_DATA_ENCODING_UNKNOWN.equals(faultCodeValue.getLocalPart()) ||
+                SOAP12Constants.FAULT_CODE_MUST_UNDERSTAND.equals(faultCodeValue.getLocalPart()) ||
+                SOAP12Constants.FAULT_CODE_RECEIVER.equals(faultCodeValue.getLocalPart()) ||
+                SOAP12Constants.FAULT_CODE_SENDER.equals(faultCodeValue.getLocalPart()) ||
+                SOAP12Constants.FAULT_CODE_VERSION_MISMATCH.equals(faultCodeValue.getLocalPart())) ){
+
+                this.faultCodeValue = faultCodeValue;
+
+            } else {
+                String msg = "Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue;
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
         }
     }
 
-    public QName getCodeSubcodeValue() {
-        return codeSubcodeValue;
+    public AXIOMXPath getFaultCodeExpr() {
+        return faultCodeExpr;
     }
 
-    public void setCodeSubcodeValue(QName codeSubcodeValue) {
-        this.codeSubcodeValue = codeSubcodeValue;
+    public void setFaultCodeExpr(AXIOMXPath faultCodeExpr) {
+        this.faultCodeExpr = faultCodeExpr;
     }
 
-    public String getReason() {
-        return Reason;
+    public String getFaultReasonValue() {
+        return faultReasonValue;
     }
 
-    public void setReason(String reason) {
-        this.Reason = reason;
+    public void setFaultReasonValue(String faultReasonValue) {
+        this.faultReasonValue = faultReasonValue;
     }
 
-    public String getReasonLang() {
-        return ReasonLang;
+    public AXIOMXPath getFaultReasonExpr() {
+        return faultReasonExpr;
     }
 
-    public void setReasonLang(String reasonLang) {
-        this.ReasonLang = reasonLang;
+    public void setFaultReasonExpr(AXIOMXPath faultReasonExpr) {
+        this.faultReasonExpr = faultReasonExpr;
     }
 
-    public URI getNode() {
-        return Node;
+    public URI getFaultNode() {
+        return faultNode;
     }
 
-    public void setNode(URI node) {
-        Node = node;
+    public void setFaultNode(URI faultNode) {
+        if (soapVersion == SOAP11) {
+            handleException("A fault node does not apply to a SOAP 1.1 fault");
+        }
+        this.faultNode = faultNode;
     }
 
-    public URI getRole() {
-        return Role;
+    public URI getFaultRole() {
+        return faultRole;
     }
 
-    public void setRole(URI role) {
-        Role = role;
+    public void setFaultRole(URI faultRole) {
+        this.faultRole = faultRole;
+    }
+
+    public String getFaultDetail() {
+        return faultDetail;
+    }
+
+    public void setFaultDetail(String faultDetail) {
+        this.faultDetail = faultDetail;
     }
 }

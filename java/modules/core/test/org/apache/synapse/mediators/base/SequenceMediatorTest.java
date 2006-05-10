@@ -16,11 +16,10 @@
 package org.apache.synapse.mediators.base;
 
 import junit.framework.TestCase;
-import junit.framework.Test;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 
 public class SequenceMediatorTest extends TestCase {
 
@@ -31,21 +30,21 @@ public class SequenceMediatorTest extends TestCase {
         TestMediator t1 = new TestMediator();
         t1.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseMessageContext synCtx) {
+                public void handle(MessageContext synCtx) {
                     result.append("T1.");
                 }
             });
         TestMediator t2 = new TestMediator();
         t2.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseMessageContext synCtx) {
+                public void handle(MessageContext synCtx) {
                     result.append("T2.");
                 }
             });
         TestMediator t3 = new TestMediator();
         t3.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseMessageContext synCtx) {
+                public void handle(MessageContext synCtx) {
                     result.append("T3");
                 }
             });
@@ -56,7 +55,7 @@ public class SequenceMediatorTest extends TestCase {
         seq.addChild(t3);
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         seq.mediate(synCtx);
 
         assertTrue("T1.T2.T3".equals(result.toString()));

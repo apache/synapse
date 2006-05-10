@@ -15,7 +15,7 @@
  */
 package org.apache.synapse.api;
 
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 
 /**
  * All Synapse mediators must implement this Mediator interface. As a message passes
@@ -32,7 +32,7 @@ public interface Mediator {
      * @param synCtx the current message for mediation
      * @return true if further mediation should continue
      */
-    public boolean mediate(SynapseMessageContext synCtx);
+    public boolean mediate(MessageContext synCtx);
 
     /**
      * This is used for debugging purposes and exposes the type of the current

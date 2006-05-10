@@ -17,11 +17,10 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 
 /**
  * This message receiver should be configured in the Axis2 configuration as the
@@ -32,17 +31,17 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
     private static final Log log = LogFactory.getLog(SynapseMessageReceiver.class);
 
-    public void receive(MessageContext mc) throws AxisFault {
+    public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         log.debug("Synapse received message");
-        SynapseMessageContext synCtx = Axis2SynapseContextFinder.getSynapseContext(mc);
+        MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
         ////////////////////////////////////////////////////////////////////////
-        // SynapseMessageContext is set as a property in MessageContext. This is due
+        // MessageContext is set as a property in MessageContext. This is due
         // use we can expect in ServiceMediatorProcessor and many extensions yet to come
         // So it a mediator uses EnvironmentAware, that mediator will be injected with the correct environment
 
         ////////////////////////////////////////////////////////////////////////
-        synCtx.getSynapseEnvironment().injectMessage(synCtx);
+        synCtx.getEnvironment().injectMessage(synCtx);
 
         ///////////////////////////////////////////////////////////////////////
         // Response handling mechanism for 200/202 and 5XX

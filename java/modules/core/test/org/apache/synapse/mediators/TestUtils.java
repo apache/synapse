@@ -15,7 +15,7 @@
 */
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.TestSynapseMessageContext;
+import org.apache.synapse.TestMessageContext;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
@@ -27,10 +27,10 @@ import java.io.StringReader;
 
 public class TestUtils {
 
-    public static TestSynapseMessageContext getTestContext(String bodyText) throws Exception {
+    public static TestMessageContext getTestContext(String bodyText) throws Exception {
 
         // create a test synapse context
-        TestSynapseMessageContext synCtx = new TestSynapseMessageContext();
+        TestMessageContext synCtx = new TestMessageContext();
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();

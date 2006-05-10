@@ -42,7 +42,7 @@ public class Util {
      * @param synCtx the source message which holds the SOAP envelope
      * @return a String representation of the result of evaluation
      */
-    public static String getStringValue(AXIOMXPath xpath, SynapseMessageContext synCtx) {
+    public static String getStringValue(AXIOMXPath xpath, MessageContext synCtx) {
 
         if (xpath != null) {
             try {

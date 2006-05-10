@@ -16,7 +16,7 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,12 +38,12 @@ public class SendMediator extends AbstractMediator {
      * @param synCtx the current message to be sent
      * @return false always as this is a leaf mediator
      */
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
         log.debug(getType() + " mediate()");
         log.debug("Sending To: " + (synCtx.getTo() != null ?
             synCtx.getTo().getAddress() : "null"));
         log.debug("Body : \n" + synCtx.getEnvelope());
-        synCtx.getSynapseEnvironment().send(synCtx);
+        synCtx.getEnvironment().send(synCtx);
         return false;
     }
 }

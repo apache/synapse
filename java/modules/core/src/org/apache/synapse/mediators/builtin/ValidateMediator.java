@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMNode;
@@ -74,7 +74,7 @@ public class ValidateMediator extends AbstractListMediator {
         this.source = source;
     }
 
-    private OMNode getValidateSource(SynapseMessageContext synCtx) {
+    private OMNode getValidateSource(MessageContext synCtx) {
 
         if (source == null) {
             try {
@@ -103,7 +103,7 @@ public class ValidateMediator extends AbstractListMediator {
         }
     }
 
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
 
         ByteArrayInputStream baisFromSource = null;
         StringBuffer nsLocations = new StringBuffer();

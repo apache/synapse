@@ -20,7 +20,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 
 import java.net.URL;
 import java.io.File;
@@ -56,7 +56,7 @@ public class TransformMediatorTest extends TestCase {
             new URL("file:///" + new File(".").getAbsolutePath() + "/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext(SOURCE);
+        MessageContext synCtx = TestUtils.getTestContext(SOURCE);
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -91,7 +91,7 @@ public class TransformMediatorTest extends TestCase {
             new URL("file:///" + new File(".").getAbsolutePath() + "/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext(SOURCE);
+        MessageContext synCtx = TestUtils.getTestContext(SOURCE);
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -127,7 +127,7 @@ public class TransformMediatorTest extends TestCase {
             new URL("file:///" + new File(".").getAbsolutePath() + "/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE);
+        MessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE);
         transformMediator.mediate(synCtx);
 
         // validate result

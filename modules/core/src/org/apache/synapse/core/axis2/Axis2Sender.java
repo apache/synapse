@@ -34,7 +34,7 @@ public class Axis2Sender {
 
         try {
 
-            MessageContext messageContext = ((Axis2SynapseMessage) smc.getSynapseMessage()).getMessageContext();
+            MessageContext messageContext = ((Axis2SynapseMessageContext) smc).getMessageContext();
             // At any time any QOS is disengaged. It's engaged iff, a flag is
             // set in execution chain.
             // ex: addressing will be engage in outpath iff ADDRESSING_PROCESSED
@@ -60,7 +60,7 @@ public class Axis2Sender {
 
             // run all rules on response
 
-            smc.getSynapseMessage().setResponse(true);//
+            smc.setResponse(true);//
 
             outMsgContext.setServerSide(true);
 
@@ -71,7 +71,7 @@ public class Axis2Sender {
 
             outMsgContext.setTransportIn(ti);
 
-            smc.setSynapseMessage(new Axis2SynapseMessage(outMsgContext, smc));
+            smc = new Axis2SynapseMessageContext(outMsgContext);
             smc.getSynapseEnvironment().injectMessage(smc);
 
         } catch (Exception e) {
@@ -81,7 +81,7 @@ public class Axis2Sender {
     }
 
     public static void sendBack(SynapseMessageContext smc) {
-        MessageContext messageContext = ((Axis2SynapseMessage) smc.getSynapseMessage()).getMessageContext();
+        MessageContext messageContext = ((Axis2SynapseMessageContext) smc).getMessageContext();
         AxisEngine ae =
             new AxisEngine(messageContext.getConfigurationContext());
         try {

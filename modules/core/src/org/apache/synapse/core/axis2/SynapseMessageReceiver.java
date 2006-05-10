@@ -22,7 +22,6 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseMessageContext;
-import org.apache.synapse.SynapseMessage;
 
 /**
  * This message receiver should be configured in the Axis2 configuration as the
@@ -43,7 +42,6 @@ public class SynapseMessageReceiver implements MessageReceiver {
         // So it a mediator uses EnvironmentAware, that mediator will be injected with the correct environment
 
         ////////////////////////////////////////////////////////////////////////
-        SynapseMessage smc = new Axis2SynapseMessage(mc, synCtx);
         synCtx.getSynapseEnvironment().injectMessage(synCtx);
 
         ///////////////////////////////////////////////////////////////////////
@@ -51,11 +49,11 @@ public class SynapseMessageReceiver implements MessageReceiver {
         // smc.isResponse =true then the response will be handle with 200 OK
         // else, response will be 202 OK without no http body
         // smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
-        if (smc.isResponse()) {
+        if (synCtx.isResponse()) {
             mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
                 Constants.VALUE_TRUE);
         }
-        if (smc.isFaultResponse()) {
+        if (synCtx.isFaultResponse()) {
             // todo: a good way to inject faultSoapEnv to the Axis2 Transport 
             throw new AxisFault(
                 "Synapse Encounters an Error - Please See Log for More Details");

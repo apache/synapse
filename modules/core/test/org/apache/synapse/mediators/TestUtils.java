@@ -16,7 +16,6 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.TestSynapseMessageContext;
-import org.apache.synapse.TestSynapseMessage;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
@@ -32,7 +31,6 @@ public class TestUtils {
 
         // create a test synapse context
         TestSynapseMessageContext synCtx = new TestSynapseMessageContext();
-        TestSynapseMessage synMsg = new TestSynapseMessage();
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();
@@ -45,8 +43,7 @@ public class TestUtils {
         // set a dummy static message
         envelope.getBody().addChild(builder.getDocumentElement());
 
-        synMsg.setEnvelope(envelope);
-        synCtx.setSynapseMessage(synMsg);
+        synCtx.setEnvelope(envelope);
         return synCtx;
     }
 }

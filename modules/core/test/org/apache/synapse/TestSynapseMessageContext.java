@@ -17,6 +17,12 @@ package org.apache.synapse;
 
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
+import org.apache.axis2.AxisFault;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -25,9 +31,11 @@ public class TestSynapseMessageContext implements SynapseMessageContext {
 
     private Map properties = new HashMap();
 
-    private SynapseMessage synMsg = null;
-
     private SynapseConfiguration synCfg = null;
+
+    SOAPEnvelope envelope = null;
+
+    private EndpointReference to = null;
 
     public SynapseConfiguration getConfiguration() {
         return synCfg;
@@ -44,17 +52,6 @@ public class TestSynapseMessageContext implements SynapseMessageContext {
     public void setSynapseEnvironment(SynapseEnvironment se) {
     }
 
-    public void setSynapseMessage(SynapseMessage sm) {
-        synMsg = sm;
-    }
-
-    public SynapseMessage getSynapseMessage() {
-        if (synMsg == null)
-            return new TestSynapseMessage();
-        else
-            return synMsg;
-    }
-
     public Object getProperty(String key) {
         Object ret = properties.get(key);
         if (ret != null) {
@@ -68,4 +65,120 @@ public class TestSynapseMessageContext implements SynapseMessageContext {
 
     public void setProperty(String key, Object value) {
         properties.put(key, value);
-    }}
+    }
+
+    //---------
+    public SOAPEnvelope getEnvelope() {
+        if (envelope == null)
+            return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        else
+            return envelope;
+    }
+
+    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
+        this.envelope = envelope;
+    }
+
+    public EndpointReference getFaultTo() {
+        return null;
+    }
+
+    public void setFaultTo(EndpointReference reference) {
+    }
+
+    public EndpointReference getFrom() {
+        return null;
+    }
+
+    public void setFrom(EndpointReference reference) {
+    }
+
+    public String getMessageID() {
+        return null;
+    }
+
+    public void setMessageID(String string) {
+    }
+
+    public RelatesTo getRelatesTo() {
+        return null;
+    }
+
+    public void setRelatesTo(RelatesTo[] reference) {
+    }
+
+    public EndpointReference getReplyTo() {
+        return null;
+    }
+
+    public void setReplyTo(EndpointReference reference) {
+    }
+
+    public EndpointReference getTo() {
+        return to;
+    }
+
+    public void setTo(EndpointReference reference) {
+        to = reference;
+    }
+
+    public void setWSAAction(String actionURI) {
+    }
+
+    public String getWSAAction() {
+        return null;
+    }
+
+    public String getSoapAction() {
+        return null;
+    }
+
+    public void setSoapAction(String string) {
+    }
+
+    public void setMessageId(String messageID) {
+    }
+
+    public String getMessageId() {
+        return null;
+    }
+
+    public boolean isDoingMTOM() {
+        return false;
+    }
+
+    public void setDoingMTOM(boolean b) {
+    }
+
+    public boolean isDoingREST() {
+        return false;
+    }
+
+    public void setDoingREST(boolean b) {
+    }
+
+    public boolean isSOAP11() {
+        return envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+    }
+
+    public void setResponse(boolean b) {
+    }
+
+    public boolean isResponse() {
+        return false;
+    }
+
+    public void setFaultResponse(boolean b) {
+    }
+
+    public boolean isFaultResponse() {
+        return false;
+    }
+
+    public SynapseMessageContext getSynapseContext() {
+        return null;
+    }
+
+    public void setSynapseContext(SynapseMessageContext env) {
+    }
+}

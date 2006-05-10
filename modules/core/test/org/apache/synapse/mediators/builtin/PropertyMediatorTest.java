@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.Util;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.TestUtils;
@@ -31,7 +31,7 @@ public class PropertyMediatorTest extends TestCase {
         propMediator.setName("name");
         propMediator.setValue("value");
 
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         propMediator.mediate(synCtx);
 
         assertTrue(
@@ -45,7 +45,7 @@ public class PropertyMediatorTest extends TestCase {
      */
     public void testSetAndReadGlobalProperty() throws Exception {
 
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
 
         SynapseConfiguration synCfg = new SynapseConfiguration();
         synCfg.addProperty("name", "value");
@@ -71,7 +71,7 @@ public class PropertyMediatorTest extends TestCase {
         propMediator.setName("name");
         propMediator.setValue("value");
 
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         propMediator.mediate(synCtx);
 
         // read property through a mediator property

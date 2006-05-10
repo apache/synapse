@@ -16,7 +16,7 @@
 package sampleMediators;
 
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
 public class InjectRedirect extends AbstractMediator {
@@ -26,7 +26,7 @@ public class InjectRedirect extends AbstractMediator {
         this.uri = uri;
     }
 
-    public boolean mediate(SynapseMessageContext mc) {
+    public boolean mediate(MessageContext mc) {
 
         System.out.println("Redirect.mediate: " + uri);
 

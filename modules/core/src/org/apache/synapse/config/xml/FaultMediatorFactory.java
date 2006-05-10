@@ -20,8 +20,16 @@ import javax.xml.namespace.QName;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
+import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jaxen.JaxenException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Creates a fault mediator instance
@@ -41,12 +49,17 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_VERSION_Q = new QName(Constants.NULL_NAMESPACE, "version");
     private static final QName CODE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "code");
     private static final QName REASON_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "reason");
+    private static final QName NODE_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "node");
+    private static final QName ROLE_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "role");
+    private static final QName DETAIL_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "detail");
 
-    private static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "name");
+    private static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
     private static final QName ATT_EXPR_Q  = new QName(Constants.NULL_NAMESPACE, "expression");
 
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";
+
+    private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
 
     public Mediator createMediator(OMElement elem) {
 
@@ -61,30 +74,85 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
             }
         }
 
-/*      TODO revisit later!
         OMElement code = elem.getFirstChildWithName(CODE_Q);
         if (code != null) {
             OMAttribute value = code.getAttribute(ATT_VALUE_Q);
             OMAttribute expression = code.getAttribute(ATT_EXPR_Q);
 
             if (value != null) {
-                faultMediator.setCode(new QName(value.getAttributeValue()));
+                faultMediator.setFaultCodeValue(QName.valueOf(value.getAttributeValue()));
             } else if (expression != null) {
-                //faultMediator.setCode();
+                try {
+                    faultMediator.setFaultCodeExpr(new AXIOMXPath(expression.getAttributeValue()));
+                } catch (JaxenException je) {
+                    String msg = "Invalid fault code expression : " + je.getMessage();
+                    log.error(msg);
+                    throw new SynapseException(msg, je);
+                }
             } else {
-                //TODO throw exception
+                String msg = "A 'value' or 'expression' attribute must specify the fault code";
+                log.error(msg);
+                throw new SynapseException(msg);
             }
 
         } else {
-            //TODO exception
+            String msg = "The fault code is a required attribute for the makefault mediator";
+            log.error(msg);
+            throw new SynapseException(msg);
         }
-*/
 
         OMElement reason = elem.getFirstChildWithName(REASON_Q);
         if (reason != null) {
-            faultMediator.setReason(reason.getText());
+            OMAttribute value = code.getAttribute(ATT_VALUE_Q);
+            OMAttribute expression = code.getAttribute(ATT_EXPR_Q);
+
+            if (value != null) {
+                faultMediator.setFaultReasonValue(value.getAttributeValue());
+            } else if (expression != null) {
+                try {
+                    faultMediator.setFaultReasonExpr(new AXIOMXPath(expression.getAttributeValue()));
+                } catch (JaxenException je) {
+                    String msg = "Invalid fault reason expression : " + je.getMessage();
+                    log.error(msg);
+                    throw new SynapseException(msg, je);
+                }
+            } else {
+                String msg = "A 'value' or 'expression' attribute must specify the fault code";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+
         }else {
-            //TODO exception
+            String msg = "The fault reason is a required attribute for the makefault mediator";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+
+        OMElement node = elem.getFirstChildWithName(NODE_Q);
+        if (node != null && node.getText() != null) {
+            try {
+                faultMediator.setFaultNode(new URI(node.getText()));
+            } catch (URISyntaxException e) {
+                String msg = "Invalid URI specified for fault node : " + node.getText();
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+        }
+
+        OMElement role = elem.getFirstChildWithName(ROLE_Q);
+        if (role != null && role.getText() != null) {
+            try {
+                faultMediator.setFaultRole(new URI(role.getText()));
+            } catch (URISyntaxException e) {
+                String msg = "Invalid URI specified for fault role : " + role.getText();
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+        }
+
+        OMElement detail = elem.getFirstChildWithName(DETAIL_Q);
+        if (detail != null && detail.getText() != null) {
+            faultMediator.setFaultDetail(detail.getText());
         }
 
         return faultMediator;

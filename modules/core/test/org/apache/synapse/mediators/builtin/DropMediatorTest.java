@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 
 public class DropMediatorTest extends TestCase {
@@ -26,7 +26,7 @@ public class DropMediatorTest extends TestCase {
         DropMediator drop = new DropMediator();
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         boolean returnValue = drop.mediate(synCtx);
 
         assertTrue(!returnValue);

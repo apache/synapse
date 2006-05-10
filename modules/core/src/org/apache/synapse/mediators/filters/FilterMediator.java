@@ -18,7 +18,7 @@ package org.apache.synapse.mediators.filters;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.Util;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +42,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * @param synCtx the current message
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
         log.debug(getType() + " mediate()");
         if (test(synCtx)) {
             return super.mediate(synCtx);
@@ -59,7 +59,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * @param synCtx the current message for evaluation of the test condition
      * @return true if evaluation of the XPath/Regex results in true
      */
-    public boolean test(SynapseMessageContext synCtx) {
+    public boolean test(MessageContext synCtx) {
         try {
             if (xpath != null) {
                 return xpath.booleanValueOf(synCtx.getEnvelope());

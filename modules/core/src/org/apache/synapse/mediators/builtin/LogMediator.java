@@ -17,7 +17,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.commons.logging.Log;
@@ -53,13 +53,13 @@ public class LogMediator extends AbstractMediator {
      * @param synCtx (current) message to be logged
      * @return true always
      */
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
         log.debug(getType() + " mediate()");
         log.info(getLogMessage(synCtx));
         return true;
     }
 
-    private String getLogMessage(SynapseMessageContext synCtx) {
+    private String getLogMessage(MessageContext synCtx) {
         switch (logLevel) {
             case CUSTOM:
                 return getCustomLogMessage(synCtx);
@@ -74,13 +74,13 @@ public class LogMediator extends AbstractMediator {
         }
     }
 
-    private String getCustomLogMessage(SynapseMessageContext synCtx) {
+    private String getCustomLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         setCustomProperties(sb, synCtx);
         return sb.toString();
     }
 
-    private String getSimpleLogMessage(SynapseMessageContext synCtx) {
+    private String getSimpleLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         if (synCtx.getTo() != null)
             sb.append("To: " + synCtx.getTo().getAddress());
@@ -98,7 +98,7 @@ public class LogMediator extends AbstractMediator {
         return sb.toString();
     }
 
-    private String getHeadersLogMessage(SynapseMessageContext synCtx) {
+    private String getHeadersLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
         while (iter.hasNext()) {
@@ -109,7 +109,7 @@ public class LogMediator extends AbstractMediator {
         return sb.toString();
     }
 
-    private String getFullLogMessage(SynapseMessageContext synCtx) {
+    private String getFullLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         sb.append(getSimpleLogMessage(synCtx));
         if (synCtx.getEnvelope() != null)
@@ -118,7 +118,7 @@ public class LogMediator extends AbstractMediator {
         return sb.toString();
     }
 
-    private void setCustomProperties(StringBuffer sb, SynapseMessageContext synCtx) {
+    private void setCustomProperties(StringBuffer sb, MessageContext synCtx) {
         if (properties != null && !properties.isEmpty()) {
             Iterator iter = properties.iterator();
             while (iter.hasNext()) {

@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.ext;
 
 import junit.framework.TestCase;
-import org.apache.synapse.TestSynapseMessageContext;
+import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 
@@ -29,7 +29,7 @@ public class ClassMediatorTest extends TestCase {
     public void testCreationWithoutProperties() throws Exception {
         ClassMediator cm = new ClassMediator();
         cm.setClazz(ClassMediatorTestMediator.class);
-        cm.mediate(new TestSynapseMessageContext());
+        cm.mediate(new TestMessageContext());
         assertTrue(ClassMediatorTestMediator.invoked);
     }
 
@@ -40,7 +40,7 @@ public class ClassMediatorTest extends TestCase {
         mp.setValue("testValue");
         cm.addProperty(mp);
         cm.setClazz(ClassMediatorTestMediator.class);
-        cm.mediate(new TestSynapseMessageContext());
+        cm.mediate(new TestMessageContext());
         assertTrue(ClassMediatorTestMediator.testProp.equals("testValue"));
     }
 
@@ -51,7 +51,7 @@ public class ClassMediatorTest extends TestCase {
         mp.setExpression(new AXIOMXPath("concat('XPath ','is ','FUN!')"));
         cm.addProperty(mp);
         cm.setClazz(ClassMediatorTestMediator.class);
-        cm.mediate(new TestSynapseMessageContext());
+        cm.mediate(new TestMessageContext());
         assertTrue(ClassMediatorTestMediator.testProp.equals("XPath is FUN!"));
     }
 

@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.Util;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 
@@ -36,7 +36,7 @@ public class PropertyMediator extends AbstractMediator {
      * @param smc the message context
      * @return true always
      */
-    public boolean mediate(SynapseMessageContext smc) {
+    public boolean mediate(MessageContext smc) {
         smc.setProperty(getName(),
             (value != null ? getValue() : Util.getStringValue(getExpression(), smc)));
         return true;

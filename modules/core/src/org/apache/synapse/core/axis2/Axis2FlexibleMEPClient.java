@@ -45,8 +45,8 @@ import java.util.Iterator;
  */
 public class Axis2FlexibleMEPClient {
 
-    public static SOAPEnvelope outEnvelopeConfiguration(MessageContext smc) {
-        SOAPEnvelope env = smc.getEnvelope();
+    public static SOAPEnvelope outEnvelopeConfiguration(MessageContext axisMsgCtx) {
+        SOAPEnvelope env = axisMsgCtx.getEnvelope();
         SOAPHeader soapHeader = env.getHeader();
         ArrayList addressingHeaders;
         if (soapHeader != null) {
@@ -79,13 +79,13 @@ public class Axis2FlexibleMEPClient {
     }
 
     // Following code is based on Axis2 Client code.
-    public static MessageContext send(MessageContext smc) throws AxisFault {
+    public static MessageContext send(MessageContext axisMsgCtx) throws AxisFault {
         // In this logic Synapse Work as a Client to a Server
         // So here this logic should expect 200 ok, 202 ok and 500 internal server error
         // current state of the code in Synchronus
 
         // This is the original_configuration_context
-        ConfigurationContext cc = smc.getConfigurationContext();
+        ConfigurationContext cc = axisMsgCtx.getConfigurationContext();
         AxisConfiguration ac = cc.getAxisConfiguration();
         PhasesInfo phasesInfo = ac.getPhasesInfo();
 
@@ -110,35 +110,35 @@ public class Axis2FlexibleMEPClient {
         mc.setConfigurationContext(sc.getConfigurationContext());
         ///////////////////////////////////////////////////////////////////////
         // filtering properties
-        if (smc.getSoapAction() != null)
-            mc.setSoapAction(smc.getSoapAction());
-        if (smc.getWSAAction() != null)
-            mc.setWSAAction(smc.getWSAAction());
-        if (smc.getFrom() != null)
-            mc.setFrom(smc.getFrom());
-        if (smc.getMessageID() != null)
-            mc.setMessageID(smc.getMessageID());
+        if (axisMsgCtx.getSoapAction() != null)
+            mc.setSoapAction(axisMsgCtx.getSoapAction());
+        if (axisMsgCtx.getWSAAction() != null)
+            mc.setWSAAction(axisMsgCtx.getWSAAction());
+        if (axisMsgCtx.getFrom() != null)
+            mc.setFrom(axisMsgCtx.getFrom());
+        if (axisMsgCtx.getMessageID() != null)
+            mc.setMessageID(axisMsgCtx.getMessageID());
         else
             mc.setMessageID(String.valueOf("uuid:"
                 + UUIDGenerator.getUUID()));
-        if (smc.getReplyTo() != null)
-            mc.setReplyTo(smc.getReplyTo());
-        //if (smc.getRelatesTo() != null)
-            //mc.setRelatesTo(smc.getRelatesTo());
-            if (smc.getTo() != null) {
-                mc.setTo(smc.getTo());
+        if (axisMsgCtx.getReplyTo() != null)
+            mc.setReplyTo(axisMsgCtx.getReplyTo());
+        //if (axisMsgCtx.getRelatesTo() != null)
+            //mc.setRelatesTo(axisMsgCtx.getRelatesTo());
+            if (axisMsgCtx.getTo() != null) {
+                mc.setTo(axisMsgCtx.getTo());
             } else {
                 throw new AxisFault(
                     "To canno't be null, if null Synapse can't infer the transport");
             }
-        if (smc.isDoingREST()) {
+        if (axisMsgCtx.isDoingREST()) {
             mc.setDoingREST(true);
         }
 
         // handling the outbound message with addressing
         AxisModule module = ac.getModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
-        if ((smc.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) ||
-            (smc.getProperty(
+        if ((axisMsgCtx.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) ||
+            (axisMsgCtx.getProperty(
                 Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null)) {
             if (!ac.getService("__ANONYMOUS_SERVICE__")
                 .isEngaged(module.getName())) {
@@ -148,7 +148,7 @@ public class Axis2FlexibleMEPClient {
 
         //TODO; following line needed to be removed
 
-        mc.setEnvelope(outEnvelopeConfiguration(smc));
+        mc.setEnvelope(outEnvelopeConfiguration(axisMsgCtx));
 
         AxisOperation axisAnonymousOperation =
             ac.getService("__ANONYMOUS_SERVICE__")
@@ -163,14 +163,14 @@ public class Axis2FlexibleMEPClient {
         MessageContext response = mepClient
             .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
         response.setProperty(MessageContext.TRANSPORT_OUT,
-            smc.getProperty(MessageContext.TRANSPORT_OUT));
+            axisMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
         response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-            smc.getProperty(
+            axisMsgCtx.getProperty(
                 org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
 
         // If request is REST we assume the response is REST, so set the
         // variable
-        response.setDoingREST(smc.isDoingREST());
+        response.setDoingREST(axisMsgCtx.isDoingREST());
         response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
 
         if (ac.getService("__ANONYMOUS_SERVICE__")

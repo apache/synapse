@@ -20,7 +20,7 @@ import org.jaxen.Context;
 import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,13 +34,13 @@ public class GetPropertyFunction implements Function {
 
     private static final Log log = LogFactory.getLog(GetPropertyFunction.class);
 
-    private SynapseMessageContext synCtx = null;
+    private MessageContext synCtx = null;
 
-    public SynapseMessageContext getSynCtx() {
+    public MessageContext getSynCtx() {
         return synCtx;
     }
 
-    public void setSynCtx(SynapseMessageContext synCtx) {
+    public void setSynCtx(MessageContext synCtx) {
         this.synCtx = synCtx;
     }
 

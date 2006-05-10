@@ -27,7 +27,7 @@ import org.apache.axis2.AxisFault;
 import java.util.Map;
 import java.util.HashMap;
 
-public class TestSynapseMessageContext implements SynapseMessageContext {
+public class TestMessageContext implements MessageContext {
 
     private Map properties = new HashMap();
 
@@ -45,11 +45,11 @@ public class TestSynapseMessageContext implements SynapseMessageContext {
         this.synCfg = cfg;
     }
 
-    public SynapseEnvironment getSynapseEnvironment() {
+    public SynapseEnvironment getEnvironment() {
         return null;
     }
 
-    public void setSynapseEnvironment(SynapseEnvironment se) {
+    public void setEnvironment(SynapseEnvironment se) {
     }
 
     public Object getProperty(String key) {
@@ -175,10 +175,10 @@ public class TestSynapseMessageContext implements SynapseMessageContext {
         return false;
     }
 
-    public SynapseMessageContext getSynapseContext() {
+    public MessageContext getSynapseContext() {
         return null;
     }
 
-    public void setSynapseContext(SynapseMessageContext env) {
+    public void setSynapseContext(MessageContext env) {
     }
 }

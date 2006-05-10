@@ -40,7 +40,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     public void send(SynapseMessageContext synCtx) {
-        if (synCtx.getSynapseMessage().isResponse())
+        if (synCtx.isResponse())
             Axis2Sender.sendBack(synCtx);
         else
             Axis2Sender.sendOn(synCtx);

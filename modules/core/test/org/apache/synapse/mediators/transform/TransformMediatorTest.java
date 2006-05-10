@@ -60,7 +60,7 @@ public class TransformMediatorTest extends TestCase {
         transformMediator.mediate(synCtx);
 
         // validate result
-        OMContainer body = synCtx.getSynapseMessage().getEnvelope().getBody();
+        OMContainer body = synCtx.getEnvelope().getBody();
         if (body.getFirstOMChild() instanceof OMElement) {
 
             OMElement getQuoteElem = (OMElement) body.getFirstOMChild();
@@ -95,7 +95,7 @@ public class TransformMediatorTest extends TestCase {
         transformMediator.mediate(synCtx);
 
         // validate result
-        OMContainer body = synCtx.getSynapseMessage().getEnvelope().getBody();
+        OMContainer body = synCtx.getEnvelope().getBody();
         if (body.getFirstOMChild() instanceof OMElement) {
 
             OMElement getQuoteElem = (OMElement) body.getFirstOMChild();
@@ -131,7 +131,7 @@ public class TransformMediatorTest extends TestCase {
         transformMediator.mediate(synCtx);
 
         // validate result
-        OMContainer body = synCtx.getSynapseMessage().getEnvelope().getBody();
+        OMContainer body = synCtx.getEnvelope().getBody();
         if (body.getFirstOMChild() instanceof OMElement) {
 
             OMElement someOtherElem = (OMElement) body.getFirstOMChild();

@@ -17,7 +17,6 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.soap.SOAPHeader;
-import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -82,28 +81,26 @@ public class LogMediator extends AbstractMediator {
     }
 
     private String getSimpleLogMessage(SynapseMessageContext synCtx) {
-        SynapseMessage synMsg = synCtx.getSynapseMessage();
         StringBuffer sb = new StringBuffer();
-        if (synMsg.getTo() != null)
-            sb.append("To: " + synMsg.getTo().getAddress());
-        if (synMsg.getFrom() != null)
-            sb.append(SEP + "From: " + synMsg.getFrom().getAddress());
-        if (synMsg.getWSAAction() != null)
-            sb.append(SEP + "WSAction: " + synMsg.getWSAAction());
-        if (synMsg.getSoapAction() != null)
-            sb.append(SEP + "SOAPAction: " + synMsg.getSoapAction());
-        if (synMsg.getReplyTo() != null)
-            sb.append(SEP + "ReplyTo: " + synMsg.getReplyTo().getAddress());
-        if (synMsg.getMessageID() != null)
-            sb.append(SEP + "MessageID: " + synMsg.getMessageID());
+        if (synCtx.getTo() != null)
+            sb.append("To: " + synCtx.getTo().getAddress());
+        if (synCtx.getFrom() != null)
+            sb.append(SEP + "From: " + synCtx.getFrom().getAddress());
+        if (synCtx.getWSAAction() != null)
+            sb.append(SEP + "WSAction: " + synCtx.getWSAAction());
+        if (synCtx.getSoapAction() != null)
+            sb.append(SEP + "SOAPAction: " + synCtx.getSoapAction());
+        if (synCtx.getReplyTo() != null)
+            sb.append(SEP + "ReplyTo: " + synCtx.getReplyTo().getAddress());
+        if (synCtx.getMessageID() != null)
+            sb.append(SEP + "MessageID: " + synCtx.getMessageID());
         setCustomProperties(sb, synCtx);
         return sb.toString();
     }
 
     private String getHeadersLogMessage(SynapseMessageContext synCtx) {
-        SynapseMessage synMsg = synCtx.getSynapseMessage();
         StringBuffer sb = new StringBuffer();
-        Iterator iter = synMsg.getEnvelope().getHeader().examineAllHeaderBlocks();
+        Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
         while (iter.hasNext()) {
             SOAPHeader header = (SOAPHeader) iter.next();
             sb.append(SEP + header.getLocalName() + " : " + header.getText());
@@ -113,11 +110,10 @@ public class LogMediator extends AbstractMediator {
     }
 
     private String getFullLogMessage(SynapseMessageContext synCtx) {
-        SynapseMessage synMsg = synCtx.getSynapseMessage();
         StringBuffer sb = new StringBuffer();
         sb.append(getSimpleLogMessage(synCtx));
-        if (synMsg.getEnvelope() != null)
-            sb.append(SEP + "Envelope: " + synMsg.getEnvelope());
+        if (synCtx.getEnvelope() != null)
+            sb.append(SEP + "Envelope: " + synCtx.getEnvelope());
         setCustomProperties(sb, synCtx);
         return sb.toString();
     }

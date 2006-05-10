@@ -9,7 +9,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.SynapseMessage;
 import org.apache.synapse.SynapseMessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
@@ -53,7 +52,7 @@ public class TransformMediator extends AbstractMediator {
         log.debug(getType() + " mediate()");
 
         if (xsltUrl != null) {
-            performXLST(synCtx.getSynapseMessage());
+            performXLST(synCtx);
             return true;
 
         } else if (xQueryUrl != null) {
@@ -67,7 +66,7 @@ public class TransformMediator extends AbstractMediator {
         }
     }
 
-    private void performXLST(SynapseMessage synMsg) {
+    private void performXLST(SynapseMessageContext synCtx) {
         try {
             // create a transformer
             Transformer transformer = TransformerFactory.newInstance().newTransformer(
@@ -77,7 +76,7 @@ public class TransformMediator extends AbstractMediator {
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
             XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
-            OMNode sourceNode = getTransformSource(synMsg);
+            OMNode sourceNode = getTransformSource(synCtx);
             sourceNode.serialize(xsWriterForSource);
             Source transformSrc = new StreamSource(new ByteArrayInputStream(baosForSource.toByteArray()));
 
@@ -112,18 +111,18 @@ public class TransformMediator extends AbstractMediator {
         }
     }
 
-    private OMNode getTransformSource(SynapseMessage synMsg) {
+    private OMNode getTransformSource(SynapseMessageContext synCtx) {
 
         if (source == null) {
             try {
                 source = new AXIOMXPath("//SOAP-ENV:Body");
-                source.addNamespace("SOAP-ENV", synMsg.isSOAP11() ?
+                source.addNamespace("SOAP-ENV", synCtx.isSOAP11() ?
                     SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI : SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             } catch (JaxenException e) {}
         }
 
         try {
-            Object o = source.evaluate(synMsg.getEnvelope());;
+            Object o = source.evaluate(synCtx.getEnvelope());;
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {

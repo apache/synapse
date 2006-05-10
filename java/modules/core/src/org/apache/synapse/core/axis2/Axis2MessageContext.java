@@ -15,11 +15,10 @@
 */
 package org.apache.synapse.core.axis2;
 
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.AxisFault;
@@ -28,14 +27,14 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import java.util.Map;
 import java.util.HashMap;
 
-public class Axis2SynapseMessageContext implements SynapseMessageContext {
+public class Axis2MessageContext implements MessageContext {
 
     private SynapseConfiguration cfg = null;
     private SynapseEnvironment   env = null;
     private Map properties = new HashMap();
 
     /** The Axis2 MessageContext reference */
-    private MessageContext mc = null;
+    private org.apache.axis2.context.MessageContext axis2MessageContext = null;
 
     private boolean response = false;
 
@@ -49,11 +48,11 @@ public class Axis2SynapseMessageContext implements SynapseMessageContext {
         this.cfg = cfg;
     }
 
-    public SynapseEnvironment getSynapseEnvironment() {
+    public SynapseEnvironment getEnvironment() {
         return env;
     }
 
-    public void setSynapseEnvironment(SynapseEnvironment env) {
+    public void setEnvironment(SynapseEnvironment env) {
         this.env = env;
     }
 
@@ -73,113 +72,116 @@ public class Axis2SynapseMessageContext implements SynapseMessageContext {
     }
 
     //--------------------
-    public Axis2SynapseMessageContext(MessageContext mc) {
-        setMessageContext(mc);
+    public Axis2MessageContext(org.apache.axis2.context.MessageContext axisMsgCtx,
+                               SynapseConfiguration synCfg, SynapseEnvironment synEnv) {
+        setAxis2MessageContext(axisMsgCtx);
+        cfg = synCfg;
+        env = synEnv;
     }
 
     public EndpointReference getFaultTo() {
-        return mc.getFaultTo();
+        return axis2MessageContext.getFaultTo();
     }
 
     public void setFaultTo(EndpointReference reference) {
-        mc.setFaultTo(reference);
+        axis2MessageContext.setFaultTo(reference);
     }
 
     public EndpointReference getFrom() {
-        return mc.getFrom();
+        return axis2MessageContext.getFrom();
     }
 
     public void setFrom(EndpointReference reference) {
-        mc.setFrom(reference);
+        axis2MessageContext.setFrom(reference);
     }
 
     public SOAPEnvelope getEnvelope() {
-        return mc.getEnvelope();
+        return axis2MessageContext.getEnvelope();
     }
 
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {
-        mc.setEnvelope(envelope);
+        axis2MessageContext.setEnvelope(envelope);
     }
 
     public String getMessageID() {
-        return mc.getMessageID();
+        return axis2MessageContext.getMessageID();
     }
 
     public void setMessageID(String string) {
-        mc.setMessageID(string);
+        axis2MessageContext.setMessageID(string);
     }
 
     public RelatesTo getRelatesTo() {
-        return mc.getRelatesTo();
+        return axis2MessageContext.getRelatesTo();
     }
 
     public void setRelatesTo(RelatesTo[] reference) {
-        mc.setRelationships(reference);
+        axis2MessageContext.setRelationships(reference);
     }
 
     public EndpointReference getReplyTo() {
-        return mc.getReplyTo();
+        return axis2MessageContext.getReplyTo();
     }
 
     public void setReplyTo(EndpointReference reference) {
-        mc.setReplyTo(reference);
+        axis2MessageContext.setReplyTo(reference);
     }
 
     public EndpointReference getTo() {
-        return mc.getTo();
+        return axis2MessageContext.getTo();
     }
 
     public void setTo(EndpointReference reference) {
-        mc.setTo(reference);
+        axis2MessageContext.setTo(reference);
     }
 
     public void setWSAAction(String actionURI) {
-        mc.setWSAAction(actionURI);
+        axis2MessageContext.setWSAAction(actionURI);
     }
 
     public String getWSAAction() {
-        return mc.getWSAAction();
+        return axis2MessageContext.getWSAAction();
     }
 
     public void setMessageId(String messageID) {
-        mc.setWSAMessageId(messageID);
+        axis2MessageContext.setWSAMessageId(messageID);
     }
 
     public String getMessageId() {
-        return mc.getMessageID();
+        return axis2MessageContext.getMessageID();
     }
 
     public String getSoapAction() {
-        return mc.getSoapAction();
+        return axis2MessageContext.getSoapAction();
     }
 
     public void setSoapAction(String string) {
-        mc.setSoapAction(string);
+        axis2MessageContext.setSoapAction(string);
     }
 
     public boolean isDoingMTOM() {
-        return mc.isDoingMTOM();
+        return axis2MessageContext.isDoingMTOM();
     }
 
     public void setDoingMTOM(boolean b) {
-        mc.setDoingMTOM(b);
+        axis2MessageContext.setDoingMTOM(b);
     }
 
     public boolean isDoingREST() {
-        return mc.isDoingREST();
+        return axis2MessageContext.isDoingREST();
     }
 
     public void setDoingREST(boolean b) {
-        mc.setDoingREST(b);
+        axis2MessageContext.setDoingREST(b);
     }
 
     public boolean isSOAP11() {
-        return mc.isSOAP11();
+        return axis2MessageContext.isSOAP11();
     }
 
     public void setResponse(boolean b) {
         response = b;
-        mc.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
+        axis2MessageContext.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
     }
 
     public boolean isResponse() {
@@ -194,13 +196,13 @@ public class Axis2SynapseMessageContext implements SynapseMessageContext {
         return this.faultResponse;
     }
 
-    public MessageContext getMessageContext() {
-        return mc;
+    public org.apache.axis2.context.MessageContext getAxis2MessageContext() {
+        return axis2MessageContext;
     }
 
-    public void setMessageContext(MessageContext mc) {
-        this.mc = mc;
-        Boolean resp = (Boolean) mc.getProperty(Constants.ISRESPONSE_PROPERTY);
+    public void setAxis2MessageContext(org.apache.axis2.context.MessageContext axisMsgCtx) {
+        this.axis2MessageContext = axisMsgCtx;
+        Boolean resp = (Boolean) axisMsgCtx.getProperty(Constants.ISRESPONSE_PROPERTY);
         if (resp != null)
             response = resp.booleanValue();
     }

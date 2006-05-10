@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.HeaderType;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -32,7 +32,7 @@ public class HeaderMediatorTest extends TestCase {
         headerMediator.setValue(TEST_HEADER);
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         headerMediator.mediate(synCtx);
 
         assertTrue(TEST_HEADER.equals(synCtx.getTo().getAddress()));
@@ -51,7 +51,7 @@ public class HeaderMediatorTest extends TestCase {
         headerMediator.setExpression(new AXIOMXPath("concat('http://','server','/path')"));
 
         // invoke transformation, with static enveope
-        SynapseMessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         headerMediator.mediate(synCtx);
 
         assertTrue(TEST_HEADER.equals(synCtx.getTo().getAddress()));

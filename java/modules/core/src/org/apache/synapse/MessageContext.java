@@ -31,7 +31,7 @@ import org.apache.axis2.addressing.RelatesTo;
  * SynapseConfiguration. Additionally it holds per message properties (i.e. local
  * properties valid for the lifetime of the message), and the current SOAPEnvelope
  */
-public interface SynapseMessageContext {
+public interface MessageContext {
 
     /**
      * Get a reference to the current SynapseConfiguration
@@ -52,13 +52,13 @@ public interface SynapseMessageContext {
      * Returns a reference to the host Synapse Environment
      * @return the Synapse Environment
      */
-    public SynapseEnvironment getSynapseEnvironment();
+    public SynapseEnvironment getEnvironment();
 
     /**
      * Sets the SynapseEnvironment reference to this context
      * @param se the reference to the Synapse Environment
      */
-    public void setSynapseEnvironment(SynapseEnvironment se);
+    public void setEnvironment(SynapseEnvironment se);
 
     /**
      * Get the value of a custom (local) property set on the message instance
@@ -88,28 +88,46 @@ public interface SynapseMessageContext {
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;
 
     // --- SOAP Message related methods ------
+    /** Get the faultTo EPR if available */
     public EndpointReference getFaultTo();
 
+    /** Set the faultTo EPR */
     public void setFaultTo(EndpointReference reference);
 
+    /** Get the from EPR if available */
     public EndpointReference getFrom();
 
+    /** Set the from EPR */
     public void setFrom(EndpointReference reference);
 
+    /** Get the message id if available */
     public String getMessageID();
 
+    /** Set the message id */
     public void setMessageID(String string);
 
+    /** Get the relatesTo of this message */
     public RelatesTo getRelatesTo();
 
+    /**
+     * Sets the relatesTo references for this message
+     * @param reference the relatesTo references array
+     */
     public void setRelatesTo(RelatesTo[] reference);
 
+    /** Set the replyTo EPR */
     public EndpointReference getReplyTo();
 
+    /** Get the replyTo EPR if available */
     public void setReplyTo(EndpointReference reference);
 
+    /** Get the To EPR */
     public EndpointReference getTo();
 
+     /**
+     * Set the To EPR
+     * @param reference the To EPR
+     */
     public void setTo(EndpointReference reference);
 
     /**
@@ -180,7 +198,7 @@ public interface SynapseMessageContext {
 
     /**
      * Mark this message as a response or not.
-     * @see org.apache.synapse.SynapseMessageContext#isResponse()
+     * @see org.apache.synapse.MessageContext#isResponse()
      * @param b true to set this as a response
      */
     public void setResponse(boolean b);
@@ -193,7 +211,7 @@ public interface SynapseMessageContext {
 
     /**
      * Marks this message as a fault response
-     * @see org.apache.synapse.SynapseMessageContext#isFaultResponse()
+     * @see org.apache.synapse.MessageContext#isFaultResponse()
      * @param b true to mark this as a fault response
      */
     public void setFaultResponse(boolean b);

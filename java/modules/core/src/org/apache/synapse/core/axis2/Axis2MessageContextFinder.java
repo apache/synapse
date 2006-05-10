@@ -17,13 +17,12 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.config.xml.SynapseConfigurationBuilder;
@@ -33,22 +32,22 @@ import java.io.InputStream;
 
 /**
  * <p/>
- * The SynapseMessageContext needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
+ * The MessageContext needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
  * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
  */
-public class Axis2SynapseContextFinder implements Constants {
+public class Axis2MessageContextFinder implements Constants {
 
-    private static Log log = LogFactory.getLog(Axis2SynapseContextFinder.class);
+    private static Log log = LogFactory.getLog(Axis2MessageContextFinder.class);
 
-    public static synchronized SynapseMessageContext getSynapseContext(MessageContext mc) {
+    public static synchronized MessageContext getSynapseMessageContext(org.apache.axis2.context.MessageContext axisMsgCtx) {
 
-        SynapseConfiguration synCfg = getSynapseConfig(mc);
-        SynapseEnvironment   synEnv = getSynapseEnvironment(mc);
+        SynapseConfiguration synCfg = getSynapseConfig(axisMsgCtx);
+        SynapseEnvironment   synEnv = getSynapseEnvironment(axisMsgCtx);
 
         if (synCfg == null || synEnv == null) {
-            initializeSynapse(mc);
-            synCfg = getSynapseConfig(mc);
-            synEnv = getSynapseEnvironment(mc);
+            initializeSynapse(axisMsgCtx);
+            synCfg = getSynapseConfig(axisMsgCtx);
+            synEnv = getSynapseEnvironment(axisMsgCtx);
         }
 
         if (synCfg == null || synEnv == null) {
@@ -57,9 +56,7 @@ public class Axis2SynapseContextFinder implements Constants {
             throw new SynapseException(msg);
         }
 
-        SynapseMessageContext synCtx = new Axis2SynapseMessageContext(mc);
-        synCtx.setSynapseEnvironment(synEnv);
-        synCtx.setConfiguration(synCfg);
+        MessageContext synCtx = new Axis2MessageContext(axisMsgCtx, synCfg, synEnv);
         return synCtx;
     }
 
@@ -68,7 +65,7 @@ public class Axis2SynapseContextFinder implements Constants {
      * for reuse
      * @param mc the current Axis2 message context
      */
-    private static synchronized void initializeSynapse(MessageContext mc) {
+    private static synchronized void initializeSynapse(org.apache.axis2.context.MessageContext mc) {
 
         if (getSynapseConfig(mc) != null && getSynapseEnvironment(mc) != null) {
             // is this a second thread which came in just after initialization?
@@ -105,7 +102,7 @@ public class Axis2SynapseContextFinder implements Constants {
         }
     }
 
-    private static SynapseConfiguration getSynapseConfig(MessageContext mc) {
+    private static SynapseConfiguration getSynapseConfig(org.apache.axis2.context.MessageContext mc) {
         AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
         Parameter synConfigParam = ac.getParameter(SYNAPSE_CONFIG);
         if (synConfigParam != null) {
@@ -114,7 +111,7 @@ public class Axis2SynapseContextFinder implements Constants {
         return null;
     }
 
-    private static SynapseEnvironment getSynapseEnvironment(MessageContext mc) {
+    private static SynapseEnvironment getSynapseEnvironment(org.apache.axis2.context.MessageContext mc) {
         AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
         Parameter synEnvParam = ac.getParameter(SYNAPSE_ENV);
         if (synEnvParam != null) {

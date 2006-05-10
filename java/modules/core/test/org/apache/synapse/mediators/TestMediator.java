@@ -16,7 +16,7 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 
 /**
  * Test mediator class.
@@ -28,7 +28,7 @@ public class TestMediator implements Mediator {
     public TestMediator() {
     }
 
-    public boolean mediate(SynapseMessageContext synCtx) {
+    public boolean mediate(MessageContext synCtx) {
         if (handlerTest != null) {
             handlerTest.handle(synCtx);
         }

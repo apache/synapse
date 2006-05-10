@@ -17,7 +17,7 @@ package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.SynapseMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
@@ -51,7 +51,7 @@ public class ValidateMediatorTest extends TestCase {
         testMediator = new TestMediator();
         testMediator.setHandler(
             new TestMediateHandler() {
-                public void handle(SynapseMessageContext synCtx) {
+                public void handle(MessageContext synCtx) {
                     setOnFailInvoked(true);
                 }
             });

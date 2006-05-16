@@ -26,8 +26,12 @@ import java.net.URL;
  */
 public class Endpoint {
 
+    /** The name of this endpoint instance */
     private String name = null;
+    /** The simple address this endpoint resolves to - if explicitly specified */
     private URL address = null;
+    /** The name of the actual endpoint to which this instance refers to */
+    private String ref = null;
 
     /**
      * Return the name of the endpoint
@@ -59,5 +63,21 @@ public class Endpoint {
      */
     public void setAddress(URL address) {
         this.address = address;
+    }
+
+    /**
+     * Get the name of the Endpoint to which this instance refers to
+     * @return the name of the referenced endpoint
+     */
+    public String getRef() {
+        return ref;
+    }
+
+    /**
+     * Set the name of an Endpoint as the referenced endpoint of this instance
+     * @param ref the name of the Endpoint referenced
+     */
+    public void setRef(String ref) {
+        this.ref = ref;
     }
 }

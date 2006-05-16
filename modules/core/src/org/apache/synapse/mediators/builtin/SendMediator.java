@@ -17,20 +17,31 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axis2.addressing.EndpointReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Send mediator sends the message using the following semantics.
  * <p/>
  * This is a leaf mediator (i.e. further processing halts after this mediator completes)
  * <p/>
- * TODO support endpoints, loadbalancing and failover
+ * TODO support loadbalancing and failover
  */
 public class SendMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SendMediator.class);
+
+    /** The list of endpoints to which the message should be sent to. If none
+     * are specified, the message is sent where its implicitly stated in the
+     * current message */
+    private List endpoints = new ArrayList();
+
     /**
      * This is a leaf mediator. i.e. processing stops once send is invoked,
      * as it always returns false
@@ -40,10 +51,55 @@ public class SendMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug(getType() + " mediate()");
-        log.debug("Sending To: " + (synCtx.getTo() != null ?
-            synCtx.getTo().getAddress() : "null"));
-        log.debug("Body : \n" + synCtx.getEnvelope());
-        synCtx.getEnvironment().send(synCtx);
+
+        // TODO this may be really strange but true.. unless you call the below, sometimes it
+        // results in an unbound URI exception for no credible reason - needs more investigation
+        // seems like a woodstox issue. Use hack for now
+        synCtx.getEnvelope().build();
+
+        // if no endpoints are defined, send where implicitly stated
+        if (endpoints.isEmpty()) {
+            log.debug("Sending To: " + (synCtx.getTo() != null ?
+                synCtx.getTo().getAddress() : "null"));
+            log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                synCtx.getWSAAction() : "null"));
+            log.debug("Body : \n" + synCtx.getEnvelope());
+            synCtx.getEnvironment().send(synCtx);
+
+        } else if (endpoints.size() == 1) {
+            Endpoint singleEndpoint = (Endpoint) endpoints.get(0);
+            String eprAddress = null;
+            if (singleEndpoint.getAddress() != null) {
+                eprAddress = singleEndpoint.getAddress().toString();
+            } else {
+                singleEndpoint = synCtx.getConfiguration().getNamedEndpoint(
+                    singleEndpoint.getRef());
+                eprAddress = singleEndpoint.getAddress().toString();
+            }
+
+            synCtx.setTo(new EndpointReference(eprAddress));
+            log.debug("Sending To: " + (synCtx.getTo() != null ?
+                synCtx.getTo().getAddress() : "null"));
+            log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                synCtx.getWSAAction() : "null"));
+            log.debug("Body : \n" + synCtx.getEnvelope());
+
+            synCtx.getEnvironment().send(synCtx);
+
+        } else {
+            String msg = "The send mediator currently supports only one endpoint";
+            log.error(msg);
+            throw new UnsupportedOperationException(msg);
+        }
         return false;
+    }
+
+    /**
+     * Add the given Endpoint as an endpoint for this Send mediator instance
+     * @param e the Endpoint to be added
+     * @return true if the endpoint list was updated
+     */
+    public boolean addEndpoint(Endpoint e) {
+        return endpoints.add(e);
     }
 }

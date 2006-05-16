@@ -18,6 +18,8 @@ package org.apache.synapse;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.synapse.mediators.GetPropertyFunction;
@@ -87,6 +89,48 @@ public class Util {
         } catch (JaxenException je) {
             String msg = "Evaluation of the XPath expression " + xpath.toString() + " resulted in an error";
             log.error(msg, je);
+            throw new SynapseException(msg, je);
+        }
+    }
+
+    /**
+     * Return the namespace with the given prefix, using the given element
+     * @param prefix the prefix looked up
+     * @param elem the source element to use
+     * @return the namespace which maps to the prefix or null
+     */
+    public static String getNameSpaceWithPrefix(String prefix, OMElement elem) {
+        if (prefix == null || elem == null) {
+            log.warn("Searching for null NS prefix and/or using null OMElement");
+            return null;
+        }
+
+        Iterator iter = elem.getAllDeclaredNamespaces();
+        while (iter.hasNext()) {
+            OMNamespace ns = (OMNamespace) iter.next();
+            if (prefix.equals(ns.getPrefix())) {
+                return ns.getName();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add xmlns NS declarations of element 'elem' into XPath expression
+     * @param xpath
+     * @param elem
+     * @param log
+     */
+    public static void addNameSpaces(AXIOMXPath xpath, OMElement elem, Log log) {
+        try {
+            Iterator it = elem.getAllDeclaredNamespaces();
+            while (it.hasNext()) {
+                OMNamespace n = (OMNamespace) it.next();
+                xpath.addNamespace(n.getPrefix(), n.getName());
+            }
+        } catch (JaxenException je) {
+            String msg = "Error adding declared name spaces of " + elem + " to the XPath : " + xpath;
+            log.error(msg);
             throw new SynapseException(msg, je);
         }
     }

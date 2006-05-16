@@ -18,6 +18,7 @@ package org.apache.synapse.config.xml;
 import javax.xml.namespace.QName;
 
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.transform.HeaderMediator;
@@ -76,7 +77,9 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
 
         } else if (exprn != null && exprn.getAttributeValue() != null) {
             try {
-                headerMediator.setExpression(new AXIOMXPath(exprn.getAttributeValue()));
+                AXIOMXPath xp = new AXIOMXPath(exprn.getAttributeValue());
+                Util.addNameSpaces(xp, elem, log);
+                headerMediator.setExpression(xp);
             } catch (JaxenException je) {
                 String msg = "Invalid XPath expression : " + exprn.getAttributeValue();
                 log.error(msg);

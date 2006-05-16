@@ -23,6 +23,9 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 
+import java.util.Iterator;
+import java.util.Set;
+
 
 /**
  * The Synapse Message Context is available to all mediators through which it flows. It
@@ -73,6 +76,12 @@ public interface MessageContext {
      * @param value value to be saved
      */
     public void setProperty(String key, Object value);
+
+    /**
+     * Returns the Set of keys over the properties on this message context
+     * @return a Set of keys over message properties
+     */
+    public Set getPropertyKeySet();
 
     /**
      * Get the SOAP envelope of this message

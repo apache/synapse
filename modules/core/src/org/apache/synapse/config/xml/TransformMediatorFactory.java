@@ -19,6 +19,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.synapse.mediators.transform.TransformMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
@@ -79,14 +80,18 @@ public class TransformMediatorFactory extends AbstractMediatorFactory {
 
         if (attSource != null) {
             try {
-                transformMediator.setSource(new AXIOMXPath(attSource.getAttributeValue()));
+                AXIOMXPath xp = new AXIOMXPath(attSource.getAttributeValue());
+                Util.addNameSpaces(xp, elem, log);
+                transformMediator.setSource(xp);
+
             } catch (JaxenException e) {
                 String msg = "Invalid XPath specified for the source attribute : " + attSource.getAttributeValue();
                 log.error(msg);
                 throw new SynapseException(msg);
             }
-
         }
+
+        transformMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
 
         return transformMediator;
     }

@@ -21,6 +21,7 @@ import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -80,10 +81,24 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
             OMAttribute expression = code.getAttribute(ATT_EXPR_Q);
 
             if (value != null) {
-                faultMediator.setFaultCodeValue(QName.valueOf(value.getAttributeValue()));
+                String strValue = value.getAttributeValue();
+                String prefix, name;
+                if (strValue.indexOf(":") != -1) {
+                    prefix = strValue.substring(0, strValue.indexOf(":"));
+                    name = strValue.substring(strValue.indexOf(":")+1);
+                } else {
+                    String msg = "A QName is expected for fault code as prefix:name";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
+                faultMediator.setFaultCodeValue(
+                    new QName(Util.getNameSpaceWithPrefix(prefix, code), name));
+                
             } else if (expression != null) {
                 try {
-                    faultMediator.setFaultCodeExpr(new AXIOMXPath(expression.getAttributeValue()));
+                    AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
+                    Util.addNameSpaces(xp, code, log);
+                    faultMediator.setFaultCodeExpr(xp);
                 } catch (JaxenException je) {
                     String msg = "Invalid fault code expression : " + je.getMessage();
                     log.error(msg);
@@ -103,14 +118,17 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
 
         OMElement reason = elem.getFirstChildWithName(REASON_Q);
         if (reason != null) {
-            OMAttribute value = code.getAttribute(ATT_VALUE_Q);
-            OMAttribute expression = code.getAttribute(ATT_EXPR_Q);
+            OMAttribute value = reason.getAttribute(ATT_VALUE_Q);
+            OMAttribute expression = reason.getAttribute(ATT_EXPR_Q);
 
             if (value != null) {
                 faultMediator.setFaultReasonValue(value.getAttributeValue());
             } else if (expression != null) {
                 try {
-                    faultMediator.setFaultReasonExpr(new AXIOMXPath(expression.getAttributeValue()));
+                    AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
+                    Util.addNameSpaces(xp, reason, log);
+                    faultMediator.setFaultReasonExpr(xp);
+
                 } catch (JaxenException je) {
                     String msg = "Invalid fault reason expression : " + je.getMessage();
                     log.error(msg);

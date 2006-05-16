@@ -26,6 +26,8 @@ public interface Constants {
 
     String CLASSMEDIATOR = "classmediator";
 
+    String CORRELATE = "correlate/";
+
     QName MEDIATE_OPERATION_NAME = new QName("mediate");
 
     String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
@@ -42,6 +44,8 @@ public interface Constants {
     String SYNAPSE_CONFIG = "synapse.config";
 
     String SYNAPSE_ENV = "synapse.env";
+
+    String SYNAPSE_XML = "synapse.xml";
 
     String ADD_ADDRESSING = "synapse.send.useaddressing";
 

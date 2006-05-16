@@ -18,9 +18,14 @@ package org.apache.synapse.config.xml;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 import org.apache.synapse.mediators.filters.SwitchCaseMediator;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -48,6 +53,25 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         SwitchMediator switchMediator = new SwitchMediator();
+
+        OMAttribute source = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
+        if (source == null) {
+            String msg = "A 'source' XPath attribute is required for a switch mediator";
+            log.error(msg);
+            throw new SynapseException(msg);
+        } else {
+            try {
+                AXIOMXPath sourceXPath = new AXIOMXPath(source.getAttributeValue());
+                Util.addNameSpaces(sourceXPath, elem, log);
+                switchMediator.setSource(sourceXPath);
+
+            } catch (JaxenException e) {
+                String msg = "Invalid XPath for attribute 'source' : " + source.getAttributeValue();
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+        }
+
         Iterator iter = elem.getChildrenWithName(CASE_Q);
         while (iter.hasNext()) {
             switchMediator.addCase((SwitchCaseMediator)

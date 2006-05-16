@@ -60,13 +60,14 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
         // Set the high level set of properties to be logged (i.e. log level)
         OMAttribute level = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "level"));
         if (level != null) {
-            if (SIMPLE.equals(level)) {
+            String levelstr = level.getAttributeValue();
+            if (SIMPLE.equals(levelstr)) {
                 logMediator.setLogLevel(LogMediator.SIMPLE);
-            } else if (HEADERS.equals(level)) {
+            } else if (HEADERS.equals(levelstr)) {
                 logMediator.setLogLevel(LogMediator.HEADERS);
-            } else if (FULL.equals(level)) {
+            } else if (FULL.equals(levelstr)) {
                 logMediator.setLogLevel(LogMediator.FULL);
-            } else if (CUSTOM.equals(level)) {
+            } else if (CUSTOM.equals(levelstr)) {
                 logMediator.setLogLevel(LogMediator.CUSTOM);
             }
         }

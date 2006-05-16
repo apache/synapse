@@ -84,6 +84,8 @@ public class LogMediator extends AbstractMediator {
         StringBuffer sb = new StringBuffer();
         if (synCtx.getTo() != null)
             sb.append("To: " + synCtx.getTo().getAddress());
+        else
+            sb.append("To: ");
         if (synCtx.getFrom() != null)
             sb.append(SEP + "From: " + synCtx.getFrom().getAddress());
         if (synCtx.getWSAAction() != null)

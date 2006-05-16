@@ -18,6 +18,7 @@ package org.apache.synapse.config.xml;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -60,7 +61,10 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
             propMediator.setValue(value.getAttributeValue());
         } else {
             try {
-                propMediator.setExpression(new AXIOMXPath(expression.getAttributeValue()));
+                AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
+                Util.addNameSpaces(xp, elem, log);
+                propMediator.setExpression(xp);
+
             } catch (JaxenException e) {
                 String msg = "Invalid XPath expression for attribute 'expression' : " + expression.getAttributeValue();
                 log.error(msg);

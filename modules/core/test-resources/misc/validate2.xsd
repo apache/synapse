@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m1="http://www.apache-synapse.org/test" xmlns:m2="http://www.apache-synapse.org/test2" targetNamespace="http://www.apache-synapse.org/test2" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.apache-synapse.org/test" schemaLocation="validate.xsd"/>
+	
+	<xs:element name="CheckPriceRequest2">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Code2" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="Outer">
+		<xs:complexType>
+			<xs:sequence>				
+				<xs:element ref="m1:CheckPriceRequest"/>
+				<xs:element ref="m2:CheckPriceRequest2"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

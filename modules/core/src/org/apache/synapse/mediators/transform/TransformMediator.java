@@ -11,6 +11,7 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * The transform mediator performs an XSLT or XQuery transformation requested, using
@@ -41,6 +43,7 @@ public class TransformMediator extends AbstractMediator {
     private URL xsltUrl = null;
     private URL xQueryUrl = null;
     private AXIOMXPath source = null;
+    private List properties = new ArrayList();
 
     /**
      * Transforms this message (or its element specified as the source) using the
@@ -142,7 +145,7 @@ public class TransformMediator extends AbstractMediator {
 
     private void handleException(Exception e) {
         String msg = "Error performing XSLT/XQ transformation " + e.getMessage();
-        log.error(msg);
+        log.error(msg, e);
         throw new SynapseException(msg, e);
     }
 
@@ -168,6 +171,14 @@ public class TransformMediator extends AbstractMediator {
 
     public void setXQueryUrl(URL xQueryUrl) {
         this.xQueryUrl = xQueryUrl;
+    }
+
+    public void addProperty(MediatorProperty p) {
+        properties.add(p);
+    }
+
+    public void addAllProperties(List list) {
+        properties.addAll(list);
     }
 
 }

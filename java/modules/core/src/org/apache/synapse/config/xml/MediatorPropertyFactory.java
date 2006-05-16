@@ -20,6 +20,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaxen.JaxenException;
@@ -83,7 +84,9 @@ public class MediatorPropertyFactory {
 
                 } else {
                     try {
-                        prop.setExpression(new AXIOMXPath(attExpr.getAttributeValue()));
+                        AXIOMXPath xp = new AXIOMXPath(attExpr.getAttributeValue());
+                        Util.addNameSpaces(xp, propEle, log);
+                        prop.setExpression(xp);
 
                     } catch (JaxenException e) {
                         String msg = "Invalid XPapth expression : " + attExpr.getAttributeValue();

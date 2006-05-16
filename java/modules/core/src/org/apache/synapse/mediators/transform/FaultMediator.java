@@ -226,7 +226,7 @@ public class FaultMediator extends AbstractMediator {
 
         } else {
             if (
-                SOAP12Constants.SOAP_DEFAULT_NAMESPACE_PREFIX.equals(faultCodeValue.getNamespaceURI()) &&
+                SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(faultCodeValue.getNamespaceURI()) &&
 
                 (SOAP12Constants.FAULT_CODE_DATA_ENCODING_UNKNOWN.equals(faultCodeValue.getLocalPart()) ||
                 SOAP12Constants.FAULT_CODE_MUST_UNDERSTAND.equals(faultCodeValue.getLocalPart()) ||

@@ -24,6 +24,26 @@ import org.apache.synapse.mediators.TestUtils;
 
 public class ValidateMediatorTest extends TestCase {
 
+    private static final String VALID_ENVELOPE_TWO_SCHEMAS =
+            "<Outer xmlns=\"http://www.apache-synapse.org/test2\">" +
+            "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+            "<m0:Code>String</m0:Code>\n" +
+            "</m0:CheckPriceRequest>\n" +
+            "<m1:CheckPriceRequest2 xmlns:m1=\"http://www.apache-synapse.org/test2\">\n" +
+            "<m1:Code2>String</m1:Code2>\n" +
+            "</m1:CheckPriceRequest2>\n" +
+            "</Outer>";
+
+    private static final String INVALID_ENVELOPE_TWO_SCHEMAS =
+            "<Outer xmlns=\"http://www.apache-synapse.org/test2\">" +
+            "<m1:CheckPriceRequest2 xmlns:m1=\"http://www.apache-synapse.org/test2\">\n" +
+            "<m1:Code2>String</m1:Code2>\n" +
+            "</m1:CheckPriceRequest2>\n" +
+            "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+            "<m0:Code>String</m0:Code>\n" +
+            "</m0:CheckPriceRequest>\n" +
+            "</Outer>";
+
     private static final String VALID_ENVELOPE =
             "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
             "\t<m0:Code>String</m0:Code>\n" +
@@ -80,6 +100,48 @@ public class ValidateMediatorTest extends TestCase {
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE));
 
         assertTrue(!onFailInvoked);
+    }
+
+    public void testValidateMedaitorValidCaseTwoSchemas() throws Exception {
+        setOnFailInvoked(false);
+
+        // create a validate mediator
+        ValidateMediator validate = new ValidateMediator();
+
+        // set the schema url, source xpath and any name spaces
+        validate.setSchemaUrl("test-resources/misc/validate.xsd test-resources/misc/validate2.xsd");
+        AXIOMXPath source = new AXIOMXPath("//m0:Outer");
+        source.addNamespace("m0", "http://www.apache-synapse.org/test2");
+        validate.setSource(source);
+
+        // set dummy mediator to be called on fail
+        validate.addChild(testMediator);
+
+        // test validate mediator, with static enveope
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_TWO_SCHEMAS));
+
+        assertTrue(!onFailInvoked);
+    }
+
+    public void testValidateMedaitorInvalidCaseTwoSchemas() throws Exception {
+        setOnFailInvoked(false);
+
+        // create a validate mediator
+        ValidateMediator validate = new ValidateMediator();
+
+        // set the schema url, source xpath and any name spaces
+        validate.setSchemaUrl("test-resources/misc/validate.xsd test-resources/misc/validate2.xsd");
+        AXIOMXPath source = new AXIOMXPath("//m0:Outer");
+        source.addNamespace("m0", "http://www.apache-synapse.org/test2");
+        validate.setSource(source);
+
+        // set dummy mediator to be called on fail
+        validate.addChild(testMediator);
+
+        // test validate mediator, with static enveope
+        validate.mediate(TestUtils.getTestContext(INVALID_ENVELOPE_TWO_SCHEMAS));
+
+        assertTrue(onFailInvoked);
     }
 
     public void testValidateMedaitorInvalidCase() throws Exception {

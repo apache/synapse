@@ -26,6 +26,8 @@ import org.apache.axis2.AxisFault;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class TestMessageContext implements MessageContext {
 
@@ -65,6 +67,10 @@ public class TestMessageContext implements MessageContext {
 
     public void setProperty(String key, Object value) {
         properties.put(key, value);
+    }
+
+    public Set getPropertyKeySet() {
+        return properties.keySet();
     }
 
     //---------

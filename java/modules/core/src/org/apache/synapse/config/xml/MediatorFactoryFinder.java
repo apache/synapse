@@ -60,7 +60,9 @@ public class MediatorFactoryFinder {
         PropertyMediatorFactory.class,
         SwitchMediatorFactory.class,
         SwitchCaseMediatorFactory.class,
-        SwitchCaseDefaultMediatorFactory.class
+        SwitchCaseDefaultMediatorFactory.class,
+        InMediatorFactory.class,
+        OutMediatorFactory.class
       };
 
     private static MediatorFactoryFinder instance = null;

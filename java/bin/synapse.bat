@@ -24,12 +24,16 @@ if "%SYNAPSE_HOME%"=="" set SYNAPSE_HOME=%DEFAULT_SYNAPSE_HOME%
 set DEFAULT_SYNAPSE_HOME=
 
 set _USE_CLASSPATH=yes
+set _SYNAPSE_XML=
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
 rem of arguments (up to the command line limit, anyway).
+if ""%1""==""-sample"" goto synapseSample
+
 set SYNAPSE_CMD_LINE_ARGS=%1
 if ""%1""=="""" goto doneStart
 shift
+
 :setupArgs
 if ""%1""=="""" goto doneStart
 if ""%1""==""-noclasspath"" goto clearclasspath
@@ -45,6 +49,12 @@ goto setupArgs
 
 rem This label provides a place for the argument list loop to break out
 rem and for NT handling to skip to.
+
+:synapseSample
+shift
+set _SYNAPSE_XML=-Dsynapse.xml=%SYNAPSE_HOME%\synapse_repository\conf\sample\synapse_sample_%1.xml
+shift
+goto setupArgs
 
 :doneStart
 rem find SYNAPSE_HOME if it does not exist due to either an invalid value passed
@@ -74,7 +84,7 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :runSynapse
 @echo on
-"%_JAVACMD%" -Daxis2.xml=%SYNAPSE_HOME%\synapse_repository\conf\axis2.xml -Djava.ext.dirs=%SYNAPSE_HOME%\lib;%EXT_DIRS%;%SYNAPSE_HOME% -cp %SYNAPSE_HOME%\lib org.apache.axis2.transport.http.SimpleHTTPServer %SYNAPSE_CMD_LINE_ARGS%
+"%_JAVACMD%" %_SYNAPSE_XML% -Daxis2.xml=%SYNAPSE_HOME%\synapse_repository\conf\axis2.xml -Djava.ext.dirs=%SYNAPSE_HOME%\lib;%EXT_DIRS%;%SYNAPSE_HOME% -cp %SYNAPSE_HOME%\lib org.apache.axis2.transport.http.SimpleHTTPServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 
 :end

@@ -15,30 +15,37 @@
 */
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.AbstractListMediator;
+import org.jaxen.JaxenException;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.jaxen.JaxenException;
+import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
-import java.io.ByteArrayOutputStream;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * Validate a message or an element against a schema
@@ -47,16 +54,29 @@ public class ValidateMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(ValidateMediator.class);
 
+    /** A space or comma delimitered list of schemas to validate the source element against */
     private String schemaUrl = null;
+    /**
+     * An XPath expression to be evaluated against the message to find the element to be validated.
+     * If this is not specified, the validation will occur against the first child element of the SOAP body
+     */
     private AXIOMXPath source = null;
 
-    private static final String SCHEMA_LOCATION_NO_NS =
-        "http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation";
-    private static final String SCHEMA_LOCATION_NS =
-        "http://apache.org/xml/properties/schema/external-schemaLocation";
-    private static final String FULL_CHECKING = "http://apache.org/xml/features/validation/schema-full-checking";
-    private static final String SCHEMA_VALIDATION = "http://apache.org/xml/features/validation/schema";
-    private static final String VALIDATION = "http://xml.org/sax/features/validation";
+    /**
+     * Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking).
+     */
+    private static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking";
+
+    /**
+     * Honour all schema locations feature id (http://apache.org/xml/features/honour-all-schemaLocations).
+     */
+    private static final String HONOUR_ALL_SCHEMA_LOCATIONS_ID = "http://apache.org/xml/features/honour-all-schemaLocations";
+
+    /**
+     * Default schema language (http://www.w3.org/2001/XMLSchema).
+     */
+    private static final String DEFAULT_SCHEMA_LANGUAGE = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+
 
     public String getSchemaUrl() {
         return schemaUrl;
@@ -74,14 +94,22 @@ public class ValidateMediator extends AbstractListMediator {
         this.source = source;
     }
 
+    /**
+     * Return the node to be validated. If a source XPath is not specified, this will
+     * default to the first child of the SOAP body
+     * @param synCtx the message context
+     * @return the OMNode against which validation should be performed
+     */
     private OMNode getValidateSource(MessageContext synCtx) {
 
         if (source == null) {
             try {
-                source = new AXIOMXPath("//SOAP-ENV:Body");
+                source = new AXIOMXPath("//SOAP-ENV:Body/child::*");
                 source.addNamespace("SOAP-ENV", synCtx.isSOAP11() ?
                     SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI : SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-            } catch (JaxenException e) {}
+            } catch (JaxenException e) {
+                // this should not cause a runtime exception!
+            }
         }
 
         try {
@@ -106,22 +134,14 @@ public class ValidateMediator extends AbstractListMediator {
     public boolean mediate(MessageContext synCtx) {
 
         ByteArrayInputStream baisFromSource = null;
-        StringBuffer nsLocations = new StringBuffer();
 
         try {
             // create a byte array output stream and serialize the source node into it
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
             XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
-            // save the list of defined namespaces for validation against the schema
+            // serialize the validation target and get an input stream into it
             OMNode sourceNode = getValidateSource(synCtx);
-            if (sourceNode instanceof OMElement) {
-                Iterator iter = ((OMElement) sourceNode).getAllDeclaredNamespaces();
-                while (iter.hasNext()) {
-                    OMNamespace omNS = (OMNamespace) iter.next();
-                    nsLocations.append(omNS.getName() + " " + getSchemaUrl());
-                }
-            }
             sourceNode.serialize(xsWriterForSource);
             baisFromSource = new ByteArrayInputStream(baosForSource.toByteArray());
 
@@ -132,22 +152,48 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         try {
-            SAXParserFactory spFactory = SAXParserFactory.newInstance();
-            spFactory.setNamespaceAware(true);
-            spFactory.setValidating(true);
-            SAXParser parser = spFactory.newSAXParser();
+            // this is our custom validation handler
+            SynapseValidator handler = new SynapseValidator();
 
-            parser.setProperty(VALIDATION, Boolean.TRUE);
-            parser.setProperty(SCHEMA_VALIDATION, Boolean.TRUE);
-            parser.setProperty(FULL_CHECKING, Boolean.TRUE);
-            parser.setProperty(SCHEMA_LOCATION_NS, nsLocations.toString());
-            parser.setProperty(SCHEMA_LOCATION_NO_NS, getSchemaUrl());
+            // Create SchemaFactory and configure
+            SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
+            factory.setErrorHandler(handler);
+            factory.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, true);
+            factory.setFeature(HONOUR_ALL_SCHEMA_LOCATIONS_ID, true);
 
-            Validator handler = new Validator();
-            parser.parse(baisFromSource, handler);
+            // Build Schema from schemaUrl
+            Schema schema = null;
+            if (schemaUrl != null) {
+                StringTokenizer st = new StringTokenizer(schemaUrl, " ,");
+                int sourceCount = st.countTokens();
+
+                if (sourceCount == 0) {
+                    schema = factory.newSchema();
+                } else {
+                    StreamSource[] sources = new StreamSource[sourceCount];
+                    for (int j = 0; j < sourceCount; ++j) {
+                        sources[j] = new StreamSource(st.nextToken());
+                    }
+                    schema = factory.newSchema(sources);
+                }
+            } else {
+                schema = factory.newSchema();
+            }
+
+            // Setup validator and input source.
+            Validator validator = schema.newValidator();
+            validator.setErrorHandler(handler);
+            validator.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, true);
+            validator.setFeature(HONOUR_ALL_SCHEMA_LOCATIONS_ID, true);
+
+            XMLReader reader = XMLReaderFactory.createXMLReader();
+            SAXSource source = new SAXSource(reader, new InputSource(baisFromSource));
+            validator.validate(source);
 
             if (handler.isValidationError()) {
-                log.debug("Validation failed :" + handler.getSaxParseException().getMessage());
+                log.debug("Validation of element : " + source + " failed against : " + schemaUrl +
+                    " Message : " + handler.getSaxParseException().getMessage() + " Executing 'on-fail' sequence");
+                log.debug("Failed message envelope : " + synCtx.getEnvelope());
                 // super.mediate() invokes the "on-fail" sequence of mediators
                 return super.mediate(synCtx);
             }
@@ -165,7 +211,7 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * This class handles validation errors to be used for error reporting
      */
-    private class Validator extends DefaultHandler {
+    private class SynapseValidator extends DefaultHandler {
 
         private boolean validationError = false;
         private SAXParseException saxParseException = null;

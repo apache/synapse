@@ -22,14 +22,18 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.AbstractDispatcher;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
 /**
- * This sends every message to the SynapseMessageReceiver so that it can pass them to Synapse
+ * This is the Axis2 Dispatcher which is registered with the Axis2 engine. It dispatches
+ * each and every message received to the SynapseMessageReceiver for processing.
  */
 public class SynapseDispatcher extends AbstractDispatcher {
-    // FOR EVERY REQUEST - ALWAYS DISPATH TO THE SYNAPSE SERVICE
+
+    private static final Log log = LogFactory.getLog(SynapseDispatcher.class);
 
     private static final long serialVersionUID = -6970206989111592645L;
 
@@ -41,7 +45,6 @@ public class SynapseDispatcher extends AbstractDispatcher {
         QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");
         HandlerDescription hd = new HandlerDescription(qn);
         super.init(hd);
-
     }
 
     public AxisService findService(MessageContext mc) throws AxisFault {
@@ -50,11 +53,8 @@ public class SynapseDispatcher extends AbstractDispatcher {
         return as;
     }
 
-    public AxisOperation findOperation(AxisService svc, MessageContext mc)
-        throws AxisFault {
-
+    public AxisOperation findOperation(AxisService svc, MessageContext mc) throws AxisFault {
         AxisOperation ao = svc.getOperation(MEDIATE_OPERATION_NAME);
         return ao;
     }
-
 }

@@ -18,38 +18,39 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+
+import java.util.Set;
+import java.util.Iterator;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
  */
 public class Axis2Sender {
 
-    public static void sendOn(org.apache.synapse.MessageContext synapseMessageContext) {
+    public static void sendOn(org.apache.synapse.MessageContext synapseInMessageContext) {
 
         try {
-            MessageContext axis2MessageContext = ((Axis2MessageContext) synapseMessageContext).getAxis2MessageContext();
+            MessageContext axis2MessageContext = ((Axis2MessageContext) synapseInMessageContext).getAxis2MessageContext();
             // At any time any QOS is disengaged. It's engaged iff, a flag is
             // set in execution chain. ex: addressing will be engage in outpath iff ADDRESSING_PROCESSED is set.
 
-            if (synapseMessageContext.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) {
+            if (synapseInMessageContext.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) {
                 axis2MessageContext.setProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE, Boolean.TRUE);
             }
 
             //Now handle the outbound message with addressing
-            if (synapseMessageContext.getProperty(Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null) {
+            if (synapseInMessageContext.getProperty(Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null) {
                 axis2MessageContext.setProperty(Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE, Boolean.TRUE);
             }
 
             MessageContext axisOutMsgContext = Axis2FlexibleMEPClient.send(axis2MessageContext);
 
             // run all rules on response
-            synapseMessageContext.setResponse(true);
+            synapseInMessageContext.setResponse(true);
             axisOutMsgContext.setServerSide(true);
-
             axisOutMsgContext.setProperty(
                 MessageContext.TRANSPORT_OUT,
                 axis2MessageContext.getProperty(MessageContext.TRANSPORT_OUT));
@@ -57,11 +58,29 @@ public class Axis2Sender {
             axisOutMsgContext.setTransportIn(
                 axis2MessageContext.getTransportIn());
 
-            synapseMessageContext.getEnvironment().injectMessage(
+            // create the synapse message context for the response
+            org.apache.synapse.MessageContext synapseOutMessageContext =
                 new Axis2MessageContext(
                     axisOutMsgContext,
-                    synapseMessageContext.getConfiguration(),
-                    synapseMessageContext.getEnvironment()));
+                    synapseInMessageContext.getConfiguration(),
+                    synapseInMessageContext.getEnvironment());
+
+            // now set properties to co-relate to the request i.e. copy over
+            // correlate/* messgae properties from original message to response received
+            Iterator iter = synapseInMessageContext.getPropertyKeySet().iterator();
+            while (iter.hasNext()) {
+                Object key = iter.next();
+                if (key instanceof String && ((String)key).startsWith(Constants.CORRELATE)) {
+                    synapseOutMessageContext.setProperty(
+                        (String) key,
+                        synapseInMessageContext.getProperty((String) key)
+                    );
+                }
+            }
+
+
+            // send the response message through the synapse mediation flow
+            synapseInMessageContext.getEnvironment().injectMessage(synapseOutMessageContext);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -17,6 +17,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.apache.synapse.mediators.filters.FilterMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
@@ -67,7 +68,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
-            addNameSpaces(elem, filter.getXpath(), log);
+            Util.addNameSpaces(filter.getXpath(), elem, log);
 
         } else if (attSource != null && attRegex != null) {
 
@@ -94,7 +95,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                     throw new SynapseException(msg);
                 }
             }
-            addNameSpaces(elem, filter.getSource(), log);
+            Util.addNameSpaces(filter.getSource(), elem, log);
 
         } else {
             String msg = "An xpath or (source, regex) attributes are required for a filter";

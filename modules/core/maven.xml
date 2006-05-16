@@ -50,10 +50,17 @@
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="../../repository/modules/addressing-${addressing.version}.mar"
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
+        <!--
         <copy file="../../repository/conf/axis2.xml"
               tofile="target/synapse-repository/conf/axis2.xml"/>
         <copy file="../../repository/conf/synapse.xml"
               tofile="target/synapse-repository/conf/synapse.xml"/>
+              -->
+        <copy todir="target/synapse-repository/conf">
+            <fileset dir="../../repository/conf">
+                <include name="**"/>
+            </fileset>
+        </copy>
 
         <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
         <mkdir dir="target/synapse-repository-fault"/>

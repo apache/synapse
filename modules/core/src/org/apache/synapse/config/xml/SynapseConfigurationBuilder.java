@@ -62,30 +62,25 @@ public class SynapseConfigurationBuilder {
         }
         root.build();
 
-        // digest defined Sequences
         OMContainer definitions = root.getFirstChildWithName(Constants.DEFINITIONS_ELT);
         if (definitions != null) {
+
+            // digest defined Sequences
             Iterator iter = definitions.getChildrenWithName(Constants.SEQUENCE_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
                 defineSequence(elt);
             }
-        }
 
-        // digest defined Endpoints
-        OMContainer endpoints = root.getFirstChildWithName(Constants.ENDPOINT_ELT);
-        if (endpoints != null) {
-            Iterator iter = endpoints.getChildrenWithName(Constants.ENDPOINT_ELT);
+            // digest defined Endpoints
+            iter = definitions.getChildrenWithName(Constants.ENDPOINT_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
                 defineEndpoint(elt);
             }
-        }
 
-        // digest defined Global properties
-        OMContainer properties = root.getFirstChildWithName(Constants.PROPERTY_ELT);
-        if (properties != null) {
-            Iterator iter = properties.getChildrenWithName(Constants.PROPERTY_ELT);
+            // digest defined Global properties
+            iter = definitions.getChildrenWithName(Constants.PROPERTY_ELT);
             while (iter.hasNext()) {
                 OMElement elt = (OMElement) iter.next();
                 defineProperty(elt);
@@ -159,6 +154,7 @@ public class SynapseConfigurationBuilder {
             if (address != null) {
                 try {
                     endpoint.setAddress(new URL(address.getAttributeValue()));
+                    config.addNamedEndpoint(endpoint.getName(), endpoint);
                 } catch (MalformedURLException e) {
                     String msg = "Invalid URL specified for 'address' : " + address.getAttributeValue();
                     log.error(msg, e);

@@ -26,6 +26,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Axis2MessageContext implements MessageContext {
 
@@ -69,6 +70,10 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setProperty(String key, Object value) {
         properties.put(key, value);
+    }
+
+    public Set getPropertyKeySet() {
+        return properties.keySet();
     }
 
     //--------------------

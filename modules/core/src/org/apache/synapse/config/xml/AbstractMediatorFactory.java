@@ -21,6 +21,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
 import org.jaxen.JaxenException;
 
 import java.util.Iterator;
@@ -29,17 +30,4 @@ import java.util.Iterator;
  * Is the abstract superclass of MediatorFactory's
  */
 public abstract class AbstractMediatorFactory implements MediatorFactory {
-    public void addNameSpaces(OMElement elem, AXIOMXPath xp, Log log) {
-        try {
-            Iterator it = elem.getAllDeclaredNamespaces();
-            while (it.hasNext()) {
-                OMNamespace n = (OMNamespace) it.next();
-                xp.addNamespace(n.getPrefix(), n.getName());
-            }
-        } catch (JaxenException je) {
-            String msg = "Error adding declared name spaces of " + elem + " to the XPath : " + xp;
-            log.error(msg);
-            throw new SynapseException(msg, je);
-        }
-    }
 }

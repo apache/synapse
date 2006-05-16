@@ -204,6 +204,24 @@
                 <module>true</module>
             </properties>
         </dependency>
+
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xerces.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xml_apis.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
         <dependency>
             <groupId>annogen</groupId>
             <artifactId>annogen</artifactId>

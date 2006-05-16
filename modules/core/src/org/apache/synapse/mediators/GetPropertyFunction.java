@@ -21,6 +21,7 @@ import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.HeaderType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,7 +60,25 @@ public class GetPropertyFunction implements Function {
             while (iter.hasNext()) {
                 String key = StringFunction.evaluate(iter.next(), navigator);
                 // ignore if more than one argument has been specified
-                return synCtx.getProperty(key);                
+                Object result = synCtx.getProperty(key);
+
+                if (result != null) {
+                    return result;
+                } else {
+                    if (HeaderType.STR_TO.equals(key) && synCtx.getTo() != null) {
+                        return synCtx.getTo().getAddress();
+                    } else if (HeaderType.STR_FROM.equals(key) && synCtx.getFrom() != null) {
+                        return synCtx.getFrom().getAddress();
+                    } else if (HeaderType.STR_ACTION.equals(key) && synCtx.getWSAAction() != null) {
+                        return synCtx.getWSAAction();
+                    } else if (HeaderType.STR_FAULT.equals(key) && synCtx.getFaultTo() != null) {
+                        return synCtx.getFaultTo().getAddress();
+                    } else if (HeaderType.STR_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
+                        return synCtx.getReplyTo().getAddress();
+                    } else {
+                        return null;
+                    }
+                }
             }
         }
         return null;

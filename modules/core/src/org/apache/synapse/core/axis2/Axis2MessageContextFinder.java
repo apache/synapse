@@ -74,12 +74,21 @@ public class Axis2MessageContextFinder implements Constants {
 
         log.debug("Synapse Config not available. Creating...");
         AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
-        Parameter param = ac.getParameter(SYNAPSE_CONFIGURATION);
-        if (param == null) {
-            throw new SynapseException(
-                "Axis2 configuration does not specify a '" + SYNAPSE_CONFIGURATION + "' parameter");
+
+        InputStream is = null;
+        // Has a system property synapse.xml overwritten the synapse config location?
+        if (System.getProperty(SYNAPSE_XML) == null) {
+            Parameter param = ac.getParameter(SYNAPSE_CONFIGURATION);
+            if (param == null) {
+                throw new SynapseException(
+                    "Axis2 configuration does not specify a '" + SYNAPSE_CONFIGURATION + "' parameter");
+            }
+            log.debug("Loading configuration from : " + ((String) param.getValue()));
+            is = mc.getAxisService().getClassLoader().getResourceAsStream(((String) param.getValue()).trim());
+        } else {
+            log.debug("Loading configuration from : " + System.getProperty(SYNAPSE_XML));
+            is = mc.getAxisService().getClassLoader().getResourceAsStream(System.getProperty(SYNAPSE_XML));
         }
-        InputStream is = mc.getAxisService().getClassLoader().getResourceAsStream(((String) param.getValue()).trim());
 
         SynapseConfigurationBuilder cfgBuilder = new SynapseConfigurationBuilder();
         cfgBuilder.setConfiguration(is);

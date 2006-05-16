@@ -23,10 +23,10 @@
             <includes>
                 <include>**/*Test.java</include>
             </includes>
-            <excludes>
+            <!--<excludes>
                 <exclude>**/*ValidateMediatorTest.java</exclude>
                 <exclude>**/*TransformMediatorTest.java</exclude>
-            </excludes>
+            </excludes>-->
             <resources>
                 <resource>
                     <directory>test-resources</directory>

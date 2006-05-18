@@ -69,7 +69,7 @@ public class FaultMediator extends AbstractMediator {
     private String faultDetail = null;
 
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Fault mediator mediate()");
         SOAPEnvelope envelop = synCtx.getEnvelope();
 
         switch (soapVersion) {
@@ -93,6 +93,7 @@ public class FaultMediator extends AbstractMediator {
 
     private boolean makeSOAPFault(MessageContext synCtx, int soapVersion) {
 
+        log.debug("Creating a SOAP fault using SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2"));
         // get the correct SOAP factory to be used
         SOAPFactory factory = (
             soapVersion == SOAP11 ? OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory());
@@ -114,6 +115,7 @@ public class FaultMediator extends AbstractMediator {
 
         // set the fault element
         faultEnvelope.getBody().setFirstChild(fault);
+        log.debug("Setting the fault message as : " + fault);
 
         // set the fault message "to" header to the "faultTo" of the original message if
         // such a header existed on the original message, else set it to the "replyTo" of the original
@@ -121,10 +123,14 @@ public class FaultMediator extends AbstractMediator {
         EndpointReference toEPR = synCtx.getTo();
         EndpointReference faultToEPR = synCtx.getFaultTo();
         if (faultToEPR != null) {
+            log.debug("Setting fault message To : " + faultToEPR);
+            log.debug("Setting fault message ReplyTo : " + toEPR);
             synCtx.setTo(faultToEPR);
             synCtx.setReplyTo(toEPR);
         } else {
             EndpointReference replyToEPR = synCtx.getReplyTo();
+            log.debug("Setting fault message To : " + replyToEPR);
+            log.debug("Setting fault message ReplyTo : " + toEPR);
             synCtx.setTo(replyToEPR);
             synCtx.setReplyTo(toEPR);
         }

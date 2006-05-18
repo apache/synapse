@@ -54,7 +54,7 @@ public class LogMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Log mediator :: mediate()");
         log.info(getLogMessage(synCtx));
         return true;
     }

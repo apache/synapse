@@ -38,7 +38,7 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
     protected List mediators = new ArrayList();
 
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Implicit Sequence <" + getType() + "> :: mediate()");
 
         Iterator it = mediators.iterator();
         while (it.hasNext()) {

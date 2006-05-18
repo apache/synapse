@@ -22,6 +22,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.Configuration;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.commons.logging.Log;
@@ -43,6 +44,7 @@ public class SynapseConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(SynapseConfigurationBuilder.class);
     private SynapseConfiguration config = new SynapseConfiguration();
+    ConfigurationFactoryFinder configFacFinder = ConfigurationFactoryFinder.getInstance();
 
     public SynapseConfigurationBuilder() {}
 
@@ -56,9 +58,7 @@ public class SynapseConfigurationBuilder {
         try {
             root = new StAXOMBuilder(is).getDocumentElement();
         } catch (XMLStreamException e) {
-            String msg = "Error parsing Synapse configuration : " + e.getMessage();
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("Error parsing Synapse configuration : " + e.getMessage(), e);
         }
         root.build();
 
@@ -79,6 +79,13 @@ public class SynapseConfigurationBuilder {
                 defineEndpoint(elt);
             }
 
+            // digest defined named Configurations
+            iter = definitions.getChildrenWithName(Constants.CONFIG_ELT);
+            while (iter.hasNext()) {
+                OMElement elt = (OMElement) iter.next();
+                defineConfiguration(elt);
+            }
+
             // digest defined Global properties
             iter = definitions.getChildrenWithName(Constants.PROPERTY_ELT);
             while (iter.hasNext()) {
@@ -89,15 +96,11 @@ public class SynapseConfigurationBuilder {
 
         OMElement elem = root.getFirstChildWithName(Constants.RULES_ELT);
         if (elem == null) {
-            String msg = "A valid Synapse configuration MUST specify the main mediator using the <rules> element";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("A valid Synapse configuration MUST specify the main mediator using the <rules> element");
         } else {
             SynapseMediator sm = (SynapseMediator) MediatorFactoryFinder.getInstance().getMediator(elem);
             if (sm.getList().isEmpty()) {
-                String msg = "Invalid configuration, the main mediator specified by the <rules> element is empty";
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Invalid configuration, the main mediator specified by the <rules> element is empty");
             } else {
                 config.setMainMediator(sm);
             }
@@ -118,9 +121,7 @@ public class SynapseConfigurationBuilder {
         OMAttribute name  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
         if (name == null || value == null) {
-            String msg = "The 'name' and 'value' attributes are required";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("The 'name' and 'value' attributes are required");
         }
         config.addProperty(name.getAttributeValue(), value.getAttributeValue());
     }
@@ -142,10 +143,7 @@ public class SynapseConfigurationBuilder {
 
         OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         if (name == null) {
-            String msg = "The 'name' attribute is required for a named endpoint definition";
-            log.error(msg);
-            throw new SynapseException(msg);
-
+            handleException("The 'name' attribute is required for a named endpoint definition");
         } else {
             Endpoint endpoint = new Endpoint();
             endpoint.setName(name.getAttributeValue());
@@ -156,12 +154,43 @@ public class SynapseConfigurationBuilder {
                     endpoint.setAddress(new URL(address.getAttributeValue()));
                     config.addNamedEndpoint(endpoint.getName(), endpoint);
                 } catch (MalformedURLException e) {
-                    String msg = "Invalid URL specified for 'address' : " + address.getAttributeValue();
-                    log.error(msg, e);
-                    throw new SynapseException(msg, e);
+                    handleException("Invalid URL specified for 'address' : " + address.getAttributeValue(), e);
                 }
             }
         }
     }
+
+    /**
+     * Digest a named configuratino definition and add it to the SynapseConfiguration
+     *
+     * <configuration name="string" type="string">
+     *    <property name="string" value="string"/>*
+     * </configuration>
+     * @param elem the XML element defining the configuration
+     */
+    private void defineConfiguration(OMElement elem) {
+
+        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute type = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "type"));
+
+        if (name == null) {
+            handleException("The 'name' attribute is required for a named configuration definition");
+        } else if (type == null) {
+            handleException("The 'type' attribute is required for a named configuration definition");
+        } else {
+            config.addNamedConfiguration(name.getAttributeValue(), configFacFinder.getConfiguration(elem));
+        }
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
 
 }

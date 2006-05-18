@@ -30,6 +30,11 @@ public abstract class AbstractMediator implements Mediator {
      * @return the class name of the mediator
      */
     public String getType() {
-        return getClass().getName();
+        String cls = getClass().getName();
+        int p = cls.lastIndexOf(".");
+        if (p == -1)
+            return cls;
+        else
+            return cls.substring(p+1);
     }
 }

@@ -34,6 +34,9 @@ public class SynapseConfiguration {
     /** Holds named endpoints (which results into absolute EPRs) for reuse */
     private Map namedEndpoints = new HashMap();
 
+    /** Holds named configurations (such as Spring configurations) */
+    private Map namedConfigurations = new HashMap();
+
     /** Holds global (system-wide) properties that apply to the synapse instance and every message */
     private Map globalProps = new HashMap();
 
@@ -110,5 +113,23 @@ public class SynapseConfiguration {
      */
     public Endpoint getNamedEndpoint(String name) {
         return (Endpoint) namedEndpoints.get(name);
+    }
+
+    /**
+     * Define a named Configuration with the given name
+     * @param name the name of the Configuration
+     * @param config the Configuration definition
+     */
+    public void addNamedConfiguration(String name, Configuration config) {
+        namedConfigurations.put(name, config);
+    }
+
+    /**
+     * Get the configuration definition with the given name
+     * @param name to be looked up
+     * @return the Configuration which maps to this name
+     */
+    public Configuration getNamedConfiguration(String name) {
+        return (Configuration) namedConfigurations.get(name);
     }
 }

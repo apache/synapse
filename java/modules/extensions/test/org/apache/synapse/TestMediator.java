@@ -13,16 +13,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.spring;
+package org.apache.synapse;
 
-import org.apache.synapse.MessageContext;
+import org.apache.synapse.api.Mediator;
 import org.apache.synapse.TestMediateHandler;
 
-public class TestMediateHandlerImpl implements TestMediateHandler {
+/**
+ * Test mediator class.
+ */
+public class TestMediator implements Mediator {
 
-    public static int invokeCount = 0;
+    private org.apache.synapse.TestMediateHandler handlerTest = null;
 
-    public void handle(MessageContext synCtx) {
-        invokeCount++;
+    public TestMediator() {
+    }
+
+    public boolean mediate(MessageContext synCtx) {
+        if (handlerTest != null) {
+            handlerTest.handle(synCtx);
+        }
+        return true;
+    }
+
+    public String getType() {
+        return null;
+    }
+
+    public TestMediateHandler getHandler() {
+        return handlerTest;
+    }
+
+    public void setHandler(TestMediateHandler handlerTest) {
+        this.handlerTest = handlerTest;
     }
 }

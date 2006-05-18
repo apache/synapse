@@ -15,32 +15,32 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.ValidateMediator;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Util;
+import org.apache.synapse.api.Mediator;
+import org.apache.synapse.mediators.ValidateMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 
 /**
  * Creates a validation mediator from the XML configuration
- *
+ * <p/>
  * <validate schema="url" [source="xpath"]>
- *   <on-fail>
- *     mediator+
- *   </on-fail>
+ * <on-fail>
+ * mediator+
+ * </on-fail>
  * </validate>
  */
 public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
     private static final Log log = LogFactory.getLog(TransformMediatorFactory.class);
-    private static final QName VALIDATE_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "validate");
+    private static final QName VALIDATE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "validate");
 
     public Mediator createMediator(OMElement elem) {
 

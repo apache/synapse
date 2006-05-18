@@ -2,11 +2,8 @@
 <project>
 
     <pomVersion>3</pomVersion>
-
     <id>Synapse-Incubating</id>
-
     <name>Apache Synpase</name>
-
     <currentVersion>M2-SNAPSHOT</currentVersion>
 
     <organization>
@@ -23,15 +20,13 @@
         framework based on Web services specifications.</description>
 
     <url>http://ws.apache.org/synapse/</url>
-    <issueTrackingUrl>
-        http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
+    <issueTrackingUrl>http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
     <siteAddress>ws.apache.org</siteAddress>
     <siteDirectory>/synapse/</siteDirectory>
     <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
 
 
     <!--any mailing lists for the project -->
-
     <mailingLists>
         <mailingList>
             <name>Synpase Developer List</name>
@@ -61,6 +56,15 @@
             <artifactId>axis2</artifactId>
             <version>${axis2.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom</artifactId>
+            <version>${axiom.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
+        </dependency>
         
         <dependency>
             <groupId>org.apache.ws.commons</groupId>
@@ -79,16 +83,6 @@
                 <module>false</module>
             </properties>
         </dependency>
-        <dependency>
-            <groupId>ws-commons</groupId>
-            <artifactId>axiom</artifactId>
-            <version>${axiom.version}</version>
-            <properties>
-                <module>false</module>
-            </properties>
-        </dependency>
-
-
 
         <!-- external JARs -->
         <dependency>
@@ -99,7 +93,6 @@
                 <module>true</module>
             </properties>
         </dependency>
-
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
@@ -149,6 +142,23 @@
             </properties>
         </dependency>
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <properties>
+                <classloader>root</classloader>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>${jaxen.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+				<dependency>
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
             <version>${axis.wsdl4j.version}</version>
@@ -181,22 +191,6 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <properties>
-                <classloader>root</classloader>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>${jaxen.version}</version>
-            <properties>
-                <module>true</module>
-            </properties>
-        </dependency>
-        <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
             <version>2.6.0</version>
@@ -204,24 +198,6 @@
                 <module>true</module>
             </properties>
         </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xerces.version}</version>
-            <properties>
-                <module>true</module>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>${xml_apis.version}</version>
-            <properties>
-                <module>true</module>
-            </properties>
-        </dependency>
-
         <dependency>
             <groupId>annogen</groupId>
             <artifactId>annogen</artifactId>
@@ -230,7 +206,6 @@
                 <module>true</module>
             </properties>
         </dependency>
-
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
@@ -239,6 +214,7 @@
                 <module>true</module>
             </properties>
         </dependency>
+
     </dependencies>
 
     <!-- ================================= -->
@@ -253,9 +229,6 @@
             <includes>
                 <include>**/*Test.java</include>
             </includes>
-            <!--<excludes>-->
-            <!--<exclude>**/AddressingInProcessorTest.java</exclude>-->
-            <!--</excludes>-->
             <resources>
 				<resource>
 					<directory>conf</directory>

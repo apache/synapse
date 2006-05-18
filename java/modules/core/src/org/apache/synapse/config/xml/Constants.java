@@ -18,19 +18,15 @@ package org.apache.synapse.config.xml;
 import javax.xml.namespace.QName;
 
 /**
- * <p/>
  * Constants used in the XML processing
  */
 public interface Constants {
-    public static final QName DEFINITIONS_ELT = new QName("definitions");
-    public static final QName SEQUENCE_ELT = new QName("sequence");
-    public static final QName ENDPOINT_ELT = new QName("endpoint");
-    public static final QName CONFIG_ELT = new QName("configuration");
-    public static final QName PROPERTY_ELT = new QName("set-property");
-
-    public static final QName RULES_ELT = new QName("rules");
+    public static final QName DEFINITIONS_ELT   = new QName(Constants.SYNAPSE_NAMESPACE, "definitions");
+    public static final QName SEQUENCE_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
+    public static final QName ENDPOINT_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "endpoint");
+    public static final QName PROPERTY_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "set-property");
+    public static final QName RULES_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
 
     public static final String SYNAPSE_NAMESPACE = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
-    public static final String SYNAPSE = "synapse";
-    public static final String NULL_NAMESPACE = "";
+    public static final String NULL_NAMESPACE    = "";
 }

@@ -15,27 +15,29 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.config.Configuration;
+import org.apache.synapse.config.Extension;
 import org.apache.axiom.om.OMElement;
+
+import javax.xml.namespace.QName;
 
 
 /**
- * A configuration factory that is capable of creating an instance of a
- * named Configuration, through a given XML, should implement this interface
+ * A extension factory that is capable of creating an instance of a
+ * named extension, through a given XML, should implement this interface
  */
 
-public interface ConfigurationFactory {
+public interface ExtensionFactory {
     /**
-     * Creates an instance of a named Configuration using the OMElement
+     * Creates an instance of a named extension using the OMElement
      * @param elem
-     * @return the created named Configuration
+     * @return the created named extension
      */
-    public Configuration createConfiguration(OMElement elem);
+    public Extension createExtension(OMElement elem);
 
     /**
-     * The type attribute of a configuration definition, that this factory could handle
-     * @return the type of configuration definition
+     * The QName of the extension element in the XML config
+     * @return QName of the extension element
      */
-    public String getType();
+    public QName getTagQName();
 
 }

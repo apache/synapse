@@ -15,35 +15,37 @@
 */
 package org.apache.synapse.mediators.ext.spring;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Configuration;
-import org.apache.synapse.config.SpringConfiguration;
-import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.api.Mediator;
+import org.apache.synapse.config.SpringConfigExtension;
 import org.springframework.context.ApplicationContext;
 
 /**
- * This mediator allows
- * <p> This class is the class that "plugs" Spring-based mediators into Synapse.
- * <p> A spring based mediator is any object that implements mediator and can be instantiated by
- * Spring (see www.springframework.org). The mediator definition is set up using the 
- *  SpringMediatorProcessorConfigurator class.
- *  
- * This class simply has a Context property which is set with a Spring GenericApplicationContext and 
- * a BeanName property, which is set with the name of the bean  
+ * This mediator allows Spring beans implementing the org.apache.synapse.api.Mediator
+ * interface to mediate messages passing through Synapse.
  *
+ * A Spring mediator is instantiated by Spring (see www.springframework.org). The mediator
+ * refers to a Spring bean name, and also either a Spring configuration defined to Synapse
+ * or an inlined Spring configuration.
  */
 public class SpringMediator implements Mediator {
 
     private static final Log log = LogFactory.getLog(SpringMediator.class);
 
-    /** The Spring bean ref to be used */
+    /**
+     * The Spring bean ref to be used
+     */
     private String beanName = null;
-    /** The named Spring configName to be used */
+    /**
+     * The named Spring configName to be used
+     */
     private String configName = null;
-    /** The Spring ApplicationContext to be used */
+    /**
+     * The Spring ApplicationContext to be used
+     */
     private ApplicationContext appContext = null;
 
     public boolean mediate(MessageContext synCtx) {
@@ -54,12 +56,13 @@ public class SpringMediator implements Mediator {
 
         // if a named configuration is referenced, use it
         if (configName != null) {
-            // get named Spring configName
-            Configuration config = synCtx.getConfiguration().getNamedConfiguration(configName);
+            // get named Spring configuration
+            Object cfg = synCtx.getConfiguration().getProperty(configName);
 
-            if (config != null && config instanceof SpringConfiguration) {
+            if (cfg != null && cfg instanceof SpringConfigExtension) {
 
-                ApplicationContext appContext = ((SpringConfiguration) config).getAppContext();
+                ApplicationContext appContext = ((SpringConfigExtension) cfg).getAppContext();
+                log.debug("Loading bean : " + beanName + " from Spring configuration named : " + configName);
                 Object o = appContext.getBean(beanName);
 
                 if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
@@ -71,11 +74,12 @@ public class SpringMediator implements Mediator {
                         " from the Spring configuration named : " + configName);
                 }
             } else {
-                handleException("Could not get a reference to the Spring configuration named : " + configName);
+                handleException("Could not get a reference to a valid Spring configuration named : " + configName);
             }
 
         } else if (appContext != null) {
 
+            log.debug("Loading bean : " + beanName + " from inline Spring configuration");
             Object o = appContext.getBean(beanName);
 
             if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
@@ -84,7 +88,7 @@ public class SpringMediator implements Mediator {
 
             } else {
                 handleException("Could not find the bean named : " + beanName +
-                    " from the anonymous Spring configuration");
+                    " from the inline Spring configuration");
             }
 
         } else {

@@ -5,17 +5,18 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.SpringConfiguration;
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.config.SpringConfigExtension;
 import org.apache.synapse.mediators.ext.spring.SpringMediator;
 
 import javax.xml.namespace.QName;
 
 /**
  * Creates an instance of a Spring mediator that refers to the given Spring
- * configuration and bean.
+ * configuration and bean. Optionally, one could specify an inlined Spring
+ * configuration as opposed to a globally defined Spring configuration
  * <p/>
- * <spring ref_bean="exampleBean1" (config_name="spring1" | config_src="spring.xml)"/>
+ * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>
  */
 public class SpringMediatorFactory implements MediatorFactory {
 
@@ -33,24 +34,25 @@ public class SpringMediatorFactory implements MediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         SpringMediator sm = new SpringMediator();
-        OMAttribute ref = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "ref_bean"));
-        OMAttribute cfg = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "config_name"));
-        OMAttribute src = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "config_src"));
+        OMAttribute bean = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "bean"));
+        OMAttribute cfg = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "config"));
+        OMAttribute src = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));
 
-        if (ref == null) {
-            handleException("The 'ref_bean' attribute is required for a Spring mediator definition");
+        if (bean == null) {
+            handleException("The 'bean' attribute is required for a Spring mediator definition");
         } else if (cfg == null && src == null) {
-            handleException("A 'config_name' or 'config_src' attribute is required for a Spring mediator definition");
+            handleException("A 'config' or 'src' attribute is required for a Spring mediator definition");
 
         } else {
-            sm.setBeanName(ref.getAttributeValue());
+            sm.setBeanName(bean.getAttributeValue());
             if (cfg != null) {
+                log.debug("Creating a Spring mediator using configuration named : " + cfg.getAttributeValue());
                 sm.setConfigName(cfg.getAttributeValue());
 
             } else {
-                log.debug("Creating an anonymous Spring configuration using source : " + src.getAttributeValue());
-                SpringConfiguration sc = new SpringConfiguration("anonymous", src.getAttributeValue());
-                sm.setAppContext(sc.getAppContext());
+                log.debug("Creating an inline Spring configuration using source : " + src.getAttributeValue());
+                SpringConfigExtension sce = new SpringConfigExtension("inline", src.getAttributeValue());
+                sm.setAppContext(sce.getAppContext());
             }
             return sm;
         }

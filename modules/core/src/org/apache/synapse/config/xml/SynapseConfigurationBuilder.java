@@ -22,7 +22,6 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.config.Configuration;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.commons.logging.Log;
@@ -44,7 +43,7 @@ public class SynapseConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(SynapseConfigurationBuilder.class);
     private SynapseConfiguration config = new SynapseConfiguration();
-    ConfigurationFactoryFinder configFacFinder = ConfigurationFactoryFinder.getInstance();
+    ExtensionFactoryFinder extensionFacFinder = ExtensionFactoryFinder.getInstance();
 
     public SynapseConfigurationBuilder() {}
 
@@ -65,32 +64,21 @@ public class SynapseConfigurationBuilder {
         OMContainer definitions = root.getFirstChildWithName(Constants.DEFINITIONS_ELT);
         if (definitions != null) {
 
-            // digest defined Sequences
-            Iterator iter = definitions.getChildrenWithName(Constants.SEQUENCE_ELT);
+            Iterator iter = definitions.getChildren();
             while (iter.hasNext()) {
-                OMElement elt = (OMElement) iter.next();
-                defineSequence(elt);
-            }
-
-            // digest defined Endpoints
-            iter = definitions.getChildrenWithName(Constants.ENDPOINT_ELT);
-            while (iter.hasNext()) {
-                OMElement elt = (OMElement) iter.next();
-                defineEndpoint(elt);
-            }
-
-            // digest defined named Configurations
-            iter = definitions.getChildrenWithName(Constants.CONFIG_ELT);
-            while (iter.hasNext()) {
-                OMElement elt = (OMElement) iter.next();
-                defineConfiguration(elt);
-            }
-
-            // digest defined Global properties
-            iter = definitions.getChildrenWithName(Constants.PROPERTY_ELT);
-            while (iter.hasNext()) {
-                OMElement elt = (OMElement) iter.next();
-                defineProperty(elt);
+                Object o = iter.next();
+                if (o instanceof OMElement) {
+                    OMElement elt = (OMElement) o;
+                    if (Constants.SEQUENCE_ELT.equals(elt.getQName())) {
+                        defineSequence(elt);
+                    } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
+                        defineEndpoint(elt);
+                    } else if (Constants.PROPERTY_ELT.equals(elt.getQName())) {
+                        defineProperty(elt);
+                    } else {
+                        defineExtension(elt);
+                    }
+                }
             }
         }
 
@@ -161,24 +149,26 @@ public class SynapseConfigurationBuilder {
     }
 
     /**
-     * Digest a named configuratino definition and add it to the SynapseConfiguration
+     * Digest extensions into Synapse configuration definitions
      *
-     * <configuration name="string" type="string">
-     *    <property name="string" value="string"/>*
-     * </configuration>
+     * An extension *must* have a unique 'name' attribute. The instance
+     * created through the ExtensionFactoryFinder will be set as a
+     * global property into the SynapseConfiguration with this name as
+     * the key.
+     *
+     * e.g. The Spring configuration extension is as follows
+     * <configuration name="string" src="string"/>
+     *
      * @param elem the XML element defining the configuration
      */
-    private void defineConfiguration(OMElement elem) {
+    private void defineExtension(OMElement elem) {
 
         OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute type = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "type"));
 
         if (name == null) {
-            handleException("The 'name' attribute is required for a named configuration definition");
-        } else if (type == null) {
-            handleException("The 'type' attribute is required for a named configuration definition");
+            handleException("The 'name' attribute is required for an extension configuration definition");
         } else {
-            config.addNamedConfiguration(name.getAttributeValue(), configFacFinder.getConfiguration(elem));
+            config.addProperty(name.getAttributeValue(), extensionFacFinder.getExtension(elem));
         }
     }
 

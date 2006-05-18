@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.mediators.builtin;
+package org.apache.synapse.mediators;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -139,6 +139,7 @@ public class ValidateMediator extends AbstractListMediator {
     public boolean mediate(MessageContext synCtx) {
 
         ByteArrayInputStream baisFromSource = null;
+        OMNode sourceNode = null;
 
         try {
             // create a byte array output stream and serialize the source node into it
@@ -146,7 +147,7 @@ public class ValidateMediator extends AbstractListMediator {
             XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
             // serialize the validation target and get an input stream into it
-            OMNode sourceNode = getValidateSource(synCtx);
+            sourceNode = getValidateSource(synCtx);
             sourceNode.serialize(xsWriterForSource);
             baisFromSource = new ByteArrayInputStream(baosForSource.toByteArray());
 
@@ -198,7 +199,7 @@ public class ValidateMediator extends AbstractListMediator {
             validator.validate(source);
 
             if (handler.isValidationError()) {
-                log.debug("Validation of element : " + source + " failed against : " + schemaUrl +
+                log.debug("Validation of element : " + sourceNode + " failed against : " + schemaUrl +
                     " Message : " + handler.getSaxParseException().getMessage() + " Executing 'on-fail' sequence");
                 log.debug("Failed message envelope : " + synCtx.getEnvelope());
                 // super.mediate() invokes the "on-fail" sequence of mediators

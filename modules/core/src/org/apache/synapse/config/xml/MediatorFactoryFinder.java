@@ -56,7 +56,6 @@ public class MediatorFactoryFinder {
         HeaderMediatorFactory.class,
         FaultMediatorFactory.class,
         TransformMediatorFactory.class,
-        ValidateMediatorFactory.class,
         PropertyMediatorFactory.class,
         SwitchMediatorFactory.class,
         SwitchCaseMediatorFactory.class,

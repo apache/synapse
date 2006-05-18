@@ -45,7 +45,7 @@
                     <directory>src</directory>
                     <includes>
                         <include>**/org.apache.synapse.config.xml.MediatorFactory</include>
-                        <include>**/org.apache.synapse.config.xml.ConfigurationFactory</include>
+                        <include>**/org.apache.synapse.config.xml.ExtensionFactory</include>
                     </includes>
                 </resource>
             </resources>

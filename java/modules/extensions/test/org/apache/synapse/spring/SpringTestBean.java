@@ -18,6 +18,11 @@ package org.apache.synapse.spring;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.MessageContext;
 
+/**
+ * This is a very simple Spring bean, that has one int property, and a
+ * reference to another bean. This second bean is invoked on each mediate()
+ * call, and it keeps a count of the invocations to be tested by JUnit
+ */
 public class SpringTestBean implements Mediator {
 
     private int testProperty;
@@ -48,6 +53,7 @@ public class SpringTestBean implements Mediator {
 
     public void setTestProperty(int i) {
         this.testProperty = i;
+        TestMediateHandlerImpl.invokeCount += i;
     }
 
     public int getTestProperty() {

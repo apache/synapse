@@ -105,7 +105,7 @@ public class MediatorFactoryFinder {
      */
     private void registerExtensions() {
 
-        log.debug("registering extensions found in the classpath : " + System.getProperty("java.class.path"));
+        log.debug("Registering mediator extensions found in the classpath : " + System.getProperty("java.class.path"));
 
         // register MediatorFactory extensions
         Iterator it = Service.providers(MediatorFactory.class);

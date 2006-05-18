@@ -42,7 +42,7 @@ public class SpringMediatorTest extends TestCase {
         msgCtx.setConfiguration(synCfgBuilder.getConfig());
         msgCtx.getConfiguration().getMainMediator().mediate(msgCtx);
 
-        assertEquals(TestMediateHandlerImpl.invokeCount, 2);
+        assertEquals(TestMediateHandlerImpl.invokeCount, 202);
     }
 
 }

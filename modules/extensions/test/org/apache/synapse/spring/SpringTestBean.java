@@ -17,6 +17,7 @@ package org.apache.synapse.spring;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.TestMediateHandler;
 
 /**
  * This is a very simple Spring bean, that has one int property, and a

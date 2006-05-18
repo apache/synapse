@@ -23,10 +23,6 @@
             <includes>
                 <include>**/*Test.java</include>
             </includes>
-            <!--<excludes>
-                <exclude>**/*ValidateMediatorTest.java</exclude>
-                <exclude>**/*TransformMediatorTest.java</exclude>
-            </excludes>-->
             <resources>
                 <resource>
                     <directory>test-resources</directory>
@@ -42,7 +38,6 @@
 				</includes>
 			</resource>
         </resources>
-
     </build>
 </project>
 

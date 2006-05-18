@@ -1,1 +1,2 @@
 org.apache.synapse.config.xml.SpringMediatorFactory
+org.apache.synapse.config.xml.ValidateMediatorFactory

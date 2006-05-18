@@ -13,14 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.mediators.builtin;
+package org.apache.synapse;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.mediators.TestMediateHandler;
-import org.apache.synapse.mediators.TestMediator;
-import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.TestMediateHandler;
+import org.apache.synapse.TestMediator;
+import org.apache.synapse.TestUtils;
+import org.apache.synapse.mediators.ValidateMediator;
 
 public class ValidateMediatorTest extends TestCase {
 
@@ -56,12 +57,12 @@ public class ValidateMediatorTest extends TestCase {
 
     private static final String VALID_ENVELOPE_NO_NS =
             "<CheckPriceRequest xmlns=\"http://www.apache-synapse.org/test\">\n" +
-            "\t<Code>String</Code>\n" +
+            "<Code>String</Code>\n" +
             "</CheckPriceRequest>\n";
 
     private static final String IN_VALID_ENVELOPE_NO_NS =
             "<CheckPriceRequest xmlns=\"http://www.apache-synapse.org/test\">\n" +
-            "\t<Code>String</Code>\n" +
+            "<Codes>String</Codes>\n" +
             "</CheckPriceRequest>\n";
 
     private boolean onFailInvoked = false;
@@ -88,7 +89,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("test-resources/misc/validate.xsd");
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -109,7 +110,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("test-resources/misc/validate.xsd test-resources/misc/validate2.xsd");
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd ../core/test-resources/misc/validate2.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
         source.addNamespace("m0", "http://www.apache-synapse.org/test2");
         validate.setSource(source);
@@ -130,7 +131,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("test-resources/misc/validate.xsd test-resources/misc/validate2.xsd");
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd ../core/test-resources/misc/validate2.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
         source.addNamespace("m0", "http://www.apache-synapse.org/test2");
         validate.setSource(source);
@@ -151,7 +152,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("modules/core/test-resources/misc/validate.xsd");
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -172,7 +173,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("test-resources/misc/validate.xsd");
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -193,7 +194,7 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("modules/core/test-resources/misc/validate.xsd");
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);

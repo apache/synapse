@@ -43,10 +43,12 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Filter mediator mediate()");
         if (test(synCtx)) {
+            log.debug("Filter condition satisfied.. executing child mediators");
             return super.mediate(synCtx);
         } else {
+            log.debug("Filter condition failed.. will skip executing child mediators");
             return true;
         }
     }
@@ -62,9 +64,11 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
     public boolean test(MessageContext synCtx) {
         try {
             if (xpath != null) {
+                log.debug("Evaluating XPath expression : " + xpath);
                 return xpath.booleanValueOf(synCtx.getEnvelope());
 
             } else if (source != null && regex != null) {
+                log.debug("Evaluating regular expression : " + regex + " against source : " + source);
                 return regex.matcher(Util.getStringValue(source, synCtx)).matches();
 
             } else {

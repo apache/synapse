@@ -18,7 +18,7 @@ package org.apache.synapse;
 import javax.xml.namespace.QName;
 
 /**
- * <p> Global constants for the Synapse project
+ * Global constants for the Synapse project
  */
 public interface Constants {
 

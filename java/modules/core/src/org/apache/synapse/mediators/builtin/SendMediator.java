@@ -50,7 +50,7 @@ public class SendMediator extends AbstractMediator {
      * @return false always as this is a leaf mediator
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Send mediator :: mediate()");
 
         // TODO this may be really strange but true.. unless you call the below, sometimes it
         // results in an unbound URI exception for no credible reason - needs more investigation
@@ -59,6 +59,7 @@ public class SendMediator extends AbstractMediator {
 
         // if no endpoints are defined, send where implicitly stated
         if (endpoints.isEmpty()) {
+            log.debug("Sending message using implicit message properties..");
             log.debug("Sending To: " + (synCtx.getTo() != null ?
                 synCtx.getTo().getAddress() : "null"));
             log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
@@ -76,6 +77,9 @@ public class SendMediator extends AbstractMediator {
                     singleEndpoint.getRef());
                 eprAddress = singleEndpoint.getAddress().toString();
             }
+
+            log.debug("Sending message to endpoint :: name = " +
+                singleEndpoint.getName() + " resolved address = " + eprAddress);
 
             synCtx.setTo(new EndpointReference(eprAddress));
             log.debug("Sending To: " + (synCtx.getTo() != null ?

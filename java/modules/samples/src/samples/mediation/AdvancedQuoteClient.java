@@ -26,13 +26,12 @@ public class AdvancedQuoteClient {
 
     public static void main(String[] args) {
 
-        String symbol = "MSFT";
         String xurl   = "http://ws.invesbot.com/stockquotes.asmx";
         String turl   = "http://localhost:8080/StockQuote";
 
-        testStandardQuote(symbol, xurl, turl);
-        testAdvancedQuote(symbol, xurl, turl);
-        testErroneousQuote(symbol, xurl, turl);
+        testStandardQuote("IBM", xurl, turl);
+        testAdvancedQuote("SUN", xurl, turl);
+        testErroneousQuote("MSFT", xurl, turl);
     }
 
     private static void testAdvancedQuote(String symbol, String xurl, String turl) {

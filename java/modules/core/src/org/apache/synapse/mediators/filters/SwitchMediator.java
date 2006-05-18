@@ -36,8 +36,11 @@ public class SwitchMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SwitchMediator.class);
 
+    /** The XPath expression specifying the source element to apply the switch case expressions against */
     private AXIOMXPath source = null;
+    /** The list of switch cases */
     private List cases = new ArrayList();
+    /** The default switch case, if any */
     private SwitchCaseMediator defaultCase = null;
 
     /**
@@ -47,7 +50,9 @@ public class SwitchMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
+        log.debug("Switch mediator :: mediate()");
         String sourceText = Util.getStringValue(source, synCtx);
+        log.debug("Applying switch case regex patterns against evaluated source value : " + sourceText);
         Iterator iter = cases.iterator();
 
         while (iter.hasNext()) {
@@ -58,6 +63,7 @@ public class SwitchMediator extends AbstractMediator {
         }
 
         if (defaultCase != null) {
+            log.debug("Executing default switch case");
             return defaultCase.mediate(synCtx);
         }
 

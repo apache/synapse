@@ -49,7 +49,7 @@ public class ClassMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        log.debug(getType() + " mediate()");
+        log.debug("Class mediator <" + clazz.getName() + ">:: mediate()");
         Mediator m = null;
         try {
             m = (Mediator) clazz.newInstance();
@@ -70,8 +70,10 @@ public class ClassMediator extends AbstractMediator {
      * @param m the mediator
      */
     private void setProperties(Mediator m, MessageContext synCtx) {
+
         Iterator iter = properties.iterator();
         while (iter.hasNext()) {
+
             MediatorProperty mProp = (MediatorProperty) iter.next();
 
             String mName = "set" + Character.toUpperCase(mProp.getName().charAt(0)) + mProp.getName().substring(1);
@@ -79,9 +81,9 @@ public class ClassMediator extends AbstractMediator {
                 mProp.getValue() :
                 Util.getStringValue(mProp.getExpression(), synCtx));
 
-
             try {
                 Method method = m.getClass().getMethod(mName, new Class[] {String.class});
+                log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
                 method.invoke(m, new Object[] { value });
 
             } catch (Exception e) {

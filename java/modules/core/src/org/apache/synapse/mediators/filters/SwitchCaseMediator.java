@@ -16,6 +16,8 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.regex.Pattern;
 import java.util.List;
@@ -26,7 +28,11 @@ import java.util.List;
  */
 public class SwitchCaseMediator extends AbstractListMediator {
 
+    private static final Log log = LogFactory.getLog(SwitchCaseMediator.class);
+
+    /** The regular expression pattern to be used */
     private Pattern regex = null;
+    /** Is this the default case? */
     private boolean defaultCase = false;
 
     public SwitchCaseMediator() {}
@@ -54,8 +60,12 @@ public class SwitchCaseMediator extends AbstractListMediator {
     }
 
     public boolean matches(String value) {
-        if (isDefaultCase())
+        if (isDefaultCase()) {
+            log.debug("This is the default case of the switch");
             return true;
-        return regex.matcher(value).matches();
+        }
+        boolean retVal = regex.matcher(value).matches();
+        log.debug("Case : " + regex + " evaluated to : " + retVal);
+        return retVal;
     }
 }

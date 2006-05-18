@@ -37,10 +37,12 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("In mediator mediate()");
         if (test(synCtx)) {
+            log.debug("Current message is incoming.. executing child mediators");
             return super.mediate(synCtx);
         } else {
+            log.debug("Current message is not incoming.. skip executing child mediators");
             return true;
         }
     }

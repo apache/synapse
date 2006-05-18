@@ -75,7 +75,7 @@ public class ValidateMediator extends AbstractListMediator {
     /**
      * Default schema language (http://www.w3.org/2001/XMLSchema).
      */
-    private static final String DEFAULT_SCHEMA_LANGUAGE = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+    private static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
 
     public String getSchemaUrl() {
@@ -102,10 +102,15 @@ public class ValidateMediator extends AbstractListMediator {
      */
     private OMNode getValidateSource(MessageContext synCtx) {
 
-        if (source == null) {
+        AXIOMXPath sourceXPath = source;
+        // do not change the source XPath if not specified, as it is shared..
+        // and will cause confusion to concurrent messages and erroneous results
+
+        if (sourceXPath == null) {
+            log.debug("validation source was not specified.. defaulting to SOAP Body");
             try {
-                source = new AXIOMXPath("//SOAP-ENV:Body/child::*");
-                source.addNamespace("SOAP-ENV", synCtx.isSOAP11() ?
+                sourceXPath = new AXIOMXPath("//SOAP-ENV:Body/child::*");
+                sourceXPath.addNamespace("SOAP-ENV", synCtx.isSOAP11() ?
                     SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI : SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             } catch (JaxenException e) {
                 // this should not cause a runtime exception!
@@ -113,7 +118,7 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         try {
-            Object o = source.evaluate(synCtx.getEnvelope());
+            Object o = sourceXPath.evaluate(synCtx.getEnvelope());
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {
@@ -168,6 +173,7 @@ public class ValidateMediator extends AbstractListMediator {
                 int sourceCount = st.countTokens();
 
                 if (sourceCount == 0) {
+                    log.debug("Schemas have not been specified..");
                     schema = factory.newSchema();
                 } else {
                     StreamSource[] sources = new StreamSource[sourceCount];
@@ -177,6 +183,7 @@ public class ValidateMediator extends AbstractListMediator {
                     schema = factory.newSchema(sources);
                 }
             } else {
+                log.debug("Schemas have not been specified..");
                 schema = factory.newSchema();
             }
 

@@ -25,6 +25,7 @@ public interface Constants {
     public static final QName DEFINITIONS_ELT = new QName("definitions");
     public static final QName SEQUENCE_ELT = new QName("sequence");
     public static final QName ENDPOINT_ELT = new QName("endpoint");
+    public static final QName CONFIG_ELT = new QName("configuration");
     public static final QName PROPERTY_ELT = new QName("set-property");
 
     public static final QName RULES_ELT = new QName("rules");

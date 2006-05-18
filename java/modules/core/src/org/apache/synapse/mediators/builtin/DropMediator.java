@@ -34,7 +34,7 @@ public class DropMediator extends AbstractMediator {
      * @return false always
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Drop mediator :: mediate()");
         if (synCtx.getTo() == null) {
             return false;
         } else {

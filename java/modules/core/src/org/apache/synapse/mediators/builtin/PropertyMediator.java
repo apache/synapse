@@ -19,6 +19,8 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Util;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The property mediator would save a named property as a local property
@@ -31,14 +33,18 @@ public class PropertyMediator extends AbstractMediator {
     private String value = null;
     private AXIOMXPath expression = null;
 
+    private static final Log log = LogFactory.getLog(PropertyMediator.class);
+
     /**
      * Sets a property into the current (local) Synapse Context
      * @param smc the message context
      * @return true always
      */
     public boolean mediate(MessageContext smc) {
-        smc.setProperty(getName(),
-            (value != null ? getValue() : Util.getStringValue(getExpression(), smc)));
+        log.debug("Set-Property mediator :: mediate()");
+        String value = (getValue() != null ? getValue() : Util.getStringValue(getExpression(), smc));
+        log.debug("Setting property : " + getName() + " = " + value);
+        smc.setProperty(getName(), value);
         return true;
     }
 

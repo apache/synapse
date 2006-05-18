@@ -44,7 +44,7 @@ public class SequenceMediator extends AbstractListMediator {
      * @return as per standard mediator result
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug(getType() + " mediate()");
+        log.debug("Sequence mediator <" + (name == null? "anonymous" : name ) +"> :: mediate()");
         if (ref == null) {
             return super.mediate(synCtx);
 

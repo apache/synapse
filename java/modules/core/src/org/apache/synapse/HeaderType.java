@@ -165,4 +165,30 @@ public class HeaderType {
             }
         }
     }
+
+    /**
+     * The header type this describes
+     * @return the header type as a string
+     */
+    public String getHeaderType() {
+        switch (headerType) {
+            case TO: {
+                return STR_TO;
+            }
+            case FROM: {
+                return STR_FROM;
+            }
+            case REPLYTO: {
+                return STR_REPLY_TO;
+            }
+            case ACTION: {
+                return STR_ACTION;
+            }
+            default: {
+                String msg = "Unknown header type : " + headerType;
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+        }
+    }
 }

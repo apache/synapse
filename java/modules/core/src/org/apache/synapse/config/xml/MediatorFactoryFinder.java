@@ -93,20 +93,27 @@ public class MediatorFactoryFinder {
 				throw new SynapseException("Error instantiating " + c.getName(), e);
 			}
 		}
-        // TODO revisit later registerExtensions();
+        // now iterate through the available pluggable mediator factories
+        registerExtensions();
     }
 
-    //TODO revist later
+    /**
+     * Register pluggable mediator factories from the classpath
+     *
+     * This looks for JAR files containing a META-INF/services that adheres to the following
+     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
+     */
     private void registerExtensions() {
-        log.debug("registering extensions");
-        log.debug(System.getProperty("java.class.path"));
-        // now try additional processors
+
+        log.debug("registering extensions found in the classpath : " + System.getProperty("java.class.path"));
+
+        // register MediatorFactory extensions
         Iterator it = Service.providers(MediatorFactory.class);
         while (it.hasNext()) {
             MediatorFactory mf = (MediatorFactory) it.next();
             QName tag = mf.getTagQName();
             factoryMap.put(tag, mf.getClass());
-            log.debug("added MediatorFactory " + mf.getClass() + " to handle " + tag);
+            log.debug("Added MediatorFactory " + mf.getClass() + " to handle " + tag);
         }
     }
 

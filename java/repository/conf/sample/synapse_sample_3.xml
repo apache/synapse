@@ -1,16 +1,12 @@
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
   
   <definitions>
-
-		<configuration name="springconfig" type="spring">    
-			<property name="config_name" value="./../../repository/conf/sample/springsample.xml"/>
-		</configuration>
-
+		<spring:config name="springconfig" src="./../../repository/conf/sample/springsample.xml"/>
   </definitions>
 
   <rules>
-  	<spring ref_bean="springtest" config_name="springconfig"/>
-  	<spring ref_bean="springtest" config_src="./../../repository/conf/sample/springsample.xml"/>
+  	<spring bean="springtest" config="springconfig"/>
+  	<spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/>
   </rules>
 
 </synapse> 

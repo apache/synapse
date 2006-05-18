@@ -15,25 +15,38 @@
 */
 package org.apache.synapse.config;
 
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
-import org.apache.synapse.config.xml.SpringConfigurationFactory;
 
-public class SpringConfiguration extends Configuration {
+/**
+ * This defines an extension to Synapse to process a Spring Configuration.
+ * This keeps the Spring dependency out from the Synapse core, and the
+ * dependent Jars from the core distribution.
+ *
+ * A Spring configuration is usually named, but this class allows an
+ * inlined configuration to be built up as well, where the Spring mediator
+ * defines an inline Spring configuration
+ */
+public class SpringConfigExtension implements Extension {
 
-    /** This is the Spring ApplicationContext/BeanFactory */
-    GenericApplicationContext appContext = null;
+    /**
+     * The name of this Spring configuration
+     */
+    private String name = null;
 
-    public static final String SPRING_TYPE = "spring";
+    /**
+     * This is the Spring ApplicationContext/BeanFactory
+     */
+    private GenericApplicationContext appContext = null;
 
     /**
      * Create a Spring configuration from the given configuration
+     *
      * @param configFile the configuration file to be used
      */
-    public SpringConfiguration(String name, String configFile) {
-        super.setName(name);
-        super.setType(SPRING_TYPE);
+    public SpringConfigExtension(String name, String configFile) {
+        setName(name);
         appContext = new GenericApplicationContext();
         XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
         xbdr.setValidating(false);
@@ -45,4 +58,11 @@ public class SpringConfiguration extends Configuration {
         return appContext;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

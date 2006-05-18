@@ -34,9 +34,6 @@ public class SynapseConfiguration {
     /** Holds named endpoints (which results into absolute EPRs) for reuse */
     private Map namedEndpoints = new HashMap();
 
-    /** Holds named configurations (such as Spring configurations) */
-    private Map namedConfigurations = new HashMap();
-
     /** Holds global (system-wide) properties that apply to the synapse instance and every message */
     private Map globalProps = new HashMap();
 
@@ -80,11 +77,11 @@ public class SynapseConfiguration {
     }
 
     /**
-     * Add a global (system-wide) property. These properties must be string literals
+     * Add a global (system-wide) property.
      * @param name the name of the property
-     * @param value its string value
+     * @param value its value
      */
-    public void addProperty(String name, String value) {
+    public void addProperty(String name, Object value) {
         globalProps.put(name, value);
     }
 
@@ -93,8 +90,8 @@ public class SynapseConfiguration {
      * @param name key of the property being looked up
      * @return its value
      */
-    public String getProperty(String name) {
-        return (String) globalProps.get(name);
+    public Object getProperty(String name) {
+        return globalProps.get(name);
     }
 
     /**
@@ -115,21 +112,4 @@ public class SynapseConfiguration {
         return (Endpoint) namedEndpoints.get(name);
     }
 
-    /**
-     * Define a named Configuration with the given name
-     * @param name the name of the Configuration
-     * @param config the Configuration definition
-     */
-    public void addNamedConfiguration(String name, Configuration config) {
-        namedConfigurations.put(name, config);
-    }
-
-    /**
-     * Get the configuration definition with the given name
-     * @param name to be looked up
-     * @return the Configuration which maps to this name
-     */
-    public Configuration getNamedConfiguration(String name) {
-        return (Configuration) namedConfigurations.get(name);
-    }
 }

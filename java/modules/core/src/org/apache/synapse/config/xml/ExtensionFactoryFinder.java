@@ -17,7 +17,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.Configuration;
+import org.apache.synapse.config.Extension;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
@@ -31,21 +31,22 @@ import sun.misc.Service;
 import javax.xml.namespace.QName;
 
 /**
- *
+ * This class loads available ConfigurationFactory implementations from the
+ * classpath and makes them available to the Synapse configuration builder.
  *
  * This class is based on J2SE Service Provider model
  * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
  */
 
-public class ConfigurationFactoryFinder {
+public class ExtensionFactoryFinder {
 
     private static Map factoryMap = new HashMap();
-    private static final Log log = LogFactory.getLog(ConfigurationFactoryFinder.class);
-    private static ConfigurationFactoryFinder instance = null;
+    private static final Log log = LogFactory.getLog(ExtensionFactoryFinder.class);
+    private static ExtensionFactoryFinder instance = null;
 
-    public static synchronized ConfigurationFactoryFinder getInstance() {
+    public static synchronized ExtensionFactoryFinder getInstance() {
         if (instance == null) {
-            instance = new ConfigurationFactoryFinder();
+            instance = new ExtensionFactoryFinder();
         }
         return instance;
     }
@@ -58,7 +59,7 @@ public class ConfigurationFactoryFinder {
         instance = null;
     }
 
-    private ConfigurationFactoryFinder() {
+    private ExtensionFactoryFinder() {
         factoryMap = new HashMap();
         // now iterate through the available pluggable mediator factories
         registerExtensions();
@@ -72,49 +73,49 @@ public class ConfigurationFactoryFinder {
      */
     private void registerExtensions() {
 
-        log.debug("registering extensions found in the classpath : " + System.getProperty("java.class.path"));
+        log.debug("Registering extensions found in the classpath : " +
+            System.getProperty("java.class.path"));
 
-        // register ConfigurationFactory extensions
-        Iterator it = Service.providers(ConfigurationFactory.class);
+        // register ExtensionFactory extensions
+        Iterator it = Service.providers(ExtensionFactory.class);
         while (it.hasNext()) {
-            ConfigurationFactory cf = (ConfigurationFactory) it.next();
-            String type = cf.getType();
-            factoryMap.put(type, cf.getClass());
-            log.debug("Added ConfigurationFactory " + cf.getClass() +
-                " to handle '" + type + "' configuration definitions");
+            ExtensionFactory ef = (ExtensionFactory) it.next();
+            factoryMap.put(ef.getTagQName(), ef.getClass());
+            log.debug("Added extension factory " + ef.getClass() +
+                " to handle '" + ef.getTagQName() + "' extension elements");
         }
     }
 
     /**
-     * This method returns a Configuration of the correct type given an OMElement.
+     * This method returns an Extension instance of the correct type given an OMElement.
      *
-     * @param elem an OMElement defining a named Configuration definition
-     * @return a correct Configuration object
+     * @param elem an OMElement defining extension
+     * @return a correct Extension instance
      */
-    public Configuration getConfiguration(OMElement elem) {
+    public Extension getExtension(OMElement elem) {
 
-        OMAttribute type = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "type"));
-        log.debug("getConfiguration( type = " + type.getAttributeValue() + " )");
+        QName qName = new QName(elem.getNamespace().getName(), elem.getLocalName());
+        log.debug("getConfiguration(" + qName + ")");
 
-        Class cls = (Class) factoryMap.get(type.getAttributeValue());
+        Class cls = (Class) factoryMap.get(qName);
 
         if (cls == null) {
-            String msg = "Unknown Configuration factory referenced by type : " + type.getAttributeValue();
+            String msg = "Unknown extension factory referenced by element : " + qName;
             log.error(msg);
             throw new SynapseException(msg);
         }
 
         try {
-            ConfigurationFactory cf = (ConfigurationFactory) cls.newInstance();
-            return cf.createConfiguration(elem);
+            ExtensionFactory ef = (ExtensionFactory) cls.newInstance();
+            return ef.createExtension(elem);
 
         } catch (InstantiationException e) {
-            String msg = "Error initializing Configuration factory : " + cls;
+            String msg = "Error initializing extension factory : " + cls;
             log.error(msg);
             throw new SynapseException(msg, e);
 
         } catch (IllegalAccessException e) {
-            String msg = "Error initializing Configuration factory : " + cls;
+            String msg = "Error initializing extension factory : " + cls;
             log.error(msg);
             throw new SynapseException(msg, e);
         }

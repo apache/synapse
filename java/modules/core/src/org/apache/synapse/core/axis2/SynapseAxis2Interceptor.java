@@ -25,7 +25,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
-import org.apache.synapse.config.xml.SynapseConfigurationBuilder;
+import org.apache.synapse.config.SynapseConfigurationBuilder;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,47 +52,23 @@ public class SynapseAxis2Interceptor implements AxisObserver, Constants {
 
         log.info("Initializing Synapse...");
 
-        String synapseXmlLocation = null;
-        // Has a system property synapse.xml overwritten the synapse config location?
-        if (System.getProperty(SYNAPSE_XML) != null) {
-            log.info("Loading configuration from XML file specified by the system property '" + SYNAPSE_XML +"'");
-            synapseXmlLocation = System.getProperty(SYNAPSE_XML);
+        SynapseConfiguration synCfg = null;
 
+        // if the Axis2 configuration defines a parameter for the Synapse config, fetch it
+        Parameter param = axisCfg.getParameter(SYNAPSE_CONFIGURATION);
+        if (param != null) {
+            String config = ((String) param.getValue()).trim();
+            log.info("Axis2 configuration specifies the '" + SYNAPSE_CONFIGURATION + "' parameter as " + config);
+            synCfg = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
-            // get the synapse configuration XML file parameter
-            Parameter param = axisCfg.getParameter(SYNAPSE_CONFIGURATION);
-            if (param == null) {
-                handleException("Axis2 configuration does not specify the '" + SYNAPSE_CONFIGURATION + "' parameter");
-            } else {
-                synapseXmlLocation = ((String) param.getValue()).trim();
-            }
+            synCfg = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
-        // The axis classloaders such as axisCfg.getServiceClassLoader(), axisCfg.getModuleClassLoader(),
-        // axisCfg.getSystemClassLoader() are not yet initialized at this point, hence load the synapse.xml
-        // from a FileInputStream as does Axis!
-        InputStream is = null;
-        try {
-            is = new FileInputStream(synapseXmlLocation);
-        } catch (FileNotFoundException fnf) {
-            handleException("Cannot load Synapse configuration from : " + synapseXmlLocation, fnf);
-        }
-
-        // build the Synapse configuration parsing the XMl config file
-        SynapseConfigurationBuilder cfgBuilder = null;
-        try {
-            cfgBuilder = new SynapseConfigurationBuilder();
-            cfgBuilder.setConfiguration(is);
-        } catch (Exception e) {
-            handleException("Could not initialize Synapse : " + e.getMessage(), e);
-        }
-        log.info("Loaded Synapse configuration from : " + synapseXmlLocation);
-
+        // set the Synapse configuration and environment into the Axis2 configuration
         Parameter synapseCtxParam = new Parameter(SYNAPSE_CONFIG, null);
-        synapseCtxParam.setValue(cfgBuilder.getConfig());
+        synapseCtxParam.setValue(synCfg);
 
         Parameter synapseEnvParam = new Parameter(SYNAPSE_ENV, null);
-        // Note.. will the classloader mentioned below be overwritten subsequently by Axis?
         synapseEnvParam.setValue(new Axis2SynapseEnvironment(axisCfg));
 
         try {
@@ -105,11 +82,6 @@ public class SynapseAxis2Interceptor implements AxisObserver, Constants {
         }
 
         log.info("Synapse initialized...");
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     private void handleException(String msg, Exception e) {

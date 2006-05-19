@@ -10,18 +10,11 @@
     <!-- Uncomment this to enable REST support -->
     <!--    <parameter name="enableREST" locked="false">true</parameter>-->
 
-
-    <!-- Location of the SynapseRepository -->
-    <parameter name="SynapseConfiguration" locked="false">./../synapse_repository/conf/synapse.xml</parameter>
-
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
     
     <!-- Always engage addressing for Synapse -->
     <module ref="addressing"/>
-    <!-- This interceptor initializes Synapse on Axis2 startup -->
-    <listener class="org.apache.synapse.core.axis2.SynapseAxis2Interceptor"/>
-
 
     <!-- ================================================= -->
     <!-- Message Receivers -->

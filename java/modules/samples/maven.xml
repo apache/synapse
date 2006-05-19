@@ -17,9 +17,7 @@
         </j:if>
     </postGoal>
 
-
     <goal name="samples_userguide">
-
         <mkdir dir="target/samples"/>
         <mkdir dir="${samples.dir}/src"/>
         <ant:copy todir="${samples.dir}/src">
@@ -31,21 +29,22 @@
     </goal>
 
     <goal name="toDistBin" prereqs="samples_userguide">
-        <property name="bin.dist.dir"
-                  value="target/dist-bin"/>
+        <property name="bin.dist.dir" value="target/dist-bin"/>
         <ant:mkdir dir="${bin.dist.dir}"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
 
-        <ant:copy file="scripts/userguide/build.xml"
-                  tofile="${bin.dist.dir}/samples/build.xml"/>
-        <ant:copy file="scripts/userguide/README.txt"
-                  tofile="${bin.dist.dir}/samples/README.txt"/>
-
+				<ant:copy todir="${bin.dist.dir}/samples">
+            <ant:fileset dir="scripts/userguide">
+                <ant:include name="**/*"/>
+            </ant:fileset>
+        </ant:copy>
+        
         <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="target/samples/">
                 <include name="**"/>
             </ant:fileset>
         </ant:copy>
-        <ant:delete dir="target/samples"/><ant:delete dir="target/samples"/>
+        
+        <ant:delete dir="target/samples"/>
     </goal>
 </project>

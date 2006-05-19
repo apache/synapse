@@ -16,8 +16,9 @@
 
 package org.apache.synapse.mediators.sla;
 
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
 
 import org.apache.synapse.api.Mediator;
 
@@ -27,81 +28,84 @@ import org.apache.commons.logging.LogFactory;
 import java.io.InputStream;
 
 public class SLAMediator implements Mediator {
-		private ClassLoader classLoader;
 
-	private SynapseEnvironment se;
+    private ClassLoader classLoader;
 
-	private Log log = LogFactory.getLog(getClass());
+    private SynapseConfiguration synCfg;
 
-	public SLAMediator() {
-	}
+    private Log log = LogFactory.getLog(getClass());
 
-	public boolean mediate(SynapseMessage synapseMessageContext) {
+    public SLAMediator() {
+    }
 
-		try {
-			log.info("SLA Mediator!");
-			// MessageContext mc =
-			// ((Axis2SynapseMessage)synapseMessageContext).getMessageContext();
-			String resource = SLAConstants.CFG_XML_FOLDER + "/"
-					+ SLAConstants.CFG_SLA_XML;
-			InputStream inStream = classLoader.getResourceAsStream(resource);
-			final SLAConfigurator slaConfigurator = new SLAConfigurator(
-					inStream);
-			SLAStack slaStack = null;
-			try {
-				if (se.getProperty("PRIORITY_STACK") != null) {
-					slaStack = (SLAStack) se.getProperty("PRIORITY_STACK");
-				} else {
-					slaStack = new SLAStack();
-					se.setProperty("PRIORITY_STACK", slaStack);
-				}
-			} catch (Exception ex) {
-				log.info(ex);
+    public boolean mediate(MessageContext synCtx) {
 
-			}
-			String fromAddress = (String) synapseMessageContext.getFrom()
-					.getAddress();
-			int priority = slaConfigurator.getPriority(fromAddress,
-					synapseMessageContext.getTo());
-			SLAObject slaObject = new SLAObject(priority, System
-					.currentTimeMillis(), fromAddress);
-			try {
-				slaStack.addRequest(slaObject);
-			} catch (Exception ex) {
-				log.info(ex);
-			}
+        try {
+            log.info("SLA Mediator!");
+            // MessageContext mc =
+            // ((Axis2SynapseMessage)synapseMessageContext).getMessageContext();
+            String resource = SLAConstants.CFG_XML_FOLDER + "/"
+                + SLAConstants.CFG_SLA_XML;
+            InputStream inStream = classLoader.getResourceAsStream(resource);
+            final SLAConfigurator slaConfigurator = new SLAConfigurator(
+                inStream);
+            SLAStack slaStack = null;
+            try {
+                if (synCfg.getProperty("PRIORITY_STACK") != null) {
+                    slaStack = (SLAStack) synCfg.getProperty("PRIORITY_STACK");
+                } else {
+                    slaStack = new SLAStack();
+                    synCfg.addProperty("PRIORITY_STACK", slaStack);
+                }
+            } catch (Exception ex) {
+                log.info(ex);
 
-			while (true) {
-				if (!slaStack.isEmpty()) {
-					SLAObject slaObjectStack = (SLAObject) slaStack.get(0);
-					if (slaObjectStack.equals(slaObject)) {
-						slaStack.remove(0);
-						break;
-					}
-				} else {
-					break;
-				}
-			}
+            }
+            String fromAddress = (String) synCtx.getFrom()
+                .getAddress();
+            int priority = slaConfigurator.getPriority(fromAddress,
+                synCtx.getTo());
+            SLAObject slaObject = new SLAObject(priority, System
+                .currentTimeMillis(), fromAddress);
+            try {
+                slaStack.addRequest(slaObject);
+            } catch (Exception ex) {
+                log.info(ex);
+            }
 
-			return true;
+            while (true) {
+                if (!slaStack.isEmpty()) {
+                    SLAObject slaObjectStack = (SLAObject) slaStack.get(0);
+                    if (slaObjectStack.equals(slaObject)) {
+                        slaStack.remove(0);
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
 
-		} catch (Exception e) {
-			log.info(e);
-			return false;
-		}
-	}
+            return true;
 
-	public void setSynapseEnvironment(SynapseEnvironment se) {
+        } catch (Exception e) {
+            log.info(e);
+            return false;
+        }
+    }
 
-		this.se = se;
-		if (se != null) {
-			log.info("ENVIRONMENT NOT NULL IN SLA");
-		}
-	}
+    public void setSynapseConfiguration(SynapseConfiguration se) {
 
-	public void setClassLoader(ClassLoader cl) {
-		this.classLoader = cl;
-	}
+        this.synCfg = se;
+        if (se != null) {
+            log.info("ENVIRONMENT NOT NULL IN SLA");
+        }
+    }
 
+    public void setClassLoader(ClassLoader cl) {
+        this.classLoader = cl;
+    }
 
+    public String getType() {
+        return null;
+    }
 }

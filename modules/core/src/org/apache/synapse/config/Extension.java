@@ -18,6 +18,12 @@ package org.apache.synapse.config;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * An Extension allows the Synapse configuration to be extended. The Spring
+ * configuration support is implemented as such an extension, so that the
+ * Synapse core will not be dependent on Spring classes. An extension
+ * <b>must</b> specify the following methods to set and get its name.
+ */
 public interface Extension {
 
     public String getName();

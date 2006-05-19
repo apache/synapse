@@ -360,11 +360,14 @@
             <ant:fileset dir="modules/core/target/synapse-repository"/>
         </ant:copy>
 
-        <!--<ant:copy todir="${bin.dist.dir}/samples" flatten="false">
+        <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
             <ant:fileset dir="modules/samples/target/dist-bin/samples"/>
         </ant:copy>
+        <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
+            <ant:fileset file="modules/samples/target/synapse-sample-${pom.currentVersion}.jar"/>
+        </ant:copy>
 
-        <ant:copy todir="${bin.dist.dir}/mediators" flatten="false">
+        <!--<ant:copy todir="${bin.dist.dir}/mediators" flatten="false">
             <ant:fileset dir="modules/mediators/target/dist-bin/mediators"/>
         </ant:copy>-->
 
@@ -410,7 +413,7 @@
                      windowtitle="Synapse API">
             <ant:sourcepath>
                 <ant:pathelement location="modules/core/src"/>
-                <ant:pathelement location="modules/mediators/src"/>
+                <!--<ant:pathelement location="modules/mediators/src"/>-->
             </ant:sourcepath>
             <ant:classpath>
                 <ant:fileset dir="target/lib">
@@ -645,7 +648,7 @@
     <!--- Create the Mediator Distribution -->
     <!-- ================================================================ -->
 
-    <goal name="dist-extensions" prereqs="jar,create-jar,javadocs">
+    <goal name="dist-extensions" > <!-- prereqs="jar,create-jar,javadocs"> -->
         <ant:echo>+----------------------------------------------</ant:echo>
         <ant:echo>| Creating: Synapse Extensions Distribution</ant:echo>
         <ant:echo>+----------------------------------------------</ant:echo>
@@ -653,7 +656,7 @@
         <ant:mkdir dir="target/temp/"/>
 
         <ant:copy todir="${extensions.dist.dir}/extensions" flatten="false">
-            <ant:fileset dir="modules/extensions/target/extensions"/>
+            <ant:fileset dir="modules/extensions/target/dist"/>
         </ant:copy>
 
         <ant:copy todir="target/temp/">

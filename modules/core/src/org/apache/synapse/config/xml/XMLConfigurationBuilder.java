@@ -39,19 +39,15 @@ import java.net.MalformedURLException;
 /**
  * Builds a Synapse Configuration model from an XML input stream.
  */
-public class SynapseConfigurationBuilder {
+public class XMLConfigurationBuilder {
 
-    private static Log log = LogFactory.getLog(SynapseConfigurationBuilder.class);
-    private SynapseConfiguration config = new SynapseConfiguration();
+    private static Log log = LogFactory.getLog(XMLConfigurationBuilder.class);
     ExtensionFactoryFinder extensionFacFinder = ExtensionFactoryFinder.getInstance();
 
-    public SynapseConfigurationBuilder() {}
+    public SynapseConfiguration getConfiguration(InputStream is) {
 
-    public SynapseConfiguration getConfig() {
-        return config;
-    }
-
-    public void setConfiguration(InputStream is) {
+        log.info("Generating the Synapse configuration model by parsing the XML configuration");
+        SynapseConfiguration config = new SynapseConfiguration();
 
         OMElement root = null;
         try {
@@ -70,13 +66,13 @@ public class SynapseConfigurationBuilder {
                 if (o instanceof OMElement) {
                     OMElement elt = (OMElement) o;
                     if (Constants.SEQUENCE_ELT.equals(elt.getQName())) {
-                        defineSequence(elt);
+                        defineSequence(config, elt);
                     } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
-                        defineEndpoint(elt);
+                        defineEndpoint(config, elt);
                     } else if (Constants.PROPERTY_ELT.equals(elt.getQName())) {
-                        defineProperty(elt);
+                        defineProperty(config, elt);
                     } else {
-                        defineExtension(elt);
+                        defineExtension(config, elt);
                     }
                 }
             }
@@ -99,13 +95,15 @@ public class SynapseConfigurationBuilder {
                 is.close();
             } catch (IOException e) {}
         }
+
+        return config;
     }
 
     /**
      * <set-property name="string" value="string"/>
      * @param elem
      */
-    private void defineProperty(OMElement elem) {
+    private void defineProperty(SynapseConfiguration config, OMElement elem) {
         OMAttribute name  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
         if (name == null || value == null) {
@@ -114,7 +112,13 @@ public class SynapseConfigurationBuilder {
         config.addProperty(name.getAttributeValue(), value.getAttributeValue());
     }
 
-    private void defineSequence(OMElement ele) {
+    /**
+     * <sequence name="string>
+     *    Mediator+
+     * </sequence>
+     * @param ele
+     */
+    private void defineSequence(SynapseConfiguration config, OMElement ele) {
         SequenceMediator seq = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(ele);
         config.addNamedMediator(seq.getName(), seq);
     }
@@ -127,7 +131,7 @@ public class SynapseConfigurationBuilder {
      * </endpoint>
      * @param ele the <endpoint> element
      */
-    private void defineEndpoint(OMElement ele) {
+    private void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
         OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         if (name == null) {
@@ -161,7 +165,7 @@ public class SynapseConfigurationBuilder {
      *
      * @param elem the XML element defining the configuration
      */
-    private void defineExtension(OMElement elem) {
+    private void defineExtension(SynapseConfiguration config, OMElement elem) {
 
         OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
 
@@ -181,6 +185,5 @@ public class SynapseConfigurationBuilder {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
-
 
 }

@@ -14,36 +14,61 @@
     ant compile 
   		build the samples
 
-  	These samples make stock quotes to www.webservicex.net mediated by Synapse
+  	These samples make stock quotes to www.webservicex.net or ws.invesbot.com mediated by Synapse
 
   	ant stockquote
   		Use the smart client - Synapse in WS-Addressing router mode
     
-  	 examples:
+  	  examples:
   	  ant stockquote
-  	  ant stockquote -Dsymbol=BRK.A -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
+  	  ant stockquote -Dsymbol=IBM -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
   	    -Drepository=../synapse_repository"
   	
   	ant proxystockquote
 	    Use the http proxy client - Synapse in "transparent mode"
     
-  	 examples:
+  	 	examples:
   	  ant proxystockquote
-  	  ant proxystockquote -Dsymbol=BRK.A -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
+  	  ant proxystockquote -Dsymbol=IBM -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
   	    -Drepository=../synapse_repository"
 
     ant dumbstockquote 
       Use the dumb soap client - Synapse in "gateway" mode
   
-  	examples:
+  		examples:
 	  	ant dumbstockquote 
-	    ant dumbstockquote [-Dsymbol=BRK.A] [-Durl=http://www.webservicex.net/stockquote.asmx]
+	    ant dumbstockquote [-Dsymbol=IBM] [-Durl=http://www.webservicex.net/stockquote.asmx]
+
+    ant customquote 
+      Use custom stock quote request
+  
+  		examples:
+	  	ant customquote 
+	    ant customquote [-Dsymbol=IBM] [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote]
+
+    ant advancedquote 
+      Use validating custom quote requests
+  
+  		examples:
+	  	ant advancedquote 
+	    ant advancedquote [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote]
+	    ant advancedquote [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote]
+	    ant advancedquote [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote]
+
+    ant simplequote 
+      Use a simple quote using WS-A addressing to demonstrate the Custom server (programmatic configuration creation)
+  
+  		examples:
+	  	ant simplequote 
+	    ant simplequote [-Dsymbol=IBM] [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote] [-Drepository=../synapse_repository]
+
 
         </echo>
     </target>
 
-    <property name="symbol" value="BRK.A"/>
-    <property name="url" value="http://www.webservicex.net/stockquote.asmx"/>
+		<property name="symbol" value="IBM"/>
+    <property name="webservicex_url" value="http://www.webservicex.net/stockquote.asmx"/>
+    <property name="investbot_url" value="http://ws.invesbot.com/stockquotes.asmx"/>
     <property name="synapseurl" value="http://localhost:8080"/>
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="../synapse_repository"/>
@@ -61,45 +86,64 @@
         <delete dir="${class.dir}" quiet="true"/>
     </target>
 
-
-    <target name="stockquote" depends="compile">
+    <target name="stockquote" depends="compile">    		
         <java classname="samples.userguide.StockQuoteClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${url}"/>
+           	<arg value="${symbol}"/>
+            <arg value="${webservicex_url}"/>
             <arg value="${synapseurl}"/>
             <arg value="${repository}"/>
         </java>
     </target>
 
-    <target name="proxystockquote" depends="compile">
+    <target name="proxystockquote" depends="compile">    		
         <java classname="samples.userguide.ProxyStockQuoteClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${url}"/>
+           	<arg value="${symbol}"/>
+            <arg value="${webservicex_url}"/>
             <arg value="${synapseurl}"/>
             <arg value="${repository}"/>
         </java>
     </target>
 
-    <target name="dumbstockquote" depends="compile">
+    <target name="dumbstockquote" depends="compile">        
         <java classname="samples.userguide.DumbStockQuoteClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
+           	<arg value="${symbol}"/>
             <arg value="${gatewayurl}"/>
             <arg value="${repository}"/>
         </java>
     </target>
 
-    <target name="log_with_addressing" depends="compile">
-        <java classname="samples.userguide.log.LoggingClient"
+    <target name="customquote" depends="compile">        
+        <java classname="samples.mediation.CustomStockQuoteClient"
               classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${investbot_url}"/>
+            <arg value="${gatewayurl}"/>
+        </java>
+    </target>
+
+    <target name="advancedquote" depends="compile">
+        <java classname="samples.mediation.AdvancedQuoteClient"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${investbot_url}"/>
+            <arg value="${gatewayurl}"/>
+        </java>
+    </target>
+
+    <target name="simplequote" depends="compile">        
+        <java classname="samples.config.SimpleStockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${investbot_url}"/>
+            <arg value="${gatewayurl}"/>
+            <arg value="${repository}"/>
         </java>
     </target>
 
     <target name="init">
         <mkdir dir="${class.dir}"/>
-        
         <path id="javac.classpath">
             <pathelement path="${class.dir}"/>
             <fileset dir="../lib">

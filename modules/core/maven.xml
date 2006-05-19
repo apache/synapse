@@ -19,8 +19,6 @@
     </postGoal>
     <goal name="synapse_core">
         <j:set var="class_test.dir" value="target/test-classes"/>
-        <!--<mkdir dir="target/lib"/>-->
-        <!--<deploy:copy-deps todir="target/lib"/>-->
 
         <echo message="----------------Creating First Dispatching aar----------------"/>
         <mkdir dir="target/services/synapse/META-INF"/>
@@ -30,6 +28,7 @@
              basedir="target/services/synapse">
             <include name="**"/>
         </jar>
+
         <echo message="----------------Creating Empty Mediator aar----------------"/>
         <mkdir dir="target/services/emptymediator/META-INF"/>
         <copy file="test-resources/axis2/services/emptymediator/META-INF/services.xml"
@@ -38,8 +37,6 @@
              basedir="target/services/emptymediator">
             <include name="**"/>
         </jar>
-
-
 
         <echo message="-----------Creating Testing Repository - Genral----------"/>
         <mkdir dir="target/synapse-repository"/>
@@ -50,45 +47,6 @@
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="../../repository/modules/addressing-${addressing.version}.mar"
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
-        <!--
-        <copy file="../../repository/conf/axis2.xml"
-              tofile="target/synapse-repository/conf/axis2.xml"/>
-        <copy file="../../repository/conf/synapse.xml"
-              tofile="target/synapse-repository/conf/synapse.xml"/>
-              -->
-        <copy todir="target/synapse-repository/conf">
-            <fileset dir="../../repository/conf">
-                <include name="**"/>
-            </fileset>
-        </copy>
-
-        <echo message="-----------Creating Testing Repository - Fault Handling ----------"/>
-        <mkdir dir="target/synapse-repository-fault"/>
-        <copy file="target/synapse.aar"
-              tofile="target/synapse-repository-fault/services/synapse.aar"/>
-        <copy file="target/emptymediator.aar"
-              tofile="target/synapse-repository-fault/services/emptymediator.aar"/>
-        <mkdir dir="target/synapse-repository-fault/modules"/>
-        <copy file="../../repository/modules/addressing-${addressing.version}.mar"
-              tofile="target/synapse-repository-fault/modules/addressing-${addressing.version}.mar"/>
-        <copy file="../../repository/conf/axis2.xml"
-              tofile="target/synapse-repository-fault/conf/axis2.xml"/>
-        <copy file="test/rules/synapse-fault-return.xml"
-              tofile="target/synapse-repository-fault/conf/synapse.xml"/>
-
-        <echo message="-----------Creating Testing Repository - Send ----------"/>
-        <mkdir dir="target/synapse-repository-send"/>
-        <copy file="target/synapse.aar"
-              tofile="target/synapse-repository-send/services/synapse.aar"/>
-        <copy file="target/emptymediator.aar"
-              tofile="target/synapse-repository-send/services/emptymediator.aar"/>
-        <mkdir dir="target/synapse-repository-send/modules"/>
-        <copy file="../../repository/modules/addressing-${addressing.version}.mar"
-              tofile="target/synapse-repository-send/modules/addressing-${addressing.version}.mar"/>
-        <copy file="../../repository/conf/axis2.xml"
-              tofile="target/synapse-repository-sendonAxis2/conf/axis2.xml"/>
-        <copy file="test/rules/synapse-send.xml"
-              tofile="target/synapse-repository-send/conf/synapse.xml"/>
 
         <ant:delete dir="target/modules"/>
         <ant:delete dir="target/services"/>

@@ -17,7 +17,7 @@ package org.apache.synapse.spring;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.config.xml.SynapseConfigurationBuilder;
+import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.TestUtils;
 
 import java.io.FileInputStream;
@@ -34,12 +34,9 @@ public class SpringMediatorTest extends TestCase {
 
     public void testSpringBean() throws Exception {
 
-        SynapseConfigurationBuilder synCfgBuilder = new SynapseConfigurationBuilder();
-        synCfgBuilder.setConfiguration(
-            new FileInputStream("./../../repository/conf/sample/synapse_sample_3.xml"));
-
         MessageContext msgCtx = TestUtils.getTestContext("<dummy/>");
-        msgCtx.setConfiguration(synCfgBuilder.getConfig());
+        msgCtx.setConfiguration(
+            SynapseConfigurationBuilder.getConfiguration("./../../repository/conf/sample/synapse_sample_3.xml"));
         msgCtx.getConfiguration().getMainMediator().mediate(msgCtx);
 
         assertEquals(TestMediateHandlerImpl.invokeCount, 202);

@@ -29,6 +29,9 @@ public class AdvancedQuoteClient {
         String xurl   = "http://ws.invesbot.com/stockquotes.asmx";
         String turl   = "http://localhost:8080/StockQuote";
 
+        if (args.length > 0) xurl   = args[0];
+        if (args.length > 1) turl   = args[1];
+
         testStandardQuote("IBM", xurl, turl);
         testAdvancedQuote("SUN", xurl, turl);
         testErroneousQuote("MSFT", xurl, turl);

@@ -75,7 +75,8 @@ The Samples are avilable in three categories
 		To start up this server, use the custom.bat or equivalent file. To run the simple client to test this 
 		configuration run the SimpleStockQuoteClient example from Ant. The programatically created Synapse 
 		configuration simply sends the messages coming into Synapse using to thier implicit destinations. 
-		i.e. Using WS-A To address.
+		i.e. Using WS-A To address. This excercise will require you to place the Spring.jar file into the <SYNAPSE>\lib
+		directory.
 		
 		The test client can be started by ant simplequote
 

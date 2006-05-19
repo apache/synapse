@@ -47,6 +47,11 @@
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="../../repository/modules/addressing-${addressing.version}.mar"
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
+        <copy todir="target/synapse-repository/conf">
+            <fileset dir="../../repository/conf">
+                <include name="**"/>
+            </fileset>
+        </copy>
 
         <ant:delete dir="target/modules"/>
         <ant:delete dir="target/services"/>

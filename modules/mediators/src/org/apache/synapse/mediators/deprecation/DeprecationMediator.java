@@ -16,8 +16,8 @@
 
 package org.apache.synapse.mediators.deprecation;
 
-import org.apache.synapse.SynapseMessage;
-import org.apache.synapse.SynapseEnvironment;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.api.Mediator;
 
 import java.util.Map;
@@ -31,7 +31,7 @@ public class DeprecationMediator implements Mediator {
     public DeprecationMediator() {
     }
 
-    public boolean mediate(SynapseMessage synapseMessageContext) {
+    public boolean mediate(MessageContext synapseMessageContext) {
 
         try {
 
@@ -66,6 +66,10 @@ public class DeprecationMediator implements Mediator {
         }
     }
 
+    public String getType() {
+        return null;
+    }
+
     private void loadConfiguration(Map mediatorConfig) {
         configuration = new DeprecationConfiguration();
 
@@ -95,7 +99,7 @@ public class DeprecationMediator implements Mediator {
 
     }
 
-    public void setSynapseEnvironment(SynapseEnvironment se) {
+    public void setSynapseConfiguration(SynapseConfiguration se) {
         //not used for now
     }
 

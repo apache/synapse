@@ -28,6 +28,8 @@ import javax.xml.namespace.QName;
 /**
  * Creates a Spring configuration extension from XML configuration. A Spring
  * configuration extension keeps Spring away from the core of synapse
+ *
+ * <spring:config name="string" src="file"/>
  */
 public class SpringConfigExtensionFactory implements ExtensionFactory {
 

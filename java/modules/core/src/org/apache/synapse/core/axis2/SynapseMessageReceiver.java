@@ -33,30 +33,27 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
-        log.debug("Synapse received message");
-        MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
-        ////////////////////////////////////////////////////////////////////////
-        // MessageContext is set as a property in MessageContext. This is due
-        // use we can expect in ServiceMediatorProcessor and many extensions yet to come
-        // So it a mediator uses EnvironmentAware, that mediator will be injected with the correct environment
+        log.debug("Synapse received a new message...");
+        log.debug("Received To: " + (mc.getTo() != null ?
+            mc.getTo().getAddress() : "null"));
+        log.debug("SOAPAction: " + (mc.getWSAAction() != null ?
+            mc.getWSAAction() : "null"));
+        log.debug("Body : \n" + mc.getEnvelope());
 
-        ////////////////////////////////////////////////////////////////////////
+        MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
         synCtx.getEnvironment().injectMessage(synCtx);
 
-        ///////////////////////////////////////////////////////////////////////
         // Response handling mechanism for 200/202 and 5XX
-        // smc.isResponse =true then the response will be handle with 200 OK
-        // else, response will be 202 OK without no http body
-        // smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
+        // if smc.isResponse = true then the response will be handled with 200 OK
+        // else, response will be 202 OK without an http body
+        // if smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
+
         if (synCtx.isResponse()) {
-            mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
-                Constants.VALUE_TRUE);
+            mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
         }
         if (synCtx.isFaultResponse()) {
-            // todo: a good way to inject faultSoapEnv to the Axis2 Transport 
-            throw new AxisFault(
-                "Synapse Encounters an Error - Please See Log for More Details");
+            // todo: is there a better way to inject faultSoapEnv to the Axis2 Transport
+            throw new AxisFault("Synapse Encountered an Error - See Log for More Details");
         }
-        ///////////////////////////////////////////////////////////////////////
     }
 }

@@ -1,42 +1,51 @@
 ======================================================
-Apache Synapse M1 build  (January, 2006)
+Apache Synapse M2 build  (May, 2006)
 
 http://incubator.apache.org/synapse/
 ------------------------------------------------------
 
 Synapse is an effort undergoing incubation at the Apache Software Foundation (ASF),
 sponsored by the Web Services PMC. Incubation is required of all newly accepted projects 
-until a further review indicates that the infrastructure, communications, and decision making process 
-have stabilized in a manner consistent with other successful ASF projects. 
-While incubation status is not necessarily a reflection of the completeness or 
-stability of the code, it does indicate that the project has 
-yet to be fully endorsed by the ASF.
+until a further review indicates that the infrastructure, communications, and decision 
+making process have stabilized in a manner consistent with other successful ASF projects. 
+While incubation status is not necessarily a reflection of the completeness or stability 
+of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
 
-___________________
+-------------------
 Documentation
 ===================
  
 Documentation can be found in the 'docs' directory included with the 
 binary distribution and in the 'xdocs' directory in the source 
-distribution.
+distribution. Documentation on samples are available in the samples directory.
+
+For examples on Synapse message mediation please see the User Guide
+(http://wiki.apache.org/ws/Synapse/UserGuide). 
+
+For more information on the Synapse Configuration language syntax and useage refer to
+the wiki page at http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage
 
 -------------------
 Getting Started
 ===================
 
-Synapse is configured using the synapse.xml file in the repository directory. 
+Synapse is typically configured using a synapse.xml file in the repository directory. 
 In the binary distribution this is the <SYNAPSE>\synapse_repository directory, where
 <SYNAPSE> is the directory you installed SYNAPSE to. 
 
-You can start Synapse using the bin\synapse command (bat or sh)
+You can start the sample Synapse configuration using the bin\synapse command (bat or sh)
+This will pick up the Synapse configuration at <SYNAPSE>\synapse_repository\conf\synapse.xml
+and the Axis2 configuration from <SYNAPSE>\synapse_repository\conf\axis2.xml
 
-Synapse allows you to mediate Web Service messages. For examples please see the User Guide
-(http://wiki.apache.org/ws/Synapse/UserGuide). 
+More sample Synapse configurations could be found at <SYNAPSE>\synapse_respository\conf\sample.
+This directory contains sample XSLT transformations, XSD schemas for validation and resources
+required to demonstrate support for Spring beans, and programatic creation of a Synapse
+configuration in addition to sample Synapse configuration XML files. 
 
-There are three simple stockquote clients that demonstrate Synapse as a mediation engine 
-in the samples\userguide directory.
+The Synapse configuration language is specified at the Wiki page given below.
+http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage
 
-
+See the README.txt in the samples directory for more information about the samples.
 
 Support
 ===================

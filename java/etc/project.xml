@@ -102,14 +102,6 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>${commons.discovery.version}</version>
-            <properties>
-                <module>true</module>
-            </properties>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${commons.codec.version}</version>
@@ -159,6 +151,14 @@
         </dependency>
 
 				<dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>${wsdl4j.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+				<dependency>
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
             <version>${axis.wsdl4j.version}</version>
@@ -166,6 +166,22 @@
                 <module>true</module>
             </properties>
         </dependency>
+        <dependency>
+          <groupId>commons-fileupload</groupId>
+          <artifactId>commons-fileupload</artifactId>
+          <version>${commons.fileupload.version}</version>
+          <properties>
+              <module>true</module>
+          </properties>
+       </dependency>
+       <dependency>
+        <groupId>servletapi</groupId>
+        <artifactId>servletapi</artifactId>
+        <version>${servletapi.version}</version>
+        <properties>
+          <module>true</module>
+        </properties>
+      </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>
@@ -186,14 +202,6 @@
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jms</artifactId>
             <version>${geronimo.spec.jms.version}</version>
-            <properties>
-                <module>true</module>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.6.0</version>
             <properties>
                 <module>true</module>
             </properties>

@@ -54,13 +54,14 @@ public class SynapseAxis2Interceptor implements AxisObserver, Constants {
 
         SynapseConfiguration synCfg = null;
 
-        // if the Axis2 configuration defines a parameter for the Synapse config, fetch it
-        Parameter param = axisCfg.getParameter(SYNAPSE_CONFIGURATION);
-        if (param != null) {
-            String config = ((String) param.getValue()).trim();
-            log.info("Axis2 configuration specifies the '" + SYNAPSE_CONFIGURATION + "' parameter as " + config);
+        // if the system property synapse.xml is specified, use it.. else default config
+        String config = System.getProperty(Constants.SYNAPSE_XML);
+        if (config != null) {
+            log.info("System property '" + Constants.SYNAPSE_XML +
+                "' specifies synapse configuration as " + config);
             synCfg = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
+            log.warn("System property '" + Constants.SYNAPSE_XML + "' is not specified. Using default configuration");
             synCfg = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 

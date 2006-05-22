@@ -10,10 +10,6 @@
     <!-- Uncomment this to enable REST support -->
     <!--    <parameter name="enableREST" locked="false">true</parameter>-->
 
-
-    <!-- Location of the SynapseRepository -->
-    <parameter name="SynapseConfiguration" locked="false">./../synapse_repository/conf/synapse.xml</parameter>
-
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
     

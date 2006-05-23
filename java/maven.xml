@@ -319,6 +319,7 @@
 
     <goal name="create-lib">
         <macros:copy-deps copyToDir="${target/lib}"/>
+        <ant:mkdir dir="${target/lib}/endorsed"/>
     </goal>
 
     <!-- ================================================================ -->
@@ -355,6 +356,8 @@
                   tofile="${bin.dist.dir}/bin/synapse.bat"/>
         <ant:copy file="README.txt"
                   tofile="${bin.dist.dir}/README.txt"/>
+        <ant:copy file="modules/core/conf/log4j.properties"
+                  tofile="${bin.dist.dir}/log4j.properties"/>
 
         <ant:copy todir="${bin.dist.dir}/synapse_repository" flatten="false">
             <ant:fileset dir="modules/core/target/synapse-repository"/>

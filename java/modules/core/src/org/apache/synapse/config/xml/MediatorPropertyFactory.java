@@ -34,9 +34,11 @@ import java.util.Iterator;
  * A utility class capable of creating instances of MediatorProperty objects by reading
  * through a given XML configuration
  *
- * <element>
- *    <property name="string" (value="literal" | expression="xpath")/>*
- * </element>
+ * <pre>
+ * &lt;element&gt;
+ *    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ * &lt;/element&gt;
+ * </pre>
  */
 public class MediatorPropertyFactory {
 

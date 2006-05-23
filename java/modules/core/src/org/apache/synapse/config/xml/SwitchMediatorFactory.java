@@ -33,14 +33,16 @@ import java.util.Iterator;
 /**
  * Constructs a Switch mediator instance from the given XML configuration
  *
- * <switch source="xpath">
- *   <case regex="string">
+ * <pre>
+ * &lt;switch source="xpath"&gt;
+ *   &lt;case regex="string"&gt;
  *     mediator+
- *   </case>+
- *   <default>
+ *   &lt;/case&gt;+
+ *   &lt;default&gt;
  *     mediator+
- *   </default>?
- * </switch>
+ *   &lt;/default&gt;?
+ * &lt;/switch&gt;
+ * </pre>
  */
 public class SwitchMediatorFactory extends AbstractMediatorFactory {
 

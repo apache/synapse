@@ -37,32 +37,44 @@ import java.net.MalformedURLException;
  *
  * //TODO support endpoints, failover and loadbalacing
  *
- * The <send> element is used to send messages out of Synapse to some endpoint. In the simplest case,
+ * The &lt;send&gt; element is used to send messages out of Synapse to some endpoint. In the simplest case,
  * the place to send the message to is implicit in the message (via a property of the message itself)-
  * that is indicated by the following
- *  <send/>
+ * <pre>
+ *  &lt;send/&gt;
+ * </pre>
  *
  * If the message is to be sent to one or more endpoints, then the following is used:
- *  <send>
+ * <pre>
+ *  &lt;send&gt;
  *   (endpointref | endpoint)+
- *  </send>
+ *  &lt;/send&gt;
+ * </pre>
  * where the endpointref token refers to the following:
- * <endpoint ref="name"/>
+ * <pre>
+ * &lt;endpoint ref="name"/&gt;
+ * </pre>
  * and the endpoint token refers to an anonymous endpoint defined inline:
- *  <endpoint address="url"/>
+ * <pre>
+ *  &lt;endpoint address="url"/&gt;
+ * </pre>
  * If the message is to be sent to an endpoint selected by load balancing across a set of endpoints,
  * then it is indicated by the following:
- * <send>
- *   <load-balance algorithm="uri">
+ * <pre>
+ * &lt;send&gt;
+ *   &lt;load-balance algorithm="uri"&gt;
  *     (endpointref | endpoint)+
- *   </load-balance>
- * </send>
+ *   &lt;/load-balance&gt;
+ * &lt;/send&gt;
+ * </pre>
  * Similarly, if the message is to be sent to an endpoint with failover semantics, then it is indicated by the following:
- * <send>
- *   <failover>
+ * <pre>
+ * &lt;send&gt;
+ *   &lt;failover&gt;
  *     (endpointref | endpoint)+
- *   </failover>
- * </send>
+ *   &lt;/failover&gt;
+ * &lt;/send&gt;
+ * </pre>
  */
 public class SendMediatorFactory extends AbstractMediatorFactory {
 

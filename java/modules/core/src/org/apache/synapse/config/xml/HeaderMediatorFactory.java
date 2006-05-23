@@ -33,10 +33,14 @@ import org.jaxen.JaxenException;
  * This builds a Header Mediator parsing the XML configuration supplied
  *
  * Set header
- *   <header name="qname" (value="literal" | expression="xpath")/>
+ *   <pre>
+ *      &lt;header name="qname" (value="literal" | expression="xpath")/&gt;
+ *   </pre>
  *
  * Remove header
- *   <header name="qname" action="remove"/>
+ *   <pre>
+ *      &lt;header name="qname" action="remove"/&gt;
+ *   </pre>
  */
 public class HeaderMediatorFactory extends AbstractMediatorFactory {
 

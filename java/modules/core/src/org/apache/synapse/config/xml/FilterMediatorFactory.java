@@ -35,9 +35,11 @@ import java.util.Iterator;
 /**
  * Creates a filter mediator instance
  *
- * <filter (source="xpath" regex="string") | xpath="xpath">
+ * <pre>
+ * &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
  *   mediator+
- * </filter>
+ * &lt;/filter&gt;
+ * </pre>
  */
 public class FilterMediatorFactory extends AbstractListMediatorFactory {
 

@@ -413,7 +413,8 @@
                      author="true"
                      version="true"
                      use="true"
-                     windowtitle="Synapse API">
+                     windowtitle="Synapse API"
+                     additionalparam="-breakiterator">
             <ant:sourcepath>
                 <ant:pathelement location="modules/core/src"/>
                 <!--<ant:pathelement location="modules/mediators/src"/>-->

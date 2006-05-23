@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Extending Synapse</title>
+</head>
+<body>
+<h1>Extending Synapse<br>
+</h1>
+<br>
+<h2>Writing custom Mediator implementations</h2>
+<p>The primary interface of the Synapse API is the MessageContext
+interface
+defined below. This essentially defines the per-message context passed
+through the chain of mediators, for each and every message received and
+processed by
+Synapse. Each message instance is wrapped within a MessageContext
+instance, and the message context is set with the references to the
+SynapseConfiguration and SynapseEnvironments to be used. The
+SynapseConfiguration holds the global configuration model that defines
+message
+mediation rules and common definitions to be used, while the
+environment gives
+access to the underlying SOAP implementation used.
+A typical mediator would need to manipulate the MessageContext by
+referring to the SynapseConfiguration. However it is strongly
+recommended that
+the SynapseConfiguration should not be updated by mediator instances as
+it is shared by all messages, and may be updated by Synapse
+administration or configuration modules.
+Mediator instances may store custom named properties into the
+MessageContext
+for later retrieval by successive mediators.<br>
+</p>
+<h4>MessageContext Interface</h4>
+<p></p>
+<pre>package org.apache.synapse;<br><br>import ...<br><br>public interface <span
+ style="font-weight: bold;">MessageContext </span>{<br><br>    /**<br>     * Get a reference to the current SynapseConfiguration<br>     *<br>     * @return the current synapse configuration<br>     */<br>    public SynapseConfiguration getConfiguration();<br><br>    /**<br>     * Set or replace the Synapse Configuration instance to be used. May be used to<br>     * programatically change the configuration at runtime etc.<br>     *<br>     * @param cfg The new synapse configuration instance<br>     */<br>    public void setConfiguration(SynapseConfiguration cfg);<br><br>    /**<br>     * Returns a reference to the host Synapse Environment<br>     * @return the Synapse Environment<br>     */<br>    public SynapseEnvironment getEnvironment();<br><br>    /**<br>     * Sets the SynapseEnvironment reference to this context<br>     * @param se the reference to the Synapse Environment<br>     */<br>    public void setEnvironment(SynapseEnvironment se);<br><br>    /**<br>     * Get the value of a custom (local) property set on the message instance<br>     * @param key key to look up property<br>     * @return value for the given key<br>     */<br>    public Object getProperty(String key);<br><br>    /**<br>     * Set a custom (local) property with the given name on the message instance<br>     * @param key key to be used<br>     * @param value value to be saved<br>     */<br>    public void setProperty(String key, Object value);<br><br>    /**<br>     * Returns the Set of keys over the properties on this message context<br>     * @return a Set of keys over message properties<br>     */<br>    public Set getPropertyKeySet();<br><br>    /**<br>     * Get the SOAP envelope of this message<br>     * @return the SOAP envelope of the message<br>     */<br>    public SOAPEnvelope getEnvelope();<br><br>    /**<br>     * Sets the given envelope as the current SOAPEnvelope for this message<br>     * @param envelope the envelope to be set<br>     * @throws org.apache.axis2.AxisFault on exception<br>     */<br>    public void setEnvelope(SOAPEnvelope envelope) throws AxisFault;<br><br>    /**<br>     * SOAP message related getters and setters<br>     */<br>    public ....get/set()...<br><br>}<br></pre>
+<p>The MessageContext interface is based on the Axis2 <a>MessageContext</a>
+interface, and uses the Axis2 <a>EndpointReference</a> and
+SOAPEnvelope
+classes/interfaces.</p>
+<p>The purpose of this interface is to capture a message as it flows
+through the system. As you will see the messages are represented using
+the SOAP infoset. Binary messages can be embedded in the Envelope using
+the MTOM support built into Axis2's AXIOM object model.</p>
+<h4>Mediator interface</h4>
+<p>The second key interface for mediator writers is the Mediator
+interface:</p>
+<pre>package org.apache.synapse.api;<br><br>import org.apache.synapse.MessageContext;<br><br>/**<br> * All Synapse mediators must implement this Mediator interface. As a message passes<br> * through the synapse system, each mediator's mediate() method is invoked in the<br> * sequence/order defined in the SynapseConfiguration.<br> */<br>public interface <span
+ style="font-weight: bold;">Mediator </span>{<br><br>    /**<br>     * Invokes the mediator passing the current message for mediation. Each<br>     * mediator performs its mediation action, and returns true if mediation<br>     * should continue, or false if further mediation should be aborted.<br>     *<br>     * @param synCtx the current message for mediation<br>     * @return true if further mediation should continue<br>     */<br>    public boolean mediate(MessageContext synCtx);<br><br>    /**<br>     * This is used for debugging purposes and exposes the type of the current<br>     * mediator for logging and debugging purposes<br>     * @return a String representation of the mediator type<br>     */<br>    public String getType();<br>}</pre>
+<p>A mediator can read and/or modify the <a>SynapseMessage</a> in any
+suitable
+manner - adjusting the routing headers or changing the message body. If
+the mediate() method
+returns false, it signals to the Synapse processing model to stop
+further processing of the message. For example, if the mediator is a
+security agent it
+may decide that this message is dangerous and should not be processed
+further. This is generally the exception as mediators are usually
+designed to co-operate to process the message onwards.<br>
+<br>
+</p>
+<h3>Leaf and Node Mediators, List mediators and Filter mediators<br>
+</h3>
+Mediators may be Node mediators (i.e. these contain sub mediators) or
+Leaf mediators (mediators that does not hold any sub mediators). A Node
+mediator&nbsp; must implement the org.apache.synapse.api.ListMediator
+interface listed below, or extend from the
+org.apache.synapse.mediators.AbstractListMediator.<br>
+<h4>The ListMediator interface<br>
+</h4>
+package org.apache.synapse.api;<br>
+<br>
+import java.util.List;<br>
+<br>
+/**<br>
+&nbsp;* The List mediator executes a given sequence/list of child
+mediators<br>
+&nbsp;*/<br>
+public interface ListMediator extends Mediator {<br>
+<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * Appends the specified mediator to the end of
+this mediator's (children) list<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @param m the mediator to be added<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @return true (as per the general contract of
+the Collection.add method)<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public boolean addChild(Mediator m);<br>
+<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * Appends all of the mediators in the
+specified collection to the end of this mediator's (children)<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * list, in the order that they are returned by
+the specified collection's iterator<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @param c the list of mediators to be added<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @return true if this list changed as a
+result of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public boolean addAll(List c);<br>
+<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * Returns the mediator at the specified
+position<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @param pos index of mediator to return<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @return the mediator at the specified
+position in this list<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public Mediator getChild(int pos);<br>
+<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * Removes the first occurrence in this list of
+the specified mediator<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @param m mediator to be removed from this
+list, if present<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @return true if this list contained the
+specified mediator<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public boolean removeChild(Mediator m);<br>
+<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * Removes the mediator at the specified
+position in this list<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @param pos the index of the mediator to
+remove<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @return the mediator previously at the
+specified position<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public Mediator removeChild(int pos);<br>
+<br>
+&nbsp;&nbsp;&nbsp; /**<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * Return the list of mediators of this List
+mediator instance<br>
+&nbsp;&nbsp;&nbsp;&nbsp; * @return the child/sub mediator list<br>
+&nbsp;&nbsp;&nbsp;&nbsp; */<br>
+&nbsp;&nbsp;&nbsp; public List getList();<br>
+}<br>
+<br>
+A ListMediator implementation should call super.mediate(synCtx) to
+process its sub mediator sequence. A FilterMediator is a ListMediator
+which executes its sequence of sub mediators on successful outcome of a
+test condition. Mediator instance which performs filtering should
+implement the FilterMediator interface.<br>
+<br>
+<h4>FilterMediator interface</h4>
+<pre>package org.apache.synapse.api;<br><br>import org.apache.synapse.MessageContext;<br><br>/**<br> * The filter mediator is a list mediator, which executes the given (sub) list of mediators<br> * if the specified condition is satisfied<br> *<br> * @see FilterMediator#test(org.apache.synapse.MessageContext)<br> */<br>public interface <span
+ style="font-weight: bold;">FilterMediator </span>extends ListMediator {<br><br>    /**<br>     * Should return true if the sub/child mediators should execute. i.e. if the filter<br>     * condition is satisfied<br>     * @param synCtx<br>     * @return true if the configured filter condition evaluates to true<br>     */<br>    public boolean test(MessageContext synCtx);<br>}<br></pre>
+<h2>Writing custom Configuration implementations for mediators<br>
+</h2>
+You may write your own custom configurator for the Mediator
+implementation you write without relying on the Class mediator or
+Spring
+extension for its initialization. You could thus write a
+MediatorFactory implementation which defines how to digest a custom
+XML configuration element to be used to create and configure the custom
+mediator instance. The custom
+MediatorFactory implementation and the mediator class must be bundled
+in a JAR file conforming to the J2SE Service Provider model (See the
+description for Extensions below for more details and examples) and
+placed into the SYNAPSE_HOME/lib folder, so that the Synapse runtime
+could find and load the definition.
+Essentially this means that a custom JAR file must bundle your class
+implementing the Mediator interface, and the MediatorFactory
+implementation class and contain a text file by the name
+"org.apache.synapse.config.xml.MediatorFactory" which will contain the
+fully qualified name(s) of your MediatorFactory implementation
+class(es). You should also place any dependency JARs into the same lib
+folder so that the correct classpath references could be made. <br>
+<br>
+The
+MediatorFactory interface listing is given below, which you should
+implement, and its getTagQName()
+method must define the fully qualified element of interest for custom
+configuration. The Synapse initialization will call back to this
+MediatorFactory
+instance through the
+createMediator(OMElement elem) method passing in this XML element, so
+that an instance of the mediator could be created utilizing the custom
+XML specification and returned.
+See the ValidateMediator and the ValidateMediatorFactory classes under
+modules/extensions in the Synapse source distribution for examples.<br>
+<br>
+<h4>The MediatorFactory interface</h4>
+<pre>package org.apache.synapse.config.xml;<br><br>import ...<br><br>/**<br> * A mediator factory capable of creating an instance of a mediator through a given<br> * XML should implement this interface<br> */<br>public interface MediatorFactory {<br>    /**<br>     * Creates an instance of the mediator using the OMElement<br>     * @param elem<br>     * @return the created mediator<br>     */<br>    public Mediator createMediator(OMElement elem);<br><br>    /**<br>     * The QName of this mediator element in the XML config<br>     * @return QName of the mediator element<br>     */<br>    public QName getTagQName();<br>}<br></pre>
+<h2>Writing custom Configuration implementations for Configuration
+extensions</h2>
+Mediators could be configured in multiple ways as Synapse, i.e.
+Either through an XML configuration file, or programatically. If
+Synapse
+is initialized with a Synapse XML configuration which is the default,
+and you want to create a custom extension to the global Synapse
+configuration,
+you must implement the org.apache.synapse.config.Extension
+interface, and you must write your custom ExtensionFactory
+implementation which will create the instance of your extension, so
+that
+it could be set into the SynapseConfiguration as a named global
+'property'.
+The interfaces referenced are listed below.<br>
+<br>
+<h4>The Extension interface</h4>
+<pre>package org.apache.synapse.config;<br><br>import ...<br><br>/**<br> * An Extension allows the Synapse configuration to be extended. The Spring<br> * configuration support is implemented as such an extension, so that the<br> * Synapse core will not be dependent on Spring classes. An extension<br> * &lt;b&gt;must&lt;/b&gt; specify the following methods to set and get its name.<br> */<br>public interface Extension {<br><br>    public String getName();<br><br>    public void setName(String name);<br>   <br>}<br></pre>
+<h4>The ExtensionFactory interface<br>
+</h4>
+<pre>package org.apache.synapse.config.xml;<br><br>import ....<br><br>/**<br> * A extension factory that is capable of creating an instance of a<br> * named extension, through a given XML, should implement this interface<br> */<br>public interface ExtensionFactory {<br>    /**<br>     * Creates an instance of a named extension using the OMElement<br>     * @param elem<br>     * @return the created named extension<br>     */<br>    public Extension createExtension(OMElement elem);<br><br>    /**<br>     * The QName of the extension element in the XML config<br>     * @return QName of the extension element<br>     */<br>    public QName getTagQName();<br><br>}<br></pre>
+<h4>Loading of Extensions by the Synapse runtime</h4>
+Synapse loads available extensions from the runtime classpath using the
+<a
+ href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">J2SE
+Service Provider model</a>.
+This essentially iterates over the available JAR files, for&nbsp; a
+META-INF/services directory within each file,&nbsp; and looks for a
+text
+file with the name org.apache.synapse.config.xml.ExtensionFactory which
+contains a list of fully qualified classname that implement the above
+interface, listing each class in a separate line.<br>
+<br>
+e.g. The built-in extension_mediators.jar contains the following
+structure<br>
+<br>
+<pre>extension_mediators.jar<br>    /META-INF/services<br>        org.apache.synapse.config.xml.ExtensionFactory<br>        org.apache.synapse.config.xml.MediatorFactory<br>    /... the implementation classes as usual...<br><br></pre>
+The org.apache.synapse.config.xml.ExtensionFactory text file discussed
+above contains the line
+"org.apache.synapse.config.xml.SpringConfigExtensionFactory" but may
+contain multiple lines specifying a list of extensions contained within
+the specific JAR file.<br>
+<br>
+Once the available ExtensionFactory implementations are loaded by the
+Synapse initializer, it accumulates the list of defined XML
+configuration elements by calling to the getTagQName() method of the
+ExtensionFactory implementation. Lets consider the Spring extension as
+an example.<br>
+<br>
+<pre>package org.apache.synapse.config.xml;<br><br>import ...<br><br>/**<br> * Creates a Spring configuration extension from XML configuration. A Spring<br> * configuration extension keeps Spring away from the core of synapse<br> *<br> * &lt;spring:config name="string" src="file"/&gt;<br> */<br>public class SpringConfigExtensionFactory implements ExtensionFactory {<br><br>    private static final Log log = LogFactory.getLog(SpringConfigExtensionFactory.class);<br><br>    private static final QName SPRING_CFG_Q = new QName(Constants.SYNAPSE_NAMESPACE + "/spring", "config");<br><br>    /**<br>     * &lt;spring:config name="string" src="file"/&gt;<br>     *<br>     * @param elem the XML configuration element<br>     * @return A named Spring Configuration<br>     */<br>    public Extension createExtension(OMElement elem) {<br><br>        SpringConfigExtension springCfgExt = null;<br>        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));<br>        OMAttribute src  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));<br><br>        if (name == null) {<br>            handleException("The 'name' attribute is required for a Spring configuration definition");<br>        } else if (src == null) {<br>            handleException("The 'src' attribute is required for a Spring configuration definition");<br>        } else {<br>            springCfgExt = new SpringConfigExtension(name.getAttributeValue(), src.getAttributeValue());<br>        }<br>        return springCfgExt;<br>    }<br><br>    private void handleException(String msg) {<br>        log.error(msg);<br>        throw new SynapseException(msg);<br>    }<br>}<br></pre>
+The getTagQName() returns the name space
+"http://ws.apache.org/ns/synapse/spring" and the element name as
+"config", and thus registers itself as the handler for a
+&lt;spring:config .../&gt; element where the namespace spring refers to
+"http://ws.apache.org/ns/synapse/spring". It should be noted that the
+XML configuration extensions must reside within the &lt;definitions&gt;
+elements of the Synapse XML configuration. Refer to the Synapse
+configuration language syntax for more information on the structure of
+the Synapse XML. If the Synapse configuration builder comes across an
+XML configuration element that has been registers (as shown above), it
+will then call into the implementation of the ExtensionFactory
+implementations' createExtension(OMElement elem) method with the XML
+element, and an instance of the Extension interface implementation in
+return. This extension implementation class getName() method is used to
+store it into the SynapseConfiguration, as a "property", and thus could
+be retrieved later via this same "name". Hence the implementations
+should be careful to use unique meaningful names for their
+implementations.<br>
+<br>
+For completeness, the implementation of the Spring extension is
+given in the following listing.<br>
+<br>
+<pre>package org.apache.synapse.config;<br><br>import ...<br><br>/**<br> * This defines an extension to Synapse to process a Spring Configuration.<br> * This keeps the Spring dependency out from the Synapse core, and the<br> * dependent Jars from the core distribution.<br> *<br> * A Spring configuration is usually named, but this class allows an<br> * inlined configuration to be built up as well, where the Spring mediator<br> * defines an inline Spring configuration<br> */<br>public class SpringConfigExtension implements Extension {<br><br>    /**<br>     * The name of this Spring configuration<br>     */<br>    private String name = null;<br><br>    /**<br>     * This is the Spring ApplicationContext/BeanFactory<br>     */<br>    private GenericApplicationContext appContext = null;<br><br>    /**<br>     * Create a Spring configuration from the given configuration<br>     *<br>     * @param configFile the configuration file to be used<br>     */<br>    public SpringConfigExtension(String name, String configFile) {<br>        setName(name);<br>        appContext = new GenericApplicationContext();<br>        XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);<br>        xbdr.setValidating(false);<br>        xbdr.loadBeanDefinitions(new FileSystemResource(configFile));<br>        appContext.refresh();<br>    }<br><br>    public GenericApplicationContext getAppContext() {<br>        return appContext;<br>    }<br><br>    public String getName() {<br>        return name;<br>    }<br><br>    public void setName(String name) {<br>        this.name = name;<br>    }<br><br>    public QName getTagQName() {<br>        return SPRING_CFG_Q;<br>    }<br>}<br><br></pre>
+</body>
+</html>

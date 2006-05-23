@@ -57,13 +57,6 @@ public class SynapseConfigurationBuilder implements Constants {
      */
     public static SynapseConfiguration getConfiguration(String configFile) {
 
-        // Has a system property synapse.xml overwritten the synapse config location?
-        String tConfigFile = System.getProperty(SYNAPSE_XML);
-        if (tConfigFile != null) {
-            log.info("A system property '" + SYNAPSE_XML + "' overrides the synapse XML file as : " + tConfigFile);
-            configFile = tConfigFile;
-        }
-
         // build the Synapse configuration parsing the XML config file
         XMLConfigurationBuilder xmlBuilder = null;
         try {

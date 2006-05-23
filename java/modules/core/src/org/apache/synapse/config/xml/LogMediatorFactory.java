@@ -35,9 +35,11 @@ import java.util.List;
 /**
  * Created a Log mediator that logs messages using commons-logging.
  *
- * <log [level="simple|headers|full|custom"]>
- *      <property> *
- * </log>
+ * <pre>
+ * &lt;log [level="simple|headers|full|custom"]&gt;
+ *      &lt;property&gt; *
+ * &lt;/log&gt;
+ * </pre>
  */
 public class LogMediatorFactory extends AbstractMediatorFactory {
 

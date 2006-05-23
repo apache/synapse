@@ -33,9 +33,11 @@ import java.net.MalformedURLException;
 /**
  * Creates a transform mediator from the given XML
  *
- * <transform xslt|xquery="url" [source="xpath"]>
- *   <property name="string" (value="literal" | expression="xpath")/>*
- * </transform>
+ * <pre>
+ * &lt;transform xslt|xquery="url" [source="xpath"]&gt;
+ *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ * &lt;/transform&gt;
+ * </pre>
  */
 public class TransformMediatorFactory extends AbstractMediatorFactory {
 

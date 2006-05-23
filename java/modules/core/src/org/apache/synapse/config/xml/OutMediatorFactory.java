@@ -24,9 +24,11 @@ import javax.xml.namespace.QName;
 /**
  * Creates an Out mediator instance
  *
- * <out>
+ * <pre>
+ * &lt;out&gt;
  *    mediator+
- * </out>
+ * &lt;/out&gt;
+ * </pre>
  */
 public class OutMediatorFactory extends AbstractListMediatorFactory {
 

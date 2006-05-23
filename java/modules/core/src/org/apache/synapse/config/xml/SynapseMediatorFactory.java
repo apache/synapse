@@ -26,9 +26,11 @@ import org.apache.axiom.om.OMElement;
 /**
  * Builds the main mediator (@see SynapseConfiguration) of the Synapse instance
  *
- * <rules>
+ * <pre>
+ * &lt;rules&gt;
  *   mediator+
- * <rules>
+ * &lt;rules&gt;
+ * </pre>
  */
 public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 

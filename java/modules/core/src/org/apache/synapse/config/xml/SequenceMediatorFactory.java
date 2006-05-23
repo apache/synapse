@@ -28,13 +28,17 @@ import javax.xml.namespace.QName;
 /**
  * Builds an instance of a Sequence mediator through the Synapse configuration. It follows the following
  *
- * <sequence name="string">
+ * <pre>
+ * &lt;sequence name="string"&gt;
  *   mediator+
- * </sequence>
+ * &lt;/sequence&gt;
+ * </pre>
  *
  * OR
  *
- * <sequence ref="name"/>
+ * <pre>
+ * &lt;sequence ref="name"/&gt;
+ * </pre>
  */
 public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 

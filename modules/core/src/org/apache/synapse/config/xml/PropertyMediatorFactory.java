@@ -31,7 +31,9 @@ import javax.xml.namespace.QName;
 /**
  * Creates a set-property mediator through the supplied XML configuration
  *
- * <set-property name="string" (value="literal" | expression="xpath")/>
+ * <pre>
+ * &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
+ * </pre>
  */
 public class PropertyMediatorFactory extends AbstractMediatorFactory {
 

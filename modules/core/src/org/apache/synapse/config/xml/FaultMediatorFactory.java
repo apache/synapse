@@ -35,13 +35,15 @@ import java.net.URISyntaxException;
 /**
  * Creates a fault mediator instance
  *
- * <makefault [version="soap11|soap12"]>
- *   <code (value="literal" | expression="xpath")/>
- *   <reason (value="literal" | expression="xpath")>
- *   <node>?
- *   <role>?
- *   <detail>?
- * </makefault>
+ * <pre>
+ * &lt;makefault [version="soap11|soap12"]&gt;
+ *   &lt;code (value="literal" | expression="xpath")/&gt;
+ *   &lt;reason (value="literal" | expression="xpath")&gt;
+ *   &lt;node&gt;?
+ *   &lt;role&gt;?
+ *   &lt;detail&gt;?
+ * &lt;/makefault&gt;
+ * </pre>
  */
 public class FaultMediatorFactory extends AbstractMediatorFactory {
 

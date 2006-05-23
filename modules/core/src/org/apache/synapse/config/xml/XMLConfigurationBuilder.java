@@ -100,7 +100,9 @@ public class XMLConfigurationBuilder {
     }
 
     /**
-     * <set-property name="string" value="string"/>
+     * <pre>
+     * &lt;set-property name="string" value="string"/&gt;
+     * </pre>
      * @param elem
      */
     private void defineProperty(SynapseConfiguration config, OMElement elem) {
@@ -113,9 +115,11 @@ public class XMLConfigurationBuilder {
     }
 
     /**
-     * <sequence name="string>
+     * <pre>
+     * &lt;sequence name="string&gt;
      *    Mediator+
-     * </sequence>
+     * &lt;/sequence&gt;
+     * </pre>
      * @param ele
      */
     private void defineSequence(SynapseConfiguration config, OMElement ele) {
@@ -126,10 +130,12 @@ public class XMLConfigurationBuilder {
     /**
      * Create an endpoint definition digesting an XML fragment
      *
-     * <endpoint name="string" [address="url"]>
+     * <pre>
+     * &lt;endpoint name="string" [address="url"]&gt;
      *    .. extensibility ..
-     * </endpoint>
-     * @param ele the <endpoint> element
+     * &lt;/endpoint&gt;
+     * </pre>
+     * @param ele the &lt;endpoint&gt; element
      */
     private void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
@@ -161,7 +167,9 @@ public class XMLConfigurationBuilder {
      * the key.
      *
      * e.g. The Spring configuration extension is as follows
-     * <configuration name="string" src="string"/>
+     * <pre>
+     * &lt;configuration name="string" src="string"/&gt;
+     * </pre>
      *
      * @param elem the XML element defining the configuration
      */

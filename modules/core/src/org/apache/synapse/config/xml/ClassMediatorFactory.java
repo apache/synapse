@@ -31,9 +31,11 @@ import java.util.Iterator;
 /**
  * Creates an instance of a Class mediator using XML configuration specified
  *
- * <class name="class-name">
- *   <property name="string" (value="literal" | expression="xpath")/>*
- * </class>
+ * <pre>
+ * &lt;class name="class-name"&gt;
+ *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ * &lt;/class&gt;
+ * </pre>
  */
 public class ClassMediatorFactory extends AbstractMediatorFactory {
 

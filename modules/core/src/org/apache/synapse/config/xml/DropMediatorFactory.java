@@ -26,7 +26,9 @@ import javax.xml.namespace.QName;
 /**
  * This creates a drop mediator instance
  *
- * <drop/>
+ * <pre>
+ * &lt;drop/&gt;
+ * </pre>
  */
 public class DropMediatorFactory extends AbstractMediatorFactory {
 

@@ -24,9 +24,11 @@ import javax.xml.namespace.QName;
 /**
  * Creates an In mediator instance
  *
- * <in>
+ * <pre>
+ * &lt;in&gt;
  *    mediator+
- * </in>
+ * &lt;/in&gt;
+ * </pre>
  */
 public class InMediatorFactory extends AbstractListMediatorFactory {
 

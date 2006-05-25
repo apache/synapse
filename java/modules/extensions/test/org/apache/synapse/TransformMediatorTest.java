@@ -13,13 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.mediators.transform;
+package org.apache.synapse;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.TestUtils;
+import org.apache.synapse.mediators.transform.TransformMediator;
 import org.apache.synapse.MessageContext;
 
 import java.net.URL;
@@ -53,7 +54,7 @@ public class TransformMediatorTest extends TestCase {
 
         // set XSLT transformation URL
         transformMediator.setXsltUrl(
-            new URL("file:///" + new File(".").getAbsolutePath() + "/test-resources/misc/transform.xslt"));
+            new URL("file:///" + new File(".").getAbsolutePath() + "/../core/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext(SOURCE);
@@ -88,7 +89,7 @@ public class TransformMediatorTest extends TestCase {
 
         // set XSLT transformation URL
         transformMediator.setXsltUrl(
-            new URL("file:///" + new File(".").getAbsolutePath() + "/test-resources/misc/transform.xslt"));
+            new URL("file:///" + new File(".").getAbsolutePath() + "/../core/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext(SOURCE);
@@ -124,7 +125,7 @@ public class TransformMediatorTest extends TestCase {
 
         // set XSLT transformation URL
         transformMediator.setXsltUrl(
-            new URL("file:///" + new File(".").getAbsolutePath() + "/test-resources/misc/transform.xslt"));
+            new URL("file:///" + new File(".").getAbsolutePath() + "/../core/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE);

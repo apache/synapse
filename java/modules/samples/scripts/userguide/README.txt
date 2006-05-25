@@ -49,24 +49,39 @@ The Samples are avilable in three categories
 		mediators and the new configuration language syntax.
 		
 		CustomStockQuoteClient (ant customquote)
-			- Synapse server should be started with <SYNAPSE>\bin\synapse.bat -sample 1 or equivanlent
-			under Unix to run this sample. This sample shows the introduction of support to handle custom
-			stock quote requests to the previous configuration used in the examples of section 1. The
-			configuration used in this sample transforms the custom request messages into the format understood
-			by the actual services. It also	shows the usage of the <in> and <out> mediators and support for the 
-			correlation of messgaes, so that when a standard stock quote response is received, Synapse knows 
-			how to mediate this response back to the correct client - i.e. as is or performing a transformation
-			back to a custom format.
+			- Synapse server should be started with <SYNAPSE>\bin\synapse.bat -sample 1  or equivanlent 
+			under Unix to run this sample. This sample shows the introduction of support to handle custom 
+			stock quote requests to the previous configuration used in the examples of section 1. 
+
+			- The configuration used in this sample transforms the custom request messages into the format 
+			understood by the actual services. It also shows the usage of the <in> and <out> mediators and 
+			support for the correlation of messgaes, so that when a standard stock quote response is received, 
+			Synapse knows how to mediate this response back to the correct client - i.e. as is or performing a 
+			transformation back to a custom format. 
+
+			- Depending on which JDK you use, you will have to setup Xerces 2.8.0 such that the JDK will 
+			properly pick it up (i.e. xml-apis.jar and xercesImpl.jar). Usually this could be accomplished by 
+			placing the Xerces JAR's into the <JAVA_HOME>\lib\endorsed directory of the JDK (or JRE). You could 
+			also place Xerces jars into <SYNAPSE>\lib\endorsed directory without altering your JDK/JRE. In 
+			addition the synapse-extensions.jar should be placed into the <SYNAPSE>\lib folder so that the 
+			extensions are properly picked up. As the Spring extension and Transform mediator is bundled with 
+			the extensions distribution you will also need the Spring 1.2.8 JAR file(spring.jar) and Xalan JAR 
+			files (xalan.jar and serializer.jar) placed into the <SYNAPSE>\lib 
+
 			
 		AdvancedQuoteClient (ant advancedquote)
 			- Synapse server should be started with <SYNAPSE>\bin\synapse.bat -sample 2 or equivanlent
 			under Unix to run this sample. This sample shows the validation mediator extension. The validation
 			mediator is kept outside of the core Synapse distribution as it relies on the Xerces parser. 
-			Depending on which JDK you use, you will have to setup Xerces 2.8.0 such that the JDK will properly
-			pick it up. Usually this could be accomplished by placing the Xerces JAR's into the <JAVA_HOME>\lib\endorsed
-			directory of the JDK (or JRE). In addition the synapse-extensions.jar should be placed into the
-			<SYNAPSE>\lib folder so that the extensions are properly picked up. As the Spring extension is bundled
-			with the extensions distribution you may also need the Spring JAR files placed into the <SYNAPSE>\lib
+			
+			- Depending on which JDK you use, you will have to setup Xerces 2.8.0 such that the JDK will 
+			properly pick it up (i.e. xml-apis.jar and xercesImpl.jar). Usually this could be accomplished by 
+			placing the Xerces JAR's into the <JAVA_HOME>\lib\endorsed directory of the JDK (or JRE). You could 
+			also place Xerces jars into <SYNAPSE>\lib\endorsed directory without altering your JDK/JRE. In 
+			addition the synapse-extensions.jar should be placed into the <SYNAPSE>\lib folder so that the 
+			extensions are properly picked up. As the Spring extension and Transform mediator is bundled with 
+			the extensions distribution you will also need the Spring 1.2.8 JAR file(spring.jar) and Xalan JAR 
+			files (xalan.jar and serializer.jar) placed into the <SYNAPSE>\lib
 		
 3.	The samples.config package contains a sample which shows how a custom Synapse/Axis2 instance could be 
 		started	up and configured. The examples demonstrates that the SynapseConfiguration to be used could be

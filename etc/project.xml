@@ -4,7 +4,7 @@
     <pomVersion>3</pomVersion>
     <id>Synapse-Incubating</id>
     <name>Apache Synpase</name>
-    <currentVersion>M2-SNAPSHOT</currentVersion>
+    <currentVersion>${synapse.version}</currentVersion>
 
     <organization>
         <name>Apache Web Services</name>

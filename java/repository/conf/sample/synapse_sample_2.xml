@@ -20,7 +20,6 @@
 	      	
 	      	<!-- send the fault and stop processing -->
 	      	<send/>
-		      <drop/>
 		    </on-fail>
 		  </validate>
 
@@ -47,15 +46,14 @@
     	
     	<log level="custom">
     		<property name="Text" value="Sending quote request"/>
-    		<property name="version" expression="synapse:get-property('version')"/>
-    		<property name="symbol" expression="synapse:get-property('symbol')"/>
+    		<property name="version" expression="get-property('version')"/>
+    		<property name="symbol" expression="get-property('symbol')"/>
     	</log>
     	
     	<!-- send message to real endpoint referenced by name "invesbot" and stop -->
     	<send>
     		<endpoint ref="invesbot"/>
     	</send>
-    	<drop/>
     </sequence>
 
 		<sequence name="customresponse">
@@ -64,7 +62,6 @@
     	
     	<!-- now send the custom response back to the client and stop -->
     	<send/>    	
-    	<drop/>
     </sequence>
     
     <sequence name="stockquote">
@@ -116,7 +113,7 @@
 		
 		<out>
   		<!-- is this a custom stock quote reply? -->
-	  	<filter source="synapse:get-property('correlate/label')" regex="customquote">
+	  	<filter source="get-property('correlate/label')" regex="customquote">
 	  		<sequence ref="customresponse"/>
 	  	</filter>
 

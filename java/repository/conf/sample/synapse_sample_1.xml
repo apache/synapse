@@ -14,7 +14,6 @@
     	
     	<!-- send message to real endpoint and stop -->
     	<send/>
-    	<drop/>
     </sequence>
 
 		<sequence name="customresponse">
@@ -23,7 +22,6 @@
     	
     	<!-- now send the custom response back to the client and stop -->
     	<send/>    	
-    	<drop/>
     </sequence>
     
     <sequence name="stockquote">
@@ -75,7 +73,7 @@
 		
 		<out>
   		<!-- is this a custom stock quote reply? -->
-	  	<filter source="synapse:get-property('correlate/label')" regex="customquote">
+	  	<filter source="get-property('correlate/label')" regex="customquote">
 	  		<sequence ref="customresponse"/>
 	  	</filter>
 

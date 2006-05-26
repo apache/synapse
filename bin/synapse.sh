@@ -81,6 +81,8 @@ if $cygwin; then
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
+# endorsed dir
+SYNAPSE_ENDORSED=$JAVA_HOME/lib/endorsed
 
 # ----- Execute The Requested Command -----------------------------------------
 
@@ -89,4 +91,4 @@ echo "Starting Synapse/Java ..."
 echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 
-$JAVA_HOME/bin/java -Daxis2.xml=$SYNAPSE_HOME/synapse_repository/conf/axis2.xml -classpath $SYNAPSE_CLASSPATH org.apache.axis2.transport.http.SimpleHTTPServer $SYNAPSE_HOME/synapse_repository -p8080
+$JAVA_HOME/bin/java -Daxis2.xml=$SYNAPSE_HOME/synapse_repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.axis2.transport.http.SimpleHTTPServer $SYNAPSE_HOME/synapse_repository -p8080

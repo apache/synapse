@@ -15,7 +15,7 @@
         <dependency>
             <groupId>synapse</groupId>
             <artifactId>synapse-core</artifactId>
-            <version>${pom.currentVersion}</version>
+            <version>${synapse.version}</version>
         </dependency>
 
         <!-- external JARs -->

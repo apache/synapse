@@ -83,8 +83,20 @@ goto runSynapse
 if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :runSynapse
+rem set the classes by looping through the libs
+setlocal EnableDelayedExpansion
+set SYNAPSE_CLASS_PATH=%SYNAPSE_HOME%
+FOR %%C in (%SYNAPSE_HOME%\lib\*.jar) DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;%%~fC
+set SYNAPSE_CLASS_PATH=%SYNAPSE_HOME%\conf;%SYNAPSE_CLASS_PATH%
+
+rem if a sample configuration is not specified, use default
+if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml=%SYNAPSE_HOME%\synapse_repository\conf\synapse.xml
+
+set SYNAPSE_ENDORSED=%SYNAPSE_HOME%\lib\endorsed;%JAVA_ENDORSED_DIRS%;%JAVA_HOME%\lib\endorsed
+
 @echo on
-"%_JAVACMD%" %_SYNAPSE_XML% -Daxis2.xml=%SYNAPSE_HOME%\synapse_repository\conf\axis2.xml -Djava.ext.dirs=%SYNAPSE_HOME%\lib;%EXT_DIRS%;%SYNAPSE_HOME% -cp %SYNAPSE_HOME%\lib org.apache.axis2.transport.http.SimpleHTTPServer %SYNAPSE_CMD_LINE_ARGS%
+cd %SYNAPSE_HOME%
+"%_JAVACMD%" -Daxis2.xml=%SYNAPSE_HOME%\synapse_repository\conf\axis2.xml -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% -cp %SYNAPSE_CLASS_PATH% org.apache.axis2.transport.http.SimpleHTTPServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 
 :end

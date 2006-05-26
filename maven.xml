@@ -333,6 +333,7 @@
         <ant:mkdir dir="${bin.dist.dir}"/>
         <ant:mkdir dir="${bin.dist.dir}/bin"/>
         <ant:mkdir dir="${bin.dist.dir}/lib"/>
+        <ant:mkdir dir="${bin.dist.dir}/lib/endorsed"/>
         <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>

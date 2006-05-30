@@ -1,0 +1,15 @@
+<module name="synapse" class="org.apache.synapse.core.axis2.SynapseModule">
+
+    <Description>
+        This module dynamically set the Synapse dispatcher. Synapse service and
+        SynapseMessageReceiver will be initialize by SynapseModule
+    </Description>
+
+    <inflow>
+        <handler name="SynapseDispatcher"
+                 class="org.apache.synapse.core.axis2.SynapseDispatcher">
+            <order phaseFirst="true" phase="Dispatch"/>
+        </handler>
+    </inflow>
+
+</module>

@@ -26,7 +26,14 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
-
+/**
+ * Creates an instance of JsonMediator.
+ * <x:json/> mediator belongs to the http://ws.apache.org/ns/synapse/json namespace.
+ * <p/>
+ * <x:json (direction="JTX"|"XTJ)"/>
+ * JTX is Json to XML
+ * XTJ is XML to Json
+ */
 public class JsonMediatorFactory implements MediatorFactory{
 
     private static final Log log = LogFactory.getLog(JsonMediatorFactory.class);

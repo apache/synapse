@@ -39,6 +39,8 @@ import java.io.FileNotFoundException;
  * The Synapse Axis2 interceptor will be invoked by Axis2 upon Axis initialization.
  * This allows the Synapse engine to be initialized at Axis2 startup, and store the
  * initial Synapse configuration into the AxisConfiguration for subsequent lookup.
+ * @deprecated
+ * SynapseModule will initialize the SynapseEnvironment. 
  */
 public class SynapseAxis2Interceptor implements AxisObserver, Constants {
 

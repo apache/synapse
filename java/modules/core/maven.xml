@@ -20,30 +20,20 @@
     <goal name="synapse_core">
         <j:set var="class_test.dir" value="target/test-classes"/>
 
-        <echo message="----------------Creating First Dispatching aar----------------"/>
-        <mkdir dir="target/services/synapse/META-INF"/>
-        <copy file="test-resources/axis2/services/synapse/META-INF/services.xml"
-              tofile="target/services/synapse/META-INF/services.xml"/>
-        <jar jarfile="target/synapse.aar"
-             basedir="target/services/synapse">
+        <echo message="----------------Creating synapse.mar----------------"/>
+        <mkdir dir="target/modules/synapse/META-INF"/>
+        <copy file="conf/module.xml"
+              tofile="target/modules/synapse/META-INF/module.xml"/>
+        <jar jarfile="target/synapse.mar"
+             basedir="target/modules/synapse">
             <include name="**"/>
         </jar>
 
-        <echo message="----------------Creating Empty Mediator aar----------------"/>
-        <mkdir dir="target/services/emptymediator/META-INF"/>
-        <copy file="test-resources/axis2/services/emptymediator/META-INF/services.xml"
-              tofile="target/services/emptymediator/META-INF/services.xml"/>
-        <jar jarfile="target/emptymediator.aar"
-             basedir="target/services/emptymediator">
-            <include name="**"/>
-        </jar>
 
         <echo message="-----------Creating Testing Repository - Genral----------"/>
         <mkdir dir="target/synapse-repository"/>
-        <copy file="target/synapse.aar"
-              tofile="target/synapse-repository/services/synapse.aar"/>
-        <copy file="target/emptymediator.aar"
-              tofile="target/synapse-repository/services/emptymediator.aar"/>
+        <copy file="target/synapse.mar"
+              tofile="target/synapse-repository/modules/synapse.mar"/>
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="../../repository/modules/addressing-${addressing.version}.mar"
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
@@ -55,9 +45,7 @@
 
         <ant:delete dir="target/modules"/>
         <ant:delete dir="target/services"/>
-        <ant:delete file="target/emptymediator.aar"/>
-        <ant:delete file="target/synapse.aar"/>
-        <ant:delete file="target/environmentaware-mediator.aar"/>
+        <ant:delete file="target/synapse.mar"/>
 
         <ant:path id="classes_test.dir" location="${class_test.dir}"/>
         <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>

@@ -1,3 +1,4 @@
 org.apache.synapse.config.xml.SpringMediatorFactory
 org.apache.synapse.config.xml.ValidateMediatorFactory
 org.apache.synapse.config.xml.TransformMediatorFactory
+org.apache.synapse.config.xml.JsonMediatorFactory

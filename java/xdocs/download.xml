@@ -48,10 +48,10 @@
         <tr>
             <td align="center" valign="middle">M2</td>
             <td align="center">Milestone</td>
-            <td><a href="http://www.apache.org/dist/ws/synapse/M2/Synapse-Incubating-M2-src.zip" title="">Source Distribution zip</a><br/>
+            <td>Available shortly<!--<a href="http://www.apache.org/dist/ws/synapse/M2/Synapse-Incubating-M2-src.zip" title="">Source Distribution zip</a><br/>
                 <a href="http://www.apache.org/dist/ws/synapse/M2/Synapse-Incubating-M2-bin.zip" title="">Binary Distribution zip</a><br/>
-                <a href="http://www.apache.org/dist/ws/synapse/M2/Extensions-Synapse-M2-bin.zip" title="">Extensions Distribution zip</a></td>
-            <td>23-May-2006</td>
+                <a href="http://www.apache.org/dist/ws/synapse/M2/Extensions-Synapse-M2-bin.zip" title="">Extensions Distribution zip</a>--></td>
+            <td></td>
             <td>Milestone 2</td>
         </tr>
 		</tbody>

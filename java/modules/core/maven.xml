@@ -24,16 +24,23 @@
         <mkdir dir="target/modules/synapse/META-INF"/>
         <copy file="conf/module.xml"
               tofile="target/modules/synapse/META-INF/module.xml"/>
-        <jar jarfile="target/synapse.mar"
-             basedir="target/modules/synapse">
-            <include name="**"/>
+        <jar jarfile="target/synapse-${pom.currentVersion}.mar">
+            <fileset dir="target/modules/synapse">
+                 <include name="**"/>
+            </fileset>
+            <fileset dir="target/classes">
+                <include name="**"/>
+            </fileset>
+
         </jar>
 
+       <copy file="target/synapse-${pom.currentVersion}.mar"
+            tofile="${maven.repo.local}/${pom.artifactId}/mars/synapse-${pom.currentVersion}.mar"/>
 
         <echo message="-----------Creating Testing Repository - Genral----------"/>
         <mkdir dir="target/synapse-repository"/>
-        <copy file="target/synapse.mar"
-              tofile="target/synapse-repository/modules/synapse.mar"/>
+        <copy file="target/synapse-${pom.currentVersion}.mar"
+              tofile="target/synapse-repository/modules/synapse-${pom.currentVersion}.mar"/>
         <mkdir dir="target/synapse-repository/modules"/>
         <copy file="../../repository/modules/addressing-${addressing.version}.mar"
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
@@ -45,7 +52,6 @@
 
         <ant:delete dir="target/modules"/>
         <ant:delete dir="target/services"/>
-        <ant:delete file="target/synapse.mar"/>
 
         <ant:path id="classes_test.dir" location="${class_test.dir}"/>
         <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>

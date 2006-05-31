@@ -85,10 +85,13 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 // results in an unbound URI exception for no credible reason - needs more investigation
                 // seems like a woodstox issue. Use hack for now
                 axisOutMsgContext.getEnvelope().build();
+                
+                log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
 
                 AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
                 try {
                     axisOutMsgContext.setProperty(org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+                    mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
                     // check for addressing is alredy engaged for this message.
                     // if engage we should use the address enable Configuraion context.
                     ae.send(axisOutMsgContext);

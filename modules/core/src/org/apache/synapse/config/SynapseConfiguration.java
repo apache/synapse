@@ -16,9 +16,9 @@
 package org.apache.synapse.config;
 
 import org.apache.synapse.api.Mediator;
+import org.apache.synapse.core.axis2.ProxyService;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The SynapseConfiguration holds the global configuration for a Synapse
@@ -33,6 +33,9 @@ public class SynapseConfiguration {
 
     /** Holds named endpoints (which results into absolute EPRs) for reuse */
     private Map namedEndpoints = new HashMap();
+
+    /** Holds names Proxy services deployed through Synapse */
+    private Map proxyServices = new HashMap();
 
     /** Holds global (system-wide) properties that apply to the synapse instance and every message */
     private Map globalProps = new HashMap();
@@ -110,6 +113,28 @@ public class SynapseConfiguration {
      */
     public Endpoint getNamedEndpoint(String name) {
         return (Endpoint) namedEndpoints.get(name);
+    }
+
+    /**
+     * Add a Proxy service to the configuration
+     * @param name the name of the Proxy service
+     * @param proxy the Proxy service instance
+     */
+    public void addProxyService(String name, ProxyService proxy) {
+        proxyServices.put(name, proxy);
+    }
+
+    /**
+     * Get the Proxy service with the given name
+     * @param name the name being looked up
+     * @return the Proxy service
+     */
+    public ProxyService getProxyService(String name) {
+        return (ProxyService) proxyServices.get(name);
+    }
+
+    public Collection getProxyServices() {
+        return proxyServices.values();
     }
 
 }

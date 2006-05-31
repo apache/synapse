@@ -20,6 +20,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -78,11 +79,27 @@ public class XMLConfigurationBuilder {
             }
         }
 
-        OMElement elem = root.getFirstChildWithName(Constants.RULES_ELT);
-        if (elem == null) {
+        OMElement proxies = root.getFirstChildWithName(Constants.PROXIES_ELT);
+        if (proxies != null) {
+            Iterator iter = proxies.getChildren();
+            while (iter.hasNext()) {
+                Object o = iter.next();
+                if (o instanceof OMElement) {
+                    OMElement elt = (OMElement) o;
+                    if (Constants.PROXY_ELT.equals(elt.getQName())) {
+                        ProxyService proxy = ProxyServiceFactory.createProxy(elt);
+                        proxy.buildAxisService();
+                        config.addProxyService(proxy.getName(), proxy);
+                    }
+                }
+            }
+        }
+
+        OMElement rules = root.getFirstChildWithName(Constants.RULES_ELT);
+        if (rules == null) {
             handleException("A valid Synapse configuration MUST specify the main mediator using the <rules> element");
         } else {
-            SynapseMediator sm = (SynapseMediator) MediatorFactoryFinder.getInstance().getMediator(elem);
+            SynapseMediator sm = (SynapseMediator) MediatorFactoryFinder.getInstance().getMediator(rules);
             if (sm.getList().isEmpty()) {
                 handleException("Invalid configuration, the main mediator specified by the <rules> element is empty");
             } else {

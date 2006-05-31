@@ -26,6 +26,8 @@ public interface Constants {
     public static final QName ENDPOINT_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "endpoint");
     public static final QName PROPERTY_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "set-property");
     public static final QName RULES_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
+    public static final QName PROXIES_ELT       = new QName(Constants.SYNAPSE_NAMESPACE, "proxies");
+    public static final QName PROXY_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "proxy");
 
     public static final String SYNAPSE_NAMESPACE = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
     public static final String NULL_NAMESPACE    = "";

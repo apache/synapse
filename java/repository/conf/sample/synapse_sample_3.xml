@@ -1,0 +1,42 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+  
+  <definitions>
+  	<sequence name="stockquote">
+    	<log level="custom">
+    		<property name="sequence" value="*** Custom 'stockquote'Sequence ***"/>
+    	</log>
+    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+      <send/>
+    </sequence>
+    
+    <endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/>
+  </definitions>
+  
+  <proxies>
+  	<proxy name="InvesbotSequenceProxy" type="wsdl" description="This uses the stockquote named sequence for mediation">
+	    <endpoint protocol="http" uri="/MyfirstProxy"/>
+	    <target sequence="stockquote"/>
+	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
+	  </proxy>
+	  
+	  <proxy name="InvesbotForwardProxy" type="wsdl" description="This simply forwards all messages to the investbot endpoint">
+	    <endpoint protocol="http" uri="/MyfirstProxy"/>
+	    <target endpoint="invesbot"/>
+	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
+	  </proxy>  	
+	  
+	  <proxy name="InvesbotDefaultProxy" type="wsdl" description="This simply forwards all messages to the investbot endpoint">
+	    <endpoint protocol="http" uri="/MyfirstProxy"/>
+	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
+	  </proxy>
+  </proxies>
+
+  <rules>
+		<log level="custom">
+			<property name="sequence" value="*** Default Main mediator Sequence ***"/>
+		</log>
+    <header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    <send/>
+  </rules>
+
+</synapse> 

@@ -28,6 +28,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 public class SynapseModule implements Module, Constants {
 
@@ -85,9 +86,14 @@ public class SynapseModule implements Module, Constants {
                     "'to the Axis2 configuration : " + e.getMessage(), e);
         }
 
+        log.info("Initializing Proxy services...");
+        Iterator iter = synCfg.getProxyServices().iterator();
+        while (iter.hasNext()) {
+            ProxyService proxy = (ProxyService) iter.next();
+            axisCfg.addService(proxy.buildAxisService());            
+        }
+
         log.info("Synapse Environment initialized...");
-
-
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {

@@ -381,6 +381,11 @@
             </ant:fileset>
         </ant:copy>
 
+        <ant:copy file="modules/core/target/synapse-${pom.currentVersion}.mar"
+                  tofile="${dist.dir}/synapse-${pom.currentVersion}.mar"/>
+        <ant:copy file="modules/core/target/synapse-${pom.currentVersion}.mar"
+                  tofile="target/synapse-${pom.currentVersion}.mar"/>
+
 
         <ant:zip file="${dist.dir}/${dist.name}-bin.zip"
                  basedir="target/temp"/>

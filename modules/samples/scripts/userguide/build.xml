@@ -62,6 +62,13 @@
 	  	ant simplequote 
 	    ant simplequote [-Dsymbol=IBM] [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote] [-Drepository=../synapse_repository]
 
+  	ant proxyquote
+	    Use Proxy services to query stock prices
+    
+  	 	examples:
+  	  ant proxyquote
+  	  ant proxyquote -Dsymbol=IBM -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
+  	    -Drepository=../synapse_repository"
 
         </echo>
     </target>
@@ -134,6 +141,16 @@
 
     <target name="simplequote" depends="compile">        
         <java classname="samples.config.SimpleStockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${investbot_url}"/>
+            <arg value="${gatewayurl}"/>
+            <arg value="${repository}"/>
+        </java>
+    </target>
+    
+    <target name="proxyquote" depends="compile">        
+        <java classname="samples.mediation.ProxyStockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${investbot_url}"/>

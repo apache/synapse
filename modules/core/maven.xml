@@ -50,6 +50,21 @@
             </fileset>
         </copy>
 
+
+        <echo message="-----------Creating Testing Repository [testing_repository]  ----------"/>
+        <mkdir dir="target/testing_repository"/>
+        <copy file="target/synapse-${pom.currentVersion}.mar"
+              tofile="target/testing_repository/modules/synapse-${pom.currentVersion}.mar"/>
+
+        <mkdir dir="target/testing_repository/modules"/>
+        <copy file="../../repository/modules/addressing-${addressing.version}.mar"
+              tofile="target/testing_repository/modules/addressing-${addressing.version}.mar"/>
+        <copy file="../../repository/conf/axis2.xml"
+              tofile="target/testing_repository/conf/axis2.xml"/>
+        <copy file="test/rules/synapse_test.xml"
+              tofile="target/testing_repository/conf/synapse.xml"/>
+
+
         <ant:delete dir="target/modules"/>
         <ant:delete dir="target/services"/>
 

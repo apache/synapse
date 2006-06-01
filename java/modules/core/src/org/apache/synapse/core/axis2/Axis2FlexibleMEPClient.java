@@ -123,31 +123,20 @@ public class Axis2FlexibleMEPClient {
                 + UUIDGenerator.getUUID()));
         if (axisMsgCtx.getReplyTo() != null)
             mc.setReplyTo(axisMsgCtx.getReplyTo());
-        //if (axisMsgCtx.getRelatesTo() != null)
-            //mc.setRelatesTo(axisMsgCtx.getRelatesTo());
-            if (axisMsgCtx.getTo() != null) {
-                mc.setTo(axisMsgCtx.getTo());
-            } else {
-                throw new AxisFault(
+        if (axisMsgCtx.getRelationships() != null)
+            mc.setRelationships(axisMsgCtx.getRelationships());
+        if (axisMsgCtx.getTo() != null) {
+            mc.setTo(axisMsgCtx.getTo());
+        } else {
+            throw new AxisFault(
                     "To canno't be null, if null Synapse can't infer the transport");
-            }
+        }
         if (axisMsgCtx.isDoingREST()) {
             mc.setDoingREST(true);
         }
 
-        // handling the outbound message with addressing
-        AxisModule module = ac.getModule(new QName(org.apache.axis2.Constants.MODULE_ADDRESSING));
-        if ((axisMsgCtx.getProperty(Constants.ENGAGE_ADDRESSING_IN_MESSAGE) != null) ||
-            (axisMsgCtx.getProperty(
-                Constants.ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE) != null)) {
-            if (!ac.getService("__ANONYMOUS_SERVICE__")
-                .isEngaged(module.getName())) {
-                ac.getService("__ANONYMOUS_SERVICE__").engageModule(module, ac);
-            }
-        }
-
-        //TODO; following line needed to be removed
-
+        // This has to be set due to addressing hadndelers will ignore the values if its set
+        // in infoset.
         mc.setEnvelope(outEnvelopeConfiguration(axisMsgCtx));
 
         AxisOperation axisAnonymousOperation =
@@ -172,12 +161,7 @@ public class Axis2FlexibleMEPClient {
         // variable
         response.setDoingREST(axisMsgCtx.isDoingREST());
         response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-
-        if (ac.getService("__ANONYMOUS_SERVICE__")
-            .isEngaged(module.getName())) {
-            ac.getService("__ANONYMOUS_SERVICE__")
-                .disEngageModule(ac.getModule(module.getName()));
-        }
+        
         return response;
     }
 

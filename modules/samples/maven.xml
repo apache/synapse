@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="jar"
+         xmlns:j="jelly:core"
+         xmlns:u="jelly:util"
+         xmlns:deploy="deploy"
+         xmlns:ant="jelly:ant"
+         xmlns:maven="jelly:maven"
+         xmlns:define="jelly:define">
+
+    <j:set var="dist.name" value="${pom.artifactId}-${pom.currentVersion}"/>
+    <!--<j:set var="dist.dir" value="target/dist"/>-->
+    <j:set var="samples.dir" value="target/samples"/>
+
+    <postGoal name="test:test">
+        <j:if test="${context.getVariable('maven.test.skip') != 'true'}">
+            <attainGoal name="toDistBin"/>
+        </j:if>
+    </postGoal>
+
+    <goal name="samples_userguide">
+        <mkdir dir="target/samples"/>
+        <mkdir dir="${samples.dir}/src"/>
+        <ant:copy todir="${samples.dir}/src">
+            <ant:fileset dir="src">
+                <ant:include name="samples/**"/>
+            </ant:fileset>
+        </ant:copy>
+
+    </goal>
+
+    <goal name="toDistBin" prereqs="samples_userguide">
+        <property name="bin.dist.dir" value="target/dist-bin"/>
+        <ant:mkdir dir="${bin.dist.dir}"/>
+        <ant:mkdir dir="${bin.dist.dir}/samples"/>
+
+				<ant:copy todir="${bin.dist.dir}/samples">
+            <ant:fileset dir="scripts/userguide">
+                <ant:include name="**/*"/>
+            </ant:fileset>
+        </ant:copy>
+        
+        <ant:copy todir="${bin.dist.dir}/samples">
+            <ant:fileset dir="target/samples/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        
+        <ant:delete dir="target/samples"/>
+    </goal>
+</project>

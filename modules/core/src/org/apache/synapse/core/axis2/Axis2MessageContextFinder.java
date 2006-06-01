@@ -1,0 +1,129 @@
+/*
+ * Copyright 2004,2005 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.synapse.core.axis2;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.config.SynapseConfigurationBuilder;
+import org.apache.synapse.config.SynapseConfiguration;
+
+import java.io.InputStream;
+
+/**
+ * <p/>
+ * The MessageContext needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
+ * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
+ */
+public class Axis2MessageContextFinder implements Constants {
+
+    private static Log log = LogFactory.getLog(Axis2MessageContextFinder.class);
+
+    public static MessageContext getSynapseMessageContext(org.apache.axis2.context.MessageContext axisMsgCtx) {
+
+        // we get the configuration on each message from the Axis2 configuration since the Synapse configuration
+        // may be updated externally and thus should not be cached.
+
+        SynapseConfiguration synCfg = getSynapseConfig(axisMsgCtx);
+        SynapseEnvironment   synEnv = getSynapseEnvironment(axisMsgCtx);
+
+        if (synCfg == null || synEnv == null) {
+            initializeSynapse(axisMsgCtx);
+            synCfg = getSynapseConfig(axisMsgCtx);
+            synEnv = getSynapseEnvironment(axisMsgCtx);
+        }
+
+        return new Axis2MessageContext(axisMsgCtx, synCfg, synEnv);
+    }
+
+    /**
+     * Create the SynapseConfiguration and SynapseEnvironment objects and set them into the Axis2 configuration
+     * for reuse
+     * @param mc the current Axis2 message context
+     */
+    private static synchronized void initializeSynapse(org.apache.axis2.context.MessageContext mc) {
+
+        if (getSynapseConfig(mc) != null && getSynapseEnvironment(mc) != null) {
+            // is this a second thread which came in just after initialization?
+            return;
+        }
+
+        log.info("Initializing Synapse...");
+        SynapseConfiguration synCfg = null;
+        AxisConfiguration axisCfg = mc.getConfigurationContext().getAxisConfiguration();
+
+        // if the system property synapse.xml is specified, use it.. else default config
+        String config = System.getProperty(Constants.SYNAPSE_XML);
+        if (config != null) {
+            log.info("System property '" + Constants.SYNAPSE_XML +
+                "' specifies synapse configuration as " + config);
+            synCfg = SynapseConfigurationBuilder.getConfiguration(config);
+        } else {
+            log.warn("System property '" + Constants.SYNAPSE_XML + "' is not specified. Using default configuration");
+            synCfg = SynapseConfigurationBuilder.getDefaultConfiguration();
+        }
+
+        // set the Synapse configuration and environment into the Axis2 configuration
+        Parameter synapseCtxParam = new Parameter(SYNAPSE_CONFIG, null);
+        synapseCtxParam.setValue(synCfg);
+
+        Parameter synapseEnvParam = new Parameter(SYNAPSE_ENV, null);
+        synapseEnvParam.setValue(new Axis2SynapseEnvironment(axisCfg));
+
+        try {
+            axisCfg.addParameter(synapseCtxParam);
+            axisCfg.addParameter(synapseEnvParam);
+
+        } catch (AxisFault e) {
+            handleException(
+                "Could not set parameters '" + SYNAPSE_CONFIG + "' and/or '" + SYNAPSE_ENV +
+                "'to the Axis2 configuration : " + e.getMessage(), e);
+        }
+
+        log.info("Synapse initialized...");
+    }
+
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
+    private static SynapseConfiguration getSynapseConfig(org.apache.axis2.context.MessageContext mc) {
+        AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
+        Parameter synConfigParam = ac.getParameter(SYNAPSE_CONFIG);
+        if (synConfigParam != null) {
+            return (SynapseConfiguration) synConfigParam.getValue();
+        }
+        return null;
+    }
+
+    private static SynapseEnvironment getSynapseEnvironment(org.apache.axis2.context.MessageContext mc) {
+        AxisConfiguration ac = mc.getConfigurationContext().getAxisConfiguration();
+        Parameter synEnvParam = ac.getParameter(SYNAPSE_ENV);
+        if (synEnvParam != null) {
+            return (SynapseEnvironment) synEnvParam.getValue();
+        }
+        return null;
+    }
+
+}

@@ -1,0 +1,125 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+  
+  <definitions>
+  
+  	<!-- define global properties -->
+  	<set-property name="version" value="0.1"/>
+  
+  	<!-- define a reuseable endpoint definition and use it within config -->
+  	<endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/>
+
+    <sequence name="customrequest">
+    	<!-- is this a valid custom request ? -->
+    	<validate schema="file:synapse_repository/conf/sample/validate.xsd">
+		    <on-fail>
+		    	<!-- if the request does not validate againt schema throw a fault -->
+	      	<makefault>
+	      		<code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+	      		<reason value="Invalid custom quote request"/>
+	      	</makefault>
+	      	
+	      	<!-- send the fault and stop processing -->
+	      	<send/>
+		    </on-fail>
+		  </validate>
+
+  		<switch source="//m0:CheckPriceRequest/m0:Code" xmlns:m0="http://www.apache-synapse.org/test">
+		    <case regex="IBM">
+		    	<set-property name="symbol" value="Great stock - IBM"/>
+		    </case>
+		    <case regex="MSFT">
+		      <set-property name="symbol" value="Are you sure? - MSFT"/>
+		    </case>
+		    <default>
+		      <set-property name="symbol" expression="fn:concat('Normal Stock - ', //m0:CheckPriceRequest/m0:Code)" xmlns:m0="http://www.apache-synapse.org/test"/>
+		    </default>
+		  </switch>
+		  
+		  <!-- set a dynamic (local) message property -->
+		  
+    
+    	<!-- set correlation field to custom label -->
+    	<set-property name="correlate/label" value="customquote"/>
+    	
+    	<!-- transform the custom quote into a standard quote requst -->
+    	<transform xslt="file:synapse_repository/conf/sample/transform.xslt"/>
+    	
+    	<log level="custom">
+    		<property name="Text" value="Sending quote request"/>
+    		<property name="version" expression="get-property('version')"/>
+    		<property name="symbol" expression="get-property('symbol')"/>
+    	</log>
+    	
+    	<!-- send message to real endpoint referenced by name "invesbot" and stop -->
+    	<send>
+    		<endpoint ref="invesbot"/>
+    	</send>
+    </sequence>
+
+		<sequence name="customresponse">
+    	<!-- transform the custom quote into a standard quote requst -->
+    	<transform xslt="file:synapse_repository/conf/sample/transform_back.xslt"/>
+    	
+    	<!-- now send the custom response back to the client and stop -->
+    	<send/>    	
+    </sequence>
+    
+    <sequence name="stockquote">
+    	<!-- set the To address to the real endpoint -->
+    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    
+    	<!-- check if the symbol is MSFT -->
+      <filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
+      	<!-- if it is throw a fault -->
+      	<makefault>
+      		<code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+      		<reason value="Isn't there a Windows API for that?"/>
+      	</makefault>
+      </filter>
+      
+      <send/>
+    </sequence>
+    
+    <sequence name="standardrequest">
+	  	<!-- now log the message using log4j -->
+	  	<log level="full"/>
+	  	
+	  	<!-- Check if the URL matches the stockquote gateway/dumb case -->
+	  	<filter source="get-property('To')" regex=".*/StockQuote.*">
+	  		<sequence ref="stockquote"/>
+	  	</filter>
+	  	
+	  	<!-- check if the URL matches the virtual url - either the proxy or ws-add case -->
+			<filter source="get-property('To')" regex="http://stockquote.*">
+	  		<sequence ref="stockquote"/>
+	  	</filter>
+	  		  	
+	  	<!-- send the message on -->
+	  	<send/>
+    </sequence>
+
+  </definitions>
+
+  <rules>
+  	<in>
+	  	<!-- is this a custom stock quote message? -->
+	  	<filter xpath="//m0:CheckPriceRequest" xmlns:m0="http://www.apache-synapse.org/test">
+	  		<sequence ref="customrequest"/>
+	  	</filter>
+	  	
+	  	<!-- else, proceed as usual with the standard processing rules -->
+	  	<sequence ref="standardrequest"/>
+		</in>
+		
+		<out>
+  		<!-- is this a custom stock quote reply? -->
+	  	<filter source="get-property('correlate/label')" regex="customquote">
+	  		<sequence ref="customresponse"/>
+	  	</filter>
+
+			<!-- just let the message flow through -->
+		  <send/>
+		</out>		
+  </rules>
+
+</synapse> 

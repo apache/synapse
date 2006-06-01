@@ -1,0 +1,11 @@
+<service name="environmentaware-mediator">
+    <description>
+        EnvironmentAware-Mediator
+    </description>
+    <parameter name="ServiceClass" locked="false">
+        org.apache.axis2.test.EnvironmentAwareMediator</parameter>
+    <operation name="mediate">
+        <messageReceiver
+                class="org.apache.synapse.core.axis2.axis2.ServiceMediatorMessageReceiver"/>
+    </operation>
+</service>

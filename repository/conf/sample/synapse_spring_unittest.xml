@@ -1,0 +1,12 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
+  
+  <definitions>
+		<spring:config name="springconfig" src="./../../repository/conf/sample/springsample.xml"/>
+  </definitions>
+
+  <rules>
+  	<spring bean="springtest" config="springconfig"/>
+  	<spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/>
+  </rules>
+
+</synapse> 

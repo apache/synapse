@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- 
+/*
+ * Copyright 2001-2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ -->
+
+<document>
+
+  <properties>
+    <title>Apache Synapse</title>
+  </properties>
+
+<body>
+  
+<section name="Apache Synapse">
+	<p>
+  The Synapse project will create a robust, lightweight
+  implementation of a highly scalable and distributed service mediation
+  framework based on Web services specifications.
+	</p>
+
+ 	<p>For more information, see:</p>
+  <ul>
+  <li>The wiki (we use this more than this main site): <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
+  <li>The original proposal: <a href="http://wiki.apache.org/incubator/SynapseProposal">http://wiki.apache.org/incubator/SynapseProposal</a></li>
+  <li>The Synapse Configuration Language: <a href="http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage">http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage</a></li>
+	<li>The Wiki User Guide: <a href="http://wiki.apache.org/incubator/Synapse/SynapseUserGuide">http://wiki.apache.org/incubator/Synapse/SynapseUserGuide</a></li>
+	<li>The Wiki Synapse extension guide: <a href="http://wiki.apache.org/incubator/Synapse/ExtendingSynapse">http://wiki.apache.org/incubator/Synapse/ExtendingSynapse</a></li>
+  <li>The M2 release download is available from <a href="http://www.apache.org/dist/ws/synapse/M2/">http://www.apache.org/dist/ws/synapse/M2</a></li>
+  <li>The developer mailing list:  <a href="mailto:synapse-dev-subscribe@ws.apache.org">Subscribe</a></li>
+  <li>The users mailing list:  <a href="mailto:synapse-user-subscribe@ws.apache.org">Subscribe</a></li>
+  </ul>
+</section>
+
+<section name="Introduction">
+	<p>Synapse is a mediation framework for Web Services. Synapse allows messages flowing through, into, or out of an organization to be mediated.</p>
+	<!--<p>The user guide is available at <a  class="external" rel="nofollow" href="http://wiki.apache.org/ws/Synapse/UserGuide">http://wiki.apache.org/ws/Synapse/UserGuide</a> </p>-->
+	<p>The configuration language and its syntax is available at <a  class="external" rel="nofollow" href="http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage">http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage</a> </p>
+
+	<p>Synapse, incidentally, is pronounced "sine-apse", and not "sin-apse".  </p>
+</section>
+	
+<section name="Status">
+	<p>Synapse is an effort undergoing incubation at the Apache Software Foundation (ASF),
+	sponsored by the Web Services PMC. Incubation is required of all newly accepted projects 
+	until a further review indicates that the infrastructure, communications, and decision making process 
+	have stabilized in a manner consistent with other successful ASF projects. 
+	While incubation status is not necessarily a reflection of the completeness or 
+	stability of the code, it does indicate that the project has 
+	yet to be fully endorsed by the ASF.</p>
+	
+	<p>We have released the second Milestone M2. The release will support: </p>
+
+	<ul>
+	<li><p> A streamlined configuration model and a new XML syntax</p></li>
+	<li><p> Concept of Endpoints </p></li>
+	<li><p> Global and message context based 'properties', and a new XPath extention function synapse:get-property() to read them</p></li>
+	<li><p> New mediators - Switch &amp; Validate </p></li>
+	<li><p> Enhanced and streamlined mediators - send, drop, log, makefault, transform, header, filter, class, set-property, sequence, in &amp; out </p></li>
+	<li><p> Message correlation support</p></li>
+	<li><p> Enhanced Spring support</p></li>
+	<li><p> Synapse initialization on Axis2 startup</p></li>
+	<li><p> Sample applications and configurations demonstrating most of the above features </p></li>
+	<li><p> Enhanced documentation </p></li>
+	</ul>
+</section>
+
+</body>
+</document>

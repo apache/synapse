@@ -45,6 +45,7 @@
     <j:set var="dist.name" value="${pom.artifactId}-${pom.currentVersion}"/>
     <j:set var="dist.dir" value="target/dist"/>
     <j:set var="bin.dist.dir" value="target/dist-bin/synapse"/>
+    <j:set var="src.dist.dir" value="target/dist-src/synapse-src"/>
     <j:set var="mediators.dist.dir" value="target/dist-mediators/synapse"/>
     <j:set var="extensions.dist.dir" value="target/dist-extensions/synapse"/>
 
@@ -350,6 +351,9 @@
             <ant:fileset dir="target/lib">
                 <ant:include name="*.jar"/>
             </ant:fileset>
+            <ant:fileset dir="licenses">
+                <ant:include name="*.txt"/>
+            </ant:fileset>
         </ant:copy>
         <ant:copy file="bin/synapse.sh"
                   tofile="${bin.dist.dir}/bin/synapse.sh"/>
@@ -589,9 +593,12 @@
 
     <goal name="dist-src">
         <ant:mkdir dir="${dist.dir}"/>
-        <ant:zip file="${dist.dir}/${dist.name}-src.zip">
+
+        <ant:mkdir dir="${src.dist.dir}"/>
+
+        <ant:copy todir="${src.dist.dir}">
             <ant:fileset dir=".">
-                <ant:include name="**"/>
+                <include name="**"/>
                 <ant:exclude name="**/target/**"/>
                 <ant:exclude name="**/.svn/**"/>
                 <ant:exclude name="**/bin/**"/>
@@ -599,21 +606,13 @@
                 <ant:exclude name=".*"/>
                 <ant:exclude name="**/*.license"/>
             </ant:fileset>
-        </ant:zip>
-        <ant:tar tarfile="target/${dist.name}-src.tar" longfile="gnu">
-            <ant:tarfileset dir=".">
-                <ant:include name="**"/>
-                <ant:exclude name="**/target/**"/>
-                <ant:exclude name="**/.svn/**"/>
-                <ant:exclude name="**/bin/**"/>
-                <ant:exclude name="**/*.log"/>
-                <ant:exclude name=".*"/>
-                <ant:exclude name="**/*.license"/>
-            </ant:tarfileset>
-        </ant:tar>
-        <gzip src="target/${dist.name}-src.tar"
-              zipfile="${dist.dir}/${dist.name}-src.tar.gz"/>
-        <ant:delete file="target/${dist.name}-src.tar"/>
+        </ant:copy>
+
+        <ant:zip file="${dist.dir}/${dist.name}-src.zip"
+                 basedir="target/dist-src"/>
+
+        <ant:delete dir="target/dist-src"/>
+
     </goal>
 
     <goal name="dep-test">

@@ -700,7 +700,7 @@
         </ant:copy>
 
 
-        <ant:zip file="${dist.dir}/Extensions-Synapse-${pom.currentVersion}-bin.zip"
+        <ant:zip file="${dist.dir}/${dist.name}-extensions-${pom.currentVersion}-bin.zip"
                  basedir="target/temp"/>
 
         <ant:delete dir="target/temp"/>

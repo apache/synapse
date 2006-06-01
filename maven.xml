@@ -328,6 +328,8 @@
         <ant:mkdir dir="${target/lib}/endorsed"/>
     </goal>
 
+    <goal name="release" prereqs="dist-src,dist-bin,dist-extensions"/>
+
     <!-- ================================================================ -->
     <!--- Create the Distro -->
     <!-- ================================================================ -->
@@ -383,6 +385,11 @@
                   tofile="${bin.dist.dir}/bin/synapse.bat"/>
         <ant:copy file="README.txt"
                   tofile="${bin.dist.dir}/README.txt"/>
+        <ant:copy file="NOTICE.txt"
+                  tofile="${bin.dist.dir}/NOTICE.txt"/>
+        <ant:copy file="LICENSE.txt"
+                  tofile="${bin.dist.dir}/LICENSE.txt"/>
+
         <ant:copy file="modules/core/conf/log4j.properties"
                   tofile="${bin.dist.dir}/log4j.properties"/>
 

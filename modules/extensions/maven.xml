@@ -43,6 +43,9 @@
             <ant:fileset dir="src/META-INF">
                 <ant:include name="**/**"/>
             </ant:fileset>
+            <ant:fileset file="../../NOTICE.txt"/>
+            <ant:fileset file="../../LICENSE.txt"/>
+
         </ant:copy>
 
         <jar jarfile="target/dist/extension_mediators.jar"

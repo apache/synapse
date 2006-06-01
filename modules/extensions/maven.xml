@@ -48,8 +48,19 @@
 
         </ant:copy>
 
+				<manifest file="MANIFEST.MF">
+			    <attribute name="Extension-Name" value="org.apache.synapse"/>
+			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
+			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
+					<attribute name="Specification-Version" value="${pom.currentVersion}"/>			      
+			    <attribute name="Implementation-Title" value="Apache Synapse"/>			
+			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>			
+		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
+		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/> 
+			  </manifest>
+			  
         <jar jarfile="target/dist/extension_mediators.jar"
-             basedir="${extensions.dir}">
+             basedir="${extensions.dir}" manifest="MANIFEST.MF">
             <include name="**/**"/>
         </jar>
         <ant:delete dir="${extensions.dir}"/>

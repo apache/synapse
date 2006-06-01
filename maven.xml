@@ -318,7 +318,18 @@
     </goal> -->
 
     <goal name="create-jar" prereqs="init">
-        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar">
+			    <manifest file="MANIFEST.MF">
+			    <attribute name="Extension-Name" value="org.apache.synapse"/>
+			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
+			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
+					<attribute name="Specification-Version" value="${pom.currentVersion}"/>			      
+			    <attribute name="Implementation-Title" value="Apache Synapse"/>			
+			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>			
+		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
+		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/> 
+			  </manifest>
+
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
             <fileset dir="modules/core/target/classes"/>
         </jar>
     </goal>
@@ -360,8 +371,25 @@
                 <ant:include name="**"/>
             </ant:fileset>
         </ant:copy>
-        <ant:zip file="target/${dist.name}.jar"
-                 basedir="target/temp1"/>
+        
+        <manifest file="MANIFEST.MF">
+			    <attribute name="Extension-Name" value="org.apache.synapse"/>
+			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
+			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
+					<attribute name="Specification-Version" value="${pom.currentVersion}"/>			      
+			    <attribute name="Implementation-Title" value="Apache Synapse"/>			
+			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>			
+		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
+		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/> 
+			  </manifest>
+
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
+            <fileset dir="modules/core/target/classes"/>
+        </jar>
+        
+        <jar destfile="target/${dist.name}.jar" manifest="MANIFEST.MF">
+        	<fileset dir="target/temp1"/>
+        </jar>
 
         <ant:copy file="target/${dist.name}.jar"
                   tofile="target/lib/${dist.name}.jar"/>

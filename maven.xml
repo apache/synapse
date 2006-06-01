@@ -296,6 +296,11 @@
         <ant:echo>+----------------------------------------</ant:echo>
         <ant:delete dir="target"/>
         <ant:delete dir="etc/target"/>
+        <ant:echo>+----------------------------------------</ant:echo>
+        <ant:echo>| Cleaning: logs</ant:echo>
+        <ant:echo>+----------------------------------------</ant:echo>
+        <ant:delete file="modules/extensions/synapse.log"/>
+        <ant:delete file="modules/core/synapse.log"/>
     </goal>
 
     <goal name="clean">
@@ -341,6 +346,23 @@
         <!--<ant:mkdir dir="${bin.dist.dir}/mediators"/>-->
 
         <ant:mkdir dir="target/temp/"/>
+
+        <ant:mkdir dir="target/temp1/"/>
+        <ant:mkdir dir="target/temp1/META-INF/"/>
+        <ant:copy todir="target/temp1/META-INF/">
+            <ant:fileset file="NOTICE.txt"/>
+            <ant:fileset file="LICENSE.txt"/>
+        </ant:copy>
+        <ant:copy todir="target/temp1/">
+            <ant:fileset dir="modules/core/target/classes">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        <ant:zip file="target/${dist.name}.jar"
+                 basedir="target/temp1"/>
+
+        <ant:copy file="target/${dist.name}.jar"
+                  tofile="target/lib/${dist.name}.jar"/>
 
         <ant:copy todir="${bin.dist.dir}/xdocs">
             <ant:fileset dir="xdocs">
@@ -390,6 +412,7 @@
                  basedir="target/temp"/>
 
         <ant:delete dir="target/temp"/>
+        <ant:delete dir="target/temp1"/>
         <ant:delete dir="target/dist-bin"/>
     </goal>
 

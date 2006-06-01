@@ -297,10 +297,12 @@
         <ant:delete dir="target"/>
         <ant:delete dir="etc/target"/>
         <ant:echo>+----------------------------------------</ant:echo>
-        <ant:echo>| Cleaning: logs</ant:echo>
+        <ant:echo>| Cleaning: logs and MANIFEST.MF </ant:echo>
         <ant:echo>+----------------------------------------</ant:echo>
         <ant:delete file="modules/extensions/synapse.log"/>
         <ant:delete file="modules/core/synapse.log"/>
+        <ant:delete file="MANIFEST.MF"/>
+        <ant:delete file="modules/extensions/MANIFEST.MF"/>
     </goal>
 
     <goal name="clean">

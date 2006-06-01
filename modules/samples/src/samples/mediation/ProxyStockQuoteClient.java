@@ -18,37 +18,41 @@ package samples.mediation;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContextConstants;
 
 public class ProxyStockQuoteClient {
 
     public static void main(String[] args) {
 
-        String symbol = "IBM";
-        String xurl   = "http://ws.invesbot.com/stockquotes.asmx";
-        String turl   = "http://localhost:8080/axis2/services/InvesbotForwardProxy";
+        String symbol   = "IBM";
+        String fwdProxy = "http://localhost:8080/axis2/services/InvesbotForwardProxy";
+        String defProxy = "http://localhost:8080/axis2/services/InvesbotDefaultProxy";
+        String seqProxy = "http://localhost:8080/axis2/services/InvesbotSequenceProxy";
 
-        if (args.length > 0) symbol = args[0];
-        if (args.length > 1) xurl   = args[1];
-        if (args.length > 2) turl   = args[2];
+        if (args.length > 0) symbol   = args[0];
+        if (args.length > 1) fwdProxy = args[1];
+        if (args.length > 2) defProxy = args[2];
+        if (args.length > 2) seqProxy = args[3];
 
-        ProxyStockQuoteClient.testStandardQuote(symbol, xurl, turl);
+        ProxyStockQuoteClient.testProxyQuote(symbol, fwdProxy);
+        ProxyStockQuoteClient.testProxyQuote(symbol, defProxy);
+        ProxyStockQuoteClient.testProxyQuote(symbol, seqProxy);
     }
 
-    private static void testStandardQuote(String symbol, String xurl, String turl) {
+    private static void testProxyQuote(String symbol, String url) {
         try {
             OMElement getQuote = CustomQuoteXMLHandler.createStandardRequestPayload(symbol);
 
             Options options = new Options();
-            //options.setTo(new EndpointReference(xurl));
-            options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+            options.setProperty(MessageContextConstants.TRANSPORT_URL, url);
             options.setAction("http://ws.invesbot.com/GetQuote");
 
             ServiceClient serviceClient = new ServiceClient();
             serviceClient.setOptions(options);
 
-            OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
+            OMElement result = serviceClient.sendReceive(getQuote);
+            result.build();
+            result = result.getFirstElement();
             System.out.println("Proxy :: Stock price = $" + CustomQuoteXMLHandler.parseStandardResponsePayload(result));
 
         } catch (Exception e) {

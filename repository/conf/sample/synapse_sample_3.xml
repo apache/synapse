@@ -5,7 +5,11 @@
     	<log level="custom">
     		<property name="sequence" value="*** Custom 'stockquote'Sequence ***"/>
     	</log>
-    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+			<in>
+	    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    	</in>
+    	<!-- set correlation field to custom label -->
+    	<set-property name="correlate/label" value="stockquote"/>
       <send/>
     </sequence>
     
@@ -32,10 +36,18 @@
   </proxies>
 
   <rules>
+    <out>
+  		<filter source="get-property('correlate/label')" regex="stockquote">
+	  		<sequence ref="stockquote"/>
+	  	</filter>
+	  </out>
+	  	
 		<log level="custom">
 			<property name="sequence" value="*** Default Main mediator Sequence ***"/>
 		</log>
-    <header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+		<in>
+    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    </in>
     <send/>
   </rules>
 

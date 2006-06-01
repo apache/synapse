@@ -69,17 +69,33 @@ public class Axis2MessageContextFinder implements Constants {
         }
 
         log.info("Initializing Synapse...");
-        SynapseConfiguration synCfg = null;
+        SynapseConfiguration synCfg;
         AxisConfiguration axisCfg = mc.getConfigurationContext().getAxisConfiguration();
 
-        // if the system property synapse.xml is specified, use it.. else default config
+        /*
+        First Check, if synapse.xml is provided as an system property, use it..
+        else
+        check if the synapse.xml is available via Axis2.xml SynapseConfiguration
+        else
+        default config [which is only the passthrow case]
+
+        Priorty will be given to the System property.
+        */
+
+        Parameter configParam = axisCfg.getParameter(SYNAPSE_CONFIGURATION);
+
         String config = System.getProperty(Constants.SYNAPSE_XML);
+
         if (config != null) {
             log.info("System property '" + Constants.SYNAPSE_XML +
                 "' specifies synapse configuration as " + config);
             synCfg = SynapseConfigurationBuilder.getConfiguration(config);
-        } else {
-            log.warn("System property '" + Constants.SYNAPSE_XML + "' is not specified. Using default configuration");
+        }else if (configParam != null) {
+            log.info("Synapse.xml is available via SynapseConfiguration in Axis2.xml");
+            synCfg = SynapseConfigurationBuilder.getConfiguration(configParam.getValue().toString().trim());
+        }else {
+            log.warn("System property '" + Constants.SYNAPSE_XML + "' is not specified or SynapseConfiguration" +
+                     "is not available via Axis2.xml.Thus,  Using default configuration");
             synCfg = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 

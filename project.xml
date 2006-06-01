@@ -3,6 +3,6 @@
 <project>
     <pomVersion>3</pomVersion>
     <extend>etc/project.xml</extend>
-    <id>Synapse-Incubating</id>
+    <id>Apache-Synapse-Incubating</id>
 </project>
 

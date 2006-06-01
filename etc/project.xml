@@ -2,7 +2,7 @@
 <project>
 
     <pomVersion>3</pomVersion>
-    <id>Synapse-Incubating</id>
+    <id>apache-synapse-incubating</id>
     <name>Apache Synpase</name>
     <currentVersion>${synapse.version}</currentVersion>
 
@@ -15,7 +15,7 @@
     <inceptionYear>2005</inceptionYear>
     <package>org.apache.synapse</package>
     <logo>http://incubator.apache.org/synapse/images/synapse.png</logo>
-    <description>The Synapse project will create a robust, lightweight
+    <description>The Apache Synapse project will create a robust, lightweight
         implementation of a highly scalable and distributed service mediation
         framework based on Web services specifications.</description>
 
@@ -29,7 +29,7 @@
     <!--any mailing lists for the project -->
     <mailingLists>
         <mailingList>
-            <name>Synpase Developer List</name>
+            <name>Apache Synapse Developer List</name>
             <subscribe>synapse-dev-subscribe@ws.apache.org</subscribe>
             <unsubscribe>synapse-dev-unsubscribe@ws.apache.org</unsubscribe>
             <archive></archive>

@@ -365,9 +365,12 @@
         <ant:mkdir dir="target/temp1/"/>
         <ant:mkdir dir="target/temp1/META-INF/"/>
         <ant:copy todir="target/temp1/META-INF/">
-            <ant:fileset file="NOTICE-JAR.txt"/>
             <ant:fileset file="LICENSE.txt"/>
         </ant:copy>
+
+        <ant:copy file="NOTICE-JAR.txt"
+                  tofile="target/temp1/META-INF/NOTICE.txt"/>
+
         <ant:copy todir="target/temp1/">
             <ant:fileset dir="modules/core/target/classes">
                 <ant:include name="**"/>
@@ -672,6 +675,7 @@
                 <ant:exclude name="**/*.log"/>
                 <ant:exclude name=".*"/>
                 <ant:exclude name="**/*.license"/>
+                <ant:exclude name="**/NOTICE-JAR.txt"/>
             </ant:fileset>
         </ant:copy>
 

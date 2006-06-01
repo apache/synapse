@@ -296,6 +296,13 @@
         <ant:echo>+----------------------------------------</ant:echo>
         <ant:delete dir="target"/>
         <ant:delete dir="etc/target"/>
+        <ant:echo>+----------------------------------------</ant:echo>
+        <ant:echo>| Cleaning: logs and MANIFEST.MF </ant:echo>
+        <ant:echo>+----------------------------------------</ant:echo>
+        <ant:delete file="modules/extensions/synapse.log"/>
+        <ant:delete file="modules/core/synapse.log"/>
+        <ant:delete file="MANIFEST.MF"/>
+        <ant:delete file="modules/extensions/MANIFEST.MF"/>
     </goal>
 
     <goal name="clean">
@@ -313,7 +320,18 @@
     </goal> -->
 
     <goal name="create-jar" prereqs="init">
-        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar">
+			    <manifest file="MANIFEST.MF">
+			    <attribute name="Extension-Name" value="org.apache.synapse"/>
+			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
+			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
+					<attribute name="Specification-Version" value="${pom.currentVersion}"/>
+			    <attribute name="Implementation-Title" value="Apache Synapse"/>
+			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>
+		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
+		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/>
+			  </manifest>
+
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
             <fileset dir="modules/core/target/classes"/>
         </jar>
     </goal>
@@ -322,6 +340,8 @@
         <macros:copy-deps copyToDir="${target/lib}"/>
         <ant:mkdir dir="${target/lib}/endorsed"/>
     </goal>
+
+    <goal name="release" prereqs="dist-src,dist-bin,dist-extensions"/>
 
     <!-- ================================================================ -->
     <!--- Create the Distro -->
@@ -338,9 +358,50 @@
         <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
-        <!--<ant:mkdir dir="${bin.dist.dir}/mediators"/>-->
+        <ant:mkdir dir="${bin.dist.dir}/licenses"/>
 
         <ant:mkdir dir="target/temp/"/>
+
+        <ant:mkdir dir="target/temp1/"/>
+        <ant:mkdir dir="target/temp1/META-INF/"/>
+        <ant:copy todir="target/temp1/META-INF/">
+            <ant:fileset file="LICENSE.txt"/>
+        </ant:copy>
+
+        <ant:copy file="NOTICE-JAR.txt"
+                  tofile="target/temp1/META-INF/NOTICE.txt"/>
+
+        <ant:copy todir="target/temp1/">
+            <ant:fileset dir="modules/core/target/classes">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
+        <manifest file="MANIFEST.MF">
+            <attribute name="Extension-Name" value="org.apache.synapse"/>
+            <attribute name="Specification-Title" value="${pom.artifactId}"/>
+            <attribute name="Specification-Vendor"
+                       value="Apache Software Foundation"/>
+            <attribute name="Specification-Version"
+                       value="${pom.currentVersion}"/>
+            <attribute name="Implementation-Title" value="Apache Synapse"/>
+            <attribute name="Implementation-Vendor-Id" value="org.apache"/>
+            <attribute name="Implementation-Vendor"
+                       value="Apache Software Foundation"/>
+            <attribute name="Implementation-Version"
+                       value="${pom.currentVersion}"/>
+        </manifest>
+
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
+            <fileset dir="modules/core/target/classes"/>
+        </jar>
+
+        <jar destfile="target/${dist.name}.jar" manifest="MANIFEST.MF">
+        	<fileset dir="target/temp1"/>
+        </jar>
+
+        <ant:copy file="target/${dist.name}.jar"
+                  tofile="target/lib/${dist.name}.jar"/>
 
         <ant:copy todir="${bin.dist.dir}/xdocs">
             <ant:fileset dir="xdocs">
@@ -355,12 +416,23 @@
                 <ant:include name="*.txt"/>
             </ant:fileset>
         </ant:copy>
+
+        <ant:copy todir="${bin.dist.dir}/licenses" flatten="true">
+            <ant:fileset dir="licenses">
+                <ant:include name="*.txt"/>
+            </ant:fileset>
+        </ant:copy>
         <ant:copy file="bin/synapse.sh"
                   tofile="${bin.dist.dir}/bin/synapse.sh"/>
         <ant:copy file="bin/synapse.bat"
                   tofile="${bin.dist.dir}/bin/synapse.bat"/>
         <ant:copy file="README.txt"
                   tofile="${bin.dist.dir}/README.txt"/>
+        <ant:copy file="NOTICE.txt"
+                  tofile="${bin.dist.dir}/NOTICE.txt"/>
+        <ant:copy file="LICENSE.txt"
+                  tofile="${bin.dist.dir}/LICENSE.txt"/>
+
         <ant:copy file="modules/core/conf/log4j.properties"
                   tofile="${bin.dist.dir}/log4j.properties"/>
 
@@ -395,6 +467,7 @@
                  basedir="target/temp"/>
 
         <ant:delete dir="target/temp"/>
+        <ant:delete dir="target/temp1"/>
         <ant:delete dir="target/dist-bin"/>
     </goal>
 
@@ -610,6 +683,7 @@
                 <ant:exclude name="**/*.log"/>
                 <ant:exclude name=".*"/>
                 <ant:exclude name="**/*.license"/>
+                <ant:exclude name="**/NOTICE-JAR.txt"/>
             </ant:fileset>
         </ant:copy>
 
@@ -675,7 +749,7 @@
         </ant:copy>
 
 
-        <ant:zip file="${dist.dir}/Extensions-Synapse-${pom.currentVersion}-bin.zip"
+        <ant:zip file="${dist.dir}/${dist.name}-extensions-${pom.currentVersion}-bin.zip"
                  basedir="target/temp"/>
 
         <ant:delete dir="target/temp"/>

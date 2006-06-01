@@ -63,13 +63,14 @@
 	    ant simplequote [-Dsymbol=IBM] [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote] [-Drepository=../synapse_repository]
 
   	ant proxyquote
-	    Use Proxy services to query stock prices
+	    Use Proxy services to query stock prices. (Must be used with the sample configuration # 3)
     
   	 	examples:
   	  ant proxyquote
-  	  ant proxyquote -Dsymbol=IBM -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
-  	    -Drepository=../synapse_repository"
-
+  	  ant proxyquote -Dsymbol=IBM 
+  	  	-DfwdProxy=http://localhost:8080/axis2/services/InvesbotForwardProxy 
+  	  	-DdefProxy=http://localhost:8080/axis2/services/InvesbotDefaultProxy 
+  	  	-DseqProxy=http://localhost:8080/axis2/services/InvesbotSequenceProxy"
         </echo>
     </target>
 
@@ -79,6 +80,9 @@
     <property name="synapseurl" value="http://localhost:8080"/>
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="../synapse_repository"/>
+    <property name="fwdProxy" value="http://localhost:8080/axis2/services/InvesbotForwardProxy"/>
+    <property name="defProxy" value="http://localhost:8080/axis2/services/InvesbotDefaultProxy"/>
+    <property name="seqProxy" value="http://localhost:8080/axis2/services/InvesbotSequenceProxy"/>
 
     <property name="class.dir" value="target/classes"/>
 
@@ -153,9 +157,9 @@
         <java classname="samples.mediation.ProxyStockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
-            <arg value="${investbot_url}"/>
-            <arg value="${gatewayurl}"/>
-            <arg value="${repository}"/>
+            <arg value="${fwdProxy}"/>
+            <arg value="${defProxy}"/>
+            <arg value="${seqProxy}"/>
         </java>
     </target>
 

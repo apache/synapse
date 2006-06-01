@@ -49,7 +49,7 @@
         <ant:copy file="../../NOTICE-JAR.txt"
                   tofile="src/META-INF/NOTICE.txt"/>
 
-        <manifest file="MANIFEST.MF">
+        <manifest file="target/MANIFEST.MF">
             <attribute name="Extension-Name" value="org.apache.synapse"/>
             <attribute name="Specification-Title" value="${pom.artifactId}"/>
             <attribute name="Specification-Vendor"
@@ -65,7 +65,7 @@
         </manifest>
 
         <jar jarfile="target/dist/extension_mediators.jar"
-             basedir="${extensions.dir}" manifest="MANIFEST.MF">
+             basedir="${extensions.dir}" manifest="target/MANIFEST.MF">
             <include name="**/**"/>
         </jar>
         <ant:delete dir="${extensions.dir}"/>

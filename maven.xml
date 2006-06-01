@@ -322,11 +322,11 @@
 			    <attribute name="Extension-Name" value="org.apache.synapse"/>
 			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
 			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
-					<attribute name="Specification-Version" value="${pom.currentVersion}"/>			      
-			    <attribute name="Implementation-Title" value="Apache Synapse"/>			
-			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>			
+					<attribute name="Specification-Version" value="${pom.currentVersion}"/>
+			    <attribute name="Implementation-Title" value="Apache Synapse"/>
+			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>
 		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
-		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/> 
+		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/>
 			  </manifest>
 
         <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
@@ -356,14 +356,14 @@
         <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
-        <!--<ant:mkdir dir="${bin.dist.dir}/mediators"/>-->
+        <ant:mkdir dir="${bin.dist.dir}/licenses"/>
 
         <ant:mkdir dir="target/temp/"/>
 
         <ant:mkdir dir="target/temp1/"/>
         <ant:mkdir dir="target/temp1/META-INF/"/>
         <ant:copy todir="target/temp1/META-INF/">
-            <ant:fileset file="NOTICE.txt"/>
+            <ant:fileset file="NOTICE-JAR.txt"/>
             <ant:fileset file="LICENSE.txt"/>
         </ant:copy>
         <ant:copy todir="target/temp1/">
@@ -371,22 +371,26 @@
                 <ant:include name="**"/>
             </ant:fileset>
         </ant:copy>
-        
+
         <manifest file="MANIFEST.MF">
-			    <attribute name="Extension-Name" value="org.apache.synapse"/>
-			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
-			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
-					<attribute name="Specification-Version" value="${pom.currentVersion}"/>			      
-			    <attribute name="Implementation-Title" value="Apache Synapse"/>			
-			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>			
-		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
-		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/> 
-			  </manifest>
+            <attribute name="Extension-Name" value="org.apache.synapse"/>
+            <attribute name="Specification-Title" value="${pom.artifactId}"/>
+            <attribute name="Specification-Vendor"
+                       value="Apache Software Foundation"/>
+            <attribute name="Specification-Version"
+                       value="${pom.currentVersion}"/>
+            <attribute name="Implementation-Title" value="Apache Synapse"/>
+            <attribute name="Implementation-Vendor-Id" value="org.apache"/>
+            <attribute name="Implementation-Vendor"
+                       value="Apache Software Foundation"/>
+            <attribute name="Implementation-Version"
+                       value="${pom.currentVersion}"/>
+        </manifest>
 
         <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
             <fileset dir="modules/core/target/classes"/>
         </jar>
-        
+
         <jar destfile="target/${dist.name}.jar" manifest="MANIFEST.MF">
         	<fileset dir="target/temp1"/>
         </jar>
@@ -403,6 +407,9 @@
             <ant:fileset dir="target/lib">
                 <ant:include name="*.jar"/>
             </ant:fileset>
+        </ant:copy>
+
+        <ant:copy todir="${bin.dist.dir}/licenses" flatten="true">
             <ant:fileset dir="licenses">
                 <ant:include name="*.txt"/>
             </ant:fileset>

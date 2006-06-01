@@ -350,6 +350,9 @@
             <ant:fileset dir="target/lib">
                 <ant:include name="*.jar"/>
             </ant:fileset>
+            <ant:fileset dir="licenses">
+                <ant:include name="*.txt"/>
+            </ant:fileset>
         </ant:copy>
         <ant:copy file="bin/synapse.sh"
                   tofile="${bin.dist.dir}/bin/synapse.sh"/>

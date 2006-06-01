@@ -297,12 +297,10 @@
         <ant:delete dir="target"/>
         <ant:delete dir="etc/target"/>
         <ant:echo>+----------------------------------------</ant:echo>
-        <ant:echo>| Cleaning: logs and MANIFEST.MF </ant:echo>
+        <ant:echo>| Cleaning: logs </ant:echo>
         <ant:echo>+----------------------------------------</ant:echo>
-        <ant:delete file="modules/extensions/synapse.log"/>
-        <ant:delete file="modules/core/synapse.log"/>
-        <ant:delete file="MANIFEST.MF"/>
-        <ant:delete file="modules/extensions/MANIFEST.MF"/>
+        <ant:delete dir="modules/extensions/logs"/>
+        <ant:delete dir="modules/core/logs"/>
     </goal>
 
     <goal name="clean">
@@ -320,18 +318,22 @@
     </goal> -->
 
     <goal name="create-jar" prereqs="init">
-			    <manifest file="MANIFEST.MF">
-			    <attribute name="Extension-Name" value="org.apache.synapse"/>
-			    <attribute name="Specification-Title" value="${pom.artifactId}"/>
-			    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
-					<attribute name="Specification-Version" value="${pom.currentVersion}"/>
-			    <attribute name="Implementation-Title" value="Apache Synapse"/>
-			    <attribute name="Implementation-Vendor-Id" value="org.apache"/>
-		      <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
-		      <attribute name="Implementation-Version" value="${pom.currentVersion}"/>
-			  </manifest>
+        <manifest file="target/MANIFEST.MF">
+            <attribute name="Extension-Name" value="org.apache.synapse"/>
+            <attribute name="Specification-Title" value="${pom.artifactId}"/>
+            <attribute name="Specification-Vendor"
+                       value="Apache Software Foundation"/>
+            <attribute name="Specification-Version"
+                       value="${pom.currentVersion}"/>
+            <attribute name="Implementation-Title" value="Apache Synapse"/>
+            <attribute name="Implementation-Vendor-Id" value="org.apache"/>
+            <attribute name="Implementation-Vendor"
+                       value="Apache Software Foundation"/>
+            <attribute name="Implementation-Version"
+                       value="${pom.currentVersion}"/>
+        </manifest>
 
-        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="target/MANIFEST.MF">
             <fileset dir="modules/core/target/classes"/>
         </jar>
     </goal>
@@ -377,7 +379,7 @@
             </ant:fileset>
         </ant:copy>
 
-        <manifest file="MANIFEST.MF">
+        <manifest file="target/MANIFEST.MF">
             <attribute name="Extension-Name" value="org.apache.synapse"/>
             <attribute name="Specification-Title" value="${pom.artifactId}"/>
             <attribute name="Specification-Vendor"
@@ -392,11 +394,11 @@
                        value="${pom.currentVersion}"/>
         </manifest>
 
-        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="MANIFEST.MF">
+        <jar destfile="target/lib/${pom.artifactId}-${pom.currentVersion}.jar" manifest="target/MANIFEST.MF">
             <fileset dir="modules/core/target/classes"/>
         </jar>
 
-        <jar destfile="target/${dist.name}.jar" manifest="MANIFEST.MF">
+        <jar destfile="target/${dist.name}.jar" manifest="target/MANIFEST.MF">
         	<fileset dir="target/temp1"/>
         </jar>
 

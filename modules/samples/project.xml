@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	
+    <pomVersion>3</pomVersion>
+    <extend>../../etc/project.xml</extend>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+    <name>Apache Synapse - Sample</name>
+    <id>synapse-sample</id>
+    <groupId>synapse</groupId>
+
+    <dependencies>
+        <dependency>
+            <groupId>synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <version>${synapse.version}</version>
+        </dependency>
+        
+    </dependencies>    
+</project>
+

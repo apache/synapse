@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+    <pomVersion>3</pomVersion>
+    <extend>../../etc/project.xml</extend>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+    <name>Apache Synapse - Extensions</name>
+    <id>synapse-extensions</id>
+    <groupId>synapse</groupId>
+
+    <dependencies>
+        <dependency>
+            <groupId>synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <version>${synapse.version}</version>
+        </dependency>
+
+        <!-- external JARs -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+            <version>${spring.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xerces.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xml_apis.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalan.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+
+            <resources>
+                <resource>
+                    <directory>src</directory>
+                    <includes>
+                        <include>**/org.apache.synapse.config.xml.MediatorFactory</include>
+                        <include>**/org.apache.synapse.config.xml.ExtensionFactory</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+
+    </build>
+</project>
+

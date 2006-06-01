@@ -1,0 +1,32 @@
+Building Synapse from Source
+
+The Synapse source code is available at http://svn.apache.org/viewcvs.cgi/incubator/synapse/trunk/java/
+
+To build Synapse, you will need JDK 1.4.x or 1.5.x., Maven and any of its dependencies.
+
+The Synapse distribution could be built with the maven target "dist-bin" as follows:
+
+maven clean dist-bin
+
+The binary would be available at target\dist
+
+Build the extensions after you perform a "dist-bin" and perform it using the "dist-extensions" target
+without specifying "clean", as follows:
+
+maven dist-extensions
+
+The binary would be available at target\dist
+
+Note:
+
+As the build process executes the unit test cases, you will need to set up your build environment to 
+support the extensions. 
+
+The Validate mediator depends on the Xerces 2.8.0 parser, and this should be installed into your
+JAVA/lib/endorsed directory. 
+(e.g. C:\jdk1.5.0_06\jre\lib\endorsed and may not be to C:\jdk1.5.0_06\lib\endorsed if you have the JRE)
+
+You will need the xml-apis.jar, and the xercesImpl.jar copied to the lib\endorsed directory at a mimimum.
+
+You may optionally ignore unit test failures with the "maven.test.failure.ignore" property. Refer to 
+http://maven.apache.org/maven-1.x/plugins/test/properties.html for more information.

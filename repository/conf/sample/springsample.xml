@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC  "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+   <bean id="springtest" class="org.apache.synapse.spring.SpringTestBean" singleton="false">
+	   <property name="testProperty"><value>100</value></property>
+	   <property name="handler"><ref bean="handler"/></property>
+   </bean>
+   
+   <bean id="handler" class="org.apache.synapse.spring.TestMediateHandlerImpl" singleton="true"/>
+
+</beans>

@@ -2,7 +2,7 @@
 <project>
 
     <pomVersion>3</pomVersion>
-    <id>Synapse-Incubating</id>
+    <id>apache-synapse-incubating</id>
     <name>Apache Synpase</name>
     <currentVersion>${synapse.version}</currentVersion>
 

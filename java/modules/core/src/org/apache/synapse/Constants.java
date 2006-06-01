@@ -52,10 +52,4 @@ public interface Constants {
     // for security supporting
     String SECURITY_QOS = "synapse_security";
 
-    String ADDRESSING_PROCESSED_CONFIGURATION_CONTEXT = "addressing_processed_configurationContext";
-
-    // addressing properites handling
-    String ENGAGE_ADDRESSING_IN_MESSAGE = "__ENGAGE_ADDRESSING_IN_MESSAGE__";
-
-    String ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE = "__ENGAGE_ADDRESSING_OUT_BOUND_MESSAGE__";
 }

@@ -2,7 +2,7 @@
 <project>
 
     <pomVersion>3</pomVersion>
-    <extend>../../etc/project.xml</extend>
+    <extend>../../project.xml</extend>
 
     <!-- ============ -->
     <!-- Dependencies -->

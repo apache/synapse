@@ -242,11 +242,11 @@
         </j:forEach>
     </goal>
 
-    <goal name="jar:jar">
-        <attainGoal name="create-jar"/>
-        <ant:copy file="target/lib/${pom.artifactId}-${pom.currentVersion}.jar"
-                  toDir="target/"/>
-    </goal>
+    <!--<goal name="jar:jar">-->
+        <!--<attainGoal name="create-jar"/>-->
+        <!--<ant:copy file="target/lib/${pom.artifactId}-${pom.currentVersion}.jar"-->
+                  <!--toDir="target/"/>-->
+    <!--</goal>-->
 
     <goal name="jar">
         <attainGoal name="multiproject:install"/>
@@ -441,7 +441,7 @@
         </ant:copy>
 
         <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
-            <ant:fileset dir="modules/samples/target/dist-bin/samples"/>
+            <ant:fileset dir="modules/samples/target/dist-bin/synapse/samples"/>
         </ant:copy>
         <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
             <ant:fileset file="modules/samples/target/synapse-sample-${pom.currentVersion}.jar"/>
@@ -469,6 +469,7 @@
         <ant:delete dir="target/temp"/>
         <ant:delete dir="target/temp1"/>
         <ant:delete dir="target/dist-bin"/>
+        <ant:delete dir="target/classes"/>
     </goal>
 
     <goal name="init-dist">

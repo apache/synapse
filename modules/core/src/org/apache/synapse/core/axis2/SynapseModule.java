@@ -53,58 +53,18 @@ public class SynapseModule implements Module, Constants {
 
         log.info("Initializing Synapse Environment ...");
 
-        SynapseConfiguration synCfg;
-
-        /*
-        First Check, if synapse.xml is provided as an system property, use it..
-        else
-        check if the synapse.xml is available via Axis2.xml SynapseConfiguration
-        else
-        default config [which is only the passthrow case]
-
-        Priorty will be given to the System property.
-        */
-
-        Parameter configParam = axisCfg.getParameter(SYNAPSE_CONFIGURATION);
-
-        String config = System.getProperty(Constants.SYNAPSE_XML);
-
-        if (config != null) {
-            log.info("System property '" + Constants.SYNAPSE_XML +
-                "' specifies synapse configuration as " + config);
-            synCfg = SynapseConfigurationBuilder.getConfiguration(config);
-        }else if (configParam != null) {
-            log.info("Synapse.xml is available via SynapseConfiguration in Axis2.xml");
-            synCfg = SynapseConfigurationBuilder.getConfiguration(configParam.getValue().toString().trim());
-        }else {
-            log.warn("System property '" + Constants.SYNAPSE_XML + "' is not specified or SynapseConfiguration" +
-                     "is not available via Axis2.xml.Thus,  Using default configuration");
-            synCfg = SynapseConfigurationBuilder.getDefaultConfiguration();
-        }
-
-        // set the Synapse configuration and environment into the Axis2 configuration
-        Parameter synapseCtxParam = new Parameter(SYNAPSE_CONFIG, null);
-        synapseCtxParam.setValue(synCfg);
-
-        Parameter synapseEnvParam = new Parameter(SYNAPSE_ENV, null);
-        synapseEnvParam.setValue(new Axis2SynapseEnvironment(axisCfg));
-
-        try {
-            axisCfg.addParameter(synapseCtxParam);
-            axisCfg.addParameter(synapseEnvParam);
-
-        } catch (AxisFault e) {
-            handleException(
-                    "Could not set parameters '" + SYNAPSE_CONFIG +
-                    "' and/or '" + SYNAPSE_ENV +
-                    "'to the Axis2 configuration : " + e.getMessage(), e);
-        }
+        SynapseConfiguration synCfg = Axis2MessageContextFinder
+                .initializeSynapseConfigurationBuilder(axisCfg);
 
         log.info("Initializing Proxy services...");
-        Iterator iter = synCfg.getProxyServices().iterator();
-        while (iter.hasNext()) {
-            ProxyService proxy = (ProxyService) iter.next();
-            axisCfg.addService(proxy.buildAxisService());            
+        if (synCfg == null) {
+            handleException("SynapseConfiguration wouldn't initialize");
+        } else {
+            Iterator iter = synCfg.getProxyServices().iterator();
+            while (iter.hasNext()) {
+                ProxyService proxy = (ProxyService) iter.next();
+                axisCfg.addService(proxy.buildAxisService());
+            }
         }
 
         log.info("Synapse Environment initialized...");
@@ -119,8 +79,8 @@ public class SynapseModule implements Module, Constants {
         // FixMe
     }
 
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

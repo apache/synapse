@@ -9,12 +9,9 @@
     xmlns:deploy="deploy"
     xmlns:ant="jelly:ant">
     <postGoal name="test:compile">
-        <mkdir dir="target/repository"/>
-        <ant:copy todir="target/repository">
-            <ant:fileset dir="../../repository">
-                <ant:include name="**"/>
-            </ant:fileset>
-        </ant:copy>
+        
+        <!--Creating the libs dir-->
+        <deploy:copy-deps todir="target/lib"/>
         <attainGoal name="synapse_core"/>
     </postGoal>
     <goal name="synapse_core">
@@ -42,7 +39,7 @@
         <copy file="target/synapse-${pom.currentVersion}.mar"
               tofile="target/synapse-repository/modules/synapse-${pom.currentVersion}.mar"/>
         <mkdir dir="target/synapse-repository/modules"/>
-        <copy file="../../repository/modules/addressing-${addressing.version}.mar"
+        <copy file="target/lib/addressing-${addressing.version}.mar"
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
         <copy todir="target/synapse-repository/conf">
             <fileset dir="../../repository/conf">
@@ -57,7 +54,7 @@
               tofile="target/testing_repository/modules/synapse-${pom.currentVersion}.mar"/>
 
         <mkdir dir="target/testing_repository/modules"/>
-        <copy file="../../repository/modules/addressing-${addressing.version}.mar"
+        <copy file="target/lib/addressing-${addressing.version}.mar"
               tofile="target/testing_repository/modules/addressing-${addressing.version}.mar"/>
         <copy file="../../repository/conf/axis2.xml"
               tofile="target/testing_repository/conf/axis2.xml"/>

@@ -56,16 +56,17 @@
             <artifactId>axis2</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-
         <dependency>
             <groupId>ws-commons</groupId>
-            <artifactId>axiom</artifactId>
+            <artifactId>axiom-api</artifactId>
             <version>${axiom.version}</version>
-            <properties>
-                <module>false</module>
-            </properties>
         </dependency>
-        
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.ws.commons</groupId>
             <artifactId>XmlSchema</artifactId>

@@ -268,6 +268,8 @@
             </srcfiles>
         </uptodate>
         <echo message="the files are up to date = ${jars.uptodate}"></echo>
+        <!-- Creating libs-->
+        <deploy:copy-deps todir="target/lib"/>
     </goal>
 
     <goal name="modules:clean">
@@ -301,6 +303,7 @@
         <ant:echo>+----------------------------------------</ant:echo>
         <ant:delete dir="modules/extensions/logs"/>
         <ant:delete dir="modules/core/logs"/>
+        <ant:delete file="velocity.log"/>
     </goal>
 
     <goal name="clean">
@@ -348,7 +351,7 @@
     <!-- ================================================================ -->
     <!--- Create the Distro -->
     <!-- ================================================================ -->
-    <goal name="dist-bin" prereqs="war,create-jar,javadocs">
+    <goal name="dist-bin" prereqs="init,war,create-jar,javadocs">
         <ant:echo>+----------------------------------------------</ant:echo>
         <ant:echo>| Creating: Synapse Binary Distribution</ant:echo>
         <ant:echo>+----------------------------------------------</ant:echo>
@@ -656,12 +659,12 @@
         </define:tag>
     </define:taglib>
 
-    <goal name="war" prereqs="init">
+    <goal name="war">
         <j:if test="${jars.uptodate != 'yes'}">
             <attainGoal name="jar"/>
         </j:if>
         <!-- jar the test classes -->
-        <deploy:copy-deps todir="target/lib"/>
+        <!--<deploy:copy-deps todir="target/lib"/>-->
         <ant:war destfile="target/synapse.war" webxml="bin/web.xml">
             <ant:lib dir="target/lib">
                 <ant:include name="**"/>

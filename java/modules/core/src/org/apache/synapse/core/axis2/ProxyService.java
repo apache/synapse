@@ -18,14 +18,20 @@ package org.apache.synapse.core.axis2;
 import org.apache.axis2.description.WSDL11ToAxisServiceBuilder;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.PolicyInclude;
 import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.policy.util.PolicyReader;
+import org.apache.ws.policy.util.PolicyFactory;
+import org.apache.ws.policy.Policy;
 
 import java.net.URL;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * <proxy name="string" type="wsdl|jms|rest" [description="string"]>
@@ -68,8 +74,8 @@ public class ProxyService {
     private URL wsdl;
     /** The URLs for any supplied schemas */
     private URL[] schemas;
-    /** The URLs for any supplied policies */
-    private URL[] policies;
+    /** The URLs for any supplied policies that would apply at the service level */
+    private List serviceLevelPolicies = new ArrayList();
 
     public ProxyService() {}
 
@@ -105,6 +111,26 @@ public class ProxyService {
                             transposrts[i] = st.nextToken();
                         }
                         proxyService.setExposeTransports(transposrts);
+                    }
+
+                    // if service level policies are specified, apply them
+                    if (!serviceLevelPolicies.isEmpty()) {
+                        PolicyReader reader = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
+                        Policy svcEffectivePolicy = null;
+
+                        Iterator iter = serviceLevelPolicies.iterator();
+                        while (iter.hasNext()) {
+                            URL policyUrl = (URL) iter.next();
+                            if (svcEffectivePolicy == null) {
+                                svcEffectivePolicy = reader.readPolicy(policyUrl.openStream());
+                            } else {
+                                svcEffectivePolicy.merge(reader.readPolicy(policyUrl.openStream()));
+                            }
+                        }
+
+                        PolicyInclude policyInclude = new PolicyInclude();
+                        policyInclude.addPolicyElement(PolicyInclude.SERVICE_POLICY, svcEffectivePolicy);
+                        proxyService.setPolicyInclude(policyInclude);
                     }
 
                     // create a custom message receiver for this proxy service to use a given named
@@ -208,12 +234,12 @@ public class ProxyService {
         this.schemas = schemas;
     }
 
-    public URL[] getPolicies() {
-        return policies;
+    public List getServiceLevelPolicies() {
+        return serviceLevelPolicies;
     }
 
-    public void setPolicies(URL[] policies) {
-        this.policies = policies;
+    public void addServiceLevelPoliciy(URL serviceLevelPolicy) {
+        this.serviceLevelPolicies.add(serviceLevelPolicy);
     }
 
     private static void handleException(String msg) {

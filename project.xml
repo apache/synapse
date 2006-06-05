@@ -19,9 +19,9 @@
         implementation of a highly scalable and distributed service mediation
         framework based on Web services specifications.</description>
 
-    <url>http://ws.apache.org/synapse/</url>
+    <url>http://incubator.apache.org/synapse/</url>
     <issueTrackingUrl>http://issues.apache.org/jira/browse/Synapse</issueTrackingUrl>
-    <siteAddress>ws.apache.org</siteAddress>
+    <siteAddress>incubator.apache.org</siteAddress>
     <siteDirectory>/synapse/</siteDirectory>
     <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
 

@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Iterator;
 
 /**
  * Creates a ProxyService instance using the XML fragment specification
@@ -131,7 +132,26 @@ public class ProxyServiceFactory {
         }
 
         //OMElement schema = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "schema"));
-        //OMElement policy = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "policy"));
+        Iterator policies = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "policy"));
+        while (policies.hasNext()) {
+            Object o = policies.next();
+            if (o instanceof OMElement) {
+                OMElement policy = (OMElement) o;
+                OMAttribute url = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "url"));
+                if (url != null) {
+                    try {
+                        proxy.addServiceLevelPoliciy(new URL(url.getAttributeValue()));
+                    } catch (MalformedURLException e) {
+                        handleException("Invalid policy URL : " + url.getAttributeValue());
+                    }
+                } else {
+                    handleException("Policy element does not specify the policy URL");
+                }
+            } else {
+                handleException("Invalid 'policy' element found under element 'policies'");
+            }
+        }
+
 
         return proxy;
     }

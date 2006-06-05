@@ -13,7 +13,14 @@
     <!-- Dependencies -->
     <!-- ============ -->
 
-    <dependencies/>
+    <dependencies>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>addressing</artifactId>
+            <version>${addressing.version}</version>
+            <type>mar</type>
+        </dependency>
+    </dependencies>
     
     <build>
         <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>

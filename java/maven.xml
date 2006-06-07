@@ -452,9 +452,6 @@
             <ant:fileset file="modules/samples/target/synapse-sample-${pom.currentVersion}.jar"/>
         </ant:copy>
 
-        <!--<ant:copy todir="${bin.dist.dir}/mediators" flatten="false">
-            <ant:fileset dir="modules/mediators/target/dist-bin/mediators"/>
-        </ant:copy>-->
 
         <ant:copy todir="target/temp/">
             <ant:fileset dir="target/dist-bin/">
@@ -466,6 +463,10 @@
                   tofile="${dist.dir}/synapse-${pom.currentVersion}.mar"/>
         <ant:copy file="modules/core/target/synapse-${pom.currentVersion}.mar"
                   tofile="target/synapse-${pom.currentVersion}.mar"/>
+
+        <!-- Uploading the latest synapse-XX.mar to the local maven repository -->
+        <copy file="target/synapse-${pom.currentVersion}.mar"
+            tofile="${maven.repo.local}/synapse/mars/synapse-${pom.currentVersion}.mar"/>
 
 
         <ant:zip file="${dist.dir}/${dist.name}-bin.zip"

@@ -31,8 +31,6 @@
 
         </jar>
 
-       <copy file="target/synapse-${pom.currentVersion}.mar"
-            tofile="${maven.repo.local}/${pom.artifactId}/mars/synapse-${pom.currentVersion}.mar"/>
 
         <echo message="-----------Creating Testing Repository - Genral----------"/>
         <mkdir dir="target/synapse-repository"/>

@@ -17,6 +17,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Constants;
 import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
@@ -87,6 +88,17 @@ public class SendMediator extends AbstractMediator {
             log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
                 synCtx.getWSAAction() : "null"));
             log.debug("Body : \n" + synCtx.getEnvelope());
+
+            // if RM is turned on
+            if (singleEndpoint.isReliableMessagingOn()) {
+                synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
+                synCtx.setProperty(Constants.OUTFLOW_RM_POLICY, singleEndpoint.getWsRMPolicy());
+            }
+
+            // if WS Security is specified
+            if (singleEndpoint.getOutflowSecurity() != null) {
+                synCtx.setProperty(Constants.OUTFLOW_SEC_PARAMETER, singleEndpoint.getOutflowSecurity());
+            }
 
             synCtx.getEnvironment().send(synCtx);
 

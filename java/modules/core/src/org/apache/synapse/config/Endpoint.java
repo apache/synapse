@@ -15,6 +15,9 @@
 */
 package org.apache.synapse.config;
 
+import org.apache.axis2.description.Parameter;
+import org.apache.ws.policy.Policy;
+
 import java.net.URL;
 
 /**
@@ -32,6 +35,12 @@ public class Endpoint {
     private URL address = null;
     /** The name of the actual endpoint to which this instance refers to */
     private String ref = null;
+    /** Should messages be sent in an RM Sequence ? */
+    private boolean reliableMessagingOn = false;
+    /** Any WS-RM Policy overrides to be used when communicating with this endpoint */
+    private Policy wsRMPolicy = null;
+    /** The Apache Rampart OutflowSecurity configuration to be used */
+    private Parameter outflowSecurity = null;
 
     /**
      * Return the name of the endpoint
@@ -79,5 +88,53 @@ public class Endpoint {
      */
     public void setRef(String ref) {
         this.ref = ref;
+    }
+
+    /**
+     * Is RM turned on on this endpoint?
+     * @return true if on
+     */
+    public boolean isReliableMessagingOn() {
+        return reliableMessagingOn;
+    }
+
+    /**
+     * Request that RM be turned on/off on this endpoint
+     * @param reliableMessagingOn
+     */
+    public void setReliableMessagingOn(boolean reliableMessagingOn) {
+        this.reliableMessagingOn = reliableMessagingOn;
+    }
+
+    /**
+     * Return the OutflowSecurity configuration to be used (See Rampart)
+     * @return the OutflowSecurity to be used, or null if WS-Sec is not on
+     */
+    public Parameter getOutflowSecurity() {
+        return outflowSecurity;
+    }
+
+    /**
+     * Set the OutflowSecurity configuration to be used (See Apache Rampart)
+     * @param outflowSecurity the Rampart OutflowSecurity configuration to be used if any
+     */
+    public void setOutflowSecurity(Parameter outflowSecurity) {
+        this.outflowSecurity = outflowSecurity;
+    }
+
+    /**
+     * Get the WS-RM Policy overrides
+     * @return the WS-RM Policy to be used when communicating with this endpoint
+     */
+    public Policy getWsRMPolicy() {
+        return wsRMPolicy;
+    }
+
+    /**
+     * Set the WS-RM Policy to be used when communicating with this endpoint
+     * @param wsRMPolicy the Policy override
+     */
+    public void setWsRMPolicy(Policy wsRMPolicy) {
+        this.wsRMPolicy = wsRMPolicy;
     }
 }

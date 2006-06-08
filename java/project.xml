@@ -79,10 +79,32 @@
         <dependency>
             <groupId>ws-commons</groupId>
             <artifactId>neethi</artifactId>
-            <version>${policy.version}</version>
+            <version>${neethi.version}</version>
             <properties>
                 <module>false</module>
             </properties>
+        </dependency>
+        
+        <!-- external MARs -->
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>addressing</artifactId>
+            <version>${addressing.version}</version>
+            <type>mar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${sandesha2.version}</version>
+            <type>mar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>rampart</artifactId>
+            <version>${rampart.version}</version>
+            <type>mar</type>
         </dependency>
 
         <!-- external JARs -->

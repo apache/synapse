@@ -33,20 +33,16 @@
 
 
         <echo message="-----------Creating Server Repository ----------"/>
-        <mkdir dir="target/synapse-repository"/>
+        <mkdir dir="target/synapse-repository/modules"/>
         <copy file="target/synapse-${pom.currentVersion}.mar"
               tofile="target/synapse-repository/modules/synapse-${pom.currentVersion}.mar"/>
         
-        <mkdir dir="target/synapse-repository/modules"/>
-<<<<<<< .mine
-        <copy file="${maven.repo.local}/axis2/mars/addressing-${addressing.version}.mar"
-=======
+
         <copy file="target/lib/addressing-${addressing.version}.mar"
->>>>>>> .r412721
               tofile="target/synapse-repository/modules/addressing-${addressing.version}.mar"/>
-        <copy file="${maven.repo.local}/sandesha2/mars/sandesha2-${sandesha2.version}.mar"
+        <copy file="target/lib/sandesha2-${sandesha2.version}.mar"
               tofile="target/synapse-repository/modules/sandesha2-${sandesha2.version}.mar"/>
-        <copy file="${maven.repo.local}/axis2/mars/rampart-${rampart.version}.mar"
+        <copy file="target/lib/rampart-${rampart.version}.mar"
               tofile="target/synapse-repository/modules/rampart-${rampart.version}.mar"/>
         
         <copy todir="target/synapse-repository/conf">        
@@ -57,21 +53,15 @@
 
 
         <echo message="-----------Creating Testing Repository [testing_repository]  ----------"/>
-        <mkdir dir="target/testing_repository"/>
+        <mkdir dir="target/testing_repository/modules"/>
+
         <copy file="target/synapse-${pom.currentVersion}.mar"
               tofile="target/testing_repository/modules/synapse-${pom.currentVersion}.mar"/>
-
-<<<<<<< .mine
-        <mkdir dir="target/synapse-repository/modules"/>
-        <copy file="${maven.repo.local}/axis2/mars/addressing-${addressing.version}.mar"
-=======
-        <mkdir dir="target/testing_repository/modules"/>
         <copy file="target/lib/addressing-${addressing.version}.mar"
->>>>>>> .r412721
               tofile="target/testing_repository/modules/addressing-${addressing.version}.mar"/>
-        <copy file="${maven.repo.local}/sandesha2/mars/sandesha2-${sandesha2.version}.mar"
+        <copy file="target/lib/sandesha2-${sandesha2.version}.mar"
               tofile="target/testing_repository/modules/sandesha2-${sandesha2.version}.mar"/>
-        <copy file="${maven.repo.local}/axis2/mars/rampart-${rampart.version}.mar"
+        <copy file="target/lib/rampart-${rampart.version}.mar"
               tofile="target/testing_repository/modules/rampart-${rampart.version}.mar"/>
         
         <copy file="../../repository/conf/axis2.xml"

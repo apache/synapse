@@ -22,34 +22,54 @@ import javax.xml.namespace.QName;
  */
 public interface Constants {
 
+    /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
 
-    String CLASSMEDIATOR = "classmediator";
-
-    String CORRELATE = "correlate/";
-
-    QName MEDIATE_OPERATION_NAME = new QName("mediate");
-
-    String MEDIATOR_RESPONSE_PROPERTY = "synapse.mediator.response";
-
-    String MEDIATOR_SYNAPSE_CTX_PROPERTY = "synapse.mediator.environment";
-
-    String ISRESPONSE_PROPERTY = "synapse.isresponse";
-
-    String EMPTYMEDIATOR = "emptymediator";
-
-    //this is for the synapse.config config
-    String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
-
+    // -- keys related to Axis2 configuration and Synapse initialization --
+    /** The key name used to store the Synapse configuration into the Axis2 config */
     String SYNAPSE_CONFIG = "synapse.config";
 
+    /** The key name used to store the Synapse environment into the Axis2 config */
     String SYNAPSE_ENV = "synapse.env";
 
+    /** The name used to denote the Axis2 Parameter specifying the Synapse configuration */
+    String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
+
+    /** The system property used to specify/override the synapse configuration XML location */
     String SYNAPSE_XML = "synapse.xml";
 
-    String ADD_ADDRESSING = "synapse.send.useaddressing";
+    // -- Synapse message context property keys --
+    /** Properties on an outgoing message context starting with this prefix
+     * would be copied over to the incoming reply for correlation
+     */
+    String CORRELATE = "correlate/";
 
-    // for security supporting
-    String SECURITY_QOS = "synapse_security";
+    /** A key with this name on the message context set to Boolean.TRUE, indicates that this is a response */
+    String ISRESPONSE_PROPERTY = "synapse.isresponse";
+
+    /** If the message context contains a Boolean.TRUE with this key, WS-A would be turned on send */
+    String OUTFLOW_ADDRESSING_ON = "OUTFLOW_ADDRESSING_ON";
+
+    /** If the message context contains a Boolean.TRUE with this key, RM would be turned on send */
+    String OUTFLOW_RM_ON = "OUTFLOW_RM_ON";
+
+    /** The message context property name which holds the RM policy to be used for outgoing messages */
+    String OUTFLOW_RM_POLICY = "OUTFLOW_RM_POLICY";
+
+    /** If the message context contains a Boolean.TRUE with this key, Rampart would be engaged on send */
+    String OUTFLOW_SECURITY_ON = "OUTFLOW_SECURITY_ON";
+
+    /** The message context property name which holds the Security 'Parameter' object to be used for outgoing messages */
+    String OUTFLOW_SEC_PARAMETER = "OUTFLOW_SEC_PARAMETER";
+
+    // -- names of modules to be engaged at runtime --
+    /** The QName of the WS-RM Sandesha module */
+    QName SANDESHA2_MODULE_NAME = new QName("sandesha2");
+
+    /** The QName of the WS-A Addressing module */
+    QName ADDRESSING_MODULE_NAME = new QName("addressing");
+
+    /** The QName of the WS-Security Rampart module */
+    QName RAMPART_MODULE_NAME = new QName("rampart");
 
 }

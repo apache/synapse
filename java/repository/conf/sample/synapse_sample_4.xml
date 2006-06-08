@@ -1,0 +1,31 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+  
+  <definitions>
+  	<sequence name="stockquote">
+    	<!-- set correlation field to custom label -->
+    	<set-property name="correlate/label" value="stockquote"/>
+      <send>
+      	<endpoint ref="invesbot"/>
+      </send>
+    </sequence>
+    
+    <endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx">
+	    <parameter name="OutflowSecurity">
+	      <action>
+	        <items>Timestamp</items>
+	      </action>
+	    </parameter>
+    </endpoint>
+    
+  </definitions>
+  
+  <rules>
+    <out>
+    	<send/>
+	  </out>	  	
+		<in>
+    	<sequence ref="stockquote"/>
+    </in>
+  </rules>
+
+</synapse> 

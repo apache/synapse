@@ -18,7 +18,6 @@ package org.apache.synapse.core.axis2;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,7 +72,11 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 org.apache.axis2.context.MessageContext axisInMsgContext =
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext();
                 org.apache.axis2.context.MessageContext axisOutMsgContext =
-                    Axis2FlexibleMEPClient.send(axisInMsgContext);
+                    Axis2FlexibleMEPClient.send(
+                        false, false, endpoint.getOutflowSecurity(),
+                        endpoint.isReliableMessagingOn(),
+                        endpoint.getWsRMPolicy(),
+                        axisInMsgContext);
 
                 axisOutMsgContext.setServerSide(true);
                 axisOutMsgContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT,

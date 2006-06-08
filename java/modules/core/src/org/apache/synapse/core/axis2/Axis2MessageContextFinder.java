@@ -87,8 +87,8 @@ public class Axis2MessageContextFinder implements Constants {
                     .getConfiguration(configParam.getValue().toString().trim());
         } else {
             log.warn("System property '" + Constants.SYNAPSE_XML +
-                     "' is not specified or SynapseConfiguration" +
-                     "is not available via Axis2.xml.Thus,  Using default configuration");
+                     "' is not specified or SynapseConfiguration Parameter " +
+                     "is not available via Axis2.xml. Thus,  Using default configuration");
             synapseConfiguration =
                     SynapseConfigurationBuilder.getDefaultConfiguration();
         }

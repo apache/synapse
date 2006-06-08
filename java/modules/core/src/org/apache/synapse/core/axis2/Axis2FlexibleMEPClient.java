@@ -16,7 +16,6 @@
 
 package org.apache.synapse.core.axis2;
 
-
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -28,30 +27,129 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
-import org.apache.axis2.deployment.util.PhasesInfo;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
+import org.apache.ws.policy.Policy;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 
 /**
  * This is a simple client that handles both in only and in out
  */
 public class Axis2FlexibleMEPClient {
 
-    public static SOAPEnvelope outEnvelopeConfiguration(MessageContext axisMsgCtx) {
+    private static final Log log = LogFactory.getLog(Axis2FlexibleMEPClient.class);
+
+    /**
+     * Based on the Axis2 client code. Sends the Axis2 Message context out and returns
+     * the Axis2 message context for the response.
+     *
+     * Here Synapse works as a Client to the service. It would expect 200 ok, 202 ok and
+     * 500 internal server error as possible responses. Currently the code expects
+     * Synchronus operation
+     *
+     * @param wsAddressingEnabled
+     * @param wsSecurityEnabled
+     * @param wsSecurityParameter
+     * @param wsRMEnabled
+     * @param wsRMPolicy
+     * @param axisMsgCtx
+     * @return The Axis2 reponse message context
+     */
+    public static MessageContext send(
+        boolean wsAddressingEnabled,
+        boolean wsSecurityEnabled,
+        Parameter wsSecurityParameter,
+        boolean wsRMEnabled,
+        Policy wsRMPolicy,
+        MessageContext axisMsgCtx) throws AxisFault {
+
+        ConfigurationContext axisCfgCtx = axisMsgCtx.getConfigurationContext();
+        AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
+
+        AxisService anoymousService =
+            AnonymousServiceFactory.getAnonymousService(
+            axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
+        ServiceGroupContext sgc = new ServiceGroupContext(
+            axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
+        ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
+
+        if (axisMsgCtx.getMessageID() != null) {
+            axisMsgCtx.setMessageID(String.valueOf("uuid:" + UUIDGenerator.getUUID()));
+        }
+
+        axisMsgCtx.setConfigurationContext(serviceCtx.getConfigurationContext());
+
+        // set SOAP envelope on the message context, removing WS-A headers
+        axisMsgCtx.setEnvelope(removeAddressingHeaders(axisMsgCtx));
+
+        // get a reference to the OUT-IN operation of the Anonymous Axis2 service
+        AxisOperation axisAnonymousOperation = anoymousService.getOperation(
+            new QName(AnonymousServiceFactory.OPERATION_OUT_IN));
+
+        Options clientOptions = new Options();
+
+        // if RM is requested, and if a WS-RM policy is specified, use it
+        if (wsRMEnabled && wsRMPolicy != null) {
+            axisAnonymousOperation.getPolicyInclude().
+                addPolicyElement(PolicyInclude.OPERATION_POLICY, wsRMPolicy);
+        }
+
+        // if security is enabled, and if a WS-Sec OutflowSecurity parameter is
+        // specified, use it
+        if (wsSecurityEnabled && wsSecurityParameter != null) {
+            clientOptions.setProperty(
+                org.apache.synapse.config.xml.Constants.OUTFLOW_SECURITY,
+                wsSecurityParameter);
+        }
+
+        OperationClient mepClient = axisAnonymousOperation.createClient(
+            serviceCtx, clientOptions);
+        mepClient.addMessageContext(axisMsgCtx);
+        mepClient.execute(true);
+
+        MessageContext response = mepClient.getMessageContext(
+            WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+        // set properties on response
+        response.setServerSide(true);
+        response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+        response.setProperty(MessageContext.TRANSPORT_OUT,
+            axisMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
+        response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
+            axisMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
+        response.setTransportIn(axisMsgCtx.getTransportIn());
+
+        // If request is REST assume that the response is REST too
+        response.setDoingREST(axisMsgCtx.isDoingREST());
+
+        return response;
+    }
+
+    /**
+     * Removes Submission and Final WS-Addressing headers and return the SOAPEnvelope
+     * from the given message context
+     * @param axisMsgCtx the Axis2 Message context
+     * @return the resulting SOAPEnvelope
+     */
+    private static SOAPEnvelope removeAddressingHeaders(MessageContext axisMsgCtx) {
+
         SOAPEnvelope env = axisMsgCtx.getEnvelope();
         SOAPHeader soapHeader = env.getHeader();
         ArrayList addressingHeaders;
+
         if (soapHeader != null) {
             addressingHeaders = soapHeader.getHeaderBlocksWithNSURI(
                 AddressingConstants.Submission.WSA_NAMESPACE);
+
             if (addressingHeaders != null && addressingHeaders.size() != 0) {
                 detachAddressingInformation(addressingHeaders);
 
@@ -67,7 +165,8 @@ public class Axis2FlexibleMEPClient {
     }
 
     /**
-     * @param headerInformation
+     * Remove WS-A headers
+     * @param headerInformation headers to be removed
      */
     private static void detachAddressingInformation(ArrayList headerInformation) {
         Iterator iterator = headerInformation.iterator();
@@ -75,95 +174,5 @@ public class Axis2FlexibleMEPClient {
             SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) iterator.next();
             headerBlock.detach();
         }
-
     }
-
-    // Following code is based on Axis2 Client code.
-    public static MessageContext send(MessageContext axisMsgCtx) throws AxisFault {
-        // In this logic Synapse Work as a Client to a Server
-        // So here this logic should expect 200 ok, 202 ok and 500 internal server error
-        // current state of the code in Synchronus
-
-        // This is the original_configuration_context
-        ConfigurationContext cc = axisMsgCtx.getConfigurationContext();
-        AxisConfiguration ac = cc.getAxisConfiguration();
-        PhasesInfo phasesInfo = ac.getPhasesInfo();
-
-        // setting operation default chains
-        if (ac.getService("__ANONYMOUS_SERVICE__") == null) {
-            // Lets default be OUT_IN
-            OutInAxisOperation outInOperation =
-                new OutInAxisOperation(new QName(
-                    "__OPERATION_OUT_IN__"));
-            AxisService axisAnonymousService =
-                new AxisService("__ANONYMOUS_SERVICE__");
-            axisAnonymousService.addOperation(outInOperation);
-            ac.addService(axisAnonymousService);
-            phasesInfo.setOperationPhases(outInOperation);
-        }
-        ServiceGroupContext sgc = new ServiceGroupContext(cc,
-            (AxisServiceGroup) ac.getService("__ANONYMOUS_SERVICE__").getParent());
-        ServiceContext sc =
-            sgc.getServiceContext(new AxisService("__ANONYMOUS_SERVICE__"));
-
-        MessageContext mc = new MessageContext();
-        mc.setConfigurationContext(sc.getConfigurationContext());
-        ///////////////////////////////////////////////////////////////////////
-        // filtering properties
-        if (axisMsgCtx.getSoapAction() != null)
-            mc.setSoapAction(axisMsgCtx.getSoapAction());
-        if (axisMsgCtx.getWSAAction() != null)
-            mc.setWSAAction(axisMsgCtx.getWSAAction());
-        if (axisMsgCtx.getFrom() != null)
-            mc.setFrom(axisMsgCtx.getFrom());
-        if (axisMsgCtx.getMessageID() != null)
-            mc.setMessageID(axisMsgCtx.getMessageID());
-        else
-            mc.setMessageID(String.valueOf("uuid:"
-                + UUIDGenerator.getUUID()));
-        if (axisMsgCtx.getReplyTo() != null)
-            mc.setReplyTo(axisMsgCtx.getReplyTo());
-        if (axisMsgCtx.getRelationships() != null)
-            mc.setRelationships(axisMsgCtx.getRelationships());
-        if (axisMsgCtx.getTo() != null) {
-            mc.setTo(axisMsgCtx.getTo());
-        } else {
-            throw new AxisFault(
-                    "To canno't be null, if null Synapse can't infer the transport");
-        }
-        if (axisMsgCtx.isDoingREST()) {
-            mc.setDoingREST(true);
-        }
-
-        // This has to be set due to addressing hadndelers will ignore the values if its set
-        // in infoset.
-        mc.setEnvelope(outEnvelopeConfiguration(axisMsgCtx));
-
-        AxisOperation axisAnonymousOperation =
-            ac.getService("__ANONYMOUS_SERVICE__")
-                .getOperation(new QName("__OPERATION_OUT_IN__"));
-
-        //Options class from Axis2 holds client side settings
-        Options options = new Options();
-        OperationClient mepClient =
-            axisAnonymousOperation.createClient(sc, options);
-        mepClient.addMessageContext(mc);
-        mepClient.execute(true);
-        MessageContext response = mepClient
-            .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-        response.setProperty(MessageContext.TRANSPORT_OUT,
-            axisMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
-        response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-            axisMsgCtx.getProperty(
-                org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-
-        // If request is REST we assume the response is REST, so set the
-        // variable
-        response.setDoingREST(axisMsgCtx.isDoingREST());
-        response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-        
-        return response;
-    }
-
-
 }

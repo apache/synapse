@@ -31,4 +31,5 @@ public interface Constants {
 
     public static final String SYNAPSE_NAMESPACE = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
     public static final String NULL_NAMESPACE    = "";
+    public static final String OUTFLOW_SECURITY  = "OutflowSecurity";
 }

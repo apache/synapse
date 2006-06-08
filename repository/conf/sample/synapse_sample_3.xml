@@ -20,22 +20,21 @@
   	<proxy name="InvesbotSequenceProxy" type="wsdl" description="This uses the stockquote named sequence for mediation">
 	    <endpoint protocol="http" uri="/MyfirstProxy"/>
 	    <target sequence="stockquote"/>
-	    <wsdl url="file:conf/sample/sample_proxy_1.wsdl"/>
-	    <policy url="file:conf/sample/sample_policy_1.xml"/>
+	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
+	    <policy url="file:synapse_repository/conf/sample/sample_policy_1.xml"/>
 	  </proxy>
 	  
-<!--
 	  <proxy name="InvesbotForwardProxy" type="wsdl" description="This simply forwards all messages to the investbot endpoint">
 	    <endpoint protocol="http" uri="/MyfirstProxy"/>
 	    <target endpoint="invesbot"/>
-	    <wsdl url="file:conf/sample/sample_proxy_1.wsdl"/>
+	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
 	  </proxy>  	
 	  
 	  <proxy name="InvesbotDefaultProxy" type="wsdl" description="This simply forwards all messages to the investbot endpoint">
 	    <endpoint protocol="http" uri="/MyfirstProxy"/>
-	    <wsdl url="file:conf/sample/sample_proxy_1.wsdl"/>
+	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
 	  </proxy>
--->
+
   </proxies>
 
   <rules>

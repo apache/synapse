@@ -71,6 +71,8 @@ public class ProxyServiceFactory {
             } else {
                 handleException("Unknown proxy type : " + sType);
             }
+        } else {
+            handleException("The 'type' is a required for proxy service : " + proxy.getName());
         }
 
         // read endpoint definition and set it to the proxy service
@@ -107,7 +109,7 @@ public class ProxyServiceFactory {
         }
 
         // read the WSDL, Schemas and Policies and set to the proxy service
-        OMElement wsdl   = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
+        OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
         if (wsdl == null && proxy.getType() == ProxyService.WSDL_TYPE) {
             handleException("A WSDL URL is required for a WSDL based proxy service");
 

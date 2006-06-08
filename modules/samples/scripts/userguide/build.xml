@@ -22,7 +22,7 @@
   	  examples:
   	  ant stockquote
   	  ant stockquote -Dsymbol=IBM -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
-  	    -Drepository=../synapse_repository"
+  	    -Drepository=client_repo"
   	
   	ant proxystockquote
 	    Use the http proxy client - Synapse in "transparent mode"
@@ -30,7 +30,7 @@
   	 	examples:
   	  ant proxystockquote
   	  ant proxystockquote -Dsymbol=IBM -Durl=http://www.webservicex.net/stockquote.asmx -Dsynapseurl=http://localhost
-  	    -Drepository=../synapse_repository"
+  	    -Drepository=client_repo"
 
     ant dumbstockquote 
       Use the dumb soap client - Synapse in "gateway" mode
@@ -60,7 +60,7 @@
   
   		examples:
 	  	ant simplequote 
-	    ant simplequote [-Dsymbol=IBM] [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote] [-Drepository=../synapse_repository]
+	    ant simplequote [-Dsymbol=IBM] [-Dinvestbot_url=http://ws.invesbot.com/stockquotes.asmx] [-Dgatewayurl=http://localhost:8080/StockQuote] [-Drepository=client_repo]
 
   	ant proxyquote
 	    Use Proxy services to query stock prices. (Must be used with the sample configuration # 3)
@@ -79,7 +79,7 @@
     <property name="investbot_url" value="http://ws.invesbot.com/stockquotes.asmx"/>
     <property name="synapseurl" value="http://localhost:8080"/>
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
-    <property name="repository" value="../synapse_repository"/>
+    <property name="repository" value="client_repo"/>
     <property name="fwdProxy" value="http://localhost:8080/axis2/services/InvesbotForwardProxy"/>
     <property name="defProxy" value="http://localhost:8080/axis2/services/InvesbotDefaultProxy"/>
     <property name="seqProxy" value="http://localhost:8080/axis2/services/InvesbotSequenceProxy"/>

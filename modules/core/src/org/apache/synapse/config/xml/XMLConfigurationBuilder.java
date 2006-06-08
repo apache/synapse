@@ -167,11 +167,23 @@ public class XMLConfigurationBuilder {
             if (address != null) {
                 try {
                     endpoint.setAddress(new URL(address.getAttributeValue()));
-                    config.addNamedEndpoint(endpoint.getName(), endpoint);
                 } catch (MalformedURLException e) {
                     handleException("Invalid URL specified for 'address' : " + address.getAttributeValue(), e);
                 }
+            } else {
+                // right now an address is *required*
+                handleException("The 'address' attribute is required for an endpoint");
             }
+
+            // if a Rampart OutflowSecurity parameter is specified, digest it
+            endpoint.setOutflowSecurity(OutflowSecurityBuilder.getOutflowSecurity(ele));
+
+            // if WS-RM is enabled, set it as requested
+            endpoint.setReliableMessagingOn(OutflowRMPolicyBuilder.isRMEnabled(ele));
+            endpoint.setWsRMPolicy(OutflowRMPolicyBuilder.getRMPolicy(ele));
+
+            // add this endpoint to the configuration
+            config.addNamedEndpoint(endpoint.getName(), endpoint);
         }
     }
 

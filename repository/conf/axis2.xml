@@ -21,6 +21,7 @@
     <parameter name="password" locked="false">axis2</parameter>
 
     <!-- ==================================================== -->
+    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
     <module ref="addressing"/>
     <!-- <module ref="rampart"/> -->
     <module ref="synapse"/>

@@ -363,6 +363,7 @@
         <ant:mkdir dir="${bin.dist.dir}/xdocs"/>
         <ant:mkdir dir="${bin.dist.dir}/synapse_repository"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
+        <ant:mkdir dir="${bin.dist.dir}/samples/client_repo"/>
         <ant:mkdir dir="${bin.dist.dir}/licenses"/>
 
         <ant:mkdir dir="target/temp/"/>
@@ -443,6 +444,12 @@
 
         <ant:copy todir="${bin.dist.dir}/synapse_repository" flatten="false">
             <ant:fileset dir="modules/core/target/synapse-repository"/>
+        </ant:copy>
+        
+        <ant:copy todir="${bin.dist.dir}/samples/client_repo" flatten="false">
+            <ant:fileset dir="modules/core/target/synapse-repository">
+            	<ant:exclude name="**/synapse-${pom.currentVersion}.mar"/>
+            </ant:fileset>
         </ant:copy>
 
         <ant:copy todir="${bin.dist.dir}/samples" flatten="false">

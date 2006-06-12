@@ -177,15 +177,15 @@ public class XMLConfigurationBuilder {
 
             OMAttribute wsAddr = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSA"));
             if (wsAddr != null) {
-                endpoint.setAddressingOn(Boolean.parseBoolean(wsAddr.getAttributeValue()));
+                endpoint.setAddressingOn(Boolean.getBoolean(wsAddr.getAttributeValue()));
             }
             OMAttribute wsSec  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSSec"));
             if (wsSec != null) {
-                endpoint.setSecurityOn(Boolean.parseBoolean(wsSec.getAttributeValue()));
+                endpoint.setSecurityOn(Boolean.getBoolean(wsSec.getAttributeValue()));
             }
             OMAttribute wsRm   = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSRM"));
             if (wsRm != null) {
-                endpoint.setReliableMessagingOn(Boolean.parseBoolean(wsRm.getAttributeValue()));
+                endpoint.setReliableMessagingOn(Boolean.getBoolean(wsRm.getAttributeValue()));
             }
 
             // if a Rampart OutflowSecurity parameter is specified, digest it

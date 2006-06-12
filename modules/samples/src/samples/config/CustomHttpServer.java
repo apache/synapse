@@ -38,7 +38,7 @@ public class CustomHttpServer extends SimpleHTTPServer {
     private static final Log log = LogFactory.getLog(CustomHttpServer.class);
 
     public CustomHttpServer(ConfigurationContext cfgCtx, int port, ThreadFactory o) throws AxisFault {
-        super(cfgCtx, port, o);
+        super(cfgCtx, port);
     }
 
     public static void main(String[] args) throws Exception {

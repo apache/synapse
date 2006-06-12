@@ -175,8 +175,26 @@ public class XMLConfigurationBuilder {
                 handleException("The 'address' attribute is required for an endpoint");
             }
 
+            OMAttribute wsAddr = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSA"));
+            if (wsAddr != null) {
+                endpoint.setAddressingOn(Boolean.parseBoolean(wsAddr.getAttributeValue()));
+            }
+            OMAttribute wsSec  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSSec"));
+            if (wsSec != null) {
+                endpoint.setSecurityOn(Boolean.parseBoolean(wsSec.getAttributeValue()));
+            }
+            OMAttribute wsRm   = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSRM"));
+            if (wsRm != null) {
+                endpoint.setReliableMessagingOn(Boolean.parseBoolean(wsRm.getAttributeValue()));
+            }
+
             // if a Rampart OutflowSecurity parameter is specified, digest it
-            endpoint.setOutflowSecurity(OutflowSecurityBuilder.getOutflowSecurity(ele));
+            endpoint.setOutflowSecurity(
+                RampartSecurityBuilder.getSecurityParameter(ele, Constants.OUTFLOW_SECURITY));
+
+            // if a Rampart InflowSecurity parameter is specified, digest it
+            endpoint.setInflowSecurity(
+                RampartSecurityBuilder.getSecurityParameter(ele, Constants.INFLOW_SECURITY));
 
             // if WS-RM is enabled, set it as requested
             endpoint.setReliableMessagingOn(OutflowRMPolicyBuilder.isRMEnabled(ele));

@@ -27,9 +27,9 @@ import javax.xml.namespace.QName;
  * Build an Apache Rampart OutflowSecurity Parameter using the given
  * XML fragment from a Synapse configuration file.
  */
-public class OutflowSecurityBuilder {
+public class RampartSecurityBuilder {
 
-    private static final Log log = LogFactory.getLog(OutflowSecurityBuilder.class);
+    private static final Log log = LogFactory.getLog(RampartSecurityBuilder.class);
 
     /**
      * Return a Rampart OutflowSecurity 'Parameter', by scanning the children of the
@@ -37,13 +37,14 @@ public class OutflowSecurityBuilder {
      * @param elem the source element to be used
      * @return a Rampart OutflowSecurity 'Parameter'
      */
-    public static Parameter getOutflowSecurity(OMElement elem) {
-        OMElement paramElt = elem.getFirstChildWithName(new QName(Constants.NULL_NAMESPACE, "parameter"));
+    public static Parameter getSecurityParameter(OMElement elem, String name) {
+        OMElement paramElt = elem.getFirstChildWithName(
+            new QName(Constants.NULL_NAMESPACE, "parameter"));
         if (paramElt != null) {
             Parameter param = new Parameter();
             param.setParameterElement(paramElt);
             param.setValue(paramElt);
-            param.setName(Constants.OUTFLOW_SECURITY);
+            param.setName(name);
             return param;
         } else {
             return null;

@@ -32,7 +32,6 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseException;
 import org.apache.ws.policy.Policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +57,7 @@ public class Axis2FlexibleMEPClient {
      *
      * @param wsAddressingEnabled
      * @param wsSecurityEnabled
-     * @param wsSecurityParameter
+     * @param outflowSecurityParameter
      * @param wsRMEnabled
      * @param wsRMPolicy
      * @param axisMsgCtx
@@ -67,7 +66,8 @@ public class Axis2FlexibleMEPClient {
     public static MessageContext send(
         boolean wsAddressingEnabled,
         boolean wsSecurityEnabled,
-        Parameter wsSecurityParameter,
+        Parameter outflowSecurityParameter,
+        Parameter inflowSecurityParameter,
         boolean wsRMEnabled,
         Policy wsRMPolicy,
         MessageContext axisMsgCtx) throws AxisFault {
@@ -103,12 +103,21 @@ public class Axis2FlexibleMEPClient {
                 addPolicyElement(PolicyInclude.OPERATION_POLICY, wsRMPolicy);
         }
 
-        // if security is enabled, and if a WS-Sec OutflowSecurity parameter is
-        // specified, use it
-        if (wsSecurityEnabled && wsSecurityParameter != null) {
-            clientOptions.setProperty(
+        // if security is enabled,
+        if (wsSecurityEnabled) {
+            // if a WS-Sec OutflowSecurity parameter is specified, use it
+            if (outflowSecurityParameter != null) {
+                clientOptions.setProperty(
                 org.apache.synapse.config.xml.Constants.OUTFLOW_SECURITY,
-                wsSecurityParameter);
+                outflowSecurityParameter);
+            }
+
+            // if a WS-Sec InflowSecurity parameter is specified, use it
+            if (inflowSecurityParameter != null) {
+                clientOptions.setProperty(
+                org.apache.synapse.config.xml.Constants.INFLOW_SECURITY,
+                inflowSecurityParameter);
+            }
         }
 
         OperationClient mepClient = axisAnonymousOperation.createClient(

@@ -264,6 +264,15 @@
             </properties>
         </dependency>
 
+        <dependency>
+            <groupId>httpcomponents-httpcore</groupId>
+            <artifactId>jakarta-httpcore</artifactId>
+            <version>${jakarta.httpcore.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency> 
+
     </dependencies>
 
     <!-- ================================= -->

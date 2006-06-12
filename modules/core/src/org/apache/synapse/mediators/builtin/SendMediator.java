@@ -92,12 +92,28 @@ public class SendMediator extends AbstractMediator {
             // if RM is turned on
             if (singleEndpoint.isReliableMessagingOn()) {
                 synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
-                synCtx.setProperty(Constants.OUTFLOW_RM_POLICY, singleEndpoint.getWsRMPolicy());
+                if (singleEndpoint.getWsRMPolicy() != null) {
+                    synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
+                        singleEndpoint.getWsRMPolicy());
+                }
             }
 
             // if WS Security is specified
-            if (singleEndpoint.getOutflowSecurity() != null) {
-                synCtx.setProperty(Constants.OUTFLOW_SEC_PARAMETER, singleEndpoint.getOutflowSecurity());
+            if (singleEndpoint.isSecurityOn()) {
+                synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
+                if (singleEndpoint.getOutflowSecurity() != null) {
+                    synCtx.setProperty(Constants.OUTFLOW_SEC_PARAMETER,
+                        singleEndpoint.getOutflowSecurity());
+                }
+                if (singleEndpoint.getInflowSecurity() != null) {
+                    synCtx.setProperty(Constants.INFLOW_SEC_PARAMETER,
+                        singleEndpoint.getInflowSecurity());
+                }
+            }
+
+            // if WS Addressing is specified
+            if (singleEndpoint.isAddressingOn()) {
+                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
             }
 
             synCtx.getEnvironment().send(synCtx);

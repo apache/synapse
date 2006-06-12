@@ -1,18 +1,41 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
   
   <definitions>
-  	<sequence name="stockquote">
-    	<!-- set correlation field to custom label -->
-    	<set-property name="correlate/label" value="stockquote"/>
-      <send>
-      	<endpoint ref="invesbot"/>
-      </send>
-    </sequence>
-    
-    <endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx">
+
+    <endpoint name="WsSecurity10_scenario_1" useWSA="true" useWSSec="true" useWSRM="false" address="http://localhost:9090/ssj/pingservice/Ping1">    
 	    <parameter name="OutflowSecurity">
 	      <action>
-	        <items>Timestamp</items>
+        	<items>UsernameToken</items>
+	        <user>Chris</user>
+  		    <passwordCallbackClass>samples.qos.security.WSSecInteropPWCallback</passwordCallbackClass>
+      		<passwordType>PasswordText</passwordType>
+      	</action>
+	    </parameter>
+    </endpoint>
+    
+    <endpoint name="WsSecurity10_scenario_3" useWSA="true" useWSSec="true" useWSRM="false" address="http://localhost:9090/ssj/pingservice/Ping3">    
+	    <parameter name="OutflowSecurity">
+		    <action>
+
+	        <items>Timestamp Signature Encrypt</items>
+	        <user>7dbc945b2ea9f2a8e5d163d80682a78fec42cbd0</user>
+	        <passwordCallbackClass>samples.qos.security.WSSecInteropPWCallback</passwordCallbackClass>
+	        <signaturePropFile>interop-client.properties</signaturePropFile>
+	        <signatureKeyIdentifier>DirectReference</signatureKeyIdentifier>
+	        <encryptionKeyIdentifier>DirectReference</encryptionKeyIdentifier>
+	        <encryptionPropFile>interop-server.properties</encryptionPropFile>
+	        <encryptionUser>38f376d22dc95f6329e43a91c6e8bedc22d044ff</encryptionUser>
+	        
+	      </action>
+	    </parameter>
+	    
+	    <parameter name="InflowSecurity">
+		    <action>
+	        <items>Encrypt Signature Timestamp</items>
+	        <passwordCallbackClass>samples.qos.security.WSSecInteropPWCallback</passwordCallbackClass>
+	        <signaturePropFile>interop-client.properties</signaturePropFile>
+	        <!--<decryptionPropFile>interop-server.properties</decryptionPropFile> -->
+	        <!--<decryptionUser>38f376d22dc95f6329e43a91c6e8bedc22d044ff</decryptionUser>-->
 	      </action>
 	    </parameter>
     </endpoint>
@@ -24,7 +47,23 @@
     	<send/>
 	  </out>	  	
 		<in>
-    	<sequence ref="stockquote"/>
+		<switch source="get-property('Action')">
+		    <case regex="Ping1">
+		    	<header name="Action" value="http://xmlsoap.org/Ping"/>
+			   	<send>
+						<endpoint ref="WsSecurity10_scenario_1"/>
+					</send>
+		    </case>
+		    <case regex="Ping3">
+		    	<header name="Action" value="http://xmlsoap.org/Ping"/>
+		      <send>
+						<endpoint ref="WsSecurity10_scenario_3"/>
+					</send>
+		    </case>
+		    <default>
+		      <send/>
+		    </default>
+		  </switch>
     </in>
   </rules>
 

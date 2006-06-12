@@ -62,6 +62,9 @@ public interface Constants {
     /** The message context property name which holds the Security 'Parameter' object to be used for outgoing messages */
     String OUTFLOW_SEC_PARAMETER = "OUTFLOW_SEC_PARAMETER";
 
+    /** The message context property name which holds the Security 'Parameter' object to be used for incoming messages */
+    String INFLOW_SEC_PARAMETER = "INFLOW_SEC_PARAMETER";
+
     // -- names of modules to be engaged at runtime --
     /** The QName of the WS-RM Sandesha module */
     QName SANDESHA2_MODULE_NAME = new QName("sandesha2");

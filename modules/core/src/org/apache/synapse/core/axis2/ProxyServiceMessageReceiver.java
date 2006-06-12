@@ -73,7 +73,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext();
                 org.apache.axis2.context.MessageContext axisOutMsgContext =
                     Axis2FlexibleMEPClient.send(
-                        false, false, endpoint.getOutflowSecurity(),
+                        false, false,
+                        endpoint.getOutflowSecurity(),
+                        endpoint.getInflowSecurity(),
                         endpoint.isReliableMessagingOn(),
                         endpoint.getWsRMPolicy(),
                         axisInMsgContext);

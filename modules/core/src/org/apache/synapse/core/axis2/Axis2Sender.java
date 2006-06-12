@@ -48,8 +48,8 @@ public class Axis2Sender {
 
             MessageContext axisOutMsgContext =
                 Axis2FlexibleMEPClient.send(
-                    // WS-A default is on
-                    (wsAOn == null || wsAOn.booleanValue()),
+                    // WS-A default is off
+                    (wsAOn != null && wsAOn.booleanValue()),
 
                     // WS-Sec default is off
                     (wsSecOn != null && wsSecOn.booleanValue()),
@@ -57,6 +57,10 @@ public class Axis2Sender {
                     // The OutflowSecurity Parameter
                     (Parameter) synapseInMessageContext.getProperty(
                         Constants.OUTFLOW_SEC_PARAMETER),
+
+                    // The InflowSecurity Parameter
+                    (Parameter) synapseInMessageContext.getProperty(
+                        Constants.INFLOW_SEC_PARAMETER),
 
                     // WS-RM default is off
                     (wsRmOn != null && wsRmOn.booleanValue()),

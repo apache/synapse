@@ -35,12 +35,18 @@ public class Endpoint {
     private URL address = null;
     /** The name of the actual endpoint to which this instance refers to */
     private String ref = null;
-    /** Should messages be sent in an RM Sequence ? */
+    /** Should messages be sent in an WS-RM Sequence ? */
     private boolean reliableMessagingOn = false;
+    /** Should messages be sent using WS-A? */
+    private boolean addressingOn = false;
+    /** Should messages be sent using WS-Security? */
+    private boolean securityOn = false;
     /** Any WS-RM Policy overrides to be used when communicating with this endpoint */
     private Policy wsRMPolicy = null;
     /** The Apache Rampart OutflowSecurity configuration to be used */
     private Parameter outflowSecurity = null;
+    /** The Apache Rampart InflowSecurity configuration to be used */
+    private Parameter inflowSecurity = null;
 
     /**
      * Return the name of the endpoint
@@ -107,6 +113,38 @@ public class Endpoint {
     }
 
     /**
+     * Is WS-A turned on on this endpoint?
+     * @return true if on
+     */
+    public boolean isAddressingOn() {
+        return addressingOn;
+    }
+
+    /**
+     * Request that WS-A be turned on/off on this endpoint
+     * @param addressingOn
+     */
+    public void setAddressingOn(boolean addressingOn) {
+        this.addressingOn = addressingOn;
+    }
+
+    /**
+     * Is WS-Security turned on on this endpoint?
+     * @return true if on
+     */
+    public boolean isSecurityOn() {
+        return securityOn;
+    }
+
+    /**
+     * Request that WS-Sec be turned on/off on this endpoint
+     * @param securityOn
+     */
+    public void setSecurityOn(boolean securityOn) {
+        this.securityOn = securityOn;
+    }
+
+    /**
      * Return the OutflowSecurity configuration to be used (See Rampart)
      * @return the OutflowSecurity to be used, or null if WS-Sec is not on
      */
@@ -120,6 +158,22 @@ public class Endpoint {
      */
     public void setOutflowSecurity(Parameter outflowSecurity) {
         this.outflowSecurity = outflowSecurity;
+    }
+
+    /**
+     * Return the InflowSecurity configuration to be used (See Rampart)
+     * @return the InflowSecurity to be used, or null if WS-Sec is not on
+     */
+    public Parameter getInflowSecurity() {
+        return inflowSecurity;
+    }
+
+    /**
+     * Set the InflowSecurity configuration to be used (See Apache Rampart)
+     * @param inflowSecurity the Rampart InflowSecurity configuration to be used if any
+     */
+    public void setInflowSecurity(Parameter inflowSecurity) {
+        this.inflowSecurity = inflowSecurity;
     }
 
     /**

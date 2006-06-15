@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project default="default" xmlns:j="jelly:core" xmlns:maven="jelly:maven" xmlns:deploy="deploy" xmlns:ant="jelly:ant">
+
+    <j:set var="dist.name" value="${pom.artifactId}-${sandesha2.version}"/>
+    <j:set var="dist.module.name" value="${pom.artifactId}-${sandesha2.module.version}"/>
+
+    <ant:property name="build.dist.dir" value="${maven.build.dir}/dist"/>
+    <ant:property name="build.temp.dir" value="${maven.build.dir}/temp"/>
+    <ant:property name="build.repo.dir" value="${maven.build.dir}/repos"/>
+    <ant:property name="build.samples.dir" value="${maven.build.dir}/samples"/>
+    <ant:property name="build.samples.services.dir" value="${build.samples.dir}/services"/>
+    <ant:property name="build.samples.clients.dir" value="${build.samples.dir}/clients"/>
+    
+	<ant:property name="mar.name" value="${dist.module.name}.mar"/>
+	<ant:property name="jar.name" value="${dist.name}.jar"/>
+	<ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
+	
+	<ant:property name="dir.samples" value="samples"/>
+	<ant:property name="dir.test.resources" value="test-resources"/>
+	<ant:property name="dir.config" value="config"/>
+	
+	<ant:property name="apache.license.file" value="LICENSE.txt" />
+	<ant:property name="readme.file" value="README.txt" />
+	<ant:property name="release.notes.file" value="release-notes.html" />
+	
+	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
+	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
+	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
+   
+    <goal name="build:all" prereqs="mar,jar,client:jar,sample:create,repo:create,test:test" />
+    
+    <goal name="all:jar" prereqs="mar,jar,client:jar" />
+        
+    <goal name="default">
+        <attainGoal name="clean"/>
+        <attainGoal name="build:all"/>
+    </goal>
+    
+    <!-- Befor running the tests the repo should be created-->
+    <preGoal name="test:test">
+       <attainGoal name="repo:create"/>
+    </preGoal>
+    
+    <goal name="mar" prereqs="java:compile">
+    	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
+    	<ant:mkdir dir="${metainf.path}" />
+    	<ant:copy file="${basedir}/config/module.xml" todir="${metainf.path}" />
+
+		<!-- For the client side -->
+        <copy todir="${build.temp.dir}/module">
+            <fileset dir="${basedir}/target/classes" >
+            	<include name="**/*.class"/>
+            </fileset>
+        </copy>
+  
+        <ant:jar jarfile="${maven.build.dir}/${mar.name}" basedir="${build.temp.dir}/module" /> 
+        
+        <copy file="${maven.build.dir}/${mar.name}" 
+            tofile="${maven.repo.local}/${pom.artifactId}/mars/${mar.name}"/>
+        
+        <delete dir="${build.temp.dir}" />
+    </goal>
+    
+    <goal name="jar" prereqs="java:compile">
+    	<ant:property name="jar.temp.path" value="${build.temp.dir}/jar" />
+    	<ant:mkdir dir="${jar.temp.path}" />
+
+        <copy todir="${jar.temp.path}">
+            <fileset dir="${basedir}/target/classes" >
+            	<include name="**/*.class"/>
+            </fileset>
+        </copy>
+  
+        <ant:jar jarfile="${maven.build.dir}/${jar.name}" basedir="${jar.temp.path}" /> 
+        
+        <copy file="${maven.build.dir}/${jar.name}" 
+            toDir="${maven.repo.local}/${pom.artifactId}/jars"/>
+        
+        <delete dir="${build.temp.dir}" />
+    </goal>
+    
+    <goal name="client:jar" prereqs="java:compile">
+    	<ant:property name="client.path" value="${build.temp.dir}/client/" />
+    	<ant:mkdir dir="${client.path}" />
+
+		<!-- For the client side -->
+        <copy todir="${build.temp.dir}/client">
+            <fileset dir="${basedir}/target/classes" >
+              <include name="**/sandesha2/client/*SandeshaClientConstants*.*" />
+              <include name="**/sandesha2/client/*SandeshaListener*.*" />
+              <include name="**/sandesha2/client/*SequenceReport*.*" />
+            </fileset>
+        </copy>
+  
+        <ant:jar jarfile="${maven.build.dir}/${client.jar.name}" basedir="${build.temp.dir}/client" /> 
+        
+        <copy file="${maven.build.dir}/${client.jar.name}" 
+            tofile="${maven.repo.local}/${pom.artifactId}/jars/${client.jar.name}"/>
+            
+        <delete dir="${build.temp.dir}" />
+        
+    </goal>
+
+	<goal name="client:create" prereqs="mar">
+		<ant:property name="client.dist.path" value="${build.repo.dir}/client"/>
+		<ant:mkdir dir="${client.dist.path}" />
+		<ant:mkdir dir="${client.dist.path}/modules" />
+		<ant:copy file="${dir.config}/client_axis2.xml" todir="${client.dist.path}" />
+		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />
+		
+		<!-- Copying addressing mar file--> 
+		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
+	</goal>
+
+    <goal name="repo:create">
+        <attainGoal name="server:create"/>
+        <attainGoal name="client:create"/>
+    </goal>	
+    
+	<goal name="server:create" prereqs="mar,sample:create">
+		<ant:property name="server.dist.path" value="${build.repo.dir}/server"/>
+		<ant:mkdir dir="${server.dist.path}" />
+		<ant:mkdir dir="${server.dist.path}/modules" />
+		<ant:mkdir dir="${server.dist.path}/services" />
+		<ant:copy file="${basedir}/config/server_axis2.xml" todir="${server.dist.path}" />
+		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${server.dist.path}/modules" /> 
+        <ant:copy todir="${server.dist.path}/services" >
+            <ant:fileset dir="${build.samples.services.dir}">
+                <ant:include name="**/*.aar" />
+            </ant:fileset>
+        </ant:copy>
+        
+        <!-- Copying addressing mar file-->
+        <ant:copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" /> 
+	</goal>
+	
+    <goal name="sample:compile">
+        <ant:mkdir dir="${basedir}/target/samples/classes" />
+        <ant:mkdir dir="${basedir}/target/samples/services" />
+        
+        <ant:javac srcdir="${dir.samples}/src" destdir="${basedir}/target/samples/classes" debug="on">
+            <ant:classpath refid="maven.dependency.classpath" />
+	    	<ant:classpath path="${basedir}/target/classes" />
+        </ant:javac>
+    </goal>
+
+    <goal name="sample:create" prereqs="sample:setup,sample:userguide:create">
+    </goal>
+    
+    <goal name="sample:setup" prereqs="sample:compile">
+        <ant:mkdir dir="${build.samples.services.dir}" />
+        <ant:mkdir dir="${build.samples.clients.dir}" />
+    </goal>
+    
+    <goal name="sample:userguide:create" prereqs="sample:compile,sample:setup">
+        <ant:property name="dir.sample.userguide.temp" value="${build.temp.dir}/userguide" />
+        <ant:property name="dir.sample.userguideclients.temp" value="${build.temp.dir}/userguideclients" />
+        <ant:property name="userguide.service.aar.name" value="RMSampleService.aar" />
+        <ant:property name="userguide.client.jar.name" value="UserguideSampleClients.jar" />
+        
+        <ant:mkdir dir="${build.samples.clients.dir}" />
+        
+        <ant:mkdir dir="${dir.sample.userguide.temp}" />
+        <ant:mkdir dir="${dir.sample.userguide.temp}/META-INF" />
+        <ant:copy file="${dir.samples}/conf/userguide/services.xml" todir="${dir.sample.userguide.temp}/META-INF" /> 
+        <!-- <ant:copy file="${dir.samples}/conf/userguide/RMSampleService.wsdl" todir="${dir.sample.userguide.temp}" /> --> 
+        <ant:copy todir="${dir.sample.userguide.temp}" >
+            <ant:fileset dir="${maven.build.dir}/samples/classes">
+                <ant:include name="sandesha2/samples/userguide/**/*Service*.class" />
+            </ant:fileset>
+        </ant:copy>
+        
+        <ant:mkdir dir="${dir.sample.userguideclients.temp}" /> 
+        <ant:copy todir="${dir.sample.userguideclients.temp}" >
+            <ant:fileset dir="${maven.build.dir}/samples/classes">
+                <ant:include name="sandesha2/samples/userguide/**/*Client*.class" />
+            </ant:fileset>
+        </ant:copy>
+        
+        <ant:jar jarfile="${build.samples.services.dir}/${userguide.service.aar.name}" basedir="${dir.sample.userguide.temp}" />
+    	<ant:jar jarfile="${build.samples.clients.dir}/${userguide.client.jar.name}" basedir="${dir.sample.userguideclients.temp}" />
+    	 
+    	<ant:copy todir="${build.samples.clients.dir}" >
+            <ant:fileset dir="${dir.samples}/conf/userguide">
+                <ant:include name="*.bat" />
+                <ant:include name="*.sh" />
+                <ant:include name="*.html" />
+            </ant:fileset>
+        </ant:copy>
+         
+    	<!-- <delete dir="${build.temp.dir}" /> -->
+    </goal>
+    
+    <preGoal name="test:test" > 
+       <!--
+    	<attainGoal name="server:create"/>
+    	<attainGoal name="client:create"/>   
+    	-->
+    </preGoal>
+    
+    <goal name="server.copy.tomcat" prereqs="server:create">
+        <property environment="env1"/>
+        <property name="webapps" value="${env1.CATALINA_HOME}/webapps"/>
+        <ant:copy file="${build.repo.dir}/server/modules/${mar.name}" todir="${webapps}/axis2/WEB-INF/modules"/>
+        <ant:copy todir="${webapps}/axis2/WEB-INF/services" >
+            <ant:fileset dir="${build.repo.dir}/server/services">
+                <ant:include name="*.aar" />
+            </ant:fileset>
+        </ant:copy>
+    </goal> 
+
+    <!-- to transforme htmls to xdocs -->
+    <preGoal name="xdoc:jelly-transform">
+        <attainGoal name="html2xdoc"/>
+    </preGoal>
+
+    <goal name="clean">
+        <delete dir="target"/>
+        <delete dir="${build.temp.dir}" />
+        <ant:delete>
+            <ant:fileset dir=".">
+                <ant:include name="**/axis.log"/>
+                <ant:include name="**/junit*.properties"/>
+                <ant:include name="**/temp.properties"/>
+            </ant:fileset>
+        </ant:delete>
+    </goal>
+
+    <!-- ================================================================ -->
+    <!--- Create the Binary Distribution -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-bin" prereqs="build:all,javadoc">
+        <property name="dir.temp.dist.bin.parent" value="${build.temp.dir}/dist-bin" />
+        <property name="dir.temp.dist.bin" value="${build.temp.dir}/dist-bin/${dist.name}-bin" />
+        
+        <ant:mkdir dir="${dir.temp.dist.bin}"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/docs"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients/services"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients/modules"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/clients/lib"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/samples/services"/>
+        <ant:mkdir dir="${dir.temp.dist.bin}/docs/api"/>
+    
+    	<ant:copy file="${dir.config}/client_axis2.xml" todir="${dir.temp.dist.bin}/samples/clients" />
+    	        
+        <ant:copy todir="${dir.temp.dist.bin}/docs/api">
+            <ant:fileset dir="target/docs/apidocs/">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+        
+        <ant:copy todir="${dir.temp.dist.bin}/docs/api">
+            <ant:fileset dir="target/docs/apidocs/">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+   
+        <ant:copy todir="${dir.temp.dist.bin}/docs">
+            <ant:fileset dir="xdocs">
+                <ant:include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+  
+       <!--  <ant:copy todir="${dir.temp.dist.bin}/lib" flatten="true">
+            <ant:fileset dir="target/lib">
+                <ant:include name="*.jar"/>
+            </ant:fileset>
+        </ant:copy> -->
+    
+        <ant:copy file="target/${jar.name}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="target/${mar.name}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="target/${client.jar.name}" todir="${dir.temp.dist.bin}" />
+       <!-- <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" /> -->
+        <ant:copy file="${apache.license.file}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="${release.notes.file}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="${readme.file}" todir="${dir.temp.dist.bin}" />
+        
+        <ant:copy todir="${dir.temp.dist.bin}/samples">
+            <ant:fileset dir="${build.samples.dir}">
+                <ant:include name="classes/**/*.class" />
+                <ant:include name="clients/*.jar" />
+                <ant:include name="clients/*.bat"/>
+                <ant:include name="clients/*.sh"/>
+                <ant:include name="clients/*.xml"/>
+                <ant:include name="clients/*.html"/>
+            </ant:fileset>
+        </ant:copy>
+    
+        <ant:copy todir="${dir.temp.dist.bin}/samples/services">
+            <ant:fileset dir="${build.repo.dir}/server/services">
+                <ant:include name="*.aar" />
+            </ant:fileset>
+        </ant:copy>
+   
+        <mkdir dir="${build.dist.dir}" />
+    
+        <ant:zip file="${build.dist.dir}/${dist.name}-bin.zip" basedir="${dir.temp.dist.bin.parent}" />
+        <ant:tar tarfile="${build.dist.dir}/${dist.name}-bin.tar" basedir="${dir.temp.dist.bin.parent}" />
+        <gzip src="${build.dist.dir}/${dist.name}-bin.tar" zipfile="${build.dist.dir}/${dist.name}-bin.tar.gz" />
+       
+        <ant:delete file="${build.dist.dir}/${dist.name}-bin.tar" />
+        
+    </goal>
+
+
+    <!-- ================================================================ -->
+    <!--- Create the Source Distribution -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-src">
+
+    	<mkdir dir="${build.dist.dir}" />
+    	
+    	<ant:zip file="${build.dist.dir}/${dist.name}-src.zip">
+   			<ant:fileset dir=".">
+    			<ant:include name="**"/>
+    			<ant:exclude name="**/target/**"/>
+    			<ant:exclude name="**/.svn/**"/>
+    			<ant:exclude name="**/bin/**"/>
+    			<ant:exclude name=".*"/>
+    			<ant:exclude name="**/*.license"/>
+    		</ant:fileset>
+    	</ant:zip>
+    	
+    	<ant:tar tarfile="${build.dist.dir}/${dist.name}-src.tar" longfile="gnu">
+   			<ant:tarfileset dir=".">
+    			<ant:include name="**"/>
+    			<ant:exclude name="**/target/**"/>
+    			<ant:exclude name="**/.svn/**"/>
+   				<ant:exclude name="**/bin/**"/>
+    			<ant:exclude name=".*"/>
+    			<ant:exclude name="**/*.license"/>
+    		</ant:tarfileset>
+    	</ant:tar>
+    	 
+    	<gzip src="${build.dist.dir}/${dist.name}-src.tar" zipfile="${build.dist.dir}/${dist.name}-src.tar.gz"/>
+    	<ant:delete file="${build.dist.dir}/${dist.name}-src.tar"/>
+    	
+    </goal>
+
+    <goal name="dist" prereqs="clean">
+        <attainGoal name="dist-bin" />
+        <attainGoal name="dist-src" />
+    </goal>
+
+</project>

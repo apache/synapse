@@ -1,0 +1,22 @@
+<project name="Sandesha2">
+    <title>Sandesha2</title>
+    <body>
+        <menu name="Apache Sandesha2">
+            <item name="Home" href="index.html" />
+            <item name="Downloads">
+                <item name="Releases" href="download.cgi"/>
+                <item name="Source Code" href="http://svn.apache.org/repos/asf/webservices/sandesha/trunk"/>
+            </item>
+		<item name="Documentation">
+			<item name="User Guide" href="userGuide.html"/>
+ 			<item name="Architecture Guide" href="architectureGuide.html"/>
+  			<item name="Java Docs" href="apidocs/index.html" />
+            </item>
+            <item name="Project Information">
+                <item name="Mailing Lists" href="mail-lists.html"/>
+                <item name="Project Team" href="team-list.html"/>
+            </item>
+        </menu>
+    </body>
+</project>
+

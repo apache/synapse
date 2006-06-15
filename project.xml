@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+    <pomVersion>3</pomVersion>
+    <id>sandesha2</id>
+    <name>Apache Sandesha2</name>
+	<groupId>sandesha2</groupId>
+    <currentVersion>${sandesha2.version}</currentVersion>
+    <organization>
+        <name>Apache Web Services</name>
+        <url>http://ws.apache.org/</url>
+        <logo>http://www.apache.org/images/asf-logo.gif</logo>
+    </organization>
+    <inceptionYear>2005</inceptionYear>
+    <package>org.apache.sandesha2</package>
+    <logo>http://ws.apache.org/ws-fx/sandesha/images/Sandesha.jpg</logo>
+    <description>
+Sandesha2 is an implementation of WS-ReliableMessaging specification published IBM, Microsoft, BEA and TIBCO. Sandesha2 was built on top of Axis2. So by using Sandesha2 you can add reliable messaging capability to the web services you have hosted using Axis2. You can also use Sandesha2 with Axis2 client to interact with already hosted web services in a reliable manner. Please see sandesha2 user guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 work internally.
+    </description>
+    <shortDescription>WS-ReliableMessaging implementation for Apache Axis2</shortDescription>
+    <url>http://ws.apache.org/ws-fx/sandesha/sandesha2</url>
+    <issueTrackingUrl>http://issues.apache.org/jira/browse/SAND</issueTrackingUrl>
+    <siteAddress>ws.apache.org</siteAddress>
+    <siteDirectory>/ws-fx/sandesha/sandesha2</siteDirectory>
+    <distributionDirectory>/www/ws.apache.org/builds/</distributionDirectory>
+
+    <repository>
+        <connection></connection>
+        <url>http://svn.apache.org/repos/asf/webservices/sandesha/trunk</url>
+    </repository>
+
+    <mailingLists>
+        <mailingList>
+            <name>Sandesha Developer List</name>
+            <subscribe>sandesha-dev-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>sandesha-dev-unsubscribe@ws.apache.org</unsubscribe>
+            <archive></archive>
+        </mailingList>
+    </mailingLists>
+
+    <developers>
+        <developer>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva@opensource.lk</email>
+            <organization>
+            </organization>
+        </developer>
+        <developer>
+            <name>Davanum Srinivas</name>
+            <id>dims</id>
+            <email>dims@yahoo.com</email>
+            <organization>
+            </organization>
+        </developer>
+        <developer>
+            <name>Jaliya Ekanayake</name>
+            <id>jaliya</id>
+            <email>jaliya@apache.org</email>
+            <organization>
+            </organization>
+        </developer>
+        <developer>
+            <name>Chamikara Jayalath</name>
+            <id>chamikara</id>
+            <email>chamikaramj@gmail.com</email>
+            <organization>
+            </organization>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <build>
+        <nagEmailAddress>jaliya@apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test/src</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <resources>
+                <resource>
+                    <directory>test-resources</directory>
+                    <includes>
+                        <include>**/*.xml</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+    </build>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+
+    <dependencies>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>addressing</artifactId>
+            <version>${addressing.version}</version>
+            <type>mar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons.codec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>${commons.httpclient.version}</version>
+        </dependency>
+	  <dependency>
+            <groupId>httpcomponents-httpcore</groupId>
+            <artifactId>jakarta-httpcore</artifactId>
+            <version>${jakarta.httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>${stax.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${stax.impl.groupid}</groupId>
+            <artifactId>${stax.impl.artifactid}</artifactId>
+            <version>${stax.impl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>${wsdl4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>neethi</artifactId>
+            <version>${neethi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom-dom</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>${XmlSchema.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>annogen</groupId>
+            <artifactId>annogen</artifactId>
+            <version>${annogen.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>${backport_util_concurrent.version}</version>
+        </dependency>                   
+    </dependencies>
+
+    <!-- ======= -->
+    <!-- Reports -->
+    <!-- ======= -->
+    <reports>
+
+       <report>maven-javadoc-plugin</report>
+    
+       <!--
+       <report>maven-license-plugin</report>
+       <report>maven-checkstyle-plugin</report>
+       <report>maven-pmd-plugin</report>
+       <report>maven-jdepend-plugin</report>
+       <report>maven-changelog-plugin</report>
+
+       <report>maven-file-activity-plugin</report>
+
+       <report>maven-developer-activity-plugin</report>
+
+       <report>maven-jxr-plugin</report>
+
+       <report>maven-junit-report-plugin</report>
+
+       <report>maven-clover-plugin</report>
+       -->
+       
+    </reports>
+    
+</project>
+

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+       "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <title>Sandesha2 Samples Guide</title>
+  <meta name="generator" content="amaya 9.2.2, see http://www.w3.org/Amaya/"
+  />
+</head>
+
+<body>
+<h1>How to run the userguide sample</h1>
+
+<h2>Setting up the server</h2>
+
+<p>Install tomcat and add the Axis2 web app.</p>
+
+<p>Add an user phase named RMPhase to both inFlow and outFlow of
+axis2.xml.</p>
+
+<p>Add the Sandesha2 module to the &lt;AXIS2_WEBAPP&gt;\WEB-INF\modules
+directory.</p>
+
+<p>Start tomcat.</p>
+
+<h2>Setting up the client</h2>
+
+<p>We have made a client repo available at the directory samples\clients
+directory of the Sandesha2 binary distribution.</p>
+
+<p>Add all the jar files that come with the lib directory of Apache Axis2
+binary distrubution to the samples\clients\lib directory.</p>
+
+<p>Add the Sandesha2 jar file that comes with the binary distribution to the
+samples\clients\lib directory.</p>
+
+<p>Add the addressing module file that comes with Apache Axis2 to the
+samples\clients\modules directory.</p>
+
+<p>Add the Sandesha2 module file that comes with Apache Sandesha2 binary
+distribution to samples\clients\modules directory.</p>
+
+<h2>Setting up the tcp monitor.</h2>
+
+<p>start the tcp monitor utility program and map following ports.</p>
+
+<p>8070 -&gt; 8080 (assuming that you started tomcat in the port 8080)</p>
+
+<p>9070 -&gt; 6060 (assuming that your Axis2 client port is 6060)</p>
+
+<h2>Running the sample clients</h2>
+
+<p>Simply double click the the bat files that come in the samples\client
+directory of the Sandesha2 binary distribution to run various samples clients
+and observe tcp monitor to see the message exchange.</p>
+</body>
+</html>

@@ -137,4 +137,26 @@ public class SynapseConfiguration {
         return proxyServices.values();
     }
 
+    /**
+     * Get the whole list of named sequencies
+     * as a Map
+     */
+    public Map getNamedSequences() {
+        return namedSequences;
+    }
+    /**
+     * Get the whole list of named endpoints
+     * as a Map
+     */
+    public Map getNamedEndpoints() {
+        return namedEndpoints;
+    }
+    /**
+     * Get the whole list of global properties
+     * as a Map
+     */
+    public Map getGlobalProps() {
+        return globalProps;
+    }
+
 }

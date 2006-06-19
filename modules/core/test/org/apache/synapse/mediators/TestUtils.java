@@ -16,10 +16,15 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.MessageContext;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.config.SynapseConfiguration;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
@@ -45,5 +50,28 @@ public class TestUtils {
 
         synCtx.setEnvelope(envelope);
         return synCtx;
+    }
+    public static MessageContext createLightweightSynapseMessageContext(
+            String paylod) throws Exception {
+        org.apache.axis2.context.MessageContext mc =
+                new org.apache.axis2.context.MessageContext();
+        SynapseConfiguration config = new SynapseConfiguration();
+        SynapseEnvironment env = new Axis2SynapseEnvironment();
+        MessageContext synMc = new Axis2MessageContext(mc,config,env);
+        SOAPEnvelope envelope =
+                OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        OMDocument omDoc =
+                OMAbstractFactory.getSOAP11Factory().createOMDocument();
+        omDoc.addChild(envelope);
+
+        XMLStreamReader parser = XMLInputFactory.newInstance().
+                createXMLStreamReader(new StringReader(paylod));
+        StAXOMBuilder builder = new StAXOMBuilder(parser);
+
+        // set a dummy static message
+        envelope.getBody().addChild(builder.getDocumentElement());
+
+        synMc.setEnvelope(envelope);
+        return synMc;
     }
 }

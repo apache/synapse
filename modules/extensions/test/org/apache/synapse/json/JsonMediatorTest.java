@@ -3,7 +3,7 @@ package org.apache.synapse.json;
 import junit.framework.TestCase;
 import org.apache.synapse.mediators.ext.json.JsonMediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.TestUtils;
+import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.

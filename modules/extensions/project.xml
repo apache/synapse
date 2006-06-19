@@ -61,17 +61,24 @@
         <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
         <sourceDirectory>src</sourceDirectory>
         <unitTestSourceDirectory>test</unitTestSourceDirectory>
+
         <unitTest>
             <includes>
-                <include>**/*Test.java</include>
+                <include>**/*Test.java</include>                
             </includes>
-
+            
             <resources>
                 <resource>
                     <directory>src</directory>
                     <includes>
                         <include>**/org.apache.synapse.config.xml.MediatorFactory</include>
                         <include>**/org.apache.synapse.config.xml.ExtensionFactory</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>./../core/target/test-classes</directory>
+                    <includes>
+                        <include>**/*</include>
                     </includes>
                 </resource>
             </resources>

@@ -20,7 +20,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.TestMediator;
-import org.apache.synapse.TestUtils;
+import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.ValidateMediator;
 
 public class ValidateMediatorTest extends TestCase {

@@ -42,7 +42,7 @@ public class OutMediator extends AbstractListMediator implements org.apache.syna
             log.debug("Current message is outgoing.. executing child mediators");
             return super.mediate(synCtx);
         } else {
-            log.debug("Current message is not outgoing.. executing child mediators");
+            log.debug("Current message is not outgoing.. skipping child mediators");
             return true;
         }
     }

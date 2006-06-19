@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.TestUtils;
+import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.transform.TransformMediator;
 import org.apache.synapse.MessageContext;
 

@@ -47,9 +47,28 @@
     <transportReceiver name="http"
                        class="org.apache.axis2.transport.http.SimpleHTTPServer">
         <parameter name="port" locked="false">6060</parameter>
-        <!--If you want to give your own host address for EPR generation-->
-        <!--uncommet following paramter , and set as you required.-->
-        <!--<parameter name="hostname" locked="false">http://myApp.com/ws</parameter>-->
+    <!-- Here is the complete list of supported parameters (see example settings further below):
+        port: the port to listen on (default 6060)
+        hostname:  if non-null, url prefix used in reply-to endpoint references                                 (default null)
+        originServer:  value of http Server header in outgoing messages                                         (default "Simple-Server/1.1")
+        requestTimeout:  value in millis of time that requests can wait for data                                (default 20000)
+        requestTcpNoDelay:  true to maximize performance and minimize latency                                   (default true)
+                            false to minimize bandwidth consumption by combining segments  
+        requestCoreThreadPoolSize:  number of threads available for request processing (unless queue fills up)  (default 25)
+        requestMaxThreadPoolSize:  number of threads available for request processing if queue fills us         (default 150)
+                                   note that default queue never fills up:  see HttpFactory
+        threadKeepAliveTime:  time to keep threads in excess of core size alive while inactive                  (default 180)
+                              note that no such threads can exist with default unbounded request queue
+        threadKeepAliveTimeUnit:  TimeUnit of value in threadKeepAliveTime (default SECONDS)                    (default SECONDS)
+    -->
+        <!-- <parameter name="hostname"                  locked="false">http://www.myApp.com/ws</parameter> -->
+        <!-- <parameter name="originServer"              locked="false">My-Server/1.1</parameter>           -->
+        <!-- <parameter name="requestTimeout"            locked="false">10000</parameter>                   -->
+        <!-- <parameter name="requestTcpNoDelay"         locked="false">false</parameter>                   -->
+        <!-- <parameter name="requestCoreThreadPoolSize" locked="false">50</parameter>                      -->
+        <!-- <parameter name="RequestMaxThreadPoolSize"  locked="false">100</parameter>                     -->
+        <!-- <parameter name="threadKeepAliveTime"       locked="false">240000</parameter>                  -->
+        <!-- <parameter name="threadKeepAliveTimeUnit"   locked="false">MILLISECONDS</parameter>            -->
     </transportReceiver>
 
     <transportReceiver name="tcp"

@@ -42,7 +42,7 @@ public class InMediator extends AbstractListMediator implements org.apache.synap
             log.debug("Current message is incoming.. executing child mediators");
             return super.mediate(synCtx);
         } else {
-            log.debug("Current message is not incoming.. skip executing child mediators");
+            log.debug("Current message is not incoming.. skipping child mediators");
             return true;
         }
     }

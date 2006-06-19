@@ -72,6 +72,8 @@ public class Axis2FlexibleMEPClient {
         Policy wsRMPolicy,
         MessageContext axisMsgCtx) throws AxisFault {
 
+        TransportOutDescription savedTransportOut = axisMsgCtx.getTransportOut();
+
         ConfigurationContext axisCfgCtx = axisMsgCtx.getConfigurationContext();
         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
 
@@ -136,6 +138,7 @@ public class Axis2FlexibleMEPClient {
         response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
             axisMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
         response.setTransportIn(axisMsgCtx.getTransportIn());
+        response.setTransportOut(savedTransportOut);
 
         // If request is REST assume that the response is REST too
         response.setDoingREST(axisMsgCtx.isDoingREST());

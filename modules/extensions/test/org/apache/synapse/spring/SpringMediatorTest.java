@@ -18,7 +18,7 @@ package org.apache.synapse.spring;
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
-import org.apache.synapse.TestUtils;
+import org.apache.synapse.mediators.TestUtils;
 
 import java.io.FileInputStream;
 

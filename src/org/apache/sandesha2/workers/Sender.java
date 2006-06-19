@@ -62,21 +62,36 @@ public class Sender extends Thread {
 	private static final Log log = LogFactory.getLog(Sender.class);
 
 	public synchronized void stopSenderForTheSequence(String sequenceID) {
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::stopSenderForTheSequence, " + sequenceID);
 		workingSequences.remove(sequenceID);
 		if (workingSequences.size() == 0) {
 			 runSender = false;
 		}
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::stopSenderForTheSequence");
 	}
 	
 	public synchronized void stopSending () {
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::stopSending");
 		runSender = false;
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::stopSending");
 	}
 
 	public synchronized boolean isSenderStarted() {
+    if (log.isDebugEnabled())
+    {
+      log.debug("Enter: Sender::isSenderStarted");
+      log.debug("Exit: Sender::isSenderStarted, " + runSender);
+    }
 		return runSender;
 	}
 
 	public void run() {
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::run");
 
 		StorageManager storageManager = null;
 
@@ -84,7 +99,7 @@ public class Sender extends Thread {
 			storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
 		} catch (SandeshaException e2) {
 			// TODO Auto-generated catch block
-			log.debug("ERROR: Could not start sender");
+			log.debug("ERROR: Could not start sender", e2);
 			e2.printStackTrace();
 			return;
 		}
@@ -115,10 +130,12 @@ public class Sender extends Thread {
 				SenderBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 				SenderBean senderBean = mgr.getNextMsgToSend();
 				if (senderBean==null) {
+          if (log.isDebugEnabled())
+            log.debug("SenderBean not found");
 					continue;
 			    }
 				
-				String key = (String) senderBean.getMessageContextRefKey();
+				String key = senderBean.getMessageContextRefKey();
 				MessageContext msgCtx = storageManager.retrieveMessageContext(key, context);
 				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,Sandesha2Constants.VALUE_TRUE);
 				
@@ -189,6 +206,8 @@ public class Sender extends Thread {
 						//But this has a performance reduction.
 						msgCtx.getEnvelope().build();
 						
+            if (log.isDebugEnabled())
+              log.debug("Invoking using transportSender " + transportSender + ", msgCtx=" + msgCtx.getEnvelope().getHeader());
 						//TODO change this to cater for security.
 						transportSender.invoke(msgCtx);
 						successfullySent = true;
@@ -263,10 +282,14 @@ public class Sender extends Thread {
 				}
 			}
 		}
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::run");
 	}
 
 	public synchronized void runSenderForTheSequence(
 			ConfigurationContext context, String sequenceID) {
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::runSenderForTheSequence, " + sequenceID);
 
 		if (sequenceID != null && !workingSequences.contains(sequenceID))
 			workingSequences.add(sequenceID);
@@ -276,6 +299,8 @@ public class Sender extends Thread {
 			runSender = true; // so that isSenderStarted()=true.
 			super.start();
 		}
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::runSenderForTheSequence");
 	}
 
 	private void updateMessage(MessageContext msgCtx1) throws SandeshaException {
@@ -284,6 +309,8 @@ public class Sender extends Thread {
 
 	private void checkForSyncResponses(MessageContext msgCtx)
 			throws SandeshaException {
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::checkForSyncResponses, " + msgCtx.getEnvelope().getHeader());
 
 		try {
 
@@ -355,17 +382,23 @@ public class Sender extends Thread {
 			
 		} catch (Exception e) {
 			String message = "No valid Sync response...";
-			log.debug(message);
+			log.debug(message, e);
 			throw new SandeshaException(message, e);
 		}
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::checkForSyncResponses");
 	}
 	
 	private boolean isAckPiggybackableMsgType(int messageType) {
-		boolean piggybackable = true;
-		
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::isAckPiggybackableMsgType, " + messageType);
+		boolean piggybackable = true;		
+    
 		if (messageType==Sandesha2Constants.MessageTypes.ACK) 
 			piggybackable = false;
 		
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::isAckPiggybackableMsgType, " + piggybackable);
 		return piggybackable;	
 	}
 	
@@ -377,11 +410,18 @@ public class Sender extends Thread {
 	}
 	
 	private boolean isFaultEnvelope (SOAPEnvelope envelope) throws SandeshaException {		
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::isFaultEnvelope, " + envelope.getBody().getFault());
 		SOAPFault fault = envelope.getBody().getFault();
-		if (fault!=null)
+		if (fault!=null) {
+      if (log.isDebugEnabled())
+        log.debug("Exit: Sender::isFaultEnvelope, TRUE");
 			return true;
-		else
-			return false;
+    }
+		
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::isFaultEnvelope, FALSE");
+		return false;
 	}
 	
 }

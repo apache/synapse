@@ -20,7 +20,6 @@ package org.apache.sandesha2.workers;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -59,25 +58,48 @@ public class InOrderInvoker extends Thread {
 	private static final Log log = LogFactory.getLog(InOrderInvoker.class);
 	
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
+    if (log.isDebugEnabled())
+      log.debug("Enter: InOrderInvoker::stopInvokerForTheSequence, "+sequenceID);
+
 		workingSequences.remove(sequenceID);
 		if (workingSequences.size()==0) {
 			runInvoker = false;
 		}
+    
+    if (log.isDebugEnabled())
+      log.debug("Exit: InOrderInvoker::stopInvokerForTheSequence");
 	}
 	
 	public synchronized void stopInvoking () {
+    if (log.isDebugEnabled())
+      log.debug("Enter: InOrderInvoker::stopInvoking");
+    
 		runInvoker = false;
+    
+    if (log.isDebugEnabled())
+      log.debug("Exit: InOrderInvoker::stopInvoking");
 	}
 
 	public synchronized boolean isInvokerStarted() {
+    if (log.isDebugEnabled())
+    {
+      log.debug("Enter: InOrderInvoker::isInvokerStarted");
+      log.debug("Exit: InOrderInvoker::isInvokerStarted, " + runInvoker);
+    }
 		return runInvoker;
 	}
 
 	public void setConfugurationContext(ConfigurationContext context) {
+    if (log.isDebugEnabled())
+      log.debug("Enter: InOrderInvoker::setConfugurationContext");
 		this.context = context;
+    if (log.isDebugEnabled())
+      log.debug("Exit: InOrderInvoker::setConfugurationContext");
 	}
 
 	public synchronized void runInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
+    if (log.isDebugEnabled())
+      log.debug("Enter: InOrderInvoker::runInvokerForTheSequence");
 		
 		if (!workingSequences.contains(sequenceID))
 			workingSequences.add(sequenceID);
@@ -87,10 +109,14 @@ public class InOrderInvoker extends Thread {
 			runInvoker = true;     //so that isSenderStarted()=true.
 			super.start();
 		}
+    if (log.isDebugEnabled())
+      log.debug("Exit: InOrderInvoker::runInvokerForTheSequence");
 	}
 
 	public void run() {
-
+    if (log.isDebugEnabled())
+      log.debug("Enter: InOrderInvoker::run");
+    
 		while (isInvokerStarted()) {
 
 			try {
@@ -115,12 +141,14 @@ public class InOrderInvoker extends Thread {
 				transaction = storageManager.getTransaction();
 				
 				//Getting the incomingSequenceIdList
-				SequencePropertyBean allSequencesBean = (SequencePropertyBean) sequencePropMgr
+				SequencePropertyBean allSequencesBean = sequencePropMgr
 						.retrieve(
 								Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
 								Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 				
 				if (allSequencesBean == null) {
+          if (log.isDebugEnabled())
+            log.debug("AllSequencesBean not found");
 					continue;
 				}
 				ArrayList allSequencesList = SandeshaUtil.getArrayListFromString (allSequencesBean.getValue());
@@ -150,6 +178,8 @@ public class InOrderInvoker extends Thread {
 
 					long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
 					if (nextMsgno <= 0) { 
+            if (log.isDebugEnabled())
+              log.debug("Invalid Next Message Number " + nextMsgno);
 						String message = "Invalid message number as the Next Message Number.";
 						throw new SandeshaException(message);
 					}
@@ -185,14 +215,20 @@ public class InOrderInvoker extends Thread {
 							AxisEngine engine = new AxisEngine (context);
 							if (postFailureInvocation) {
 								makeMessageReadyForReinjection (msgToInvoke);
+                if (log.isDebugEnabled())
+                  log.debug("Receiving message, key=" + key +", msgCtx=" + msgToInvoke.getEnvelope().getHeader());
 								engine.receive(msgToInvoke);
 							} else {
+                if (log.isDebugEnabled())
+                  log.debug("Resuming message, key=" + key +", msgCtx=" + msgToInvoke.getEnvelope().getHeader());
 								engine.resume(msgToInvoke);
 							}
 							
 							invoked = true;
 
 						} catch (Exception e) {
+              if (log.isDebugEnabled())
+                log.debug("Exception :", e);
 							throw new SandeshaException(e);
 						} finally {
 							transaction = storageManager.getTransaction();
@@ -252,6 +288,8 @@ public class InOrderInvoker extends Thread {
 				}
 			}
 		}
+    if (log.isDebugEnabled())
+      log.debug("Exit: InOrderInvoker::run");
 	}
 	
 	private void makeMessageReadyForReinjection (MessageContext messageContext) {

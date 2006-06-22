@@ -149,16 +149,21 @@ public class SOAPFaultEnvelopeCreator {
 
 		OMNamespace namespace = factory.createOMNamespace(
 				OMConstants.XMLNS_URI, OMConstants.XMLNS_PREFIX);
-		faultReason.getSOAPFaultText("en").addAttribute("lang", "en", namespace);
 
 		faultReason.setText(data.getReason());
 		faultCode.getValue().setText(data.getSubcode());
 		SOAPFaultText faultText = faultReason.getSOAPFaultText("en");
 		if (faultText==null)
+    {
 			faultText = factory.createSOAPFaultText();
-		
-		faultText.setText(data.getReason());
+      // Add the SOAP text
+      faultReason.addSOAPText(faultText);
+    }
+	
+    faultText.addAttribute("lang", "en", namespace);
 
+		faultText.setText(data.getReason());
+    
 		//SequenceFault header is added only for SOAP 1.1
 		if (isSequenceFault(data))
 			addSequenceFaultHeader(faultMsgContext, data, factory, rmNamespaceValue);
@@ -202,6 +207,7 @@ public class SOAPFaultEnvelopeCreator {
 		
 		if (faultText==null) {
 			faultText = factory.createSOAPFaultText();
+      faultReason.addSOAPText(faultText);
 		}
 		
 		if (data!=null && data.getReason()!=null)

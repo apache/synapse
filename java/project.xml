@@ -283,7 +283,7 @@
         </dependency>
 
         <dependency>
-            <groupId>XmlBeans</groupId>
+            <groupId>xmlbeans</groupId>
             <artifactId>xbean</artifactId>
             <version>${xbean.version}</version>
             <properties>

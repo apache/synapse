@@ -56,6 +56,7 @@ public class InOrderInvoker extends Thread {
 	private ArrayList workingSequences = new ArrayList();
 	private ConfigurationContext context = null;
 	private static final Log log = LogFactory.getLog(InOrderInvoker.class);
+	private boolean hasStopped = false;
 	
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
     if (log.isDebugEnabled())
@@ -74,7 +75,19 @@ public class InOrderInvoker extends Thread {
     if (log.isDebugEnabled())
       log.debug("Enter: InOrderInvoker::stopInvoking");
     
-		runInvoker = false;
+		if(isInvokerStarted()){
+			//the invoker is started so stop it
+			runInvoker = false;
+			//wait for it to finish
+			while(!hasStoppedInvoking()){
+				try {
+					wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
+				}
+				catch (InterruptedException e1) {
+						log.debug(e1.getMessage());
+				}
+			}
+		}
     
     if (log.isDebugEnabled())
       log.debug("Exit: InOrderInvoker::stopInvoking");
@@ -112,15 +125,43 @@ public class InOrderInvoker extends Thread {
     if (log.isDebugEnabled())
       log.debug("Exit: InOrderInvoker::runInvokerForTheSequence");
 	}
+	
+	private synchronized boolean hasStoppedInvoking(){
+    if (log.isDebugEnabled())
+    {
+      log.debug("Enter: InOrderInvoker::hasStoppedInvoking");
+      log.debug("Exit: InOrderInvoker::hasStoppedInvoking, " + hasStopped);
+    }
+		return hasStopped;
+	}
 
-	public void run() {
+	public void run(){
     if (log.isDebugEnabled())
       log.debug("Enter: InOrderInvoker::run");
+    
+    try{
+    	internalRun();
+    }
+    finally{
+    	//flag that we have exited the run loop and notify any waiting threads
+    	synchronized(this){
+    			hasStopped = true;
+    			notify();
+    	}    	
+    }
+    
+    if (log.isDebugEnabled())
+      log.debug("Exit: InOrderInvoker::run");
+	}
+	
+	private void internalRun() {
+    if (log.isDebugEnabled())
+      log.debug("Enter: InOrderInvoker::internalRun");
     
 		while (isInvokerStarted()) {
 
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(Sandesha2Constants.INVOKER_SLEEP_TIME);
 			} catch (InterruptedException ex) {
 				log.debug("Invoker was Inturrepted....");
 				log.debug(ex.getMessage());
@@ -289,7 +330,7 @@ public class InOrderInvoker extends Thread {
 			}
 		}
     if (log.isDebugEnabled())
-      log.debug("Exit: InOrderInvoker::run");
+      log.debug("Exit: InOrderInvoker::internalRun");
 	}
 	
 	private void makeMessageReadyForReinjection (MessageContext messageContext) {

@@ -33,6 +33,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -209,7 +210,7 @@ public class AcknowledgementManager {
 		AxisOperation ackOperation = null;
 
 		try {
-			ackOperation = AxisOperationFactory.getOperationDescription(AxisOperationFactory.MEP_URI_IN_ONLY);
+			ackOperation = AxisOperationFactory.getOperationDescription(WSDL20_2004Constants.MEP_URI_IN_ONLY);
 		} catch (AxisFault e) {
 			throw new SandeshaException("Could not create the Operation");
 		}
@@ -271,7 +272,7 @@ public class AcknowledgementManager {
 				// handler.
 				try {
 					AxisOperation op = AxisOperationFactory
-							.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_IN_OUT);
+							.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_IN_OUT);
 					OperationContext opCtx = new OperationContext(op);
 					referenceRMMessage.getMessageContext().setAxisOperation(op);
 					referenceRMMessage.getMessageContext().setOperationContext(opCtx);

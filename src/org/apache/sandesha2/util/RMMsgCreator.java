@@ -35,6 +35,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -224,7 +225,7 @@ public class RMMsgCreator {
 			// creating by copying common contents. (this will not set contexts
 			// except for configCtx).
 			AxisOperation createSequenceOperation = AxisOperationFactory
-					.getAxisOperation(AxisOperation.MEP_CONSTANT_OUT_IN);
+					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
 
 			createSeqmsgContext = SandeshaUtil.createNewRelatedMessageContext(
 					applicationRMMsg, createSequenceOperation);
@@ -362,7 +363,7 @@ public class RMMsgCreator {
 
 		try {
 			terminateOperation = AxisOperationFactory
-					.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_OUT_ONLY);
+					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 		} catch (AxisFault e1) {
 			throw new SandeshaException(e1.getMessage());
 		}
@@ -694,7 +695,7 @@ public class RMMsgCreator {
 					.getMessageContext();
 
 			AxisOperation ackOperation = AxisOperationFactory
-					.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_OUT_ONLY);
+					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 			
 			MessageContext ackMsgCtx = SandeshaUtil
 					.createNewRelatedMessageContext(relatedRMMessage,

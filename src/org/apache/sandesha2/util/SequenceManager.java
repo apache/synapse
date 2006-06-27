@@ -21,6 +21,7 @@ import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -325,7 +326,7 @@ public class SequenceManager {
 			startListnerForAsyncAcks = true;
 		}
 		
-		if (mep!=null && !AxisOperation.MEP_URI_OUT_ONLY.equals(mep)) {
+		if (mep!=null && !WSDL20_2004Constants.MEP_URI_OUT_ONLY.equals(mep)) {
 			//starting listner for the async createSeqResponse & terminateSer messages.
 			startListnerForAsyncControlMsgs = true;
 		}

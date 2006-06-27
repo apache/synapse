@@ -38,6 +38,7 @@ import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.util.Utils;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.FaultData;
@@ -434,7 +435,7 @@ public class FaultManager {
 					.getServiceContextID());
 
 			AxisOperation operation = AxisOperationFactory
-					.getAxisOperation(AxisOperationFactory.MEP_CONSTANT_OUT_ONLY);
+					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 
 			OperationContext operationContext = new OperationContext(operation);
 

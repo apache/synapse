@@ -60,6 +60,7 @@ public class Sender extends Thread {
 	private ArrayList workingSequences = new ArrayList();
 	private ConfigurationContext context = null;
 	private static final Log log = LogFactory.getLog(Sender.class);
+	private boolean hasStopped = false;
 
 	public synchronized void stopSenderForTheSequence(String sequenceID) {
     if (log.isDebugEnabled())
@@ -75,9 +76,32 @@ public class Sender extends Thread {
 	public synchronized void stopSending () {
     if (log.isDebugEnabled())
       log.debug("Enter: Sender::stopSending");
-		runSender = false;
+		
+    if(isSenderStarted()){
+			//the sender is started so stop it
+			runSender = false;
+			//wait for it to finish
+			while(!hasStoppedSending()){
+				try {
+					wait(Sandesha2Constants.SENDER_SLEEP_TIME);
+				}
+				catch (InterruptedException e1) {
+						log.debug(e1.getMessage());
+				}
+			}
+		}
+    
     if (log.isDebugEnabled())
       log.debug("Exit: Sender::stopSending");
+	}
+	
+	private synchronized boolean hasStoppedSending(){
+    if (log.isDebugEnabled())
+    {
+      log.debug("Enter: Sender::hasStoppedSending");
+      log.debug("Exit: Sender::hasStoppedSending, " + hasStopped);
+    }
+		return hasStopped;
 	}
 
 	public synchronized boolean isSenderStarted() {
@@ -88,10 +112,29 @@ public class Sender extends Thread {
     }
 		return runSender;
 	}
-
-	public void run() {
+	
+	public void run(){
     if (log.isDebugEnabled())
-      log.debug("Enter: Sender::run");
+    	log.debug("Enter: Sender::run");
+    
+    try{
+    	internalRun();
+    }
+    finally{
+    	//flag that we have exited the run loop and notify any waiting threads
+    	synchronized(this){
+    			hasStopped = true;
+    			notify();
+    	}    	
+    }
+    
+    if (log.isDebugEnabled())
+      log.debug("Exit: Sender::run");
+	}
+
+	private void internalRun() {
+    if (log.isDebugEnabled())
+      log.debug("Enter: Sender::internalRun");
 
 		StorageManager storageManager = null;
 
@@ -283,7 +326,7 @@ public class Sender extends Thread {
 			}
 		}
     if (log.isDebugEnabled())
-      log.debug("Exit: Sender::run");
+      log.debug("Exit: Sender::internalRun");
 	}
 
 	public synchronized void runSenderForTheSequence(

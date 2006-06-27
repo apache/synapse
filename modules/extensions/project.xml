@@ -55,6 +55,24 @@
             </properties>
         </dependency>
 
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>${js.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>xmlbeans</groupId>
+            <artifactId>xbean</artifactId>
+            <version>${xbean.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+
     </dependencies>
 
     <build>

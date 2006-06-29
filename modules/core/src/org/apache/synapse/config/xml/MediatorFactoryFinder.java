@@ -150,4 +150,10 @@ public class MediatorFactoryFinder {
             throw new SynapseException(msg, e);
 		}
 	}
+    /*
+    This method exposes all the MediatorFactories and its Extensions 
+    */
+    public Map getFactoryMap() {
+        return factoryMap;
+    }
 }

@@ -91,7 +91,12 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		MessageContext closeSequenceMsg = rmMsgCtx.getMessageContext();
 		
 		MessageContext closeSequenceResponseMsg = null;
-		closeSequenceResponseMsg = Utils.createOutMessageContext(closeSequenceMsg);
+		
+		try {
+			closeSequenceResponseMsg = Utils.createOutMessageContext(closeSequenceMsg);
+		} catch (AxisFault e1) {
+			throw new SandeshaException (e1);
+		}
 		
 		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator
 				.createCloseSeqResponseMsg(rmMsgCtx, closeSequenceResponseMsg,storageManager);

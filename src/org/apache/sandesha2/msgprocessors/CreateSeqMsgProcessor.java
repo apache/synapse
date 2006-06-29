@@ -91,8 +91,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		}
 
 		MessageContext outMessage = null;
-		outMessage = Utils.createOutMessageContext(createSeqMsg);  //createing a new response message.
-		
+		try {
+			outMessage = Utils.createOutMessageContext(createSeqMsg);  //createing a new response message.
+		} catch (AxisFault e1) {
+			throw new SandeshaException (e1);
+		}
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
 
 		try {

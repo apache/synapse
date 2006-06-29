@@ -235,7 +235,12 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		ConfigurationContext configCtx = terminateSeqMsg.getConfigurationContext();
 		
 		MessageContext outMessage = null;
-		outMessage = Utils.createOutMessageContext(terminateSeqMsg);
+		
+		try {
+			outMessage = Utils.createOutMessageContext(terminateSeqMsg);
+		} catch (AxisFault e1) {
+			throw new SandeshaException (e1);
+		}
 		
 		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator
 				.createTerminateSeqResponseMsg(terminateSeqRMMsg, outMessage,storageManager);

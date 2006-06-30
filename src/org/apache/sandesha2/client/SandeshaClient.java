@@ -113,7 +113,7 @@ public class SandeshaClient {
 		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		String withinTransactionStr = (String) configurationContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
@@ -235,7 +235,7 @@ public class SandeshaClient {
 	public static SandeshaReport getSandeshaReport(ConfigurationContext configurationContext) throws SandeshaException {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		SandeshaReport sandeshaReport = new SandeshaReport();
 		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean();
 
@@ -572,7 +572,7 @@ public class SandeshaClient {
 		}
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
@@ -700,7 +700,7 @@ public class SandeshaClient {
 			throw new SandeshaException("Canot close the sequence since it is not active");
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 		if (sequenceIDBean == null)
@@ -847,7 +847,7 @@ public class SandeshaClient {
 	private static byte getServerSequenceStatus(String sequenceID, StorageManager storageManager)
 			throws SandeshaException {
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean terminatedBean = seqPropMgr.retrieve(sequenceID,
 				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED);
@@ -894,7 +894,7 @@ public class SandeshaClient {
 			throws SandeshaException {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx,configCtx.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		String withinTransactionStr = (String) configCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
 		boolean withinTransaction = false;
@@ -967,7 +967,7 @@ public class SandeshaClient {
 			throw new SandeshaException("Canot terminate the sequence since it is not active");
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 		if (sequenceIDBean == null)

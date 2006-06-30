@@ -137,7 +137,7 @@ public class FaultManager {
 		String sequenceID = sequence.getIdentifier().getIdentifier();
 		
 		ConfigurationContext configCtx = applicationRMMessage.getMessageContext().getConfigurationContext();
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		boolean lastMessageNumberExceeded = false;
 		String reason = null;
@@ -352,7 +352,7 @@ public class FaultManager {
     MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 		ConfigurationContext configCtx = referenceMessage.getConfigurationContext();
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		boolean sequenceClosed = false;
 		String reason = null;
@@ -450,7 +450,7 @@ public class FaultManager {
 						.getAddress();
 			} else {
 				SequencePropertyBeanMgr seqPropMgr = storageManager
-						.getSequencePropretyBeanMgr();
+						.getSequencePropertyBeanMgr();
 				
 				//TODO get the acksTo value using the property key.
 				

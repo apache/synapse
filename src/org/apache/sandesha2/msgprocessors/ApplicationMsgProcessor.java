@@ -142,7 +142,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		//setting acked msg no range
 		Sequence sequence = (Sequence) rmMsgCtx
@@ -365,7 +365,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 		
 		Sequence sequence = (Sequence) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -417,9 +417,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext,configContext.getAxisConfiguration());
-
-		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		boolean serverSide = msgContext.isServerSide();  
 
@@ -771,7 +769,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
 		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 		
@@ -848,7 +846,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(rmMsg.getSOAPEnvelope()));
 		ConfigurationContext configurationContext = rmMsg.getMessageContext().getConfigurationContext();
 
-		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 
 		SequencePropertyBean toBean = sequencePropertyMgr.retrieve(
@@ -1048,7 +1046,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
     if (log.isDebugEnabled())
       log.debug("Enter: ApplicationMsgProcessor::getPreviousMsgNo, " + internalSequenceId);
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean nextMsgNoBean = seqPropMgr.retrieve(
 				internalSequenceId,Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
@@ -1076,7 +1074,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException (message);
 		}
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean nextMsgNoBean = seqPropMgr.retrieve(
 				internalSequenceId,Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);

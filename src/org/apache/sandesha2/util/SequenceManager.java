@@ -81,7 +81,7 @@ public class SequenceManager {
 
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(
 				sequenceId, Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
@@ -165,7 +165,7 @@ public class SequenceManager {
 										.getConfigurationContext();
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 
 		//setting the addressing version
 		String addressingNamespace = (String) firstAplicationMsgCtx.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
@@ -351,7 +351,7 @@ public class SequenceManager {
 	 */
 	public static void updateLastActivatedTime (String propertyKey, StorageManager storageManager) throws SandeshaException {
 		//Transaction lastActivatedTransaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(propertyKey, Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 		
@@ -377,7 +377,7 @@ public class SequenceManager {
 	
 	public static long getLastActivatedTime (String propertyKey, StorageManager storageManager) throws SandeshaException {
 		
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(propertyKey,Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 		
@@ -410,7 +410,7 @@ public class SequenceManager {
 	
 	public static long getOutGoingSequenceAckedMessageCount (String internalSequenceID,StorageManager storageManager) throws SandeshaException {
 ///		Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean findSeqIDBean = new SequencePropertyBean ();
 		findSeqIDBean.setValue(internalSequenceID);
@@ -444,7 +444,7 @@ public class SequenceManager {
 	
 	public static boolean isOutGoingSequenceCompleted (String internalSequenceID,StorageManager storageManager) throws SandeshaException {
 ///		Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean findSeqIDBean = new SequencePropertyBean ();
 		findSeqIDBean.setValue(internalSequenceID);
@@ -480,7 +480,7 @@ public class SequenceManager {
 	public static boolean isIncomingSequenceCompleted (String sequenceID, StorageManager storageManager) throws SandeshaException {
 		
 ///		Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean terminateReceivedBean = seqPropBeanMgr.retrieve(sequenceID,Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
 		boolean complete = false;

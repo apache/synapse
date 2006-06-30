@@ -102,14 +102,6 @@ public class InOrderInvoker extends Thread {
 		return runInvoker;
 	}
 
-	public void setConfugurationContext(ConfigurationContext context) {
-    if (log.isDebugEnabled())
-      log.debug("Enter: InOrderInvoker::setConfugurationContext");
-		this.context = context;
-    if (log.isDebugEnabled())
-      log.debug("Exit: InOrderInvoker::setConfugurationContext");
-	}
-
 	public synchronized void runInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
     if (log.isDebugEnabled())
       log.debug("Enter: InOrderInvoker::runInvokerForTheSequence");
@@ -177,7 +169,7 @@ public class InOrderInvoker extends Thread {
 				InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
 
 				SequencePropertyBeanMgr sequencePropMgr = storageManager
-						.getSequencePropretyBeanMgr();
+						.getSequencePropertyBeanMgr();
 
 				transaction = storageManager.getTransaction();
 				
@@ -256,13 +248,14 @@ public class InOrderInvoker extends Thread {
 							AxisEngine engine = new AxisEngine (context);
 							if (postFailureInvocation) {
 								makeMessageReadyForReinjection (msgToInvoke);
-                if (log.isDebugEnabled())
-                  log.debug("Receiving message, key=" + key +", msgCtx=" + msgToInvoke.getEnvelope().getHeader());
+								if (log.isDebugEnabled())
+									log.debug("Receiving message, key=" + key +", msgCtx=" + msgToInvoke.getEnvelope().getHeader());
 								engine.receive(msgToInvoke);
 							} else {
-                if (log.isDebugEnabled())
-                  log.debug("Resuming message, key=" + key +", msgCtx=" + msgToInvoke.getEnvelope().getHeader());
-								engine.resume(msgToInvoke);
+								if (log.isDebugEnabled())
+									log.debug("Resuming message, key=" + key +", msgCtx=" + msgToInvoke.getEnvelope().getHeader());
+								msgToInvoke.setPaused(false);
+								engine.resumeReceive(msgToInvoke);
 							}
 							
 							invoked = true;
@@ -270,7 +263,10 @@ public class InOrderInvoker extends Thread {
 						} catch (Exception e) {
               if (log.isDebugEnabled())
                 log.debug("Exception :", e);
-							throw new SandeshaException(e);
+              
+              			handleFault(msgToInvoke,e);
+              			
+//							throw new SandeshaException(e);
 						} finally {
 							transaction = storageManager.getTransaction();
 						}
@@ -340,4 +336,12 @@ public class InOrderInvoker extends Thread {
 		messageContext.getOptions().setAction(null);
 		messageContext.setProperty(Sandesha2Constants.REINJECTED_MESSAGE,Sandesha2Constants.VALUE_TRUE);
 	}
+	
+	private void handleFault(MessageContext inMsgContext,Exception e) throws Exception {
+		//		msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
+		AxisEngine engine = new AxisEngine(inMsgContext.getConfigurationContext());
+		MessageContext faultContext = engine.createFaultMessageContext(inMsgContext, e);
+		engine.sendFault(faultContext);
+	}
+	
 }

@@ -74,7 +74,7 @@ public class InMemoryStorageManager extends StorageManager {
 		return senderBeanMgr;
 	}
 
-	public SequencePropertyBeanMgr getSequencePropretyBeanMgr() {
+	public SequencePropertyBeanMgr getSequencePropertyBeanMgr() {
 		return sequencePropertyBeanMgr;
 	}
 

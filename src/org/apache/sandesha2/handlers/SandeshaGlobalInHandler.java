@@ -240,7 +240,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			long msgNo = sequence.getMessageNumber().getMessageNumber();
 
 			if (sequenceId != null && msgNo > 0) {
-				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,
 						Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 				if (receivedMsgsBean != null) {
@@ -345,7 +345,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				sequenceId = sequence.getIdentifier().getIdentifier();
 			}
 
-			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,
 					Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 			String receivedMsgStr = receivedMsgsBean.getValue();

@@ -58,7 +58,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 		
 
-		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean ();
 		sequenceClosedBean.setSequenceID(sequenceID);
 		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);

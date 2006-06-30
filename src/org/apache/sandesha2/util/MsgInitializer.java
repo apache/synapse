@@ -164,7 +164,7 @@ public class MsgInitializer {
 		ConfigurationContext configContext = rmMsgCtx.getMessageContext().getConfigurationContext();
 		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext,axisConfiguration);
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		String sequenceID = null;
 		

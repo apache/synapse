@@ -60,7 +60,7 @@ public abstract class StorageManager {
 
 	public abstract SenderBeanMgr getRetransmitterBeanMgr();
 
-	public abstract SequencePropertyBeanMgr getSequencePropretyBeanMgr();
+	public abstract SequencePropertyBeanMgr getSequencePropertyBeanMgr();
 
 	public abstract InvokerBeanMgr getStorageMapBeanMgr();
 	

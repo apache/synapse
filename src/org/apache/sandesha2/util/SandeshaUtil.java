@@ -690,7 +690,7 @@ public class SandeshaUtil {
 	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
 			StorageManager storageManager) throws SandeshaException {
 
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean outSequenceBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
@@ -818,7 +818,7 @@ public class SandeshaUtil {
 	public static String getRMVersion(String propertyKey, StorageManager storageManager)
 			throws SandeshaException {
 
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean specVersionBean = sequencePropertyBeanMgr.retrieve(propertyKey,
 				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 
@@ -830,7 +830,7 @@ public class SandeshaUtil {
 
 	public static String getSequenceProperty(String id, String name, StorageManager storageManager)
 			throws SandeshaException {
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr.retrieve(id, name);
 		if (sequencePropertyBean == null)

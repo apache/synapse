@@ -83,7 +83,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 			
 		//Setting the ack depending on AcksTo.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceID,

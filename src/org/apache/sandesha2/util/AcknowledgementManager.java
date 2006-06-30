@@ -71,7 +71,7 @@ public class AcknowledgementManager {
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SenderBean findBean = new SenderBean();
 
@@ -194,7 +194,7 @@ public class AcknowledgementManager {
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 		
 		ConfigurationContext configurationContext = referenceRMMessage.getMessageContext().getConfigurationContext();
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		//Setting the ack depending on AcksTo.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceID,

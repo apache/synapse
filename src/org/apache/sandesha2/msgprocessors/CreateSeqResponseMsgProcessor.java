@@ -147,7 +147,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		//storing new out sequence id
 		SequencePropertyBeanMgr sequencePropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 		SequencePropertyBean outSequenceBean = new SequencePropertyBean(
 				internalSequenceId, Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID,
 				newOutSequenceId);

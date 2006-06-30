@@ -79,7 +79,7 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		SenderBeanMgr retransmitterMgr = storageManager
 				.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges()
 				.iterator();

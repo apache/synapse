@@ -219,7 +219,7 @@ public class RMMsgCreator {
 				.getSOAPVersion(applicationMsgContext.getEnvelope()));
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 		MessageContext createSeqmsgContext;
 		try {
 			// creating by copying common contents. (this will not set contexts
@@ -644,7 +644,7 @@ public class RMMsgCreator {
 		sequenceAck.setIdentifier(id);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
 				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);

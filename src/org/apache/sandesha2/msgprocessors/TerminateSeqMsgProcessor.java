@@ -118,7 +118,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		}
 		
 
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean ();
 		terminateReceivedBean.setSequenceID(sequenceId);
@@ -158,7 +158,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
     if (log.isDebugEnabled())
       log.debug("Enter: TerminateSeqMsgProcessor::setUpHighestMsgNumbers, "+sequenceID);
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		String highestImMsgNumberStr = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER,storageManager);
 		String highestImMsgKey = SandeshaUtil.getSequenceProperty(sequenceID,Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY,storageManager);
@@ -189,7 +189,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 				MessageContext highestInMsg = storageManager.retrieveMessageContext(highestImMsgKey,configCtx);
 				
 				//TODO get the out message in a storage friendly manner.
-				MessageContext highestOutMessage = highestInMsg.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
+				MessageContext highestOutMessage = highestOutMessage = highestInMsg.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_FAULT_VALUE);
+				
+				if (highestOutMessage==null || highestOutMessage.getEnvelope()==null)
+					highestOutMessage = highestInMsg.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
+				
+				if (highestOutMessage.getEnvelope()==null)
+					throw new SandeshaException ("Out message does not have a envelope");
 				
 				if (highestOutMessage!=null) {
 					RMMsgContext highestOutRMMsg = MsgInitializer.initializeMessage(highestOutMessage);
@@ -293,7 +299,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		String toAddress = rmMsgCtx.getTo().getAddress();
 		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);

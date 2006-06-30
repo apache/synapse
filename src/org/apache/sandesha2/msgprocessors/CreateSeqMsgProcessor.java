@@ -96,7 +96,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		} catch (AxisFault e1) {
 			throw new SandeshaException (e1);
 		}
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		try {
 			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg,storageManager);  //newly created sequnceID.

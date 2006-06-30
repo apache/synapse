@@ -154,7 +154,7 @@ public class TerminateManager {
 	}
 
 	private static void removeReceivingSideProperties (ConfigurationContext configContext, String sequenceID,StorageManager storageManager) throws SandeshaException {
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 		
 		if (allSequenceBean!=null) {
@@ -190,7 +190,7 @@ public class TerminateManager {
 	 */
 	public static void terminateSendingSide (ConfigurationContext configContext, String internalSequenceID,boolean serverSide,StorageManager storageManager) throws SandeshaException {
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (internalSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED,Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
@@ -234,7 +234,7 @@ public class TerminateManager {
 		}	
 	}
 	
-	private static boolean isProportyDeletable (String name) {
+	private static boolean isPropertyDeletable (String name) {
 		boolean deleatable = true;
 				
 		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
@@ -263,7 +263,7 @@ public class TerminateManager {
 	
 	public static void timeOutSendingSideSequence (ConfigurationContext context,String internalSequenceID, boolean serverside,StorageManager storageManager) throws SandeshaException {
 		
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean (internalSequenceID,Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT,Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
 		
@@ -272,7 +272,7 @@ public class TerminateManager {
 	
 	private static void cleanSendingSideData (ConfigurationContext configContext,String internalSequenceID, boolean serverSide,StorageManager storageManager) throws SandeshaException {
 		
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropretyBeanMgr();
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 		
@@ -324,7 +324,7 @@ public class TerminateManager {
 			doUpdatesIfNeeded (outSequenceID,sequencePropertyBean,sequencePropertyBeanMgr);
 			
 			//TODO all properties which hv the temm:Seq:id as the key should be deletable.
-			if (isProportyDeletable(sequencePropertyBean.getName())) {
+			if (isPropertyDeletable(sequencePropertyBean.getName())) {
 				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(),sequencePropertyBean.getName());
 			}
 		}
@@ -339,7 +339,7 @@ public class TerminateManager {
 ///		Transaction addTerminateSeqTransaction = storageManager.getTransaction();
 		
 		SequencePropertyBeanMgr seqPropMgr = storageManager
-				.getSequencePropretyBeanMgr();
+				.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);

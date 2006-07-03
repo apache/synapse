@@ -189,15 +189,15 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 				MessageContext highestInMsg = storageManager.retrieveMessageContext(highestImMsgKey,configCtx);
 				
 				//TODO get the out message in a storage friendly manner.
-				MessageContext highestOutMessage = highestOutMessage = highestInMsg.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_FAULT_VALUE);
+				MessageContext highestOutMessage = highestInMsg.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_FAULT_VALUE);
 				
 				if (highestOutMessage==null || highestOutMessage.getEnvelope()==null)
 					highestOutMessage = highestInMsg.getOperationContext().getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
 				
-				if (highestOutMessage.getEnvelope()==null)
-					throw new SandeshaException ("Out message does not have a envelope");
-				
 				if (highestOutMessage!=null) {
+					if (highestOutMessage.getEnvelope()==null)
+						throw new SandeshaException ("Out message does not have a envelope");
+					
 					RMMsgContext highestOutRMMsg = MsgInitializer.initializeMessage(highestOutMessage);
 					Sequence seqPartOfOutMsg = (Sequence) highestOutRMMsg.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 				

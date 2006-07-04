@@ -74,10 +74,10 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
             }
         }
 
-        // check if a custom seperator has been supplied, if so use it
-        OMAttribute seperator = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "seperator"));
-        if (seperator != null) {
-            logMediator.setSeperator(seperator.getAttributeValue());
+        // check if a custom separator has been supplied, if so use it
+        OMAttribute separator = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "separator"));
+        if (separator != null) {
+            logMediator.setSeparator(separator.getAttributeValue());
         }
 
         logMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));

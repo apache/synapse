@@ -15,15 +15,26 @@
 */
 package org.apache.synapse;
 
+import java.io.ByteArrayInputStream;
+import javax.xml.stream.XMLStreamException;
 import junit.framework.TestCase;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.ValidateMediator;
+import org.apache.synapse.config.xml.ValidateMediatorFactory;
 
 public class ValidateMediatorTest extends TestCase {
+
+    private static final String SCHEMA_FULL_CHECKING_FEATURE_ID = 
+        "http://apache.org/xml/features/validation/schema-full-checking";
+
+    private static final String HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID = 
+        "http://apache.org/xml/features/honour-all-schemaLocations";
 
     private static final String VALID_ENVELOPE_TWO_SCHEMAS =
             "<Outer xmlns=\"http://www.apache-synapse.org/test2\">" +
@@ -65,6 +76,30 @@ public class ValidateMediatorTest extends TestCase {
             "<Codes>String</Codes>\n" +
             "</CheckPriceRequest>\n";
 
+    private static final String DEFAULT_FEATURES_MEDIATOR_CONFIG = 
+            "<validate xmlns=\"http://ws.apache.org/ns/synapse\" " +
+            "       schema=\"file:synapse_repository/conf/sample/validate.xsd\">" + 
+            "   <on-fail>" +
+            "       <makefault>" +
+            "           <code value=\"tns:Receiver\" xmlns:tns=\"http://www.w3.org/2003/05/soap-envelope\"/>" +
+            "           <reason value=\"Invalid request\"/>" +
+            "       </makefault>" +
+            "   </on-fail>" +
+            "</validate>";
+
+    private static final String CUSTOM_FEATURES_MEDIATOR_CONFIG = 
+            "<validate xmlns=\"http://ws.apache.org/ns/synapse\" " +
+            "       schema=\"file:synapse_repository/conf/sample/validate.xsd\">" + 
+            "   <property name=\"" + SCHEMA_FULL_CHECKING_FEATURE_ID + "\" value=\"false\"/>" +
+            "   <property name=\"" + HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID + "\" value=\"true\"/>" +
+            "   <on-fail>" +
+            "       <makefault>" +
+            "           <code value=\"tns:Receiver\" xmlns:tns=\"http://www.w3.org/2003/05/soap-envelope\"/>" +
+            "           <reason value=\"Invalid request\"/>" +
+            "       </makefault>" +
+            "   </on-fail>" +
+            "</validate>";
+
     private boolean onFailInvoked = false;
     private TestMediator testMediator = null;
 
@@ -82,7 +117,7 @@ public class ValidateMediatorTest extends TestCase {
         this.onFailInvoked = onFailInvoked;
     }
 
-    public void testValidateMedaitorValidCase() throws Exception {
+    public void testValidateMediatorValidCase() throws Exception {
         setOnFailInvoked(false);
 
         // create a validate mediator
@@ -100,10 +135,10 @@ public class ValidateMediatorTest extends TestCase {
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE));
 
-        assertTrue(!onFailInvoked);
+        assertFalse(onFailInvoked);
     }
 
-    public void testValidateMedaitorValidCaseTwoSchemas() throws Exception {
+    public void testValidateMediatorValidCaseTwoSchemas() throws Exception {
         setOnFailInvoked(false);
 
         // create a validate mediator
@@ -121,10 +156,10 @@ public class ValidateMediatorTest extends TestCase {
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_TWO_SCHEMAS));
 
-        assertTrue(!onFailInvoked);
+        assertFalse(onFailInvoked);
     }
 
-    public void testValidateMedaitorInvalidCaseTwoSchemas() throws Exception {
+    public void testValidateMediatorInvalidCaseTwoSchemas() throws Exception {
         setOnFailInvoked(false);
 
         // create a validate mediator
@@ -145,7 +180,7 @@ public class ValidateMediatorTest extends TestCase {
         assertTrue(onFailInvoked);
     }
 
-    public void testValidateMedaitorInvalidCase() throws Exception {
+    public void testValidateMediatorInvalidCase() throws Exception {
         setOnFailInvoked(false);
 
         // create a validate mediator
@@ -166,7 +201,7 @@ public class ValidateMediatorTest extends TestCase {
         assertTrue(onFailInvoked);
     }
 
-    public void testValidateMedaitorValidCaseNoNS() throws Exception {
+    public void testValidateMediatorValidCaseNoNS() throws Exception {
         setOnFailInvoked(false);
 
         // create a validate mediator
@@ -184,10 +219,10 @@ public class ValidateMediatorTest extends TestCase {
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_NO_NS));
 
-        assertTrue(!onFailInvoked);
+        assertFalse(onFailInvoked);
     }
 
-    public void testValidateMedaitorInvalidCaseNoNS() throws Exception {
+    public void testValidateMediatorInvalidCaseNoNS() throws Exception {
         setOnFailInvoked(false);
 
         // create a validate mediator
@@ -206,5 +241,61 @@ public class ValidateMediatorTest extends TestCase {
         validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE_NO_NS));
 
         assertTrue(onFailInvoked);
+    }
+
+    public void testValidateMediatorDefaultFeatures() throws Exception {
+
+        ValidateMediatorFactory mf = new ValidateMediatorFactory();
+        ValidateMediator validate = (ValidateMediator)mf.createMediator(
+            createOMElement(DEFAULT_FEATURES_MEDIATOR_CONFIG));
+
+        assertNull(validate.getProperty(SCHEMA_FULL_CHECKING_FEATURE_ID));
+        assertNull(validate.getProperty(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
+
+        makeValidInvocation(validate);
+    }
+
+    public void testValidateMediatorCustomFeatures() throws Exception 
+    {
+        ValidateMediatorFactory mf = new ValidateMediatorFactory();
+        ValidateMediator validate = (ValidateMediator)mf.createMediator(
+            createOMElement(CUSTOM_FEATURES_MEDIATOR_CONFIG));
+
+        assertNotNull(validate.getProperty(SCHEMA_FULL_CHECKING_FEATURE_ID));
+        assertFalse("true".equals((String)validate.getProperty(SCHEMA_FULL_CHECKING_FEATURE_ID)));
+        assertNotNull(validate.getProperty(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
+        assertTrue("true".equals((String)validate.getProperty(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID)));
+
+        makeValidInvocation(validate);
+    }
+
+    private void makeValidInvocation(ValidateMediator validate) throws Exception {
+
+        setOnFailInvoked(false);
+
+        // set the schema url, source xpath and any name spaces
+        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
+        AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
+        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        validate.setSource(source);
+
+        // set dummy mediator to be called on fail
+        validate.removeChild(0);
+        validate.addChild(testMediator);
+
+        // test validate mediator, with static enveope
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE));
+
+        assertFalse(onFailInvoked);
+    }
+
+    private static OMElement createOMElement(String xml) {
+        try {
+            StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xml.getBytes()));
+            OMElement omElement = builder.getDocumentElement();
+            return omElement;
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

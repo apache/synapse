@@ -3,9 +3,6 @@
   <definitions>
 
     <endpoint name="WsSecurity10_scenario_1" useWSA="true" useWSSec="true" useWSRM="false" address="http://localhost:9090/ssj/pingservice/Ping1">    
-      <enableRM/> alias for
-      <wsrmp:RMAssertion optional="true"/>    
-      
 	    <parameter name="OutflowSecurity">
 	      <action>
         	<items>UsernameToken</items>

@@ -30,12 +30,12 @@ import java.util.Iterator;
 /**
  * Creates a ProxyService instance using the XML fragment specification
  *
- * <proxy name="string" type="wsdl|jms|rest" [description="string"]>
- *   <endpoint protocols="(http|https|jms)+|all" uri="uri">
- *   <target sequence="name" | endpoint="name"/>?
+ * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
+ *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
  *   <wsdl url="url">?
  *   <schema url="url">*
  *   <policy url="url">*
+ *   <property name="string" value="string"/>*
  * </proxy>
  */
 public class ProxyServiceFactory {
@@ -58,39 +58,9 @@ public class ProxyServiceFactory {
             proxy.setDescription(desc.getAttributeValue());
         }
 
-        // set the type of the proxy service
-        OMAttribute type = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "type"));
-        if (type != null) {
-            String sType = type.getAttributeValue();
-            if ("wsdl".equals(sType)) {
-                proxy.setType(ProxyService.WSDL_TYPE);
-            } else if ("jms".equals(sType)) {
-                proxy.setType(ProxyService.JMS_TYPE);
-            } else if ("rest".equals(sType)) {
-                proxy.setType(ProxyService.REST_TYPE);
-            } else {
-                handleException("Unknown proxy type : " + sType);
-            }
-        } else {
-            handleException("The 'type' is a required for proxy service : " + proxy.getName());
-        }
-
-        // read endpoint definition and set it to the proxy service
-        OMElement endpt   = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
-        if (endpt == null) {
-            handleException("The proxy services endpoint definition is missing for " + proxy.getName());
-        } else {
-            // read endpoint protocol
-            OMAttribute proto = endpt.getAttribute(new QName(Constants.NULL_NAMESPACE, "protocol"));
-            if (proto != null) {
-                proxy.setEndpointProtocols(proto.getAttributeValue());
-            }
-
-            // read endpoint uri where the service will be made available
-            OMAttribute uri   = endpt.getAttribute(new QName(Constants.NULL_NAMESPACE, "uri"));
-            if (uri != null) {
-                proxy.setEndpointURI(uri.getAttributeValue());
-            }
+        OMAttribute trans = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "transports"));
+        if (trans != null) {
+            proxy.setTransports(trans.getAttributeValue());
         }
 
         // read definition of the target of this proxy service. The target could be an 'endpoint'
@@ -110,10 +80,7 @@ public class ProxyServiceFactory {
 
         // read the WSDL, Schemas and Policies and set to the proxy service
         OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
-        if (wsdl == null && proxy.getType() == ProxyService.WSDL_TYPE) {
-            handleException("A WSDL URL is required for a WSDL based proxy service");
-
-        } else if (proxy.getType() == ProxyService.WSDL_TYPE) {
+        if (wsdl != null) {
             OMAttribute wsdlurl = wsdl.getAttribute(new QName(Constants.NULL_NAMESPACE, "url"));
             if (wsdlurl == null) {
                 handleException("The 'url' attribute is required for the base WSDL definition");
@@ -125,12 +92,6 @@ public class ProxyServiceFactory {
                     handleException("Invalid WSDL URL : " + wUrl, e);
                 }
             }
-        } else if (proxy.getType() == ProxyService.JMS_TYPE) {
-            // TODO
-            throw new UnsupportedOperationException("JMS Proxy services are not yet implemented");
-        } else if (proxy.getType() == ProxyService.REST_TYPE) {
-            // TODO
-            throw new UnsupportedOperationException("REST Proxy services are not yet implemented");
         }
 
         //OMElement schema = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "schema"));
@@ -151,6 +112,23 @@ public class ProxyServiceFactory {
                 }
             } else {
                 handleException("Invalid 'policy' element found under element 'policies'");
+            }
+        }
+
+        Iterator props = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "property"));
+        while (props.hasNext()) {
+            Object o = props.next();
+            if (o instanceof OMElement) {
+                OMElement prop = (OMElement) o;
+                OMAttribute pname = prop.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+                OMAttribute value = prop.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
+                if (name != null && value != null) {
+                    proxy.addProperty(pname.getAttributeValue(), value.getAttributeValue());
+                } else {
+                    handleException("Invalid property specified for proxy service : " + name);
+                }
+            } else {
+                handleException("Invalid property specified for proxy service : " + name);
             }
         }
 

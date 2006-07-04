@@ -20,6 +20,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axiom.om.OMElement;
+import samples.common.Util;
 
 public class CustomStockQuoteClient {
 
@@ -27,54 +28,14 @@ public class CustomStockQuoteClient {
 
         String symbol = "IBM";
         String xurl   = "http://ws.invesbot.com/stockquotes.asmx";
-        String turl   = "http://localhost:8080/StockQuote";
+        String turl   = "http://localhost:8080";
+        String sAction= "http://ws.invesbot.com/GetQuote";
 
         if (args.length > 0) symbol = args[0];
         if (args.length > 1) xurl   = args[1];
         if (args.length > 2) turl   = args[2];
 
-        testStandardQuote(symbol, xurl, turl);
-        testCustomQuote(symbol, xurl, turl);
+        Util.testStandardQuote(symbol, sAction, xurl, turl);
+        Util.testCustomQuote(symbol, sAction, xurl, turl);
     }
-
-    private static void testCustomQuote(String symbol, String xurl, String turl) {
-        try {
-            OMElement getQuote = CustomQuoteXMLHandler.createCustomRequestPayload(symbol);
-
-            Options options = new Options();
-            options.setTo(new EndpointReference(xurl));
-            options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
-            options.setAction("http://ws.invesbot.com/GetQuote");
-
-            ServiceClient serviceClient = new ServiceClient();
-            serviceClient.setOptions(options);
-
-            OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
-            System.out.println("Custom :: Stock price = $" + CustomQuoteXMLHandler.parseCustomResponsePayload(result));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void testStandardQuote(String symbol, String xurl, String turl) {
-        try {
-            OMElement getQuote = CustomQuoteXMLHandler.createStandardRequestPayload(symbol);
-
-            Options options = new Options();
-            options.setTo(new EndpointReference(xurl));
-            options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
-            options.setAction("http://ws.invesbot.com/GetQuote");
-
-            ServiceClient serviceClient = new ServiceClient();
-            serviceClient.setOptions(options);
-
-            OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
-            System.out.println("Standard :: Stock price = $" + CustomQuoteXMLHandler.parseStandardResponsePayload(result));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }

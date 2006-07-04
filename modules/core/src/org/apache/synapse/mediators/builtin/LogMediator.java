@@ -33,7 +33,7 @@ import java.util.ArrayList;
  * which attributes would be logged, and is configurable. Additionally custom
  * properties may be defined to the logger, where literal values or expressions
  * could be specified for logging. The custom properties are printed into the log
- * using the defined seperator (\n, "," etc)
+ * using the defined separator (\n, "," etc)
  */
 public class LogMediator extends AbstractMediator {
 
@@ -139,11 +139,11 @@ public class LogMediator extends AbstractMediator {
         this.logLevel = logLevel;
     }
 
-    public String getSeperator() {
+    public String getSeparator() {
         return SEP;
     }
 
-    public void setSeperator(String SEP) {
+    public void setSeparator(String SEP) {
         this.SEP = SEP;
     }
 

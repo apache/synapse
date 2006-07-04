@@ -44,7 +44,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 /**
@@ -54,8 +57,16 @@ public class ValidateMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(ValidateMediator.class);
 
-    /** A space or comma delimitered list of schemas to validate the source element against */
+    /**
+     * Default validation schema language (http://www.w3.org/2001/XMLSchema) and validator feature ids.
+     */
+    private static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
+
+    /**
+     * A space or comma delimitered list of schemas to validate the source element against
+     */
     private String schemaUrl = null;
+
     /**
      * An XPath expression to be evaluated against the message to find the element to be validated.
      * If this is not specified, the validation will occur against the first child element of the SOAP body
@@ -63,19 +74,10 @@ public class ValidateMediator extends AbstractListMediator {
     private AXIOMXPath source = null;
 
     /**
-     * Schema full checking feature id (http://apache.org/xml/features/validation/schema-full-checking).
+     * A Map containing properties for the validate mediator - such as
+     * features to be passed to the actual validator (Xerces)
      */
-    private static final String SCHEMA_FULL_CHECKING_FEATURE_ID = "http://apache.org/xml/features/validation/schema-full-checking";
-
-    /**
-     * Honour all schema locations feature id (http://apache.org/xml/features/honour-all-schemaLocations).
-     */
-    private static final String HONOUR_ALL_SCHEMA_LOCATIONS_ID = "http://apache.org/xml/features/honour-all-schemaLocations";
-
-    /**
-     * Default schema language (http://www.w3.org/2001/XMLSchema).
-     */
-    private static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
+    private Map properties = new HashMap();
 
 
     public String getSchemaUrl() {
@@ -164,8 +166,7 @@ public class ValidateMediator extends AbstractListMediator {
             // Create SchemaFactory and configure
             SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
             factory.setErrorHandler(handler);
-            factory.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, true);
-            factory.setFeature(HONOUR_ALL_SCHEMA_LOCATIONS_ID, true);
+            setXmlFeatures(factory);
 
             // Build Schema from schemaUrl
             Schema schema = null;
@@ -188,11 +189,10 @@ public class ValidateMediator extends AbstractListMediator {
                 schema = factory.newSchema();
             }
 
-            // Setup validator and input source.
+            // Setup validator and input source
+            // Features set for the SchemaFactory get propagated to Schema and Validator (JAXP 1.4).
             Validator validator = schema.newValidator();
             validator.setErrorHandler(handler);
-            validator.setFeature(SCHEMA_FULL_CHECKING_FEATURE_ID, true);
-            validator.setFeature(HONOUR_ALL_SCHEMA_LOCATIONS_ID, true);
 
             XMLReader reader = XMLReaderFactory.createXMLReader();
             SAXSource source = new SAXSource(reader, new InputSource(baisFromSource));
@@ -214,6 +214,63 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         return true;
+    }
+
+    /**
+     * Get a mediator property. The common use case is a feature for the
+     * underlying Xerces validator
+     * @param key property key / feature name
+     * @return property string value (usually true|false)
+     */
+    public Object getProperty(String key) {
+        return properties.get(key);
+    }
+
+    /**
+     * Set a property for this mediator
+     * @param key the property key / feature name
+     * @param value property string value (usually true|false)
+     * @see #getProperty(String)
+     */
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+
+    /**
+     * Add a list of 'MediatorProperty'ies to this mediator
+     * @param list a List of MediatorProperty objects
+     */
+    public void addAllProperties(List list) {
+        Iterator iter = list.iterator();
+        while (iter.hasNext()) {
+            Object o = iter.next();
+            if (o instanceof MediatorProperty) {
+                MediatorProperty prop = (MediatorProperty) o;
+                setProperty(prop.getName(), prop.getValue());
+            } else {
+                handleException("Attempt to set invalid property type. " +
+                    "Expected MediatorProperty type got " + o.getClass().getName());
+            }
+        }
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
+    /**
+     * Set the properties set on this mediator to the underlying Xerces
+     * @param factory Schema factory
+     * @throws SAXException on error
+     */
+    private void setXmlFeatures(SchemaFactory factory) throws SAXException {
+        Iterator iter = properties.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            String value = (String)entry.getValue();
+            factory.setFeature((String)entry.getKey(), value != null && "true".equals(value));
+        }
     }
 
     /**

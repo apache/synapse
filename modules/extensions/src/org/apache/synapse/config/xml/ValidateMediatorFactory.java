@@ -26,27 +26,33 @@ import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.ValidateMediator;
 import org.jaxen.JaxenException;
 
+import java.util.Iterator;
 import javax.xml.namespace.QName;
 
 /**
  * Creates a validation mediator from the XML configuration
  * <p/>
  * <validate schema="url" [source="xpath"]>
- * <on-fail>
- * mediator+
- * </on-fail>
+ *   <property name="<validation-feature-id>" value="true|false"/> *
+ *   <on-fail>
+ *     mediator+
+ *   </on-fail>
  * </validate>
  */
 public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
     private static final Log log = LogFactory.getLog(TransformMediatorFactory.class);
+
     private static final QName VALIDATE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "validate");
+    private static final QName ON_FAIL_Q = new QName(Constants.SYNAPSE_NAMESPACE, "on-fail");
+    private static final QName SCHEMA_Q = new QName(Constants.NULL_NAMESPACE, "schema");
+    private static final QName SOURCE_Q = new QName(Constants.NULL_NAMESPACE, "source");
 
     public Mediator createMediator(OMElement elem) {
 
         ValidateMediator validateMediator = new ValidateMediator();
-        OMAttribute attSchema = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "schema"));
-        OMAttribute attSource = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
+        OMAttribute attSchema = elem.getAttribute(SCHEMA_Q);
+        OMAttribute attSource = elem.getAttribute(SOURCE_Q);
 
         if (attSchema != null) {
             validateMediator.setSchemaUrl(attSchema.getAttributeValue());
@@ -61,7 +67,6 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                 AXIOMXPath xp = new AXIOMXPath(attSource.getAttributeValue());
                 validateMediator.setSource(xp);
                 Util.addNameSpaces(xp, elem, log);
-
             } catch (JaxenException e) {
                 String msg = "Invalid XPath expression specified for attribute 'source'";
                 log.error(msg);
@@ -69,16 +74,21 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
             }
         }
 
-        OMElement onFail = elem.getFirstElement();
-        if (new QName(Constants.SYNAPSE_NAMESPACE, "on-fail").equals(onFail.getQName()) &&
-            onFail.getChildElements().hasNext()) {
-            super.addChildren(onFail, validateMediator);
+        OMElement onFail = null;
+        Iterator iter = elem.getChildrenWithName(ON_FAIL_Q);
+        if (iter.hasNext()) {
+            onFail = (OMElement)iter.next();
+        }
 
+        if (onFail != null && onFail.getChildElements().hasNext()) {
+            super.addChildren(onFail, validateMediator);
         } else {
-            String msg = "A non-empty on-fail element is required for the validate mediator";
+            String msg = "A non-empty <on-fail> child element is required for the <validate> mediator";
             log.error(msg);
             throw new SynapseException(msg);
         }
+
+        validateMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
 
         return validateMediator;
     }

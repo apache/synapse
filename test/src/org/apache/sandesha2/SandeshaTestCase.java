@@ -101,10 +101,5 @@ public class SandeshaTestCase extends TestCase {
     	else 
     		return null;
     }
-    
-    public void testMethod () {
-    	
-    }
-
 
 }

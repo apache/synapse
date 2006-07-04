@@ -51,7 +51,7 @@ public class SequencePropertyBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getSequencePropretyBeanMgr();
+        mgr = storageManager.getSequencePropertyBeanMgr();
 
     }
     

@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
 
@@ -45,6 +46,19 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
     private static final Log log = LogFactory.getLog(SequenceMediatorFactory.class);
 
     private static final QName SEQUENCE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"sequence\" type=\"sequence_type\"/>\n" +
+        "\t<xs:complexType name=\"sequence_type\">\n" +
+        "\t\t<xs:complexContent>\n" +
+        "\t\t\t<xs:extension base=\"synapse:mediator_type\"/>\n" +
+        "\t\t</xs:complexContent>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, SEQUENCE_Q);
 
     public QName getTagQName() {
         return SEQUENCE_Q;
@@ -74,4 +88,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return seqMediator;
     }
 
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
 }

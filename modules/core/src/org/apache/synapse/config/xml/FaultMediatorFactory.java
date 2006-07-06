@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
 import java.net.URI;
@@ -47,13 +48,13 @@ import java.net.URISyntaxException;
  */
 public class FaultMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "makefault");
+    private static final QName FAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "makefault");
 
     private static final QName ATT_VERSION_Q = new QName(Constants.NULL_NAMESPACE, "version");
     private static final QName CODE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "code");
     private static final QName REASON_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "reason");
-    private static final QName NODE_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "node");
-    private static final QName ROLE_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "role");
+    private static final QName NODE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "node");
+    private static final QName ROLE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "role");
     private static final QName DETAIL_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "detail");
 
     private static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
@@ -63,6 +64,34 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
     private static final String SOAP12 = "soap12";
 
     private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"makefault\" type=\"makefault_type\"/>\n" +
+        "\t<xs:complexType name=\"makefault_type\">\n" +
+        "\t\t<xs:sequence>\n" +
+        "\t\t\t<xs:element name=\"code\">\n" +
+        "\t\t\t\t<xs:complexType>\n" +
+        "\t\t\t\t\t<xs:attribute name=\"value\" type=\"xs:string\"/>\n" +
+        "\t\t\t\t\t<xs:attribute name=\"expression\" type=\"xs:string\"/>\n" +
+        "\t\t\t\t</xs:complexType>\n" +
+        "\t\t\t</xs:element>\n" +
+        "\t\t\t<xs:element name=\"reason\">\n" +
+        "\t\t\t\t<xs:complexType>\n" +
+        "\t\t\t\t\t<xs:attribute name=\"value\" type=\"xs:string\"/>\n" +
+        "\t\t\t\t\t<xs:attribute name=\"expression\" type=\"xs:string\"/>\n" +
+        "\t\t\t\t</xs:complexType>\n" +
+        "\t\t\t</xs:element>\n" +
+        "\t\t\t<xs:element name=\"node\" minOccurs=\"0\"/>\n" +
+        "\t\t\t<xs:element name=\"role\" minOccurs=\"0\"/>\n" +
+        "\t\t\t<xs:element name=\"detail\" type=\"xs:anyType\" minOccurs=\"0\"/>\n" +
+        "\t\t</xs:sequence>\n" +
+        "\t\t<xs:attribute name=\"version\" type=\"xs:string\"/>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, FAULT_Q);
 
     public Mediator createMediator(OMElement elem) {
 
@@ -179,7 +208,10 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
     }
 
     public QName getTagQName() {
-        return HEADER_Q;
+        return FAULT_Q;
     }
 
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
 }

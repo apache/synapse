@@ -33,4 +33,12 @@ public interface Constants {
     public static final String NULL_NAMESPACE    = "";
     public static final String OUTFLOW_SECURITY  = "OutflowSecurity";
     public static final String INFLOW_SECURITY   = "InflowSecurity";
+
+    public static final String SCHEMA_PROLOG =
+        "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" " +
+            "elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" " +
+            "xmlns:synapse=\"http://ws.apache.org/ns/synapse\" " +
+            "targetNamespace=\"http://ws.apache.org/ns/synapse\">\n";
+
+    public static final String SCHEMA_EPILOG = "</xs:schema>\n";
 }

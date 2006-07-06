@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.mediators;
+package org.apache.synapse.mediators.validate;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

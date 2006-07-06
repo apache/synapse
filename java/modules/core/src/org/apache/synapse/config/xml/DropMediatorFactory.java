@@ -20,8 +20,12 @@ import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.axiom.om.OMElement;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
+import java.io.StringReader;
 
 /**
  * This creates a drop mediator instance
@@ -34,11 +38,23 @@ public class DropMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "drop");
 
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"drop\" type=\"drop_type\"/>\n" +
+        "\t<xs:complexType name=\"drop_type\"/>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, DROP_Q);
+
     public Mediator createMediator(OMElement el) {
         return new DropMediator();
     }
 
     public QName getTagQName() {
         return DROP_Q;
+    }
+
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
     }
 }

@@ -1,7 +1,7 @@
 package org.apache.synapse.json;
 
 import junit.framework.TestCase;
-import org.apache.synapse.mediators.ext.json.JsonMediator;
+import org.apache.synapse.mediators.json.JsonMediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;

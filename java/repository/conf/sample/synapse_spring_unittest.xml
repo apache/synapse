@@ -5,8 +5,8 @@
   </definitions>
 
   <rules>
-  	<spring bean="springtest" config="springconfig"/>
-  	<spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/>
+  	<spring:spring bean="springtest" config="springconfig"/>
+  	<spring:spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/>
   </rules>
 
 </synapse> 

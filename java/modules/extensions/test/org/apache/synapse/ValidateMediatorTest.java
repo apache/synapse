@@ -25,8 +25,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.mediators.ValidateMediator;
-import org.apache.synapse.config.xml.ValidateMediatorFactory;
+import org.apache.synapse.mediators.validate.ValidateMediator;
+import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
 
 public class ValidateMediatorTest extends TestCase {
 

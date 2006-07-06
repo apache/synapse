@@ -22,12 +22,23 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Util;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
+import javax.xml.namespace.QName;
 import java.util.Iterator;
 
 /**
  * Is the abstract superclass of MediatorFactory's
  */
 public abstract class AbstractMediatorFactory implements MediatorFactory {
+
+    public QName getTagSchemaType() {
+        return new QName(Constants.SYNAPSE_NAMESPACE,
+            getTagQName().getLocalPart() + "_type", "synapse");
+    }
+
+    public XmlSchema getTagSchema() {
+        return null; // not supported
+    }
 }

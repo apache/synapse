@@ -13,14 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.mediators.ext.spring;
+package org.apache.synapse.mediators.spring;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.config.SpringConfigExtension;
+import org.apache.synapse.mediators.spring.SpringConfigExtension;
 import org.springframework.context.ApplicationContext;
 
 /**

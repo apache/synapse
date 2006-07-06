@@ -18,6 +18,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.filters.OutMediator;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
 
@@ -32,7 +33,20 @@ import javax.xml.namespace.QName;
  */
 public class OutMediatorFactory extends AbstractListMediatorFactory {
 
-    private static final QName IN_Q = new QName(Constants.SYNAPSE_NAMESPACE, "out");
+    private static final QName OUT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "out");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"out\" type=\"out_type\"/>\n" +
+        "\t<xs:complexType name=\"out_type\">\n" +
+        "\t\t<xs:complexContent>\n" +
+        "\t\t\t<xs:extension base=\"synapse:mediator_type\"/>\n" +
+        "\t\t</xs:complexContent>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, OUT_Q);
 
     public Mediator createMediator(OMElement elem) {
         OutMediator filter = new OutMediator();
@@ -41,7 +55,10 @@ public class OutMediatorFactory extends AbstractListMediatorFactory {
     }
 
     public QName getTagQName() {
-        return IN_Q;
+        return OUT_Q;
     }
 
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
 }

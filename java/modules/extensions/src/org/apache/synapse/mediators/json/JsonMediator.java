@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.mediators.ext.json;
+package org.apache.synapse.mediators.json;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.MessageContext;

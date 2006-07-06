@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -46,6 +47,23 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
     private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
 
     private static final QName FILTER_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "filter");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"filter\" type=\"filter_type\"/>\n" +
+        "\t<xs:complexType name=\"filter_type\">\n" +
+        "\t\t<xs:complexContent>\n" +
+        "\t\t\t<xs:extension base=\"synapse:mediator_type\">\n" +
+        "\t\t\t\t<xs:attribute name=\"source\"/>\n" +
+        "\t\t\t\t<xs:attribute name=\"regex\"/>\n" +
+        "\t\t\t\t<xs:attribute name=\"xpath\"/>\n" +
+        "\t\t\t</xs:extension>\n" +
+        "\t\t</xs:complexContent>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, FILTER_Q);
 
     public Mediator createMediator(OMElement elem) {
         FilterMediator filter = new FilterMediator();
@@ -111,4 +129,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
         return FILTER_Q;
     }
 
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
 }

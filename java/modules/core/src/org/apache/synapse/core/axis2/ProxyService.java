@@ -99,11 +99,11 @@ public class ProxyService {
             // default to all transports using service name as destination
         } else {
             StringTokenizer st = new StringTokenizer(transports, ", ");
-            String[] transports = new String[st.countTokens()];
-            for (int i=0; i<transports.length; i++) {
-                transports[i] = st.nextToken();
+            ArrayList transportList = new ArrayList();
+            for (int i=0; i<st.countTokens(); i++) {
+                transportList.add(st.nextToken());
             }
-            proxyService.setExposeTransports(transports);
+            proxyService.setExposedTransports(transportList);
         }
 
         // process parameters

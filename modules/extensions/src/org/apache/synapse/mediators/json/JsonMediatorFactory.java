@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.config.xml;
+package org.apache.synapse.mediators.json;
 
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.ext.json.JsonMediator;
+import org.apache.synapse.mediators.json.JsonMediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.Util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
 
@@ -34,11 +38,21 @@ import javax.xml.namespace.QName;
  * JTX is Json to XML
  * XTJ is XML to Json
  */
-public class JsonMediatorFactory implements MediatorFactory{
+public class JsonMediatorFactory implements MediatorFactory {
 
     private static final Log log = LogFactory.getLog(JsonMediatorFactory.class);
 
-    private static final QName tagName = new QName(Constants.SYNAPSE_NAMESPACE+"/json", "json");
+    private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE+"/json", "json");
+
+    private static final String STR_SCHEMA =
+        org.apache.synapse.config.xml.Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"json\" type=\"synapse:json_type\"/>\n" +
+        "\t<xs:complexType name=\"json_type\">\n" +
+        "\t\t<xs:attribute name=\"direction\" type=\"xs:string\"/>" +
+        "\t</xs:complexType>" +
+        org.apache.synapse.config.xml.Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, TAG_NAME);
 
     public Mediator createMediator(OMElement elem) {
         JsonMediator jsonMediator = new JsonMediator();
@@ -52,8 +66,18 @@ public class JsonMediatorFactory implements MediatorFactory{
     }
 
     public QName getTagQName() {
-        return tagName;
+        return TAG_NAME;
     }
+
+    public QName getTagSchemaType() {
+        return new QName(Constants.SYNAPSE_NAMESPACE,
+            getTagQName().getLocalPart() + "_type", "json");
+    }
+
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
+
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);

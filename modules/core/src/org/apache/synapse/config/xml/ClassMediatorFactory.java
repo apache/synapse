@@ -16,6 +16,7 @@
 package org.apache.synapse.config.xml;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.SynapseException;
@@ -25,8 +26,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 import java.util.Iterator;
+import java.io.StringReader;
 
 /**
  * Creates an instance of a Class mediator using XML configuration specified
@@ -42,6 +46,19 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
     private static final QName CLASS_Q = new QName(Constants.SYNAPSE_NAMESPACE, "class");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"class\" type=\"class_type\"/>\n" +
+        "\t<xs:complexType name=\"class_type\">\n" +
+        "\t\t<xs:sequence minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
+        "\t\t\t<xs:element name=\"property\" type=\"synapse:property_type\"/>\n" +
+        "\t\t</xs:sequence>\n" +
+        "\t\t<xs:attribute name=\"name\"/>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, CLASS_Q);        
 
     public Mediator createMediator(OMElement elem) {
 
@@ -71,5 +88,9 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return CLASS_Q;
+    }
+
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
     }
 }

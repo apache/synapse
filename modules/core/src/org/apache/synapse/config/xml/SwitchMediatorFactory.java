@@ -19,16 +19,19 @@ import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 import org.apache.synapse.mediators.filters.SwitchCaseMediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.stream.StreamSource;
 import java.util.Iterator;
+import java.io.StringReader;
 
 /**
  * Constructs a Switch mediator instance from the given XML configuration
@@ -52,6 +55,29 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
     private static final QName CASE_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "case");
     private static final QName DEFAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "default");
 
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"switch\" type=\"synapse:switch_type\"/>\n" +
+        "\t<xs:complexType name=\"switch_type\">\n" +
+        "\t\t<xs:sequence>\n" +
+        "\t\t\t<xs:sequence maxOccurs=\"unbounded\">\n" +
+        "\t\t\t\t<xs:element name=\"case\" type=\"synapse:switch_case_type\"/>\n" +
+        "\t\t\t</xs:sequence>\n" +
+        "\t\t\t<xs:element name=\"default\" type=\"synapse:mediator_type\" minOccurs=\"0\"/>\n" +
+        "\t\t</xs:sequence>\n" +
+        "\t\t<xs:attribute name=\"source\"/>\n" +
+        "\t</xs:complexType>" +
+        "\t<xs:complexType name=\"switch_case_type\">\n" +
+        "\t\t<xs:complexContent>\n" +
+        "\t\t\t<xs:extension base=\"synapse:mediator_type\">\n" +
+        "\t\t\t\t<xs:attribute name=\"regex\" type=\"xs:string\"/>\n" +
+        "\t\t\t</xs:extension>\n" +
+        "\t\t</xs:complexContent>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, SWITCH_Q);
+
     public Mediator createMediator(OMElement elem) {
 
         SwitchMediator switchMediator = new SwitchMediator();
@@ -64,7 +90,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
         } else {
             try {
                 AXIOMXPath sourceXPath = new AXIOMXPath(source.getAttributeValue());
-                Util.addNameSpaces(sourceXPath, elem, log);
+                org.apache.synapse.Util.addNameSpaces(sourceXPath, elem, log);
                 switchMediator.setSource(sourceXPath);
 
             } catch (JaxenException e) {
@@ -92,5 +118,9 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return SWITCH_Q;
+    }
+
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
     }
 }

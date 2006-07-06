@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
 /**
@@ -47,6 +48,15 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(HeaderMediatorFactory.class);
 
     private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "header");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"header\" type=\"header_type\"/>\n" +
+        "\t<xs:complexType name=\"header_type\"/>\n" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, HEADER_Q);
 
     public Mediator createMediator(OMElement elem) {
 
@@ -103,4 +113,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
         return HEADER_Q;
     }
 
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
 }

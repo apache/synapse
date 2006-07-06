@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -40,6 +41,19 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
     private static final QName PROP_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "set-property");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"set-property\" type=\"set-property_type\"/>\n" +
+        "\t<xs:complexType name=\"set-property_type\">\n" +
+        "\t\t<xs:attribute name=\"name\"/>\n" +
+        "\t\t<xs:attribute name=\"value\"/>\n" +
+        "\t\t<xs:attribute name=\"expression\"/>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, PROP_Q);
 
     public Mediator createMediator(OMElement elem) {
 
@@ -79,5 +93,9 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return PROP_Q;
+    }
+
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
     }
 }

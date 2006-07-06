@@ -20,6 +20,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
+import org.apache.ws.commons.schema.XmlSchema;
 
 /**
  * A mediator factory capable of creating an instance of a mediator through a given
@@ -38,4 +39,17 @@ public interface MediatorFactory {
      * @return QName of the mediator element
      */
     public QName getTagQName();
+
+    /**
+     * The name of the type in the schema returned by getTagSchema() which
+     * defines this element
+     * @return the QName for the type
+     */
+    public QName getTagSchemaType();
+
+    /**
+     * The schema for the mediator's XML configuration
+     * @return the schema of the mediator
+     */
+    public XmlSchema getTagSchema();
 }

@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
 import java.util.Iterator;
@@ -50,6 +51,21 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
     private static final String HEADERS = "headers";
     private static final String FULL    = "full";
     private static final String CUSTOM  = "custom";
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"log\" type=\"log_type\"/>\n" +
+        "\t<xs:complexType name=\"log_type\">\n" +
+        "\t\t<xs:sequence minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
+        "\t\t\t<xs:element name=\"property\" type=\"synapse:property_type\"/>\n" +
+        "\t\t</xs:sequence>\n" +
+        "\t\t<xs:attribute name=\"level\"/>\n" +
+        "\t\t<xs:attribute name=\"seperator\"/>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, LOG_Q);
 
     public QName getTagQName() {
         return LOG_Q;
@@ -85,4 +101,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory {
         return logMediator;
     }
 
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
+    }
 }

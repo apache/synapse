@@ -22,6 +22,7 @@ import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.axiom.om.OMElement;
+import org.apache.ws.commons.schema.XmlSchema;
 
 /**
  * Builds the main mediator (@see SynapseConfiguration) of the Synapse instance
@@ -34,10 +35,27 @@ import org.apache.axiom.om.OMElement;
  */
 public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
-    private final static QName tagname = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
+    private final static QName RULES_Q = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
+
+    private static final String STR_SCHEMA =
+        Constants.SCHEMA_PROLOG +
+        "\t<xs:element name=\"rules\" type=\"rules_type\"/>\n" +
+        "\t<xs:complexType name=\"rules_type\">\n" +
+        "\t\t<xs:complexContent>\n" +
+        "\t\t\t<xs:extension base=\"synapse:mediator_type\"/>\n" +
+        "\t\t</xs:complexContent>\n" +
+        "\t</xs:complexType>" +
+        Constants.SCHEMA_EPILOG;
+
+    private static final XmlSchema SCHEMA =
+        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, RULES_Q);
 
     public QName getTagQName() {
-        return tagname;
+        return RULES_Q;
+    }
+
+    public XmlSchema getTagSchema() {
+        return SCHEMA;
     }
 
     public Mediator createMediator(OMElement elem) {

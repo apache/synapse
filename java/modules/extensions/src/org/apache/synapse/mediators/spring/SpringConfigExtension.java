@@ -13,11 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.config;
+package org.apache.synapse.mediators.spring;
 
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
+import org.apache.synapse.config.Extension;
 
 /**
  * This defines an extension to Synapse to process a Spring Configuration.

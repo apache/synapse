@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -18,6 +19,13 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 /*
@@ -42,7 +50,8 @@ public class SandeshaTestCase extends TestCase {
     Properties properties = null;
     final String PROPERTY_FILE_NAME = "sandesha2-test.properties";
     public final int DEFAULT_SERVER_TEST_PORT = 8060;
-    
+    public ConfigurationContext serverConfigurationContext = null;
+    private final String RMServiceName = "RMSampleService";
 	private Log log = LogFactory.getLog(getClass());
     
     public SandeshaTestCase(String name) {
@@ -63,7 +72,7 @@ public class SandeshaTestCase extends TestCase {
 			log.error(e);
 		}
     }
-
+    
     protected InputStreamReader getResource(String relativePath, String resourceName) {
         String resourceFile = resourceDir + relativePath + File.separator + resourceName;
         try {
@@ -100,6 +109,25 @@ public class SandeshaTestCase extends TestCase {
     		return properties.getProperty(key);
     	else 
     		return null;
+    }
+    
+    public void overrideConfigurationContext (ConfigurationContext context,MessageReceiver messageReceiver, String operationName, boolean newOperation, int mep) throws Exception  {
+    	
+    	
+    	AxisService rmService = context.getAxisConfiguration().getService(RMServiceName);
+    	
+    	AxisOperation operation = null;
+    	
+    	if (newOperation) {
+    		operation = rmService.getOperation(new QName (operationName));
+    		if (operation==null)
+    			throw new Exception ("Given operation not found");
+    	} else {
+    		operation = AxisOperationFactory.getAxisOperation(mep);
+    		rmService.addOperation(operation);
+    	}
+    	
+    	operation.setMessageReceiver(messageReceiver);
     }
 
 }

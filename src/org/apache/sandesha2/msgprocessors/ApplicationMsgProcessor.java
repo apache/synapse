@@ -91,7 +91,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck != null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
+			
+			//setting message type temporarily as ack message. so that the ack processor would not be confused
+			int messageType = rmMsgCtx.getMessageType();
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			
 			ackProcessor.processInMessage(rmMsgCtx);
+			
+			//resetting the correct message type.
+			rmMsgCtx.setMessageType(messageType);
 		}
 		
 		//TODO process embedded ack requests

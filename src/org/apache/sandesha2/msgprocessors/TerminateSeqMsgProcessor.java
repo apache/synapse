@@ -79,7 +79,15 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		if (sequenceAck != null) {
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
+
+			//setting message type temporarily as ack message. so that the ack processor would not be confused
+			int messageType = terminateSeqRMMsg.getMessageType();
+			terminateSeqRMMsg.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			
 			ackProcessor.processInMessage(terminateSeqRMMsg);
+			
+			//resetting the correct message type.
+			terminateSeqRMMsg.setMessageType(messageType);
 		}
 		
 		//Processing the terminate message

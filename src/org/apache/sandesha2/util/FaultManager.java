@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -45,7 +44,6 @@ import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
@@ -192,13 +190,11 @@ public class FaultManager {
       log.debug("Enter: FaultManager::checkForUnknownSequence, " + sequenceID);
 
 		MessageContext messageContext = rmMessageContext.getMessageContext();
-		ConfigurationContext configCtx = messageContext.getConfigurationContext();
 		
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		int type = rmMessageContext.getMessageType();
 		
 		boolean validSequence = true;
-		String reason = null;
 		
 		if (type==Sandesha2Constants.MessageTypes.ACK || 
 			type==Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE ||
@@ -215,7 +211,6 @@ public class FaultManager {
 			
 		} else {
 			NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
-			SOAPEnvelope envelope = messageContext.getEnvelope();
 
 			Collection coll = mgr.retrieveAll();
 			Iterator it = coll.iterator();
@@ -230,8 +225,8 @@ public class FaultManager {
 				}
 			}
 			
-			if (contains)
-				validSequence = true;
+			if (!contains)
+				validSequence = false;
 		}
 		
 		String rmNamespaceValue = rmMessageContext.getRMNamespaceValue();

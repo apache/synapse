@@ -14,12 +14,11 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.wsrm;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
+ * Represents an Identifier element.
  */
 
 import javax.xml.namespace.QName;

@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
@@ -26,9 +27,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
+ * Represents the RM Accept element which may come within the 
+ * Create Sequence Response.
  */
 
 public class Accept implements IOMRMElement {

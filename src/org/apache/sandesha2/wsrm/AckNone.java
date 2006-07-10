@@ -28,8 +28,6 @@ import org.apache.sandesha2.SandeshaException;
 
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * 
  * This represent the wsrm:none element that may be present withing a sequence acknowledgement.
  */
 public class AckNone implements IOMRMElement {

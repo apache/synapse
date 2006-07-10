@@ -17,15 +17,9 @@
 
 package org.apache.sandesha2;
 
-
-
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
  * Please see sub-interfaces to see grouped data.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Jaliya Ekanayaka <jaliya@opensource.lk>
  */
 
 public interface Sandesha2Constants {

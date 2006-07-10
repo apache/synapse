@@ -14,6 +14,7 @@
  * limitations under the License.
  * 
  */
+
 package org.apache.sandesha2.storage.inmemory;
 
 import java.sql.ResultSet;
@@ -29,11 +30,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- */
 
 public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr {
 	

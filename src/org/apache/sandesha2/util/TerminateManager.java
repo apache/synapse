@@ -50,8 +50,6 @@ import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 /**
  * Contains logic to remove all the storad data of a sequence.
  * Methods of this are called by sending side and the receiving side when appropriate
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class TerminateManager {

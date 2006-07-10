@@ -20,9 +20,6 @@ package org.apache.sandesha2.storage.beans;
 /**
  * This bean is used at the sending side (of both server and client)
  * There is on object of this for each sequence.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class CreateSeqBean extends RMBean {

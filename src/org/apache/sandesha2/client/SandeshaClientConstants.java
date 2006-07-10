@@ -16,6 +16,9 @@
 
 package org.apache.sandesha2.client;
 
+/**
+ * Constants that are needed for the Sandesha2 Client API.
+ */
 public class SandeshaClientConstants {
 	public static String AcksTo = "Sandesha2AcksTo";
 	public static String LAST_MESSAGE = "Sandesha2LastMessage";

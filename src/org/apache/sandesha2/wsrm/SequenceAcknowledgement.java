@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.wsrm;
 
 import java.util.ArrayList;
@@ -36,10 +37,6 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 
 /**
  * Adds the SequenceAcknowledgement header block.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
 
 public class SequenceAcknowledgement implements IOMRMPart {

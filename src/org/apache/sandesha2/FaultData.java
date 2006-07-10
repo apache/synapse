@@ -22,8 +22,6 @@ import org.apache.axiom.om.OMElement;
 /**
  * Used to hold data related to a RM Fault.
  * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class FaultData {

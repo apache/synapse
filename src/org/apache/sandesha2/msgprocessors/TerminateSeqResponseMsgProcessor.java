@@ -24,8 +24,6 @@ import org.apache.sandesha2.SandeshaException;
 
 /**
  * To process terminate sequence response messages.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 

@@ -58,9 +58,6 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Has logic to check for possible RM related faults and create it.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class FaultManager {

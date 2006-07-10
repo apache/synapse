@@ -29,8 +29,6 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 /**
  * Storage managers should extend this.
  * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public abstract class StorageManager {

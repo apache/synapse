@@ -50,8 +50,6 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Contains logic for managing acknowledgements.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class AcknowledgementManager {

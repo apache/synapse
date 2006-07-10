@@ -19,7 +19,7 @@ package org.apache.sandesha2.client;
 import java.util.ArrayList;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ *This report will contain details of a specific sequence.
  */
 
 public class SequenceReport {

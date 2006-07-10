@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.wsrm;
 
 import java.util.ArrayList;
@@ -32,9 +33,9 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
+ * All RM model classes should implement this.
+ * RM model classes include all the class that represent the elements 
+ * defined by RM specification. 
  */
 
 public class RMElements {

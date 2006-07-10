@@ -59,8 +59,6 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 /**
  * Contains all the Sandesha2Constants of Sandesha2. Please see sub-interfaces
  * to see grouped data.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaClient {

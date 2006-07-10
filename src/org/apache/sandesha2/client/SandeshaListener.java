@@ -22,8 +22,6 @@ import org.apache.axis2.AxisFault;
 /**
  * By implementing this interface and registering an object with
  * Sandesha2, users will be invoked in some events.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public interface SandeshaListener {

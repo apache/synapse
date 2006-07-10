@@ -40,8 +40,6 @@ import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**
  * This class is used to create an RMMessageContext out of an MessageContext.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class MsgInitializer {

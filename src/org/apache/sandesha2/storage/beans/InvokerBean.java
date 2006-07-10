@@ -20,9 +20,6 @@ package org.apache.sandesha2.storage.beans;
 /**
  * This bean is used at the receiving side (of both server and client)
  * There is one object for each application message to be invoked.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class InvokerBean extends RMBean {

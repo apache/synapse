@@ -33,8 +33,6 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
  * This is used to adjust retransmission infoamation after each time the message is sent.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class MessageRetransmissionAdjuster {

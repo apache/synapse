@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
@@ -30,10 +31,6 @@ import org.apache.sandesha2.SandeshaException;
 
 /**
  * Represent the AckRequested header block.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
 
 public class AckRequested implements IOMRMPart {

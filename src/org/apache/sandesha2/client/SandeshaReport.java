@@ -22,7 +22,8 @@ import java.util.HashMap;
 
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * This gives a report explaining the current state of the Sandesha2 
+ * system.
  */
 public class SandeshaReport {
 	

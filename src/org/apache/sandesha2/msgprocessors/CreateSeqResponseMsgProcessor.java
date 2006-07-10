@@ -53,8 +53,6 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Responsible for processing an incoming Create Sequence Response message.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class CreateSeqResponseMsgProcessor implements MsgProcessor {

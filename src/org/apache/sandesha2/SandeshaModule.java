@@ -35,8 +35,6 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * The Module class of Sandesha2.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaModule implements Module, ModulePolicyExtension {

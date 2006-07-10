@@ -14,14 +14,13 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.SandeshaException;
 
 /**
  * To easily track exceptions happening in the storage area.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaStorageException extends SandeshaException {

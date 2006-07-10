@@ -25,9 +25,6 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 
 /**
  * Used to manage invoker beans.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface InvokerBeanMgr extends RMBeanManager {

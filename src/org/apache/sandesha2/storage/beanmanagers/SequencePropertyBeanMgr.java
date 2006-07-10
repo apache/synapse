@@ -25,9 +25,6 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
  * Used to manage Sequence Property beans.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface SequencePropertyBeanMgr extends RMBeanManager {

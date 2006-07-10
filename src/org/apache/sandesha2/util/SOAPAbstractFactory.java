@@ -22,7 +22,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
+ * A wrapper for SOA11 and SOAP12 factories of OM.
  */
 
 public class SOAPAbstractFactory {

@@ -40,8 +40,6 @@ import org.apache.sandesha2.util.SandeshaUtil;
 /**
  * This is invoked in the inFlow of an RM endpoint. This is responsible for
  * selecting an suitable message processor and letting it process the message.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaInHandler extends AbstractHandler {

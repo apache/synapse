@@ -41,8 +41,6 @@ import org.apache.sandesha2.wsrm.Sequence;
 
 /**
  * This is invoked in the outFlow of an RM endpoint
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaOutHandler extends AbstractHandler {

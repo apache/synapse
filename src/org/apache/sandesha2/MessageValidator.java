@@ -21,6 +21,10 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 
+/**
+ *Used to validate RM messages. 
+ *This include both application messages and RM control messages.
+ */
 public class MessageValidator {
 
 	public static void validateMessage (RMMsgContext rmMsg,StorageManager storageManager) throws SandeshaException {

@@ -25,9 +25,6 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 
 /**
  * Used to manage NextMsg beans.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface NextMsgBeanMgr extends RMBeanManager {

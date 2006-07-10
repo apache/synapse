@@ -27,8 +27,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * 
  * This represent the wsrm:final element that may be present withing a sequence acknowledgement.
  */
 public class AckFinal implements IOMRMElement {

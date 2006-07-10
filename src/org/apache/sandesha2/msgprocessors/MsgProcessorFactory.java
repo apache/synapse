@@ -22,8 +22,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * Used to get a suitable message processor. Given the message type.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class MsgProcessorFactory {

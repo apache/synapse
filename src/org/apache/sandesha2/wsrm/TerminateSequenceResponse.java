@@ -31,8 +31,6 @@ import org.apache.axiom.soap.SOAPFactory;
 
 /**
  * Adds the Terminate Sequence Response body part.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class TerminateSequenceResponse implements IOMRMPart {

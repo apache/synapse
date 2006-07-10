@@ -18,7 +18,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
@@ -37,8 +36,6 @@ import org.apache.sandesha2.wsrm.CreateSequence;
 
 /**
  * This is used to set up a new sequence, both at the sending side and the receiving side.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SequenceManager {

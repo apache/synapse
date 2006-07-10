@@ -33,11 +33,6 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- */
-
 public class InMemoryStorageManager extends StorageManager {
 
 	private static InMemoryStorageManager instance = null;

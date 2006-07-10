@@ -20,8 +20,7 @@ package org.apache.sandesha2.storage.beans;
 import java.io.Serializable;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
+ * Defines a data bean used and managed by Sandesha2.
  */
 
 public abstract class RMBean implements Serializable {

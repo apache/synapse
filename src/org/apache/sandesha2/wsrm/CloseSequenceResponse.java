@@ -30,8 +30,6 @@ import org.apache.sandesha2.SandeshaException;
 
 /**
  * Adds the Close Sequence Response body part.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 public class CloseSequenceResponse implements IOMRMPart {
 

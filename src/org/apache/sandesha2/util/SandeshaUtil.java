@@ -14,6 +14,7 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.util;
 
 import java.io.OutputStream;
@@ -72,8 +73,6 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Contains utility methods that are used in many plases of Sandesha2.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaUtil {

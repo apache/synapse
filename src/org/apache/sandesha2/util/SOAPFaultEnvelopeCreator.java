@@ -41,9 +41,6 @@ import org.apache.sandesha2.wsrm.SequenceFault;
 /**
  * Used to create an SOAP Envelope for a RM Related Fault.
  * Support both SOAP 1.1 and SOAP 1.2 encoding.
- * 
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SOAPFaultEnvelopeCreator {

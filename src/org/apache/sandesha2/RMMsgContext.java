@@ -34,11 +34,6 @@ import org.apache.sandesha2.wsrm.IOMRMPart;
 /**
  * This class is used to hold a MessageContext within Sandesha. This is used to
  * easily manupilate the properties of a MessageContext.
- * 
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Jaliya Ekanayaka <jaliya@opensource.lk>
  */
 
 public class RMMsgContext {

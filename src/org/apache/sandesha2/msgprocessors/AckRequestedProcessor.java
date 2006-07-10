@@ -55,9 +55,8 @@ import org.apache.sandesha2.wsrm.AckRequested;
 
 /**
  * Responsible for processing an incoming Application message.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
+
 public class AckRequestedProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(AckRequestedProcessor.class);

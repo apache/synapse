@@ -14,14 +14,11 @@
  *  limitations under the License.
  *
  */
+
 package org.apache.sandesha2.wsrm;
 
 /**
  * This is the base interface for all RM infoset objects.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
  */
 
 import org.apache.sandesha2.SandeshaException;

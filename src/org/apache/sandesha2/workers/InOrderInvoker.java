@@ -46,8 +46,6 @@ import org.apache.sandesha2.wsrm.Sequence;
  * This is used when InOrder invocation is required. This is a seperated Thread that keep running
  * all the time. At each iteration it checks the InvokerTable to find weather there are any messages to
  * me invoked.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class InOrderInvoker extends Thread {

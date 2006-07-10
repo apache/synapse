@@ -25,7 +25,6 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
-import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -52,8 +51,6 @@ import org.apache.sandesha2.wsrm.Sequence;
 /**
  * The Global handler of Sandesha2. This is used to perform things that should
  * be done before diapatching such as duplicate detection.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class SandeshaGlobalInHandler extends AbstractHandler {

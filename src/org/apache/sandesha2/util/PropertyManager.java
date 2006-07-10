@@ -38,8 +38,6 @@ import org.apache.ws.policy.Policy;
 /**
  * Loads properties from sandesha2.properties file (from Sandesha2Constants if
  * this is not available).
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class PropertyManager {

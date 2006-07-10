@@ -19,9 +19,6 @@ package org.apache.sandesha2.storage;
 
 /**
  * Transaction implementations should extend this.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface Transaction {

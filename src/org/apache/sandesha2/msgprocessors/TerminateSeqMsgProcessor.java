@@ -59,8 +59,6 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * Responsible for processing an incoming Terminate Sequence message.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class TerminateSeqMsgProcessor implements MsgProcessor {

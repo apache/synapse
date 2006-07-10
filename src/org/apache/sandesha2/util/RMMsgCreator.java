@@ -63,8 +63,6 @@ import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**
  * Used to create new RM messages.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
  */
 
 public class RMMsgCreator {

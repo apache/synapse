@@ -21,9 +21,6 @@ import org.apache.axis2.AxisFault;
 
 /**
  * Exception class of Sandesa2.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class SandeshaException extends AxisFault  {

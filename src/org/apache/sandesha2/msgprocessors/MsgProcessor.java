@@ -22,9 +22,6 @@ import org.apache.sandesha2.SandeshaException;
 
 /**
  * The message processor interface.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public interface MsgProcessor {

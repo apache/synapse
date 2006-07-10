@@ -4,6 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
+
 package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
@@ -16,9 +17,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
- * @author Saminda Abeyruwan  <saminda@opensource.lk>
+ * Represents an Address element.
  */
 
 public class Address implements IOMRMElement {

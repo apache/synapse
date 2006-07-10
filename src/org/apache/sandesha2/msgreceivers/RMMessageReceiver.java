@@ -28,13 +28,11 @@ import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Jaliya Ekanayaka <jaliya@opensource.lk>
- */
+*Currently this is a dummy Msg Receiver.
+*All the necessary RM logic happens at MessageProcessors.
+*This only ensures that the defaults Messsage Receiver does not get called for RM control messages.
+*/
 
-//Currently this is a dummy Msg Receiver.
-//All the necessary RM logic happens at MessageProcessors.
-//This only ensures that the defaults Messsage Receiver does not get called for RM control messages.
 
 public class RMMessageReceiver extends AbstractMessageReceiver {
 

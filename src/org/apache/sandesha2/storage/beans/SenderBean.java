@@ -20,9 +20,6 @@ package org.apache.sandesha2.storage.beans;
 /**
  * This bean is used at the sending side (of both server and client)
  * There is one eatry for each message to be sent.
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- * @author Sanka Samaranayaka <ssanka@gmail.com>
  */
 
 public class SenderBean extends RMBean {

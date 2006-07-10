@@ -1,17 +1,3 @@
-package org.apache.sandesha2.storage;
-
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
-import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
-import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaTestCase;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.context.ConfigurationContext;
-
-import java.util.Iterator;
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
  *
@@ -27,6 +13,21 @@ import java.util.Iterator;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.apache.sandesha2.storage;
+
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.util.PropertyManager;
+import org.apache.sandesha2.util.SandeshaPropertyBean;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaTestCase;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.context.ConfigurationContext;
+
+import java.util.Iterator;
 
 public class NextMsgBeanMgrTest extends SandeshaTestCase {
     

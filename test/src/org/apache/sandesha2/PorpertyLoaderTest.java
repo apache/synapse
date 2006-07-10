@@ -25,10 +25,6 @@ import junit.framework.TestCase;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
-
 public class PorpertyLoaderTest extends TestCase {
 	
 	SandeshaPropertyBean propertyBean = null;

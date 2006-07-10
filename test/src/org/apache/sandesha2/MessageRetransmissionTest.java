@@ -37,10 +37,6 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
-/**
- * @author chamikara
- *
- */
 public class MessageRetransmissionTest extends SandeshaTestCase {
 
 	SimpleHTTPServer httpServer = null;

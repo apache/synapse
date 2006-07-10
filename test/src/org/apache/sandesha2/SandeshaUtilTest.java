@@ -27,11 +27,6 @@ import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
 import junit.framework.TestCase;
 
-/**
- * 
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
-
 public class SandeshaUtilTest extends TestCase {
 
 	public void testUUIDGen () {

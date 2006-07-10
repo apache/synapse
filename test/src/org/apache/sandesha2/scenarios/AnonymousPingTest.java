@@ -41,10 +41,6 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
-
 public class AnonymousPingTest extends SandeshaTestCase  {
 
 	SimpleHTTPServer httpServer = null;

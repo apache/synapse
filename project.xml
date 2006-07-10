@@ -39,32 +39,35 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
 
     <developers>
         <developer>
-            <name>Sanjiva Weerawarana</name>
-            <id>sanjiva</id>
-            <email>sanjiva@opensource.lk</email>
-            <organization>
-            </organization>
+            <name>Chamikara Jayalath</name>
+            <id>chamikara</id>
+            <email>chamikaramj AT gmail.com</email>
+            <organization>WSO2</organization>
         </developer>
         <developer>
             <name>Davanum Srinivas</name>
             <id>dims</id>
-            <email>dims@yahoo.com</email>
-            <organization>
-            </organization>
+            <email>dims AT wso2.com</email>
+            <organization>WSO2</organization>
         </developer>
         <developer>
             <name>Jaliya Ekanayake</name>
             <id>jaliya</id>
-            <email>jaliya@apache.org</email>
-            <organization>
-            </organization>
+            <email>jaliya AT opensource.lk</email>
+            <organization>Indiana University, USA</organization>
+            <url>http://www.apache.org/~jaliya</url>
         </developer>
         <developer>
-            <name>Chamikara Jayalath</name>
-            <id>chamikara</id>
-            <email>chamikaramj@gmail.com</email>
-            <organization>
-            </organization>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Sanka Samaranayaka</name>
+            <id>sanka</id>
+            <email>ssanka AT gmail.com</email>
+            <organization>WSO2</organization>
         </developer>
     </developers>
 
@@ -185,7 +188,17 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
             <version>${backport_util_concurrent.version}</version>
-        </dependency>                   
+        </dependency>             
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>${geronimo.spec.activation.version}</version>
+        </dependency>    
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>${geronimo.spec.javamail.version}</version>
+        </dependency>   
     </dependencies>
 
     <!-- ======= -->

@@ -16,6 +16,9 @@
     <!--is set then, Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
     <parameter name="DrillDownToRootCauseForFaultReason" locked="false">false</parameter>
 
+
+    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
+
     <!--This is the user name and password of admin console-->
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
@@ -133,11 +136,13 @@
             </handler>
         </phase>
         <!--  System pre defined phases       -->
+        <phase name="RMPhase"/>
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
         <phase name="OperationInPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
+        <phase name="RMPhase"/>
         <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
@@ -172,10 +177,12 @@
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
+        <phase name="RMPhase"/>
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
+        <phase name="RMPhase"/>
         <phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>

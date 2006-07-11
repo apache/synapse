@@ -68,6 +68,18 @@
         </dependency>
 
         <dependency>
+            <groupId>ws-commons</groupId>
+            <artifactId>axiom-dom</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2-rahas</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.ws.commons</groupId>
             <artifactId>XmlSchema</artifactId>
             <version>${XmlSchema.version}</version>

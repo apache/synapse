@@ -45,5 +45,11 @@ public interface SenderBeanMgr extends RMBeanManager {
 
 	public boolean update(SenderBean bean) throws SandeshaStorageException;
 
+	/**
+	 * @deprecated
+	 * 
+	 * @param messageContextRefKey
+	 * @return
+	 */
 	public SenderBean retrieveFromMessageRefKey (String messageContextRefKey);
 }

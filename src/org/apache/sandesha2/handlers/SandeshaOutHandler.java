@@ -66,6 +66,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 			log.debug(message);
 			throw new AxisFault(message);
 		}
+		
+		String unreliable = (String) msgCtx.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+		if(null != unreliable && "true".equals(unreliable)) {
+			if(log.isDebugEnabled()) log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
+			return;
+		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE))

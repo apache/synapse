@@ -101,10 +101,12 @@
         </phase>
         <!--  System pre defined phases       -->
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
+        <phase name="MUPhase"/>
         <phase name="OperationInPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
+        <phase name="MUPhase"/>
         <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
@@ -139,10 +141,12 @@
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
+        <phase name="MUPhase"/>
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
+        <phase name="MUPhase"/>
         <phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>

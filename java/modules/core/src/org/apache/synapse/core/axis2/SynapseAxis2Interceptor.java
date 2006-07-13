@@ -21,6 +21,7 @@ import org.apache.axis2.engine.AxisEvent;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.AxisFault;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseException;
@@ -94,6 +95,11 @@ public class SynapseAxis2Interceptor implements AxisObserver, Constants {
 
     //---------------------------------------------------------------------------------------
     public void serviceUpdate(AxisEvent axisEvent, AxisService axisService) {
+    }
+
+    public void serviceGroupUpdate(AxisEvent event,
+                                   AxisServiceGroup serviceGroup) {
+        //TODO
     }
 
     public void moduleUpdate(AxisEvent axisEvent, AxisModule axisModule) {

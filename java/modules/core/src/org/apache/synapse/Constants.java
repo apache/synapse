@@ -74,7 +74,9 @@ public interface Constants {
 
     /** The QName of the WS-Security Rampart module */
     QName RAMPART_MODULE_NAME = new QName("rampart");
-
+    /** Sandesha2 engaged service being process*/
     String MESSAGE_RECEIVED_RM_ENGAGED = "__MESSAGE_RECEIVED_RM_ENGAGED__";
+
+    String PROCESSED_MUST_UNDERSTAND = "__PROCESSED_MUST_UNDERSTAND__";
 
 }

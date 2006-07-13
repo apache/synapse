@@ -137,11 +137,13 @@
         </phase>
         <!--  System pre defined phases       -->
         <phase name="RMPhase"/>
+        <phase name="MUPhase"/>
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
         <phase name="OperationInPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
+        <phase name="MUPhase"/>
         <phase name="RMPhase"/>
         <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
@@ -178,10 +180,12 @@
         </phase>
         <!--      user can add his own phases to this area  -->
         <phase name="RMPhase"/>
+        <phase name="MUPhase"/>
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
+        <phase name="MUPhase"/>
         <phase name="RMPhase"/>
         <phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>

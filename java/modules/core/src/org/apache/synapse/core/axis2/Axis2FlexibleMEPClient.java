@@ -137,6 +137,10 @@ public class Axis2FlexibleMEPClient {
             axisMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
         response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
             axisMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
+        response.setProperty(
+                org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
+                axisMsgCtx.getProperty(
+                        org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND));
         response.setTransportIn(axisMsgCtx.getTransportIn());
         response.setTransportOut(savedTransportOut);
 

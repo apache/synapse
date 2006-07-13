@@ -28,6 +28,9 @@ public class EmptyRMMessageReceiver implements MessageReceiver {
          Message Recieved with RM
         */
         //TODO : SynapseEnvironment Inject
+        System.out.println("########  EmptyRMMessageReceiver ######");
+        System.out.println("########   Envelope  :  " + messageContext.getEnvelope().toString());
+
         messageContext.setProperty(
                 org.apache.synapse.Constants.MESSAGE_RECEIVED_RM_ENGAGED,
                 Boolean.TRUE);

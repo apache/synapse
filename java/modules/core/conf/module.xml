@@ -10,6 +10,10 @@
                  class="org.apache.synapse.core.axis2.SynapseDispatcher">
             <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
         </handler>
+        <handler name="SynapseMustUnderstandHandler"
+                 class="org.apache.synapse.core.axis2.SynapseMustUnderstandHandler">
+            <order phase="MUPhase"/>
+        </handler>
     </inflow>
 
 </module>

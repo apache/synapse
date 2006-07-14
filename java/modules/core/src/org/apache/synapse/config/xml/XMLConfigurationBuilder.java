@@ -20,9 +20,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.registry.Registry;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.commons.logging.Log;
@@ -107,6 +109,19 @@ public class XMLConfigurationBuilder {
             }
         }
 
+        Iterator regs = root.getChildrenWithName(Constants.REGISTRY_ELT);
+        if (regs != null) {
+            while (regs.hasNext()) {
+                Object o = regs.next();
+                if (o instanceof OMElement) {
+                    Registry reg = RegistryFactory.createRegistry((OMElement) o);
+                    config.addRegistry(reg.getRegistryName(), reg);
+                } else {
+                    handleException("Invalid registry declaration in configuration");
+                }
+            }
+        }
+
         if (is != null) {
             try {
                 is.close();
@@ -125,10 +140,47 @@ public class XMLConfigurationBuilder {
     private void defineProperty(SynapseConfiguration config, OMElement elem) {
         OMAttribute name  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-        if (name == null || value == null) {
-            handleException("The 'name' and 'value' attributes are required");
+        OMAttribute src   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));
+        OMAttribute key   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+        if (name == null) {
+            handleException("The 'name' attribute is required for a property definition");
+        } else if (
+            (value != null && src != null) ||
+            (value != null && key != null) ||
+            (src != null && key != null)) {
+            // if more than one attribute of (value|src|key) is specified
+            handleException("A property must use exactly one of 'value', " +
+                "'src' or 'key' attributes");
+
+        } else if (value == null && src == null && key == null) {
+            // if no attribute of (value|src|key) is specified, check if this is a TextNode
+            if (elem.getFirstOMChild() != null) {
+                config.addProperty(name.getAttributeValue(), elem.getFirstOMChild());
+            } else {
+                handleException("A property must use exactly one of 'value', " +
+                    "'src' or 'key' attributes");
+            }
         }
-        config.addProperty(name.getAttributeValue(), value.getAttributeValue());
+
+        // a simple string literal property
+        if (value != null) {
+            config.addProperty(name.getAttributeValue(), value.getAttributeValue());
+
+        // a property (XML) loaded once through the given URL as an OMNode
+        } else if (src != null) {
+            try {
+                config.addProperty(name.getAttributeValue(),
+                    org.apache.synapse.config.Util.getObject(new URL(src.getAttributeValue())));
+            } catch (MalformedURLException e) {
+                handleException("Invalid URL specified by 'src' attribute : " +
+                    src.getAttributeValue(), e);
+            }
+
+        // a DynamicProperty which refers to an XML resource on a remote registry
+        } else if (key != null) {
+            config.addProperty(name.getAttributeValue(),
+                new DynamicProperty(key.getAttributeValue()));
+        }
     }
 
     /**

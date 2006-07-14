@@ -103,7 +103,7 @@ public class ProxyService {
             for (int i=0; i<st.countTokens(); i++) {
                 transportList.add(st.nextToken());
             }
-            proxyService.setExposedTransports(transportList);
+            proxyService.setExposeTransports((String[])transportList.toArray());
         }
 
         // process parameters

@@ -15,18 +15,17 @@
 */
 package org.apache.synapse.mediators.validate;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.config.Util;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.registry.Registry;
 import org.jaxen.JaxenException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -35,7 +34,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.sax.SAXSource;
@@ -45,32 +43,38 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Validate a message or an element against a schema
+ * <p/>
+ * This internally uses the Xerces2-j parser, which cautions a lot about thread-safety and
+ * memory leaks. Hence this initial implementation will create a single parser instance
+ * for each unique mediator instance, and re-use it to validate multiple messages - even
+ * concurrently - by synchronizing access
  */
 public class ValidateMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(ValidateMediator.class);
 
     /**
-     * Default validation schema language (http://www.w3.org/2001/XMLSchema) and validator feature ids.
+     * Default schema language (http://www.w3.org/2001/XMLSchema) and validator feature ids.
      */
     private static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
+    /** The name of the registry on which the Schema keys could be looked up from */
+    private String registryName = null;
+
     /**
-     * A space or comma delimitered list of schemas to validate the source element against
+     * A list of DynamicProperty keys, referring to the schemas to be used for validation
      */
-    private String schemaUrl = null;
+    private List schemaKeys = new ArrayList();
 
     /**
      * An XPath expression to be evaluated against the message to find the element to be validated.
-     * If this is not specified, the validation will occur against the first child element of the SOAP body
+     * If this is not specified, the validation will occur against the first child element of the
+     * SOAP body
      */
     private AXIOMXPath source = null;
 
@@ -80,204 +84,175 @@ public class ValidateMediator extends AbstractListMediator {
      */
     private Map properties = new HashMap();
 
+    /**
+     * This is the actual Validator instance used to validate messages - probably
+     * by multiple threads. Always *USE* validatorLock to synchronize access to this
+     */
+    private Validator validator = null;
 
-    public String getSchemaUrl() {
-        return schemaUrl;
-    }
+    /**
+     * Lock used to ensure thread-safe creation and use of the above Validator
+     */
+    private final Object validatorLock = new Object();
 
-    public void setSchemaUrl(String schemaUrl) {
-        this.schemaUrl = schemaUrl;
-    }
+    /**
+     * This is the reference to the DefaultHandler instance
+     */
+    private final MyErrorHandler errorHandler = new MyErrorHandler();
 
-    public AXIOMXPath getSource() {
-        return source;
-    }
-
-    public void setSource(AXIOMXPath source) {
-        this.source = source;
+    public ValidateMediator() {
+        // create the default XPath
+        try {
+            this.source = new AXIOMXPath("//*:Envelope/*:Body/child::*");
+        } catch (JaxenException e) {
+            // this should not cause a runtime exception!
+        }
     }
 
     /**
-     * Return the node to be validated. If a source XPath is not specified, this will
-     * default to the first child of the SOAP body
+     * Return the OMNode to be validated. If a source XPath is not specified, this will
+     * default to the first child of the SOAP body i.e. - //*:Envelope/*:Body/child::*
+     *
      * @param synCtx the message context
      * @return the OMNode against which validation should be performed
      */
     private OMNode getValidateSource(MessageContext synCtx) {
 
-        AXIOMXPath sourceXPath = source;
-        // do not change the source XPath if not specified, as it is shared..
-        // and will cause confusion to concurrent messages and erroneous results
-
-        if (sourceXPath == null) {
-            log.debug("validation source was not specified.. defaulting to SOAP Body");
-            try {
-                sourceXPath = new AXIOMXPath("//SOAP-ENV:Body/child::*");
-                sourceXPath.addNamespace("SOAP-ENV", synCtx.isSOAP11() ?
-                    SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI : SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-            } catch (JaxenException e) {
-                // this should not cause a runtime exception!
-            }
-        }
-
         try {
-            Object o = sourceXPath.evaluate(synCtx.getEnvelope());
+            Object o = source.evaluate(synCtx.getEnvelope());
             if (o instanceof OMNode) {
                 return (OMNode) o;
             } else if (o instanceof List && !((List) o).isEmpty()) {
                 return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
             } else {
-                String msg = "The evaluation of the XPath expression " + source + " must result in an OMNode";
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("The evaluation of the XPath expression "
+                    + source + " must result in an OMNode");
             }
-
         } catch (JaxenException e) {
-            String msg = "Error evaluating XPath " + source + " on message";
-            log.error(msg);
-            throw new SynapseException(msg, e);
+            handleException("Error evaluating XPath " + source + " on message");
         }
+        return null;
     }
 
     public boolean mediate(MessageContext synCtx) {
 
         ByteArrayInputStream baisFromSource = null;
-        OMNode sourceNode = null;
 
         try {
             // create a byte array output stream and serialize the source node into it
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
-            XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
+            XMLStreamWriter xsWriterForSource =
+                XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
             // serialize the validation target and get an input stream into it
-            sourceNode = getValidateSource(synCtx);
-            sourceNode.serialize(xsWriterForSource);
+            getValidateSource(synCtx).serialize(xsWriterForSource);
             baisFromSource = new ByteArrayInputStream(baosForSource.toByteArray());
 
         } catch (Exception e) {
-            String msg = "Error accessing source element for validation : " + source;
-            log.error(msg);
-            throw new SynapseException(msg, e);
+            handleException("Error accessing source element for validation : " + source, e);
         }
 
         try {
-            // this is our custom validation handler
-            SynapseValidator handler = new SynapseValidator();
-
-            // Create SchemaFactory and configure
-            SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
-            factory.setErrorHandler(handler);
-            setXmlFeatures(factory);
-
-            // Build Schema from schemaUrl
-            Schema schema = null;
-            if (schemaUrl != null) {
-                StringTokenizer st = new StringTokenizer(schemaUrl, " ,");
-                int sourceCount = st.countTokens();
-
-                if (sourceCount == 0) {
-                    log.debug("Schemas have not been specified..");
-                    schema = factory.newSchema();
-                } else {
-                    StreamSource[] sources = new StreamSource[sourceCount];
-                    for (int j = 0; j < sourceCount; ++j) {
-                        sources[j] = new StreamSource(st.nextToken());
-                    }
-                    schema = factory.newSchema(sources);
-                }
-            } else {
-                log.debug("Schemas have not been specified..");
-                schema = factory.newSchema();
-            }
-
-            // Setup validator and input source
-            // Features set for the SchemaFactory get propagated to Schema and Validator (JAXP 1.4).
-            Validator validator = schema.newValidator();
-            validator.setErrorHandler(handler);
-
             XMLReader reader = XMLReaderFactory.createXMLReader();
-            SAXSource source = new SAXSource(reader, new InputSource(baisFromSource));
-            validator.validate(source);
+            SAXSource saxSrc = new SAXSource(reader, new InputSource(baisFromSource));
 
-            if (handler.isValidationError()) {
-                log.debug("Validation of element : " + sourceNode + " failed against : " + schemaUrl +
-                    " Message : " + handler.getSaxParseException().getMessage() + " Executing 'on-fail' sequence");
-                log.debug("Failed message envelope : " + synCtx.getEnvelope());
-                // super.mediate() invokes the "on-fail" sequence of mediators
-                return super.mediate(synCtx);
+            synchronized (validatorLock) {
+
+                // initialize schemas/Validator if required
+                initialize(synCtx);
+
+                // perform actual validation
+                validator.validate(saxSrc);
+
+                if (errorHandler.isValidationError()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(
+                            "Validation of element returned by XPath : " + source +
+                                " failed against the given schemas with Message : " +
+                                errorHandler.getSaxParseException().getMessage() +
+                                " Executing 'on-fail' sequence");
+                        log.debug("Failed message envelope : " + synCtx.getEnvelope());
+                    }
+                    // super.mediate() invokes the "on-fail" sequence of mediators
+                    return super.mediate(synCtx);
+                }
             }
-
-        }
-        catch (Exception e) {
-            String msg = "Error validating " + source + " against schema : " + schemaUrl + " : " + e.getMessage();
-            log.error(msg);
-            throw new SynapseException(msg, e);
+        } catch (SAXException e) {
+            handleException("Error validating " + source + " element" + e.getMessage(), e);
+        } catch (IOException e) {
+            handleException("Error validating " + source + " element" + e.getMessage(), e);
         }
 
         return true;
     }
 
     /**
-     * Get a mediator property. The common use case is a feature for the
-     * underlying Xerces validator
-     * @param key property key / feature name
-     * @return property string value (usually true|false)
+     * Perform actual initialization of this validate mediator instance - if required
      */
-    public Object getProperty(String key) {
-        return properties.get(key);
-    }
+    private void initialize(MessageContext msgCtx) {
 
-    /**
-     * Set a property for this mediator
-     * @param key the property key / feature name
-     * @param value property string value (usually true|false)
-     * @see #getProperty(String)
-     */
-    public void setProperty(String key, Object value) {
-        properties.put(key, value);
-    }
+        // flag to check if we need to initialize/re-initialize the schema Validator
+        boolean reCreate = false;
 
-    /**
-     * Add a list of 'MediatorProperty'ies to this mediator
-     * @param list a List of MediatorProperty objects
-     */
-    public void addAllProperties(List list) {
-        Iterator iter = list.iterator();
+        Registry reg = msgCtx.getConfiguration().getRegistry(registryName);
+
+        // if any of the schemas are not loaded or expired, load or re-load them
+        Iterator iter = schemaKeys.iterator();
         while (iter.hasNext()) {
-            Object o = iter.next();
-            if (o instanceof MediatorProperty) {
-                MediatorProperty prop = (MediatorProperty) o;
-                setProperty(prop.getName(), prop.getValue());
-            } else {
-                handleException("Attempt to set invalid property type. " +
-                    "Expected MediatorProperty type got " + o.getClass().getName());
+            DynamicProperty dp = (DynamicProperty) iter.next();
+            if (dp.getCache() == null || dp.isExpired()) {
+                reg.getProperty(dp.getKey());   // load property from registry
+                reCreate = true;                // request re-initialization of Validator
             }
         }
-    }
 
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
+        // do not re-initialize Validator unless required
+        if (!reCreate) {
+            return;
+        }
 
-    /**
-     * Set the properties set on this mediator to the underlying Xerces
-     * @param factory Schema factory
-     * @throws SAXException on error
-     */
-    private void setXmlFeatures(SchemaFactory factory) throws SAXException {
-        Iterator iter = properties.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String value = (String)entry.getValue();
-            factory.setFeature((String)entry.getKey(), value != null && "true".equals(value));
+        synchronized (validatorLock) {
+
+            try {
+                // Create SchemaFactory and configure for the default schema language - XMLSchema
+                SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
+                factory.setErrorHandler(errorHandler);
+
+                // set any features on/off as requested
+                iter = properties.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry entry = (Map.Entry) iter.next();
+                    String value = (String) entry.getValue();
+                    factory.setFeature(
+                        (String) entry.getKey(), value != null && "true".equals(value));
+                }
+
+                Schema schema = null;
+
+                StreamSource[] sources = new StreamSource[schemaKeys.size()];
+                iter = schemaKeys.iterator();
+                int i = 0;
+                while (iter.hasNext()) {
+                    DynamicProperty dp = (DynamicProperty) iter.next();
+                    sources[i++] = Util.getStreamSource(reg.getProperty(dp.getKey()));
+                }
+                schema = factory.newSchema(sources);
+
+                // Setup validator and input source
+                // Features set for the SchemaFactory get propagated to Schema and Validator (JAXP 1.4)
+                validator = schema.newValidator();
+                validator.setErrorHandler(errorHandler);
+
+            } catch (SAXException e) {
+                handleException("Error creating Validator", e);
+            }
         }
     }
 
     /**
      * This class handles validation errors to be used for error reporting
      */
-    private class SynapseValidator extends DefaultHandler {
+    private class MyErrorHandler extends DefaultHandler {
 
         private boolean validationError = false;
         private SAXParseException saxParseException = null;
@@ -304,4 +279,82 @@ public class ValidateMediator extends AbstractListMediator {
         }
     }
 
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
+    // setters and getters
+
+    /**
+     * Get a mediator property. The common use case is a feature for the
+     * underlying Xerces validator
+     *
+     * @param key property key / feature name
+     * @return property string value (usually true|false)
+     */
+    public Object getProperty(String key) {
+        return properties.get(key);
+    }
+
+    /**
+     * Set a property for this mediator
+     *
+     * @param key   the property key / feature name
+     * @param value property string value (usually true|false)
+     * @see #getProperty(String)
+     */
+    public void setProperty(String key, Object value) {
+        properties.put(key, value);
+    }
+
+    /**
+     * Add a list of 'MediatorProperty'ies to this mediator
+     *
+     * @param list a List of MediatorProperty objects
+     */
+    public void addAllProperties(List list) {
+        Iterator iter = list.iterator();
+        while (iter.hasNext()) {
+            Object o = iter.next();
+            if (o instanceof MediatorProperty) {
+                MediatorProperty prop = (MediatorProperty) o;
+                setProperty(prop.getName(), prop.getValue());
+            } else {
+                handleException("Attempt to set invalid property type. " +
+                    "Expected MediatorProperty type got " + o.getClass().getName());
+            }
+        }
+    }
+
+    /**
+     * Set a list of DynamicProperty elements which refer to the list of schemas to be
+     * used for validation
+     *
+     * @param schemaKeys list of DynamicProperty elements
+     */
+    public void setSchemaKeys(List schemaKeys) {
+        this.schemaKeys = schemaKeys;
+    }
+
+    /**
+     * Set the given XPath as the source XPath
+     * @param source an XPath to be set as the source
+     */
+    public void setSource(AXIOMXPath source) {
+       this.source = source;
+    }
+
+    /**
+     * Set the name of the registry which should be used for schema key lookup
+     * @param registryName the name of the registry
+     */
+    public void setRegistryName(String registryName) {
+        this.registryName = registryName;
+    }
 }

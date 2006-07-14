@@ -17,6 +17,7 @@ package org.apache.synapse.config;
 
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.registry.Registry;
 
 import java.util.*;
 
@@ -39,6 +40,9 @@ public class SynapseConfiguration {
 
     /** Holds global (system-wide) properties that apply to the synapse instance and every message */
     private Map globalProps = new HashMap();
+
+    /** Hold referenced to the declared registries */
+    private Map registryMap = new HashMap();
 
     /** This is the "main" (or default) synapse mediator which mediates each and every message */
     private Mediator mainMediator = null;
@@ -157,6 +161,30 @@ public class SynapseConfiguration {
      */
     public Map getGlobalProps() {
         return globalProps;
+    }
+
+    /**
+     * Add a registry into this configuration with the given name
+     * @param name a name for the registry or null for default registry
+     * @param reg the actual registry implementation
+     */
+    public void addRegistry(String name, Registry reg) {
+        if (name == null) {
+            name = "DEFAULT";
+        }
+        registryMap.put(name, reg);
+    }
+
+    /**
+     * Get the named registry, or the default if name is null
+     * @param name registry name or null - for default registry
+     * @return actual registry for the given name or the default registry
+     */
+    public Registry getRegistry(String name) {
+        if (name == null) {
+            name = "DEFAULT";
+        }
+        return (Registry) registryMap.get(name);
     }
 
 }

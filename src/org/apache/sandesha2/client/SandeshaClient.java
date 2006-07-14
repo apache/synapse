@@ -623,10 +623,10 @@ public class SandeshaClient {
 		SOAPFactory factory = null;
 		SOAPEnvelope dummyEnvelope = null;
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-			factory = new SOAP11Factory();
+			factory = new SOAP12Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
 		} else {
-			factory = new SOAP12Factory();
+			factory = new SOAP11Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
 		}
 

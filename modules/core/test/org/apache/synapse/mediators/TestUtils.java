@@ -17,6 +17,7 @@ package org.apache.synapse.mediators;
 
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.registry.url.SimpleURLRegistry;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
@@ -36,6 +37,9 @@ public class TestUtils {
 
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
+        SynapseConfiguration testConfig = new SynapseConfiguration();
+        testConfig.addRegistry(null, new SimpleURLRegistry());
+        synCtx.setConfiguration(testConfig);
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();

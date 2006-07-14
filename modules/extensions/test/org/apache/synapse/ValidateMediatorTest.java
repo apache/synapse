@@ -16,6 +16,8 @@
 package org.apache.synapse;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
+import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
@@ -24,6 +26,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.TestMediator;
+import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.validate.ValidateMediator;
 import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
@@ -77,8 +80,8 @@ public class ValidateMediatorTest extends TestCase {
             "</CheckPriceRequest>\n";
 
     private static final String DEFAULT_FEATURES_MEDIATOR_CONFIG = 
-            "<validate xmlns=\"http://ws.apache.org/ns/synapse\" " +
-            "       schema=\"file:synapse_repository/conf/sample/validate.xsd\">" + 
+            "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
+            "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <on-fail>" +
             "       <makefault>" +
             "           <code value=\"tns:Receiver\" xmlns:tns=\"http://www.w3.org/2003/05/soap-envelope\"/>" +
@@ -88,8 +91,8 @@ public class ValidateMediatorTest extends TestCase {
             "</validate>";
 
     private static final String CUSTOM_FEATURES_MEDIATOR_CONFIG = 
-            "<validate xmlns=\"http://ws.apache.org/ns/synapse\" " +
-            "       schema=\"file:synapse_repository/conf/sample/validate.xsd\">" + 
+            "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
+            "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
             "   <property name=\"" + SCHEMA_FULL_CHECKING_FEATURE_ID + "\" value=\"false\"/>" +
             "   <property name=\"" + HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID + "\" value=\"true\"/>" +
             "   <on-fail>" +
@@ -124,7 +127,9 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -145,7 +150,10 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd ../core/test-resources/misc/validate2.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
         source.addNamespace("m0", "http://www.apache-synapse.org/test2");
         validate.setSource(source);
@@ -166,7 +174,10 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd ../core/test-resources/misc/validate2.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
         source.addNamespace("m0", "http://www.apache-synapse.org/test2");
         validate.setSource(source);
@@ -187,7 +198,9 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -208,7 +221,9 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -229,7 +244,9 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = new ValidateMediator();
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);
@@ -274,7 +291,9 @@ public class ValidateMediatorTest extends TestCase {
         setOnFailInvoked(false);
 
         // set the schema url, source xpath and any name spaces
-        validate.setSchemaUrl("../core/test-resources/misc/validate.xsd");
+        List keys = new ArrayList();
+        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
         validate.setSource(source);

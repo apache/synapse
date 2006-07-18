@@ -6,8 +6,7 @@
   <title>Synapse Configuration Language</title>
 </head>
 <body>
-<h1>Synapse Configuration Language<br>
-</h1>
+<h1>Synapse Configuration Language</h1>
 <p>The Synapse configuration language is designed to support a
 processing model where messages come into Synapse, are processed via
 some number of mediators and then delivered to an endpoint somewhere.
@@ -17,7 +16,18 @@ can easily be added as a selection mechanism for mediators (see below
 for details). </p>
 <h2>Overall Structure</h2>
 <p>A Synapse configuration looks like the following at the top level: </p>
-<pre> &lt;synapse&gt;<br>   &lt;definitions&gt;<br>     (sequencedef | endpointdef | literalpropertydef | extensiondef)+<br>   &lt;definitions&gt;?<br> &lt;proxies&gt;<br>   proxyservice+<br> &lt;/proxies&gt;?<br> &lt;rules&gt;<br>   mediator+<br> &lt;/rules&gt;<br> &lt;/synapse&gt;<br>
+<pre> &lt;synapse&gt;
+   &lt;definitions&gt;
+     (sequencedef | endpointdef | literalpropertydef | extensiondef)+
+   &lt;definitions&gt;?
+ &lt;proxies&gt;
+   proxyservice+
+ &lt;/proxies&gt;?
+ &lt;rules&gt;
+   mediator+
+ &lt;/rules&gt;
+ &lt;/synapse&gt;
+
 </pre>
 <h3>Definitions</h3>
 <p>The &lt;definitions&gt; section defines reusable elements that can
@@ -32,7 +42,14 @@ possibly different semantics, such as WS-Security, WS-RM and Transport
 switching etc. </p>
 <p>A proxyservice token represents a &lt;proxy&gt; element which is
 used to define a Synapse Proxy service. </p>
-<pre> &lt;proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]&gt;<br>   &lt;target sequence="name" | endpoint="name"/&gt;? // default is main sequence<br>   &lt;wsdl url="url"&gt;?<br>   &lt;schema url="url"&gt;*<br>   &lt;policy url="url"&gt;*<br>   &lt;property name="string" value="string"/&gt;*<br> &lt;/proxy&gt;<br>
+<pre> &lt;proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]&gt;
+   &lt;target sequence="name" | endpoint="name"/&gt;? // default is main sequence
+   &lt;wsdl url="url"&gt;?
+   &lt;schema url="url"&gt;*
+   &lt;policy url="url"&gt;*
+   &lt;property name="string" value="string"/&gt;*
+ &lt;/proxy&gt;
+
 </pre>
 <p>A proxy service is created and exposed on the specified transports
 through the underlying Axis2 instance, exposing service EPR's as per
@@ -50,14 +67,33 @@ the JMS destination etc) </p>
 <p>A sequencedef token represents a &lt;sequence&gt; element which is
 used to define a named sequence of mediators that can be invoked later
 by name as a sequence of mediators. </p>
-<pre> &lt;sequence name="string"&gt;<br>   mediator+<br> &lt;/sequence&gt;<br>
+<pre> &lt;sequence name="string"&gt;
+   mediator+
+ &lt;/sequence&gt;
+
 </pre>
 <h4>Endpoints</h4>
 <p>An endpointdef token represents an &lt;endpoint&gt; element which is
 used to give a logical name to an endpoint address. If the address is
 not just a simple URL, then extensibility elements may be used to
 indicate the address (i.e. to compute the address at runtime). </p>
-<pre> &lt;endpoint name="string" [address="url"]&gt;<br><br>   .. extensibility ..<br><br>   &lt;parameter name="OutflowSecurity"&gt;<br>     ...<br>   &lt;/parameter&gt;<br><br>   &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..<br>     xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy"&gt;<br>     ...<br>   &lt;/Policy&gt;<br><br>   .. extensibility ..<br><br> &lt;/endpoint&gt;<br>
+<pre> &lt;endpoint name="string" [address="url"]&gt;
+
+   .. extensibility ..
+
+   &lt;parameter name="OutflowSecurity"&gt;
+     ...
+   &lt;/parameter&gt;
+
+   &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..
+     xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy"&gt;
+     ...
+   &lt;/Policy&gt;
+
+   .. extensibility ..
+
+ &lt;/endpoint&gt;
+
 </pre>
 <p>An Axis2 Parameter element within an endpoint definition with the
 name " OutflowSecurity"
@@ -93,7 +129,8 @@ http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider</a>)
 <h4>Properties</h4>
 <p>The token literalpropertydef refers to a &lt;set-property&gt;
 element as follows: </p>
-<pre> &lt;set-property name="string" value="string"/&gt;<br>
+<pre> &lt;set-property name="string" value="string"/&gt;
+
 </pre>
 <p>which is used to set a global property with a constant value. </p>
 <p>These properties are top level properties which are set globally for
@@ -101,7 +138,8 @@ the entire system. Values of these properties can be retrieved via the
 extension XPath function called "synapse:get-property(prop-name)". </p>
 <h3>Mediators</h3>
 <p>A mediator token refers to any of the following tokens: </p>
-<pre>send | drop | log | makefault | transform | header | filter | switch | class | validate | setproperty | sequenceref | in | out <br>
+<pre>send | drop | log | makefault | transform | header | filter | 
+	switch | class | validate | setproperty | sequenceref | in | out 
 </pre>
 <p>In addition to the above, Synapse will be able to load mediators via
 the J2SE Service Provider model. Mediator extensions must implement the
@@ -121,27 +159,43 @@ more details. </p>
 <p>In the simplest case, the place to send the message to is implicit
 in the message (via a property of the message itself)- that is
 indicated by the following: </p>
-<pre> &lt;send/&gt;<br>
+<pre> &lt;send/&gt;
+
 </pre>
 <p>If the message is to be sent to one or more endpoints, then the
 following is used: </p>
-<pre> &lt;send&gt;<br>   (endpointref | endpoint)+<br> &lt;/send&gt;<br>
+<pre> &lt;send&gt;
+   (endpointref | endpoint)+
+ &lt;/send&gt;
+
 </pre>
 <p>where the endpointref token refers to the following: </p>
-<pre> &lt;endpoint ref="name"/&gt;<br>
+<pre> &lt;endpoint ref="name"/&gt;
+
 </pre>
 <p>and the endpoint token refers to an anonymous endpoint defined
 inline: </p>
-<pre> &lt;endpoint address="url"/&gt;<br>
+<pre> &lt;endpoint address="url"/&gt;
+
 </pre>
 <p>If the message is to be sent to an endpoint selected by load
 balancing across a set of endpoints, then it is indicated by the
 following: </p>
-<pre> &lt;send&gt;<br>   &lt;load-balance algorithm="uri"&gt;<br>     (endpointref | endpoint)+<br>   &lt;/load-balance&gt;<br> &lt;/send&gt;<br>
+<pre> &lt;send&gt;
+   &lt;load-balance algorithm="uri"&gt;
+     (endpointref | endpoint)+
+   &lt;/load-balance&gt;
+ &lt;/send&gt;
+
 </pre>
 <p>Similarly, if the message is to be sent to an endpoint with failover
 semantics, then it is indicated by the following: </p>
-<pre> &lt;send&gt;<br>   &lt;failover&gt;<br>     (endpointref | endpoint)+<br>   &lt;/failover&gt;<br> &lt;/send&gt;<br>
+<pre> &lt;send&gt;
+   &lt;failover&gt;
+     (endpointref | endpoint)+
+   &lt;/failover&gt;
+ &lt;/send&gt;
+
 </pre>
 <p>Once the &lt;send&gt; mediator executes, further processing of the
 current message stops. </p>
@@ -150,14 +204,18 @@ semantics, and supports only a single endpoint reference. </p>
 <h4>Drop</h4>
 <p>The drop token refers to a &lt;drop&gt; element which is used to
 drop a message: </p>
-<pre> &lt;drop/&gt;<br>
+<pre> &lt;drop/&gt;
+
 </pre>
 <p>Once the &lt;drop&gt; mediator executes, further processing of the
 current message stops. </p>
 <h4>Log</h4>
 <p>The log token refers to a &lt;log&gt; element which may be used to
 log messages being mediated: </p>
-<pre> &lt;log [level="string"] [seperator="string"]&gt;<br>   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*<br> &lt;/log&gt;<br>
+<pre> &lt;log [level="string"] [seperator="string"]&gt;
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ &lt;/log&gt;
+
 </pre>
 <p>The optional level attribute selects a pre-defined subset of
 properties to be logged. e.g. simple = To, From, WSAction, SOAPAction,
@@ -175,7 +233,14 @@ specified to the Log mediator </p>
 logged. The default seperator is the ',' comma. </p>
 <h4>Transforms</h4>
 <h5>Faults</h5>
-<pre> &lt;makefault [version="soap11|soap12"]&gt;<br>   &lt;code (value="literal" | expression="xpath")/&gt;<br>   &lt;reason (value="literal" | expression="xpath")&gt;<br>   &lt;node&gt;?<br>   &lt;role&gt;?<br>   &lt;detail&gt;?<br> &lt;/makefault&gt;<br>
+<pre> &lt;makefault [version="soap11|soap12"]&gt;
+   &lt;code (value="literal" | expression="xpath")/&gt;
+   &lt;reason (value="literal" | expression="xpath")&gt;
+   &lt;node&gt;?
+   &lt;role&gt;?
+   &lt;detail&gt;?
+ &lt;/makefault&gt;
+
 </pre>
 <p>The &lt;makefault&gt; mediator transforms the current message into a
 fault message, but does NOT send it. The &lt;send&gt; mediator needs to
@@ -184,7 +249,10 @@ be invoked to send a fault message created this way. The fault message
 header existed on the original message, else it is set it to the
 "replyTo" of the original message. </p>
 <h5>XSLT/XQuery</h5>
-<pre> &lt;transform xslt|xquery="url" [source="xpath"]&gt;<br>   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*<br> &lt;/transform&gt;<br>
+<pre> &lt;transform xslt|xquery="url" [source="xpath"]&gt;
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ &lt;/transform&gt;
+
 </pre>
 <p>The &lt;transform&gt; mediator applies the specified XSLT or XQuery
 transformation to the given element. If the source element is not
@@ -193,7 +261,9 @@ specified, it defaults to the soap body content. Optionally parameters
 through the &lt;property&gt; elements. </p>
 <p>Note: Synapse does not currently support XQuery transformations </p>
 <h5>Headers</h5>
-<pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;<br> &lt;header name="qname" action="remove"/&gt;<br>
+<pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
+ &lt;header name="qname" action="remove"/&gt;
+
 </pre>
 <p>The &lt;header&gt; mediator sets or removes a specified header from
 the current soap message. Currently the set header only supports simple
@@ -203,7 +273,10 @@ optional action attribute specifies whether the mediator should set or
 remove the header. If omitted, it defaults to a set-header. </p>
 <h4>Selection</h4>
 <h5>Filters</h5>
-<pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;<br>   mediator+<br> &lt;/filter&gt;<br>
+<pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
+   mediator+
+ &lt;/filter&gt;
+
 </pre>
 <p>The &lt;filter&gt; mediator either test the given xpath expression
 as a boolean expression, or match the evaluation result of a source
@@ -211,14 +284,27 @@ xpath expression against the given regular expression. If the test
 succeeds, the filter mediator will execute the enclosed mediators in
 sequence. </p>
 <h5>Switch</h5>
-<pre> &lt;switch source="xpath"&gt;<br>   &lt;case regex="string"&gt;<br>     mediator+<br>   &lt;/case&gt;+<br>   &lt;default&gt;<br>     mediator+<br>   &lt;/default&gt;?<br> &lt;/switch&gt;<br>
+<pre> &lt;switch source="xpath"&gt;
+   &lt;case regex="string"&gt;
+     mediator+
+   &lt;/case&gt;+
+   &lt;default&gt;
+     mediator+
+   &lt;/default&gt;?
+ &lt;/switch&gt;
+
 </pre>
 <p>The &lt;switch&gt; mediator will evaluate the given source xpath
 expression into its string value, and match it against the given
 regular expressions. If the specified cases does not match and a
 default case exists, it will be executed. </p>
 <h4>Validation</h4>
-<pre> &lt;validate schema="url" [source="xpath"]&gt;<br>   &lt;on-fail&gt;<br>     mediator+<br>   &lt;/on-fail&gt;<br> &lt;/validate&gt;<br>
+<pre> &lt;validate schema="url" [source="xpath"]&gt;
+   &lt;on-fail&gt;
+     mediator+
+   &lt;/on-fail&gt;
+ &lt;/validate&gt;
+
 </pre>
 <p>The &lt;validate&gt; mediator validates the result of the evaluation
 of the source xpath expression, against the schema specified. If the
@@ -229,7 +315,8 @@ the on-fail sequence of mediators is executed. </p>
 2.8.0 parser, it is bundled with the Synapse extensions, so that the
 Synapse core will remain simple and lightweight. </p>
 <h4>Properties</h4>
-<pre> &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;<br>
+<pre> &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
+
 </pre>
 <p>The setproperty token refers to a &lt;set-property&gt; element which
 is a mediator that has no direct impact on the message but rather on
@@ -238,7 +325,10 @@ the message context applies only to the current message and can be
 later retrieved through the synapse:get-property(prop-name) extension
 function. </p>
 <h4>Class Mediators</h4>
-<pre> &lt;class name="class-name"&gt;<br>   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*<br> &lt;/class&gt; <br>
+<pre> &lt;class name="class-name"&gt;
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+ &lt;/class&gt; 
+
 </pre>
 <p>The class mediator creates an instance of the specified class and
 sets it as a mediator. The class must implement the
@@ -246,7 +336,8 @@ org.apache.synapse.api.Mediator interface. If any properties are
 specified, the corresponding setter methods are invoked on the class.
 However, Synapse will only support String properties. </p>
 <h4>Reusing Sequences</h4>
-<pre> &lt;sequence ref="name"/&gt;<br>
+<pre> &lt;sequence ref="name"/&gt;
+
 </pre>
 <p>A sequenceref token refers to a &lt;sequence&gt; element which is
 used to invoke a named sequence of mediators. </p>
@@ -259,7 +350,8 @@ mediator and Spring Configuration are such examples. </p>
 Spring ApplicationContext (BeanFactory).
 This could be referred subsequently by Spring mediator instances which
 will use this context. </p>
-<pre> &lt;spring:config name="string" src="file"/&gt;<br>
+<pre> &lt;spring:config name="string" src="file"/&gt;
+
 </pre>
 <p>The name attribute specifies a unique name for the configuration,
 and the src attribute specifies the Spring configuration file. </p>
@@ -268,7 +360,8 @@ and the src attribute specifies the Spring configuration file. </p>
  src="file:///wiki/modern/img/moin-www.png" alt="[WWW]" height="11"
  width="11"> http://ws.apache.org/ns/synapse/spring</a> namespace. </p>
 <h4>Spring mediator</h4>
-<pre> &lt;spring:spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/&gt;<br>
+<pre> &lt;spring:spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/&gt;
+
 </pre>
 <p>The &lt;spring&gt; element creates an instance of a mediator, which
 is managed by Spring. This Spring bean must implement the Mediator
@@ -297,154 +390,335 @@ fault reply should be sent back. For valid messages, we determine its
 category and attempt to use the Gold endpoint, failing which the Silver
 endpoint is tried. For requests that does not fall into the Gold
 category the default silver endpoint is used always. </p>
-<pre> &lt;synapse&gt;<br> &lt;definitions&gt;<br> &lt;sequence name="registration_flow"&gt;<br> &lt;validate schema="http://registry/xsd/registration.xsd" source="//regRequest"&gt;<br> &lt;on-fail&gt;<br> &lt;set-property name="error-code" value="100"/&gt;<br> &lt;set-property name="error-reason" value="validation failed"/&gt;<br> &lt;sequence ref="fault_flow"/&gt;<br> &lt;/on-fail&gt;<br> &lt;/validate&gt; <br> &lt;filter xpath="/regRequest[@Category='GOLD']"&gt;<br> &lt;send&gt;<br> &lt;failover&gt;<br> &lt;endpoint ref="gold_registration"/&gt;<br> &lt;endpoint ref="silver_registration"/&gt;<br> &lt;/failover&gt;<br> &lt;/send&gt;<br> &lt;filter&gt; <br> &lt;send&gt;<br> &lt;endpoint ref="silver_registration"/&gt;<br> &lt;/send&gt;<br> &lt;sequence&gt;<br> <br>
- &lt;sequence name="fault_flow"&gt;<br> &lt;log level="simple"&gt;<br> &lt;property name="application" value="synapse:get-property('reg-app')"/&gt;<br> &lt;/log&gt;<br> &lt;makefault version="soap11"&gt;<br> &lt;code value="synapse:get-property('error-code')"/&gt;<br> &lt;reason expression="synapse:get-property('error-reason')"&gt;<br> &lt;makefault&gt;<br> &lt;send/&gt;<br> &lt;sequence&gt;<br> <br>
- &lt;endpoint name="gold_registration" address="http://gold/registration"/&gt;<br> &lt;endpoint name="silver_registration" address="http://silver/registration"/&gt;<br> <br>
- &lt;set-property name="reg_app" value="Registration Application"/&gt; <br> &lt;/definitions&gt;<br> <br>
- &lt;rules&gt;<br> &lt;switch source="synapse:get-property('to')"&gt;<br> &lt;case regex="/registration"&gt;<br> &lt;sequence ref="registration_flow"/&gt;<br> &lt;/case&gt;<br> &lt;case regex="someother"&gt;<br> ...<br> &lt;/case&gt;<br> &lt;default&gt;<br> &lt;drop/&gt;<br> &lt;/default&gt;<br> &lt;/rules&gt;<br> <br>
- &lt;/synapse&gt; 
-<br></pre>
+<pre> &lt;synapse&gt;
+   &lt;definitions&gt;
+     &lt;sequence name="registration_flow"&gt;
+       &lt;validate schema="http://registry/xsd/registration.xsd" source="//regRequest"&gt;
+         &lt;on-fail&gt;
+           &lt;set-property name="error-code" value="100"/&gt;
+           &lt;set-property name="error-reason" value="validation failed"/&gt;
+           &lt;sequence ref="fault_flow"/&gt;
+         &lt;/on-fail&gt;
+       &lt;/validate&gt; 
+       &lt;filter xpath="/regRequest[@Category='GOLD']"&gt;
+         &lt;send&gt;
+           &lt;failover&gt;
+             &lt;endpoint ref="gold_registration"/&gt;
+             &lt;endpoint ref="silver_registration"/&gt;
+           &lt;/failover&gt;
+         &lt;/send&gt;
+       &lt;filter&gt; 
+       &lt;send&gt;
+         &lt;endpoint ref="silver_registration"/&gt;
+       &lt;/send&gt;
+     &lt;sequence&gt;
+ 
+     &lt;sequence name="fault_flow"&gt;
+       &lt;log level="simple"&gt;
+         &lt;property name="application" value="synapse:get-property('reg-app')"/&gt;
+       &lt;/log&gt;
+       &lt;makefault version="soap11"&gt;
+         &lt;code value="synapse:get-property('error-code')"/&gt;
+         &lt;reason expression="synapse:get-property('error-reason')"&gt;
+       &lt;makefault&gt;
+      &lt;send/&gt;
+    &lt;sequence&gt;
+ 
+   &lt;endpoint name="gold_registration" address="http://gold/registration"/&gt;
+   &lt;endpoint name="silver_registration" address="http://silver/registration"/&gt;
+ 
+   &lt;set-property name="reg_app" value="Registration Application"/&gt; 
+ &lt;/definitions&gt;
+ 
+ &lt;rules&gt;
+   &lt;switch source="synapse:get-property('to')"&gt;
+     &lt;case regex="/registration"&gt;
+       &lt;sequence ref="registration_flow"/&gt;
+     &lt;/case&gt;
+     &lt;case regex="someother"&gt;
+       ...
+     &lt;/case&gt;
+     &lt;default&gt;
+       &lt;drop/&gt;
+     &lt;/default&gt;
+    &lt;switch&gt;
+ &lt;/rules&gt;
+ 
+&lt;/synapse&gt; 
+
+</pre>
 <h3>Example 0. </h3>
-<pre><br>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;<br>  <br>  &lt;definitions&gt;<br>    <br>    &lt;sequence name="stockquote"&gt;<br>    	&lt;!-- set the To address to the real endpoint --&gt;<br>    	&lt;header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/&gt;<br>    <br>    	&lt;!-- check if the symbol is MSFT --&gt;<br>      &lt;filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://ws.invesbot.com/"&gt;<br>      	&lt;!-- if it is throw a fault --&gt;<br>      	&lt;makefault&gt;<br>      		&lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;<br>      		&lt;reason value="Isn't there a Windows API for that?"/&gt;<br>      	&lt;/makefault&gt;<br>      &lt;/filter&gt;<br>    &lt;/sequence&gt;<br><br>  &lt;/definitions&gt;<br><br>  &lt;rules&gt;<br>  	&lt;!-- now log the message using log4j --&gt;<br>  	&lt;log level="full"/&gt;<br>  	<br>  	&lt;!-- Check if the URL matches the stockquote gateway/dumb case --&gt;<br>  	&lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;<br>  		&lt;sequence ref="stockquote"/&gt;<br>  	&lt;/filter&gt;<br>  	<br>  	&lt;!-- check if the URL matches the virtual url - either the proxy or ws-add case --&gt;<br>		&lt;filter source="get-property('To')" regex="http://.*stockquotes.*"&gt;<br>  		&lt;sequence ref="stockquote"/&gt;<br>  	&lt;/filter&gt;<br>  	<br>  	&lt;!-- send the message on --&gt;<br>  	&lt;send/&gt;<br>  &lt;/rules&gt;<br><br>&lt;/synapse&gt;  <br>
+<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+  
+  &lt;definitions&gt;
+    
+    &lt;sequence name="stockquote"&gt;
+    	&lt;!-- set the To address to the real endpoint --&gt;
+    	&lt;header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/&gt;
+    
+    	&lt;!-- check if the symbol is MSFT --&gt;
+      &lt;filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://ws.invesbot.com/"&gt;
+      	&lt;!-- if it is throw a fault --&gt;
+      	&lt;makefault&gt;
+      		&lt;code value="tns:Receiver" 
+      		xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+      		&lt;reason value="Isn't there a Windows API for that?"/&gt;
+      	&lt;/makefault&gt;
+      &lt;/filter&gt;
+    &lt;/sequence&gt;
+
+  &lt;/definitions&gt;
+
+  &lt;rules&gt;
+  	&lt;!-- now log the message using log4j --&gt;
+  	&lt;log level="full"/&gt;
+  	
+  	&lt;!-- Check if the URL matches the stockquote gateway/dumb case --&gt;
+  	&lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+  		&lt;sequence ref="stockquote"/&gt;
+  	&lt;/filter&gt;
+  	
+  	&lt;!-- check if the URL matches the virtual url - either the proxy or ws-add case --&gt;
+		&lt;filter source="get-property('To')" regex="http://.*stockquotes.*"&gt;
+  		&lt;sequence ref="stockquote"/&gt;
+  	&lt;/filter&gt;
+  	
+  	&lt;!-- send the message on --&gt;
+  	&lt;send/&gt;
+  &lt;/rules&gt;
+
+&lt;/synapse&gt;  
+
 </pre>
 <p>The above configuration is available with the Synapse distribution
 and illustrates the usual Stock quote examples. The client code for
 these are available with the Synapse samples, and the README.txt of the
 samples defines these in detail. </p>
 <h3>Example 1. </h3>
-&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;<br>
-&nbsp; <br>
-&nbsp; &lt;definitions&gt;<br>
-<br>
-&nbsp;&nbsp;&nbsp; &lt;sequence name="customrequest"&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- set the To address to the
-real endpoint --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;header name="To"
-value="http://ws.invesbot.com/stockquotes.asmx"/&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- set correlation field to
-custom label --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;set-property
-name="correlate/label" value="customquote"/&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- transform the custom
-quote into a standard quote requst --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;transform
-xslt="file:synapse_repository/conf/sample/transform.xslt"/&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- send message to real
-endpoint and stop --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;send/&gt;<br>
-&nbsp;&nbsp;&nbsp; &lt;/sequence&gt;<br>
-<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;sequence
-name="customresponse"&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- transform the custom
-quote into a standard quote requst --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;transform
-xslt="file:synapse_repository/conf/sample/transform_back.xslt"/&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- now send the custom
-response back to the client and stop --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;send/&gt;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp;&nbsp; &lt;/sequence&gt;<br>
-&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp;&nbsp; &lt;sequence name="stockquote"&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- set the To address to the
-real endpoint --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;header name="To"
-value="http://ws.invesbot.com/stockquotes.asmx"/&gt;<br>
-&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- check if the symbol is
-MSFT --&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;filter
-xpath="//*[wsx:symbol='MSFT']"
-xmlns:wsx="http://www.webserviceX.NET/"&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- if it is
-throw a fault --&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;makefault&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&lt;code value="tns:Receiver"
-xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&lt;reason value="Isn't there a Windows API for that?"/&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/makefault&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/filter&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;send/&gt;<br>
-&nbsp;&nbsp;&nbsp; &lt;/sequence&gt;<br>
-&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp;&nbsp; &lt;sequence name="standardrequest"&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- now log the
-message using log4j --&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;log level="full"/&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- Check if the URL
-matches the stockquote gateway/dumb case --&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;filter
-source="get-property('To')" regex=".*/StockQuote.*"&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&lt;sequence ref="stockquote"/&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/filter&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- check if the URL
-matches the virtual url - either the proxy or ws-add case --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;filter
-source="get-property('To')" regex="http://stockquote.*"&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&lt;sequence ref="stockquote"/&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/filter&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- send the message
-on --&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;send/&gt;<br>
-&nbsp;&nbsp;&nbsp; &lt;/sequence&gt;<br>
-<br>
-&nbsp; &lt;/definitions&gt;<br>
-<br>
-&nbsp; &lt;rules&gt;<br>
-&nbsp; &nbsp;&nbsp; &nbsp;&lt;in&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- is this a custom
-stock quote message? --&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;filter
-xpath="//m0:CheckPriceRequest"
-xmlns:m0="http://www.apache-synapse.org/test"&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&lt;sequence ref="customrequest"/&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/filter&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- else, proceed as
-usual with the standard processing rules --&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;sequence
-ref="standardrequest"/&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/in&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;out&gt;<br>
-&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- is this a custom
-stock quote reply? --&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;filter
-source="get-property('correlate/label')" regex="customquote"&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&lt;sequence ref="customresponse"/&gt;<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/filter&gt;<br>
-<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;!-- just
-let the message flow through --&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &lt;send/&gt;<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&lt;/out&gt;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;<br>
-&nbsp; &lt;/rules&gt;<br>
-<br>
-&lt;/synapse&gt; <br>
+<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+  
+  &lt;definitions&gt;
+
+    &lt;sequence name="customrequest"&gt;
+    	&lt;!-- set the To address to the real endpoint --&gt;
+    	&lt;header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/&gt;
+    	
+    	&lt;!-- set correlation field to custom label --&gt;
+    	&lt;set-property name="correlate/label" value="customquote"/&gt;
+    	
+    	&lt;!-- transform the custom quote into a standard quote requst --&gt;
+    	&lt;transform xslt="file:synapse_repository/conf/sample/transform.xslt"/&gt;
+    	
+    	&lt;!-- send message to real endpoint and stop --&gt;
+    	&lt;send/&gt;
+    &lt;/sequence&gt;
+
+		&lt;sequence name="customresponse"&gt;
+    	&lt;!-- transform the custom quote into a standard quote requst --&gt;
+    	&lt;transform xslt="file:synapse_repository/conf/sample/transform_back.xslt"/&gt;
+    	
+    	&lt;!-- now send the custom response back to the client and stop --&gt;
+    	&lt;send/&gt;    	
+    &lt;/sequence&gt;
+    
+    &lt;sequence name="stockquote"&gt;
+    	&lt;!-- set the To address to the real endpoint --&gt;
+    	&lt;header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/&gt;
+    
+    	&lt;!-- check if the symbol is MSFT --&gt;
+      &lt;filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/"&gt;
+      	&lt;!-- if it is throw a fault --&gt;
+      	&lt;makefault&gt;
+      		&lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+      		&lt;reason value="Isn't there a Windows API for that?"/&gt;
+      	&lt;/makefault&gt;
+      &lt;/filter&gt;
+      
+      &lt;send/&gt;
+    &lt;/sequence&gt;
+    
+    &lt;sequence name="standardrequest"&gt;
+	  	&lt;!-- now log the message using log4j --&gt;
+	  	&lt;log level="full"/&gt;
+	  	
+	  	&lt;!-- Check if the URL matches the stockquote gateway/dumb case --&gt;
+	  	&lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+	  		&lt;sequence ref="stockquote"/&gt;
+	  	&lt;/filter&gt;
+	  	
+	  	&lt;!-- check if the URL matches the virtual url - 
+	  	either the proxy or ws-add case --&gt;
+			&lt;filter source="get-property('To')" regex="http://stockquote.*"&gt;
+	  		&lt;sequence ref="stockquote"/&gt;
+	  	&lt;/filter&gt;
+	  		  	
+	  	&lt;!-- send the message on --&gt;
+	  	&lt;send/&gt;
+    &lt;/sequence&gt;
+
+  &lt;/definitions&gt;
+
+  &lt;rules&gt;
+  	&lt;in&gt;
+	  	&lt;!-- is this a custom stock quote message? --&gt;
+	  	&lt;filter xpath="//m0:CheckPriceRequest" 
+	  	xmlns:m0="http://www.apache-synapse.org/test"&gt;
+	  		&lt;sequence ref="customrequest"/&gt;
+	  	&lt;/filter&gt;
+	  	
+	  	&lt;!-- else, proceed as usual with the standard processing rules --&gt;
+	  	&lt;sequence ref="standardrequest"/&gt;
+		&lt;/in&gt;
+		
+		&lt;out&gt;
+  		&lt;!-- is this a custom stock quote reply? --&gt;
+	  	&lt;filter source="get-property('correlate/label')" regex="customquote"&gt;
+	  		&lt;sequence ref="customresponse"/&gt;
+	  	&lt;/filter&gt;
+
+			&lt;!-- just let the message flow through --&gt;
+		  &lt;send/&gt;
+		&lt;/out&gt;		
+  &lt;/rules&gt;
+
+&lt;/synapse&gt; 
+</pre>
 <p>This example illustrates the correlation of incoming and outgoing
 messages and the use of the &lt;in&gt; and &lt;out&gt; mediators that
 simplify the mediation configuration. This example also shows how an
 XSLT transformation of a message may be performed on receipt or reply,
 and also how a SOAP fault message may be created when required. </p>
 <h3>Example 2. </h3>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;<br>  <br>  &lt;definitions&gt;<br>  <br>  	&lt;!-- define global properties --&gt;<br>  	&lt;set-property name="version" value="0.1"/&gt;<br>  <br>  	&lt;!-- define a reuseable endpoint definition and use it within config --&gt;<br>  	&lt;endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/&gt;<br><br>    &lt;sequence name="customrequest"&gt;<br>    	&lt;!-- is this a valid custom request ? --&gt;<br>    	&lt;validate schema="file:synapse_repository/conf/sample/validate.xsd"&gt;<br>		    &lt;on-fail&gt;<br>		    	&lt;!-- if the request does not validate againt schema throw a fault --&gt;<br>	      	&lt;makefault&gt;<br>	      		&lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;<br>	      		&lt;reason value="Invalid custom quote request"/&gt;<br>	      	&lt;/makefault&gt;<br>	      	<br>	      	&lt;!-- send the fault and stop processing --&gt;<br>	      	&lt;send/&gt;<br>		    &lt;/on-fail&gt;<br>		  &lt;/validate&gt;<br><br>  		&lt;switch source="//m0:CheckPriceRequest/m0:Code" xmlns:m0="http://www.apache-synapse.org/test"&gt;<br>		    &lt;case regex="IBM"&gt;<br>		    	&lt;set-property name="symbol" value="Great stock - IBM"/&gt;<br>		    &lt;/case&gt;<br>		    &lt;case regex="MSFT"&gt;<br>		      &lt;set-property name="symbol" value="Are you sure? - MSFT"/&gt;<br>		    &lt;/case&gt;<br>		    &lt;default&gt;<br>		      &lt;set-property name="symbol" expression="fn:concat('Normal Stock - ', //m0:CheckPriceRequest/m0:Code)" xmlns:m0="http://www.apache-synapse.org/test"/&gt;<br>		    &lt;/default&gt;<br>		  &lt;/switch&gt;<br>		  <br>		  &lt;!-- set a dynamic (local) message property --&gt;<br>		  <br>    <br>    	&lt;!-- set correlation field to custom label --&gt;<br>    	&lt;set-property name="correlate/label" value="customquote"/&gt;<br>    	<br>    	&lt;!-- transform the custom quote into a standard quote requst --&gt;<br>    	&lt;transform xslt="file:synapse_repository/conf/sample/transform.xslt"/&gt;<br>    	<br>    	&lt;log level="custom"&gt;<br>    		&lt;property name="Text" value="Sending quote request"/&gt;<br>    		&lt;property name="version" expression="get-property('version')"/&gt;<br>    		&lt;property name="symbol" expression="get-property('symbol')"/&gt;<br>    	&lt;/log&gt;<br>    	<br>    	&lt;!-- send message to real endpoint referenced by name "invesbot" and stop --&gt;<br>    	&lt;send&gt;<br>    		&lt;endpoint ref="invesbot"/&gt;<br>    	&lt;/send&gt;<br>    &lt;/sequence&gt;<br><br>		&lt;sequence name="customresponse"&gt;<br>    	&lt;!-- transform the custom quote into a standard quote requst --&gt;<br>    	&lt;transform xslt="file:synapse_repository/conf/sample/transform_back.xslt"/&gt;<br>    	<br>    	&lt;!-- now send the custom response back to the client and stop --&gt;<br>    	&lt;send/&gt;    	<br>    &lt;/sequence&gt;<br>    <br>    &lt;sequence name="stockquote"&gt;<br>    	&lt;!-- set the To address to the real endpoint --&gt;<br>    	&lt;header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/&gt;<br>    <br>    	&lt;!-- check if the symbol is MSFT --&gt;<br>      &lt;filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/"&gt;<br>      	&lt;!-- if it is throw a fault --&gt;<br>      	&lt;makefault&gt;<br>      		&lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;<br>      		&lt;reason value="Isn't there a Windows API for that?"/&gt;<br>      	&lt;/makefault&gt;<br>      &lt;/filter&gt;<br>      <br>      &lt;send/&gt;<br>    &lt;/sequence&gt;<br>    <br>    &lt;sequence name="standardrequest"&gt;<br>	  	&lt;!-- now log the message using log4j --&gt;<br>	  	&lt;log level="full"/&gt;<br>	  	<br>	  	&lt;!-- Check if the URL matches the stockquote gateway/dumb case --&gt;<br>	  	&lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;<br>	  		&lt;sequence ref="stockquote"/&gt;<br>	  	&lt;/filter&gt;<br>	  	<br>	  	&lt;!-- check if the URL matches the virtual url - either the proxy or ws-add case --&gt;<br>			&lt;filter source="get-property('To')" regex="http://stockquote.*"&gt;<br>	  		&lt;sequence ref="stockquote"/&gt;<br>	  	&lt;/filter&gt;<br>	  		  	<br>	  	&lt;!-- send the message on --&gt;<br>	  	&lt;send/&gt;<br>    &lt;/sequence&gt;<br><br>  &lt;/definitions&gt;<br><br>  &lt;rules&gt;<br>  	&lt;in&gt;<br>	  	&lt;!-- is this a custom stock quote message? --&gt;<br>	  	&lt;filter xpath="//m0:CheckPriceRequest" xmlns:m0="http://www.apache-synapse.org/test"&gt;<br>	  		&lt;sequence ref="customrequest"/&gt;<br>	  	&lt;/filter&gt;<br>	  	<br>	  	&lt;!-- else, proceed as usual with the standard processing rules --&gt;<br>	  	&lt;sequence ref="standardrequest"/&gt;<br>		&lt;/in&gt;<br>		<br>		&lt;out&gt;<br>  		&lt;!-- is this a custom stock quote reply? --&gt;<br>	  	&lt;filter source="get-property('correlate/label')" regex="customquote"&gt;<br>	  		&lt;sequence ref="customresponse"/&gt;<br>	  	&lt;/filter&gt;<br><br>			&lt;!-- just let the message flow through --&gt;<br>		  &lt;send/&gt;<br>		&lt;/out&gt;		<br>  &lt;/rules&gt;<br><br>&lt;/synapse&gt;  <br>
+<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+  
+  &lt;definitions&gt;
+  
+  	&lt;!-- define global properties --&gt;
+  	&lt;set-property name="version" value="0.1"/&gt;
+  
+  	&lt;!-- define a reuseable endpoint definition and use it within config --&gt;
+  	&lt;endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/&gt;
+
+    &lt;sequence name="customrequest"&gt;
+    	&lt;!-- is this a valid custom request ? --&gt;
+    	&lt;validate schema="file:synapse_repository/conf/sample/validate.xsd"&gt;
+		    &lt;on-fail&gt;
+		    	&lt;!-- if the request does not validate againt schema throw a fault --&gt;
+	      	&lt;makefault&gt;
+	      		&lt;code value="tns:Receiver" 
+	      		xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+	      		&lt;reason value="Invalid custom quote request"/&gt;
+	      	&lt;/makefault&gt;
+	      	
+	      	&lt;!-- send the fault and stop processing --&gt;
+	      	&lt;send/&gt;
+		    &lt;/on-fail&gt;
+		  &lt;/validate&gt;
+
+  		&lt;switch source="//m0:CheckPriceRequest/m0:Code" 
+  		xmlns:m0="http://www.apache-synapse.org/test"&gt;
+		    &lt;case regex="IBM"&gt;
+		    	&lt;set-property name="symbol" value="Great stock - IBM"/&gt;
+		    &lt;/case&gt;
+		    &lt;case regex="MSFT"&gt;
+		      &lt;set-property name="symbol" value="Are you sure? - MSFT"/&gt;
+		    &lt;/case&gt;
+		    &lt;default&gt;
+		      &lt;set-property name="symbol" 
+		      expression="fn:concat('Normal Stock - ', //m0:CheckPriceRequest/m0:Code)" 
+		      xmlns:m0="http://www.apache-synapse.org/test"/&gt;
+		    &lt;/default&gt;
+		  &lt;/switch&gt;
+		  
+		  &lt;!-- set a dynamic (local) message property --&gt;
+		  
+    
+    	&lt;!-- set correlation field to custom label --&gt;
+    	&lt;set-property name="correlate/label" value="customquote"/&gt;
+    	
+    	&lt;!-- transform the custom quote into a standard quote requst --&gt;
+    	&lt;transform xslt="file:synapse_repository/conf/sample/transform.xslt"/&gt;
+    	
+    	&lt;log level="custom"&gt;
+    		&lt;property name="Text" value="Sending quote request"/&gt;
+    		&lt;property name="version" expression="get-property('version')"/&gt;
+    		&lt;property name="symbol" expression="get-property('symbol')"/&gt;
+    	&lt;/log&gt;
+    	
+    	&lt;!-- send message to real endpoint referenced by name "invesbot" and stop --&gt;
+    	&lt;send&gt;
+    		&lt;endpoint ref="invesbot"/&gt;
+    	&lt;/send&gt;
+    &lt;/sequence&gt;
+
+		&lt;sequence name="customresponse"&gt;
+    	&lt;!-- transform the custom quote into a standard quote requst --&gt;
+    	&lt;transform xslt="file:synapse_repository/conf/sample/transform_back.xslt"/&gt;
+    	
+    	&lt;!-- now send the custom response back to the client and stop --&gt;
+    	&lt;send/&gt;    	
+    &lt;/sequence&gt;
+    
+    &lt;sequence name="stockquote"&gt;
+    	&lt;!-- set the To address to the real endpoint --&gt;
+    	&lt;header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/&gt;
+    
+    	&lt;!-- check if the symbol is MSFT --&gt;
+      &lt;filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/"&gt;
+      	&lt;!-- if it is throw a fault --&gt;
+      	&lt;makefault&gt;
+      		&lt;code value="tns:Receiver" 
+      		xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+      		&lt;reason value="Isn't there a Windows API for that?"/&gt;
+      	&lt;/makefault&gt;
+      &lt;/filter&gt;
+      
+      &lt;send/&gt;
+    &lt;/sequence&gt;
+    
+    &lt;sequence name="standardrequest"&gt;
+	  	&lt;!-- now log the message using log4j --&gt;
+	  	&lt;log level="full"/&gt;
+	  	
+	  	&lt;!-- Check if the URL matches the stockquote gateway/dumb case --&gt;
+	  	&lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+	  		&lt;sequence ref="stockquote"/&gt;
+	  	&lt;/filter&gt;
+	  	
+	  	&lt;!-- check if the URL matches the virtual url - either the proxy or ws-add case --&gt;
+			&lt;filter source="get-property('To')" regex="http://stockquote.*"&gt;
+	  		&lt;sequence ref="stockquote"/&gt;
+	  	&lt;/filter&gt;
+	  		  	
+	  	&lt;!-- send the message on --&gt;
+	  	&lt;send/&gt;
+    &lt;/sequence&gt;
+
+  &lt;/definitions&gt;
+
+  &lt;rules&gt;
+  	&lt;in&gt;
+	  	&lt;!-- is this a custom stock quote message? --&gt;
+	  	&lt;filter xpath="//m0:CheckPriceRequest" xmlns:m0="http://www.apache-synapse.org/test"&gt;
+	  		&lt;sequence ref="customrequest"/&gt;
+	  	&lt;/filter&gt;
+	  	
+	  	&lt;!-- else, proceed as usual with the standard processing rules --&gt;
+	  	&lt;sequence ref="standardrequest"/&gt;
+		&lt;/in&gt;
+		
+		&lt;out&gt;
+  		&lt;!-- is this a custom stock quote reply? --&gt;
+	  	&lt;filter source="get-property('correlate/label')" regex="customquote"&gt;
+	  		&lt;sequence ref="customresponse"/&gt;
+	  	&lt;/filter&gt;
+
+			&lt;!-- just let the message flow through --&gt;
+		  &lt;send/&gt;
+		&lt;/out&gt;		
+  &lt;/rules&gt;
+
+&lt;/synapse&gt; 
 </pre>
 <p>This example adds onto the example 2 shown above and shows how the
 validate mediator could be used to perform message validation. This
@@ -458,9 +732,18 @@ and the synapse-extensions.jar into the &lt;SYNAPSE&gt;/lib folder for
 this excersice as the validation mediator extension is dependent on the
 Xerces parser. </p>
 <h3>Example 3. </h3>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring"&gt;
- &lt;definitions&gt;<br> &lt;spring:config name="springconfig" src="./../../repository/conf/sample/springsample.xml"/&gt;<br> &lt;/definitions&gt;<br>
- &lt;rules&gt;<br> &lt;spring:spring bean="springtest" config="springconfig"/&gt;<br> &lt;spring:spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/&gt;<br> &lt;/rules&gt;<br>&lt;/synapse&gt;<br>
+<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse" 
+	xmlns:spring="http://ws.apache.org/ns/synapse/spring"&gt;
+ &lt;definitions&gt;
+ &lt;spring:config name="springconfig" src="./../../repository/conf/sample/springsample.xml"/&gt;
+ &lt;/definitions&gt;
+
+ &lt;rules&gt;
+ &lt;spring:spring bean="springtest" config="springconfig"/&gt;
+ &lt;spring:spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/&gt;
+ &lt;/rules&gt;
+&lt;/synapse&gt;
+
 </pre>
 </body>
 </html>

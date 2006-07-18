@@ -1,0 +1,169 @@
+<axisconfig name="AxisJava2.0">
+    <!-- ================================================= -->
+    <!-- Parameters -->
+    <!-- ================================================= -->
+    <parameter name="hotdeployment" locked="false">true</parameter>
+    <parameter name="hotupdate" locked="false">false</parameter>
+    <parameter name="enableMTOM" locked="false">true</parameter>
+
+    <!--During a fault, stacktrace can be sent with the fault message. The following flag will control -->
+    <!--that behaviour.-->
+    <parameter name="sendStacktraceDetailsWithFaults" locked="false">true</parameter>
+
+    <!--If there aren't any information available to find out the fault reason, we set the message of the expcetion-->
+    <!--as the faultreason/Reason. But when a fault is thrown from a service or some where, it will be -->
+    <!--wrapped by different levels. Due to this the initial exception message can be lost. If this flag-->
+    <!--is set then, Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
+    <parameter name="DrillDownToRootCauseForFaultReason" locked="false">false</parameter>
+
+    <!-- Uncomment this to enable REST support -->
+    <!--    <parameter name="enableREST" locked="false">true</parameter>-->
+
+    <!--This is the user name and password of admin console-->
+    <parameter name="userName" locked="false">admin</parameter>
+    <parameter name="password" locked="false">axis2</parameter>
+    
+    
+    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
+    
+
+    <!-- ================================================= -->
+    <!-- Message Receivers -->
+    <!-- ================================================= -->
+    <!--This is the Deafult Message Receiver for the system , if you want to have MessageReceivers for -->
+    <!--all the other MEP implement it and add the correct entry to here , so that you can refer from-->
+    <!--any operation -->
+    <!--Note : You can ovride this for particular service by adding the same element with your requirement-->
+    <messageReceivers>
+        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+    </messageReceivers>
+    <!-- ================================================= -->
+    <!-- Transport Ins -->
+    <!-- ================================================= -->
+    <transportReceiver name="http"
+                       class="org.apache.axis2.transport.http.SimpleHTTPServer">
+        <parameter name="port" locked="false">6060</parameter>
+        <!--If you want to give your own host address for EPR generation-->
+        <!--uncommet following paramter , and set as you required.-->
+        <!--<parameter name="hostname" locked="false">http://myApp.com/ws</parameter>-->
+    </transportReceiver>
+
+    <transportReceiver name="tcp"
+                       class="org.apache.axis2.transport.tcp.TCPServer">
+        <parameter name="port" locked="false">6061</parameter>
+        <!--If you want to give your own host address for EPR generation-->
+        <!--uncommet following paramter , and set as you required.-->
+        <!--<parameter name="hostname" locked="false">tcp://myApp.com/ws</parameter>-->
+    </transportReceiver>
+
+    <!-- ================================================= -->
+    <!-- Transport Outs -->
+    <!-- ================================================= -->
+
+    <transportSender name="tcp"
+                     class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
+    <transportSender name="local"
+                     class="org.apache.axis2.transport.local.LocalTransportSender"/>
+    <transportSender name="jms"
+                     class="org.apache.axis2.transport.jms.JMSSender"/>
+    <transportSender name="http"
+                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+        <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
+        <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
+    </transportSender>
+    <transportSender name="https"
+                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+        <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
+        <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
+    </transportSender>
+
+    <module ref="addressing" />
+
+    <!-- ================================================= -->
+    <!-- Phases  -->
+    <!-- ================================================= -->
+    <phaseOrder type="inflow">
+        <!--  System pre defined phases       -->
+         <phase name="Transport">
+            <handler name="RequestURIBasedDispatcher"
+                     class="org.apache.axis2.engine.RequestURIBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            <handler name="SOAPActionBasedDispatcher"
+                     class="org.apache.axis2.engine.SOAPActionBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+        </phase>
+        <phase name="Security"/>
+        <phase name="PreDispatch"/>
+        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
+            <handler name="AddressingBasedDispatcher"
+                     class="org.apache.axis2.engine.AddressingBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="SOAPMessageBodyBasedDispatcher"
+                     class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            <handler name="InstanceDispatcher"
+                     class="org.apache.axis2.engine.InstanceDispatcher">
+                <order phase="PostDispatch"/>
+            </handler>
+        </phase>
+        <!--  System pre defined phases       -->
+        <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
+        <phase name="RMPhase"/>
+        <phase name="OperationInPhase"/>
+    </phaseOrder>
+    <phaseOrder type="outflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="OperationOutPhase"/>
+        <phase name="RMPhase"/>
+        <!--system predefined phase-->
+        <!--these phase will run irrespective of the service-->
+        <phase name="PolicyDetermination"/>
+        <phase name="MessageOut"/>
+    </phaseOrder>
+    <phaseOrder type="INfaultflow">
+        <phase name="PreDispatch"/>
+        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
+            <handler name="RequestURIBasedDispatcher"
+                     class="org.apache.axis2.engine.RequestURIBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="SOAPActionBasedDispatcher"
+                     class="org.apache.axis2.engine.SOAPActionBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="AddressingBasedDispatcher"
+                     class="org.apache.axis2.engine.AddressingBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
+            <handler name="SOAPMessageBodyBasedDispatcher"
+                     class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            <handler name="InstanceDispatcher"
+                     class="org.apache.axis2.engine.InstanceDispatcher">
+                <order phase="PostDispatch"/>
+            </handler>
+        </phase>
+        <!--      user can add his own phases to this area  -->
+        <phase name="RMPhase"/>
+        <phase name="OperationInFaultPhase"/>
+    </phaseOrder>
+    <phaseOrder type="Outfaultflow">
+        <!--      user can add his own phases to this area  -->
+        <phase name="OperationOutFaultPhase"/>
+        <phase name="RMPhase"/>
+        <phase name="PolicyDetermination"/>
+        <phase name="MessageOut"/>
+    </phaseOrder>
+</axisconfig>

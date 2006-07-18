@@ -8,7 +8,7 @@
         <item name="Source Code" href="http://svn.apache.org/viewcvs.cgi/incubator/synapse/trunk/java/"/>
       </item>
       <item name="Documentation">
-      	<item name="Synapse configuration language and syntax" href="http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage"/>
+      	<item name="Synapse configuration language and syntax" href="Synapse_Configuration_Language.html"/>
         <item name="User Guide" href="userguide.html"/>
         <item name="Extending Synapse" href="extending_synapse.html"/>
       </item>

@@ -27,6 +27,8 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Adds the SequenceFault header block.
@@ -42,7 +44,9 @@ public class SequenceFault implements IOMRMElement {
 
 	public SequenceFault(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -56,13 +60,16 @@ public class SequenceFault implements IOMRMElement {
 
 		if (body == null || !(body instanceof SOAPBody))
 			throw new OMException(
-					"Cant get Sequence Fault part from a non-header element");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
 
 		OMElement sequenceFaultPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT));
 
 		if (sequenceFaultPart == null)
-			throw new OMException("The passed element does not contain a Sequence Fault element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noSeqFaultInElement,
+					body.toString()));
 
 		OMElement faultCodePart = sequenceFaultPart
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
@@ -78,7 +85,8 @@ public class SequenceFault implements IOMRMElement {
 	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody))
-			throw new OMException("Cant get Sequence Fault part from a non-header element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
 
 		OMFactory factory = body.getOMFactory();
 		if (factory==null)

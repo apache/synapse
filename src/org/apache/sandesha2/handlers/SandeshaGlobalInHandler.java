@@ -39,6 +39,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -56,36 +58,38 @@ import org.apache.sandesha2.wsrm.Sequence;
 public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	private static final long serialVersionUID = -7187928423123306156L;
-  
-  private static final Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
+
+	private static final Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
 
 	public void invoke(MessageContext msgContext) throws AxisFault {
 
-    if (log.isDebugEnabled())
-      log.debug("Enter: SandeshaGlobalInHandler::msgContext, " + msgContext.getEnvelope().getHeader());
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaGlobalInHandler::msgContext, " + msgContext.getEnvelope().getHeader());
 
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 		if (configContext == null)
-			throw new AxisFault("Configuration context is not set");
+			throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet));
 
 		SOAPEnvelope envelope = msgContext.getEnvelope();
 		if (envelope == null)
-			throw new SandeshaException("SOAP envelope is not set");
-		
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.soapEnvNotSet));
+
 		String reinjectedMessage = (String) msgContext.getProperty(Sandesha2Constants.REINJECTED_MESSAGE);
-		if (reinjectedMessage!=null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage))
-			return;  //Reinjected messages are not processed by Sandesha2 inflow handlers
-		
+		if (reinjectedMessage != null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage))
+			return; // Reinjected messages are not processed by Sandesha2 inflow
+					// handlers
+
 		StorageManager storageManager = null;
 		try {
-			storageManager = SandeshaUtil.getSandeshaStorageManager(configContext,configContext.getAxisConfiguration());
-			if (storageManager==null) {
-				log.debug ("Sandesha2 cannot proceed. The StorageManager is not available");
+			storageManager = SandeshaUtil
+					.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
+			if (storageManager == null) {
+				log.debug("Sandesha2 cannot proceed. The StorageManager is not available");
 				return;
 			}
 		} catch (SandeshaException e1) {
-			//TODO make this a log
-			log.debug ("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager");
+			// TODO make this a log
+			log.debug("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager");
 			return;
 		}
 
@@ -132,7 +136,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 									AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
 
 									// reporting the fault
-//									log.error(axisFault);
+									// log.error(axisFault);
 									if (faultCallback != null) {
 										faultCallback.onError(axisFault);
 									}
@@ -142,9 +146,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 								// stopping the fault from going further and
 								// getting dispatched
 								msgContext.pause(); // TODO let this go in the
-													// last try
-                if (log.isDebugEnabled())
-                  log.debug("Exit: SandeshaGlobalInHandler::msgContext");
+								// last try
+								if (log.isDebugEnabled())
+									log.debug("Exit: SandeshaGlobalInHandler::msgContext");
 
 								return;
 							}
@@ -157,19 +161,19 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			// RM.
 			boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 			if (!isRMGlobalMessage) {
-        if (log.isDebugEnabled())
-          log.debug("Exit: SandeshaGlobalInHandler::msgContext, !isRMGlobalMessage");
+				if (log.isDebugEnabled())
+					log.debug("Exit: SandeshaGlobalInHandler::msgContext, !isRMGlobalMessage");
 				return;
 			}
 
 			RMMsgContext rmMessageContext = MsgInitializer.initializeMessage(msgContext);
 
 			// Dropping duplicates
-			boolean dropped = dropIfDuplicate(rmMessageContext,storageManager);
+			boolean dropped = dropIfDuplicate(rmMessageContext, storageManager);
 			if (dropped) {
-				processDroppedMessage(rmMessageContext,storageManager);
-        if (log.isDebugEnabled())
-          log.debug("Exit: SandeshaGlobalInHandler::msgContext, dropped");
+				processDroppedMessage(rmMessageContext, storageManager);
+				if (log.isDebugEnabled())
+					log.debug("Exit: SandeshaGlobalInHandler::msgContext, dropped");
 				return;
 			}
 
@@ -186,44 +190,44 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 
 		} catch (Exception e) {
-			//message should not be sent in a exception situation.
+			// message should not be sent in a exception situation.
 			msgContext.pause();
-			
+
 			if (!withinTransaction) {
 				try {
 					transaction.rollback();
 					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 					rolebacked = true;
 				} catch (Exception e1) {
-					String message = "Exception thrown when trying to roleback the transaction.";
-					log.debug(message,e);
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
+					log.debug(message, e);
 				}
 			}
-			
-			String message = "Sandesha2 got an exception when processing the in message";
-      if (log.isDebugEnabled())
-        log.debug("Exit: SandeshaGlobalInHandler::msgContext " ,e);
-			throw new AxisFault (message,e);
+
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaGlobalInHandler::msgContext ", e);
+			throw new AxisFault(message, e);
 		} finally {
 			if (!withinTransaction && !rolebacked) {
 				try {
 					transaction.commit();
 					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				} catch (Exception e) {
-					String message = "Exception thrown when trying to commit the transaction.";
-					log.debug(message,e);
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
+					log.debug(message, e);
 				}
 			}
 		}
-    if (log.isDebugEnabled())
-      log.debug("Exit: SandeshaGlobalInHandler::msgContext");
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaGlobalInHandler::msgContext");
 	}
 
-	private boolean dropIfDuplicate(RMMsgContext rmMsgContext,StorageManager storageManager) throws SandeshaException {
-    if (log.isDebugEnabled())
-      log.debug("Enter: SandeshaGlobalInHandler::dropIfDuplicate");
+	private boolean dropIfDuplicate(RMMsgContext rmMsgContext, StorageManager storageManager) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaGlobalInHandler::dropIfDuplicate");
 
-    boolean drop = false;
+		boolean drop = false;
 
 		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
@@ -264,7 +268,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 					if (emptyBody) {
 						if (sequence.getLastMessage() != null) {
-							log.debug ("Empty Body LastMessage Received");
+							log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
 							drop = true;
 
 							if (receivedMsgsBean == null) {
@@ -286,7 +290,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							seqPropMgr.update(receivedMsgsBean);
 
 							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
-							ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr,storageManager);
+							ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
 
 						}
 					}
@@ -311,7 +315,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				// I.e. both not having a op. ctx not and not having a op. ctx
 				// in the global list.
 				if (operationContext == null && operationContextFromMap == null) {
-					String message = "Dropping duplicate RM message";
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.droppingDuplicate);
 					log.debug(message);
 					drop = true;
 				}
@@ -320,21 +324,24 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		if (drop) {
 			rmMsgContext.getMessageContext().pause();
-      if (log.isDebugEnabled())
-        log.debug("Exit: SandeshaGlobalInHandler::dropIfDuplicate, true");
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.droppingDuplicate);
+			log.debug(message);
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaGlobalInHandler::dropIfDuplicate, true");
 			return true;
 		}
 
-    if (log.isDebugEnabled())
-      log.debug("Exit: SandeshaGlobalInHandler::dropIfDuplicate, false");
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaGlobalInHandler::dropIfDuplicate, false");
 		return false;
 	}
 
-	private void processDroppedMessage(RMMsgContext rmMsgContext, StorageManager storageManager) throws SandeshaException {
-    if (log.isDebugEnabled())
-      log.debug("Enter: SandeshaGlobalInHandler::processDroppedMessage");
+	private void processDroppedMessage(RMMsgContext rmMsgContext, StorageManager storageManager)
+			throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaGlobalInHandler::processDroppedMessage");
 
-    if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			String sequenceId = null;
 
@@ -350,11 +357,11 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
 			// Even though the duplicate message is dropped, hv to send the ack
 			// if needed.
-			ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr,storageManager);
+			ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
 
 		}
-    if (log.isDebugEnabled())
-      log.debug("Exit: SandeshaGlobalInHandler::processDroppedMessage");
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaGlobalInHandler::processDroppedMessage");
 	}
 
 	private void doGlobalProcessing(RMMsgContext rmMsgCtx) throws SandeshaException {
@@ -372,9 +379,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		return new QName(Sandesha2Constants.GLOBAL_IN_HANDLER_NAME);
 	}
 
-	private AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart) {		
-        AxisFault axisFault = new AxisFault(faultPart.getCode(), faultPart.getReason(),
-        		faultPart.getNode(), faultPart.getRole(), faultPart.getDetail());
+	private AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart) {
+		AxisFault axisFault = new AxisFault(faultPart.getCode(), faultPart.getReason(), faultPart.getNode(), faultPart
+				.getRole(), faultPart.getDetail());
 
 		return axisFault;
 	}

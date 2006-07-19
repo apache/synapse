@@ -28,6 +28,8 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represent the CreateSequence body element.
@@ -49,7 +51,9 @@ public class CreateSequence implements IOMRMPart {
 	
 	public CreateSequence(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					rmNamespaceValue));
 		
 		this.defaultFactory = factory;
 		this.rmNamespaceValue = rmNamespaceValue;
@@ -71,7 +75,9 @@ public class CreateSequence implements IOMRMPart {
 				.getFirstChildWithName(new QName(rmNamespaceValue,
 						                         Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		if (createSequencePart == null)
-			throw new OMException("Create sequence is not present in the passed element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noCreateSeqPartInElement,
+					bodyElement.toString()));
 		
 		acksTo = new AcksTo(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
 		acksTo.fromOMElement(createSequencePart);
@@ -97,10 +103,12 @@ public class CreateSequence implements IOMRMPart {
 	public OMElement toOMElement(OMElement bodyElement) throws OMException {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
-			throw new OMException("Cant add Create Sequence Part to a non-body element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.createSeqCannotBeAddedToNonBody));
 
 		if (acksTo == null)
-			throw new OMException("Cant add create seqeunce part, having acks to as null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.createSeqNullAcksTo));
 
 		SOAPBody soapBody = (SOAPBody) bodyElement;
 		

@@ -30,6 +30,8 @@ import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.StorageManager;
@@ -46,7 +48,7 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	private static final long serialVersionUID = 733210926016820857L;
 
-  private static final Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
+	private static final Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
 
 	public QName getName() {
 		return new QName(Sandesha2Constants.IN_HANDLER_NAME);
@@ -54,12 +56,12 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
 
-    if (log.isDebugEnabled())
-      log.debug("Enter: SandeshaInHandler::invoke, " + msgCtx.getEnvelope().getHeader());
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaInHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 
 		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null) {
-			String message = "ConfigurationContext is null";
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
 			log.debug(message);
 			throw new AxisFault(message);
 		}
@@ -69,14 +71,14 @@ public class SandeshaInHandler extends AbstractHandler {
 			return;
 
 		String reinjectedMessage = (String) msgCtx.getProperty(Sandesha2Constants.REINJECTED_MESSAGE);
-		if (reinjectedMessage!=null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage))
-    {
-      if (log.isDebugEnabled())
-        log.debug("Exit: SandeshaInHandler::invoke, reinjectedMessage" );
-			return;  //Reinjected messages are not processed by Sandesha2 inflow handlers
-    }
-		
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
+		if (reinjectedMessage != null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaInHandler::invoke, reinjectedMessage");
+			return; // Reinjected messages are not processed by Sandesha2 inflow
+					// handlers
+		}
+
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
 		boolean withinTransaction = false;
 		String withinTransactionStr = (String) msgCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
@@ -95,7 +97,7 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
-				String message = "AxisService is null";
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);
 				log.debug(message);
 				throw new AxisFault(message);
 			}
@@ -104,14 +106,13 @@ public class SandeshaInHandler extends AbstractHandler {
 			try {
 				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 			} catch (SandeshaException ex) {
-				String message = "Cant initialize the message";
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInnitMessage);
 				log.debug(message);
 				throw new AxisFault(message);
 			}
-			
-			
-			//validating the message
-			MessageValidator.validateMessage(rmMsgCtx,storageManager);
+
+			// validating the message
+			MessageValidator.validateMessage(rmMsgCtx, storageManager);
 
 			MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 
@@ -119,41 +120,41 @@ public class SandeshaInHandler extends AbstractHandler {
 				if (msgProcessor != null)
 					msgProcessor.processInMessage(rmMsgCtx);
 			} catch (SandeshaException se) {
-				String message = "Error in processing the message";
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgError, se.toString());
 				log.debug(message, se);
 				throw new AxisFault(message, se);
 			}
 
 		} catch (Exception e) {
-			//message should not be sent in a exception situation.
+			// message should not be sent in a exception situation.
 			msgCtx.pause();
-			
+
 			if (!withinTransaction) {
 				try {
 					transaction.rollback();
 					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 					rolebacked = true;
 				} catch (Exception e1) {
-					String message = "Exception thrown when trying to roleback the transaction.";
-					log.debug(message,e);
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
+					log.debug(message, e);
 				}
 			}
-			
-			String message = "Sandesha2 got an exception when processing the in message";
-			throw new AxisFault (message,e);
+
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
+			throw new AxisFault(message, e);
 		} finally {
 			if (!withinTransaction && !rolebacked) {
 				try {
 					transaction.commit();
 					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				} catch (Exception e) {
-					String message = "Exception thrown when trying to commit the transaction.";
-					log.debug(message,e);
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
+					log.debug(message, e);
 				}
 			}
 		}
-    if (log.isDebugEnabled())
-      log.debug("Exit: SandeshaInHandler::invoke" );
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaInHandler::invoke");
 	}
 
 }

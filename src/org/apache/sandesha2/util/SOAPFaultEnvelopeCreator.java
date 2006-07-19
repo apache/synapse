@@ -35,6 +35,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.FaultData;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
@@ -128,7 +130,8 @@ public class SOAPFaultEnvelopeCreator {
 
 		SOAPEnvelope faultMsgEnvelope = faultMsgContext.getEnvelope();
 		if (faultMsgEnvelope == null)
-			throw new SandeshaException("SOAP Envelope is null");
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.soapEnvNotSet));
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(faultMsgEnvelope));
@@ -180,14 +183,17 @@ public class SOAPFaultEnvelopeCreator {
 
 		SOAPEnvelope faultEnvelope = faultMsgContext.getEnvelope();
 		if (faultEnvelope == null)
-			throw new SandeshaException("SOAP Envelope is null");
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.soapEnvNotSet));
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
 				.getSOAPVersion(faultEnvelope));
 
 		SOAPFault fault = faultEnvelope.getBody().getFault();
 		if (fault == null)
-			throw new SandeshaException("Fault part is null");
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noFaultCode,
+					faultEnvelope.toString()));
 
 		SOAPFaultCode faultCode = fault.getCode();
 		SOAPFaultValue codeValue = faultCode.getValue();

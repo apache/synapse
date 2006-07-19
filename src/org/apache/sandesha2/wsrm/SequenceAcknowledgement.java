@@ -33,6 +33,8 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 
 /**
@@ -52,7 +54,9 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	
 	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.namespaceValue = namespaceValue;
 		this.defaultFactory = factory;
@@ -67,14 +71,16 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 
 		if (element == null || !(element instanceof SOAPHeader))
-			throw new OMException("Cant get sequence acknowlegement from a non-header element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.seqAckNonHeader));
 
 		SOAPHeader header = (SOAPHeader) element;
 		OMElement sequenceAckPart = header.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
 
 		if (sequenceAckPart == null)
-			throw new OMException("The passed element does not contain a seqence ackknowledgement Part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.seqAckPartIsNull));
 
 		OMFactory factory = element.getOMFactory();
 		if (factory==null)
@@ -145,7 +151,9 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		if (identifier == null)
 			throw new OMException(
-					"Cant set the sequence since Identifier is null");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.invalidIdentifier,
+							header.toString()));
 
 		sequenceAcknowledgementHeaderBlock.setMustUnderstand(isMustUnderstand());
 		identifier.toOMElement(sequenceAcknowledgementHeaderBlock);
@@ -172,15 +180,19 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		
 		if (ackNone!=null) {
 			if (!SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
-				throw new SandeshaException ("The given namespace does not allow the 'None' part to be added to the sequenceAcknowledgement element");
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.noneNotAllowedNamespace,
+						rmSpecVersion));
 			}
 			
 			if (acknowledgementRangeList.size()>0) {
-				throw new SandeshaException ("The 'None' element cannot be present when there are acknowledgement range elements under the sequenceAcknowledgement");
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.noneNotAllowedAckRangesPresent));
 			}
 			
 			if (nackList.size()>0) {
-				throw new SandeshaException ("The 'None' element cannot be present when there are Nack elements under the sequenceAcknowledgement");
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.noneNotAllowedNackPresent));
 			}
 			
 			ackNone.toOMElement(sequenceAcknowledgementHeaderBlock);
@@ -188,11 +200,13 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		
 		if (ackFinal!=null) {
 			if (!SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
-				throw new SandeshaException ("The given namespace does not allow the 'Final' part to be added to the sequenceAcknowledgement element");
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.finalNotAllowedNamespace));
 			}
 			
 			if (nackList.size()>0) {
-				throw new SandeshaException ("The 'Final' element cannot be present when there are Nack elements under the sequenceAcknowledgement");
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.cannotHaveFinalWithNack));
 			}
 			
 			ackFinal.toOMElement(sequenceAcknowledgementHeaderBlock);

@@ -27,6 +27,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -56,7 +58,8 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 
 	public synchronized boolean insert(SenderBean bean) throws SandeshaStorageException {
 		if (bean.getMessageID() == null)
-			throw new SandeshaStorageException("Key (MessageId) is null. Cant insert.");
+			throw new SandeshaStorageException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullMsgId));
 		table.put(bean.getMessageID(), bean);
 		return true;
 	}
@@ -206,7 +209,8 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	public synchronized SenderBean findUnique(SenderBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
-			String message = "Non-Unique result";
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nonUniqueResult);
 			log.error(message);
 			throw new SandeshaException (message);
 		}

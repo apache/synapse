@@ -28,6 +28,8 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Adds the Terminate Sequence body part.
@@ -43,7 +45,9 @@ public class TerminateSequence implements IOMRMPart {
 	
 	public TerminateSequence(SOAPFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -56,13 +60,16 @@ public class TerminateSequence implements IOMRMPart {
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
 
 		if (!(body instanceof SOAPBody))
-			throw new OMException("Cant add terminate sequence to a non body element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.terminateSeqCannotBeAddedToNonBody));
 
 		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 
 		if (terminateSeqPart == null)
-			throw new OMException("passed element does not contain a terminate sequence part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noTerminateSeqInElement,
+					body.toString()));
 
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(terminateSeqPart);
@@ -73,10 +80,12 @@ public class TerminateSequence implements IOMRMPart {
 	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody))
-			throw new OMException("Cant add terminate sequence to a nonbody element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.terminateSeqCannotBeAddedToNonBody));
 
 		if (identifier == null)
-			throw new OMException("Cant add terminate sequence since identifier is not set");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullMsgId));
 
 		OMFactory factory= body.getOMFactory();
 		if (factory==null)

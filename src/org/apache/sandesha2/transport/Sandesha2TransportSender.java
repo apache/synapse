@@ -29,6 +29,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -48,14 +50,16 @@ public class Sandesha2TransportSender implements TransportSender  {
 		TransportOutDescription transportOut = (TransportOutDescription) msgContext.getProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC);
 		
 		if (transportOut==null)
-			throw new SandeshaException ("Original transport sender is not present");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.transportOutNotPresent));
 
 		msgContext.setTransportOut(transportOut);
 		
 		String key =  (String) msgContext.getProperty(Sandesha2Constants.MESSAGE_STORE_KEY);
 		
 		if (key==null)
-			throw new SandeshaException ("Cant store message without the storage key");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotGetStorageKey));
 		
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 		AxisConfiguration axisConfiguration = configurationContext.getAxisConfiguration();

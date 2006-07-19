@@ -26,6 +26,8 @@ import org.apache.axis2.modules.Module;
 import org.apache.axis2.modules.ModulePolicyExtension;
 import org.apache.axis2.modules.PolicyExtension;
 import org.apache.log4j.Logger;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.RMPolicyExtension;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -47,6 +49,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 		//storing the Sadesha module as a property.
 		configContext.setProperty(Sandesha2Constants.MODULE_CLASS_LOADER,module.getModuleClassLoader());
+
+		//init the i18n messages
+		SandeshaMessageHelper.innit();
 		
 		// continueUncompletedSequences (storageManager,configCtx);
 
@@ -68,7 +73,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			StorageManager inMemorytorageManager = SandeshaUtil.getInMemoryStorageManager(configContext);
 			inMemorytorageManager.initStorage(module);
 		} catch (SandeshaStorageException e) {
-			String message = "Cannot initialize the given in-memory storage manager.";
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotInitInMemoryStorageManager,
+					e.toString());
 			log.debug(message,e);
 		}
 		
@@ -76,7 +83,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			StorageManager permanentStorageManager = SandeshaUtil.getPermanentStorageManager(configContext);
 			permanentStorageManager.initStorage(module);
 		} catch (SandeshaStorageException e) {
-			String message = "Cannot initialize the given persistent storage manager.";
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotInitPersistentStorageManager,
+					e.toString());
 			log.debug(message,e);
 		}
 	}
@@ -85,7 +94,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		
 		SandeshaPropertyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription);
 		if (parentPropertyBean==null) 
-			throw new AxisFault ("Default Property Bean is not set");
+			throw new AxisFault (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
 		SandeshaPropertyBean axisDescPropertyBean = PropertyManager.loadPropertiesFromAxisDescription(axisDescription,parentPropertyBean);
 		

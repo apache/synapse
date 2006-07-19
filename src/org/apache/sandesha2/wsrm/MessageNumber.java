@@ -25,6 +25,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an MessageNumber element.
@@ -40,7 +42,9 @@ public class MessageNumber implements IOMRMElement {
 	
 	public MessageNumber(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -53,11 +57,13 @@ public class MessageNumber implements IOMRMElement {
 		this.messageNumber = messageNumber;
 	}
 	
-	public Object fromOMElement(OMElement seqenceElement) throws OMException {
-		OMElement msgNumberPart = seqenceElement.getFirstChildWithName( 
+	public Object fromOMElement(OMElement sequenceElement) throws OMException {
+		OMElement msgNumberPart = sequenceElement.getFirstChildWithName( 
 				new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
 		if (msgNumberPart==null)
-			throw new OMException ("The passed sequnce element does not contain a message number part");
+			throw new OMException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noMessageNumberPartInElement,
+					sequenceElement.toString()));
 		
 		String msgNoStr = msgNumberPart.getText();
 		messageNumber = Long.parseLong(msgNoStr);
@@ -66,7 +72,9 @@ public class MessageNumber implements IOMRMElement {
 	
 	public OMElement toOMElement(OMElement element) throws OMException {
 		if (messageNumber <= 0 ){
-			throw new OMException("Set A Valid Message Number");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.setAValidMsgNumber,
+					Long.toString(messageNumber)));
 		}
 		
 		OMFactory factory = element.getOMFactory();

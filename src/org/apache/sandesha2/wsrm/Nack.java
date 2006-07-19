@@ -24,6 +24,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an Nack element.
@@ -39,7 +41,9 @@ public class Nack implements IOMRMElement {
 		
 	public Nack(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -53,12 +57,14 @@ public class Nack implements IOMRMElement {
 	public Object fromOMElement(OMElement nackElement) throws OMException{
 		
 		if (nackElement==null)
-			throw new OMException ("Passed seq ack element does not contain a nack part");
+			throw new OMException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullPassedElement));
 		
 		try {
 			nackNumber = Long.parseLong(nackElement.getText());
 		}catch (Exception ex ) {
-			throw new OMException ("Nack element does not contain a valid long value");
+			throw new OMException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nackDoesNotContainValidLongValue));
 		}
 		
 		return this;
@@ -66,10 +72,12 @@ public class Nack implements IOMRMElement {
 	
 	public OMElement toOMElement(OMElement sequenceAckElement) throws OMException {
 		if (sequenceAckElement==null)
-			throw new OMException ("Cant set the nack part since the seq ack element is null");
+			throw new OMException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noNackInSeqAckPart));
 		
 		if (nackNumber<=0)
-			throw new OMException ("Cant set the nack part since the nack number does not have a valid value");
+			throw new OMException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nackDoesNotContainValidLongValue));
 		
 		OMFactory factory = sequenceAckElement.getOMFactory();
 		if (factory==null)

@@ -26,6 +26,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represent the LastMessage element defined by the WSRM 1.0 epecification.
@@ -39,7 +41,9 @@ public class LastMessage implements IOMRMElement {
 	
 	public LastMessage(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -53,7 +57,9 @@ public class LastMessage implements IOMRMElement {
 		OMElement lastMessagePart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.LAST_MSG));
 		if (lastMessagePart == null)
-			throw new OMException("The passed element does not contain a Last Message part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noLastMessagePartInElement,
+					element.toString()));
 
 		return this;
 	}

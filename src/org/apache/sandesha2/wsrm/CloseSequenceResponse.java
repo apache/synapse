@@ -27,6 +27,8 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Adds the Close Sequence Response body part.
@@ -41,7 +43,9 @@ public class CloseSequenceResponse implements IOMRMPart {
 	
 	public CloseSequenceResponse(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -55,13 +59,16 @@ public class CloseSequenceResponse implements IOMRMPart {
 
 		if (!(body instanceof SOAPBody))
 			throw new OMException(
-					"Cant add 'close sequence response' to a non body element");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.closeSeqResponseCannotBeAddedToNonBody));
 
 		OMElement closeSeqResponsePart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE));
 
 		if (closeSeqResponsePart == null)
-			throw new OMException("passed element does not contain a 'close sequence response' part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noCloseSeqResponsePartInElement,
+					body.toString()));
 
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(closeSeqResponsePart);
@@ -73,11 +80,13 @@ public class CloseSequenceResponse implements IOMRMPart {
 
 		if (body == null || !(body instanceof SOAPBody))
 			throw new OMException(
-					"Cant add close sequence response to a nonbody element");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.closeSeqResponseCannotBeAddedToNonBody));
 
 		if (identifier == null)
 			throw new OMException(
-					"Cant add close sequence response since identifier is not set");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.closeSeqResponsePartNullID));
 
 		OMFactory factory = body.getOMFactory();
 		if (factory==null)

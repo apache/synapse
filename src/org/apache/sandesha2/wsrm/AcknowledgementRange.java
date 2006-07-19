@@ -26,6 +26,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents and AcknowledgementRange element.
@@ -43,7 +45,9 @@ public class AcknowledgementRange implements IOMRMElement {
 	
 	public AcknowledgementRange(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -56,7 +60,8 @@ public class AcknowledgementRange implements IOMRMElement {
 	public Object fromOMElement(OMElement ackRangePart) throws OMException {
 
 		if (ackRangePart == null)
-			throw new OMException("The passed element is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullPassedElement));
 
 		OMAttribute lowerAttrib = ackRangePart.getAttribute(new QName(
 				Sandesha2Constants.WSRM_COMMON.LOWER));
@@ -65,7 +70,9 @@ public class AcknowledgementRange implements IOMRMElement {
 
 		if (lowerAttrib == null || upperAttrib == null)
 			throw new OMException(
-					"Passed element does not contain upper or lower attributes");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.noUpperOrLowerAttributesInElement,
+							ackRangePart.toString()));
 
 		try {
 			long lower = Long.parseLong(lowerAttrib.getAttributeValue());
@@ -74,7 +81,9 @@ public class AcknowledgementRange implements IOMRMElement {
 			lowerValue = lower;
 		} catch (Exception ex) {
 			throw new OMException(
-					"The ack range does not have proper long values for Upper and Lower attributes");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.ackRandDoesNotHaveCorrectValues,
+							ackRangePart.toString()));
 		}
 
 		return this;
@@ -84,11 +93,14 @@ public class AcknowledgementRange implements IOMRMElement {
 			throws OMException {
 
 		if (sequenceAckElement == null)
-			throw new OMException("Cant set Ack Range part since element is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotSetAckRangeNullElement));
 
 		if (upperValue <= 0 || lowerValue <= 0 || lowerValue > upperValue)
 			throw new OMException(
-					"Cant set Ack Range part since Upper or Lower is not set to the correct value");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.ackRandDoesNotHaveCorrectValues,
+							upperValue + ":" + lowerValue));
 
 		OMFactory factory = sequenceAckElement.getOMFactory();
 		if (factory==null)

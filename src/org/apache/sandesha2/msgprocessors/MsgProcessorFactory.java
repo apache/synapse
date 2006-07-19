@@ -27,9 +27,9 @@ import org.apache.sandesha2.Sandesha2Constants;
 public class MsgProcessorFactory {
 
 	public static MsgProcessor getMessageProcessor(RMMsgContext rmMessageContext) {
-		
+
 		int messageType = rmMessageContext.getMessageType();
-		
+
 		switch (messageType) {
 		case (Sandesha2Constants.MessageTypes.CREATE_SEQ):
 			return new CreateSeqMsgProcessor();
@@ -44,9 +44,9 @@ public class MsgProcessorFactory {
 		case (Sandesha2Constants.MessageTypes.ACK):
 			return new AcknowledgementProcessor();
 		case (Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE):
-			return new CloseSequenceProcessor ();
+			return new CloseSequenceProcessor();
 		case (Sandesha2Constants.MessageTypes.ACK_REQUEST):
-			return new AckRequestedProcessor ();
+			return new AckRequestedProcessor();
 		default:
 			return null;
 		}

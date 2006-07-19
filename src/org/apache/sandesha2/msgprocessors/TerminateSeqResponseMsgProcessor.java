@@ -28,17 +28,15 @@ import org.apache.sandesha2.SandeshaException;
 public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(TerminateSeqResponseMsgProcessor.class);
-	
-	public void processInMessage(RMMsgContext terminateResRMMsg)
-			throws SandeshaException { 
-		
-		
-		//TODO add processing logic
-		
+
+	public void processInMessage(RMMsgContext terminateResRMMsg) throws SandeshaException {
+
+		// TODO add processing logic
+
 		terminateResRMMsg.pause();
 	}
-	
+
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-		
+
 	}
 }

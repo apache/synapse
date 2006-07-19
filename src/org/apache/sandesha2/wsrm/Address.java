@@ -15,6 +15,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an Address element.
@@ -43,11 +45,15 @@ public class Address implements IOMRMElement {
 		OMElement addressPart = element.getFirstChildWithName(new QName(
 				addressingNamespaceValue, Sandesha2Constants.WSA.ADDRESS));
 		if (addressPart == null)
-			throw new OMException("Cant find an Address element in the given part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotFindAddressElement,
+					element.toString()));
 		String addressText = addressPart.getText();
 		if (addressText == null || addressText == "")
 			throw new OMException(
-					"Passed element does not have a valid address text");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.cannotFindAddressText,
+							element.toString()));
 
 		epr = new EndpointReference(addressText);
 		return this;
@@ -60,7 +66,8 @@ public class Address implements IOMRMElement {
 	public OMElement toOMElement(OMElement element) throws OMException {
 
 		if (epr == null || epr.getAddress() == null || epr.getAddress() == "")
-			throw new OMException("cant set the address. The address value is not valid");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.addressNotValid));
 
 		OMFactory factory = element.getOMFactory();
 		if (factory==null)

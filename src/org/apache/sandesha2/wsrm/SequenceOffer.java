@@ -25,6 +25,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an SequenceOffer element which may be present within a 
@@ -43,7 +45,9 @@ public class SequenceOffer implements IOMRMElement {
 
 	public SequenceOffer(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -59,7 +63,9 @@ public class SequenceOffer implements IOMRMElement {
 		OMElement sequenceOfferPart = createSequenceElement
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
 		if (sequenceOfferPart == null)
-			throw new OMException("The passed element does not contain a SequenceOffer part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noSeqOfferInElement,
+					createSequenceElement.toString()));
 
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(sequenceOfferPart);
@@ -78,7 +84,8 @@ public class SequenceOffer implements IOMRMElement {
 			throws OMException {
 
 		if (identifier == null)
-			throw new OMException("Cant set sequnceOffer since identifier is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullMsgId));
 
 		OMFactory factory = createSequenceElement.getOMFactory();
 		if (factory==null)

@@ -25,6 +25,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * This represent the wsrm:final element that may be present withing a sequence acknowledgement.
@@ -37,7 +39,9 @@ public class AckFinal implements IOMRMElement {
 	
 	public AckFinal(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultfactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -56,7 +60,9 @@ public class AckFinal implements IOMRMElement {
 		OMElement finalPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.FINAL));
 		if (finalPart == null)
-			throw new OMException("The passed element does not contain a 'Final' part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noFinalPartInElement,
+					element.toString()));
 
 		return this;
 	}

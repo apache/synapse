@@ -27,6 +27,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;
@@ -274,7 +276,8 @@ public class RMMsgContext {
 	public void setAddressingNamespaceValue(String addressingNamespaceValue) throws SandeshaException {
 		if (!AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNamespaceValue) &&
 			!AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNamespaceValue))
-			throw new SandeshaException ("Unknown addressing version");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownWSAVersion, addressingNamespaceValue));
 		
 		this.addressingNamespaceValue = addressingNamespaceValue;
 	}

@@ -23,6 +23,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -116,12 +118,14 @@ public class InMemoryStorageManager extends StorageManager {
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		
 		if (storageMap==null) {
-			throw new SandeshaStorageException ("Storage Map not present");
+			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.storageMapNotPresent));
 		}
 		
 		Object oldEntry = storageMap.get(key);
 		if (oldEntry==null)
-			throw new SandeshaStorageException ("Entry is not present for updating");
+			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.entryNotPresentForUpdating));
 		
 		storeMessageContext(key,msgContext);
 	}

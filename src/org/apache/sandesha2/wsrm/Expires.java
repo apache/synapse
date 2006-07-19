@@ -25,6 +25,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an Expires element.
@@ -40,7 +42,9 @@ public class Expires implements IOMRMElement {
 
 	public Expires(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -50,10 +54,13 @@ public class Expires implements IOMRMElement {
 		OMElement expiresPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart == null)
-			throw new OMException("Passed elemenet does not have a Expires part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noExpiresPartInElement,
+					element.toString()));
 		String expiresText = expiresPart.getText();
 		if (expiresText == null || expiresText == "")
-			throw new OMException("The duration value is not valid");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotProcessExpires));
 
 		duration = expiresText;
 		return element;
@@ -67,7 +74,8 @@ public class Expires implements IOMRMElement {
 	public OMElement toOMElement(OMElement element) throws OMException {
 
 		if (duration == null || duration == "")
-			throw new OMException("Cant set Expires. The duration value is not set");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotProcessExpires));
 
 		OMFactory factory = element.getOMFactory();
 		if (factory==null)

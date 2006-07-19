@@ -35,6 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -142,7 +144,7 @@ public class Sender extends Thread {
 			storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 		} catch (SandeshaException e2) {
 			// TODO Auto-generated catch block
-			log.debug("ERROR: Could not start sender", e2);
+			log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotCointinueSender, e2.toString()), e2);
 			e2.printStackTrace();
 			return;
 		}
@@ -163,7 +165,8 @@ public class Sender extends Thread {
 
 			try {
 				if (context == null) {
-					String message = "Can't continue the Sender. Context is null";
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
+					message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotCointinueSender, message);
 					log.debug(message);
 					throw new SandeshaException(message);
 				}
@@ -206,7 +209,7 @@ public class Sender extends Thread {
 				}
 
 				if (msgCtx == null) {
-					log.debug("ERROR: Sender has an Unavailable Message entry");
+					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendHasUnavailableMsgEntry));
 					break;
 				}
 
@@ -263,7 +266,8 @@ public class Sender extends Thread {
 						successfullySent = true;
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						String message = "Sandesha2 got an exception when trying to send the message";
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e
+								.toString());
 						log.debug(message, e);
 					} finally {
 						transaction = storageManager.getTransaction();
@@ -317,19 +321,22 @@ public class Sender extends Thread {
 						transaction.rollback();
 						rolebacked = true;
 					} catch (Exception e1) {
-						String message = "Exception thrown when trying to roleback the transaction.";
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1
+								.toString());
 						log.debug(message, e1);
 					}
 				}
 
-				String message = "An Exception was throws in sending";
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e.toString());
+
 				log.debug(message, e);
 			} finally {
 				if (transaction != null && !rolebacked) {
 					try {
 						transaction.commit();
 					} catch (Exception e) {
-						String message = "Exception thrown when trying to commit the transaction.";
+						String message = SandeshaMessageHelper
+								.getMessage(SandeshaMessageKeys.commitError, e.toString());
 						log.debug(message, e);
 					}
 				}
@@ -408,7 +415,7 @@ public class Sender extends Thread {
 
 			} catch (AxisFault e) {
 				// TODO Auto-generated catch block
-				log.debug("Valid SOAP envelope not found");
+				log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.soapEnvNotSet));
 				log.debug(e.getStackTrace().toString());
 			}
 
@@ -430,7 +437,7 @@ public class Sender extends Thread {
 			}
 
 		} catch (Exception e) {
-			String message = "No valid Sync response...";
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noValidSyncResponse);
 			log.debug(message, e);
 			throw new SandeshaException(message, e);
 		}

@@ -19,6 +19,8 @@ package org.apache.sandesha2.policy.processors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.PolicyEngineData;
 import org.apache.sandesha2.policy.RMPolicyToken;
 import org.apache.sandesha2.policy.RMProcessorContext;
@@ -45,7 +47,10 @@ public class MessageTypesToDropProcessor {
 				} catch (NoSuchMethodException e) {
 					logger
 							.error(
-									"Exception occured in initializeMessageTypesToDrop",
+									SandeshaMessageHelper.getMessage(
+											SandeshaMessageKeys.policyProcessingException,
+											e.toString(),
+											"MessageTypesToDrop"),
 									e);
 					return new Boolean(false);
 				}

@@ -28,6 +28,8 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represent the AckRequested header block.
@@ -47,7 +49,9 @@ public class AckRequested implements IOMRMPart {
 
 	public AckRequested(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -60,12 +64,15 @@ public class AckRequested implements IOMRMPart {
 	public Object fromOMElement(OMElement header) throws OMException,SandeshaException {
 
 		if (header == null || !(header instanceof SOAPHeader))
-			throw new OMException("Cant add the Ack Requested part to a non-header element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.ackRequestedCannotBeAddedToNonHeader));
 
 		OMElement ackReqPart = header.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
 
 		if (ackReqPart == null)
-			throw new OMException("the passed element does not contain an ack requested part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noAckRequestedElement,
+					header.toString()));
 
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(ackReqPart);
@@ -85,10 +92,12 @@ public class AckRequested implements IOMRMPart {
 
 		if (header == null || !(header instanceof SOAPHeader))
 			throw new OMException(
-					"Cant add the Ack Requested part to a non-header element");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.ackRequestedCannotBeAddedToNonHeader));
 
 		if (identifier == null)
-			throw new OMException("Cant add ack Req block since the identifier is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.ackRequestNullID));
 		
 		OMFactory factory = header.getOMFactory();
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);

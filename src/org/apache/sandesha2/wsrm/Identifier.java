@@ -29,6 +29,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 public class Identifier implements Sandesha2Constants, IOMRMElement {
 
@@ -40,7 +42,9 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 	
 	public Identifier(OMFactory defaultFactory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = defaultFactory;
 		this.namespaceValue = namespaceValue;
@@ -67,11 +71,15 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
 		if (identifierPart == null)
-			throw new OMException("The parsed element does not contain an identifier part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidIdentifier,
+					element.toString()));
 		
 		String identifierText = identifierPart.getText();
 		if (identifierText == null || identifierText == "")
-			throw new OMException("The identifier value is not valid");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidIdentifier,
+					element.toString()));
 
 		identifier = identifierText;
 		return this;
@@ -80,7 +88,9 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 	public OMElement toOMElement(OMElement element) throws OMException {
 
 		if (identifier == null || identifier == "") {
-			throw new OMException("identifier is not set .. ");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidIdentifier,
+					element.toString()));
 		}
 		
 		OMFactory factory = element.getOMFactory();

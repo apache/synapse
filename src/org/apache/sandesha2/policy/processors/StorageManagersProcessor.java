@@ -19,6 +19,8 @@ package org.apache.sandesha2.policy.processors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.PolicyEngineData;
 import org.apache.sandesha2.policy.RMPolicy;
 import org.apache.sandesha2.policy.RMPolicyToken;
@@ -56,7 +58,10 @@ public class StorageManagersProcessor {
 					initializedStorageManager = true;
 				} catch (NoSuchMethodException e) {
 					logger.error(
-							"Exception occured in initializeStorageManager", e);
+							SandeshaMessageHelper.getMessage(
+									SandeshaMessageKeys.policyProcessingException,
+									e.toString(),
+									"StorageManagers"), e);
 					return new Boolean(false);
 				}
 			}

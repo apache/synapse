@@ -27,6 +27,8 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Adds the CreateSequenceResponse body part.
@@ -48,7 +50,9 @@ public class CreateSequenceResponse implements IOMRMPart {
 
 	public CreateSequenceResponse(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					rmNamespaceValue));
 		
 		this.defaultFactory = factory;
 		this.rmNamespaceValue = rmNamespaceValue;
@@ -62,14 +66,17 @@ public class CreateSequenceResponse implements IOMRMPart {
 	public Object fromOMElement(OMElement bodyElement) throws OMException,SandeshaException {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
-			throw new OMException("Cant get create sequnce response from a non-body element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.createSeqResponseCannotBeAddedToNonBody));
 
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
 
 		OMElement createSeqResponsePart = SOAPBody
 				.getFirstChildWithName(new QName(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResponsePart == null)
-			throw new OMException("The passed element does not contain a create seqence response part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noCreateSeqResponsePartInElement,
+					bodyElement.toString()));
 
 		identifier = new Identifier(defaultFactory,rmNamespaceValue);
 		identifier.fromOMElement(createSeqResponsePart);
@@ -97,12 +104,15 @@ public class CreateSequenceResponse implements IOMRMPart {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
 			throw new OMException(
-					"Cant get create sequnce response from a non-body element");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.createSeqResponseCannotBeAddedToNonBody));
 
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
 
 		if (identifier == null)
-			throw new OMException("cant set create sequnce response since the Identifier is not set");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidIdentifier,
+					bodyElement.toString()));
 
 		OMFactory factory = bodyElement.getOMFactory();
 		if (factory==null)

@@ -59,6 +59,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -160,7 +162,8 @@ public class SandeshaUtil {
 				long msgNo = Long.parseLong(temp);
 				msgNubers.add(new Long(msgNo));
 			} catch (Exception ex) {
-				String message = "Invalid msg number list";
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.invalidMsgNumberList);
 				log.debug(message);
 				throw new SandeshaException(message);
 			}
@@ -311,7 +314,9 @@ public class SandeshaUtil {
 
 		String startStr = Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":";
 		if (!internalSequenceId.startsWith(startStr)) {
-			throw new SandeshaException("Invalid internal sequence ID");
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidInternalSequenceID,
+					internalSequenceId));
 		}
 
 		String incomingSequenceId = internalSequenceId.substring(startStr.length());
@@ -339,7 +344,8 @@ public class SandeshaUtil {
 		else if (Sandesha2Constants.PERMANENT_STORAGE_MANAGER.equals(value))
 			return getPermanentStorageManager(context);
 		else
-			throw new SandeshaException ("Unknown StorageManager type. Please check your parameter value.");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotGetStorageManager));
 	}
 	
 	public static StorageManager getInMemoryStorageManager(ConfigurationContext context) throws SandeshaException {
@@ -379,7 +385,8 @@ public class SandeshaUtil {
 		    ClassLoader classLoader = (ClassLoader)	context.getProperty(Sandesha2Constants.MODULE_CLASS_LOADER);
 
 		    if (classLoader==null)
-		    	throw new SandeshaException ("Module class loader not found");
+		    	throw new SandeshaException (SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.classLoaderNotFound));
 		    
 		    Class c = classLoader.loadClass(className);
 			Class configContextClass = context.getClass();
@@ -388,14 +395,16 @@ public class SandeshaUtil {
 			Object obj = constructor.newInstance(new Object[] {context});
 
 			if (obj == null || !(obj instanceof StorageManager))
-				throw new SandeshaException("StorageManager must implement org.apache.sandesha2.storage.StorageManager");
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.storageManagerMustImplement));
 
 			StorageManager mgr = (StorageManager) obj;
 			storageManager = mgr;
 			return storageManager;
 			
 		} catch (Exception e) {
-			String message = "Cannot load the given storage manager";
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotGetStorageManager);
 			log.error(message);
 			throw new SandeshaException(message,e);
 		}
@@ -408,7 +417,9 @@ public class SandeshaUtil {
 		else if (namespaceName.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			return Sandesha2Constants.SOAPVersion.v1_2;
 		else
-			throw new SandeshaException("Unknown SOAP version");
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSoapVersion,
+					namespaceName));
 	}
 
 	public static boolean isRMGlobalMessage(MessageContext msgCtx) {
@@ -420,7 +431,8 @@ public class SandeshaUtil {
 		if (env != null)
 			header = env.getHeader();
 		else {
-			log.error("SOAP envelope is null");
+			log.error(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.soapEnvNotSet));
 			return false;
 		}
 
@@ -590,7 +602,8 @@ public class SandeshaUtil {
 	public static SandeshaPropertyBean getDefaultPropertyBean (AxisConfiguration axisConfiguration) throws SandeshaException {
 		Parameter parameter = axisConfiguration.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 		if (parameter==null)
-			throw new SandeshaException ("Default Sandesha Property Bean is not available");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
 		SandeshaPropertyBean sandeshaPropertyBean = (SandeshaPropertyBean) parameter.getValue();
 		return sandeshaPropertyBean;
@@ -624,7 +637,9 @@ public class SandeshaUtil {
 			return new ArrayList();
 
 		if (str.length() < 2) {
-			String message = "Invalid String array : " + str;
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidStringArray,
+					str);
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
@@ -632,7 +647,8 @@ public class SandeshaUtil {
 		int length = str.length();
 
 		if (str.charAt(0) != '[' || str.charAt(length - 1) != ']') {
-			String message = "Invalid String array" + str;
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidStringArray, str);
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
@@ -704,7 +720,8 @@ public class SandeshaUtil {
 	public static QName getQNameFromString(String qnameStr) throws SandeshaException {
 		String[] parts = qnameStr.split(Sandesha2Constants.QNAME_SEPERATOR);
 		if (!(parts.length == 3))
-			throw new SandeshaException("Invalid QName String");
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invalidQName));
 
 		if (parts[0].equals(Sandesha2Constants.VALUE_NONE))
 			parts[0] = null;
@@ -857,7 +874,8 @@ public class SandeshaUtil {
 	public static SandeshaPropertyBean getPropertyBean (AxisDescription axisDescription) throws SandeshaException {
 		Parameter parameter = axisDescription.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 		if (parameter==null)
-			throw new SandeshaException ("Property bean is not set. Cant find Sandesha2 configuration data");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
 		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
 		return propertyBean;

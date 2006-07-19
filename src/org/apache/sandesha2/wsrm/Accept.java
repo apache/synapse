@@ -25,6 +25,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents the RM Accept element which may come within the 
@@ -44,7 +46,9 @@ public class Accept implements IOMRMElement {
 
 	public Accept(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownNamespace,
+					rmNamespaceValue));
 		
 		this.defaultFactory = factory;
 		this.addressingNamespaceValue = addressingNamespaceValue;
@@ -64,7 +68,9 @@ public class Accept implements IOMRMElement {
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
 				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart == null)
-			throw new OMException("Passed element does not contain an Accept part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noAcceptPartInElement,
+					element.toString()));
 
 		acksTo = new AcksTo(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
 		acksTo.fromOMElement(acceptPart);
@@ -79,7 +85,8 @@ public class Accept implements IOMRMElement {
 			factory = defaultFactory;
 		
 		if (acksTo == null)
-			throw new OMException("Cant add Accept part since AcksTo object is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.acceptNullAcksTo));
 
 		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement acceptElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACCEPT, rmNamespace);

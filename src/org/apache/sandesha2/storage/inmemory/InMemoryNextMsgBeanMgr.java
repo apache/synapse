@@ -28,6 +28,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 
@@ -61,7 +63,8 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 	}
 
 	public synchronized ResultSet find(String query) {
-		throw new UnsupportedOperationException("selectRS() is not supported");
+		throw new UnsupportedOperationException(SandeshaMessageHelper.getMessage(
+				SandeshaMessageKeys.selectRSNotSupported));
 	}
 
 	public synchronized Collection find(NextMsgBean bean) {
@@ -107,7 +110,8 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 	public synchronized NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
 		Collection coll = find(bean);
 		if (coll.size()>1) {
-			String message = "Non-Unique result";
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nonUniqueResult);
 			log.error(message);
 			throw new SandeshaException (message);
 		}

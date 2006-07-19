@@ -33,6 +33,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -55,207 +57,229 @@ import org.apache.sandesha2.wsrm.SequenceOffer;
 public class CreateSeqMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqMsgProcessor.class);
-	
-	public void processInMessage(RMMsgContext createSeqRMMsg)
-			throws SandeshaException {
-    if (log.isDebugEnabled())
-      log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
-		
+
+	public void processInMessage(RMMsgContext createSeqRMMsg) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
+
 		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
-		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		if (createSeqPart == null) {
-			String message = "No create sequence part is present in the create sequence message"; 
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts);
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
 
 		ConfigurationContext context = createSeqMsg.getConfigurationContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
-		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager.checkForCreateSequenceRefused(createSeqMsg,storageManager);
+		RMMsgContext faultMessageContext = faultManager.checkForCreateSequenceRefused(createSeqMsg, storageManager);
 		if (faultMessageContext != null) {
 			ConfigurationContext configurationContext = createSeqMsg.getConfigurationContext();
 			AxisEngine engine = new AxisEngine(configurationContext);
-			
+
 			try {
 				engine.sendFault(faultMessageContext.getMessageContext());
 			} catch (AxisFault e) {
-				throw new SandeshaException ("Could not send the fault message",e);
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault), e);
 			}
-			
+
 			createSeqMsg.pause();
 			return;
 		}
 
 		MessageContext outMessage = null;
 		try {
-			outMessage = Utils.createOutMessageContext(createSeqMsg);  //createing a new response message.
+			outMessage = Utils.createOutMessageContext(createSeqMsg); // createing
+																		// a new
+																		// response
+																		// message.
 		} catch (AxisFault e1) {
-			throw new SandeshaException (e1);
+			throw new SandeshaException(e1);
 		}
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		try {
-			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg,storageManager);  //newly created sequnceID.
-			
-			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(
-					createSeqRMMsg, outMessage,newSequenceId,storageManager);    // converting the blank out message in to a create
-			                                                      // sequence response.
-			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
-			
-			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE,"true");  //for making sure that this wont be processed again.
-			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager); // newly
+																										// created
+																										// sequnceID.
 
-			
-			//OFFER PROCESSING
+			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
+					newSequenceId, storageManager); // converting the blank out
+													// message in to a create
+			// sequence response.
+			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
+
+			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); // for
+																									// making
+																									// sure
+																									// that
+																									// this
+																									// wont
+																									// be
+																									// processed
+																									// again.
+			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
+					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+
+			// OFFER PROCESSING
 			SequenceOffer offer = createSeqPart.getSequenceOffer();
 			if (offer != null) {
 				Accept accept = createSeqResPart.getAccept();
 				if (accept == null) {
-					String message = "An accept part has not been generated for the create seq request with an offer part"; 
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart);
 					log.debug(message);
 					throw new SandeshaException(message);
 				}
 
-				String offeredSequenceID = offer.getIdentifer().getIdentifier(); //offered seq. id.
-				
-				boolean offerEcepted = offerAccepted (offeredSequenceID,context,createSeqRMMsg,storageManager);
-				
-				if (offerEcepted)  {
-					//Setting the CreateSequence table entry for the outgoing side.
+				String offeredSequenceID = offer.getIdentifer().getIdentifier(); // offered
+																					// seq.
+																					// id.
+
+				boolean offerEcepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
+
+				if (offerEcepted) {
+					// Setting the CreateSequence table entry for the outgoing
+					// side.
 					CreateSeqBean createSeqBean = new CreateSeqBean();
 					createSeqBean.setSequenceID(offeredSequenceID);
-					String outgoingSideInternalSequenceID = SandeshaUtil.getOutgoingSideInternalSequenceID(newSequenceId);
+					String outgoingSideInternalSequenceID = SandeshaUtil
+							.getOutgoingSideInternalSequenceID(newSequenceId);
 					createSeqBean.setInternalSequenceID(outgoingSideInternalSequenceID);
-					createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); //this is a dummy value.
-				
+					createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); // this
+																				// is a
+																				// dummy
+																				// value.
+
 					CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 					createSeqMgr.insert(createSeqBean);
-				
-					//Setting sequence properties for the outgoing sequence. 
-					//Only will be used by the server side response path. Will be wasted properties for the client side.
-				
-					//setting the out_sequence_id
+
+					// Setting sequence properties for the outgoing sequence.
+					// Only will be used by the server side response path. Will
+					// be wasted properties for the client side.
+
+					// setting the out_sequence_id
 					SequencePropertyBean outSequenceBean = new SequencePropertyBean();
 					outSequenceBean.setName(Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 					outSequenceBean.setValue(offeredSequenceID);
 					outSequenceBean.setSequenceID(outgoingSideInternalSequenceID);
 					seqPropMgr.insert(outSequenceBean);
 
-					//setting the internal_sequence_id
+					// setting the internal_sequence_id
 					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
 					internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 					internalSequenceBean.setSequenceID(offeredSequenceID);
 					internalSequenceBean.setValue(outgoingSideInternalSequenceID);
 					seqPropMgr.insert(internalSequenceBean);
 				} else {
-					//removing the accept part.
+					// removing the accept part.
 					createSeqResPart.setAccept(null);
 					createSeqResponse.addSOAPEnvelope();
 				}
 			}
 
 			EndpointReference acksTo = createSeqPart.getAcksTo().getAddress().getEpr();
-			if (acksTo == null || acksTo.getAddress() == null
-					|| acksTo.getAddress() == "") {
-				String message = "Acks to not present in the create sequence message";
+			if (acksTo == null || acksTo.getAddress() == null || acksTo.getAddress() == "") {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence);
 				log.debug(message);
 				throw new AxisFault(message);
 			}
 
-			SequencePropertyBean acksToBean = new SequencePropertyBean(
-					newSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,acksTo.getAddress());
+			SequencePropertyBean acksToBean = new SequencePropertyBean(newSequenceId,
+					Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo.getAddress());
 
 			seqPropMgr.insert(acksToBean);
-			
+
 			outMessage.setResponseWritten(true);
 
-			//commiting tr. before sending the response msg.
-			
-			SequenceManager.updateLastActivatedTime(newSequenceId,storageManager);
-			
+			// commiting tr. before sending the response msg.
+
+			SequenceManager.updateLastActivatedTime(newSequenceId, storageManager);
+
 			AxisEngine engine = new AxisEngine(context);
 			engine.send(outMessage);
-			
-			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,Sandesha2Constants.SequenceProperties.TO_EPR);
-			if (toBean==null) {
-				String message = "Internal Error: wsa:To value is not set";
+
+			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,
+					Sandesha2Constants.SequenceProperties.TO_EPR);
+			if (toBean == null) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
 				log.debug(message);
-				throw new SandeshaException (message);
+				throw new SandeshaException(message);
 			}
-			
-			EndpointReference toEPR = new EndpointReference (toBean.getValue());
-			
-			String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(newSequenceId,Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,storageManager);
+
+			EndpointReference toEPR = new EndpointReference(toBean.getValue());
+
+			String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(newSequenceId,
+					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-			
+
 			if (anonymousURI.equals(toEPR.getAddress())) {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 			}
-			
+
 		} catch (AxisFault e1) {
 			throw new SandeshaException(e1);
 		}
 
 		createSeqRMMsg.pause();
-    
-    if (log.isDebugEnabled())
-      log.debug("Exit: CreateSeqMsgProcessor::processInMessage");
-	}
-	
-	private boolean offerAccepted (String sequenceID, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,StorageManager storageManager) throws SandeshaException {
-    if (log.isDebugEnabled())
-      log.debug("Enter: CreateSeqMsgProcessor::offerAccepted, "+sequenceID);
 
-    if ("".equals(sequenceID)) 
-    {
-      if (log.isDebugEnabled())
-        log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, "+false);
+		if (log.isDebugEnabled())
+			log.debug("Exit: CreateSeqMsgProcessor::processInMessage");
+	}
+
+	private boolean offerAccepted(String sequenceID, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,
+			StorageManager storageManager) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: CreateSeqMsgProcessor::offerAccepted, " + sequenceID);
+
+		if ("".equals(sequenceID)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
 			return false;
-    }
-		
+		}
+
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-		
-		CreateSeqBean createSeqFindBean = new CreateSeqBean ();	
+
+		CreateSeqBean createSeqFindBean = new CreateSeqBean();
 		createSeqFindBean.setSequenceID(sequenceID);
 		Collection arr = createSeqMgr.find(createSeqFindBean);
-		
-		if (arr.size()>0)
-    {
-      if (log.isDebugEnabled())
-        log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, "+false);
+
+		if (arr.size() > 0) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
 			return false;
-    }
-		if (sequenceID.length()<=1)
-    {
-      if (log.isDebugEnabled())
-        log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, "+false);
-			return false;   //Single character offers are NOT accepted.
-    }
-				
-    if (log.isDebugEnabled())
-      log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, "+true);
+		}
+		if (sequenceID.length() <= 1) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
+			return false; // Single character offers are NOT accepted.
+		}
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + true);
 		return true;
 	}
-	
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {	
-    if (log.isDebugEnabled())
-      log.debug("Enter: CreateSeqMsgProcessor::processOutMessage");
 
-    MessageContext msgCtx = rmMsgCtx.getMessageContext();
-		
-		//adding the SANDESHA_LISTENER
-		SandeshaListener faultCallback = (SandeshaListener) msgCtx.getOptions().getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
-		if (faultCallback!=null) {
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: CreateSeqMsgProcessor::processOutMessage");
+
+		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+
+		// adding the SANDESHA_LISTENER
+		SandeshaListener faultCallback = (SandeshaListener) msgCtx.getOptions().getProperty(
+				SandeshaClientConstants.SANDESHA_LISTENER);
+		if (faultCallback != null) {
 			OperationContext operationContext = msgCtx.getOperationContext();
-			if (operationContext!=null) {
-				operationContext.setProperty(SandeshaClientConstants.SANDESHA_LISTENER,faultCallback);
+			if (operationContext != null) {
+				operationContext.setProperty(SandeshaClientConstants.SANDESHA_LISTENER, faultCallback);
 			}
 		}
-    if (log.isDebugEnabled())
-      log.debug("Exit: CreateSeqMsgProcessor::processOutMessage");
+		if (log.isDebugEnabled())
+			log.debug("Exit: CreateSeqMsgProcessor::processOutMessage");
 	}
 }

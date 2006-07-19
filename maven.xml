@@ -43,6 +43,12 @@
     </preGoal>
     
     <goal name="mar" prereqs="java:compile">
+    	<copy todir="${maven.build.dir}/classes/">
+    	 <fileset dir="${basedir}/src">
+    	  <include name="**/*.properties" /> 
+    	 </fileset>
+    	</copy>
+    	
     	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
     	<ant:mkdir dir="${metainf.path}" />
     	<ant:copy file="${basedir}/config/module.xml" todir="${metainf.path}" />

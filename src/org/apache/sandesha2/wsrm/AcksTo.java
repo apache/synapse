@@ -26,6 +26,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an AcksTo element which comes within
@@ -44,7 +46,9 @@ public class AcksTo implements IOMRMElement {
 
 	public AcksTo(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					rmNamespaceValue));
 		
 		this.defaultFactory = factory;
 		this.rmNamespaceValue = rmNamespaceValue;
@@ -65,7 +69,9 @@ public class AcksTo implements IOMRMElement {
 				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
 
 		if (acksToPart == null)
-			throw new OMException("Passed element does not contain an acksTo part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noAcksToPart,
+					element.toString()));
 
 		address = new Address(defaultFactory,addressingNamespaceValue);
 		address.fromOMElement(acksToPart);
@@ -76,7 +82,9 @@ public class AcksTo implements IOMRMElement {
 	public OMElement toOMElement(OMElement element) throws OMException {
 
 		if (address == null)
-			throw new OMException("Cannot set AcksTo. Address is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotSetACksTo,
+					null));
 
 		OMFactory factory = element.getOMFactory();
 		if (factory==null)

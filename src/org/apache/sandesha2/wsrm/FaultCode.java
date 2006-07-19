@@ -26,6 +26,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents an FaultCode element.
@@ -41,7 +43,9 @@ public class FaultCode implements IOMRMElement {
 	
 	public FaultCode(SOAPFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -54,14 +58,18 @@ public class FaultCode implements IOMRMElement {
 	public Object fromOMElement(OMElement sequenceFault) throws OMException {
 
 		if (sequenceFault == null)
-			throw new OMException("Can't add Fault Code part since the passed element is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noFaultCodePart,
+					null));
 
 		OMElement faultCodePart = sequenceFault
 				.getFirstChildWithName(new QName(namespaceValue,
 						Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
 
 		if (faultCodePart == null)
-			throw new OMException("Passed element does not contain a Fauld Code part");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noFaultCode,
+					sequenceFault.toString()));
 
 		this.faultCode = faultCodePart.getText();
 
@@ -73,11 +81,13 @@ public class FaultCode implements IOMRMElement {
 
 		if (sequenceFault == null)
 			throw new OMException(
-					"Can't add Fault Code part since the passed element is null");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.nullPassedElement));
 
 		if (faultCode == null || faultCode == "")
 			throw new OMException(
-					"Cant add fault code since the the value is not set correctly.");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.noFaultCode));
 
 		OMFactory factory = sequenceFault.getOMFactory();
 		if (factory==null)

@@ -30,6 +30,8 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 
 /**
@@ -64,7 +66,8 @@ public class RMElements {
 	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws SandeshaException {
 
 		if (envelope == null)
-			throw new OMException("The passed envelope is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullPassedElement));
 
 		SOAPFactory factory;
 
@@ -87,7 +90,8 @@ public class RMElements {
 		}
 		
 		if (addressingNamespaceValue==null) {
-			String message = "Cant find the addressing version";
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownWSAVersion);
 			throw new SandeshaException (message);
 //			return;
 		}

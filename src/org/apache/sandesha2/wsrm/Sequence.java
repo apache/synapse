@@ -29,6 +29,8 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represents a Sequence element which get carried within a RM application 
@@ -46,7 +48,9 @@ public class Sequence implements IOMRMPart {
 	
 	public Sequence(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
-			throw new SandeshaException ("Unsupported namespace");
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
 		
 		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
@@ -61,12 +65,15 @@ public class Sequence implements IOMRMPart {
 		SOAPHeader header = (SOAPHeader) headerElement;
 		if (header == null)
 			throw new OMException(
-					"Sequence element cannot be added to non-header element");
+					SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.seqElementCannotBeAddedToNonHeader));
 
 		OMElement sequencePart = headerElement.getFirstChildWithName(new QName(namespaceValue,
 						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequencePart == null)
-			throw new OMException("Cannot find Sequence element in the given element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.noSequencePartInElement,
+					headerElement.toString()));
 
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		messageNumber = new MessageNumber(defaultFactory,namespaceValue);
@@ -87,14 +94,17 @@ public class Sequence implements IOMRMPart {
 	public OMElement toOMElement(OMElement headerElement) throws OMException {
 
 		if (headerElement == null || !(headerElement instanceof SOAPHeader))
-			throw new OMException("Cant add Sequence Part to a non-header element");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.seqElementCannotBeAddedToNonHeader));
 
 		SOAPHeader soapHeader = (SOAPHeader) headerElement;
 
 		if (identifier == null)
-			throw new OMException("Cant add Sequence part since identifier is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.nullMsgId));
 		if (messageNumber == null)
-			throw new OMException("Cant add Sequence part since MessageNumber is null");
+			throw new OMException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.seqPartIsNull));
 
 		OMFactory factory = headerElement.getOMFactory();
 		if (factory==null)

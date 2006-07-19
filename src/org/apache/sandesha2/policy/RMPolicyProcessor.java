@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.processors.AcknowledgementIntervalProcessor;
 import org.apache.sandesha2.policy.processors.ExponentialBackoffProcessor;
 import org.apache.sandesha2.policy.processors.InactivityTimeoutMeasureProcessor;
@@ -233,8 +235,9 @@ public class RMPolicyProcessor {
 		RMPolicyToken currentToken = rmProcessorContext
 				.readCurrentRMToken();
 		if (currentToken == null) {
-			logger.error("Internal error on token stack - No current token");
-			System.exit(1);
+			logger.error(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.errorOnTokenStack));
+			System.exit(1); 
 		}
 		rmpt = currentToken.getChildToken(tokenName);
 		rmProcessorContext.pushRMToken(rmpt);
@@ -261,7 +264,8 @@ public class RMPolicyProcessor {
 		try {
 			ret = rmpt.invokeProcessTokenMethod(rmProcessorContext);
 		} catch (Exception ex) {
-			logger.error("Exception occured when invoking processTokenMethod",
+			logger.error(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.generalError, ex.toString()),
 					ex);
 		} finally {
 			rmProcessorContext.setAction(RMProcessorContext.NONE);
@@ -273,8 +277,9 @@ public class RMPolicyProcessor {
 		RMPolicyToken currentToken = rmProcessorContext
 				.readCurrentRMToken();
 		if (currentToken == null) {
-			logger.debug("Abort transaction because of unknown token: '"
-					+ pa.getName().getLocalPart() + "'");
+			logger.debug(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownTokenAbortTran,
+					pa.getName().getLocalPart()));
 
 			rmProcessorContext.popRMToken();
 			return;
@@ -286,7 +291,8 @@ public class RMPolicyProcessor {
 			currentToken.invokeProcessTokenMethod(rmProcessorContext);
 
 		} catch (Exception ex) {
-			logger.error("Exception occured when invoking processTokenMethod:",
+			logger.error(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.processTokenMethodError, ex.toString()),
 					ex);
 
 		} finally {
@@ -301,8 +307,9 @@ public class RMPolicyProcessor {
 		RMPolicyToken currentToken = rmProcessorContext
 				.readCurrentRMToken();
 		if (currentToken == null) {
-			logger.error("Internal error on token stack - Commiting an unknown token: "
-							+ pa.getName().getLocalPart() + "'");
+			logger.error(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.commitingUnknownToken, 
+					pa.getName().getLocalPart()));
 			System.exit(1);
 		}
 		rmProcessorContext.setAssertion(pa);

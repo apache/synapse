@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
@@ -46,43 +48,43 @@ import org.apache.sandesha2.wsrm.Sequence;
 public class SandeshaOutHandler extends AbstractHandler {
 
 	private static final long serialVersionUID = 8261092322051924103L;
-  
-  private static final Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
+
+	private static final Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-    if (log.isDebugEnabled())
-      log.debug("Enter: SandeshaOutHandler::invoke, " + msgCtx.getEnvelope().getHeader() );
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaOutHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 
 		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null) {
-			String message = "ConfigurationContext is null";
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
 			log.debug(message);
 			throw new AxisFault(message);
 		}
 
 		AxisService axisService = msgCtx.getAxisService();
 		if (axisService == null) {
-			String message = "AxisService is null";
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);
 			log.debug(message);
 			throw new AxisFault(message);
 		}
-		
+
 		String unreliable = (String) msgCtx.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
-		if(null != unreliable && "true".equals(unreliable)) {
-			if(log.isDebugEnabled()) log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
+		if (null != unreliable && "true".equals(unreliable)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
 			return;
 		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
-		if (null != DONE && "true".equals(DONE))
-    {
-      if (log.isDebugEnabled())
-        log.debug("Exit: SandeshaOutHandler::invoke, Application processing done");
+		if (null != DONE && "true".equals(DONE)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaOutHandler::invoke, Application processing done");
 			return;
-    }
+		}
 
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
 		boolean withinTransaction = false;
 		String withinTransactionStr = (String) msgCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
@@ -96,7 +98,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
 		}
 		boolean rolebacked = false;
-		
+
 		try {
 			// getting rm message
 			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
@@ -117,8 +119,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 							.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 					if (sequencePart != null)
 						msgProcessor = new ApplicationMsgProcessor();// a rm
-																		// intended
-																		// message.
+					// intended
+					// message.
 				} else if (!msgCtx.isServerSide()) // if client side.
 					msgProcessor = new ApplicationMsgProcessor();
 			} else {
@@ -129,36 +131,36 @@ public class SandeshaOutHandler extends AbstractHandler {
 				msgProcessor.processOutMessage(rmMsgCtx);
 
 		} catch (Exception e) {
-			//message should not be sent in a exception situation.
+			// message should not be sent in a exception situation.
 			msgCtx.pause();
-			
-			//rolling back the transaction
+
+			// rolling back the transaction
 			if (!withinTransaction) {
 				try {
 					transaction.rollback();
 					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 					rolebacked = true;
 				} catch (Exception e1) {
-					String message = "Exception thrown when trying to roleback the transaction.";
-					log.debug(message,e);
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
+					log.debug(message, e);
 				}
 			}
-			
-			String message = "Sandesha2 got an exception when processing the out message";
-			throw new AxisFault (message,e);
+
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.outMsgError, e.toString());
+			throw new AxisFault(message, e);
 		} finally {
 			if (!withinTransaction && !rolebacked) {
 				try {
 					transaction.commit();
 					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				} catch (Exception e) {
-					String message = "Exception thrown when trying to commit the transaction.";
-					log.debug(message,e);
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
+					log.debug(message, e);
 				}
 			}
 		}
-    if (log.isDebugEnabled())
-      log.debug("Exit: SandeshaOutHandler::invoke");
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaOutHandler::invoke");
 	}
 
 	public QName getName() {

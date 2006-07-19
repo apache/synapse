@@ -368,7 +368,6 @@ public class AcknowledgementManager {
 			RMMsgContext ackRMMessageCtx = MsgInitializer.initializeMessage(ackMsgCtx);
 
 			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceID);
-			referenceMsg.pause();
 			return ackRMMessageCtx;
 		}
 	}

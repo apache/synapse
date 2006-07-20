@@ -1,16 +1,29 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
-  
+
+	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
+		<property name="root" value=""/>
+		<property name="cachableDuration" value="15000"/>
+	</registry>
+	  
   <definitions>
   
   	<!-- define global properties -->
   	<set-property name="version" value="0.1"/>
+  	
+  	<!-- define the local property key for the XSD schema -->
+  	<set-property name="validate_schema" key="file:synapse_repository/conf/sample/validate.xsd"/>
+  	
+  	<!-- define the local property keys for the XSLTs -->
+  	<set-property name="xslt-key-req" src="file:synapse_repository/conf/sample/transform.xslt"/>
+  	<set-property name="xslt-key-resp" key="file:synapse_repository/conf/sample/transform_back.xslt"/>
   
   	<!-- define a reuseable endpoint definition and use it within config -->
   	<endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/>
 
     <sequence name="customrequest">
     	<!-- is this a valid custom request ? -->
-    	<validate schema="file:synapse_repository/conf/sample/validate.xsd">
+    	<validate>
+    		<schema key="validate_schema"/>
 		    <on-fail>
 		    	<!-- if the request does not validate againt schema throw a fault -->
 	      	<makefault>
@@ -42,7 +55,7 @@
     	<set-property name="correlate/label" value="customquote"/>
     	
     	<!-- transform the custom quote into a standard quote requst -->
-    	<transform xslt="file:synapse_repository/conf/sample/transform.xslt"/>
+    	<xslt key="xslt-key-req"/>
     	
     	<log level="custom">
     		<property name="Text" value="Sending quote request"/>
@@ -58,7 +71,7 @@
 
 		<sequence name="customresponse">
     	<!-- transform the custom quote into a standard quote requst -->
-    	<transform xslt="file:synapse_repository/conf/sample/transform_back.xslt"/>
+    	<xslt key="xslt-key-resp"/>
     	
     	<!-- now send the custom response back to the client and stop -->
     	<send/>    	

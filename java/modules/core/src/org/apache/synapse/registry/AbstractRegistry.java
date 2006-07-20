@@ -32,84 +32,54 @@ public abstract class AbstractRegistry implements Registry {
 
     private static final Log log = LogFactory.getLog(AbstractRegistry.class);
 
-    /** A local cache of Objects */
-    protected Map localCache = new HashMap();
-
     /** The name of the registry */
     protected String name = null;
 
     /**
      * Get the object for the given key from this registry
-     * @param key the key for the registry lookup
-     * @return the matching object
+     * @param dp the DynamicProperty for the registry lookup
+     * @return the matching resultant object
      */
-    public Object getProperty(String key) {
-
-        DynamicProperty dp = null;
-
-        // check local cache for the given key
-        Object obj = localCache.get(key);
-
-        if (obj != null) {
-            // if the local cache contains an object which is not a DynamicProperty, return it
-            if (!(obj instanceof DynamicProperty)) {
-                log.debug("Returning non dynamic object from cache for key : " + key);
-                return obj;
-
-            } else {
-                log.debug("Cache contains DynamicProperty for key : " + key);
-                dp = (DynamicProperty) obj;
-            }
-
-        } else {
-            log.debug("Object not available in local registry cache for key : " + key);
-        }
+    public Object getProperty(DynamicProperty dp) {
 
         OMNode omNode = null;
         RegistryEntry re = null;
 
         // we are dealing with a DynamicProperty. Have we seen this before and processed
-        // it at least once and have it in the localCache?
-        if (dp != null) {
-            // if we have an unexpired cached copy, return the cached object
-            if (!dp.isExpired() && dp.getCache() != null) {
+        // it at least once and have it cached?
+
+        // if we have an unexpired cached copy, return the cached object
+        if (dp.isCached() && !dp.isExpired()) {
+            return dp.getCache();
+
+        // if we have not cached the referenced object, fetch it and its RegistryEntry
+        } else if (!dp.isCached()) {
+            omNode = lookup(dp.getKey());
+            re = getRegistryEntry(dp.getKey());
+
+        // if we have cached it before, and now the cache has expired
+        // get its *new* registry entry and compare versions and pick new cache duration
+        } else if (dp.isExpired()) {
+
+            log.debug("Cached object has expired for key : " + dp.getKey());
+            re = getRegistryEntry(dp.getKey());
+
+            if (re.getVersion() != Long.MIN_VALUE &&
+                re.getVersion() == dp.getVersion()) {
+                log.debug("Expired version number is same as current version in registry");
+
+                // renew cache lease for another cachable duration (as returned by the
+                // new getRegistryEntry() call
+                dp.setExpiryTime(
+                    System.currentTimeMillis() + re.getCachableDuration());
+                log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
+
+                // return cached object
                 return dp.getCache();
 
-            // if we have not cached the referenced object, fetch it and its RegistryEntry
-            } else if (dp.getCache() == null) {
-                omNode = lookup(key);
-                re = getRegistryEntry(key);
-
-            // if we have cached it before, and not the cache has expired
-            // get its *new* registry entry and compare versions and pick new cache duration
-            } else if (dp.isExpired()) {
-
-                log.debug("Cached object has expired for key : " + key);
-                re = getRegistryEntry(key);
-
-                if (re.getVersion() != Long.MIN_VALUE &&
-                    re.getVersion() == dp.getVersion()) {
-                    log.debug("Expired version number is same as current version in registry");
-
-                    // renew cache lease for another cachable duration (as returned by the
-                    // last getRegistryEntry() call
-                    dp.setExpiryTime(
-                        System.currentTimeMillis() + re.getCachableDuration());
-                    log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
-
-                    // return cached object
-                    return dp.getCache();
-
-                } else {
-                    omNode = lookup(key);
-                }
+            } else {
+                omNode = lookup(dp.getKey());
             }
-
-        } else {
-            log.debug("Processing DynamicProperty for the first time. key : " + key);
-            dp = new DynamicProperty(key);
-            omNode = lookup(key);
-            re = getRegistryEntry(key);
         }
 
         // if we get here, we have received the raw omNode from the
@@ -134,9 +104,6 @@ public abstract class AbstractRegistry implements Registry {
         dp.setExpiryTime(
             System.currentTimeMillis() + re.getCachableDuration());
         dp.setVersion(re.getVersion());
-
-        // place DynamicProperty in local cache
-        localCache.put(key, dp);
 
         return dp.getCache();
     }

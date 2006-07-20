@@ -103,10 +103,10 @@ public class InvesbotHandler {
     public static String parseStandardResponsePayload(OMElement result) throws Exception {
 
         OMElement getQResp = result.getFirstChildWithName(
-            new QName("http://ws.invesbot.com/", "StockQuote"));
+            new QName("", "StockQuote"));
         if (getQResp != null) {
             OMElement price = getQResp.getFirstChildWithName(
-                new QName("http://ws.invesbot.com/", "Price"));
+                new QName("", "Price"));
             return price.getText();
         } else {
             throw new Exception("Unexpected response : " + result);

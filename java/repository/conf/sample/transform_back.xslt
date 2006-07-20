@@ -7,10 +7,10 @@
 <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
 
 <xsl:template match="/">
-  <xsl:apply-templates select="//m0:StockQuote" /> 
+  <xsl:apply-templates select="//StockQuote" /> 
 </xsl:template>
   
-<xsl:template match="m0:StockQuote">
+<xsl:template match="StockQuote">
 
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 <soap:Body>

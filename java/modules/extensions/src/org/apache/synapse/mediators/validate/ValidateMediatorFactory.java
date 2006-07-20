@@ -25,7 +25,6 @@ import org.apache.synapse.Util;
 import org.apache.synapse.config.xml.AbstractListMediatorFactory;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.validate.ValidateMediator;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -93,9 +92,9 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                 OMElement omElem = (OMElement) o;
                 OMAttribute keyAtt = omElem.getAttribute(KEY_Q);
                 if (keyAtt != null) {
-                    schemaKeys.add(new DynamicProperty(keyAtt.getAttributeValue()));
+                    schemaKeys.add(keyAtt.getAttributeValue());
                 } else {
-                    handleException("A 'schema' definition must contain the registry 'key'");
+                    handleException("A 'schema' definition must contain a local property 'key'");
                 }
             } else {
                 handleException("Invalid 'schema' declaration for validate mediator");

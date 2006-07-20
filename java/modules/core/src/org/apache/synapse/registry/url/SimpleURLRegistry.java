@@ -18,6 +18,7 @@ package org.apache.synapse.registry.url;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.registry.AbstractRegistry;
 import org.apache.synapse.registry.RegistryEntry;
+import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
@@ -60,11 +61,11 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             return builder.getDocumentElement();
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            handleException("Invalid URL reference " + root + key, e);
         } catch (IOException e) {
-            e.printStackTrace();
+            handleException("IO Error reading from URL " + root + key, e);
         } catch (XMLStreamException e) {
-            e.printStackTrace();
+            handleException("XML Error reading from URL " + root + key, e);
         }
         return null;
     }
@@ -92,11 +93,11 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             return wre;
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            handleException("Invalid URL reference " + root + key, e);
         } catch (IOException e) {
-            e.printStackTrace();
+            handleException("IO Error reading from URL " + root + key, e);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            handleException("URI Syntax error reading from URL " + root + key, e);
         }
         return null;
     }
@@ -107,5 +108,10 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         } else if ("cachableDuration".equals(name)) {
             this.cachableDuration = Long.parseLong(value);
         }
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 }

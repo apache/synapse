@@ -68,7 +68,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
                 return xpath.booleanValueOf(synCtx.getEnvelope());
 
             } else if (source != null && regex != null) {
-                log.debug("Evaluating regular expression : " + regex + " against source : " + source);
+                log.debug("Evaluating regular expression : " + regex.pattern() + " against source : " + source);
                 return regex.matcher(Util.getStringValue(source, synCtx)).matches();
 
             } else {

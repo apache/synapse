@@ -30,15 +30,26 @@ import org.apache.synapse.config.SynapseConfiguration;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import java.io.StringReader;
+import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 public class TestUtils {
 
-    public static TestMessageContext getTestContext(String bodyText) throws Exception {
+    public static TestMessageContext getTestContext(String bodyText, Map props) throws Exception {
 
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
         testConfig.addRegistry(null, new SimpleURLRegistry());
+
+        if (props != null) {
+            Iterator iter = props.keySet().iterator();
+            while (iter.hasNext()) {
+                String key = (String) iter.next();
+                testConfig.addProperty(key, props.get(key));
+            }
+        }
         synCtx.setConfiguration(testConfig);
 
         SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
@@ -55,6 +66,11 @@ public class TestUtils {
         synCtx.setEnvelope(envelope);
         return synCtx;
     }
+
+    public static TestMessageContext getTestContext(String bodyText) throws Exception {
+        return getTestContext(bodyText, null);
+    }
+
     public static MessageContext createLightweightSynapseMessageContext(
             String paylod) throws Exception {
         org.apache.axis2.context.MessageContext mc =

@@ -28,6 +28,8 @@ package org.apache.synapse.config;
  * the new RegistryEntry lookup.
  */
 public class DynamicProperty {
+    /** The name of the registry to which this key applies */
+    private String registryName = null;
     /** The registry key */
     private String key;
     /** The cached object */
@@ -53,6 +55,10 @@ public class DynamicProperty {
 
     public Object getCache() {
         return cache;
+    }
+
+    public boolean isCached() {
+        return cache != null;
     }
 
     public void setCache(Object cache) {
@@ -85,5 +91,13 @@ public class DynamicProperty {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getRegistryName() {
+        return registryName;
+    }
+
+    public void setRegistryName(String registryName) {
+        this.registryName = registryName;
     }
 }

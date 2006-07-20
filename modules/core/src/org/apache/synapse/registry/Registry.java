@@ -16,6 +16,7 @@
 package org.apache.synapse.registry;
 
 import org.apache.axiom.om.OMNode;
+import org.apache.synapse.config.DynamicProperty;
 
 /**
  * This is the interface to a Registry from Synapse.
@@ -30,15 +31,14 @@ public interface Registry {
     public OMNode lookup(String key);
 
     /**
-     * This is the publicly used interface to the registry. It will perform
-     * the lookup on the local cache considering expiry time, and will fetch
-     * the content from the registry and cache when required.
+     * This is the publicly used interface to the registry. It will fetch
+     * the content from the registry and cache if required.
      * @see AbstractRegistry
      *
-     * @param key the key for the proprty lookup
+     * @param dp the DynamicProperty
      * @return the value from the registry or local cache
      */
-    public Object getProperty(String key);
+    public Object getProperty(DynamicProperty dp);
 
     /**
      * Get the registry entry for the given key

@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 import org.apache.synapse.registry.Registry;
+import org.apache.synapse.config.DynamicProperty;
 
 public class SimpleURLRegistryTest extends TestCase {
 
@@ -37,17 +38,18 @@ public class SimpleURLRegistryTest extends TestCase {
         Registry reg = new SimpleURLRegistry();
         reg.setConfigProperty("root", "file:./");
         reg.setConfigProperty("cachableDuration", "1500");
+        DynamicProperty dp = new DynamicProperty(FILE);
 
         // initial load of file from registry
-        assertEquals(TEXT_1, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_1, reg.getProperty(dp).toString());
 
         // sleep 1 sec
         Thread.sleep(1000);
-        assertEquals(TEXT_1, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_1, reg.getProperty(dp).toString());
 
         // sleep another 1 sec, has expired in cache, but content hasnt changed
         Thread.sleep(1000);
-        assertEquals(TEXT_1, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_1, reg.getProperty(dp).toString());
 
         // the renewed cache should be valid for another 1.5 secs
         // change the file now and change next cache duration
@@ -55,15 +57,15 @@ public class SimpleURLRegistryTest extends TestCase {
         reg.setConfigProperty("cachableDuration", "100");
 
         // still cached content should be available and valid
-        assertEquals(TEXT_1, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_1, reg.getProperty(dp).toString());
 
         // now sleep 1 sec, still cache should be valid
         Thread.sleep(1000);
-        assertEquals(TEXT_1, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_1, reg.getProperty(dp).toString());
 
         // sleep another 1 sec.. cache should expire and new content should be loaded
         Thread.sleep(1000);
-        assertEquals(TEXT_2, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_2, reg.getProperty(dp).toString());
 
         // change content back to original
         writeToFile(TEXT_1);
@@ -71,7 +73,7 @@ public class SimpleURLRegistryTest extends TestCase {
         // sleep for .5 sec, now the new content should be loaded as new expiry time
         // is .1 sec
         Thread.sleep(500);
-        assertEquals(TEXT_1, reg.getProperty(FILE).toString());
+        assertEquals(TEXT_1, reg.getProperty(dp).toString());
     }
 
     public void tearDown() throws Exception {

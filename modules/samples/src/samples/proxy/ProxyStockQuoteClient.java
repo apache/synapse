@@ -30,15 +30,17 @@ public class ProxyStockQuoteClient {
         String fwdProxy = "http://localhost:8080/axis2/services/InvesbotForwardProxy";
         String defProxy = "http://localhost:8080/axis2/services/InvesbotDefaultProxy";
         String seqProxy = "http://localhost:8080/axis2/services/InvesbotSequenceProxy";
+        String repo     = "client_repo";
         String sAction  = "http://ws.invesbot.com/GetQuote";
 
         if (args.length > 0) symbol   = args[0];
         if (args.length > 1) fwdProxy = args[1];
         if (args.length > 2) defProxy = args[2];
-        if (args.length > 2) seqProxy = args[3];
+        if (args.length > 3) seqProxy = args[3];
+        if (args.length > 4) repo     = args[4];
 
-        Util.testStandardQuote(symbol, sAction, null, fwdProxy);
-        Util.testStandardQuote(symbol, sAction, null, defProxy);
-        Util.testStandardQuote(symbol, sAction, null, seqProxy);
+        Util.testStandardQuote(symbol, sAction, null, fwdProxy, repo);
+        Util.testStandardQuote(symbol, sAction, null, defProxy, repo);
+        Util.testStandardQuote(symbol, sAction, null, seqProxy, repo);
     }
 }

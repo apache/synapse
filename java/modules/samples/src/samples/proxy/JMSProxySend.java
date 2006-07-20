@@ -24,13 +24,15 @@ public class JMSProxySend {
         String symbol  = "IBM";
         String xurl    = "http://ws.invesbot.com/stockquotes.asmx";
         String turl    = "jms:/JMSInvesbotSequenceProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&java.naming.provider.url=tcp://localhost:61616";
+        String repo    = "client_repo";
         String sAction = "http://ws.invesbot.com/GetQuote";
 
         if (args.length > 0) symbol = args[0];
         if (args.length > 1) xurl   = args[1];
         if (args.length > 2) turl   = args[2];
+        if (args.length > 3) repo   = args[3];
 
-        Util.testStandardQuote(symbol, sAction, xurl, turl);
+        Util.testStandardQuote(symbol, sAction, xurl, turl, repo);
     }
 
 }

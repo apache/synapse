@@ -18,6 +18,8 @@ package org.apache.synapse;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
@@ -103,6 +105,17 @@ public class ValidateMediatorTest extends TestCase {
             "   </on-fail>" +
             "</validate>";
 
+    private static final String REG_KEY =
+            "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
+            "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
+            "   <on-fail>" +
+            "       <makefault>" +
+            "           <code value=\"tns:Receiver\" xmlns:tns=\"http://www.w3.org/2003/05/soap-envelope\"/>" +
+            "           <reason value=\"Invalid request\"/>" +
+            "       </makefault>" +
+            "   </on-fail>" +
+            "</validate>";
+
     private boolean onFailInvoked = false;
     private TestMediator testMediator = null;
 
@@ -128,7 +141,7 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add("xsd-key");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
@@ -137,8 +150,11 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE));
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE, props));
 
         assertFalse(onFailInvoked);
     }
@@ -151,8 +167,8 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+        keys.add("xsd-key-1");
+        keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
         source.addNamespace("m0", "http://www.apache-synapse.org/test2");
@@ -161,8 +177,12 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        props.put("xsd-key-2", new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_TWO_SCHEMAS));
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_TWO_SCHEMAS, props));
 
         assertFalse(onFailInvoked);
     }
@@ -175,8 +195,8 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+        keys.add("xsd-key-1");
+        keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
         source.addNamespace("m0", "http://www.apache-synapse.org/test2");
@@ -185,8 +205,12 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        props.put("xsd-key-2", new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(INVALID_ENVELOPE_TWO_SCHEMAS));
+        validate.mediate(TestUtils.getTestContext(INVALID_ENVELOPE_TWO_SCHEMAS, props));
 
         assertTrue(onFailInvoked);
     }
@@ -199,7 +223,7 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
@@ -208,8 +232,11 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE));
+        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE, props));
 
         assertTrue(onFailInvoked);
     }
@@ -222,7 +249,7 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
@@ -231,8 +258,11 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_NO_NS));
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_NO_NS, props));
 
         assertFalse(onFailInvoked);
     }
@@ -245,7 +275,7 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
@@ -254,8 +284,11 @@ public class ValidateMediatorTest extends TestCase {
         // set dummy mediator to be called on fail
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE_NO_NS));
+        validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE_NO_NS, props));
 
         assertTrue(onFailInvoked);
     }
@@ -292,7 +325,7 @@ public class ValidateMediatorTest extends TestCase {
 
         // set the schema url, source xpath and any name spaces
         List keys = new ArrayList();
-        keys.add(new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
         source.addNamespace("m0", "http://www.apache-synapse.org/test");
@@ -302,8 +335,12 @@ public class ValidateMediatorTest extends TestCase {
         validate.removeChild(0);
         validate.addChild(testMediator);
 
+        Map props = new HashMap();
+        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+
+
         // test validate mediator, with static enveope
-        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE));
+        validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE, props));
 
         assertFalse(onFailInvoked);
     }

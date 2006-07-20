@@ -20,13 +20,16 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.mediators.transform.TransformMediator;
+import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.DynamicProperty;
 
 import java.net.URL;
 import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
 
-public class TransformMediatorTest extends TestCase {
+public class XSLTMediatorTest extends TestCase {
 
     private static final String SOURCE =
         "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
@@ -40,12 +43,12 @@ public class TransformMediatorTest extends TestCase {
         "</m0:CheckPriceRequest>" +
         "</m:someOtherElement>";
 
-    TransformMediator transformMediator = null;
+    XSLTMediator transformMediator = null;
 
     public void testTransformXSLTCustomSource() throws Exception {
 
         // create a new switch mediator
-        transformMediator = new TransformMediator();
+        transformMediator = new XSLTMediator();
 
         // set xpath condition to select source
         AXIOMXPath xpath = new AXIOMXPath("//m0:CheckPriceRequest");
@@ -53,11 +56,13 @@ public class TransformMediatorTest extends TestCase {
         transformMediator.setSource(xpath);
 
         // set XSLT transformation URL
-        transformMediator.setXsltUrl(
-            new URL("file:///" + new File(".").getAbsolutePath() + "/../core/test-resources/misc/transform.xslt"));
+        transformMediator.setXsltKey("xslt-key");
+
+        Map props = new HashMap();
+        props.put("xslt-key", new DynamicProperty("file:../core/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext(SOURCE);
+        MessageContext synCtx = TestUtils.getTestContext(SOURCE, props);
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -85,14 +90,16 @@ public class TransformMediatorTest extends TestCase {
     public void testTransformXSLTDefaultSource() throws Exception {
 
         // create a new switch mediator
-        transformMediator = new TransformMediator();
+        transformMediator = new XSLTMediator();
 
         // set XSLT transformation URL
-        transformMediator.setXsltUrl(
-            new URL("file:///" + new File(".").getAbsolutePath() + "/../core/test-resources/misc/transform.xslt"));
+        transformMediator.setXsltKey("xslt-key");
+
+        Map props = new HashMap();
+        props.put("xslt-key", new DynamicProperty("file:../core/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext(SOURCE);
+        MessageContext synCtx = TestUtils.getTestContext(SOURCE, props);
         transformMediator.mediate(synCtx);
 
         // validate result
@@ -116,7 +123,7 @@ public class TransformMediatorTest extends TestCase {
     public void testTransformXSLTCustomSourceNonMainElement() throws Exception {
 
         // create a new switch mediator
-        transformMediator = new TransformMediator();
+        transformMediator = new XSLTMediator();
 
         // set xpath condition to select source
         AXIOMXPath xpath = new AXIOMXPath("//m0:CheckPriceRequest");
@@ -124,11 +131,13 @@ public class TransformMediatorTest extends TestCase {
         transformMediator.setSource(xpath);
 
         // set XSLT transformation URL
-        transformMediator.setXsltUrl(
-            new URL("file:///" + new File(".").getAbsolutePath() + "/../core/test-resources/misc/transform.xslt"));
+        transformMediator.setXsltKey("xslt-key");
+
+        Map props = new HashMap();
+        props.put("xslt-key", new DynamicProperty("file:../core/test-resources/misc/transform.xslt"));
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE);
+        MessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE, props);
         transformMediator.mediate(synCtx);
 
         // validate result

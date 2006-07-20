@@ -20,12 +20,16 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.AxisFault;
+
+import javax.xml.namespace.QName;
 
 public class Util {
 
     public static void testStandardQuote(
-        String symbol, String soapAction, String xurl, String turl) {
+        String symbol, String soapAction, String xurl, String turl, String repo) {
 
         try {
             OMElement getQuote = InvesbotHandler.createStandardRequestPayload(symbol);
@@ -37,7 +41,16 @@ public class Util {
                 options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
-            ServiceClient serviceClient = new ServiceClient();
+            ServiceClient serviceClient = null;
+            if (repo != null) {
+                ConfigurationContext configContext =
+                    ConfigurationContextFactory.
+                        createConfigurationContextFromFileSystem(repo, null);
+                serviceClient = new ServiceClient(configContext, null);
+            } else {
+                serviceClient = new ServiceClient();
+            }
+            serviceClient.engageModule(new QName("addressing"));
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
@@ -50,7 +63,7 @@ public class Util {
     }
 
     public static void testCustomQuote(
-        String symbol, String soapAction, String xurl, String turl) {
+        String symbol, String soapAction, String xurl, String turl, String repo) {
 
         try {
             OMElement getQuote = InvesbotHandler.createCustomRequestPayload(symbol);
@@ -62,7 +75,16 @@ public class Util {
                 options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
-            ServiceClient serviceClient = new ServiceClient();
+            ServiceClient serviceClient = null;
+            if (repo != null) {
+                ConfigurationContext configContext =
+                    ConfigurationContextFactory.
+                        createConfigurationContextFromFileSystem(repo, null);
+                serviceClient = new ServiceClient(configContext, null);
+            } else {
+                serviceClient = new ServiceClient();
+            }
+            serviceClient.engageModule(new QName("addressing"));
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
@@ -75,7 +97,7 @@ public class Util {
     }
 
     public static void testAdvancedQuote(
-        String symbol, String soapAction, String xurl, String turl) {
+        String symbol, String soapAction, String xurl, String turl, String repo) {
         try {
             OMElement getQuote = InvesbotHandler.createCustomRequestPayload(symbol);
 
@@ -86,7 +108,16 @@ public class Util {
                 options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
-            ServiceClient serviceClient = new ServiceClient();
+            ServiceClient serviceClient = null;
+            if (repo != null) {
+                ConfigurationContext configContext =
+                    ConfigurationContextFactory.
+                        createConfigurationContextFromFileSystem(repo, null);
+                serviceClient = new ServiceClient(configContext, null);
+            } else {
+                serviceClient = new ServiceClient();
+            }
+            serviceClient.engageModule(new QName("addressing"));
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote);
@@ -99,7 +130,7 @@ public class Util {
     }
 
     public static void testErroneousQuote(
-        String symbol, String soapAction, String xurl, String turl) {
+        String symbol, String soapAction, String xurl, String turl, String repo) {
         try {
             OMElement getQuote = InvesbotHandler.createErroneousCustomRequestPayload(symbol);
 
@@ -110,7 +141,16 @@ public class Util {
                 options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
-            ServiceClient serviceClient = new ServiceClient();
+            ServiceClient serviceClient = null;
+            if (repo != null) {
+                ConfigurationContext configContext =
+                    ConfigurationContextFactory.
+                        createConfigurationContextFromFileSystem(repo, null);
+                serviceClient = new ServiceClient(configContext, null);
+            } else {
+                serviceClient = new ServiceClient();
+            }
+            serviceClient.engageModule(new QName("addressing"));
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote);

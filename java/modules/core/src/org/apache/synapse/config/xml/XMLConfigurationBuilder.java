@@ -180,6 +180,10 @@ public class XMLConfigurationBuilder {
         } else if (key != null) {
             config.addProperty(name.getAttributeValue(),
                 new DynamicProperty(key.getAttributeValue()));
+
+        // an inline XML fragment
+        } else {
+            config.addProperty(name.getAttributeValue(), elem.getFirstElement());
         }
     }
 

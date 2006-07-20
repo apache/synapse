@@ -57,6 +57,7 @@
         <copy todir="${build.temp.dir}/module">
             <fileset dir="${basedir}/target/classes" >
             	<include name="**/*.class"/>
+            	<include name="**/*.properties" /> 
             </fileset>
         </copy>
   

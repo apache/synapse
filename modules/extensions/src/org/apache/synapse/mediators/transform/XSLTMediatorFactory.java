@@ -23,7 +23,7 @@ import org.apache.synapse.Util;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
-import org.apache.synapse.mediators.transform.TransformMediator;
+import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,18 +35,18 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 /**
- * Creates a transform mediator from the given XML
+ * Creates a XSLT mediator from the given XML
  *
  * <pre>
- * &lt;transform xslt|xquery="url" [source="xpath"]&gt;
+ * &lt;xslt key="property-key" [source="xpath"]&gt;
  *   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  * &lt;/transform&gt;
  * </pre>
  */
-public class TransformMediatorFactory extends AbstractMediatorFactory {
+public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(TransformMediatorFactory.class);
-    private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "transform");
+    private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
+    private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
 
     private static final String STR_SCHEMA =
         Constants.SCHEMA_PROLOG +
@@ -69,34 +69,15 @@ public class TransformMediatorFactory extends AbstractMediatorFactory {
 
     public Mediator createMediator(OMElement elem) {
 
-        TransformMediator transformMediator = new TransformMediator();
+        XSLTMediator transformMediator = new XSLTMediator();
 
-        OMAttribute attXslt   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "xslt"));
-        OMAttribute attXQuery = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "xquery"));
+        OMAttribute attXslt   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
         OMAttribute attSource = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
 
         if (attXslt != null) {
-            try {
-                transformMediator.setXsltUrl(new URL(attXslt.getAttributeValue()));
-            } catch (MalformedURLException e) {
-                String msg = "Invalid URL specified for the xslt attribute : " + attXslt.getAttributeValue();
-                log.error(msg);
-                throw new SynapseException(msg);
-            }
-
-        } else  if (attXQuery != null) {
-            try {
-                transformMediator.setXQueryUrl(new URL(attXQuery.getAttributeValue()));
-            } catch (MalformedURLException e) {
-                String msg = "Invalid URL specified for the xquery attribute : " + attXQuery.getAttributeValue();
-                log.error(msg);
-                throw new SynapseException(msg);
-            }
-
+            transformMediator.setXsltKey(attXslt.getAttributeValue());
         } else {
-            String msg = "The 'xslt' or 'xquery' attributes are required for the Transform mediator";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException("The 'key' attribute is required for the XSLT mediator");
         }
 
         if (attSource != null) {
@@ -106,9 +87,8 @@ public class TransformMediatorFactory extends AbstractMediatorFactory {
                 transformMediator.setSource(xp);
 
             } catch (JaxenException e) {
-                String msg = "Invalid XPath specified for the source attribute : " + attSource.getAttributeValue();
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Invalid XPath specified for the source attribute : " +
+                    attSource.getAttributeValue());
             }
         }
 
@@ -121,4 +101,15 @@ public class TransformMediatorFactory extends AbstractMediatorFactory {
     public XmlSchema getTagSchema() {
         return SCHEMA;
     }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
 }

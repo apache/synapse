@@ -65,7 +65,7 @@ public class SwitchCaseMediator extends AbstractListMediator {
             return true;
         }
         boolean retVal = regex.matcher(value).matches();
-        log.debug("Case : " + regex + " evaluated to : " + retVal);
+        log.debug("Case : " + regex.pattern() + " evaluated to : " + retVal);
         return retVal;
     }
 }

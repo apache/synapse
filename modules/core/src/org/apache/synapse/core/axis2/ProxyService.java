@@ -98,7 +98,7 @@ public class ProxyService {
         if (transports == null || ALL_TRANSPORTS.equals(transports)) {
             // default to all transports using service name as destination
         } else {
-            StringTokenizer st = new StringTokenizer(transports, ", ");
+            StringTokenizer st = new StringTokenizer(transports, " ");
             ArrayList transportList = new ArrayList();
             for (int i=0; i<st.countTokens(); i++) {
                 transportList.add(st.nextToken());

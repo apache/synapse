@@ -47,7 +47,10 @@ public class Util {
      */
     public static StreamSource getStreamSource(Object o) {
 
-        if (o instanceof OMNode) {
+        if (o == null) {
+            handleException("Cannot convert null to a StreamSource");
+
+        } else if (o instanceof OMNode) {
             OMNode omNode = (OMNode) o;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {

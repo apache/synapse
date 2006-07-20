@@ -17,6 +17,8 @@ package org.apache.synapse.mediators.validate;
 
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -63,11 +65,8 @@ public class ValidateMediator extends AbstractListMediator {
      */
     private static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
-    /** The name of the registry on which the Schema keys could be looked up from */
-    private String registryName = null;
-
     /**
-     * A list of DynamicProperty keys, referring to the schemas to be used for validation
+     * A list of property keys, referring to the schemas to be used for the validation
      */
     private List schemaKeys = new ArrayList();
 
@@ -100,12 +99,17 @@ public class ValidateMediator extends AbstractListMediator {
      */
     private final MyErrorHandler errorHandler = new MyErrorHandler();
 
+    private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+        "//s12:Envelope/s12:Body/child::*[position()=1]";
+
     public ValidateMediator() {
         // create the default XPath
         try {
-            this.source = new AXIOMXPath("//*:Envelope/*:Body/child::*");
+            this.source = new AXIOMXPath(DEFAULT_XPATH);
+            this.source.addNamespace("s11", SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+            this.source.addNamespace("s12", SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         } catch (JaxenException e) {
-            // this should not cause a runtime exception!
+            handleException("Error creating source XPath expression", e);
         }
     }
 
@@ -194,15 +198,15 @@ public class ValidateMediator extends AbstractListMediator {
         // flag to check if we need to initialize/re-initialize the schema Validator
         boolean reCreate = false;
 
-        Registry reg = msgCtx.getConfiguration().getRegistry(registryName);
-
         // if any of the schemas are not loaded or expired, load or re-load them
         Iterator iter = schemaKeys.iterator();
         while (iter.hasNext()) {
-            DynamicProperty dp = (DynamicProperty) iter.next();
-            if (dp.getCache() == null || dp.isExpired()) {
-                reg.getProperty(dp.getKey());   // load property from registry
-                reCreate = true;                // request re-initialization of Validator
+            String propKey = (String) iter.next();
+            DynamicProperty dp = msgCtx.getConfiguration().getDynamicProperty(propKey);
+            if (dp != null) {
+                if (!dp.isCached() || dp.isExpired()) {
+                    reCreate = true;       // request re-initialization of Validator
+                }
             }
         }
 
@@ -211,41 +215,39 @@ public class ValidateMediator extends AbstractListMediator {
             return;
         }
 
-        synchronized (validatorLock) {
+        try {
+            // Create SchemaFactory and configure for the default schema language - XMLSchema
+            SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
+            factory.setErrorHandler(errorHandler);
 
-            try {
-                // Create SchemaFactory and configure for the default schema language - XMLSchema
-                SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
-                factory.setErrorHandler(errorHandler);
-
-                // set any features on/off as requested
-                iter = properties.entrySet().iterator();
-                while (iter.hasNext()) {
-                    Map.Entry entry = (Map.Entry) iter.next();
-                    String value = (String) entry.getValue();
-                    factory.setFeature(
-                        (String) entry.getKey(), value != null && "true".equals(value));
-                }
-
-                Schema schema = null;
-
-                StreamSource[] sources = new StreamSource[schemaKeys.size()];
-                iter = schemaKeys.iterator();
-                int i = 0;
-                while (iter.hasNext()) {
-                    DynamicProperty dp = (DynamicProperty) iter.next();
-                    sources[i++] = Util.getStreamSource(reg.getProperty(dp.getKey()));
-                }
-                schema = factory.newSchema(sources);
-
-                // Setup validator and input source
-                // Features set for the SchemaFactory get propagated to Schema and Validator (JAXP 1.4)
-                validator = schema.newValidator();
-                validator.setErrorHandler(errorHandler);
-
-            } catch (SAXException e) {
-                handleException("Error creating Validator", e);
+            // set any features on/off as requested
+            iter = properties.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry) iter.next();
+                String value = (String) entry.getValue();
+                factory.setFeature(
+                    (String) entry.getKey(), value != null && "true".equals(value));
             }
+
+            Schema schema = null;
+
+            StreamSource[] sources = new StreamSource[schemaKeys.size()];
+            iter = schemaKeys.iterator();
+            int i = 0;
+            while (iter.hasNext()) {
+                String propName = (String) iter.next();
+                sources[i++] = Util.getStreamSource(
+                    msgCtx.getConfiguration().getProperty(propName));
+            }
+            schema = factory.newSchema(sources);
+
+            // Setup validator and input source
+            // Features set for the SchemaFactory get propagated to Schema and Validator (JAXP 1.4)
+            validator = schema.newValidator();
+            validator.setErrorHandler(errorHandler);
+
+        } catch (SAXException e) {
+            handleException("Error creating Validator", e);
         }
     }
 
@@ -333,10 +335,10 @@ public class ValidateMediator extends AbstractListMediator {
     }
 
     /**
-     * Set a list of DynamicProperty elements which refer to the list of schemas to be
+     * Set a list of local property names which refer to a list of schemas to be
      * used for validation
      *
-     * @param schemaKeys list of DynamicProperty elements
+     * @param schemaKeys list of local property names
      */
     public void setSchemaKeys(List schemaKeys) {
         this.schemaKeys = schemaKeys;
@@ -350,11 +352,4 @@ public class ValidateMediator extends AbstractListMediator {
        this.source = source;
     }
 
-    /**
-     * Set the name of the registry which should be used for schema key lookup
-     * @param registryName the name of the registry
-     */
-    public void setRegistryName(String registryName) {
-        this.registryName = registryName;
-    }
 }

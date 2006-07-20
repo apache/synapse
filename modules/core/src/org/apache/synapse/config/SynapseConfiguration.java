@@ -18,6 +18,9 @@ package org.apache.synapse.config;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
+import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
@@ -29,6 +32,9 @@ import java.util.*;
  *  - contains named endpoint definitions
  */
 public class SynapseConfiguration {
+
+    private static final Log log = LogFactory.getLog(SynapseConfiguration.class);
+
     /** Holds named sequences of mediators for reuse */
     private Map namedSequences = new HashMap();
 
@@ -98,7 +104,31 @@ public class SynapseConfiguration {
      * @return its value
      */
     public Object getProperty(String name) {
-        return globalProps.get(name);
+        Object o = globalProps.get(name);
+        if (o != null && o instanceof DynamicProperty) {
+            DynamicProperty dp = (DynamicProperty) o;
+            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+            if (o == null) {
+                handleException("Invalid DynamicProperty reference for key : " + name);
+            }
+        }
+        return o;
+    }
+
+    /**
+     * Return the raw DynamicProperty property with the given name if such an
+     * object exists. This call does not load/re-load or check expiry of the
+     * actual object from the registry for a DynamicProperty. If the given name
+     * does not map to a DynamicProperty, this method returns null
+     * @param name the name of a DynamicProperty
+     * @return raw DynamicProperty object, or null
+     */
+    public DynamicProperty getDynamicProperty(String name) {
+        Object o = globalProps.get(name);
+        if (o != null && o instanceof DynamicProperty) {
+            return (DynamicProperty) o;
+        }
+        return null;
     }
 
     /**
@@ -184,7 +214,15 @@ public class SynapseConfiguration {
         if (name == null) {
             name = "DEFAULT";
         }
-        return (Registry) registryMap.get(name);
+        Registry reg = (Registry) registryMap.get(name);
+        if (reg == null) {
+            handleException("Reference to non-existing registry named : " + name);
+        }
+        return reg;
     }
 
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
 }

@@ -29,13 +29,15 @@ public class CustomStockQuoteClient {
         String symbol = "IBM";
         String xurl   = "http://ws.invesbot.com/stockquotes.asmx";
         String turl   = "http://localhost:8080";
+        String repo   = "client_repo";
         String sAction= "http://ws.invesbot.com/GetQuote";
 
         if (args.length > 0) symbol = args[0];
         if (args.length > 1) xurl   = args[1];
         if (args.length > 2) turl   = args[2];
+        if (args.length > 3) repo   = args[3];
 
-        Util.testStandardQuote(symbol, sAction, xurl, turl);
-        Util.testCustomQuote(symbol, sAction, xurl, turl);
+        Util.testStandardQuote(symbol, sAction, xurl, turl, repo);
+        Util.testCustomQuote(symbol, sAction, xurl, turl, repo);
     }
 }

@@ -160,13 +160,13 @@ public class MediatorFactoryFinder {
         registerExtensions(mediators);
 
         // add registers mediators as extensions
-        if (loadSchemas) {
+        /*if (loadSchemas) {
             mergeSchema(mediators);
             if (log.isDebugEnabled()) {
                 System.out.println("Mediator Schema : ");
                 schema.write(System.out);
             }
-        }
+        }*/
     }
 
     private void handleException(String msg, Exception e) {

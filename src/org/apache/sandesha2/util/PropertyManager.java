@@ -195,7 +195,7 @@ public class PropertyManager {
 		if (data.isAcknowledgementIntervalSet())
 			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
 		else
-			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInaterval());
+			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInterval());
 
 		if (data.isExponentialBackoffSet())
 			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
@@ -283,7 +283,7 @@ public class PropertyManager {
 		if (data.isAcknowledgementIntervalSet())
 			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
 		else
-			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInaterval());
+			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInterval());
 
 		if (data.isExponentialBackoffSet())
 			propertyBean.setExponentialBackoff(data.isExponentialBackoff());

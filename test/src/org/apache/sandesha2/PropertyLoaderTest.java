@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaPropertyBean;
 
-public class PorpertyLoaderTest extends TestCase {
+public class PropertyLoaderTest extends TestCase {
 	
 	SandeshaPropertyBean propertyBean = null;
 	
@@ -57,7 +57,7 @@ public class PorpertyLoaderTest extends TestCase {
 	}
 	
 	public void testAcknowledgementInterval () {
-		long value = propertyBean.getAcknowledgementInaterval();
+		long value = propertyBean.getAcknowledgementInterval();
 		assertEquals(value,8000);
 	}
 	

@@ -44,7 +44,7 @@ public class RMPolicyBean {
         return inactiveTimeoutInterval;
     }
     
-    public long getAcknowledgementInaterval() {
+    public long getAcknowledgementInterval() {
         return acknowledgementInterval;
     }
     

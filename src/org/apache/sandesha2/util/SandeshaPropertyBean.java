@@ -43,8 +43,8 @@ public class SandeshaPropertyBean {
 		return policyBean.getInactiveTimeoutInterval();
 	}
 
-	public long getAcknowledgementInaterval() {
-		return policyBean.getAcknowledgementInaterval();
+	public long getAcknowledgementInterval() {
+		return policyBean.getAcknowledgementInterval();
 	}
 
 	public long getRetransmissionInterval() {

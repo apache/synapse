@@ -208,7 +208,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 			// operation is the lowest level, Sandesha2 can be engaged.
 			SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
 
-			long ackInterval = propertyBean.getAcknowledgementInaterval();
+			long ackInterval = propertyBean.getAcknowledgementInterval();
 
 			// Ack will be sent as stand alone, only after the retransmitter
 			// interval.

@@ -137,7 +137,7 @@ public class XMLConfigurationBuilder {
      * </pre>
      * @param elem
      */
-    private void defineProperty(SynapseConfiguration config, OMElement elem) {
+    public void defineProperty(SynapseConfiguration config, OMElement elem) {
         OMAttribute name  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
         OMAttribute src   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));
@@ -195,7 +195,7 @@ public class XMLConfigurationBuilder {
      * </pre>
      * @param ele
      */
-    private void defineSequence(SynapseConfiguration config, OMElement ele) {
+    public void defineSequence(SynapseConfiguration config, OMElement ele) {
         SequenceMediator seq = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(ele);
         config.addNamedMediator(seq.getName(), seq);
     }
@@ -210,7 +210,7 @@ public class XMLConfigurationBuilder {
      * </pre>
      * @param ele the &lt;endpoint&gt; element
      */
-    private void defineEndpoint(SynapseConfiguration config, OMElement ele) {
+    public void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
         OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         if (name == null) {
@@ -276,7 +276,7 @@ public class XMLConfigurationBuilder {
      *
      * @param elem the XML element defining the configuration
      */
-    private void defineExtension(SynapseConfiguration config, OMElement elem) {
+    public void defineExtension(SynapseConfiguration config, OMElement elem) {
 
         OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
 

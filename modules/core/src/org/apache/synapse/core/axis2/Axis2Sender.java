@@ -73,6 +73,10 @@ public class Axis2Sender {
                     ((Axis2MessageContext) synapseInMessageContext).
                         getAxis2MessageContext());
 
+            //set the response Envelop as a property in Original axisMsgCtx
+            synapseInMessageContext.setProperty(org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,
+                                                axisOutMsgContext.getEnvelope());
+
             // create the synapse message context for the response
             org.apache.synapse.MessageContext synapseOutMessageContext =
                 new Axis2MessageContext(

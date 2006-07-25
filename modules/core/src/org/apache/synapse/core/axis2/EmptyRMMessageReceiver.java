@@ -18,19 +18,30 @@ package org.apache.synapse.core.axis2;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 /*
  * 
  */
 
 public class EmptyRMMessageReceiver implements MessageReceiver {
+
+    private static Log log = LogFactory.getLog(EmptyRMMessageReceiver.class);
+
     public void receive(MessageContext messageContext) throws AxisFault {
         /*
          Message Recieved with RM
         */
-        //TODO : SynapseEnvironment Inject
-        System.out.println("########  EmptyRMMessageReceiver ######");
-        System.out.println("########   Envelope  :  " + messageContext.getEnvelope().toString());
         
+        log.info("EmptyRMMessageReceiver#receive() and inject the Message into Synapse Environment");
+        log.debug("Application Message  :  " + messageContext.getEnvelope().toString());
+
+        org.apache.synapse.MessageContext synCtx =
+                Axis2MessageContextFinder.getSynapseMessageContext(messageContext);
+        synCtx.getEnvironment().injectMessage(synCtx);
+
+        log.debug("Executed EmptyRMMessageReceiver#receive() and Java Return for RMMediator");
+
 
         messageContext.setProperty(
                 org.apache.synapse.Constants.MESSAGE_RECEIVED_RM_ENGAGED,

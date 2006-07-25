@@ -79,4 +79,6 @@ public interface Constants {
 
     String PROCESSED_MUST_UNDERSTAND = "__PROCESSED_MUST_UNDERSTAND__";
 
+    String RESPONSE_SOAP_ENVELOPE = "_RESPONSE_SOAP_ENVELOPE_";
+
 }

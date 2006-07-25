@@ -54,6 +54,11 @@ public class RMMediator extends AbstractMediator {
         log.debug("RM Mediator  ::  mediate() ");
         org.apache.axis2.context.MessageContext msgCtx =
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        Object obj = msgCtx.getProperty(org.apache.synapse.Constants.MESSAGE_RECEIVED_RM_ENGAGED);
+        if (obj != null && ((Boolean)obj).booleanValue()) {
+            log.debug("RM Mediator works only for the First Chain");
+            return true;
+        }
 
         ConfigurationContext cc = msgCtx.getConfigurationContext();
         AxisConfiguration ac = cc.getAxisConfiguration();
@@ -65,19 +70,11 @@ public class RMMediator extends AbstractMediator {
 
             ae.receive(msgCtx);
 
-            if (msgCtx.getProperty(
-                    org.apache.synapse.Constants.MESSAGE_RECEIVED_RM_ENGAGED) !=
-                                                                              null)
-            {
-                return ((Boolean) msgCtx.getProperty(
-                        org.apache.synapse.Constants.MESSAGE_RECEIVED_RM_ENGAGED))
-                        .booleanValue();
-            }
-
         } catch (AxisFault axisFault) {
             throw new SynapseException(axisFault);
         }
         return false;
+
     }
 
     private void rmEnabledService(ConfigurationContext cc, AxisConfiguration ac,

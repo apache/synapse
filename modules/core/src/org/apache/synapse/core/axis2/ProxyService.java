@@ -17,8 +17,10 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.description.*;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.njms.JMSConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.policy.util.PolicyReader;
@@ -36,6 +38,8 @@ import java.util.*;
  *   <schema url="url">*
  *   <policy url="url">*
  *   <property name="string" value="string"/>*
+ *   <enableRM/>+
+ *   <enableSec/>+
  * </proxy>
  */
 public class ProxyService {
@@ -62,12 +66,16 @@ public class ProxyService {
     private URL[] schemas;
     /** The URLs for any supplied policies that would apply at the service level */
     private List serviceLevelPolicies = new ArrayList();
+    /** Should WS RM (default configuration) be engaged on this service */
+    private boolean wsRMEnabled = false;
+    /** Should WS Sec (default configuration) be engaged on this service */
+    private boolean wsSecEnabled = false;
 
     public static final String ALL_TRANSPORTS = "all";
 
     public ProxyService() {}
 
-    public AxisService buildAxisService() {
+    public AxisService buildAxisService(AxisConfiguration axisCfg) {
 
         AxisService proxyService = null;
         if (wsdl != null) {
@@ -168,6 +176,26 @@ public class ProxyService {
             op.setMessageReceiver(msgRcvr);
         }
 
+        // should RM be engaged on this service?
+        if (wsRMEnabled) {
+            try {
+                proxyService.engageModule(
+                    axisCfg.getModule(Constants.SANDESHA2_MODULE_NAME), axisCfg);
+            } catch (AxisFault axisFault) {
+                handleException("Error loading WS RM module on proxy service : " + name, axisFault);
+            }
+        }
+
+        // should Security be engaged on this service?
+        if (wsSecEnabled) {
+            try {
+                proxyService.engageModule(
+                    axisCfg.getModule(Constants.RAMPART_MODULE_NAME), axisCfg);
+            } catch (AxisFault axisFault) {
+                handleException("Error loading WS Sec module on proxy service : " + name, axisFault);
+            }
+        }
+
         return proxyService;
     }
 
@@ -237,6 +265,22 @@ public class ProxyService {
 
     public void addServiceLevelPoliciy(URL serviceLevelPolicy) {
         this.serviceLevelPolicies.add(serviceLevelPolicy);
+    }
+
+    public boolean isWsRMEnabled() {
+        return wsRMEnabled;
+    }
+
+    public void setWsRMEnabled(boolean wsRMEnabled) {
+        this.wsRMEnabled = wsRMEnabled;
+    }
+
+    public boolean isWsSecEnabled() {
+        return wsSecEnabled;
+    }
+
+    public void setWsSecEnabled(boolean wsSecEnabled) {
+        this.wsSecEnabled = wsSecEnabled;
     }
 
     private static void handleException(String msg) {

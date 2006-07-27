@@ -36,6 +36,8 @@ import java.util.Iterator;
  *   <schema url="url">*
  *   <policy url="url">*
  *   <property name="string" value="string"/>*
+ *   <enableRM/>+
+ *   <enableSec/>+
  * </proxy>
  */
 public class ProxyServiceFactory {
@@ -130,6 +132,14 @@ public class ProxyServiceFactory {
             } else {
                 handleException("Invalid property specified for proxy service : " + name);
             }
+        }
+
+        if (elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
+            proxy.setWsRMEnabled(true);
+        }
+
+        if (elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
+            proxy.setWsSecEnabled(true);
         }
 
 

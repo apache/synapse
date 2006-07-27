@@ -1,0 +1,75 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:axis2="http://ws.apache.org/axis2" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ns0="http://services.samples/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://ws.apache.org/axis2">
+	<wsdl:types>
+		<xs:schema xmlns:stn_1="http://services.samples/xsd" attributeFormDefault="qualified" elementFormDefault="unqualified" targetNamespace="http://services.samples/xsd">
+			<xs:element name="getQuote">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="request" type="stn_1:GetQuote"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetQuote" type="stn_1:GetQuote"/>
+			<xs:complexType name="GetQuote">
+				<xs:sequence>
+					<xs:element name="symbol" type="xs:string"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="getQuoteResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="response" type="stn_1:GetQuoteResponse"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetQuoteResponse" type="stn_1:GetQuoteResponse"/>
+			<xs:complexType name="GetQuoteResponse">
+				<xs:sequence>
+					<xs:element name="change" type="xs:double"/>
+					<xs:element name="earnings" type="xs:double"/>
+					<xs:element name="high" type="xs:double"/>
+					<xs:element name="last" type="xs:double"/>
+					<xs:element name="lastTradeTimestamp" type="xs:dateTime"/>
+					<xs:element name="low" type="xs:double"/>
+					<xs:element name="marketCap" type="xs:double"/>
+					<xs:element name="name" type="xs:string"/>
+					<xs:element name="open" type="xs:double"/>
+					<xs:element name="peRatio" type="xs:double"/>
+					<xs:element name="percentageChange" type="xs:double"/>
+					<xs:element name="prevClose" type="xs:double"/>
+					<xs:element name="symbol" type="xs:string"/>
+					<xs:element name="volume" type="xs:int"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="getQuoteMessage">
+		<wsdl:part name="part1" element="ns0:getQuote"/>
+	</wsdl:message>
+	<wsdl:message name="getQuoteResponse">
+		<wsdl:part name="part1" element="ns0:getQuoteResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="stockquotePortType">
+		<wsdl:operation name="getQuote">
+			<wsdl:input message="axis2:getQuoteMessage"/>
+			<wsdl:output message="axis2:getQuoteResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="stockquoteSOAP11Binding" type="axis2:stockquotePortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="getQuote">
+			<soap:operation soapAction="urn:getQuote" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="SimpleStockQuoteService">
+		<wsdl:port name="stockquoteSOAP11port_http" binding="axis2:stockquoteSOAP11Binding">
+			<soap:address location="http://192.168.1.213:8080/axis2/services/stockquote"/>
+		</wsdl:port>
+	</wsdl:service>
+	<wsdl:documentation>My Echo Service XXX</wsdl:documentation>
+</wsdl:definitions>

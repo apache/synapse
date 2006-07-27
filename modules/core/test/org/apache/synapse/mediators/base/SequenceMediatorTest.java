@@ -20,6 +20,8 @@ import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 
 public class SequenceMediatorTest extends TestCase {
 
@@ -59,5 +61,58 @@ public class SequenceMediatorTest extends TestCase {
         seq.mediate(synCtx);
 
         assertTrue("T1.T2.T3".equals(result.toString()));
+    }
+
+    public void testErrorHandling() throws Exception {
+
+        TestMediator t1 = new TestMediator();
+        t1.setHandler(
+            new TestMediateHandler() {
+                public void handle(MessageContext synCtx) {
+                    result.append("T1.");
+                }
+            });
+        TestMediator t2 = new TestMediator();
+        t2.setHandler(
+            new TestMediateHandler() {
+                public void handle(MessageContext synCtx) {
+                    result.append("T2.");
+                    throw new SynapseException("test");
+                }
+            });
+        TestMediator t3 = new TestMediator();
+        t3.setHandler(
+            new TestMediateHandler() {
+                public void handle(MessageContext synCtx) {
+                    result.append("T3.");
+                }
+            });
+        TestMediator t4 = new TestMediator();
+        t4.setHandler(
+            new TestMediateHandler() {
+                public void handle(MessageContext synCtx) {
+                    result.append("T4");
+                }
+            });
+
+        SequenceMediator seq = new SequenceMediator();
+        seq.addChild(t1);
+        seq.addChild(t2);
+        seq.addChild(t3);
+        seq.setErrorHandler("myErrorHandler");
+
+        SequenceMediator seqErr = new SequenceMediator();
+        seqErr.setName("myErrorHandler");
+        seqErr.addChild(t4);
+
+        // invoke transformation, with static enveope
+        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
+        synCtx.getConfiguration().addNamedMediator("myErrorHandler", seqErr);
+
+        seq.mediate(synCtx);
+
+        assertTrue("T1.T2.T4".equals(result.toString()));
+
+        assertEquals("test", synCtx.getProperty(Constants.ERROR_MESSAGE));
     }
 }

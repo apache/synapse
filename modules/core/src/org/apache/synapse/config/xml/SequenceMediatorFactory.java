@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
  * Builds an instance of a Sequence mediator through the Synapse configuration. It follows the following
  *
  * <pre>
- * &lt;sequence name="string"&gt;
+ * &lt;sequence name="string" [onError="string"]&gt;
  *   mediator+
  * &lt;/sequence&gt;
  * </pre>
@@ -85,6 +85,12 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 throw new SynapseException(msg);
             }
         }
+
+        OMAttribute e = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "onError"));
+        if (e != null) {
+            seqMediator.setErrorHandler(e.getAttributeValue());
+        }
+
         return seqMediator;
     }
 

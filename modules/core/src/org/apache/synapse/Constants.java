@@ -65,6 +65,15 @@ public interface Constants {
     /** The message context property name which holds the Security 'Parameter' object to be used for incoming messages */
     String INFLOW_SEC_PARAMETER = "INFLOW_SEC_PARAMETER";
 
+    /** The message context property name which holds the error code for the last encountered exception */
+    String ERROR_CODE = "ERROR_CODE";
+
+    /** The message context property name which holds the error message for the last encountered exception */
+    String ERROR_MESSAGE = "ERROR_MESSAGE";
+
+    /** The message context property name which holds the error detail (stack trace) for the last encountered exception */
+    String ERROR_DETAIL = "ERROR_DETAIL";
+
     // -- names of modules to be engaged at runtime --
     /** The QName of the WS-RM Sandesha module */
     QName SANDESHA2_MODULE_NAME = new QName("sandesha2");

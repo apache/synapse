@@ -90,7 +90,6 @@ public class XMLConfigurationBuilder {
                     OMElement elt = (OMElement) o;
                     if (Constants.PROXY_ELT.equals(elt.getQName())) {
                         ProxyService proxy = ProxyServiceFactory.createProxy(elt);
-                        proxy.buildAxisService();
                         config.addProxyService(proxy.getName(), proxy);
                     }
                 }
@@ -212,53 +211,9 @@ public class XMLConfigurationBuilder {
      */
     public void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
-        OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        if (name == null) {
-            handleException("The 'name' attribute is required for a named endpoint definition");
-        } else {
-            Endpoint endpoint = new Endpoint();
-            endpoint.setName(name.getAttributeValue());
-
-            OMAttribute address = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "address"));
-            if (address != null) {
-                try {
-                    endpoint.setAddress(new URL(address.getAttributeValue()));
-                } catch (MalformedURLException e) {
-                    handleException("Invalid URL specified for 'address' : " + address.getAttributeValue(), e);
-                }
-            } else {
-                // right now an address is *required*
-                handleException("The 'address' attribute is required for an endpoint");
-            }
-
-            OMAttribute wsAddr = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSA"));
-            if (wsAddr != null) {
-                endpoint.setAddressingOn(Boolean.getBoolean(wsAddr.getAttributeValue()));
-            }
-            OMAttribute wsSec  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSSec"));
-            if (wsSec != null) {
-                endpoint.setSecurityOn(Boolean.getBoolean(wsSec.getAttributeValue()));
-            }
-            OMAttribute wsRm   = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "useWSRM"));
-            if (wsRm != null) {
-                endpoint.setReliableMessagingOn(Boolean.getBoolean(wsRm.getAttributeValue()));
-            }
-
-            // if a Rampart OutflowSecurity parameter is specified, digest it
-            endpoint.setOutflowSecurity(
-                RampartSecurityBuilder.getSecurityParameter(ele, Constants.OUTFLOW_SECURITY));
-
-            // if a Rampart InflowSecurity parameter is specified, digest it
-            endpoint.setInflowSecurity(
-                RampartSecurityBuilder.getSecurityParameter(ele, Constants.INFLOW_SECURITY));
-
-            // if WS-RM is enabled, set it as requested
-            endpoint.setReliableMessagingOn(OutflowRMPolicyBuilder.isRMEnabled(ele));
-            endpoint.setWsRMPolicy(OutflowRMPolicyBuilder.getRMPolicy(ele));
-
-            // add this endpoint to the configuration
-            config.addNamedEndpoint(endpoint.getName(), endpoint);
-        }
+        Endpoint endpoint = EndpointFactory.createEndpoint(ele);
+        // add this endpoint to the configuration
+        config.addNamedEndpoint(endpoint.getName(), endpoint);
     }
 
     /**

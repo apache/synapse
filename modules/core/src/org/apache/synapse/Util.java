@@ -135,4 +135,9 @@ public class Util {
         }
     }
 
+    public static void setErrorInformation(MessageContext synCtx, SynapseException e) {
+        synCtx.setProperty(Constants.ERROR_CODE, "00000"); //TODO not yet defined
+        synCtx.setProperty(Constants.ERROR_MESSAGE, e.getMessage());
+        synCtx.setProperty(Constants.ERROR_DETAIL, e.getStackTrace().toString());
+    }
 }

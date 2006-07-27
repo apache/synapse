@@ -35,19 +35,6 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName IN_Q = new QName(Constants.SYNAPSE_NAMESPACE, "in");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"in\" type=\"in_type\"/>\n" +
-        "\t<xs:complexType name=\"in_type\">\n" +
-        "\t\t<xs:complexContent>\n" +
-        "\t\t\t<xs:extension base=\"synapse:mediator_type\"/>\n" +
-        "\t\t</xs:complexContent>\n" +
-        "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA =
-        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, IN_Q);
-
     public Mediator createMediator(OMElement elem) {
         InMediator filter = new InMediator();
         super.addChildren(elem, filter);
@@ -56,9 +43,5 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     public QName getTagQName() {
         return IN_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

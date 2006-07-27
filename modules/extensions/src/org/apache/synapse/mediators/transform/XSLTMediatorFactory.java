@@ -48,21 +48,6 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"transform\" type=\"transform_type\"/>\n" +
-        "\t<xs:complexType name=\"transform_type\">\n" +
-        "\t\t<xs:sequence minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
-        "\t\t\t<xs:element name=\"property\" type=\"synapse:property_type\"/>\n" +
-        "\t\t</xs:sequence>\n" +
-        "\t\t<xs:attribute name=\"xslt\" type=\"xs:string\" use=\"required\"/>\n" +
-        "\t\t<xs:attribute name=\"source\" type=\"xs:string\"/>\n" +
-            "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA =
-        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, TAG_NAME);
-
     public QName getTagQName() {
         return TAG_NAME;
     }
@@ -96,10 +81,6 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
             MediatorPropertyFactory.getMediatorProperties(elem));
 
         return transformMediator;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 
     private void handleException(String msg, Exception e) {

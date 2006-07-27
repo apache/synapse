@@ -55,29 +55,6 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
     private static final QName CASE_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "case");
     private static final QName DEFAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "default");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"switch\" type=\"synapse:switch_type\"/>\n" +
-        "\t<xs:complexType name=\"switch_type\">\n" +
-        "\t\t<xs:sequence>\n" +
-        "\t\t\t<xs:sequence maxOccurs=\"unbounded\">\n" +
-        "\t\t\t\t<xs:element name=\"case\" type=\"synapse:switch_case_type\"/>\n" +
-        "\t\t\t</xs:sequence>\n" +
-        "\t\t\t<xs:element name=\"default\" type=\"synapse:mediator_type\" minOccurs=\"0\"/>\n" +
-        "\t\t</xs:sequence>\n" +
-        "\t\t<xs:attribute name=\"source\"/>\n" +
-        "\t</xs:complexType>" +
-        "\t<xs:complexType name=\"switch_case_type\">\n" +
-        "\t\t<xs:complexContent>\n" +
-        "\t\t\t<xs:extension base=\"synapse:mediator_type\">\n" +
-        "\t\t\t\t<xs:attribute name=\"regex\" type=\"xs:string\"/>\n" +
-        "\t\t\t</xs:extension>\n" +
-        "\t\t</xs:complexContent>\n" +
-        "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, SWITCH_Q);
-
     public Mediator createMediator(OMElement elem) {
 
         SwitchMediator switchMediator = new SwitchMediator();
@@ -118,9 +95,5 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return SWITCH_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

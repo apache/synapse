@@ -65,34 +65,6 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"makefault\" type=\"makefault_type\"/>\n" +
-        "\t<xs:complexType name=\"makefault_type\">\n" +
-        "\t\t<xs:sequence>\n" +
-        "\t\t\t<xs:element name=\"code\">\n" +
-        "\t\t\t\t<xs:complexType>\n" +
-        "\t\t\t\t\t<xs:attribute name=\"value\" type=\"xs:string\"/>\n" +
-        "\t\t\t\t\t<xs:attribute name=\"expression\" type=\"xs:string\"/>\n" +
-        "\t\t\t\t</xs:complexType>\n" +
-        "\t\t\t</xs:element>\n" +
-        "\t\t\t<xs:element name=\"reason\">\n" +
-        "\t\t\t\t<xs:complexType>\n" +
-        "\t\t\t\t\t<xs:attribute name=\"value\" type=\"xs:string\"/>\n" +
-        "\t\t\t\t\t<xs:attribute name=\"expression\" type=\"xs:string\"/>\n" +
-        "\t\t\t\t</xs:complexType>\n" +
-        "\t\t\t</xs:element>\n" +
-        "\t\t\t<xs:element name=\"node\" minOccurs=\"0\"/>\n" +
-        "\t\t\t<xs:element name=\"role\" minOccurs=\"0\"/>\n" +
-        "\t\t\t<xs:element name=\"detail\" type=\"xs:anyType\" minOccurs=\"0\"/>\n" +
-        "\t\t</xs:sequence>\n" +
-        "\t\t<xs:attribute name=\"version\" type=\"xs:string\"/>\n" +
-        "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA =
-        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, FAULT_Q);
-
     public Mediator createMediator(OMElement elem) {
 
         FaultMediator faultMediator = new FaultMediator();
@@ -209,9 +181,5 @@ public class FaultMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return FAULT_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

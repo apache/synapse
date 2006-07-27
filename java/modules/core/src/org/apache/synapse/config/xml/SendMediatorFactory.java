@@ -86,15 +86,6 @@ public class SendMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_REF_Q = new QName(Constants.NULL_NAMESPACE, "ref");
     private static final QName ATT_ADDRESS_Q = new QName(Constants.NULL_NAMESPACE, "address");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"send\" type=\"send_type\"/>\n" +
-        "\t<xs:complexType name=\"send_type\"/>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA =
-        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, SEND_Q);
-
     public Mediator createMediator(OMElement elem) {
 
         SendMediator sm =  new SendMediator();
@@ -132,9 +123,5 @@ public class SendMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return SEND_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

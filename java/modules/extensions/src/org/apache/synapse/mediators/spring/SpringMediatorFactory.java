@@ -24,7 +24,6 @@ import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.spring.SpringConfigExtension;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.synapse.config.xml.Util;
 import org.apache.synapse.mediators.spring.SpringMediator;
 import org.apache.ws.commons.schema.XmlSchema;
 
@@ -42,18 +41,6 @@ public class SpringMediatorFactory implements MediatorFactory {
     private static final Log log = LogFactory.getLog(SpringMediatorFactory.class);
 
     private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE + "/spring", "spring");
-
-    private static final String STR_SCHEMA =
-        org.apache.synapse.config.xml.Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"spring\" type=\"synapse:spring_type\"/>\n" +
-        "\t<xs:complexType name=\"spring_type\">\n" +
-        "\t\t<xs:attribute name=\"bean\" type=\"xs:string\" use=\"required\"/>\n" +
-        "\t\t<xs:attribute name=\"config\" type=\"xs:string\"/>\n" +
-        "\t\t<xs:attribute name=\"src\" type=\"xs:string\"/>\n" +
-        "\t</xs:complexType>" +
-        org.apache.synapse.config.xml.Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, TAG_NAME);
 
     /**
      * Create a Spring mediator instance referring to the bean and configuration given
@@ -102,9 +89,5 @@ public class SpringMediatorFactory implements MediatorFactory {
     public QName getTagSchemaType() {
         return new QName(Constants.SYNAPSE_NAMESPACE,
             getTagQName().getLocalPart() + "_type", "spring");
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

@@ -287,38 +287,6 @@
 
     </dependencies>
 
-    <!-- ================================= -->
-    <!-- build information for the project -->
-    <!-- ================================= -->
-
-    <build>
-        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
-        <sourceDirectory>src</sourceDirectory>
-        <unitTestSourceDirectory>test</unitTestSourceDirectory>
-        <unitTest>
-            <includes>
-                <include>**/*Test.java</include>
-            </includes>
-            <resources>
-				<resource>
-					<directory>conf</directory>
-					<includes>
-						<include>**/*.properties</include>
-					</includes>
-				</resource>				
-			</resources>
-        </unitTest>
-
-        <resources>
-			<resource>
-				<directory>conf</directory>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-		</resources>
-    </build>
-
     <!-- ======= -->
     <!-- Reports -->
     <!-- ======= -->

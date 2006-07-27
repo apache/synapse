@@ -65,7 +65,8 @@ public class MediatorFactoryFinder {
         SwitchCaseDefaultMediatorFactory.class,
         InMediatorFactory.class,
         OutMediatorFactory.class,
-        RMMediatorFactory.class
+        RMMediatorFactory.class,
+        TryMediatorFactory.class
       };
 
     private static final String STR_SCHEMA =

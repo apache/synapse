@@ -18,6 +18,11 @@
             <version>${synapse.version}</version>
         </dependency>
         
-    </dependencies>    
+    </dependencies>
+
+    <build>
+        <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
 </project>
 

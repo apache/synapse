@@ -11,6 +11,11 @@
     <!--<j:set var="dist.dir" value="target/dist"/>-->
     <j:set var="samples.dir" value="target/samples"/>
 
+    <preGoal name="java:compile">
+        <ant:path id="simpleStockQuoteService.src.dir" location="services/SimpleStockQuoteService/src"/>
+        <maven:addPath id="maven.compile.src.set" refid="simpleStockQuoteService.src.dir"/>
+    </preGoal>
+
     <postGoal name="test:test">
         <j:if test="${context.getVariable('maven.test.skip') != 'true'}">
             <attainGoal name="toDistBin"/>

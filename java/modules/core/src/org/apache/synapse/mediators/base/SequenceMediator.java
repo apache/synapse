@@ -17,20 +17,27 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Util;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * The Sequence mediator either refers to another Sequence mediator instance
+ * The Sequence mediator either refers to a named Sequence mediator instance
  * or is a *Named* list/sequence of other (child) Mediators
+ *
+ * If this instance defines a sequence mediator, then the name is required, and
+ * an errorHandler sequence name optional. If this instance refers to another (defined)
+ * sequence mediator, the errorHandler will not have a meaning, and if an error in
+ * encountered in the reffered sequence, its errorHandler would execute.
  */
 public class SequenceMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(SequenceMediator.class);
     private String name = null;
     private String ref = null;
+    private String errorHandler = null;
 
     /**
      * If this mediator refers to another named Sequence, execute that. Else
@@ -46,18 +53,35 @@ public class SequenceMediator extends AbstractListMediator {
     public boolean mediate(MessageContext synCtx) {
         log.debug("Sequence mediator <" + (name == null? "anonymous" : name ) +"> :: mediate()");
         if (ref == null) {
-            return super.mediate(synCtx);
+            try {
+                return super.mediate(synCtx);
+            } catch (SynapseException e) {
+                // set exception information to message context
+                Util.setErrorInformation(synCtx, e);
+
+                Mediator errHandler = synCtx.getConfiguration().getNamedMediator(errorHandler);
+                if (errHandler == null) {
+                    handleException("Error handler sequence mediator instance named " +
+                        errorHandler + " cannot be found");
+                } else {
+                    return errHandler.mediate(synCtx);
+                }
+            }
 
         } else {
             Mediator m = synCtx.getConfiguration().getNamedMediator(ref);
             if (m == null) {
-                String msg = "Sequence mediator instance named " + ref + " cannot be found.";
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException("Sequence mediator instance named " + ref + " cannot be found.");
             } else {
                 return m.mediate(synCtx);
             }
         }
+        return false;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
     public String getName() {
@@ -74,5 +98,13 @@ public class SequenceMediator extends AbstractListMediator {
 
     public void setRef(String ref) {
         this.ref = ref;
+    }
+
+    public String getErrorHandler() {
+        return errorHandler;
+    }
+
+    public void setErrorHandler(String errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

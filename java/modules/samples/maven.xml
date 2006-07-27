@@ -32,19 +32,26 @@
         <property name="bin.dist.dir" value="target/dist-bin"/>
         <ant:mkdir dir="${bin.dist.dir}"/>
         <ant:mkdir dir="${bin.dist.dir}/samples"/>
+        <ant:mkdir dir="${bin.dist.dir}/samples/services"/>
 
-				<ant:copy todir="${bin.dist.dir}/samples">
+        <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="scripts/userguide">
                 <ant:include name="**/*"/>
             </ant:fileset>
         </ant:copy>
-        
+
+        <ant:copy todir="${bin.dist.dir}/samples/services">
+            <ant:fileset dir="services">
+                <ant:include name="**/*"/>
+            </ant:fileset>
+        </ant:copy>
+
         <ant:copy todir="${bin.dist.dir}/samples">
             <ant:fileset dir="target/samples/">
                 <include name="**"/>
             </ant:fileset>
         </ant:copy>
-        
+
         <ant:delete dir="target/samples"/>
     </goal>
 </project>

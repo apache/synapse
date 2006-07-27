@@ -47,19 +47,6 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName CLASS_Q = new QName(Constants.SYNAPSE_NAMESPACE, "class");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"class\" type=\"class_type\"/>\n" +
-        "\t<xs:complexType name=\"class_type\">\n" +
-        "\t\t<xs:sequence minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
-        "\t\t\t<xs:element name=\"property\" type=\"synapse:property_type\"/>\n" +
-        "\t\t</xs:sequence>\n" +
-        "\t\t<xs:attribute name=\"name\"/>\n" +
-        "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, CLASS_Q);        
-
     public Mediator createMediator(OMElement elem) {
 
         ClassMediator classMediator = new ClassMediator();
@@ -88,9 +75,5 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return CLASS_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

@@ -39,17 +39,4 @@ public interface MediatorFactory {
      * @return QName of the mediator element
      */
     public QName getTagQName();
-
-    /**
-     * The name of the type in the schema returned by getTagSchema() which
-     * defines this element
-     * @return the QName for the type
-     */
-    public QName getTagSchemaType();
-
-    /**
-     * The schema for the mediator's XML configuration
-     * @return the schema of the mediator
-     */
-    public XmlSchema getTagSchema();
 }

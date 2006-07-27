@@ -38,23 +38,11 @@ public class DropMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "drop");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"drop\" type=\"drop_type\"/>\n" +
-        "\t<xs:complexType name=\"drop_type\"/>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, DROP_Q);
-
     public Mediator createMediator(OMElement el) {
         return new DropMediator();
     }
 
     public QName getTagQName() {
         return DROP_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

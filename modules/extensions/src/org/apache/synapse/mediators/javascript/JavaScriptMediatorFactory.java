@@ -22,7 +22,6 @@ import org.apache.axiom.om.OMText;
 import org.apache.synapse.Constants;
 import org.apache.synapse.api.Mediator;
 import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.synapse.config.xml.Util;
 import org.apache.ws.commons.schema.XmlSchema;
 
 /**
@@ -37,18 +36,6 @@ public class JavaScriptMediatorFactory implements MediatorFactory {
     // private static final Log log = LogFactory.getLog(JavaScriptMediatorFactory.class);
 
     private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE + "/js", "javascript");
-
-    private static final String STR_SCHEMA =
-        org.apache.synapse.config.xml.Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"javascript\" type=\"synapse:javascript_type\"/>\n" +
-        "\t<xs:complexType name=\"javascript_type\">\n" +
-        "\t\t<xs:complexContent>\n" +
-        "\t\t\t<xs:extension base=\"xs:anyType\"/>\n" +
-        "\t\t</xs:complexContent>\n" +
-        "\t</xs:complexType>" +
-        org.apache.synapse.config.xml.Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA = Util.getSchema(STR_SCHEMA, TAG_NAME);
 
     /**
      * Create a JavaScript mediator
@@ -76,9 +63,4 @@ public class JavaScriptMediatorFactory implements MediatorFactory {
         return new QName(Constants.SYNAPSE_NAMESPACE,
             getTagQName().getLocalPart() + "_type", "js");
     }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
-    }
-
 }

@@ -69,21 +69,6 @@ public class MediatorFactoryFinder {
         TryMediatorFactory.class
       };
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:complexType name=\"mediator_type\">\n" +
-        "\t\t<xs:sequence maxOccurs=\"unbounded\">\n" +
-        "\t\t\t<xs:choice>\n" +
-        "\t\t\t</xs:choice>\n" +
-        "\t\t</xs:sequence>\n" +
-        "\t</xs:complexType>\n" +
-        "\t<xs:complexType name=\"property_type\">\n" +
-        "\t\t<xs:attribute name=\"name\" type=\"xs:string\" use=\"required\"/>\n" +
-        "\t\t<xs:attribute name=\"value\" type=\"xs:string\"/>\n" +
-        "\t\t<xs:attribute name=\"expression\" type=\"xs:string\"/>\n" +
-        "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
     private static MediatorFactoryFinder instance = null;
 
     /**
@@ -102,12 +87,6 @@ public class MediatorFactoryFinder {
      */
     private XmlSchema mediators = null;
 
-    /**
-     * Load schemas only if Xalan (a dependency for XmlSchema) is available
-     * i.e. if someone wants to access schema's this is a runtime requirement
-     */
-    private boolean loadSchemas = false;
-
     public static synchronized MediatorFactoryFinder getInstance() {
         if (instance == null) {
             instance = new MediatorFactoryFinder();
@@ -125,23 +104,6 @@ public class MediatorFactoryFinder {
 
     private MediatorFactoryFinder() {
 
-        try {
-            TransformerFactory.newInstance();
-            loadSchemas = true;
-
-            schema = new XmlSchema(Constants.SYNAPSE_NAMESPACE, null);
-            try {
-                mediators = new XmlSchemaCollection().read(new StreamSource(
-                    new StringReader(STR_SCHEMA)), null);
-            } catch (XmlSchemaException e) {
-                handleException("Error defining mediator_types " +
-                    "elemement for the configuration language schema", e);
-            }
-
-        } catch(TransformerFactoryConfigurationError e) {
-            log.warn("Xalan unavailable. Mediator schemas will not be available");
-        }
-
         factoryMap = new HashMap();
 
         for (int i = 0; i < mediatorFactories.length; i++) {
@@ -149,45 +111,17 @@ public class MediatorFactoryFinder {
 			try {
                 MediatorFactory fac = (MediatorFactory) c.newInstance();
                 factoryMap.put(fac.getTagQName(), c);
-                if (loadSchemas) {
-                    mergeSchema(fac.getTagSchema());
-                    addMediatorType(mediators,  fac);
-                }
             } catch (Exception e) {
 				throw new SynapseException("Error instantiating " + c.getName(), e);
 			}
 		}
         // now iterate through the available pluggable mediator factories
         registerExtensions(mediators);
-
-        // add registers mediators as extensions
-        /*if (loadSchemas) {
-            mergeSchema(mediators);
-            if (log.isDebugEnabled()) {
-                System.out.println("Mediator Schema : ");
-                schema.write(System.out);
-            }
-        }*/
     }
 
     private void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
-    }
-
-    /**
-     * Merge given schema into our master schema
-     * @param child the sub schema / fragment to be merged
-     */
-    private void mergeSchema(XmlSchema child) {
-        if (child != null) {
-            XmlSchemaObjectTable schemaTypes = child.getSchemaTypes();
-            Iterator iter = schemaTypes.getNames();
-            while (iter.hasNext()) {
-                QName name = (QName) iter.next();
-                schema.getItems().add(schemaTypes.getItem(name));
-            }
-        }
     }
 
     /**
@@ -206,30 +140,7 @@ public class MediatorFactoryFinder {
             MediatorFactory mf = (MediatorFactory) it.next();
             QName tag = mf.getTagQName();
             factoryMap.put(tag, mf.getClass());
-            mergeSchema(mf.getTagSchema());
-            addMediatorType(mediators,  mf);
-
             log.debug("Added MediatorFactory " + mf.getClass() + " to handle " + tag);
-        }
-    }
-
-    /**
-     * Include the mediator type element into the available "mediator_types"
-     * @param mediators the parent schema which holds the "mediator_types"
-     * @param mf the mediator factory which will provide the QName of the type
-     */
-    private void addMediatorType(XmlSchema mediators, MediatorFactory mf) {
-
-        XmlSchemaComplexType cmplx =
-            (XmlSchemaComplexType) mediators.getItems().getItem(0);
-        XmlSchemaSequence seq  = (XmlSchemaSequence) cmplx.getParticle();
-        XmlSchemaChoice choice = (XmlSchemaChoice) seq.getItems().getItem(0);
-
-        XmlSchemaElement ele = new XmlSchemaElement();
-        ele.setName(mf.getTagQName().getLocalPart());
-        if (mf.getTagSchemaType() != null && mf.getTagSchema() != null) {
-            ele.setSchemaTypeName(mf.getTagSchemaType());
-            choice.getItems().add(ele);
         }
     }
 
@@ -273,16 +184,5 @@ public class MediatorFactoryFinder {
     */
     public Map getFactoryMap() {
         return factoryMap;
-    }
-
-    /**
-     * Returns the XML schema for the known mediators if available - or null
-     * @return the XmlSchema for the mediator configuration, if avialable. This
-     * will load only if the mediator factory has properly met the requirements
-     * for this feature, and if Xalan is available to the runtime (this is a
-     * requiement for the XmlSchema package used underneath)
-     */
-    public XmlSchema getSchema() {
-        return schema;
     }
 }

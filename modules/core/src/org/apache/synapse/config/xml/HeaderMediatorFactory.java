@@ -49,15 +49,6 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "header");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"header\" type=\"header_type\"/>\n" +
-        "\t<xs:complexType name=\"header_type\"/>\n" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA =
-        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, HEADER_Q);
-
     public Mediator createMediator(OMElement elem) {
 
         HeaderMediator headerMediator = new HeaderMediator();
@@ -111,9 +102,5 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory {
 
     public QName getTagQName() {
         return HEADER_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

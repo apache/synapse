@@ -56,28 +56,6 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName KEY_Q      = new QName(Constants.NULL_NAMESPACE, "key");
     private static final QName SOURCE_Q   = new QName(Constants.NULL_NAMESPACE, "source");
 
-    private static final String STR_SCHEMA =
-        Constants.SCHEMA_PROLOG +
-        "\t<xs:element name=\"validate\" type=\"validate_type\"/>\n" +
-        "\t<xs:complexType name=\"validate_type\">\n" +
-        "\t\t<xs:sequence minOccurs=\"0\" maxOccurs=\"unbounded\">\n" +
-        "\t\t\t<xs:element name=\"property\" type=\"synapse:property_type\"/>\n" +
-        "\t\t</xs:sequence>\n" +
-        "\t\t<xs:element name=\"on-fail\" type=\"on-fail_type\"/>" +
-        "\t\t<xs:attribute name=\"url\" type=\"xs:string\" use=\"required\"/>\n" +
-        "\t\t<xs:attribute name=\"source\" type=\"xs:string\"/>\n" +
-        "\t</xs:complexType>" +
-        "\t<xs:complexType name=\"on-fail_type\">\n" +
-        "\t\t<xs:complexContent>\n" +
-        "\t\t\t<xs:extension base=\"synapse:mediator_type\"/>\n" +
-        "\t\t</xs:complexContent>\n" +
-        "\t</xs:complexType>" +
-        Constants.SCHEMA_EPILOG;
-
-    private static final XmlSchema SCHEMA =
-        org.apache.synapse.config.xml.Util.getSchema(STR_SCHEMA, VALIDATE_Q);
-
-
     public Mediator createMediator(OMElement elem) {
 
         ValidateMediator validateMediator = new ValidateMediator();
@@ -153,9 +131,5 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
     public QName getTagQName() {
         return VALIDATE_Q;
-    }
-
-    public XmlSchema getTagSchema() {
-        return SCHEMA;
     }
 }

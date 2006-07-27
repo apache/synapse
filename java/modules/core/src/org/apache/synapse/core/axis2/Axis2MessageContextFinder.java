@@ -143,7 +143,7 @@ public class Axis2MessageContextFinder implements Constants {
             Iterator iter = synCfg.getProxyServices().iterator();
             while (iter.hasNext()) {
                 ProxyService proxy = (ProxyService) iter.next();
-                axisCfg.addService(proxy.buildAxisService());
+                axisCfg.addService(proxy.buildAxisService(axisCfg));
             }
         }
 

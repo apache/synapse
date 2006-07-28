@@ -53,7 +53,7 @@ public class ProxyStockQuoteClient {
             HttpTransportProperties httpProps = new HttpTransportProperties();
 
             HttpTransportProperties.ProxyProperties proxyProperties =
-                httpProps.new ProxyProperties();
+                new HttpTransportProperties.ProxyProperties();
             URL url = new URL(purl);
             proxyProperties.setProxyName(url.getHost());
             proxyProperties.setProxyPort(url.getPort());

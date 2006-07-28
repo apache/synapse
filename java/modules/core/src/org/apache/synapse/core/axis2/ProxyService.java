@@ -223,6 +223,10 @@ public class ProxyService {
         properties.put(name, value);
     }
 
+    public Map getPropertyMap() {
+        return this.properties;
+    }
+
     public void setTransports(String transports) {
         this.transports = transports;
     }

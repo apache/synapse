@@ -367,10 +367,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::sendAckIfNeeded");
 
-		MessageContext msgCtx = rmMsgCtx.getMessageContext();
-
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();

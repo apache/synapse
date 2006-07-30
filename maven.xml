@@ -76,6 +76,7 @@
         <copy todir="${jar.temp.path}">
             <fileset dir="${basedir}/target/classes" >
             	<include name="**/*.class"/>
+            	<include name="**/*.properties" /> 
             </fileset>
         </copy>
   

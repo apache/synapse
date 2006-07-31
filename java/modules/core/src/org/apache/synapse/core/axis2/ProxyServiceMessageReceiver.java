@@ -108,7 +108,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
         // if a named sequence is specified, use it for message mediation
         } else if (targetSequence != null) {
-            Mediator mediator = synCtx.getConfiguration().getNamedMediator(targetSequence);
+            Mediator mediator = synCtx.getConfiguration().getNamedSequence(targetSequence);
             if (mediator == null) {
                 // what else can/should we do instead of just logging the message as an error?
                 log.error("The mediator named '" + targetSequence + "' is not defined. Dropping current message");

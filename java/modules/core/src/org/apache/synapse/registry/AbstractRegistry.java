@@ -85,18 +85,23 @@ public abstract class AbstractRegistry implements Registry {
         // if we get here, we have received the raw omNode from the
         // registry and our previous copy (if we had one) has expired or is not valid
 
-        // if the type of the object is known to have a mapper, create the
-        // resultant Object using the known mapper, and cache this Object
-        // else cache the raw OMNode
-        if (re != null && re.getType() != null) {
+        if (dp.getMapper() != null) {
+            dp.setCache(
+                dp.getMapper().getObjectFromOMNode(omNode));
+        } else {
+            // if the type of the object is known to have a mapper, create the
+            // resultant Object using the known mapper, and cache this Object
+            // else cache the raw OMNode
+            if (re != null && re.getType() != null) {
 
-            XMLToObjectMapper mapper = getMapper(re.getType());
-            if (mapper != null) {
-                dp.setMapper(mapper);
-                dp.setCache(mapper.getObjectFromOMNode(omNode));
+                XMLToObjectMapper mapper = getMapper(re.getType());
+                if (mapper != null) {
+                    dp.setMapper(mapper);
+                    dp.setCache(mapper.getObjectFromOMNode(omNode));
 
-            } else {
-                dp.setCache(omNode);
+                } else {
+                    dp.setCache(omNode);
+                }
             }
         }
 

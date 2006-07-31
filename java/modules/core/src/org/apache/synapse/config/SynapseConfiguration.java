@@ -58,8 +58,18 @@ public class SynapseConfiguration {
      * @param name the name for the sequence
      * @param m the mediator to be reffered to by the name
      */
-    public void addNamedMediator(String name, Mediator m) {
+    public void addNamedSequence(String name, Mediator m) {
         namedSequences.put(name, m);
+    }
+
+    /**
+     * Allow a DynamicProperty to be added as a named sequence, this will become
+     * a DynamicSequence
+     * @param name the name of the sequence
+     * @param dp a DynamicProperty reflecting the dynamic sequence
+     */
+    public void addNamedSequence(String name, DynamicProperty dp) {
+        namedSequences.put(name, dp);
     }
 
     /**
@@ -67,8 +77,16 @@ public class SynapseConfiguration {
      * @param name the name being looked up
      * @return the mediator referenced by the name
      */
-    public Mediator getNamedMediator(String name) {
-        return (Mediator) namedSequences.get(name);
+    public Mediator getNamedSequence(String name) {
+        Object o = namedSequences.get(name);
+        if (o != null && o instanceof DynamicProperty) {
+            DynamicProperty dp = (DynamicProperty) o;
+            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+            if (o == null) {
+                handleException("Invalid DynamicSequence for name : " + name);
+            }
+        }
+        return (Mediator) o;
     }
 
     /**
@@ -172,7 +190,7 @@ public class SynapseConfiguration {
     }
 
     /**
-     * Get the whole list of named sequencies
+     * Get the whole list of named sequences
      * as a Map
      */
     public Map getNamedSequences() {

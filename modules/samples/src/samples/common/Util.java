@@ -32,7 +32,7 @@ public class Util {
         String symbol, String soapAction, String xurl, String turl, String repo) {
 
         try {
-            OMElement getQuote = InvesbotHandler.createStandardRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createStandardRequestPayload(symbol);
 
             Options options = new Options();
             if (xurl != null)
@@ -55,7 +55,7 @@ public class Util {
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
             System.out.println("Standard :: Stock price = $" +
-                InvesbotHandler.parseStandardResponsePayload(result));
+                StockQuoteHandler.parseStandardResponsePayload(result));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class Util {
         String symbol, String soapAction, String xurl, String turl, String repo) {
 
         try {
-            OMElement getQuote = InvesbotHandler.createCustomRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createCustomRequestPayload(symbol);
 
             Options options = new Options();
             if (xurl != null)
@@ -89,7 +89,7 @@ public class Util {
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
             System.out.println("Custom :: Stock price = $" +
-                InvesbotHandler.parseCustomResponsePayload(result));
+                StockQuoteHandler.parseCustomResponsePayload(result));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class Util {
     public static void testAdvancedQuote(
         String symbol, String soapAction, String xurl, String turl, String repo) {
         try {
-            OMElement getQuote = InvesbotHandler.createCustomRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createCustomRequestPayload(symbol);
 
             Options options = new Options();
             if (xurl != null)
@@ -122,7 +122,7 @@ public class Util {
 
             OMElement result = serviceClient.sendReceive(getQuote);
             System.out.println("Custom :: Stock price = $" +
-                InvesbotHandler.parseCustomResponsePayload(result.getFirstElement()));
+                StockQuoteHandler.parseCustomResponsePayload(result.getFirstElement()));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,7 +132,7 @@ public class Util {
     public static void testErroneousQuote(
         String symbol, String soapAction, String xurl, String turl, String repo) {
         try {
-            OMElement getQuote = InvesbotHandler.createErroneousCustomRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createErroneousCustomRequestPayload(symbol);
 
             Options options = new Options();
             if (xurl != null)
@@ -155,7 +155,7 @@ public class Util {
 
             OMElement result = serviceClient.sendReceive(getQuote);
             System.out.println("Error :: Stock price = $" +
-                InvesbotHandler.parseCustomResponsePayload(result.getFirstElement()));
+                StockQuoteHandler.parseCustomResponsePayload(result.getFirstElement()));
 
         } catch (Exception e) {
             if (e instanceof AxisFault) {

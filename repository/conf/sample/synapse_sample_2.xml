@@ -18,7 +18,7 @@
   	<set-property name="xslt-key-resp" key="file:synapse_repository/conf/sample/transform_back.xslt"/>
   
   	<!-- define a reuseable endpoint definition and use it within config -->
-  	<endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/>
+  	<endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
 
     <sequence name="customrequest">
     	<!-- is this a valid custom request ? -->
@@ -63,9 +63,9 @@
     		<property name="symbol" expression="get-property('symbol')"/>
     	</log>
     	
-    	<!-- send message to real endpoint referenced by name "invesbot" and stop -->
+    	<!-- send message to real endpoint referenced by name "stockquote" and stop -->
     	<send>
-    		<endpoint ref="invesbot"/>
+    		<endpoint ref="stockquote"/>
     	</send>
     </sequence>
 
@@ -79,7 +79,7 @@
     
     <sequence name="stockquote">
     	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    	<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
     
     	<!-- check if the symbol is MSFT -->
       <filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">

@@ -9,60 +9,70 @@
     ant help 
   		display this message
     ant clean 
-  		delete the built directory
-
+  		delete the build directory
     ant compile 
   		build the samples
 
-  	These samples make stockquote requests to ws.invesbot.com mediated through Synapse
+  	These samples make stockquote requests to the sample services through Synapse
 
   	ant stockquote
   		Use the smart client - Synapse in WS-Addressing router mode
+  		Use default sample configuration (i.e. start with -sample 0)
     
   	  examples:
   	  ant stockquote
-  	  ant stockquote [-Dsymbol=IBM] [-Durl=http://ws.invesbot.com/stockquotes.asmx]
+  	  ant stockquote [-Dsymbol=IBM] 
+  	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
   	  	[-Dsynapseurl=http://localhost:8080] [-Drepository=client_repo]
   	
   	ant proxystockquote
-	    Use the http proxy client - Synapse in "transparent mode" using HTTP proxy
+	    Use the http proxy client - Synapse in "transparent mode" as an HTTP proxy
+	    Use default sample configuration (i.e. start with -sample 0)
     
   	 	examples:
   	  ant proxystockquote
-  	  ant proxystockquote [-Dsymbol=IBM] [-Durl=http://ws.invesbot.com/stockquotes.asmx]
+  	  ant proxystockquote [-Dsymbol=IBM] 
+  	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
   	  	[-Dsynapseurl=http://localhost:8080]
 
     ant dumbstockquote 
-      Use the dumb soap client - Synapse in "gateway" mode, and transport set to virtual
-      url interpreted by Synapse
+      Use the dumb soap client - Synapse in "gateway" mode; transport set to virtual
+      url which is interpreted by Synapse
+      Use default sample configuration (i.e. start with -sample 0)
   
   		examples:
 	  	ant dumbstockquote 
 	    ant dumbstockquote [-Dsymbol=IBM] [-Dgatewayurl=http://localhost:8080/StockQuote]
 
     ant customquote 
-      Use custom stock quote request and transform (XSLT) between schemas
+      Use a custom stock quote request and response format, and transform (XSLT) between
+      Use sample configuration #1 (i.e. start with -sample 1)
   
   		examples:
 	  	ant customquote 
-	    ant customquote [-Dsymbol=IBM] [-Durl=http://ws.invesbot.com/stockquotes.asmx] 
+	    ant customquote [-Dsymbol=IBM] 
+	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
 	    	[-Dsynapseurl=http://localhost:8080]
 
     ant advancedquote 
-      Use validating custom quote requests, and also validate against XSD
+      Validate custom quote requests against a schema before sending out
+      Use sample configuration #2 (i.e. start with -sample 2)
   
   		examples:
 	  	ant advancedquote 
-	    ant advancedquote [-Durl=http://ws.invesbot.com/stockquotes.asmx] 
+	    ant advancedquote 
+	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
 	    	[-Dsynapseurl=http://localhost:8080]
 
     ant simplequote 
-      Use a simple quote using WS-A addressing to demonstrate the Custom server (programmatic configuration creation)
+      Use a simple quote using addressing to demonstrate the custom server 
+      configuration created programmatically
+      Use sample configuration created programmatically (i.e. start using custom.bat/sh)
   
   		examples:
 	  	ant simplequote 
 	    ant simplequote [-Dsymbol=IBM] 
-	    	[-Durl=http://ws.invesbot.com/stockquotes.asmx] 
+	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
 	    	[-Dsynapseurl=http://localhost:8080] [-Drepository=client_repo]
 
   	ant proxyquote
@@ -71,20 +81,20 @@
   	 	examples:
   	  ant proxyquote
   	  ant proxyquote -Dsymbol=IBM 
-  	  	-DfwdProxy=http://localhost:8080/axis2/services/InvesbotForwardProxy 
-  	  	-DdefProxy=http://localhost:8080/axis2/services/InvesbotDefaultProxy 
-  	  	-DseqProxy=http://localhost:8080/axis2/services/InvesbotSequenceProxy"
+  	  	-DfwdProxy=http://localhost:8080/axis2/services/StockQuoteForwardProxy 
+  	  	-DdefProxy=http://localhost:8080/axis2/services/StockQuoteDefaultProxy 
+  	  	-DseqProxy=http://localhost:8080/axis2/services/StockQuoteSequenceProxy"
         </echo>
     </target>
 
 		<property name="symbol" value="IBM"/>
-    <property name="url" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    <property name="url" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
     <property name="synapseurl" value="http://localhost:8080"/>
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="client_repo"/>
-    <property name="fwdProxy" value="http://localhost:8080/axis2/services/InvesbotForwardProxy"/>
-    <property name="defProxy" value="http://localhost:8080/axis2/services/InvesbotDefaultProxy"/>
-    <property name="seqProxy" value="http://localhost:8080/axis2/services/InvesbotSequenceProxy"/>
+    <property name="fwdProxy" value="http://localhost:8080/axis2/services/StockQuoteForwardProxy"/>
+    <property name="defProxy" value="http://localhost:8080/axis2/services/StockQuoteDefaultProxy"/>
+    <property name="seqProxy" value="http://localhost:8080/axis2/services/StockQuoteSequenceProxy"/>
 
     <property name="class.dir" value="target/classes"/>
 
@@ -144,7 +154,7 @@
     </target>
 
     <target name="simplequote" depends="compile">        
-        <java classname="samples.config.SimpleStockQuoteClient"
+        <java classname="samples.userguide.StockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${url}"/>

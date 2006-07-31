@@ -12,9 +12,11 @@
   
 <xsl:template match="m0:CheckPriceRequest">
 
-<m:GetQuote xmlns:m="http://ws.invesbot.com/">
-	<m:symbol><xsl:value-of select="m0:Code"/></m:symbol>
-</m:GetQuote>
+<m:getQuote xmlns:m="http://services.samples/xsd">
+	<m:request>
+		<m:symbol><xsl:value-of select="m0:Code"/></m:symbol>
+	</m:request>
+</m:getQuote>
 
 </xsl:template>
 </xsl:stylesheet>

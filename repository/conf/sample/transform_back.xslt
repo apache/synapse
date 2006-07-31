@@ -2,21 +2,21 @@
 <xsl:stylesheet version="2.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-	xmlns:m0="http://ws.invesbot.com/"
+	xmlns:m0="http://services.samples/xsd"
 	exclude-result-prefixes="m0 fn">
 <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
 
 <xsl:template match="/">
-  <xsl:apply-templates select="//StockQuote" /> 
+  <xsl:apply-templates select="//m0:return" /> 
 </xsl:template>
   
-<xsl:template match="StockQuote">
+<xsl:template match="m0:return">
 
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 <soap:Body>
 <m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test">
-	<m:Code><xsl:value-of select="m0:Symbol"/></m:Code>
-	<m:Price><xsl:value-of select="m0:Price"/></m:Price>
+	<m:Code><xsl:value-of select="m0:symbol"/></m:Code>
+	<m:Price><xsl:value-of select="m0:last"/></m:Price>
 </m:CheckPriceResponse>
 </soap:Body>
 </soap:Envelope>

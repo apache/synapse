@@ -33,8 +33,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
 import org.apache.ws.commons.schema.*;
 
 import sun.misc.Service;
@@ -46,7 +48,7 @@ import sun.misc.Service;
  * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
  */
 
-public class MediatorFactoryFinder {
+public class MediatorFactoryFinder implements XMLToObjectMapper {
 
 	private static final Log log = LogFactory.getLog(MediatorFactoryFinder.class);
 
@@ -124,6 +126,11 @@ public class MediatorFactoryFinder {
         throw new SynapseException(msg, e);
     }
 
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+
     /**
      * Register pluggable mediator factories from the classpath
      *
@@ -184,5 +191,20 @@ public class MediatorFactoryFinder {
     */
     public Map getFactoryMap() {
         return factoryMap;
+    }
+
+    /**
+     * Allow the mediator factory finder to act as an XMLToObjectMapper for Mediators
+     * (i.e. Sequence Mediator) loaded dynamically from a Registry 
+     * @param om
+     * @return
+     */
+    public Object getObjectFromOMNode(OMNode om) {
+        if (om instanceof OMElement) {
+            return getMediator((OMElement) om);
+        } else {
+            handleException("Invalid mediator configuration XML : " + om);
+        }
+        return null;
     }
 }

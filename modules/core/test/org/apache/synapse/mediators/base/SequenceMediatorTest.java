@@ -107,7 +107,7 @@ public class SequenceMediatorTest extends TestCase {
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext("<empty/>");
-        synCtx.getConfiguration().addNamedMediator("myErrorHandler", seqErr);
+        synCtx.getConfiguration().addNamedSequence("myErrorHandler", seqErr);
 
         seq.mediate(synCtx);
 

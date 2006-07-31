@@ -188,15 +188,24 @@ public class XMLConfigurationBuilder {
 
     /**
      * <pre>
-     * &lt;sequence name="string&gt;
-     *    Mediator+
+     * &lt;sequence name="string" [key="string"]&gt;
+     *    Mediator*
      * &lt;/sequence&gt;
      * </pre>
      * @param ele
      */
     public void defineSequence(SynapseConfiguration config, OMElement ele) {
-        SequenceMediator seq = (SequenceMediator) MediatorFactoryFinder.getInstance().getMediator(ele);
-        config.addNamedMediator(seq.getName(), seq);
+        OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute key  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+        if (name != null && key != null) {
+            DynamicProperty dp = new DynamicProperty(key.getAttributeValue());
+            dp.setMapper(MediatorFactoryFinder.getInstance());
+            config.addNamedSequence(name.getAttributeValue(), dp);
+        } else {
+            SequenceMediator seq = (SequenceMediator)
+                MediatorFactoryFinder.getInstance().getMediator(ele);
+            config.addNamedSequence(seq.getName(), seq);
+        }
     }
 
     /**

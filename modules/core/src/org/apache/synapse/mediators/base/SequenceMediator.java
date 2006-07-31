@@ -62,7 +62,7 @@ public class SequenceMediator extends AbstractListMediator {
                     // set exception information to message context
                     Util.setErrorInformation(synCtx, e);
 
-                    Mediator errHandler = synCtx.getConfiguration().getNamedMediator(errorHandler);
+                    Mediator errHandler = synCtx.getConfiguration().getNamedSequence(errorHandler);
                     if (errHandler == null) {
                         handleException("Error handler sequence mediator instance named " +
                             errorHandler + " cannot be found");
@@ -76,7 +76,7 @@ public class SequenceMediator extends AbstractListMediator {
             }
 
         } else {
-            Mediator m = synCtx.getConfiguration().getNamedMediator(ref);
+            Mediator m = synCtx.getConfiguration().getNamedSequence(ref);
             if (m == null) {
                 handleException("Sequence mediator instance named " + ref + " cannot be found.");
             } else {

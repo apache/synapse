@@ -16,9 +16,11 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,9 +52,13 @@ import java.net.MalformedURLException;
  *
  * </endpoint>
  */
-public class EndpointFactory {
+public class EndpointFactory implements XMLToObjectMapper {
 
     private static Log log = LogFactory.getLog(EndpointFactory.class);
+
+    private static final EndpointFactory instance = new EndpointFactory();
+
+    private EndpointFactory() {}
 
     public static Endpoint createEndpoint(OMElement elem) {
 
@@ -119,4 +125,16 @@ public class EndpointFactory {
         throw new SynapseException(msg, e);
     }
 
+    public Object getObjectFromOMNode(OMNode om) {
+        if (om instanceof OMElement) {
+            return createEndpoint((OMElement) om);
+        } else {
+            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
+        }
+        return null;
+    }
+
+    public static EndpointFactory getInstance() {
+        return instance;
+    }
 }

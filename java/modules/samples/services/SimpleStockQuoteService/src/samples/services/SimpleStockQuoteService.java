@@ -18,6 +18,7 @@ package samples.services;
 public class SimpleStockQuoteService {
 
     public GetQuoteResponse getQuote(GetQuote request) {
+        System.out.println("Generating quote for : " + request.getSymbol());
         return new GetQuoteResponse(request.getSymbol());
     }
 }

@@ -23,9 +23,12 @@
 			  
 			<xsl:template match="m0:CheckPriceRequest">
 			
-			<m:GetQuote xmlns:m="http://ws.invesbot.com/">
-				<m:symbol><xsl:value-of select="m0:Code"/></m:symbol>
-			</m:GetQuote>
+			<m:getQuote xmlns:m="http://services.samples/xsd">
+				<m:request>
+					<m:symbol><xsl:value-of select="m0:Code"/></m:symbol>
+				</m:request>
+			</m:getQuote>
+
 					
 			</xsl:template>
 			</xsl:stylesheet>
@@ -35,7 +38,7 @@
 
     <sequence name="customrequest">
     	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    	<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
     	
     	<!-- set correlation field to custom label -->
     	<set-property name="correlate/label" value="customquote"/>
@@ -57,7 +60,7 @@
     
     <sequence name="stockquote">
     	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
+    	<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
     
     	<!-- check if the symbol is MSFT -->
       <filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">

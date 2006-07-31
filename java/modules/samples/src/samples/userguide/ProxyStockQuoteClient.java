@@ -12,7 +12,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.axiom.om.OMElement;
-import samples.common.InvesbotHandler;
+import samples.common.StockQuoteHandler;
 
 import javax.xml.namespace.QName;
 
@@ -31,16 +31,16 @@ public class ProxyStockQuoteClient {
     public static void main(String[] args) {
 
         String symbol = "IBM";
-        String xurl   = "http://ws.invesbot.com/stockquotes.asmx";
+        String xurl   = "http://localhost:9000/axis2/services/SimpleStockQuoteService";
         String purl   = "http://localhost:8080";
-        String sAction= "http://ws.invesbot.com/GetQuote";
+        String sAction= "urn:getQuote";
 
         if (args.length > 0) symbol = args[0];
         if (args.length > 1) xurl   = args[1];
         if (args.length > 2) purl   = args[2];
 
         try {
-            OMElement getQuote = InvesbotHandler.createStandardRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createStandardRequestPayload(symbol);
 
             Options options = new Options();
             if (xurl != null)
@@ -66,7 +66,7 @@ public class ProxyStockQuoteClient {
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
             System.out.println("Standard :: Stock price = $" +
-                InvesbotHandler.parseStandardResponsePayload(result));
+                StockQuoteHandler.parseStandardResponsePayload(result));
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -39,7 +39,9 @@ public class SynapseModule implements Module, Constants {
 
     public void init(ConfigurationContext configurationContext,
                      AxisModule axisModule) throws AxisFault {
-        log.info("Initializing Synapse Service from SynapseModule ..");
+
+        log.info("Initializing Synapse ..");
+
         // Dynamically initialize the Empty Synapse Service
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();
         AxisService synapseService = new AxisService(SYNAPSE_SERVICE_NAME);
@@ -50,11 +52,10 @@ public class SynapseModule implements Module, Constants {
         axisCfg.addService(synapseService);
 
         // Initializing the SynapseEnvironment For Synapse to work
-
         log.info("Initializing Synapse Environment ...");
 
-        SynapseConfiguration synCfg = Axis2MessageContextFinder
-                .initializeSynapseConfigurationBuilder(axisCfg);
+        SynapseConfiguration synCfg =
+                initializeSynapseConfigurationBuilder(axisCfg);
 
         log.info("Initializing Proxy services...");
         if (synCfg == null) {
@@ -67,7 +68,62 @@ public class SynapseModule implements Module, Constants {
             }
         }
 
-        log.info("Synapse Environment initialized...");
+        log.info("Synapse initialized...!");
+    }
+
+    private static SynapseConfiguration initializeSynapseConfigurationBuilder(
+            AxisConfiguration axisConfiguration) {
+        /*
+        First check, if synapse.xml URL is provided as a system property, if so use it..
+        else check if synapse.xml location is available from the axis2.xml
+        SynapseConfiguration else use the default config
+        */
+        SynapseConfiguration synapseConfiguration;
+        Parameter configParam =
+                axisConfiguration.getParameter(SYNAPSE_CONFIGURATION);
+
+        String config = System.getProperty(Constants.SYNAPSE_XML);
+
+        if (config != null) {
+            log.info("System property '" + Constants.SYNAPSE_XML +
+                     "' specifies synapse configuration as " + config);
+            synapseConfiguration =
+                    SynapseConfigurationBuilder.getConfiguration(config);
+        } else if (configParam != null) {
+            log.info(
+                    "Synapse.xml is available via SynapseConfiguration in Axis2.xml");
+            synapseConfiguration = SynapseConfigurationBuilder
+                    .getConfiguration(configParam.getValue().toString().trim());
+        } else {
+            log.warn("System property '" + Constants.SYNAPSE_XML +
+                     "' is not specified or SynapseConfiguration Parameter " +
+                     "is not available via Axis2.xml. Thus,  Using default configuration");
+            synapseConfiguration =
+                    SynapseConfigurationBuilder.getDefaultConfiguration();
+        }
+
+        // set the Synapse configuration and environment into the Axis2 configuration
+        Parameter synapseCtxParam = new Parameter(SYNAPSE_CONFIG, null);
+        synapseCtxParam.setValue(synapseConfiguration);
+
+        Parameter synapseEnvParam = new Parameter(SYNAPSE_ENV, null);
+        synapseEnvParam
+                .setValue(new Axis2SynapseEnvironment(axisConfiguration));
+
+        try {
+            axisConfiguration.addParameter(synapseCtxParam);
+            axisConfiguration.addParameter(synapseEnvParam);
+
+        } catch (AxisFault e) {
+            String msg =
+                    "Could not set parameters '" + SYNAPSE_CONFIG +
+                    "' and/or '" + SYNAPSE_ENV +
+                    "'to the Axis2 configuration : " + e.getMessage();
+            log.fatal(msg, e);
+            throw new SynapseException(msg, e);
+        }
+        return synapseConfiguration;
+
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {

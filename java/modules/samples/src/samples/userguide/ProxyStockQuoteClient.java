@@ -50,10 +50,9 @@ public class ProxyStockQuoteClient {
             ServiceClient serviceClient = new ServiceClient();
 
             // engage HTTP Proxy
-            HttpTransportProperties httpProps = new HttpTransportProperties();
 
-            HttpTransportProperties.ProxyProperties proxyProperties =
-                httpProps.new ProxyProperties();
+            HttpTransportProperties.ProxyProperties proxyProperties =new
+                HttpTransportProperties.ProxyProperties();
             URL url = new URL(purl);
             proxyProperties.setProxyName(url.getHost());
             proxyProperties.setProxyPort(url.getPort());

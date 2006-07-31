@@ -50,8 +50,11 @@ public class SynapseConfiguration {
     /** Hold referenced to the declared registries */
     private Map registryMap = new HashMap();
 
-    /** This is the "main" (or default) synapse mediator which mediates each and every message */
-    private Mediator mainMediator = null;
+    /**
+     * This is the "main" (or default) synapse mediator which mediates each and every message
+     * It could/would hold a Mediator object or a DynamicProperty (if loaded from a registry)
+     */
+    private Object mainMediator = null;
 
     /**
      * Add a named mediator into this configuration
@@ -83,7 +86,7 @@ public class SynapseConfiguration {
             DynamicProperty dp = (DynamicProperty) o;
             o = getRegistry(dp.getRegistryName()).getProperty(dp);
             if (o == null) {
-                handleException("Invalid DynamicSequence for name : " + name);
+                handleException("Invalid DynamicSequence for name : " + name + " from registry");
             }
         }
         return (Mediator) o;
@@ -96,7 +99,15 @@ public class SynapseConfiguration {
      * @return the main mediator to be used
      */
     public Mediator getMainMediator() {
-        return mainMediator;
+        Object o = mainMediator;
+        if (o != null && o instanceof DynamicProperty) {
+            DynamicProperty dp = (DynamicProperty) o;
+            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+            if (o == null) {
+                handleException("Invalid Synapse Mainmediator from registry");
+            }
+        }
+        return (Mediator) o;
     }
 
     /**
@@ -105,6 +116,10 @@ public class SynapseConfiguration {
      */
     public void setMainMediator(Mediator mainMediator) {
         this.mainMediator = mainMediator;
+    }
+
+    public void setMainMediator(DynamicProperty dp) {
+        this.mainMediator = dp;
     }
 
     /**
@@ -159,12 +174,29 @@ public class SynapseConfiguration {
     }
 
     /**
+     * Support DynamicEndpoints
+     * @param name name of Dynamic Endpoint
+     * @param dp the DynamicProperty referencing the endpoint
+     */
+    public void addNamedEndpoint(String name, DynamicProperty dp) {
+        namedEndpoints.put(name, dp);
+    }
+
+    /**
      * Get the definition of a named endpoint
      * @param name the name being looked up
      * @return the endpoint definition which will resolve into an absolute address
      */
     public Endpoint getNamedEndpoint(String name) {
-        return (Endpoint) namedEndpoints.get(name);
+        Object o = namedEndpoints.get(name);
+        if (o != null && o instanceof DynamicProperty) {
+            DynamicProperty dp = (DynamicProperty) o;
+            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+            if (o == null) {
+                handleException("Invalid DynamicEndpoint for name : " + name + " from registry");
+            }
+        }
+        return (Endpoint) o;
     }
 
     /**

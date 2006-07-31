@@ -942,7 +942,7 @@ public class SandeshaClient {
 		return SandeshaUtil.getInternalSequenceID(toEPR, sequenceKey);
 	}
 
-	private static SequenceReport getIncomingSequenceReport(String sequenceID, ConfigurationContext configCtx)
+	public static SequenceReport getIncomingSequenceReport(String sequenceID, ConfigurationContext configCtx)
 			throws SandeshaException {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx,configCtx.getAxisConfiguration());

@@ -19,7 +19,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContextConstants;
-import samples.common.InvesbotHandler;
+import samples.common.StockQuoteHandler;
 
 /**
  * A simple example showing a dumb client.. the client just sets the transport
@@ -30,15 +30,15 @@ public class DumbStockQuoteClient {
 
     public static void main(String[] args) {
 
-        String symbol = "IBM";
-        String turl = "http://localhost:8080/StockQuote";
-        String sAction = "http://ws.invesbot.com/GetQuote";
+        String symbol  = "IBM";
+        String turl    = "http://localhost:9000/axis2/services/SimpleStockQuoteService";
+        String sAction = "urn:getQuote";
 
         if (args.length > 0) symbol = args[0];
         if (args.length > 1) turl = args[1];
 
         try {
-            OMElement getQuote = InvesbotHandler.createStandardRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createStandardRequestPayload(symbol);
 
             Options options = new Options();
             if (turl != null)
@@ -50,7 +50,7 @@ public class DumbStockQuoteClient {
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
             System.out.println("Standard :: Stock price = $" +
-                InvesbotHandler.parseStandardResponsePayload(result));
+                StockQuoteHandler.parseStandardResponsePayload(result));
 
         } catch (Exception e) {
             e.printStackTrace();

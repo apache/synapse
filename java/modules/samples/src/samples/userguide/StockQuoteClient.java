@@ -10,7 +10,7 @@ import org.apache.axis2.context.MessageContextConstants;
 
 import javax.xml.namespace.QName;
 
-import samples.common.InvesbotHandler;
+import samples.common.StockQuoteHandler;
 
 /**
  * The EPR to the actual service is set, but the transport is set to
@@ -21,9 +21,9 @@ public class StockQuoteClient {
     public static void main(String[] args) {
 
         String symbol  = "IBM";
-        String xurl    = "http://ws.invesbot.com/stockquotes.asmx";
+        String xurl    = "http://localhost:9000/axis2/services/SimpleStockQuoteService";
         String turl    = "http://localhost:8080";
-        String sAction = "http://ws.invesbot.com/GetQuote";
+        String sAction = "urn:getQuote";
         String repo    = "client_repo";
 
         if (args.length > 0) symbol = args[0];
@@ -32,7 +32,7 @@ public class StockQuoteClient {
         if (args.length > 3) repo   = args[3];
 
         try {
-            OMElement getQuote = InvesbotHandler.createStandardRequestPayload(symbol);
+            OMElement getQuote = StockQuoteHandler.createStandardRequestPayload(symbol);
 
             Options options = new Options();
             if (xurl != null)
@@ -55,7 +55,7 @@ public class StockQuoteClient {
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
             System.out.println("Standard :: Stock price = $" +
-                InvesbotHandler.parseStandardResponsePayload(result));
+                StockQuoteHandler.parseStandardResponsePayload(result));
 
         } catch (Exception e) {
             e.printStackTrace();

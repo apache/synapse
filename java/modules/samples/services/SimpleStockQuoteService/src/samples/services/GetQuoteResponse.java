@@ -44,7 +44,7 @@ public class GetQuoteResponse {
         this.open = getRandom(last, 0.05, false);
         this.high = getRandom(last, 0.05, false);
         this.low = getRandom(last, 0.05, false);
-        this.volume = (int) getRandom(10000, 1.0, false);
+        this.volume = (int) getRandom(10000, 1.0, true);
         this.marketCap = getRandom(10E6, 5.0, false);
         this.prevClose = getRandom(last, 0.15, false);
         this.percentageChange = change / prevClose * 100;

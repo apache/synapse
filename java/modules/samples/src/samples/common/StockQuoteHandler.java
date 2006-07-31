@@ -23,10 +23,9 @@ import org.apache.axiom.om.OMNamespace;
 import javax.xml.namespace.QName;
 
 /**
- * A class that can create messages to, and parse replies from the
- * invesbot stock quote service at http://ws.invesbot.com/stockquotes.asmx
+ * A class that can create messages to, and parse replies from our sample StockQuote service
  */
-public class InvesbotHandler {
+public class StockQuoteHandler {
     /**
      * Create a new custom stock quote request with a body as follows
      * <m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test">
@@ -67,18 +66,22 @@ public class InvesbotHandler {
 
     /**
      * Create a new custom stock quote request with a body as follows
-     *  <m:GetQuote xmlns:m="http://ws.invesbot.com/">
-     *      <m:symbol>IBM</m:symbol>
+     *  <m:GetQuote xmlns:m="http://services.samples/xsd">
+     *      <m:request>
+     *          <m:symbol>IBM</m:symbol>
+     *      </m:request>
      *  </m:GetQuote>
      * @param symbol the stock symbol
      * @return OMElement for SOAP body
      */
     public static OMElement createStandardRequestPayload(String symbol) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
-        OMNamespace ns      = factory.createOMNamespace("http://ws.invesbot.com/", "m0");
-        OMElement getQuote  = factory.createOMElement("GetQuote", ns);
+        OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMElement getQuote  = factory.createOMElement("getQuote", ns);
+        OMElement request   = factory.createOMElement("request", ns);
         OMElement symb      = factory.createOMElement("symbol", ns);
-        getQuote.addChild(symb);
+        request.addChild(symb);
+        getQuote.addChild(request);
         symb.setText(symbol);
         return getQuote;
     }
@@ -89,25 +92,21 @@ public class InvesbotHandler {
      * @return
      * @throws javax.xml.stream.XMLStreamException
      *
-     *  <GetQuoteResponse xmlns="http://ws.invesbot.com/">
-     *      <GetQuoteResult>
-     *          <StockQuote xmlns="">
-     *              <Symbol>IBM</Symbol>
-     *              ...
-     *              <Price>82.47</Price>
-     *              .......
-     *          </StockQuote>
-     *      </GetQuoteResult>
-     *  </GetQuoteResponse>
+     *  <ns:getQuoteResponse xmlns:ns="http://services.samples/xsd">
+     *      <ns:return>
+     *          <ns:change>-2.3238706829151026</ns:change>
+     *          ...
+     *          <ns:symbol>IBM</ns:symbol>
+     *          <ns:volume>17949</ns:volume>
+     *      </ns:return>
+     *  </ns:getQuoteResponse>
      */
     public static String parseStandardResponsePayload(OMElement result) throws Exception {
 
-        OMElement getQResp = result.getFirstChildWithName(
-            new QName("", "StockQuote"));
-        if (getQResp != null) {
-            OMElement price = getQResp.getFirstChildWithName(
-                new QName("", "Price"));
-            return price.getText();
+        OMElement last = result.getFirstChildWithName(
+            new QName("http://services.samples/xsd", "last"));
+        if (last != null) {
+            return last.getText();
         } else {
             throw new Exception("Unexpected response : " + result);
         }

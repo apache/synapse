@@ -25,7 +25,8 @@ import org.apache.axis2.description.Parameter;
 import org.apache.axis2.modules.Module;
 import org.apache.axis2.modules.ModulePolicyExtension;
 import org.apache.axis2.modules.PolicyExtension;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.RMPolicyExtension;
@@ -42,7 +43,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SandeshaModule implements Module, ModulePolicyExtension {
     
-    private Logger log = Logger.getLogger(SandeshaModule.class);
+    private Log log = LogFactory.getLog(SandeshaModule.class);
     
 	// initialize the module
 	public void init(ConfigurationContext configContext,

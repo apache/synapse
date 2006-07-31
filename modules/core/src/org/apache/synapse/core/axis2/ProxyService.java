@@ -17,6 +17,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.description.*;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.njms.JMSConstants;
 import org.apache.synapse.SynapseException;
@@ -26,7 +27,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.policy.util.PolicyReader;
 import org.apache.ws.policy.util.PolicyFactory;
 import org.apache.ws.policy.Policy;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import java.net.URL;
 import java.io.IOException;
 import java.util.*;
@@ -80,17 +85,46 @@ public class ProxyService {
         AxisService proxyService = null;
         if (wsdl != null) {
             try {
-                WSDL11ToAxisServiceBuilder wsdl2AxisServiceBuilder =
-                    new WSDL11ToAxisServiceBuilder(wsdl.openStream(), null, null);
-                proxyService = wsdl2AxisServiceBuilder.populateService();
-                proxyService.setWsdlfound(true);
+                // detect version of the WSDL 1.1 or 2.0
+                OMNamespace documentElementNS = new StAXOMBuilder(wsdl.openStream()).
+                    getDocumentElement().getNamespace();
+
+                if (documentElementNS != null) {
+                    WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
+                    if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.
+                        equals(documentElementNS.getName())) {
+                        wsdlToAxisServiceBuilder =
+                            new WSDL20ToAxisServiceBuilder(wsdl.openStream(), null, null);
+
+                    } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
+                        equals(documentElementNS.getName())) {
+                        wsdlToAxisServiceBuilder =
+                            new WSDL11ToAxisServiceBuilder(wsdl.openStream(), null, null);
+                    } else {
+                        handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
+                    }
+
+                    proxyService = wsdlToAxisServiceBuilder.populateService();
+                    proxyService.setWsdlfound(true);
+
+                } else {
+                    handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
+                }
+
+            } catch (XMLStreamException e) {
+                handleException("Error reading WSDL at URL : " + wsdl, e);
             } catch (AxisFault af) {
                 handleException("Error building service from WSDL at : " + wsdl, af);
             } catch (IOException ioe) {
                 handleException("Error reading WSDL from URL : " + wsdl, ioe);
             }
         } else {
+            // this is for POX... create a dummy service and an operation for which
+            // our SynapseDispatcher will properly dispatch to
             proxyService = new AxisService();
+            AxisOperation mediateOperation =
+                new InOutAxisOperation(new QName("mediate"));
+            proxyService.addOperation(mediateOperation);
         }
 
         // Set the name and description. Currently Axis2 uses the name as the

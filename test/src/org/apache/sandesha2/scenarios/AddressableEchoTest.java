@@ -1,10 +1,9 @@
 package org.apache.sandesha2.scenarios;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
-
-import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -118,22 +117,46 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		
 		serviceClient.setOptions(clientOptions);
 		
-		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
+		
+		TestCallback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
+		
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		TestCallback callback3 = new TestCallback ("Callback 3");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo3",sequenceKey),callback3);
 
         
         Thread.sleep(40000);
 		
         //assertions for the out sequence.
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+		SequenceReport outgoingSequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+		assertEquals (outgoingSequenceReport.getCompletedMessages().size(),3);
+		assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(3)));
+		assertEquals(outgoingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(outgoingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+		
+		ArrayList incomingReports = SandeshaClient.getIncomingSequenceReports(configContext);
+		assertEquals(incomingReports.size(),1);
+		SequenceReport incomingSequenceReport = (SequenceReport) incomingReports.get(0);
+		assertEquals (incomingSequenceReport.getCompletedMessages().size(),3);
+		assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(3)));
+		assertEquals(incomingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(incomingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_IN);
 		
 		assertTrue(callback1.isComplete());
 		assertEquals(callback1.getResult(),"echo1");
+		
+		assertTrue(callback2.isComplete());
+		assertEquals(callback2.getResult(),"echo1echo2");
+		
+		assertTrue(callback3.isComplete());
+		assertEquals(callback3.getResult(),"echo1echo2echo3");
 		
 		serviceClient.finalizeInvoke();
 	}
@@ -174,21 +197,45 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		serviceClient.setOptions(clientOptions);
 		
 		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
+		
+		TestCallback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
+		
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		TestCallback callback3 = new TestCallback ("Callback 3");
+		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo3",sequenceKey),callback3);
 
         
         Thread.sleep(40000);
 		
         //assertions for the out sequence.
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+        //assertions for the out sequence.
+		SequenceReport outgoingSequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+		assertEquals (outgoingSequenceReport.getCompletedMessages().size(),3);
+		assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(3)));
+		assertEquals(outgoingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(outgoingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+		
+		SequenceReport incomingSequenceReport = SandeshaClient.getIncomingSequenceReport(offeredSequeiceId,configContext);
+		assertEquals (incomingSequenceReport.getCompletedMessages().size(),3);
+		assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(3)));
+		assertEquals(incomingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(incomingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_IN);
 		
 		assertTrue(callback1.isComplete());
 		assertEquals(callback1.getResult(),"echo1");
+		
+		assertTrue(callback2.isComplete());
+		assertEquals(callback2.getResult(),"echo1echo2");
+		
+		assertTrue(callback3.isComplete());
+		assertEquals(callback3.getResult(),"echo1echo2echo3");
 		
 		serviceClient.finalizeInvoke();
 	}

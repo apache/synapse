@@ -47,6 +47,8 @@ public class CreateSequenceResponse implements IOMRMPart {
 	private String rmNamespaceValue = null;
 	
 	private String addressingNamespaceValue = null;
+	
+	private OMElement element;
 
 	public CreateSequenceResponse(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
@@ -70,6 +72,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 					SandeshaMessageKeys.createSeqResponseCannotBeAddedToNonBody));
 
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
+		element = bodyElement;
 
 		OMElement createSeqResponsePart = SOAPBody
 				.getFirstChildWithName(new QName(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
@@ -186,5 +189,9 @@ public class CreateSequenceResponse implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public OMElement getOMElement() {
+		return element;
 	}
 }

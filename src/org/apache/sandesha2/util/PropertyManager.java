@@ -66,6 +66,8 @@ public class PropertyManager {
 		String msgTypesToDrop = Sandesha2Constants.Properties.DefaultValues.MessageTypesToDrop;
 		loadMessageTypesToDrop(msgTypesToDrop, propertyBean);
 
+		propertyBean.setSecurityManagerClass(Sandesha2Constants.Properties.DefaultValues.SecurityManager);
+		
 		return propertyBean;
 	}
 
@@ -114,6 +116,9 @@ public class PropertyManager {
 			String messageTypesToDrop = properties.getProperty(Sandesha2Constants.Properties.MessageTypesToDrop);
 			loadMessageTypesToDrop(messageTypesToDrop, propertyBean);
 
+			String securityManagerClassStr = properties
+			    .getProperty(Sandesha2Constants.Properties.SecurityManager);
+			loadSecurityManagerClass(securityManagerClassStr,propertyBean);
 		} catch (IOException e) {
 			throw new SandeshaException(e);
 		}
@@ -165,6 +170,10 @@ public class PropertyManager {
 		Parameter messageTypesToDropParam = desc.getParameter(Sandesha2Constants.Properties.MessageTypesToDrop);
 		String messageTypesToDrop = (String) messageTypesToDropParam.getValue();
 		loadMessageTypesToDrop(messageTypesToDrop, propertyBean);
+
+		Parameter securityManagerClassParam = desc.getParameter(Sandesha2Constants.Properties.SecurityManager);
+		String securityManagerClassStr = (String) securityManagerClassParam.getValue();
+		loadSecurityManagerClass(securityManagerClassStr,propertyBean);
 
 		return propertyBean;
 	}
@@ -225,21 +234,6 @@ public class PropertyManager {
 		else
 			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
 
-		// if (data.isStorageManagerSet())
-		// propertyBean.setStorageManagerClass(data.getStorageManager());
-		// else
-		// propertyBean.setStorageManagerClass(data.getStorageManager());
-
-		if (data.isInMemoryStorageManagerSet())
-			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
-		else
-			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
-
-		// if (data.isStorageManagerSet())
-		// propertyBean.setStorageManagerClass(data.getStorageManager());
-		// else
-		// propertyBean.setStorageManagerClass(data.getStorageManager());
-
 		if (data.isInMemoryStorageManagerSet())
 			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
 		else
@@ -254,6 +248,8 @@ public class PropertyManager {
 			loadMessageTypesToDrop(data.getMessageTypesToDrop(), propertyBean);
 		else
 			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
+
+		propertyBean.setSecurityManagerClass(data.getSecurityManager());
 
 		return propertyBean;
 	}
@@ -333,6 +329,8 @@ public class PropertyManager {
 		else
 			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
 
+		propertyBean.setSecurityManagerClass(data.getSecurityManager());
+		
 		return propertyBean;
 	}
 
@@ -498,6 +496,18 @@ public class PropertyManager {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.propertyInvalidValue,
 					Sandesha2Constants.Properties.MessageTypesToDrop);
 			throw new SandeshaException(message, e);
+		}
+	}
+
+	/**
+	 * Loads the SecurityManager class name.
+	 * 
+	 * @param properties
+	 */
+	private static void loadSecurityManagerClass(String securityManagerClassStr, SandeshaPropertyBean propertyBean) throws SandeshaException  {
+		if (securityManagerClassStr != null) {
+			securityManagerClassStr = securityManagerClassStr.trim();
+			propertyBean.setSecurityManagerClass(securityManagerClassStr);
 		}
 	}
 

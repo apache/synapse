@@ -41,6 +41,7 @@ public class SequenceReport {
 	private String sequenceID = null;
 	private String internalSequenceID = null;   //only for outgoing sequences
 	private ArrayList completedMessages = null; //no of messages acked (both for incoming and outgoing)
+	private boolean secureSequence = false;
 	
 	public SequenceReport () {
 		completedMessages = new ArrayList ();
@@ -92,6 +93,14 @@ public class SequenceReport {
 
 	public void setInternalSequenceID(String internalSequenceID) {
 		this.internalSequenceID = internalSequenceID;
+	}
+
+	public boolean isSecureSequence() {
+		return secureSequence;
+	}
+
+	public void setSecureSequence(boolean secureSequence) {
+		this.secureSequence = secureSequence;
 	}
 	
 	

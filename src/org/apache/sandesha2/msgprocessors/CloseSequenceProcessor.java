@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
@@ -31,6 +32,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -65,6 +68,16 @@ public class CloseSequenceProcessor implements MsgProcessor {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
+		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
+		
+		// Check that the sender of this CloseSequence holds the correct token
+		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
+			OMElement body = msgCtx.getEnvelope().getBody();
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.checkProofOfPossession(token, body, msgCtx);
+		}
 
 		FaultManager faultManager = new FaultManager();
 		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceID, storageManager);
@@ -83,7 +96,6 @@ public class CloseSequenceProcessor implements MsgProcessor {
 			return;
 		}
 
-		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
 		sequenceClosedBean.setSequenceID(sequenceID);
 		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);

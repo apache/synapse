@@ -38,6 +38,8 @@ public class SandeshaPropertyBean {
 	private String inMemoryStorageManagerClass = null;
 
 	private String permanentStorageManagerClass = null;
+	
+	private String securityManagerClass = null;
 
 	public long getInactiveTimeoutInterval() {
 		return policyBean.getInactiveTimeoutInterval();
@@ -152,5 +154,12 @@ public class SandeshaPropertyBean {
 	public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
 		policyBean.setMaximumRetransmissionCount(maximumRetransmissionCount);
 	}
-
+	
+	public String getSecurityManagerClass() {
+		return securityManagerClass;
+	}
+	
+	public void setSecurityManagerClass(String className) {
+		this.securityManagerClass = className;
+	}
 }

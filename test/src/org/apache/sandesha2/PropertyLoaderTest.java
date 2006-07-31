@@ -70,4 +70,9 @@ public class PropertyLoaderTest extends TestCase {
 		String storageMgr = propertyBean.getInMemoryStorageManagerClass();
 		assertEquals(storageMgr,"org.apache.sandesha2.storage.inmemory.InMemoryStorageManager1");
 	}
+
+	public void testSecurityManager() {
+		String secMgr = propertyBean.getSecurityManagerClass();
+		assertEquals(secMgr,"org.apache.sandesha2.security.SecurityManager1");
+	}
 }

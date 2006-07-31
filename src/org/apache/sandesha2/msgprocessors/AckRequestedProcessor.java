@@ -41,6 +41,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -86,6 +88,14 @@ public class AckRequestedProcessor implements MsgProcessor {
 				configurationContext.getAxisConfiguration());
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+
+		// Check that the sender of this AckRequest holds the correct token
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.checkProofOfPossession(token, ackRequested.getOMElement(), msgContext);
+		}
 
 		// Setting the ack depending on AcksTo.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceID,

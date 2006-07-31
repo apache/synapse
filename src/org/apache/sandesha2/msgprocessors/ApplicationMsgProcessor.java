@@ -19,6 +19,8 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -43,6 +45,8 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -123,15 +127,27 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		// RM will not send sync responses. If sync acks are there this will be
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		String sequenceId = sequence.getIdentifier().getIdentifier();
+		
+		// Check that both the Sequence header and message body have been secured properly
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
+			OMElement body = msgCtx.getEnvelope().getBody();
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.checkProofOfPossession(token, sequence.getOMElement(), msgCtx);
+			secManager.checkProofOfPossession(token, body, msgCtx);
+		}
+		
+		//RM will not send sync responses. If sync acks are there this will be
 		// made true again later.
 		if (rmMsgCtx.getMessageContext().getOperationContext() != null) {
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
 					Constants.VALUE_FALSE);
 		}
-
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(), msgCtx
-				.getConfigurationContext().getAxisConfiguration());
 
 		FaultManager faultManager = new FaultManager();
 		RMMsgContext faultMessageContext = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
@@ -150,11 +166,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		// setting acked msg no range
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-		String sequenceId = sequence.getIdentifier().getIdentifier();
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
 		if (configCtx == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
@@ -810,6 +822,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 												// relateTo anything
 
 		CreateSeqBean createSeqBean = new CreateSeqBean(internalSequenceId, createSeqMsg.getMessageID(), null);
+		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(token != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
+			createSeqBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
+		}
+		
 		createSeqMgr.insert(createSeqBean);
 
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(internalSequenceId,

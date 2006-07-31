@@ -34,6 +34,8 @@ public interface Sandesha2Constants {
 		
 		String NS_URI = "http://schemas.xmlsoap.org/ws/2005/02/rm";
 		
+		String SEC_NS_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+		
 		public interface Actions {
 
 			String ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
@@ -283,6 +285,8 @@ public interface Sandesha2Constants {
 		String LAST_OUT_MESSAGE_NO = "LastOutMessage";
 		
 		String LAST_IN_MESSAGE_NO = "LastInMessage";
+		
+		String SECURITY_TOKEN = "SecurityToken";
 	}
 
 	public interface SOAPVersion {
@@ -384,6 +388,8 @@ public interface Sandesha2Constants {
 		String MessageTypesToDrop = "MessageTypesToDrop";
 		
 		String RetransmissionCount = "RetransmissionCount";
+
+		String SecurityManager = "SecurityManager";
 		
 		public interface DefaultValues {
 			
@@ -410,6 +416,8 @@ public interface Sandesha2Constants {
 			int RetransmissionCount = 8;
 			
 			int MaximumRetransmissionCount = 10;
+			
+			String SecurityManager = "org.apache.sandesha2.security.dummy.DummySecurityManager";
 		}
 	}
 	
@@ -494,5 +502,7 @@ public interface Sandesha2Constants {
 	String REINJECTED_MESSAGE = "ReinjectedMessage";
 	
 	String MODULE_CLASS_LOADER = "Sandesha2ModuleClassLoader";
+	
+	String SECURITY_MANAGER = "Sandesha2SecurityManager";
 	
 }

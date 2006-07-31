@@ -19,6 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -41,6 +42,8 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -108,7 +111,17 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		}
 
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
+		
+		// Check that the sender of this TerminateSequence holds the correct token
+		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
+			OMElement body = terminateSeqRMMsg.getSOAPEnvelope().getBody();
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.checkProofOfPossession(token, body, terminateSeqRMMsg.getMessageContext());
+		}
 
 		FaultManager faultManager = new FaultManager();
 		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId,
@@ -128,7 +141,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			return;
 		}
 
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean();
 		terminateReceivedBean.setSequenceID(sequenceId);

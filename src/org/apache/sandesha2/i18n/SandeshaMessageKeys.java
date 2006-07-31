@@ -9,6 +9,8 @@ public class SandeshaMessageKeys {
 	public static final String cannotGetStorageKey="cannotGetStorageKey";
 	public static final String cannotGetStorageManager="cannotGetStorageManager";
 	public static final String storageManagerMustImplement="storageManagerMustImplement";
+	public static final String cannotInitSecurityManager="cannotInitSecurityManager";
+	public static final String securityManagerMustImplement="securityManagerMustImplement";
 
 	public static final String commitError="commitError";
 	public static final String rollbackError="rollbackError";
@@ -214,5 +216,8 @@ public class SandeshaMessageKeys {
 	public static final String invalidMsgNumberList="invalidMsgNumberList";
 	public static final String cannotFindReqMsgFromOpContext="cannotFindReqMsgFromOpContext";
 
-	
+	public static final String secureDummyNoProof="secureDummyNoProof";
+	public static final String secureDummyNoToken="secureDummyNoToken";
+	public static final String secureDummyNoSTR  ="secureDummyNoSTR";
+
 }

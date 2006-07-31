@@ -42,6 +42,8 @@ public class CloseSequence implements IOMRMPart {
 	
 	private String namespaceValue = null;
 	
+	private OMElement element = null;
+	
 	public CloseSequence(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -62,6 +64,8 @@ public class CloseSequence implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.closeSeqCannotBeAddedToNonBody));
 
+		element = body;
+		
 		OMElement closeSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE));
 
@@ -128,5 +132,9 @@ public class CloseSequence implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public OMElement getOMElement() {
+		return element;
 	}
 }

@@ -175,6 +175,7 @@ public class SandeshaClient {
 				sequenceReport.setInternalSequenceID(internalSequenceID);
 				sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
 				sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
+				if(createSeqBean.getSecurityTokenData() != null) sequenceReport.setSecureSequence(true);
 
 				return sequenceReport;
 			}
@@ -890,6 +891,9 @@ public class SandeshaClient {
 			Long lng = new Long(Long.parseLong((String) iter.next()));
 			report.addCompletedMessage(lng);
 		}
+		
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(outSequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) report.setSecureSequence(true);
 	}
 
 	private static byte getServerSequenceStatus(String sequenceID, StorageManager storageManager)
@@ -980,6 +984,9 @@ public class SandeshaClient {
 
 			sequenceReport.setSequenceStatus(getServerSequenceStatus(sequenceID, storageManager));
 
+			SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+			if(tokenBean != null) sequenceReport.setSecureSequence(true);
+			
 			return sequenceReport;
 
 		} catch (Exception e) {

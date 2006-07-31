@@ -30,6 +30,7 @@ public class PolicyEngineData {
 	private String inMemoryStorageManager = null;	
 //	private String storageManager = null;
 	private int maximumRetransmissionCount; 
+	private String securityManager = null;
 	
 	private boolean acknowledgementIntervalSet = false;
 	private boolean exponentialBackoffSet = false;
@@ -42,6 +43,7 @@ public class PolicyEngineData {
 	private boolean inMemoryStorageManagerSet = false;	
 //	private boolean storageManagerSet = false;
 	private boolean maximumRetransmissionCountSet = false;
+	private boolean securityManagerSet = false;
 
 	public boolean isExponentialBackoff() {
 		return exponentialBackoff;
@@ -225,6 +227,18 @@ public class PolicyEngineData {
 		return retransmissionIntervalSet;
 	}
 
+	public String getSecurityManager() {
+		return securityManager;
+	}
+	
+	public void setSecurityManager(String className) {
+		securityManager = className;
+		securityManagerSet = true;
+	}
+	
+	public boolean isSecuritymanagerSet() {
+		return securityManagerSet;
+	}
 //	public boolean isStorageManagerSet() {
 //		return storageManagerSet;
 //	}

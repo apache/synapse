@@ -124,6 +124,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		
 		assertNotNull(sequenceReport.getSequenceID());
+		assertFalse(sequenceReport.isSecureSequence());
 		
 		serviceClient.finalizeInvoke();
 	}

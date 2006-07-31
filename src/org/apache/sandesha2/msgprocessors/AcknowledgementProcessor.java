@@ -32,6 +32,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -79,15 +81,23 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
-
-		Iterator nackIterator = sequenceAck.getNackList().iterator();
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
 		if (outSequenceId == null || "".equals(outSequenceId)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.outSeqIDIsNull);
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+
+		// Check that the sender of this Ack holds the correct token
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(outSequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.checkProofOfPossession(token, sequenceAck.getOMElement(), msgCtx);
+		}
+		
+		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
+		Iterator nackIterator = sequenceAck.getNackList().iterator();
 
 		FaultManager faultManager = new FaultManager();
 		RMMsgContext faultMessageContext = faultManager

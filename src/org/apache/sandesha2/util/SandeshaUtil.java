@@ -61,6 +61,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -911,4 +912,40 @@ public class SandeshaUtil {
 		return sequenceID;
 	}
 
+	public static SecurityManager getSecurityManager(ConfigurationContext context) throws SandeshaException {
+		SecurityManager util = (SecurityManager) context.getProperty(Sandesha2Constants.SECURITY_MANAGER);
+		if (util != null) return util;
+
+		//Currently module policies are used to find the security impl. These cant be overriden
+		String securityManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getSecurityManagerClass();
+		util = getSecurityManagerInstance(securityManagerClassStr,context);
+		context.setProperty(Sandesha2Constants.SECURITY_MANAGER,util);
+		
+		return util;
+	}
+
+	private static SecurityManager getSecurityManagerInstance (String className,ConfigurationContext context) throws SandeshaException {
+		try {
+		  ClassLoader classLoader = (ClassLoader)	context.getProperty(Sandesha2Constants.MODULE_CLASS_LOADER);
+
+		  if (classLoader==null)
+	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
+		    
+		  Class c = classLoader.loadClass(className);
+			Class configContextClass = context.getClass();
+			
+			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
+			Object obj = constructor.newInstance(new Object[] {context});
+
+			if (!(obj instanceof SecurityManager)) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.securityManagerMustImplement, className);
+				throw new SandeshaException(message);
+			}
+			return (SecurityManager) obj;
+			
+		} catch (Exception e) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitSecurityManager, e.toString());
+			throw new SandeshaException(message,e);
+		}
+	}
 }

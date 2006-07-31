@@ -43,6 +43,8 @@ public class TerminateSequence implements IOMRMPart {
 	
 	private String namespaceValue = null;
 	
+	private OMElement element;
+	
 	public TerminateSequence(SOAPFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -63,6 +65,8 @@ public class TerminateSequence implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.terminateSeqCannotBeAddedToNonBody));
 
+		element = body;
+		
 		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 
@@ -129,5 +133,9 @@ public class TerminateSequence implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public OMElement getOMElement() {
+		return element;
 	}
 }

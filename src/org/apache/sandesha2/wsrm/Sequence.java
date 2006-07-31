@@ -45,6 +45,7 @@ public class Sequence implements IOMRMPart {
 	private SOAPFactory defaultFactory;
 	private boolean mustUnderstand = true;
 	private String namespaceValue = null;
+	private OMElement element;
 	
 	public Sequence(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -74,7 +75,8 @@ public class Sequence implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noSequencePartInElement,
 					headerElement.toString()));
-
+		
+		element = sequencePart;
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		messageNumber = new MessageNumber(defaultFactory,namespaceValue);
 		identifier.fromOMElement(sequencePart);
@@ -178,4 +180,7 @@ public class Sequence implements IOMRMPart {
 		return false;
 	}
 
+	public OMElement getOMElement() {
+		return element;
+	}
 }

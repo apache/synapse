@@ -33,6 +33,7 @@ import org.apache.sandesha2.policy.processors.InvokeInOrderProcessor;
 import org.apache.sandesha2.policy.processors.MaximumRetransmissionCountProcessor;
 import org.apache.sandesha2.policy.processors.MessageTypesToDropProcessor;
 import org.apache.sandesha2.policy.processors.RetransmissionItervalProcessor;
+import org.apache.sandesha2.policy.processors.SecurityManagerProcessor;
 import org.apache.sandesha2.policy.processors.StorageManagersProcessor;
 import org.apache.ws.policy.All;
 import org.apache.ws.policy.Assertion;
@@ -103,6 +104,11 @@ public class RMPolicyProcessor {
 		rpt.setProcessTokenMethod(smp);
 		topLevel.setChildToken(rpt);
 
+		SecurityManagerProcessor secmp = new SecurityManagerProcessor();
+		rpt = RMPolicy.securityManager.copy();
+		rpt.setProcessTokenMethod(secmp);
+		topLevel.setChildToken(rpt);
+		
 		/*
 		 * Now get the initial PolicyEngineData, initialize it and put it onto
 		 * the PED stack.

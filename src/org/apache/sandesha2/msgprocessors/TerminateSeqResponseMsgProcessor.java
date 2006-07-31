@@ -17,10 +17,21 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**
  * To process terminate sequence response messages.
@@ -28,15 +39,38 @@ import org.apache.sandesha2.SandeshaException;
 public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(TerminateSeqResponseMsgProcessor.class);
+	
+	public void processInMessage(RMMsgContext terminateResRMMsg)
+			throws SandeshaException { 
+		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processInMessage");
+		
+		MessageContext msgContext = terminateResRMMsg.getMessageContext();
+		ConfigurationContext context = terminateResRMMsg.getConfigurationContext();
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
+		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
+		
+		TerminateSequenceResponse tsResponse = (TerminateSequenceResponse)
+		  terminateResRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
+		String sequenceId = tsResponse.getIdentifier().getIdentifier();
 
-	public void processInMessage(RMMsgContext terminateResRMMsg) throws SandeshaException {
+		// Check that the sender of this TerminateSequence holds the correct token
+		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
+			OMElement body = terminateResRMMsg.getSOAPEnvelope().getBody();
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.checkProofOfPossession(token, body, msgContext);
+		}
 
-		// TODO add processing logic
-
+		// Stop this message travelling further through the Axis runtime
 		terminateResRMMsg.pause();
-	}
+
+		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processInMessage");
+  }
 
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-
+		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processOutMessage");
+		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processOutMessage");
 	}
 }

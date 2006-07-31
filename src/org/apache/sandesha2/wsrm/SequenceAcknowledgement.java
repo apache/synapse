@@ -51,6 +51,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private boolean mustUnderstand = false;
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
+	private OMElement ackElement = null;
 	
 	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -82,6 +83,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.seqAckPartIsNull));
 
+		ackElement = sequenceAckPart;
+		
 		OMFactory factory = element.getOMFactory();
 		if (factory==null)
 			factory = defaultFactory;
@@ -296,5 +299,9 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	public void setAckNone(AckNone ackNone) {
 		this.ackNone = ackNone;
+	}
+	
+	public OMElement getOMElement() {
+		return ackElement;
 	}
 }

@@ -44,6 +44,12 @@ public class CreateSeqBean extends RMBean {
 	 * This is the actual Sequence ID of the sequence.
 	 */
 	private String sequenceID;
+	
+	/**
+	 * Comment for <code>securityTokenData</code>
+	 * This is the security token data needed to reconstruct the token that secures this sequence.
+	 */
+	private String securityTokenData;
 
 	public CreateSeqBean() {
 	}
@@ -77,6 +83,14 @@ public class CreateSeqBean extends RMBean {
 
 	public void setInternalSequenceID(String internalSequenceID) {
 		this.internalSequenceID = internalSequenceID;
+	}
+
+	public String getSecurityTokenData() {
+		return securityTokenData;
+	}
+
+	public void setSecurityTokenData(String securityTokenData) {
+		this.securityTokenData = securityTokenData;
 	}
 
 }

@@ -46,6 +46,8 @@ public class AckRequested implements IOMRMPart {
 	private String namespaceValue = null;
 	
 	private boolean mustUnderstand = false;
+	
+	private OMElement ackElement = null;
 
 	public AckRequested(OMFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -74,6 +76,7 @@ public class AckRequested implements IOMRMPart {
 					SandeshaMessageKeys.noAckRequestedElement,
 					header.toString()));
 
+		ackElement = ackReqPart;
 		identifier = new Identifier(defaultFactory,namespaceValue);
 		identifier.fromOMElement(ackReqPart);
 
@@ -159,5 +162,9 @@ public class AckRequested implements IOMRMPart {
 			return true;
 		
 		return false;
+	}
+	
+	public OMElement getOMElement() {
+		return ackElement;
 	}
 }

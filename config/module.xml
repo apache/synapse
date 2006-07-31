@@ -111,6 +111,9 @@
           </wsrm:PermanentStorageManager> 
       
       </wsrm:StorageManagers>
+      
+      <!-- This will not be overriden by service level policies -->
+      <wsrm:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</wsrm:SecurityManager>
    
 </wsp:Policy>
 

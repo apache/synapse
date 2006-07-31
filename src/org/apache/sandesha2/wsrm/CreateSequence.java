@@ -19,6 +19,7 @@ package org.apache.sandesha2.wsrm;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
@@ -30,6 +31,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 
 /**
  * Represent the CreateSequence body element.
@@ -49,6 +51,12 @@ public class CreateSequence implements IOMRMPart {
 	
 	private String addressingNamespaceValue = null;
 	
+	private String secNamespaceValue = null;
+	
+	private OMElement securityTokenReference = null;
+	
+	private OMElement element;
+	
 	public CreateSequence(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -58,6 +66,7 @@ public class CreateSequence implements IOMRMPart {
 		this.defaultFactory = factory;
 		this.rmNamespaceValue = rmNamespaceValue;
 		this.addressingNamespaceValue = addressingNamespaceValue;
+		this.secNamespaceValue = SpecSpecificConstants.getSecurityNamespace(rmNamespaceValue);
 	}
 	
 	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
@@ -79,6 +88,8 @@ public class CreateSequence implements IOMRMPart {
 					SandeshaMessageKeys.noCreateSeqPartInElement,
 					bodyElement.toString()));
 		
+		element = bodyElement;
+		
 		acksTo = new AcksTo(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
 		acksTo.fromOMElement(createSequencePart);
 
@@ -96,7 +107,11 @@ public class CreateSequence implements IOMRMPart {
 			expires = new Expires(defaultFactory,rmNamespaceValue);
 			expires.fromOMElement(createSequencePart);
 		}
-
+		
+		if(secNamespaceValue != null) {
+			securityTokenReference = createSequencePart.getFirstChildWithName(
+				new QName(secNamespaceValue, "SecurityTokenReference"));
+		}
 		return this;
 	}
 
@@ -127,6 +142,10 @@ public class CreateSequence implements IOMRMPart {
 
 		if (expires != null) {
 			expires.toOMElement(createSequenceElement);
+		}
+		
+		if(securityTokenReference != null) {
+			createSequenceElement.addChild(securityTokenReference);
 		}
 
 		soapBody.addChild(createSequenceElement);
@@ -170,4 +189,17 @@ public class CreateSequence implements IOMRMPart {
 		
 		return false;
 	}
+	
+	public OMElement getSecurityTokenReference() {
+		return securityTokenReference;
+	}
+
+	public void setSecurityTokenReference(OMElement theSTR) {
+		this.securityTokenReference = theSTR;
+	}
+
+	public OMElement getOMElement() {
+		return element;
+	}
+
 }

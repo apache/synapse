@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.RMPolicyExtension;
+import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
@@ -88,6 +89,11 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 					e.toString());
 			log.debug(message,e);
 		}
+		
+		configContext.setProperty(Sandesha2Constants.SECURITY_MANAGER,null);
+		SecurityManager util = SandeshaUtil.getSecurityManager(configContext);
+		util.initSecurity(module);
+
 	}
 
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {

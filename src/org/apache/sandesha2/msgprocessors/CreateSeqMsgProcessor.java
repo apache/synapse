@@ -19,6 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -35,6 +36,8 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -88,6 +91,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 			createSeqMsg.pause();
 			return;
+		}
+		
+		// If the inbound CreateSequence includes a SecurityTokenReference then
+		// ask the security manager to resolve that to a token for us. We also
+		// check that the Create was secured using the token.
+		OMElement theSTR = createSeqPart.getSecurityTokenReference();
+		SecurityToken token = null;
+		if(theSTR != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
+			MessageContext msgcontext = createSeqRMMsg.getMessageContext();
+			token = secManager.getSecurityToken(theSTR, msgcontext);
+			secManager.checkProofOfPossession(token, createSeqPart.getOMElement(), msgcontext);
 		}
 
 		MessageContext outMessage = null;

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
@@ -44,6 +45,8 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -306,6 +309,17 @@ public class RMMsgCreator {
 
 		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR, factory, addressingNamespaceValue), factory,
 				rmNamespaceValue, addressingNamespaceValue));
+		
+		// Find the token that should be used to secure this new sequence. If there is a token, then we
+		// save it in the properties so that the caller can store the token within the create sequence
+		// bean.
+		SecurityManager secMgr = SandeshaUtil.getSecurityManager(context);
+		SecurityToken token = secMgr.getSecurityToken(createSeqmsgContext);
+		if(token != null) {
+			OMElement str = secMgr.createSecurityTokenReference(token, createSeqmsgContext);
+			createSequencePart.setSecurityTokenReference(str);
+			createSeqRMMsg.setProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, token);
+		}
 
 		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, createSequencePart);
 

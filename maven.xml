@@ -4,6 +4,7 @@
 
     <j:set var="dist.name" value="${pom.artifactId}-${sandesha2.version}"/>
     <j:set var="dist.module.name" value="${pom.artifactId}-${sandesha2.module.version}"/>
+    <j:set var="test.module.name" value="${pom.artifactId}-UnitTest"/>
 
     <ant:property name="build.dist.dir" value="${maven.build.dir}/dist"/>
     <ant:property name="build.temp.dir" value="${maven.build.dir}/temp"/>
@@ -121,9 +122,35 @@
 		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
 	</goal>
 
+	<goal name="secure:create" prereqs="server:create,client:create">
+		<ant:property name="secure.client.path" value="${build.repo.dir}/secure-client"/>
+		<ant:property name="secure.server.path" value="${build.repo.dir}/secure-server"/>
+
+		<copy todir="${secure.client.path}">
+		  <fileset dir="${build.repo.dir}/client">
+		    <exclude name="modules/${mar.name}"/>
+		  </fileset>
+		</copy>
+
+		<copy todir="${secure.server.path}">
+		  <fileset dir="${build.repo.dir}/server">
+		    <exclude name="modules/${mar.name}"/>
+		  </fileset>
+		</copy>
+
+		<!-- Replace the security manager in the module.xml file -->
+		<ant:unjar src="${maven.build.dir}/${mar.name}" dest="${build.temp.dir}"/>
+		<ant:copy  file="${dir.test.resources}/test.module.xml" tofile="${build.temp.dir}/META-INF/module.xml" overwrite="true"/>
+		<ant:jar jarfile="${secure.client.path}/modules/${test.module.name}.mar" basedir="${build.temp.dir}"/>
+		<ant:jar jarfile="${secure.server.path}/modules/${test.module.name}.mar" basedir="${build.temp.dir}"/>
+		
+		<delete dir="${build.temp.dir}"/>
+	</goal>
+
     <goal name="repo:create">
         <attainGoal name="server:create"/>
         <attainGoal name="client:create"/>
+        <attainGoal name="secure:create"/>
     </goal>	
     
 	<goal name="server:create" prereqs="mar,sample:create">

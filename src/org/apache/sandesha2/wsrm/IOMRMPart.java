@@ -18,6 +18,7 @@
 package org.apache.sandesha2.wsrm;
 
 import org.apache.sandesha2.SandeshaException;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 
 /**
@@ -27,4 +28,5 @@ import org.apache.axiom.soap.SOAPEnvelope;
 
 public interface IOMRMPart extends IOMRMElement {
 	public void toSOAPEnvelope (SOAPEnvelope envelope) throws SandeshaException;
+	public OMElement getOMElement();
 }

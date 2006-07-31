@@ -57,6 +57,6 @@ public class RMPolicy {
 	public static final RMPolicyToken permanentStorageManager = new RMPolicyToken(
 			"PermanentStorageManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
 	
-//	public static final RMPolicyToken storageManager = new RMPolicyToken(
-//			"StorageManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
+	public static final RMPolicyToken securityManager = new RMPolicyToken(
+			"SecurityManager", RMPolicyToken.SIMPLE_TOKEN, new String[]{});
 }

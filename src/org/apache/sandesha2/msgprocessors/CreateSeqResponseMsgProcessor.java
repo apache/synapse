@@ -19,6 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -32,6 +33,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
@@ -127,6 +130,16 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
+		// Check that the create sequence response message proves possession of the correct token
+		String tokenData = createSeqBean.getSecurityTokenData();
+		if(tokenData != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
+			MessageContext crtSeqResponseCtx = createSeqResponseRMMsgCtx.getMessageContext();
+			OMElement body = crtSeqResponseCtx.getEnvelope().getBody();
+			SecurityToken token = secManager.recoverSecurityToken(tokenData);
+			secManager.checkProofOfPossession(token, body, crtSeqResponseCtx);
+		}
+
 		String internalSequenceId = createSeqBean.getInternalSequenceID();
 		if (internalSequenceId == null || "".equals(internalSequenceId)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.tempSeqIdNotSet);
@@ -157,6 +170,13 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		sequencePropMgr.insert(outSequenceBean);
 		sequencePropMgr.insert(internalSequenceBean);
+		
+		// Store the security token under the new sequence id
+		if(tokenData != null) {
+			SequencePropertyBean newToken = new SequencePropertyBean(newOutSequenceId,
+					Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
+			sequencePropMgr.insert(newToken);
+		}
 
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
@@ -211,6 +231,12 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, addressingNamespace);
 			sequencePropMgr.insert(addressingVersionBean);
 
+			// Store the security token for the offered sequence
+			if(tokenData != null) {
+				SequencePropertyBean newToken = new SequencePropertyBean(offeredSequenceId,
+						Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
+				sequencePropMgr.insert(newToken);
+			}
 		}
 
 		SenderBean target = new SenderBean();

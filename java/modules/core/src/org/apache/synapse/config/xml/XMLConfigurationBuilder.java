@@ -97,14 +97,23 @@ public class XMLConfigurationBuilder {
         }
 
         OMElement rules = root.getFirstChildWithName(Constants.RULES_ELT);
+
         if (rules == null) {
             handleException("A valid Synapse configuration MUST specify the main mediator using the <rules> element");
         } else {
-            SynapseMediator sm = (SynapseMediator) MediatorFactoryFinder.getInstance().getMediator(rules);
-            if (sm.getList().isEmpty()) {
-                handleException("Invalid configuration, the main mediator specified by the <rules> element is empty");
+            OMAttribute key  = rules.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+            if (key != null) {
+                DynamicProperty dp = new DynamicProperty(key.getAttributeValue());
+                dp.setMapper(MediatorFactoryFinder.getInstance());
+                config.setMainMediator(dp);
             } else {
-                config.setMainMediator(sm);
+                SynapseMediator sm = (SynapseMediator)
+                    MediatorFactoryFinder.getInstance().getMediator(rules);
+                if (sm.getList().isEmpty()) {
+                    handleException("Invalid configuration, the main mediator specified by the <rules> element is empty");
+                } else {
+                    config.setMainMediator(sm);
+                }
             }
         }
 
@@ -212,7 +221,7 @@ public class XMLConfigurationBuilder {
      * Create an endpoint definition digesting an XML fragment
      *
      * <pre>
-     * &lt;endpoint name="string" [address="url"]&gt;
+     * &lt;endpoint name="string" [key="string"] [address="url"]&gt;
      *    .. extensibility ..
      * &lt;/endpoint&gt;
      * </pre>
@@ -220,9 +229,17 @@ public class XMLConfigurationBuilder {
      */
     public void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
-        Endpoint endpoint = EndpointFactory.createEndpoint(ele);
-        // add this endpoint to the configuration
-        config.addNamedEndpoint(endpoint.getName(), endpoint);
+        OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute key  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+        if (name != null && key != null) {
+            DynamicProperty dp = new DynamicProperty(key.getAttributeValue());
+            dp.setMapper(EndpointFactory.getInstance());
+            config.addNamedEndpoint(name.getAttributeValue(), dp);
+        } else {
+            Endpoint endpoint = EndpointFactory.createEndpoint(ele);
+            // add this endpoint to the configuration
+            config.addNamedEndpoint(endpoint.getName(), endpoint);
+        }
     }
 
     /**

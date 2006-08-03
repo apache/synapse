@@ -17,15 +17,21 @@
 
 package sandesha2.samples.userguide;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMText;
+import org.apache.axis2.AxisFault;
 
 public class RMSampleService {
 
@@ -35,7 +41,9 @@ public class RMSampleService {
 	private final String Sequence = "Sequence";
 	private final String echoStringResponse = "echoStringResponse";
 	private final String EchoStringReturn = "EchoStringReturn";
-  
+	private final String Attachment = "Attachment";
+	private final String DESTINATION_IMAGE_FILE = "mtom-image1.jpg";
+	
 	public OMElement echoString(OMElement in) throws Exception {
 		
 		OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text));
@@ -75,5 +83,34 @@ public class RMSampleService {
 		String textValue = textElem.getText();
 		
 		System.out.println("ping service got text:" + textValue);
+	}
+	
+	public void MTOMPing(OMElement in) throws Exception  {
+		OMElement attachmentElem = in.getFirstChildWithName(new QName(applicationNamespaceName, Attachment));
+		if (attachmentElem == null)
+			throw new AxisFault("'Attachment' element is not present as a child of the 'Ping' element");
+
+		OMText binaryElem = (OMText) attachmentElem.getFirstOMChild();
+
+		binaryElem.setOptimize(true);
+		DataHandler dataHandler = (DataHandler) binaryElem.getDataHandler();
+
+		try {
+			
+			File destinationFile = new File(DESTINATION_IMAGE_FILE);
+			if (destinationFile.exists())
+				destinationFile.delete();
+
+			FileOutputStream fileOutputStream = new FileOutputStream(DESTINATION_IMAGE_FILE);
+
+			InputStream inputStream = dataHandler.getDataSource().getInputStream();
+			byte[] bytes = new byte[5000];
+			int length = inputStream.read(bytes);
+			fileOutputStream.write(bytes, 0, length);
+			fileOutputStream.close();
+
+		} catch (Exception e) {
+			throw new AxisFault(e);
+		}
 	}
 }

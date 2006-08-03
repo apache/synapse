@@ -13,6 +13,10 @@
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
     </operation>
     
+    <operation name="MTOMPing" mep="http://www.w3.org/2004/08/wsdl/in-only">  
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+    </operation>
+    
     <operation name="echoString">
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
     </operation>
@@ -23,9 +27,8 @@
 		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
 	    xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
 	        
-	      <!-- Following policy value has been overrided from the default values.-->> 
-	      <wsrm:AcknowledgementInterval>3500</wsrm:AcknowledgementInterval>
-	    
+	    <!-- Following policy value has been overrided from the default values.-->> 
+	    <wsrm:AcknowledgementInterval>3500</wsrm:AcknowledgementInterval>
 	   
 	</wsp:Policy>
     

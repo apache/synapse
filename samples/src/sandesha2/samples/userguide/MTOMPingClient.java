@@ -111,22 +111,7 @@ public class MTOMPingClient {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 
 		serviceClient.fireAndForget(getPingOMBlock());
-		
-		SequenceReport sequenceReport = null;
-			
-		boolean complete = false;
-		while (!complete) {
-			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3)
-				complete = true;
-			else {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		SandeshaClient.waitUntilSequenceCompleted(serviceClient);
 		
 		serviceClient.finalizeInvoke();
 	}

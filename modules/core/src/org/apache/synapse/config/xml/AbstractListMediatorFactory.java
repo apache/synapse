@@ -26,11 +26,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.xml.namespace.QName;
+
 /**
  * This implements the basic logic to build a list mediator from a given XML
  * configuration. It recursively builds the child mediators of the list.
  */
-public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
+public abstract class AbstractListMediatorFactory implements MediatorFactory {
 
     private static final Log log = LogFactory.getLog(AbstractListMediatorFactory.class);
 

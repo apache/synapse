@@ -352,4 +352,27 @@ public class ValidateMediator extends AbstractListMediator {
        this.source = source;
     }
 
+    /**
+     * Get the source XPath which yeilds the source element for validation
+     * @return the XPath which yeilds the source element for validation
+     */
+    public AXIOMXPath getSource() {
+        return source;
+    }
+
+    /**
+     * The keys for the schema resources used for validation
+     * @return schema registry keys
+     */
+    public List getSchemaKeys() {
+        return schemaKeys;
+    }
+
+    /**
+     * Properties for the actual Xerces validator
+     * @return properties to be passed to the Xerces validator
+     */
+    public Map getProperties() {
+        return properties;
+    }
 }

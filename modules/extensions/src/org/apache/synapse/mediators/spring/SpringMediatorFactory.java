@@ -21,11 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.spring.SpringConfigExtension;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.synapse.mediators.spring.SpringMediator;
-import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
 
@@ -34,7 +31,7 @@ import javax.xml.namespace.QName;
  * configuration and bean. Optionally, one could specify an inlined Spring
  * configuration as opposed to a globally defined Spring configuration
  * <p/>
- * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>
+ * <spring bean="exampleBean1" key="string""/>
  */
 public class SpringMediatorFactory implements MediatorFactory {
 
@@ -53,25 +50,15 @@ public class SpringMediatorFactory implements MediatorFactory {
 
         SpringMediator sm = new SpringMediator();
         OMAttribute bean = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "bean"));
-        OMAttribute cfg = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "config"));
-        OMAttribute src = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));
+        OMAttribute key  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
 
         if (bean == null) {
             handleException("The 'bean' attribute is required for a Spring mediator definition");
-        } else if (cfg == null && src == null) {
-            handleException("A 'config' or 'src' attribute is required for a Spring mediator definition");
-
+        } else if (key == null) {
+            handleException("A 'key' attribute is required for a Spring mediator definition");
         } else {
             sm.setBeanName(bean.getAttributeValue());
-            if (cfg != null) {
-                log.debug("Creating a Spring mediator using configuration named : " + cfg.getAttributeValue());
-                sm.setConfigName(cfg.getAttributeValue());
-
-            } else {
-                log.debug("Creating an inline Spring configuration using source : " + src.getAttributeValue());
-                SpringConfigExtension sce = new SpringConfigExtension("inline", src.getAttributeValue());
-                sm.setAppContext(sce.getAppContext());
-            }
+            sm.setConfigKey(key.getAttributeValue());
             return sm;
         }
         return null;
@@ -84,10 +71,5 @@ public class SpringMediatorFactory implements MediatorFactory {
 
     public QName getTagQName() {
         return TAG_NAME;
-    }
-
-    public QName getTagSchemaType() {
-        return new QName(Constants.SYNAPSE_NAMESPACE,
-            getTagQName().getLocalPart() + "_type", "spring");
     }
 }

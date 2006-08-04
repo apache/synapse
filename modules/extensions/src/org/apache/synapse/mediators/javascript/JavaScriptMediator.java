@@ -29,6 +29,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class JavaScriptMediator extends AbstractMediator {
 
     private RhinoFunctionInvoker mediateFunction;
+    private String script;
 
     public boolean mediate(MessageContext synCtx) {
         Boolean b = (Boolean) mediateFunction.invoke(new Object[] { synCtx });
@@ -36,9 +37,14 @@ public class JavaScriptMediator extends AbstractMediator {
     }
 
     public void setScript(String script) {
+        this.script = script;
         RhinoScript rhinoScript = new RhinoScript("JavaScriptMediator", script);
         rhinoScript.setResponseClass("mediate", Boolean.class);
         RhinoScriptInstance scriptInstance = rhinoScript.createRhinoScriptInstance();
         this.mediateFunction = scriptInstance.createRhinoFunctionInvoker("mediate");
+    }
+
+    public String getScript() {
+        return script;
     }
 }

@@ -46,7 +46,7 @@ import java.net.URISyntaxException;
  * &lt;/makefault&gt;
  * </pre>
  */
-public class FaultMediatorFactory extends AbstractMediatorFactory {
+public class FaultMediatorFactory implements MediatorFactory {
 
     private static final QName FAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "makefault");
 

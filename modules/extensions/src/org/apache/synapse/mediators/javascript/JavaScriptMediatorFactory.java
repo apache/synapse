@@ -58,9 +58,4 @@ public class JavaScriptMediatorFactory implements MediatorFactory {
     public QName getTagQName() {
         return TAG_NAME;
     }
-
-    public QName getTagSchemaType() {
-        return new QName(Constants.SYNAPSE_NAMESPACE,
-            getTagQName().getLocalPart() + "_type", "js");
-    }
 }

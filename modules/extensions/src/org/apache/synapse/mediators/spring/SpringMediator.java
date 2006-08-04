@@ -19,9 +19,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.config.Util;
 import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.spring.SpringConfigExtension;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.core.io.InputStreamResource;
 
 /**
  * This mediator allows Spring beans implementing the org.apache.synapse.api.Mediator
@@ -40,9 +44,9 @@ public class SpringMediator implements Mediator {
      */
     private String beanName = null;
     /**
-     * The named Spring configName to be used
+     * The named Spring config to be used
      */
-    private String configName = null;
+    private String configKey = null;
     /**
      * The Spring ApplicationContext to be used
      */
@@ -50,51 +54,48 @@ public class SpringMediator implements Mediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        if (beanName == null) {
-            handleException("The bean name for the Spring mediator has not been specified");
+        DynamicProperty dp = synCtx.getConfiguration().getDynamicProperty(configKey);
+
+        // if the configKey refers to a dynamic property
+        if (dp != null) {
+            if (!dp.isCached() || dp.isExpired()) {
+                buildAppContext(synCtx);
+            }
+        // if the property is not a DynamicProperty, we will create an ApplicationContext only once
+        } else {
+            if (appContext == null) {
+                buildAppContext(synCtx);
+            }
         }
 
-        // if a named configuration is referenced, use it
-        if (configName != null) {
-            // get named Spring configuration
-            Object cfg = synCtx.getConfiguration().getProperty(configName);
+        if (appContext != null) {
 
-            if (cfg != null && cfg instanceof SpringConfigExtension) {
-
-                ApplicationContext appContext = ((SpringConfigExtension) cfg).getAppContext();
-                log.debug("Loading bean : " + beanName + " from Spring configuration named : " + configName);
-                Object o = appContext.getBean(beanName);
-
-                if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
-                    Mediator m = (Mediator) o;
-                    return m.mediate(synCtx);
-
-                } else {
-                    handleException("Could not find the bean named : " + beanName +
-                        " from the Spring configuration named : " + configName);
-                }
-            } else {
-                handleException("Could not get a reference to a valid Spring configuration named : " + configName);
-            }
-
-        } else if (appContext != null) {
-
-            log.debug("Loading bean : " + beanName + " from inline Spring configuration");
-            Object o = appContext.getBean(beanName);
-
+            Object o = appContext.getBean(beanName);    
             if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
                 Mediator m = (Mediator) o;
                 return m.mediate(synCtx);
 
             } else {
-                handleException("Could not find the bean named : " + beanName +
-                    " from the inline Spring configuration");
+                handleException("Could not load bean named : " + beanName +
+                    " from the Spring configuration with key : " + configKey);
             }
-
         } else {
-            handleException("A named Spring configuration or an ApplicationContext has not been specified");
+            handleException("Cannot reference Spring application context with key : " + configKey);
         }
+
         return true;
+    }
+
+    private synchronized void buildAppContext(MessageContext synCtx) {
+        log.debug("Creating Spring ApplicationContext from property key : " + configKey);
+        GenericApplicationContext appContext = new GenericApplicationContext();
+        XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
+        xbdr.setValidating(false);
+        xbdr.loadBeanDefinitions(new InputStreamResource(
+            Util.getStreamSource(
+                    synCtx.getConfiguration().getProperty(configKey)).getInputStream()));
+        appContext.refresh();
+        this.appContext = appContext;
     }
 
     private void handleException(String msg) {
@@ -110,12 +111,12 @@ public class SpringMediator implements Mediator {
         return beanName;
     }
 
-    public String getConfigName() {
-        return configName;
+    public String getConfigKey() {
+        return configKey;
     }
 
-    public void setConfigName(String configName) {
-        this.configName = configName;
+    public void setConfigKey(String configKey) {
+        this.configKey = configKey;
     }
 
     public ApplicationContext getAppContext() {

@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
  * Creates an instance of JsonMediator.
  * <x:json/> mediator belongs to the http://ws.apache.org/ns/synapse/json namespace.
  * <p/>
- * <x:json (direction="JTX"|"XTJ)"/>
+ * <x:json direction="JTX"|"XTJ"/>
  * JTX is Json to XML
  * XTJ is XML to Json
  */
@@ -48,7 +48,7 @@ public class JsonMediatorFactory implements MediatorFactory {
         OMAttribute direction = elem.getAttribute(new QName("direction"));
         if (direction == null) {
             handleException("JSON element doesnot contain 'direction' attribute.");
-        }else {
+        } else {
             jsonMediator.setDirection(direction.getAttributeValue().trim());
         }
         return jsonMediator;
@@ -56,11 +56,6 @@ public class JsonMediatorFactory implements MediatorFactory {
 
     public QName getTagQName() {
         return TAG_NAME;
-    }
-
-    public QName getTagSchemaType() {
-        return new QName(Constants.SYNAPSE_NAMESPACE,
-            getTagQName().getLocalPart() + "_type", "json");
     }
 
     private void handleException(String msg) {

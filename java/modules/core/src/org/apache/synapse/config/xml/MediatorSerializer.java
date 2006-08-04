@@ -15,29 +15,28 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.config.Extension;
+import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
-
 /**
- * A extension factory that is capable of creating an instance of a
- * named extension, through a given XML, should implement this interface
+ * Interface which should be implemented by mediator serializers. Does the
+ * reverse of the MediatorFactory
  */
-
-public interface ExtensionFactory {
-    /**
-     * Creates an instance of a named extension using the OMElement
-     * @param elem
-     * @return the created named extension
-     */
-    public Extension createExtension(OMElement elem);
+public interface MediatorSerializer {
 
     /**
-     * The QName of the extension element in the XML config
-     * @return QName of the extension element
+     * Return the XML representation of this mediator
+     * @param m mediator to be serialized
+     * @param parent the OMElement to which the serialization should be attached
+     * @return the serialized mediator XML
      */
-    public QName getTagQName();
+    public OMElement serializeMediator(OMElement parent, Mediator m);
 
+    /**
+     * Return the class name of the mediator which can be serialized
+     * @return the class name 
+     */
+    public String getMediatorClassName();
 }

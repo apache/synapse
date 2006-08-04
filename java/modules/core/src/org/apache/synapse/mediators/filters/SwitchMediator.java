@@ -80,6 +80,14 @@ public class SwitchMediator extends AbstractMediator {
     }
 
     /**
+     * Get the list of cases
+     * @return the cases list
+     */
+    public List getCases() {
+        return cases;
+    }
+
+    /**
      * Return the source XPath expression set
      * @return thje source XPath expression
      */
@@ -93,5 +101,13 @@ public class SwitchMediator extends AbstractMediator {
      */
     public void setSource(AXIOMXPath source) {
         this.source = source;
+    }
+
+    /**
+     * Get default case
+     * @return the default csae
+     */
+    public SwitchCaseMediator getDefaultCase() {
+        return defaultCase;
     }
 }

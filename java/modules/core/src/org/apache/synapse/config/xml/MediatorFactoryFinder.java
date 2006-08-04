@@ -78,17 +78,6 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      */
     private static Map factoryMap = new HashMap();
 
-    /**
-     * A holder to construct the Synapse.XSD for known mediators
-     */
-    private XmlSchema schema = null;
-
-    /**
-     * Used to define the "mediator_type" element for all known and
-     * dynamically registered mediators
-     */
-    private XmlSchema mediators = null;
-
     public static synchronized MediatorFactoryFinder getInstance() {
         if (instance == null) {
             instance = new MediatorFactoryFinder();
@@ -118,7 +107,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 			}
 		}
         // now iterate through the available pluggable mediator factories
-        registerExtensions(mediators);
+        registerExtensions();
     }
 
     private void handleException(String msg, Exception e) {
@@ -137,7 +126,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      * This looks for JAR files containing a META-INF/services that adheres to the following
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
-    private void registerExtensions(XmlSchema mediators) {
+    private void registerExtensions() {
 
         log.debug("Registering mediator extensions found in the classpath : " + System.getProperty("java.class.path"));
 

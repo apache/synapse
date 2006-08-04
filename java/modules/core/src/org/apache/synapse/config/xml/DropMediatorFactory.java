@@ -34,7 +34,7 @@ import java.io.StringReader;
  * &lt;drop/&gt;
  * </pre>
  */
-public class DropMediatorFactory extends AbstractMediatorFactory {
+public class DropMediatorFactory implements MediatorFactory {
 
     private static final QName DROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "drop");
 

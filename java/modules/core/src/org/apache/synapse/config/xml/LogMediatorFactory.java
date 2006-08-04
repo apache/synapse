@@ -42,7 +42,7 @@ import java.util.List;
  * &lt;/log&gt;
  * </pre>
  */
-public class LogMediatorFactory extends AbstractMediatorFactory {
+public class LogMediatorFactory implements MediatorFactory {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 

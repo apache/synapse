@@ -22,6 +22,8 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.njms.JMSConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.policy.util.PolicyReader;
@@ -32,6 +34,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.stream.StreamSource;
 import java.net.URL;
 import java.io.IOException;
 import java.util.*;
@@ -39,9 +42,9 @@ import java.util.*;
 /**
  * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
  *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
- *   <wsdl url="url">?
- *   <schema url="url">*
- *   <policy url="url">*
+ *   <wsdl key="string">?
+ *   <schema key="string">*
+ *   <policy key="string">*
  *   <property name="string" value="string"/>*
  *   <enableRM/>+
  *   <enableSec/>+
@@ -65,11 +68,11 @@ public class ProxyService {
     /** A list properties */
     private Map properties = new HashMap();
 
-    /** The URL for the base WSDL, if specified */
-    private URL wsdl;
-    /** The URLs for any supplied schemas */
-    private URL[] schemas;
-    /** The URLs for any supplied policies that would apply at the service level */
+    /** The key for the base WSDL, if specified */
+    private String wsdlKey;
+    /** The keys for any supplied schemas */
+    private List schemaKeys = new ArrayList();
+    /** The keys for any supplied policies that would apply at the service level */
     private List serviceLevelPolicies = new ArrayList();
     /** Should WS RM (default configuration) be engaged on this service */
     private boolean wsRMEnabled = false;
@@ -80,26 +83,29 @@ public class ProxyService {
 
     public ProxyService() {}
 
-    public AxisService buildAxisService(AxisConfiguration axisCfg) {
+    public AxisService buildAxisService(SynapseConfiguration synCfg, AxisConfiguration axisCfg) {
 
         AxisService proxyService = null;
-        if (wsdl != null) {
+        if (wsdlKey != null) {
             try {
+                StreamSource wsdlStreamSource = Util.getStreamSource(synCfg.getProperty(wsdlKey));
                 // detect version of the WSDL 1.1 or 2.0
-                OMNamespace documentElementNS = new StAXOMBuilder(wsdl.openStream()).
+                OMNamespace documentElementNS = new StAXOMBuilder(wsdlStreamSource.getInputStream()).
                     getDocumentElement().getNamespace();
 
                 if (documentElementNS != null) {
                     WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
                     if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.
-                        equals(documentElementNS.getName())) {
+                        equals(documentElementNS.getNamespaceURI())) {
                         wsdlToAxisServiceBuilder =
-                            new WSDL20ToAxisServiceBuilder(wsdl.openStream(), null, null);
+                            new WSDL20ToAxisServiceBuilder(
+                                wsdlStreamSource.getInputStream(), null, null);
 
                     } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
-                        equals(documentElementNS.getName())) {
+                        equals(documentElementNS.getNamespaceURI())) {
                         wsdlToAxisServiceBuilder =
-                            new WSDL11ToAxisServiceBuilder(wsdl.openStream(), null, null);
+                            new WSDL11ToAxisServiceBuilder(
+                                wsdlStreamSource.getInputStream(), null, null);
                     } else {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                     }
@@ -112,11 +118,11 @@ public class ProxyService {
                 }
 
             } catch (XMLStreamException e) {
-                handleException("Error reading WSDL at URL : " + wsdl, e);
+                handleException("Error reading WSDL defined by registry key : " + wsdlKey, e);
             } catch (AxisFault af) {
-                handleException("Error building service from WSDL at : " + wsdl, af);
+                handleException("Error building service from WSDL defined by registry key : " + wsdlKey, af);
             } catch (IOException ioe) {
-                handleException("Error reading WSDL from URL : " + wsdl, ioe);
+                handleException("Error reading WSDL from WSDL defined by registry key : " + wsdlKey, ioe);
             }
         } else {
             // this is for POX... create a dummy service and an operation for which
@@ -174,19 +180,17 @@ public class ProxyService {
             PolicyReader reader = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
             Policy svcEffectivePolicy = null;
 
-            URL policyUrl = null;
-            try {
-                iter = serviceLevelPolicies.iterator();
-                while (iter.hasNext()) {
-                    policyUrl = (URL) iter.next();
-                    if (svcEffectivePolicy == null) {
-                        svcEffectivePolicy = reader.readPolicy(policyUrl.openStream());
-                    } else {
-                        svcEffectivePolicy.merge(reader.readPolicy(policyUrl.openStream()));
-                    }
+            String policyKey = null;
+            iter = serviceLevelPolicies.iterator();
+            while (iter.hasNext()) {
+                policyKey = (String) iter.next();
+                if (svcEffectivePolicy == null) {
+                    svcEffectivePolicy = reader.readPolicy(
+                        Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream());
+                } else {
+                    svcEffectivePolicy.merge(reader.readPolicy(
+                        Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream()));
                 }
-            } catch (IOException ioe) {
-                handleException("Error reading policy from URL : " + policyUrl, ioe);
             }
 
             PolicyInclude policyInclude = new PolicyInclude();
@@ -250,7 +254,7 @@ public class ProxyService {
     }
 
     public String getTransports() {
-        return transports;
+        return transports != null ? transports : ALL_TRANSPORTS;
     }
 
     public void addProperty(String name, String value) {
@@ -281,20 +285,20 @@ public class ProxyService {
         this.targetSequence = targetSequence;
     }
 
-    public URL getWsdl() {
-        return wsdl;
+    public String getWSDLKey() {
+        return wsdlKey;
     }
 
-    public void setWsdl(URL wsdl) {
-        this.wsdl = wsdl;
+    public void setWSDLKey(String wsdlKey) {
+        this.wsdlKey = wsdlKey;
     }
 
-    public URL[] getSchemas() {
-        return schemas;
+    public List getSchemas() {
+        return schemaKeys;
     }
 
-    public void setSchemas(URL[] schemas) {
-        this.schemas = schemas;
+    public void setSchemas(List schemas) {
+        this.schemaKeys = schemas;
     }
 
     public List getServiceLevelPolicies() {

@@ -75,7 +75,7 @@ public class XSLTMediator extends AbstractMediator {
     /** Lock used to ensure thread-safe creation and use of the above Transformer */
     private final Object transformerLock = new Object();
 
-    private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
         "//s12:Envelope/s12:Body/child::*[position()=1]";
 
     public XSLTMediator() {
@@ -251,6 +251,9 @@ public class XSLTMediator extends AbstractMediator {
         properties.addAll(list);
     }
 
+    public List getProperties() {
+        return properties;
+    }
 }
 
 	

@@ -45,7 +45,6 @@ import java.net.MalformedURLException;
 public class XMLConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(XMLConfigurationBuilder.class);
-    ExtensionFactoryFinder extensionFacFinder = ExtensionFactoryFinder.getInstance();
 
     public SynapseConfiguration getConfiguration(InputStream is) {
 
@@ -75,7 +74,7 @@ public class XMLConfigurationBuilder {
                     } else if (Constants.PROPERTY_ELT.equals(elt.getQName())) {
                         defineProperty(config, elt);
                     } else {
-                        defineExtension(config, elt);
+                        handleException("Unexpected element : " + elt);
                     }
                 }
             }
@@ -239,32 +238,6 @@ public class XMLConfigurationBuilder {
             Endpoint endpoint = EndpointFactory.createEndpoint(ele);
             // add this endpoint to the configuration
             config.addNamedEndpoint(endpoint.getName(), endpoint);
-        }
-    }
-
-    /**
-     * Digest extensions into Synapse configuration definitions
-     *
-     * An extension *must* have a unique 'name' attribute. The instance
-     * created through the ExtensionFactoryFinder will be set as a
-     * global property into the SynapseConfiguration with this name as
-     * the key.
-     *
-     * e.g. The Spring configuration extension is as follows
-     * <pre>
-     * &lt;configuration name="string" src="string"/&gt;
-     * </pre>
-     *
-     * @param elem the XML element defining the configuration
-     */
-    public void defineExtension(SynapseConfiguration config, OMElement elem) {
-
-        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-
-        if (name == null) {
-            handleException("The 'name' attribute is required for an extension configuration definition");
-        } else {
-            config.addProperty(name.getAttributeValue(), extensionFacFinder.getExtension(elem));
         }
     }
 

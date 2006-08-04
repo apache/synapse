@@ -111,4 +111,8 @@ public class ClassMediator extends AbstractMediator {
         properties.addAll(list);
     }
 
+    public List getProperties() {
+        return properties;
+    }
+
 }

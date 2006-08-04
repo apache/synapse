@@ -22,9 +22,9 @@ package org.apache.synapse.config;
  * expires for such a property. The cachable duration for each property is given
  * by the registry when the RegistryEntry for a property is requested. This duration
  * can change while the property is being used, and will be refreshed at each
- * cache expiry. However, the resource will be loaded, iff the RegistryEntry returned
- * after a cache expiry as a version later than the version cached. Else, the
- * existing cache of the resource will be renewed for a further period, as stated by
+ * value expiry. However, the resource will be loaded, iff the RegistryEntry returned
+ * after a value expiry as a version later than the version cached. Else, the
+ * existing value of the resource will be renewed for a further period, as stated by
  * the new RegistryEntry lookup.
  */
 public class DynamicProperty {
@@ -33,7 +33,7 @@ public class DynamicProperty {
     /** The registry key */
     private String key;
     /** The cached object */
-    private Object cache = null;
+    private Object value = null;
     /** An XML to Object mapper - if one is available */
     private XMLToObjectMapper mapper = null;
     /** The version of the cached resource */
@@ -53,16 +53,16 @@ public class DynamicProperty {
         this.key = key;
     }
 
-    public Object getCache() {
-        return cache;
+    public Object getValue() {
+        return value;
     }
 
     public boolean isCached() {
-        return cache != null;
+        return value != null;
     }
 
-    public void setCache(Object cache) {
-        this.cache = cache;
+    public void setValue(Object cache) {
+        this.value = cache;
     }
 
     public XMLToObjectMapper getMapper() {

@@ -32,9 +32,9 @@ import java.util.Iterator;
  *
  * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
  *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
- *   <wsdl url="url">?
- *   <schema url="url">*
- *   <policy url="url">*
+ *   <wsdl key="string">?
+ *   <schema key="string">*
+ *   <policy key="string">*
  *   <property name="string" value="string"/>*
  *   <enableRM/>+
  *   <enableSec/>+
@@ -83,16 +83,11 @@ public class ProxyServiceFactory {
         // read the WSDL, Schemas and Policies and set to the proxy service
         OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
         if (wsdl != null) {
-            OMAttribute wsdlurl = wsdl.getAttribute(new QName(Constants.NULL_NAMESPACE, "url"));
-            if (wsdlurl == null) {
-                handleException("The 'url' attribute is required for the base WSDL definition");
+            OMAttribute wsdlkey = wsdl.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+            if (wsdlkey == null) {
+                handleException("The 'key' attribute is required for the base WSDL definition");
             } else {
-                String wUrl = wsdlurl.getAttributeValue();
-                try {
-                    proxy.setWsdl(new URL(wUrl));
-                } catch (MalformedURLException e) {
-                    handleException("Invalid WSDL URL : " + wUrl, e);
-                }
+                proxy.setWSDLKey(wsdlkey.getAttributeValue());
             }
         }
 

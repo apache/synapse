@@ -43,7 +43,7 @@ import org.jaxen.JaxenException;
  *      &lt;header name="qname" action="remove"/&gt;
  *   </pre>
  */
-public class HeaderMediatorFactory extends AbstractMediatorFactory {
+public class HeaderMediatorFactory implements MediatorFactory {
 
     private static final Log log = LogFactory.getLog(HeaderMediatorFactory.class);
 

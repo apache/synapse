@@ -134,4 +134,12 @@ public class SendMediator extends AbstractMediator {
     public boolean addEndpoint(Endpoint e) {
         return endpoints.add(e);
     }
+
+    /**
+     * Get list of Endpoints to which the message should be sent
+     * @return the endpoints to which the message should be sent
+     */
+    public List getEndpoints() {
+        return endpoints;
+    }
 }

@@ -41,7 +41,7 @@ import java.io.StringReader;
  * &lt;/class&gt;
  * </pre>
  */
-public class ClassMediatorFactory extends AbstractMediatorFactory {
+public class ClassMediatorFactory {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 

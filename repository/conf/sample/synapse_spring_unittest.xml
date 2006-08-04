@@ -1,12 +1,13 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
   
   <definitions>
-		<spring:config name="springconfig" src="./../../repository/conf/sample/springsample.xml"/>
+		<set-property name="springconfig1" key="file:./../../repository/conf/sample/springsample.xml"/>
+		<set-property name="springconfig2" src="file:./../../repository/conf/sample/springsample.xml"/>
   </definitions>
 
   <rules>
-  	<spring:spring bean="springtest" config="springconfig"/>
-  	<spring:spring bean="springtest" src="./../../repository/conf/sample/springsample.xml"/>
+  	<spring:spring bean="springtest" key="springconfig1"/>
+  	<spring:spring bean="springtest" key="springconfig2"/>
   </rules>
 
 </synapse> 

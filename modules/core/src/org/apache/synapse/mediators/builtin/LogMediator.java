@@ -43,9 +43,10 @@ public class LogMediator extends AbstractMediator {
     public static final int SIMPLE = 1;
     public static final int HEADERS = 2;
     public static final int FULL = 3;
+    public static final String DEFAULT_SEP = ", ";
 
     private int logLevel = SIMPLE;
-    private String SEP = ", ";
+    private String separator = DEFAULT_SEP;
     private List properties = new ArrayList();
 
     /**
@@ -87,15 +88,15 @@ public class LogMediator extends AbstractMediator {
         else
             sb.append("To: ");
         if (synCtx.getFrom() != null)
-            sb.append(SEP + "From: " + synCtx.getFrom().getAddress());
+            sb.append(separator + "From: " + synCtx.getFrom().getAddress());
         if (synCtx.getWSAAction() != null)
-            sb.append(SEP + "WSAction: " + synCtx.getWSAAction());
+            sb.append(separator + "WSAction: " + synCtx.getWSAAction());
         if (synCtx.getSoapAction() != null)
-            sb.append(SEP + "SOAPAction: " + synCtx.getSoapAction());
+            sb.append(separator + "SOAPAction: " + synCtx.getSoapAction());
         if (synCtx.getReplyTo() != null)
-            sb.append(SEP + "ReplyTo: " + synCtx.getReplyTo().getAddress());
+            sb.append(separator + "ReplyTo: " + synCtx.getReplyTo().getAddress());
         if (synCtx.getMessageID() != null)
-            sb.append(SEP + "MessageID: " + synCtx.getMessageID());
+            sb.append(separator + "MessageID: " + synCtx.getMessageID());
         setCustomProperties(sb, synCtx);
         return sb.toString();
     }
@@ -105,19 +106,19 @@ public class LogMediator extends AbstractMediator {
         Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
         while (iter.hasNext()) {
             SOAPHeader header = (SOAPHeader) iter.next();
-            sb.append(SEP + header.getLocalName() + " : " + header.getText());
+            sb.append(separator + header.getLocalName() + " : " + header.getText());
         }
         setCustomProperties(sb, synCtx);
-        return sb.toString();
+        return trimLeadingSeparator(sb);
     }
 
     private String getFullLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         sb.append(getSimpleLogMessage(synCtx));
         if (synCtx.getEnvelope() != null)
-            sb.append(SEP + "Envelope: " + synCtx.getEnvelope());
+            sb.append(separator + "Envelope: " + synCtx.getEnvelope());
         setCustomProperties(sb, synCtx);
-        return sb.toString();
+        return trimLeadingSeparator(sb);
     }
 
     private void setCustomProperties(StringBuffer sb, MessageContext synCtx) {
@@ -125,7 +126,7 @@ public class LogMediator extends AbstractMediator {
             Iterator iter = properties.iterator();
             while (iter.hasNext()) {
                 MediatorProperty prop = (MediatorProperty) iter.next();
-                sb.append(SEP + prop.getName() + " = " +
+                sb.append(separator + prop.getName() + " = " +
                     (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synCtx)));
             }
         }
@@ -140,11 +141,11 @@ public class LogMediator extends AbstractMediator {
     }
 
     public String getSeparator() {
-        return SEP;
+        return separator;
     }
 
-    public void setSeparator(String SEP) {
-        this.SEP = SEP;
+    public void setSeparator(String separator) {
+        this.separator = separator;
     }
 
     public void addProperty(MediatorProperty p) {
@@ -155,4 +156,16 @@ public class LogMediator extends AbstractMediator {
         properties.addAll(list);
     }
 
+    public List getProperties() {
+        return properties;
+    }
+
+    private String trimLeadingSeparator(StringBuffer sb) {
+        String retStr = sb.toString();
+        if (retStr.startsWith(separator)) {
+            return retStr.substring(separator.length());
+        } else {
+            return retStr;
+        }
+    }
 }

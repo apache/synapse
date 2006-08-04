@@ -77,7 +77,7 @@ import java.net.MalformedURLException;
  * &lt;/send&gt;
  * </pre>
  */
-public class SendMediatorFactory extends AbstractMediatorFactory {
+public class SendMediatorFactory implements MediatorFactory {
 
     private static final Log log = LogFactory.getLog(SendMediatorFactory.class);
 

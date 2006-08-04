@@ -8,6 +8,26 @@
     xmlns:maven="jelly:maven"
     xmlns:deploy="deploy"
     xmlns:ant="jelly:ant">
+
+    <postGoal name="java:compile">
+        <property name="metricsTmpDir" value="target/tmp/metrics"/>
+        <ant:mkdir dir="${metricsTmpDir}"/>
+        <ant:mkdir dir="${metricsTmpDir}/META-INF"/>
+        <ant:copy toDir="${metricsTmpDir}">
+            <ant:fileset dir="target/classes">
+                <ant:include name="org/apache/synapse/metrics/**/*.class"/>
+            </ant:fileset>
+        </ant:copy>
+        <copy file="conf/metrics_module.xml"
+              tofile="${metricsTmpDir}/META-INF/module.xml"/>
+
+        <jar jarfile="target/Metrics-${pom.currentVersion}.mar">
+            <fileset dir="${metricsTmpDir}">
+                 <include name="**"/>
+            </fileset>
+        </jar>
+
+    </postGoal>
     <postGoal name="test:compile">
         
         <!--Creating the libs dir-->

@@ -1,0 +1,36 @@
+<module name="MetricsAggregatorModule" class="org.apache.synapse.metrics.MetricsAggregatorModule">
+    <inflow>
+        <handler name="GlobalRequestCounter"
+                 class="org.apache.synapse.metrics.GlobalRequestCountHandler">
+            <order phase="Transport"/>
+        </handler>
+        <!--<handler name="ServiceRequestCounter"
+                 class="">
+            <order phaseLast="true" phase="Dispatch"/>
+        </handler>
+        <handler name="OperationInCounter"
+                 class="">
+            <order phase="OpPhase"/>
+        </handler>-->
+    </inflow>
+    <!--<outflow>
+        <handler name="GlobalResponseCounter"
+                 class="">
+            <order phase="OpPhase"/>
+        </handler>
+        <handler name="OperationOutCounter"
+                 class="">
+            <order phase="OpPhase"/>
+        </handler>
+        <handler name="ResponseTimeHandler"
+                 class="">
+            <order phase="MessageOut" phaseLast="true"/>
+        </handler>
+    </outflow>-->
+    <!--<Outfaultflow>
+        <handler name="FaultCounter"
+                 class="">
+            <order phase="MessageOut"/>
+        </handler>
+    </Outfaultflow>-->
+</module>

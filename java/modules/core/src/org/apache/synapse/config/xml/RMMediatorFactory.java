@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
  * 
  */
 
-public class RMMediatorFactory extends AbstractMediatorFactory {
+public class RMMediatorFactory implements MediatorFactory {
 
     private static Log log = LogFactory.getLog(RMMediatorFactory.class);
 

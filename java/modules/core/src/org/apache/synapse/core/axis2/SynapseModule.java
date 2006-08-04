@@ -64,7 +64,7 @@ public class SynapseModule implements Module, Constants {
             Iterator iter = synCfg.getProxyServices().iterator();
             while (iter.hasNext()) {
                 ProxyService proxy = (ProxyService) iter.next();
-                axisCfg.addService(proxy.buildAxisService(axisCfg));
+                axisCfg.addService(proxy.buildAxisService(synCfg, axisCfg));
             }
         }
 

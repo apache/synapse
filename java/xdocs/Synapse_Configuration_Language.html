@@ -18,7 +18,7 @@ for details). </p>
 <p>A Synapse configuration looks like the following at the top level: </p>
 <pre> &lt;synapse&gt;
    &lt;definitions&gt;
-     (sequencedef | endpointdef | literalpropertydef | extensiondef)+
+     (sequencedef | endpointdef | literalpropertydef)+
    &lt;definitions&gt;?
  &lt;proxies&gt;
    proxyservice+
@@ -42,11 +42,11 @@ possibly different semantics, such as WS-Security, WS-RM and Transport
 switching etc. </p>
 <p>A proxyservice token represents a &lt;proxy&gt; element which is
 used to define a Synapse Proxy service. </p>
-<pre> &lt;proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]&gt;
-   &lt;target sequence="name" | endpoint="name"/&gt;? // default is main sequence
-   &lt;wsdl url="url"&gt;?
-   &lt;schema url="url"&gt;*
-   &lt;policy url="url"&gt;*
+<pre> &lt;proxy name="string" [description="string"] [transports="(http |https |jms )+|all"]&gt;
+   &lt;target sequence="name" | endpoint="name"/&gt;? // defaults to the synapse main sequence
+   &lt;wsdl key="string"&gt;?
+   &lt;schema key="string"&gt;* // not yet used
+   &lt;policy key="string"&gt;*
    &lt;property name="string" value="string"/&gt;*
  &lt;/proxy&gt;
 
@@ -104,42 +104,29 @@ documentation for more details. </p>
 "RMPolicy" describes the Apache Sandesha2 RM configuration (or any
 overrides against the default) to be used for messages flowing to this
 endpoint. Please see Sandesha2/Axis2 documentation for more details. </p>
-<h4>Extensions</h4>
-<p>An extensiondef token represents an extension element that extends
-the core Synapse configuration. An extension provider must create an
-ExtensionFactory
-implementation that defines the type of element that the factory
-handles. At runtime the configuration builder loads any extensions
-through the Java service provider model, and then passes any unknown
-elements to the extension factory finder which will return the
-registered factory, if any. Then the factory is requested to process
-the extension element and create the extension, and this could be set
-as a 'property' into the SynapseConfiguration
-object. The Spring configuration extension operates in this manner and
-creates the Spring application contexts and sets it to the
-configuration as a property. </p>
-<p>See 'Extensibility of Synapse' below for more details. </p>
-<p>Note: The supported extensions are loaded through the J2SE Service
-Provider model. (<a rel="nofollow"
- href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider"><img
- src="file:///wiki/modern/img/moin-www.png" alt="[WWW]" height="11"
- width="11">
-http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider</a>)
-</p>
 <h4>Properties</h4>
 <p>The token literalpropertydef refers to a &lt;set-property&gt;
 element as follows: </p>
-<pre> &lt;set-property name="string" value="string"/&gt;
+<pre>  &lt;set-property name="string" [value="string"] [src="url"] [key="string"]&gt;
+	&lt;inline-xml/&gt;?
+  &lt;set-property/&gt;
 
 </pre>
-<p>which is used to set a global property with a constant value. </p>
 <p>These properties are top level properties which are set globally for
 the entire system. Values of these properties can be retrieved via the
 extension XPath function called "synapse:get-property(prop-name)". </p>
+<p>A property can be static literal text (specified with the value
+attribute) or static XML specified as an inline XML fragment or 
+specified as a URL (using the src attribute). A property can alternatively
+be a DynamicProperty which will reference a key on a Registry.
+If a property is a DynamicProperty, it will be fetched from the Registry
+and cached locally as per meta information provided by the Registry for
+caching. DynamicProperties are automatically refreshed when expired, and
+thus can be used to specify dynamic behaviour in Synapse.</p>
 <h3>Mediators</h3>
 <p>A mediator token refers to any of the following tokens: </p>
 <pre>send | drop | log | makefault | transform | header | filter | 
-	switch | class | validate | setproperty | sequenceref | in | out 
+	switch | class | validate | setproperty | sequenceref | in | out | rm | try
 </pre>
 <p>In addition to the above, Synapse will be able to load mediators via
 the J2SE Service Provider model. Mediator extensions must implement the
@@ -212,25 +199,19 @@ current message stops. </p>
 <h4>Log</h4>
 <p>The log token refers to a &lt;log&gt; element which may be used to
 log messages being mediated: </p>
-<pre> &lt;log [level="string"] [seperator="string"]&gt;
+<pre> &lt;log [level="string"] [separator="string"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/log&gt;
 
 </pre>
 <p>The optional level attribute selects a pre-defined subset of
-properties to be logged. e.g. simple = To, From, WSAction, SOAPAction,
-ReplyTo,
-MessageID and any properties </p>
-<ul>
-  <li style="list-style-type: none;">
-    <p>headers = All SOAP header blocks
-and any properties full = all attributes included in log level 'simple'
-and the SOAP envelope and any properties custom = Only properties
-specified to the Log mediator </p>
-  </li>
-</ul>
-<p>A seperator if defined will be used to seperate the attributes being
-logged. The default seperator is the ',' comma. </p>
+properties to be logged. 
+<p>e.g. simple = To, From, WSAction, SOAPAction, ReplyTo, MessageID and any properties </p>
+<p>headers = All SOAP header blocks and any properties</p>
+<p>full = all attributes included in log level 'simple' and the SOAP envelope and any properties</p>
+<p>custom = Only properties specified to the Log mediator </p>
+<p>A separator if defined will be used to seperate the attributes being
+logged. The default separator is the ',' comma. </p>
 <h4>Transforms</h4>
 <h5>Faults</h5>
 <pre> &lt;makefault [version="soap11|soap12"]&gt;
@@ -248,18 +229,17 @@ be invoked to send a fault message created this way. The fault message
 "to" header is set to the "faultTo" of the original message if such a
 header existed on the original message, else it is set it to the
 "replyTo" of the original message. </p>
-<h5>XSLT/XQuery</h5>
-<pre> &lt;transform xslt|xquery="url" [source="xpath"]&gt;
+<h5>XSLT</h5>
+<pre> &lt;xslt key="string" [source="xpath"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/transform&gt;
 
 </pre>
-<p>The &lt;transform&gt; mediator applies the specified XSLT or XQuery
+<p>The &lt;xslt&gt; mediator applies the specified XSLT 
 transformation to the given element. If the source element is not
-specified, it defaults to the soap body content. Optionally parameters
-(XSLT) or variables (XQuery) could be passed into the transformations
+specified, it defaults to the first child of the soap body. Optionally parameters
+(XSLT) could be passed into the transformations
 through the &lt;property&gt; elements. </p>
-<p>Note: Synapse does not currently support XQuery transformations </p>
 <h5>Headers</h5>
 <pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
  &lt;header name="qname" action="remove"/&gt;
@@ -299,7 +279,7 @@ expression into its string value, and match it against the given
 regular expressions. If the specified cases does not match and a
 default case exists, it will be executed. </p>
 <h4>Validation</h4>
-<pre> &lt;validate schema="url" [source="xpath"]&gt;
+<pre> &lt;validate key="string" [source="xpath"]&gt;
    &lt;on-fail&gt;
      mediator+
    &lt;/on-fail&gt;
@@ -344,32 +324,25 @@ used to invoke a named sequence of mediators. </p>
 <h3>Extensibility of Synapse</h3>
 <p>The Synapse configuration language could be easily extended, with
 configuration extensions as well as mediation extensions. The Spring
-mediator and Spring Configuration are such examples. </p>
+mediator is such an example. </p>
 <h4>Spring Configuration</h4>
-<p>The &lt;spring:config&gt; element could be used to define a reusable
-Spring ApplicationContext (BeanFactory).
-This could be referred subsequently by Spring mediator instances which
-will use this context. </p>
-<pre> &lt;spring:config name="string" src="file"/&gt;
-
+<p>A Spring configuration could be created as a property or DynamicProperty
+providing a URL or a reference to a Registry. The configuration is then
+created on first use or as necessary (as per DynamicProperty semantics)
+by the mediators which reference this configuration.</p>
+<pre> &lt;set-property name="string" key="string"/&gt;
+ &lt;set-property name="string" src="url"/&gt;
 </pre>
 <p>The name attribute specifies a unique name for the configuration,
-and the src attribute specifies the Spring configuration file. </p>
-<p>Note: the &lt;spring:config&gt; element belongs to the <a
- rel="nofollow" href="http://ws.apache.org/ns/synapse/spring"><img
- src="file:///wiki/modern/img/moin-www.png" alt="[WWW]" height="11"
- width="11"> http://ws.apache.org/ns/synapse/spring</a> namespace. </p>
+and the src, key or inlined XML references to the Spring configuration</p>
 <h4>Spring mediator</h4>
-<pre> &lt;spring:spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/&gt;
+<pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;
 
 </pre>
 <p>The &lt;spring&gt; element creates an instance of a mediator, which
 is managed by Spring. This Spring bean must implement the Mediator
-interface for it to act as a Mediator. If a config attribute is
-specified, the bean will refer to the Spring configuration with the
-given name as its bean factory. If a src attribute specifies the Spring
-configuration file, the required application context is created inline
-and will be used by the mediator instance. </p>
+interface for it to act as a Mediator. The key will reference the Spring
+ApplicationContext/Configuration used for the bean</p>
 <h2>Examples</h2>
 <p>The following illustrates the hypothetical example used to
 illustrate the new Synapse configuration language syntax. However,

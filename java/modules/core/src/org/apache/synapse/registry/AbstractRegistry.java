@@ -21,8 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.DynamicProperty;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.net.URI;
 
 /**
@@ -50,7 +48,7 @@ public abstract class AbstractRegistry implements Registry {
 
         // if we have an unexpired cached copy, return the cached object
         if (dp.isCached() && !dp.isExpired()) {
-            return dp.getCache();
+            return dp.getValue();
 
         // if we have not cached the referenced object, fetch it and its RegistryEntry
         } else if (!dp.isCached()) {
@@ -75,7 +73,7 @@ public abstract class AbstractRegistry implements Registry {
                 log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
 
                 // return cached object
-                return dp.getCache();
+                return dp.getValue();
 
             } else {
                 omNode = lookup(dp.getKey());
@@ -86,7 +84,7 @@ public abstract class AbstractRegistry implements Registry {
         // registry and our previous copy (if we had one) has expired or is not valid
 
         if (dp.getMapper() != null) {
-            dp.setCache(
+            dp.setValue(
                 dp.getMapper().getObjectFromOMNode(omNode));
         } else {
             // if the type of the object is known to have a mapper, create the
@@ -97,10 +95,10 @@ public abstract class AbstractRegistry implements Registry {
                 XMLToObjectMapper mapper = getMapper(re.getType());
                 if (mapper != null) {
                     dp.setMapper(mapper);
-                    dp.setCache(mapper.getObjectFromOMNode(omNode));
+                    dp.setValue(mapper.getObjectFromOMNode(omNode));
 
                 } else {
-                    dp.setCache(omNode);
+                    dp.setValue(omNode);
                 }
             }
         }
@@ -110,7 +108,7 @@ public abstract class AbstractRegistry implements Registry {
             System.currentTimeMillis() + re.getCachableDuration());
         dp.setVersion(re.getVersion());
 
-        return dp.getCache();
+        return dp.getValue();
     }
 
     private XMLToObjectMapper getMapper(URI type) {

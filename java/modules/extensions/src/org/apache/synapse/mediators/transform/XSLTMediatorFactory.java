@@ -21,8 +21,8 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Util;
 import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
+import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
@@ -43,7 +43,7 @@ import java.net.MalformedURLException;
  * &lt;/transform&gt;
  * </pre>
  */
-public class XSLTMediatorFactory extends AbstractMediatorFactory {
+public class XSLTMediatorFactory implements MediatorFactory {
 
     private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");

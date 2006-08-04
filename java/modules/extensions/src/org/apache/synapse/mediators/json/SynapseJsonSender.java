@@ -24,6 +24,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -52,7 +53,7 @@ public class SynapseJsonSender extends AbstractHandler
         EndpointReference epr = null;
         String transportURL =
                 (String) msgContext
-                        .getProperty(MessageContextConstants.TRANSPORT_URL);
+                        .getProperty(Constants.Configuration.TRANSPORT_URL);
 
         if (transportURL != null) {
             epr = new EndpointReference(transportURL);
@@ -185,7 +186,7 @@ public class SynapseJsonSender extends AbstractHandler
                 if (charsetEnc != null) {
                     if (opContext != null) {
                         opContext.setProperty(
-                                MessageContext.CHARACTER_SET_ENCODING,
+                                Constants.Configuration.CHARACTER_SET_ENCODING,
                                 charsetEnc.getValue());
                     }
                 }

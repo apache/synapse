@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.json;
+package org.apache.synapse.mediators.json;
 
 /**
  * The JSONException is thrown by the JSON.org classes then things are amiss.

@@ -22,6 +22,9 @@ import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.DynamicProperty;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Implements the core Registry lookup algorithm
@@ -32,6 +35,9 @@ public abstract class AbstractRegistry implements Registry {
 
     /** The name of the registry */
     protected String name = null;
+
+    /** The list of configuration properties */
+    protected Map properties = new HashMap();
 
     /**
      * Get the object for the given key from this registry
@@ -121,5 +127,17 @@ public abstract class AbstractRegistry implements Registry {
 
     public String getRegistryName() {
         return name;
+    }
+
+    public String getProviderClass() {
+        return this.getClass().getName();
+    }
+
+    public Map getConfigProperties() {
+        return properties;
+    }
+
+    public void addConfigProperty(String name, String value) {
+        properties.put(name, value);
     }
 }

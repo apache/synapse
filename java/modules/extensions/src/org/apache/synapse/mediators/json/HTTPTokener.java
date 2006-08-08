@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.json;
+package org.apache.synapse.mediators.json;
 
 /*
 Copyright (c) 2002 JSON.org

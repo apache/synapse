@@ -45,7 +45,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer
         }
 
         FaultMediator mediator = (FaultMediator) m;
-        OMElement fault = fac.createOMElement("fault", synNS);
+        OMElement fault = fac.createOMElement("makefault", synNS);
 
         OMElement code = fac.createOMElement("code", synNS, fault);
         if (mediator.getFaultCodeValue() != null) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.json;
+package org.apache.synapse.mediators.json;
 
 import java.io.IOException;
 import java.io.Writer;

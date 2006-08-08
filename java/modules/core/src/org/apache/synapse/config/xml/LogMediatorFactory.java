@@ -16,22 +16,14 @@
 
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.LogMediator;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.jaxen.JaxenException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.builtin.LogMediator;
 
-import java.util.Iterator;
-import java.util.List;
+import javax.xml.namespace.QName;
 
 /**
  * Created a Log mediator that logs messages using commons-logging.

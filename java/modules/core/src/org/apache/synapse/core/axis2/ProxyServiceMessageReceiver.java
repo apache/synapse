@@ -22,8 +22,8 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.api.Mediator;
 
 /**
  * This is the MessageReceiver set to act on behalf of Proxy services.

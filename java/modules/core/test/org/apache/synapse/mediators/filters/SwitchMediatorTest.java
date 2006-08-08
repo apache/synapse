@@ -16,15 +16,15 @@
 package org.apache.synapse.mediators.filters;
 
 import junit.framework.TestCase;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.api.Mediator;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 
-import java.util.regex.Pattern;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class SwitchMediatorTest extends TestCase {
 

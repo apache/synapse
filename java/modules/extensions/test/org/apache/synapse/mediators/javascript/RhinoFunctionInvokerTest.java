@@ -15,12 +15,11 @@
  */
 package org.apache.synapse.mediators.javascript;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
-
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+
+import java.io.IOException;
 
 /**
  * Tests for the RhinoScript

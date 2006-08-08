@@ -1,12 +1,6 @@
 package org.apache.synapse.mediators.javascript;
 
-import java.io.ByteArrayInputStream;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-
 import junit.framework.TestCase;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
@@ -21,6 +15,10 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.util.Set;
 
 public class E4XMessageContextTest extends TestCase {
 

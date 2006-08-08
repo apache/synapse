@@ -15,21 +15,17 @@
  */
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.transform.FaultMediator;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.transform.FaultMediator;
 import org.jaxen.JaxenException;
 
+import javax.xml.namespace.QName;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -95,12 +91,12 @@ public class FaultMediatorFactory implements MediatorFactory {
                     throw new SynapseException(msg);
                 }
                 faultMediator.setFaultCodeValue(
-                    new QName(Util.getNameSpaceWithPrefix(prefix, code), name));
+                    new QName(OMElementUtils.getNameSpaceWithPrefix(prefix, code), name));
                 
             } else if (expression != null) {
                 try {
                     AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
-                    Util.addNameSpaces(xp, code, log);
+                    OMElementUtils.addNameSpaces(xp, code, log);
                     faultMediator.setFaultCodeExpr(xp);
                 } catch (JaxenException je) {
                     String msg = "Invalid fault code expression : " + je.getMessage();
@@ -129,7 +125,7 @@ public class FaultMediatorFactory implements MediatorFactory {
             } else if (expression != null) {
                 try {
                     AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
-                    Util.addNameSpaces(xp, reason, log);
+                    OMElementUtils.addNameSpaces(xp, reason, log);
                     faultMediator.setFaultReasonExpr(xp);
 
                 } catch (JaxenException je) {

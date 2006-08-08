@@ -15,20 +15,14 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.api.ListMediator;
-import org.apache.synapse.api.Mediator;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.jaxen.NamespaceContext;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Collection;
+import java.util.Iterator;
 
 public class AbstractMediatorSerializer {
 

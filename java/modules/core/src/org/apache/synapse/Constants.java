@@ -90,4 +90,14 @@ public interface Constants {
 
     String RESPONSE_SOAP_ENVELOPE = "_RESPONSE_SOAP_ENVELOPE_";
 
+    /** Refers the To header */
+    String HEADER_TO = "To";
+    /** Refers the From header */
+    String HEADER_FROM = "From";
+    /** Refers the FaultTo header */
+    String HEADER_FAULT = "FaultTo";
+    /** Refers the Action header */
+    String HEADER_ACTION = "Action";
+    /** Refers the ReplyTo header */
+    String HEADER_REPLY_TO = "ReplyTo";
 }

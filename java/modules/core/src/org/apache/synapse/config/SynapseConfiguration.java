@@ -15,14 +15,16 @@
 */
 package org.apache.synapse.config;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.registry.Registry;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.registry.Registry;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The SynapseConfiguration holds the global configuration for a Synapse

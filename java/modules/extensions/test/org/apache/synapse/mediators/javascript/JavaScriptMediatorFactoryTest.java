@@ -15,15 +15,13 @@
  */
 package org.apache.synapse.mediators.javascript;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.stream.XMLStreamException;
-
 import junit.framework.TestCase;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.synapse.api.Mediator;
+import org.apache.synapse.Mediator;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
 
 public class JavaScriptMediatorFactoryTest extends TestCase {
 

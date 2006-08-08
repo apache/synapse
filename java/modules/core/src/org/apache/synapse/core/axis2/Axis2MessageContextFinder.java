@@ -24,9 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
 
 /**
  * <p/>

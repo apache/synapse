@@ -16,12 +16,12 @@
 package org.apache.synapse.mediators.builtin;
 
 import junit.framework.TestCase;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Util;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.mediators.TestUtils;
 
 public class PropertyMediatorTest extends TestCase {
 
@@ -35,7 +35,7 @@ public class PropertyMediatorTest extends TestCase {
         propMediator.mediate(synCtx);
 
         assertTrue(
-            "value".equals(Util.getStringValue(
+            "value".equals(Axis2MessageContext.getStringValue(
                 new AXIOMXPath("synapse:get-property('name')"), synCtx)));
     }
 
@@ -52,7 +52,7 @@ public class PropertyMediatorTest extends TestCase {
         synCtx.setConfiguration(synCfg);
 
         assertTrue(
-            "value".equals(Util.getStringValue(
+            "value".equals(Axis2MessageContext.getStringValue(
                 new AXIOMXPath("synapse:get-property('name')"), synCtx)));
     }
 

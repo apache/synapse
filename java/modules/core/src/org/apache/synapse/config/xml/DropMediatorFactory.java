@@ -16,16 +16,11 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.axiom.om.OMElement;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.builtin.DropMediator;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
 
 /**
  * This creates a drop mediator instance

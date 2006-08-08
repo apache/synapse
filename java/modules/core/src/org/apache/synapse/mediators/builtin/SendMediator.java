@@ -16,13 +16,13 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Constants;
-import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.addressing.EndpointReference;
+import org.apache.synapse.Constants;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.mediators.AbstractMediator;
 
 import java.util.ArrayList;
 import java.util.List;

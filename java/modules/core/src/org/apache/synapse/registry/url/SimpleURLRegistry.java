@@ -20,8 +20,6 @@ import org.apache.synapse.registry.AbstractRegistry;
 import org.apache.synapse.registry.RegistryEntry;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,17 +40,11 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
     private static final Log log = LogFactory.getLog(SimpleURLRegistry.class);
 
-    /** The root for the URLs */
-    private String root = "";
-
-    /** default cachable duration */
-    private long cachableDuration = 15000;
-
     public OMNode lookup(String key) {
 
         log.info("==> Repository fetch of resource with key : " + key);
         try {
-            URL url = new URL(root + key);
+            URL url = new URL(getRoot() + key);
             URLConnection urlc = url.openConnection();
 
             XMLStreamReader parser = XMLInputFactory.newInstance().
@@ -61,11 +53,11 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             return builder.getDocumentElement();
 
         } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + root + key, e);
+            handleException("Invalid URL reference " + getRoot() + key, e);
         } catch (IOException e) {
-            handleException("IO Error reading from URL " + root + key, e);
+            handleException("IO Error reading from URL " + getRoot() + key, e);
         } catch (XMLStreamException e) {
-            handleException("XML Error reading from URL " + root + key, e);
+            handleException("XML Error reading from URL " + getRoot() + key, e);
         }
         return null;
     }
@@ -74,7 +66,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
         log.debug("Perform RegistryEntry lookup for key : " + key);
         try {
-            URL url = new URL(root + key);
+            URL url = new URL(getRoot() + key);
             URLConnection urlc = url.openConnection();
 
             URLRegistryEntry wre = new URLRegistryEntry();
@@ -88,26 +80,26 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
                 wre.setCachableDuration(
                     urlc.getExpiration() - System.currentTimeMillis());
             } else {
-                wre.setCachableDuration(cachableDuration);
+                wre.setCachableDuration(getCachableDuration());
             }
             return wre;
 
         } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + root + key, e);
+            handleException("Invalid URL reference " + getRoot() + key, e);
         } catch (IOException e) {
-            handleException("IO Error reading from URL " + root + key, e);
+            handleException("IO Error reading from URL " + getRoot() + key, e);
         } catch (URISyntaxException e) {
-            handleException("URI Syntax error reading from URL " + root + key, e);
+            handleException("URI Syntax error reading from URL " + getRoot() + key, e);
         }
         return null;
     }
 
-    public void setConfigProperty(String name, String value) {
-        if ("root".equals(name)) {
-            this.root = value;
-        } else if ("cachableDuration".equals(name)) {
-            this.cachableDuration = Long.parseLong(value);
-        }
+    public String getRoot() {
+        return (String) properties.get("root");
+    }
+
+    public long getCachableDuration() {
+        return Long.parseLong((String) properties.get("cachableDuration"));
     }
 
     private void handleException(String msg, Exception e) {

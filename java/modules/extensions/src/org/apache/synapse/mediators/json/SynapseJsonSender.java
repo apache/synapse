@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.synapse.json;
+package org.apache.synapse.mediators.json;
 
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.http.HTTPConstants;

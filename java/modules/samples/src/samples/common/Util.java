@@ -23,6 +23,7 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 
 import javax.xml.namespace.QName;
 
@@ -38,7 +39,7 @@ public class Util {
             if (xurl != null)
                 options.setTo(new EndpointReference(xurl));
             if (turl != null)
-                options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+                options.setProperty(Constants.Configuration.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
             ServiceClient serviceClient = null;
@@ -72,7 +73,7 @@ public class Util {
             if (xurl != null)
                 options.setTo(new EndpointReference(xurl));
             if (turl != null)
-                options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+                options.setProperty(Constants.Configuration.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
             ServiceClient serviceClient = null;
@@ -105,7 +106,7 @@ public class Util {
             if (xurl != null)
                 options.setTo(new EndpointReference(xurl));
             if (turl != null)
-                options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+                options.setProperty(Constants.Configuration.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
             ServiceClient serviceClient = null;
@@ -138,7 +139,7 @@ public class Util {
             if (xurl != null)
                 options.setTo(new EndpointReference(xurl));
             if (turl != null)
-                options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+                options.setProperty(Constants.Configuration.TRANSPORT_URL, turl);
             options.setAction(soapAction);
 
             ServiceClient serviceClient = null;

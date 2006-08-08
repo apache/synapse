@@ -19,6 +19,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.Constants;
 import samples.common.StockQuoteHandler;
 
 public class DirectStockQuoteClient {
@@ -37,7 +38,7 @@ public class DirectStockQuoteClient {
 
             Options options = new Options();
             if (turl != null)
-                options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+                options.setProperty(Constants.Configuration.TRANSPORT_URL, turl);
             options.setAction(sAction);
 
             ServiceClient serviceClient = new ServiceClient();

@@ -36,8 +36,8 @@ public class SimpleURLRegistryTest extends TestCase {
 
     public void testRegistry() throws Exception {
         Registry reg = new SimpleURLRegistry();
-        reg.setConfigProperty("root", "file:./");
-        reg.setConfigProperty("cachableDuration", "1500");
+        reg.addConfigProperty("root", "file:./");
+        reg.addConfigProperty("cachableDuration", "1500");
         DynamicProperty dp = new DynamicProperty(FILE);
 
         // initial load of file from registry
@@ -54,7 +54,7 @@ public class SimpleURLRegistryTest extends TestCase {
         // the renewed cache should be valid for another 1.5 secs
         // change the file now and change next cache duration
         writeToFile(TEXT_2);
-        reg.setConfigProperty("cachableDuration", "100");
+        reg.addConfigProperty("cachableDuration", "100");
 
         // still cached content should be available and valid
         assertEquals(TEXT_1, reg.getProperty(dp).toString());

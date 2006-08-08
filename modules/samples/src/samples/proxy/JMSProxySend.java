@@ -15,7 +15,6 @@
 */
 package samples.proxy;
 
-import org.apache.axiom.om.OMFactory;
 import samples.common.Util;
 
 public class JMSProxySend {

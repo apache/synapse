@@ -21,19 +21,17 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
+import org.apache.synapse.config.xml.OMElementUtils;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractListMediatorFactory;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.validate.ValidateMediator;
-import org.apache.ws.commons.schema.XmlSchema;
 import org.jaxen.JaxenException;
 
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import javax.xml.namespace.QName;
 
 /**
  * Creates a validation mediator from the XML configuration
@@ -92,7 +90,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
             try {
                 AXIOMXPath xp = new AXIOMXPath(attSource.getAttributeValue());
                 validateMediator.setSource(xp);
-                Util.addNameSpaces(xp, elem, log);
+                OMElementUtils.addNameSpaces(xp, elem, log);
             } catch (JaxenException e) {
                 handleException("Invalid XPath expression specified for attribute 'source'", e);
             }

@@ -17,13 +17,13 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 import org.apache.ws.policy.Policy;
 
 import java.util.Iterator;

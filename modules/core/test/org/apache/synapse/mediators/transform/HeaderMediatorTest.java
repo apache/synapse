@@ -16,10 +16,10 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.HeaderType;
-import org.apache.synapse.mediators.TestUtils;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Constants;
+import org.apache.synapse.mediators.TestUtils;
 
 public class HeaderMediatorTest extends TestCase {
 
@@ -28,7 +28,7 @@ public class HeaderMediatorTest extends TestCase {
     public void testSimpleHeaderSetAndRemove() throws Exception {
 
         HeaderMediator headerMediator = new HeaderMediator();
-        headerMediator.setName(HeaderType.STR_TO);
+        headerMediator.setName(Constants.HEADER_TO);
         headerMediator.setValue(TEST_HEADER);
 
         // invoke transformation, with static enveope
@@ -47,7 +47,7 @@ public class HeaderMediatorTest extends TestCase {
     public void testSimpleHeaderXPathSetAndRemove() throws Exception {
 
         HeaderMediator headerMediator = new HeaderMediator();
-        headerMediator.setName(HeaderType.STR_TO);
+        headerMediator.setName(Constants.HEADER_TO);
         headerMediator.setExpression(new AXIOMXPath("concat('http://','server','/path')"));
 
         // invoke transformation, with static enveope

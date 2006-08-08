@@ -15,28 +15,28 @@
 */
 package org.apache.synapse.core.axis2;
 
-import org.apache.axis2.description.*;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.transport.njms.JMSConstants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Util;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ws.policy.util.PolicyReader;
-import org.apache.ws.policy.util.PolicyFactory;
-import org.apache.ws.policy.Policy;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.*;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.transport.njms.JMSConstants;
+import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Util;
+import org.apache.ws.policy.Policy;
+import org.apache.ws.policy.util.PolicyFactory;
+import org.apache.ws.policy.util.PolicyReader;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
-import java.net.URL;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 /**

@@ -15,23 +15,21 @@
 */
 package org.apache.synapse;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.stream.XMLStreamException;
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.TestMediateHandler;
-import org.apache.synapse.TestMediator;
 import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.validate.ValidateMediator;
 import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ValidateMediatorTest extends TestCase {
 

@@ -15,14 +15,14 @@
  */
 package org.apache.synapse.mediators.javascript;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.UniqueTag;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * An invokeable instance of a JavaScript script.

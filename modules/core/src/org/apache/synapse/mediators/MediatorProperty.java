@@ -15,10 +15,10 @@
 */
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.Util;
-import org.apache.synapse.MessageContext;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.config.xml.Constants;
 
 import javax.xml.namespace.QName;
 
@@ -65,7 +65,7 @@ public class MediatorProperty {
     }
 
     public String getEvaluatedExpression(MessageContext synCtx) {
-        return Util.getStringValue(expression, synCtx);
+        return Axis2MessageContext.getStringValue(expression, synCtx);
     }
 
 }

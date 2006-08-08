@@ -20,8 +20,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.mediators.TestUtils;
 
-import java.io.FileInputStream;
-
 /**
  * This unit test is a different 'type' of a unit test, such that it tests end-to-end
  * like scenario of using Spring extensions! First it tests that the configuration

@@ -15,18 +15,17 @@
 */
 package org.apache.synapse;
 
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.axis2.AxisFault;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class TestMessageContext implements MessageContext {

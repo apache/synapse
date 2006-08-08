@@ -15,23 +15,19 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.filters.SwitchMediator;
-import org.apache.synapse.mediators.filters.SwitchCaseMediator;
-import org.apache.synapse.SynapseException;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.filters.SwitchCaseMediator;
+import org.apache.synapse.mediators.filters.SwitchMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.stream.StreamSource;
 import java.util.Iterator;
-import java.io.StringReader;
 
 /**
  * Constructs a Switch mediator instance from the given XML configuration
@@ -67,7 +63,7 @@ public class SwitchMediatorFactory implements MediatorFactory {
         } else {
             try {
                 AXIOMXPath sourceXPath = new AXIOMXPath(source.getAttributeValue());
-                org.apache.synapse.Util.addNameSpaces(sourceXPath, elem, log);
+                org.apache.synapse.config.xml.OMElementUtils.addNameSpaces(sourceXPath, elem, log);
                 switchMediator.setSource(sourceXPath);
 
             } catch (JaxenException e) {

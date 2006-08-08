@@ -1,20 +1,14 @@
 package samples.userguide;
 
-import java.net.URL;
-
-
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
-import org.apache.axiom.om.OMElement;
 import samples.common.StockQuoteHandler;
 
-import javax.xml.namespace.QName;
+import java.net.URL;
 
 
 public class ProxyStockQuoteClient {

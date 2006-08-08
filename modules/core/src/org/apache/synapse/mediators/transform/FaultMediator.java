@@ -20,15 +20,14 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.*;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.Util;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
@@ -157,7 +156,7 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultCodeValue != null) {
             fault_code = faultCodeValue;
         } else {
-            fault_code = QName.valueOf(Util.getStringValue(faultCodeExpr, synCtx));
+            fault_code = QName.valueOf(Axis2MessageContext.getStringValue(faultCodeExpr, synCtx));
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
@@ -174,7 +173,7 @@ public class FaultMediator extends AbstractMediator {
         } else if (faultReasonValue != null) {
             reasonString = faultReasonValue;
         } else {
-            reasonString = Util.getStringValue(faultReasonExpr, synCtx);
+            reasonString = Axis2MessageContext.getStringValue(faultReasonExpr, synCtx);
         }
 
         SOAPFaultReason reason = factory.createSOAPFaultReason();

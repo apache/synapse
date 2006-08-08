@@ -15,10 +15,10 @@
  */
 package org.apache.synapse.mediators.javascript;
 
+import junit.framework.TestCase;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for the RhinoScript

@@ -13,13 +13,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package samples.mediation;
+package samples.proxy;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.MessageContextConstants;
-import samples.common.StockQuoteHandler;
 import samples.common.Util;
 
 public class ProxyStockQuoteClient {

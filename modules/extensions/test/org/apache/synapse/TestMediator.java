@@ -15,8 +15,7 @@
 */
 package org.apache.synapse;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.TestMediateHandler;
+import org.apache.synapse.Mediator;
 
 /**
  * Test mediator class.

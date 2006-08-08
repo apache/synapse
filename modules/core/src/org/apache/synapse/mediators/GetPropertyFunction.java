@@ -15,18 +15,18 @@
 */
 package org.apache.synapse.mediators;
 
-import org.jaxen.Function;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Constants;
 import org.jaxen.Context;
+import org.jaxen.Function;
 import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.HeaderType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Implements the XPath extension function synapse:get-property(prop-name)
@@ -65,15 +65,15 @@ public class GetPropertyFunction implements Function {
                 if (result != null) {
                     return result;
                 } else {
-                    if (HeaderType.STR_TO.equals(key) && synCtx.getTo() != null) {
+                    if (Constants.HEADER_TO.equals(key) && synCtx.getTo() != null) {
                         return synCtx.getTo().getAddress();
-                    } else if (HeaderType.STR_FROM.equals(key) && synCtx.getFrom() != null) {
+                    } else if (Constants.HEADER_FROM.equals(key) && synCtx.getFrom() != null) {
                         return synCtx.getFrom().getAddress();
-                    } else if (HeaderType.STR_ACTION.equals(key) && synCtx.getWSAAction() != null) {
+                    } else if (Constants.HEADER_ACTION.equals(key) && synCtx.getWSAAction() != null) {
                         return synCtx.getWSAAction();
-                    } else if (HeaderType.STR_FAULT.equals(key) && synCtx.getFaultTo() != null) {
+                    } else if (Constants.HEADER_FAULT.equals(key) && synCtx.getFaultTo() != null) {
                         return synCtx.getFaultTo().getAddress();
-                    } else if (HeaderType.STR_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
+                    } else if (Constants.HEADER_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
                         return synCtx.getReplyTo().getAddress();
                     } else {
                         return null;

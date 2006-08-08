@@ -1,4 +1,9 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
+
+	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
+		<property name="root" value=""/>
+		<property name="cachableDuration" value="15000"/>
+	</registry>
   
   <definitions>
 		<set-property name="springconfig1" key="file:./../../repository/conf/sample/springsample.xml"/>

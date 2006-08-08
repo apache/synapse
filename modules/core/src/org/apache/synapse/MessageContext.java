@@ -16,14 +16,13 @@
 package org.apache.synapse;
 
 
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
 
-import java.util.Iterator;
 import java.util.Set;
 
 

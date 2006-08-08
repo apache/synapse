@@ -15,20 +15,17 @@
  */
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.transform.HeaderMediator;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.jaxen.JaxenException;
+
+import javax.xml.namespace.QName;
 
 /**
  * This builds a Header Mediator parsing the XML configuration supplied
@@ -83,7 +80,7 @@ public class HeaderMediatorFactory implements MediatorFactory {
         } else if (exprn != null && exprn.getAttributeValue() != null) {
             try {
                 AXIOMXPath xp = new AXIOMXPath(exprn.getAttributeValue());
-                Util.addNameSpaces(xp, elem, log);
+                OMElementUtils.addNameSpaces(xp, elem, log);
                 headerMediator.setExpression(xp);
             } catch (JaxenException je) {
                 String msg = "Invalid XPath expression : " + exprn.getAttributeValue();

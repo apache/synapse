@@ -15,16 +15,14 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.PropertyMediator;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -65,7 +63,7 @@ public class PropertyMediatorFactory implements MediatorFactory {
         } else {
             try {
                 AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
-                Util.addNameSpaces(xp, elem, log);
+                OMElementUtils.addNameSpaces(xp, elem, log);
                 propMediator.setExpression(xp);
 
             } catch (JaxenException e) {

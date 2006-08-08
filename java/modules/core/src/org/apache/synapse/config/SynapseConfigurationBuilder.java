@@ -15,17 +15,14 @@
 */
 package org.apache.synapse.config;
 
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.base.SynapseMediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.XMLConfigurationBuilder;
+import org.apache.synapse.mediators.base.SynapseMediator;
+import org.apache.synapse.mediators.builtin.SendMediator;
 
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 

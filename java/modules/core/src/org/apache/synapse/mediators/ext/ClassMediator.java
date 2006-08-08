@@ -19,15 +19,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
-import org.apache.synapse.api.Mediator;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 
-import java.util.List;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * The class mediator delegates the mediation to a new instance of a specified class. The specified class
@@ -79,7 +79,7 @@ public class ClassMediator extends AbstractMediator {
             String mName = "set" + Character.toUpperCase(mProp.getName().charAt(0)) + mProp.getName().substring(1);
             String value = (mProp.getValue() != null ?
                 mProp.getValue() :
-                Util.getStringValue(mProp.getExpression(), synCtx));
+                Axis2MessageContext.getStringValue(mProp.getExpression(), synCtx));
 
             try {
                 Method method = m.getClass().getMethod(mName, new Class[] {String.class});

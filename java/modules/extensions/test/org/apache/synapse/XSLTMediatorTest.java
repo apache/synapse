@@ -16,18 +16,15 @@
 package org.apache.synapse;
 
 import junit.framework.TestCase;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.config.DynamicProperty;
 
-import java.net.URL;
-import java.io.File;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class XSLTMediatorTest extends TestCase {
 

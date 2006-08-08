@@ -15,25 +15,23 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.DynamicProperty;
-import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.SynapseException;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.ProxyService;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.util.Iterator;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
 
 public class XMLConfigurationSerializer {
 

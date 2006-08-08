@@ -15,15 +15,11 @@
 */
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.synapse.api.ListMediator;
-import org.apache.synapse.api.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
 
 import java.util.Iterator;
 import java.util.List;

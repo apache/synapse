@@ -15,17 +15,15 @@
 */
 package org.apache.synapse.mediators.json;
 
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.SynapseException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-
-import javax.xml.stream.XMLStreamConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.MediatorSerializer;
 
 /**
  * <x:json/> mediator belongs to the http://ws.apache.org/ns/synapse/json namespace.

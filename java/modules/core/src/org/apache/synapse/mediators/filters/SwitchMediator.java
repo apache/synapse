@@ -15,16 +15,16 @@
 */
 package org.apache.synapse.mediators.filters;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Util;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * The switch mediator implements the functionality of the "switch" contruct. It first
@@ -51,7 +51,7 @@ public class SwitchMediator extends AbstractMediator {
     public boolean mediate(MessageContext synCtx) {
 
         log.debug("Switch mediator :: mediate()");
-        String sourceText = Util.getStringValue(source, synCtx);
+        String sourceText = Axis2MessageContext.getStringValue(source, synCtx);
         log.debug("Applying switch case regex patterns against evaluated source value : " + sourceText);
         Iterator iter = cases.iterator();
 

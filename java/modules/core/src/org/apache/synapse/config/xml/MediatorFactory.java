@@ -16,11 +16,10 @@
 
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.Mediator;
+
+import javax.xml.namespace.QName;
 
 /**
  * A mediator factory capable of creating an instance of a mediator through a given

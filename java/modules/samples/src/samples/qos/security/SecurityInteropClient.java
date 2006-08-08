@@ -15,15 +15,13 @@
 */
 package samples.qos.security;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.Constants;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 
 import javax.xml.namespace.QName;
 

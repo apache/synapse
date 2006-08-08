@@ -16,26 +16,25 @@
 
 package org.apache.synapse.mediators.json;
 
-import org.apache.axis2.transport.TransportSender;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.description.TransportOutDescription;
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.transport.TransportSender;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

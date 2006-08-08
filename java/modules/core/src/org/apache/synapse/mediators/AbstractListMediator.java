@@ -16,11 +16,10 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.api.ListMediator;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
 
 import java.util.ArrayList;
 import java.util.Iterator;

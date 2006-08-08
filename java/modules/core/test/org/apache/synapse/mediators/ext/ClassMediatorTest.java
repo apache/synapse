@@ -16,9 +16,9 @@
 package org.apache.synapse.mediators.ext;
 
 import junit.framework.TestCase;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 
 /**
  * Tests the class mediator instantiation and setting of literal and

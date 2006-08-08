@@ -15,18 +15,14 @@
  */
 package org.apache.synapse.config.xml;
 
-import java.util.Iterator;
-
-
-
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.api.ListMediator;
-import org.apache.synapse.api.Mediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.ListMediator;
+import org.apache.synapse.Mediator;
 
-import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 /**
  * This implements the basic logic to build a list mediator from a given XML

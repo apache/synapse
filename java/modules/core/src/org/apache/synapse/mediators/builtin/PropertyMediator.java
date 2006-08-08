@@ -15,12 +15,12 @@
 */
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Util;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
  * The property mediator would save a named property as a local property
@@ -42,7 +42,7 @@ public class PropertyMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext smc) {
         log.debug("Set-Property mediator :: mediate()");
-        String value = (getValue() != null ? getValue() : Util.getStringValue(getExpression(), smc));
+        String value = (getValue() != null ? getValue() : Axis2MessageContext.getStringValue(getExpression(), smc));
         log.debug("Setting property : " + getName() + " = " + value);
         smc.setProperty(getName(), value);
         return true;

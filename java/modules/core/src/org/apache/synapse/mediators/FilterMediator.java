@@ -1,4 +1,4 @@
-package org.apache.synapse.api;
+package org.apache.synapse.mediators;
 
 import org.apache.synapse.MessageContext;
 

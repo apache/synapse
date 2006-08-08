@@ -18,13 +18,12 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.config.XMLToObjectMapper;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implements the core Registry lookup algorithm

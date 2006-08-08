@@ -19,16 +19,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.Util;
-import org.apache.synapse.api.Mediator;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.InputStreamResource;
 
 /**
- * This mediator allows Spring beans implementing the org.apache.synapse.api.Mediator
+ * This mediator allows Spring beans implementing the org.apache.synapse.Mediator
  * interface to mediate messages passing through Synapse.
  *
  * A Spring mediator is instantiated by Spring (see www.springframework.org). The mediator

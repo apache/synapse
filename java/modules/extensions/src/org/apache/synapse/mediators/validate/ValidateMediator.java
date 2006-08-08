@@ -27,7 +27,6 @@ import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.Util;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.registry.Registry;
 import org.jaxen.JaxenException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

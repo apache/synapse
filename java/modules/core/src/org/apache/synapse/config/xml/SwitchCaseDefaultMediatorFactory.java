@@ -15,11 +15,11 @@
 */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.filters.SwitchCaseMediator;
 import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.filters.SwitchCaseMediator;
 
 import javax.xml.namespace.QName;
 

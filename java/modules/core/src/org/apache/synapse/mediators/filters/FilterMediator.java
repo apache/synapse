@@ -17,11 +17,11 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.Util;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractListMediator;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Pattern;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * The filter mediator combines the regex and xpath filtering functionality. If an xpath
  * is set, it is evaluated; else the given regex is evaluated against the source xpath.
  */
-public class FilterMediator extends AbstractListMediator implements org.apache.synapse.api.FilterMediator {
+public class FilterMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
     private static final Log log = LogFactory.getLog(FilterMediator.class);
     private AXIOMXPath source = null;
@@ -69,7 +69,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
 
             } else if (source != null && regex != null) {
                 log.debug("Evaluating regular expression : " + regex.pattern() + " against source : " + source);
-                return regex.matcher(Util.getStringValue(source, synCtx)).matches();
+                return regex.matcher(Axis2MessageContext.getStringValue(source, synCtx)).matches();
 
             } else {
                 log.error("Invalid configuration specified");

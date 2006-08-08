@@ -1,0 +1,123 @@
+/*
+* Copyright 2004,2005 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package org.apache.synapse.config.xml;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.Iterator;
+
+/**
+ * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
+ *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
+ *   <wsdl key="string">?
+ *   <schema key="string">*
+ *   <policy key="string">*
+ *   <property name="string" value="string"/>*
+ *   <enableRM/>+
+ *   <enableSec/>+
+ * </proxy>
+ */
+public class ProxyServiceSerializer {
+
+    private static final Log log = LogFactory.getLog(PropertyMediatorSerializer.class);
+
+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
+    protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+
+    public static OMElement serializeProxy(OMElement parent, ProxyService service) {
+
+        OMElement proxy = fac.createOMElement("proxy", synNS);
+        if (service.getName() != null) {
+            proxy.addAttribute(fac.createOMAttribute(
+                "name", nullNS, service.getName()));
+        } else {
+            handleException("Invalid proxy service. Service name is required");
+        }
+
+        if (service.getDescription() != null) {
+            proxy.addAttribute(fac.createOMAttribute(
+                "description", nullNS, service.getDescription()));
+        }
+
+        if (service.getTransports() != null &&
+            !ProxyService.ALL_TRANSPORTS.equals(service.getTransports())) {
+            proxy.addAttribute(fac.createOMAttribute(
+                "transports", nullNS, service.getTransports()));
+        }
+
+        if (service.getTargetEndpoint() != null) {
+            OMElement target = fac.createOMElement("target", synNS);
+            target.addAttribute(fac.createOMAttribute(
+                "endpoint", nullNS, service.getTargetEndpoint()));
+            proxy.addChild(target);
+        } else if (service.getTargetSequence() != null) {
+            OMElement target = fac.createOMElement("target", synNS);
+            target.addAttribute(fac.createOMAttribute(
+                "sequence", nullNS, service.getTargetSequence()));
+            proxy.addChild(target);
+        }
+
+        // TODO still schemas are not used
+        // Iterator iter = service.getSchemas();
+        // ....
+
+        Iterator iter = service.getServiceLevelPolicies().iterator();
+        while (iter.hasNext()) {
+            String policyKey = (String) iter.next();
+            OMElement policy = fac.createOMElement("policy", synNS);
+            policy.addAttribute(fac.createOMAttribute(
+                "key", nullNS, policyKey));
+            proxy.addChild(policy);
+        }
+
+        iter = service.getPropertyMap().keySet().iterator();
+        while (iter.hasNext()) {
+            String propertyName = (String) iter.next();
+            OMElement property = fac.createOMElement("property", synNS);
+            property.addAttribute(fac.createOMAttribute(
+                "name", nullNS, propertyName));
+            property.addAttribute(fac.createOMAttribute(
+                "value", nullNS, (String) service.getPropertyMap().get(propertyName)));
+            proxy.addChild(property);
+        }
+
+        if (service.isWsRMEnabled()) {
+            proxy.addChild(fac.createOMElement("enableRM", synNS));
+        }
+
+        if (service.isWsSecEnabled()) {
+            proxy.addChild(fac.createOMElement("enableSec", synNS));
+        }
+
+        if (parent != null) {
+            parent.addChild(proxy);
+        }
+        return proxy;
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
+}

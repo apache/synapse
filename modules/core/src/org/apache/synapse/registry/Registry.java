@@ -18,6 +18,9 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.config.DynamicProperty;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This is the interface to a Registry from Synapse.
  */
@@ -51,7 +54,7 @@ public interface Registry {
      * @param name property name
      * @param value simple String value
      */
-    public void setConfigProperty(String name, String value);
+    public void addConfigProperty(String name, String value);
 
     /**
      * Get the name of this registry
@@ -64,4 +67,16 @@ public interface Registry {
      * @param name of this registry
      */
     public void setRegistryName(String name);
+
+    /**
+     * Return the name of the implementation class
+     * @return name of the registry provider implementation class name
+     */
+    public String getProviderClass();
+
+    /**
+     * Return the list of configuration properties set on this instance
+     * @return a Map of configuration properties
+     */
+    public Map getConfigProperties();
 }

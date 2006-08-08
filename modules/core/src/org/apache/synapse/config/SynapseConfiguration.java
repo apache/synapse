@@ -271,6 +271,14 @@ public class SynapseConfiguration {
         return reg;
     }
 
+    /**
+     * Get the map of registered registries
+     * @return a map of registry name to registry instance
+     */
+    public Map getRegistries() {
+        return registryMap;
+    }
+
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);

@@ -23,6 +23,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.Constants;
 
 import javax.xml.namespace.QName;
 
@@ -50,7 +51,7 @@ public class SecurityInteropClient {
             ServiceClient serviceClient = new ServiceClient();
             Options options = new Options();
 
-            options.setProperty(MessageContextConstants.TRANSPORT_URL, turl);
+            options.setProperty(Constants.Configuration.TRANSPORT_URL, turl);
             options.setAction(soapAction);
             serviceClient.setOptions(options);
             OMElement result = serviceClient.sendReceive(ping);

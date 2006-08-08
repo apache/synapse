@@ -16,13 +16,12 @@
 package org.apache.synapse.registry.url;
 
 import junit.framework.TestCase;
-
-import java.io.File;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-
-import org.apache.synapse.registry.Registry;
 import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.registry.Registry;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 public class SimpleURLRegistryTest extends TestCase {
 

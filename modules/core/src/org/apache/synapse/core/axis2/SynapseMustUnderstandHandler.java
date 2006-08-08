@@ -15,11 +15,11 @@
  */
 package org.apache.synapse.core.axis2;
 
-import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.context.MessageContext;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axiom.soap.*;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.handlers.AbstractHandler;
 
 import java.util.Iterator;
 /*

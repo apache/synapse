@@ -13,7 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.synapse.api;
+package org.apache.synapse.mediators;
+
+import org.apache.synapse.Mediator;
 
 import java.util.List;
 

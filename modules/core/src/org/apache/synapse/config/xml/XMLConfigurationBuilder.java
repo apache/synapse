@@ -15,28 +15,28 @@
 */
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.registry.Registry;
-import org.apache.synapse.core.axis2.ProxyService;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.config.DynamicProperty;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.base.SynapseMediator;
+import org.apache.synapse.registry.Registry;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.namespace.QName;
-import java.io.InputStream;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.util.Iterator;
-import java.net.URL;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
 
 
 /**

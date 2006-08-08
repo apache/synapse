@@ -16,8 +16,8 @@
 package samples.common;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 
 import javax.xml.namespace.QName;

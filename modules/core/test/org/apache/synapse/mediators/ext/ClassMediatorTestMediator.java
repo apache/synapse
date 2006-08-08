@@ -15,8 +15,8 @@
 */
 package org.apache.synapse.mediators.ext;
 
-import org.apache.synapse.api.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
 
 /**
  * Since the class mediator always "instantiates" a new instance of a class

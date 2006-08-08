@@ -15,14 +15,13 @@
  */
 package org.apache.synapse.mediators.javascript;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.synapse.Constants;
-import org.apache.synapse.api.Mediator;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.ws.commons.schema.XmlSchema;
+
+import javax.xml.namespace.QName;
 
 /**
  * Creates an instance of a JavaScript mediator. <p/>

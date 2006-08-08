@@ -16,13 +16,11 @@
 
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.base.SynapseMediator;
 import org.apache.axiom.om.OMElement;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.base.SynapseMediator;
+
+import javax.xml.namespace.QName;
 
 /**
  * Builds the main mediator (@see SynapseConfiguration) of the Synapse instance

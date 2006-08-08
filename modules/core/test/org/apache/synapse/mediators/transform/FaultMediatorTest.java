@@ -16,14 +16,12 @@
 package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
-
-import javax.xml.namespace.QName;
-
-import org.apache.synapse.mediators.TestUtils;
-import org.apache.synapse.MessageContext;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.TestUtils;
 
+import javax.xml.namespace.QName;
 import java.net.URI;
 
 public class FaultMediatorTest extends TestCase {

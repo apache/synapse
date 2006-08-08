@@ -15,17 +15,17 @@
 */
 package org.apache.synapse.mediators.base;
 
-import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Util;
-import org.apache.synapse.api.Mediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractListMediator;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is a ListMediator which is similar to a Java try-catch-finally but with a catch-all
@@ -49,7 +49,7 @@ public class TryMediator extends AbstractListMediator {
 
         } catch (SynapseException e) {
             // set exception information to message context
-            Util.setErrorInformation(synCtx, e);
+            Axis2MessageContext.setErrorInformation(synCtx, e);
 
             Iterator it = errorHandlerMediators.iterator();
             while (it.hasNext()) {

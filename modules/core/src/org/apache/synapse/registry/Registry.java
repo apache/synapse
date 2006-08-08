@@ -18,7 +18,6 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.config.DynamicProperty;
 
-import java.util.List;
 import java.util.Map;
 
 /**

@@ -15,12 +15,12 @@
 */
 package org.apache.synapse.mediators.filters;
 
-import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.mediators.AbstractListMediator;
 
-import java.util.regex.Pattern;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * A SwitchCaseMediator is a list mediator which has a regex that is matched by

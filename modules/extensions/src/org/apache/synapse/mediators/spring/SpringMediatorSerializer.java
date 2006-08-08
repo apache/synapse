@@ -15,15 +15,15 @@
 */
 package org.apache.synapse.mediators.spring;
 
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.SynapseException;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.MediatorSerializer;
 
 /**
  * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>

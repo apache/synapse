@@ -16,16 +16,14 @@
 
 package org.apache.synapse.mediators.json;
 
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.json.JsonMediator;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.MediatorFactory;
 
 import javax.xml.namespace.QName;
 

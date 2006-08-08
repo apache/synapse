@@ -15,14 +15,14 @@
 */
 package org.apache.synapse.core.axis2;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.AxisFault;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 

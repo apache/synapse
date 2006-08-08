@@ -15,11 +15,6 @@
  */
 package org.apache.synapse.mediators.javascript;
 
-import java.io.ByteArrayInputStream;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -33,6 +28,10 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.xmlbeans.XmlObject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.util.Set;
 
 /**
  * E4XMessageContext decorates the Synapse MessageContext adding methods to use the 

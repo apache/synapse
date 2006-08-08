@@ -16,12 +16,12 @@
 package org.apache.synapse.mediators.base;
 
 import junit.framework.TestCase;
-import org.apache.synapse.mediators.TestMediator;
-import org.apache.synapse.mediators.TestMediateHandler;
-import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.mediators.TestMediateHandler;
+import org.apache.synapse.mediators.TestMediator;
+import org.apache.synapse.mediators.TestUtils;
 
 public class SequenceMediatorTest extends TestCase {
 

@@ -15,20 +15,20 @@
 */
 package org.apache.synapse.registry.url;
 
-import org.apache.synapse.registry.Registry;
-import org.apache.synapse.registry.AbstractRegistry;
-import org.apache.synapse.registry.RegistryEntry;
-import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.registry.AbstractRegistry;
+import org.apache.synapse.registry.Registry;
+import org.apache.synapse.registry.RegistryEntry;
 
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.net.*;
+import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
+import java.net.*;
 
 /**
  * A Simple HTTP GET based registry which will work with a Web Server / WebDAV
@@ -95,11 +95,17 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
     public String getRoot() {
-        return (String) properties.get("root");
+        String root = (String) properties.get("root");
+        if (root == null) {
+            return "";
+        } else {
+            return root;
+        }
     }
 
     public long getCachableDuration() {
-        return Long.parseLong((String) properties.get("cachableDuration"));
+        String cachableDuration = (String) properties.get("cachableDuration");
+        return cachableDuration == null ? 1500 : Long.parseLong(cachableDuration);
     }
 
     private void handleException(String msg, Exception e) {

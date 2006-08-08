@@ -16,10 +16,10 @@
 
 package org.apache.synapse.mediators.base;
 
-import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
  * The SynapseMediator is the "mainmediator" of the synapse engine. It is

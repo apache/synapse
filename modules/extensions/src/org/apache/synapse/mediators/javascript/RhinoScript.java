@@ -16,15 +16,11 @@
  */
 package org.apache.synapse.mediators.javascript;
 
+import org.mozilla.javascript.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.ImporterTopLevel;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Represents a compiled JavaScript script. 

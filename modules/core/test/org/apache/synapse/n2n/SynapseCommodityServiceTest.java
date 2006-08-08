@@ -16,20 +16,20 @@
 package org.apache.synapse.n2n;
 
 import junit.framework.TestCase;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.synapse.utils.Services;
 import org.apache.synapse.Constants;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMFactory;
+import org.apache.synapse.utils.Services;
 
 import javax.xml.namespace.QName;
 

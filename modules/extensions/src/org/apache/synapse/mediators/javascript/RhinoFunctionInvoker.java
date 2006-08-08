@@ -16,11 +16,7 @@
 package org.apache.synapse.mediators.javascript;
 
 import org.apache.xmlbeans.XmlObject;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.Wrapper;
+import org.mozilla.javascript.*;
 import org.mozilla.javascript.xml.XMLObject;
 
 /**

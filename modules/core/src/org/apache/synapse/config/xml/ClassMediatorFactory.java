@@ -15,22 +15,15 @@
  */
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.ext.ClassMediator;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.ext.ClassMediator;
 
-import java.util.Iterator;
-import java.io.StringReader;
+import javax.xml.namespace.QName;
 
 /**
  * Creates an instance of a Class mediator using XML configuration specified

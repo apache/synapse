@@ -15,13 +15,13 @@
 */
 package org.apache.synapse.mediators.transform;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.HeaderType;
-import org.apache.synapse.Util;
-import org.apache.synapse.MessageContext;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.*;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.axis2.addressing.EndpointReference;
 
 /**
  * The header mediator is able to set a given value as a SOAP header, or remove a given
@@ -47,8 +47,6 @@ public class HeaderMediator extends AbstractMediator {
     private int action = ACTION_SET;
     /** An expression which should be evaluated, and the result set as the header value */
     private AXIOMXPath expression = null;
-    /** The header type to which this mediator applies to */
-    private HeaderType headerType = new HeaderType();
 
     /**
      * Sets/Removes a SOAP header on the current message
@@ -61,13 +59,40 @@ public class HeaderMediator extends AbstractMediator {
 
         if (action == ACTION_SET) {
             String value = (getValue() != null ? getValue() :
-                    Util.getStringValue(getExpression(), synCtx));
-            log.debug("Setting header : " + headerType.getHeaderType() + " to : " + value);
-            headerType.setHeader(synCtx, value);
+                Axis2MessageContext.getStringValue(getExpression(), synCtx));
+
+            log.debug("Setting header : " + name + " to : " + value);
+
+            if (Constants.HEADER_TO.equals(name)) {
+                synCtx.setTo(new EndpointReference(value));
+            } else if (Constants.HEADER_FROM.equals(name)){
+                synCtx.setFrom(new EndpointReference(value));
+            } else if (Constants.HEADER_ACTION.equals(name)) {
+                synCtx.setWSAAction(value);
+            } else if (Constants.HEADER_FAULT.equals(name)) {
+                synCtx.setFaultTo(new EndpointReference(value));
+            } else if (Constants.HEADER_REPLY_TO.equals(name)) {
+                synCtx.setReplyTo(new EndpointReference(value));
+            } else {
+                handleException("Unsupported header : " + name);
+            }
 
         } else {
-            log.debug("Removing header : " + headerType.getHeaderType() + " from current message");
-            headerType.removeHeader(synCtx);
+            log.debug("Removing header : " + name + " from current message");
+
+            if (Constants.HEADER_TO.equals(name)) {
+                synCtx.setTo(null);
+            } else if (Constants.HEADER_FROM.equals(name)){
+                synCtx.setFrom(null);
+            } else if (Constants.HEADER_ACTION.equals(name)) {
+                synCtx.setWSAAction(null);
+            } else if (Constants.HEADER_FAULT.equals(name)) {
+                synCtx.setFaultTo(null);
+            } else if (Constants.HEADER_REPLY_TO.equals(name)) {
+                synCtx.setReplyTo(null);
+            } else {
+                handleException("Unsupported header : " + name);
+            }
         }
         return true;
     }
@@ -86,7 +111,6 @@ public class HeaderMediator extends AbstractMediator {
 
     public void setName(String name) {
         this.name = name;
-        this.headerType.setHeaderType(name);
     }
 
     public String getValue() {
@@ -103,5 +127,10 @@ public class HeaderMediator extends AbstractMediator {
 
     public void setExpression(AXIOMXPath expression) {
         this.expression = expression;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

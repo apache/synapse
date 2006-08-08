@@ -16,11 +16,11 @@
 
 package org.apache.synapse.core.axis2;
 
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.axis2.engine.AxisConfiguration;
 
 /**
  * <p> This is the Axis2 implementation of the MessageContext

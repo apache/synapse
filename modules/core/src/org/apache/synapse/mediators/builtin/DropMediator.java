@@ -16,10 +16,10 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
  * Halts further processing/mediation of the current message. i.e. returns false

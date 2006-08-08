@@ -26,7 +26,7 @@ import org.apache.synapse.mediators.AbstractListMediator;
  *
  * @see org.apache.synapse.MessageContext#isResponse()
  */
-public class OutMediator extends AbstractListMediator implements org.apache.synapse.api.FilterMediator {
+public class OutMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
     private static final Log log = LogFactory.getLog(OutMediator.class);
 

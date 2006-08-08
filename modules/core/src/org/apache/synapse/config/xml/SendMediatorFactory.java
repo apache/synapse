@@ -16,22 +16,19 @@
 
 package org.apache.synapse.config.xml;
 
-import javax.xml.namespace.QName;
-
-
-import org.apache.synapse.api.Mediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
-import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.SynapseException;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.mediators.builtin.SendMediator;
 
-import java.util.Iterator;
-import java.net.URL;
+import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
 
 /**
  * The Send mediator factory parses a Send element and creates an instance of the mediator

@@ -82,7 +82,7 @@ public class RegistryFactory {
                 OMAttribute nAtt = propEle.getAttribute(NAME_Q);
                 OMAttribute vAtt = propEle.getAttribute(VALUE_Q);
                 if (nAtt != null && vAtt !=null) {
-                    reg.setConfigProperty(nAtt.getAttributeValue(), vAtt.getAttributeValue());
+                    reg.addConfigProperty(nAtt.getAttributeValue(), vAtt.getAttributeValue());
                 } else {
                     handleException("The 'name' and 'value' attributes are required for a " +
                         "registry property definition");

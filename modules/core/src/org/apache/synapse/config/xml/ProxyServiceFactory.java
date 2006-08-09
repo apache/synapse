@@ -97,7 +97,7 @@ public class ProxyServiceFactory {
             Object o = policies.next();
             if (o instanceof OMElement) {
                 OMElement policy = (OMElement) o;
-                OMAttribute url = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "url"));
+                OMAttribute url = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
                 if (url != null) {
                     try {
                         proxy.addServiceLevelPoliciy(new URL(url.getAttributeValue()));

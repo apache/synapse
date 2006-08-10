@@ -365,14 +365,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	}
 
 	private void doGlobalProcessing(RMMsgContext rmMsgCtx) throws SandeshaException {
-		switch (rmMsgCtx.getMessageType()) {
-		case Sandesha2Constants.MessageTypes.ACK:
-
-		// //rmMsgCtx.addRelatesTo(null);
-		// rmMsgCtx.getMessageContext().getre
-		// //Removing the relatesTo part from ackMessageIf present. Some
-		// Frameworks tend to send this.
-		}
 	}
 
 	public QName getName() {

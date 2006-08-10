@@ -196,38 +196,31 @@ public class FaultManager {
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		int type = rmMessageContext.getMessageType();
 
-		boolean validSequence = true;
+		boolean validSequence = false;
 
-		if (type == Sandesha2Constants.MessageTypes.ACK || type == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE
-				|| type == Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE
-				|| type == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE) {
+		// Look for an outbound sequence
+		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		createSeqFindBean.setSequenceID(sequenceID);
 
-			CreateSeqBean createSeqFindBean = new CreateSeqBean();
-			createSeqFindBean.setSequenceID(sequenceID);
-
-			Collection coll = createSeqMgr.find(createSeqFindBean);
-			if (coll.size() == 0) {
-				validSequence = false;
-			}
+		Collection coll = createSeqMgr.find(createSeqFindBean);
+		if (!coll.isEmpty()) {
+			validSequence = true;
 
 		} else {
+			// Look for an inbound sequence
 			NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
 
-			Collection coll = mgr.retrieveAll();
+			coll = mgr.retrieveAll();
 			Iterator it = coll.iterator();
 
-			boolean contains = false;
 			while (it.hasNext()) {
 				NextMsgBean nextMsgBean = (NextMsgBean) it.next();
 				String tempId = nextMsgBean.getSequenceID();
 				if (tempId.equals(sequenceID)) {
-					contains = true;
+					validSequence = true;
 					break;
 				}
 			}
-
-			if (!contains)
-				validSequence = false;
 		}
 
 		String rmNamespaceValue = rmMessageContext.getRMNamespaceValue();
@@ -470,7 +463,7 @@ public class FaultManager {
 			return faultRMMsgCtx;
 
 		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
+			throw new SandeshaException(e.getMessage(), e);
 		}
 	}
 

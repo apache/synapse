@@ -76,22 +76,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			log.debug("Enter: TerminateSeqMsgProcessor::processInMessage");
 
 		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
-		// Processing for ack if any
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) terminateSeqRMMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		if (sequenceAck != null) {
-			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-
-			// setting message type temporarily as ack message. so that the ack
-			// processor would not be confused
-			int messageType = terminateSeqRMMsg.getMessageType();
-			terminateSeqRMMsg.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-
-			ackProcessor.processInMessage(terminateSeqRMMsg);
-
-			// resetting the correct message type.
-			terminateSeqRMMsg.setMessageType(messageType);
-		}
 
 		// Processing the terminate message
 		// TODO Add terminate sequence message logic.

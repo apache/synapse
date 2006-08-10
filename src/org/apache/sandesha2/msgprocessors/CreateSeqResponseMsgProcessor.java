@@ -77,24 +77,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
 
-		// Processing for ack if available
-
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) createSeqResponseRMMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		if (sequenceAck != null) {
-			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-
-			// setting message type temporarily as ack message. so that the ack
-			// processor would not be confused
-			int messageType = createSeqResponseRMMsgCtx.getMessageType();
-			createSeqResponseRMMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-
-			ackProcessor.processInMessage(createSeqResponseRMMsgCtx);
-
-			// resetting the correct message type.
-			createSeqResponseRMMsgCtx.setMessageType(messageType);
-		}
-
 		// Processing the create sequence response.
 
 		CreateSequenceResponse createSeqResponsePart = (CreateSequenceResponse) createSeqResponseRMMsgCtx

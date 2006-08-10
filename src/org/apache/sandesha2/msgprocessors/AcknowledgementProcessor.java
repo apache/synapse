@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -41,6 +46,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
+import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.TerminateManager;
@@ -49,34 +55,52 @@ import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
- * Responsible for processing an incoming acknowledgement message.
+ * Responsible for processing acknowledgement headers on incoming messages.
  */
 
-public class AcknowledgementProcessor implements MsgProcessor {
+public class AcknowledgementProcessor {
 
 	private static final Log log = LogFactory.getLog(AcknowledgementProcessor.class);
 
-	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processAckHeaders(MessageContext message) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementProcessor::processInMessage");
+			log.debug("Enter: AcknowledgementProcessor::processAckHeaders");
 
-		SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		if (sequenceAck == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqAckPartIsNull);
-			log.debug(message);
-			throw new SandeshaException(message);
+		SOAPEnvelope envelope = message.getEnvelope();
+		SOAPHeader header = envelope.getHeader();
+		
+		for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+			QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
+			
+			Iterator acks = header.getChildrenWithName(headerName);
+			while(acks.hasNext()) {
+				OMElement ack = (OMElement) acks.next();
+				SequenceAcknowledgement seqAck = new SequenceAcknowledgement(null, headerName.getNamespaceURI());
+			  seqAck.fromOMElement(ack);
+			  processAckHeader(message, seqAck);
+			}
 		}
 
-		MessageContext msgCtx = rmMsgCtx.getMessageContext();
+		if (log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementProcessor::processAckHeaders");
+	}
+	
+	private void processAckHeader(MessageContext msgCtx, SequenceAcknowledgement sequenceAck)
+	throws SandeshaException
+	{
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementProcessor::processAckHeader");
+		
+		// TODO: Note that this RMMessageContext is not really any use - but we need to create it
+		// so that it can be passed to the fault handling chain. It's really no more than a
+		// container for the correct addressing and RM spec levels, so we'd be better off passing
+		// them in directly. Unfortunately that change ripples through the codebase...
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+
 		ConfigurationContext configCtx = msgCtx.getConfigurationContext();
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
-
-		// setting mustUnderstand to false.
-		sequenceAck.setMustUnderstand(false);
-		rmMsgCtx.addSOAPEnvelope();
 
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
@@ -102,23 +126,9 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		FaultManager faultManager = new FaultManager();
 		RMMsgContext faultMessageContext = faultManager
 				.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager);
-		if (faultMessageContext != null) {
-
-			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()));
-			}
-
-			msgCtx.pause();
-			return;
+		if(faultMessageContext == null) {
+			faultMessageContext = faultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
 		}
-
-		faultMessageContext = faultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
 		if (faultMessageContext != null) {
 
 			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
@@ -127,10 +137,12 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			try {
 				engine.sendFault(faultMessageContext.getMessageContext());
 			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()));
+				throw new SandeshaException(
+						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e.toString()),
+						e);
 			}
 
+			// TODO: Should a bad ack stop processing of the message?
 			msgCtx.pause();
 			return;
 		}
@@ -147,23 +159,10 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		if (internalSequenceBean == null || internalSequenceBean.getValue() == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.tempSeqIdNotSet);
 			log.debug(message);
-
 			throw new SandeshaException(message);
 		}
 
 		String internalSequenceId = (String) internalSequenceBean.getValue();
-
-		// Following happens in the SandeshaGlobal handler
-		rmMsgCtx.getMessageContext().setProperty(Sandesha2Constants.ACK_PROCSSED, "true");
-
-		// Removing relatesTo - Some v1_0 endpoints tend to set relatesTo value
-		// for ack messages.
-		// Because of this dispatching may go wrong. So we set relatesTo value
-		// to null for ackMessages.
-		// (this happens in the SandeshaGlobal handler). Do this only if this is
-		// a standalone ACK.
-		// if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.ACK)
-		// rmMsgCtx.setRelatesTo(null);
 
 		SenderBean input = new SenderBean();
 		input.setSend(true);
@@ -253,11 +252,12 @@ public class AcknowledgementProcessor implements MsgProcessor {
 			}
 		}
 
+		// TODO - surely this is only appropriate for standalone ack messages?
 		// stopping the progress of the message further.
 		rmMsgCtx.pause();
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementProcessor::processInMessage");
+			log.debug("Exit: AcknowledgementProcessor::processAckHeader");
 	}
 
 	private SenderBean getRetransmitterEntry(Collection collection, long msgNo) {
@@ -286,11 +286,4 @@ public class AcknowledgementProcessor implements MsgProcessor {
 		return noOfMsgs;
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-		if (log.isDebugEnabled()) {
-			log.debug("Enter: AcknowledgementProcessor::processOutMessage");
-			log.debug("Exit: AcknowledgementProcessor::processOutMessage");
-		}
-
-	}
 }

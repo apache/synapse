@@ -32,6 +32,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.StorageManager;
@@ -77,6 +78,10 @@ public class SandeshaInHandler extends AbstractHandler {
 			return; // Reinjected messages are not processed by Sandesha2 inflow
 					// handlers
 		}
+		
+		// Process Ack headers in the message
+		AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
+		ackProcessor.processAckHeaders(msgCtx);
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 

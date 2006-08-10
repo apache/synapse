@@ -22,8 +22,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -71,11 +75,8 @@ public class AcknowledgementManager {
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		SenderBean findBean = new SenderBean();
-
-		String sequnceID = SandeshaUtil.getSequenceIDFromRMMessage(rmMessageContext);
 
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
@@ -95,10 +96,6 @@ public class AcknowledgementManager {
 				// //Piggybacking will happen only if the end of ack interval
 				// (timeToSend) is not reached.
 
-				boolean disablePiggybacking = false;
-				if (disablePiggybacking)
-					continue piggybackLoop;
-
 				MessageContext ackMsgContext = storageManager.retrieveMessageContext(ackBean.getMessageContextRefKey(),
 						configurationContext);
 
@@ -108,32 +105,29 @@ public class AcknowledgementManager {
 					continue piggybackLoop;
 				}
 
-				// String ackSequenceID = ackBean.getSequenceID();
-
-				// //sequenceID has to match for piggybacking
-				// if (!ackSequenceID.equals(sequnceID)) {
-				// continue piggybackLoop;
-				// }
-
 				// deleting the ack entry.
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
 
-				// Adding the ack to the application message
-				RMMsgContext ackRMMsgContext = MsgInitializer.initializeMessage(ackMsgContext);
-				if (ackRMMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
+				// Adding the ack(s) to the application message
+				boolean acks = false;
+				SOAPHeader appMsgHeaders = rmMessageContext.getMessageContext().getEnvelope().getHeader();
+				SOAPHeader headers = ackMsgContext.getEnvelope().getHeader();
+				if(headers != null) {
+					for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+						QName name = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
+						Iterator iter = headers.getChildrenWithName(name);
+						while(iter.hasNext()) {
+							appMsgHeaders.addChild((OMElement) iter.next());
+							acks = true;
+						}
+					}
+				}
+				if (!acks) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckMessageEntry,
-							ackRMMsgContext.toString());
+							ackMsgContext.getEnvelope().toString());
 					log.debug(message);
 					throw new SandeshaException(message);
 				}
-
-				SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgContext
-						.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-				rmMessageContext.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
-						sequenceAcknowledgement);
-
-				rmMessageContext.addSOAPEnvelope();
-				break piggybackLoop;
 			}
 		}
 	}

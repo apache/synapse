@@ -71,14 +71,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 
-		if (element == null || !(element instanceof SOAPHeader))
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.seqAckNonHeader));
-
-		SOAPHeader header = (SOAPHeader) element;
-		OMElement sequenceAckPart = header.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
-
+		OMElement sequenceAckPart = element;
 		if (sequenceAckPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.seqAckPartIsNull));

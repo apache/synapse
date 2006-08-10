@@ -505,4 +505,8 @@ public interface Sandesha2Constants {
 	
 	String SECURITY_MANAGER = "Sandesha2SecurityManager";
 	
+	String [] SPEC_NS_URIS = {
+			SPEC_2005_02.NS_URI,
+			SPEC_2005_10.NS_URI
+	};
 }

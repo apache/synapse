@@ -679,39 +679,4 @@ public class RMMsgCreator {
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 	}
 
-	/**
-	 * Create a new Acknowledgement message.
-	 * 
-	 * @param applicationRMMsgCtx
-	 * @return
-	 * @throws SandeshaException
-	 */
-	public static RMMsgContext createAckMessage(RMMsgContext relatedRMMessage, String sequenceID,
-			String rmNamespaceValue, StorageManager storageManager) throws SandeshaException {
-
-		try {
-			MessageContext applicationMsgCtx = relatedRMMessage.getMessageContext();
-
-			AxisOperation ackOperation = AxisOperationFactory
-					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
-
-			MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(relatedRMMessage, ackOperation);
-
-			RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
-
-			initializeCreation(applicationMsgCtx, ackMsgCtx);
-
-			addAckMessage(ackRMMsgCtx, sequenceID, storageManager);
-
-			ackMsgCtx.setProperty(MessageContext.TRANSPORT_IN, null);
-
-			finalizeCreation(applicationMsgCtx, ackMsgCtx);
-
-			ackRMMsgCtx.getMessageContext().setServerSide(true);
-			return ackRMMsgCtx;
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
-	}
-
 }

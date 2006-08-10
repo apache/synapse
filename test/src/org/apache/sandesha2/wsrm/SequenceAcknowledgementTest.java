@@ -37,9 +37,10 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
     }
 
     public void testFromOMElement()  throws SandeshaException {
+    	  QName name = new QName(rmNamespace, "SequenceAcknowledgement");
         SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory,rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "SequenceAcknowledgement.xml");
-        sequenceAck.fromOMElement(env.getHeader());
+        sequenceAck.fromOMElement(env.getHeader().getFirstChildWithName(name));
 
         Identifier identifier = sequenceAck.getIdentifier();
         assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifier.getIdentifier());

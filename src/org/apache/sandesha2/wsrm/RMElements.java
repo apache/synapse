@@ -91,7 +91,7 @@ public class RMElements {
 		
 		if (addressingNamespaceValue==null) {
 			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownWSAVersion);
+					SandeshaMessageKeys.unknownWSAVersion, envelope.toString());
 			throw new SandeshaException (message);
 //			return;
 		}
@@ -104,15 +104,6 @@ public class RMElements {
 		if (sequenceElement != null) {
 			sequence = new Sequence(factory,rmNamespaceValue);
 			sequence.fromOMElement(envelope.getHeader());
-		}
-
-		OMElement sequenceAckElement = envelope.getHeader()
-				.getFirstChildWithName(
-						new QName(rmNamespaceValue,
-								Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
-		if (sequenceAckElement != null) {
-			sequenceAcknowledgement = new SequenceAcknowledgement(factory,rmNamespaceValue);
-			sequenceAcknowledgement.fromOMElement(envelope.getHeader());
 		}
 
 		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(

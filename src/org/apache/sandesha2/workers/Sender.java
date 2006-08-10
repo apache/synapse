@@ -224,14 +224,14 @@ public class Sender extends Thread {
 
 				updateMessage(msgCtx);
 
-				int messageType = rmMsgCtx.getMessageType();
+				int messageType = senderBean.getMessageType();
 				if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
 					Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 					String sequenceID = sequence.getIdentifier().getIdentifier();
 				}
 
 				// checking weather this message can carry piggybacked acks
-				if (isAckPiggybackableMsgType(messageType) && !isAckAlreadyPiggybacked(rmMsgCtx)) {
+				if (isAckPiggybackableMsgType(messageType)) {
 					// piggybacking if an ack if available for the same
 					// sequence.
 					// TODO do piggybacking based on wsa:To
@@ -456,13 +456,6 @@ public class Sender extends Thread {
 		if (log.isDebugEnabled())
 			log.debug("Exit: Sender::isAckPiggybackableMsgType, " + piggybackable);
 		return piggybackable;
-	}
-
-	private boolean isAckAlreadyPiggybacked(RMMsgContext rmMessageContext) {
-		if (rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) != null)
-			return true;
-
-		return false;
 	}
 
 	private boolean isFaultEnvelope(SOAPEnvelope envelope) throws SandeshaException {

@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -56,6 +57,27 @@ public class Util {
                 handleException("Error converting to a StreamSource", e);
             }
             
+        } else {
+            handleException("Cannot convert object to a StreamSource");
+        }
+        return null;
+    }
+
+    public static InputStream getInputStream(Object o) {
+
+        if (o == null) {
+            handleException("Cannot convert null to a StreamSource");
+
+        } else if (o instanceof OMElement) {
+            OMElement omElement = (OMElement) o;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                omElement.serialize(baos);
+                return new ByteArrayInputStream(baos.toByteArray());
+            } catch (XMLStreamException e) {
+                handleException("Error converting to a StreamSource", e);
+            }
+
         } else {
             handleException("Cannot convert object to a StreamSource");
         }

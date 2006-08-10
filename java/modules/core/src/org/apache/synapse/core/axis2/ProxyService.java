@@ -34,8 +34,8 @@ import org.apache.ws.policy.util.PolicyReader;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -88,28 +88,28 @@ public class ProxyService {
         AxisService proxyService = null;
         if (wsdlKey != null) {
             try {
-                StreamSource wsdlStreamSource = Util.getStreamSource(synCfg.getProperty(wsdlKey));
+                InputStream wsdlInputStream = Util.getInputStream(synCfg.getProperty(wsdlKey));
                 // detect version of the WSDL 1.1 or 2.0
-                OMNamespace documentElementNS = new StAXOMBuilder(wsdlStreamSource.getInputStream()).
-                    getDocumentElement().getNamespace();
+                OMNamespace documentElementNS = new StAXOMBuilder(wsdlInputStream).getDocumentElement().getNamespace();
+
+                wsdlInputStream = Util.getInputStream(synCfg.getProperty(wsdlKey));
 
                 if (documentElementNS != null) {
                     WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
                     if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.
                         equals(documentElementNS.getNamespaceURI())) {
                         wsdlToAxisServiceBuilder =
-                            new WSDL20ToAxisServiceBuilder(
-                                wsdlStreamSource.getInputStream(), null, null);
+                            new WSDL20ToAxisServiceBuilder(wsdlInputStream, null, null);
 
                     } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
                         equals(documentElementNS.getNamespaceURI())) {
                         wsdlToAxisServiceBuilder =
-                            new WSDL11ToAxisServiceBuilder(
-                                wsdlStreamSource.getInputStream(), null, null);
+                            new WSDL11ToAxisServiceBuilder(wsdlInputStream, null, null);
                     } else {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                     }
 
+                    assert wsdlToAxisServiceBuilder != null;
                     proxyService = wsdlToAxisServiceBuilder.populateService();
                     proxyService.setWsdlfound(true);
 
@@ -135,6 +135,7 @@ public class ProxyService {
 
         // Set the name and description. Currently Axis2 uses the name as the
         // default Service destination
+        assert proxyService != null;
         proxyService.setName(name);
         if (description != null) {
             proxyService.setServiceDescription(description);
@@ -176,11 +177,11 @@ public class ProxyService {
         }
 
         // if service level policies are specified, apply them
-        if (!serviceLevelPolicies.isEmpty()) {
+        /*if (!serviceLevelPolicies.isEmpty()) {
             PolicyReader reader = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
             Policy svcEffectivePolicy = null;
 
-            String policyKey = null;
+            String policyKey;
             iter = serviceLevelPolicies.iterator();
             while (iter.hasNext()) {
                 policyKey = (String) iter.next();
@@ -197,7 +198,7 @@ public class ProxyService {
             policyInclude.addPolicyElement(PolicyInclude.SERVICE_POLICY, svcEffectivePolicy);
             proxyService.setPolicyInclude(policyInclude);
         }
-
+*/
         // create a custom message receiver for this proxy service to use a given named
         // endpoint or sequence for forwarding/message mediation
         ProxyServiceMessageReceiver msgRcvr = new ProxyServiceMessageReceiver();

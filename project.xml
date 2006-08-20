@@ -81,7 +81,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
     </licenses>
 
     <build>
-        <nagEmailAddress>jaliya@apache.org</nagEmailAddress>
+        <nagEmailAddress>sandesha-dev@ws.apache.org</nagEmailAddress>
         <sourceDirectory>src</sourceDirectory>
         <unitTestSourceDirectory>test/src</unitTestSourceDirectory>
         <unitTest>

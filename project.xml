@@ -2,6 +2,7 @@
 <project>
     <pomVersion>3</pomVersion>
     <id>sandesha2</id>
+    <groupId>sandesha</groupId>
     <name>Apache Sandesha2</name>
 	<groupId>sandesha2</groupId>
     <currentVersion>${sandesha2.version}</currentVersion>

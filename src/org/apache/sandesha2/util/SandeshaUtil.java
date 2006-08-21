@@ -65,7 +65,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.workers.InOrderInvoker;
+import org.apache.sandesha2.workers.Invoker;
 import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -230,24 +230,24 @@ public class SandeshaUtil {
 
 	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
 		
-		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
+		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
 		if (invoker!=null)
 			invoker.runInvokerForTheSequence(context,sequenceID);
 		else {
-			invoker = new InOrderInvoker ();
+			invoker = new Invoker ();
 			context.setProperty(Sandesha2Constants.INVOKER,invoker);
 			invoker.runInvokerForTheSequence(context,sequenceID);
 		}
 	}
 
 	private static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
-		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
+		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
 		if (invoker!=null)
 			invoker.stopInvokerForTheSequence(sequenceID);
 	}
 	
 	public static void stopInvoker(ConfigurationContext context) {
-		InOrderInvoker invoker = (InOrderInvoker) context.getProperty(Sandesha2Constants.INVOKER);
+		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
 		if (invoker!=null)
 			invoker.stopInvoking();
 	}

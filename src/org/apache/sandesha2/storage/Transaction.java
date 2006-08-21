@@ -27,4 +27,6 @@ public interface Transaction {
 	
 	public void rollback ();
 	
+	//indicates that the transaction has been started, but has not been committed or rolledbacked yet.
+	public boolean isActive ();
 }

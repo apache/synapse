@@ -33,5 +33,9 @@ public class InMemoryTransaction implements Transaction {
 	public void rollback() {
 
 	}
+	
+	public boolean isActive () {
+		return false;
+	}
 
 }

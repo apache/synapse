@@ -24,6 +24,8 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.util.threadpool.ThreadFactory;
+import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -50,17 +52,20 @@ import org.apache.sandesha2.wsrm.Sequence;
  * to find weather there are any messages to me invoked.
  */
 
-public class InOrderInvoker extends Thread {
+public class Invoker extends Thread {
 
 	private boolean runInvoker = false;
-
 	private ArrayList workingSequences = new ArrayList();
-
 	private ConfigurationContext context = null;
-
-	private static final Log log = LogFactory.getLog(InOrderInvoker.class);
-
+	private static final Log log = LogFactory.getLog(Invoker.class);
 	private boolean hasStopped = false;
+	
+    private transient ThreadFactory threadPool;
+    public int INVOKER_THREADPOOL_SIZE =5;
+    
+    public Invoker () {
+    	threadPool = new ThreadPool (INVOKER_THREADPOOL_SIZE,INVOKER_THREADPOOL_SIZE);
+    }
 
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
 		if (log.isDebugEnabled())
@@ -188,14 +193,8 @@ public class InOrderInvoker extends Thread {
 
 				Iterator allSequencesItr = allSequencesList.iterator();
 
-				currentIteration: while (allSequencesItr.hasNext()) {
+//				currentIteration: while (allSequencesItr.hasNext()) {
 					String sequenceId = (String) allSequencesItr.next();
-
-					// commiting the old transaction
-					transaction.commit();
-
-					// starting a new transaction for the new iteration.
-					transaction = storageManager.getTransaction();
 
 					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 					if (nextMsgBean == null) {
@@ -220,95 +219,20 @@ public class InOrderInvoker extends Thread {
 
 					Iterator stMapIt = storageMapMgr.find(new InvokerBean(null, nextMsgno, sequenceId)).iterator();
 
-					boolean invoked = false;
+					if (stMapIt.hasNext()) {
 
-					while (stMapIt.hasNext()) {
+						InvokerBean invokerBean = (InvokerBean) stMapIt.next();
 
-						InvokerBean stMapBean = (InvokerBean) stMapIt.next();
-						String key = stMapBean.getMessageContextRefKey();
-
-						MessageContext msgToInvoke = storageManager.retrieveMessageContext(key, context);
-						RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
-
-						// have to commit the transaction before invoking. This
-						// may get changed when WS-AT is available.
 						transaction.commit();
-
-						try {
-							// Invoking the message.
-							msgToInvoke.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
-									Sandesha2Constants.VALUE_TRUE);
-
-							boolean postFailureInvocation = false;
-
-							// StorageManagers should st following property to
-							// true, to indicate that the message received comes
-							// after a failure.
-							String postFaulureProperty = (String) msgToInvoke
-									.getProperty(Sandesha2Constants.POST_FAILURE_MESSAGE);
-							if (postFaulureProperty != null
-									&& Sandesha2Constants.VALUE_TRUE.equals(postFaulureProperty))
-								postFailureInvocation = true;
-
-							AxisEngine engine = new AxisEngine(context);
-							if (postFailureInvocation) {
-								makeMessageReadyForReinjection(msgToInvoke);
-								if (log.isDebugEnabled())
-									log.debug("Receiving message, key=" + key + ", msgCtx="
-											+ msgToInvoke.getEnvelope().getHeader());
-								engine.receive(msgToInvoke);
-							} else {
-								if (log.isDebugEnabled())
-									log.debug("Resuming message, key=" + key + ", msgCtx="
-											+ msgToInvoke.getEnvelope().getHeader());
-								msgToInvoke.setPaused(false);
-								engine.resumeReceive(msgToInvoke);
-							}
-
-							invoked = true;
-
-						} catch (Exception e) {
-							if (log.isDebugEnabled())
-								log.debug("Exception :", e);
-
-							handleFault(msgToInvoke, e);
-
-							// throw new SandeshaException(e);
-						} finally {
-							transaction = storageManager.getTransaction();
-						}
-
-						// Service will be invoked only once. I.e. even if an
-						// exception get thrown in invocation
-						// the service will not be invoked again.
-						storageMapMgr.delete(key);
-
-						// removing the corresponding message context as well.
-						MessageContext msgCtx = storageManager.retrieveMessageContext(key, context);
-						if (msgCtx != null) {
-							storageManager.removeMessageContext(key);
-						}
-
-						// undating the next msg to invoke
-
-						if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-							Sequence sequence = (Sequence) rmMsg
-									.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-							if (sequence.getLastMessage() != null) {
-								TerminateManager.cleanReceivingSideAfterInvocation(context, sequenceId, storageManager);
-								// exit from current iteration. (since an entry
-								// was removed)
-								break currentIteration;
-							}
-						}
+						
+						//start a new worker thread and let it do the invocation.
+						InvokerWorker worker = new InvokerWorker (context,invokerBean);
+						threadPool.execute(worker);
+						
 					}
 
-					if (invoked) {
-						nextMsgno++;
-						nextMsgBean.setNextMsgNoToProcess(nextMsgno);
-						nextMsgMgr.update(nextMsgBean);
-					}
-				}
+
+//				}
 
 			} catch (Exception e) {
 				if (transaction != null) {
@@ -337,21 +261,6 @@ public class InOrderInvoker extends Thread {
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: InOrderInvoker::internalRun");
-	}
-
-	private void makeMessageReadyForReinjection(MessageContext messageContext) {
-		messageContext.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, null);
-		messageContext.getOptions().setMessageId(null);
-		messageContext.getOptions().setTo(null);
-		messageContext.getOptions().setAction(null);
-		messageContext.setProperty(Sandesha2Constants.REINJECTED_MESSAGE, Sandesha2Constants.VALUE_TRUE);
-	}
-
-	private void handleFault(MessageContext inMsgContext, Exception e) throws Exception {
-		// msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
-		AxisEngine engine = new AxisEngine(inMsgContext.getConfigurationContext());
-		MessageContext faultContext = engine.createFaultMessageContext(inMsgContext, e);
-		engine.sendFault(faultContext);
 	}
 
 }

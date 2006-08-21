@@ -113,16 +113,16 @@ public class SandeshaOutHandler extends AbstractHandler {
 			if (messageType == Sandesha2Constants.MessageTypes.UNKNOWN) {
 				MessageContext requestMsgCtx = msgCtx.getOperationContext().getMessageContext(
 						OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
-				if (requestMsgCtx != null) { // for the server side
-					RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsgCtx);
-					Sequence sequencePart = (Sequence) reqRMMsgCtx
-							.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-					if (sequencePart != null)
-						msgProcessor = new ApplicationMsgProcessor();// a rm
-					// intended
-					// message.
-				} else if (!msgCtx.isServerSide()) // if client side.
-					msgProcessor = new ApplicationMsgProcessor();
+
+                if (msgCtx.isServerSide()) { // for the server side
+                    RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsgCtx);
+                    Sequence sequencePart = (Sequence) reqRMMsgCtx
+                                    .getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+                    if (sequencePart != null)
+                            msgProcessor = new ApplicationMsgProcessor();// a rm intended message
+                } else // if client side.
+                    msgProcessor = new ApplicationMsgProcessor();
+                
 			} else {
 				msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 			}

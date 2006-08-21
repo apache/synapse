@@ -29,4 +29,5 @@ public interface Transaction {
 	
 	//indicates that the transaction has been started, but has not been committed or rolledbacked yet.
 	public boolean isActive ();
+
 }

@@ -20,6 +20,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -320,6 +321,7 @@ public class SequenceManager {
 
 		SandeshaUtil.startSenderForTheSequence(configurationContext, internalSequenceId);
 
+		
 		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonymousURI);
 
 	}
@@ -344,16 +346,29 @@ public class SequenceManager {
 			startListnerForAsyncAcks = true;
 		}
 
-		if (mep != null && !WSDL20_2004Constants.MEP_URI_OUT_ONLY.equals(mep)) {
-			// starting listner for the async createSeqResponse & terminateSer
-			// messages.
-			startListnerForAsyncControlMsgs = true;
-		}
-
 		try {
-			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) && transportInProtocol == null)
-				throw new SandeshaException(SandeshaMessageHelper
+			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) ) {
+				
+				if (transportInProtocol == null)
+					throw new SandeshaException(SandeshaMessageHelper
 						.getMessage(SandeshaMessageKeys.cannotStartListenerForIncommingMsgs));
+			
+				//TODO following code was taken from ServiceContext.gegMyEPR method.
+				//	   When a listner-starting method becomes available from Axis2, use that.
+				ConfigurationContext configctx = messageContext.getConfigurationContext();
+				ListenerManager lm = configctx.getListenerManager();
+				if (!lm.isListenerRunning(transportInProtocol)) {
+					TransportInDescription trsin = configctx.getAxisConfiguration().
+                        	getTransportIn(new QName(transportInProtocol));
+					if (trsin != null) {
+						lm.addListener(trsin, false);
+					} else {
+						String message = SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.cannotFindTransportInDesc,transportInProtocol);
+						throw new AxisFault(message);
+					}
+				}
+			}
 
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(

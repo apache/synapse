@@ -219,5 +219,7 @@ public class SandeshaMessageKeys {
 	public static final String secureDummyNoProof="secureDummyNoProof";
 	public static final String secureDummyNoToken="secureDummyNoToken";
 	public static final String secureDummyNoSTR  ="secureDummyNoSTR";
-
+	
+	public static final String cannotFindTransportInDesc = "cannotFindTransportInDesc";
+	
 }

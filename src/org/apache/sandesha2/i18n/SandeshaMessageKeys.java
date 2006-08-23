@@ -221,5 +221,7 @@ public class SandeshaMessageKeys {
 	public static final String secureDummyNoSTR  ="secureDummyNoSTR";
 	
 	public static final String cannotFindTransportInDesc = "cannotFindTransportInDesc";
+	public static final String toEPRNotSet = "toEPRNotSet";
+	
 	
 }

@@ -171,12 +171,9 @@ public class Sender extends Thread {
 				
 				transaction.commit();
 				
-				
-				
 				//start a worker which will work on this message.s
 				SenderWorker worker = new SenderWorker (context,senderBean);
 				threadPool.execute(worker);
-				
 
 			} catch (Exception e) {
 

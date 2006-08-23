@@ -130,8 +130,13 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	}
 
 	public synchronized SenderBean getNextMsgToSend() {
+		
 		Iterator iterator = table.keySet().iterator();
 
+		//TODO
+		//pick a random sequence out of the sequences to be sent.
+		
+		
 		long lowestAppMsgNo = 0;
 		while (iterator.hasNext()) {
 			Object key = iterator.next();

@@ -55,21 +55,28 @@ import org.apache.sandesha2.wsrm.Sequence;
 public class Invoker extends Thread {
 
 	private boolean runInvoker = false;
+
 	private ArrayList workingSequences = new ArrayList();
+
 	private ConfigurationContext context = null;
+
 	private static final Log log = LogFactory.getLog(Invoker.class);
+
 	private boolean hasStopped = false;
-	
-    private transient ThreadFactory threadPool;
-    public int INVOKER_THREADPOOL_SIZE =5;
-    
-    public Invoker () {
-    	threadPool = new ThreadPool (INVOKER_THREADPOOL_SIZE,INVOKER_THREADPOOL_SIZE);
-    }
+
+	private transient ThreadFactory threadPool;
+
+	public int INVOKER_THREADPOOL_SIZE = 5;
+
+	public Invoker() {
+		threadPool = new ThreadPool(INVOKER_THREADPOOL_SIZE,
+				INVOKER_THREADPOOL_SIZE);
+	}
 
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
 		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::stopInvokerForTheSequence, " + sequenceID);
+			log.debug("Enter: InOrderInvoker::stopInvokerForTheSequence, "
+					+ sequenceID);
 
 		workingSequences.remove(sequenceID);
 		if (workingSequences.size() == 0) {
@@ -109,7 +116,8 @@ public class Invoker extends Thread {
 		return runInvoker;
 	}
 
-	public synchronized void runInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
+	public synchronized void runInvokerForTheSequence(
+			ConfigurationContext context, String sequenceID) {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::runInvokerForTheSequence");
 
@@ -128,7 +136,9 @@ public class Invoker extends Thread {
 	private synchronized boolean hasStoppedInvoking() {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: InOrderInvoker::hasStoppedInvoking");
-			log.debug("Exit: InOrderInvoker::hasStoppedInvoking, " + hasStopped);
+			log
+					.debug("Exit: InOrderInvoker::hasStoppedInvoking, "
+							+ hasStopped);
 		}
 		return hasStopped;
 	}
@@ -169,70 +179,75 @@ public class Invoker extends Thread {
 			boolean rolebacked = false;
 
 			try {
-				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context
-						.getAxisConfiguration());
+				StorageManager storageManager = SandeshaUtil
+						.getSandeshaStorageManager(context, context
+								.getAxisConfiguration());
 				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 
-				InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
+				InvokerBeanMgr storageMapMgr = storageManager
+						.getStorageMapBeanMgr();
 
-				SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
+				SequencePropertyBeanMgr sequencePropMgr = storageManager
+						.getSequencePropertyBeanMgr();
 
 				transaction = storageManager.getTransaction();
 
 				// Getting the incomingSequenceIdList
-				SequencePropertyBean allSequencesBean = sequencePropMgr.retrieve(
-						Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-						Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+				SequencePropertyBean allSequencesBean = sequencePropMgr
+						.retrieve(
+								Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
+								Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 
 				if (allSequencesBean == null) {
 					if (log.isDebugEnabled())
 						log.debug("AllSequencesBean not found");
 					continue;
 				}
-				ArrayList allSequencesList = SandeshaUtil.getArrayListFromString(allSequencesBean.getValue());
-
+				
+				//TODO pick the sequence randomly.
+				ArrayList allSequencesList = SandeshaUtil
+						.getArrayListFromString(allSequencesBean.getValue());
 				Iterator allSequencesItr = allSequencesList.iterator();
+				String sequenceId = (String) allSequencesItr.next();
 
-//				currentIteration: while (allSequencesItr.hasNext()) {
-					String sequenceId = (String) allSequencesItr.next();
+				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
+				if (nextMsgBean == null) {
+					String message = "Next message not set correctly. Removing invalid entry.";
+					log.debug(message);
+					allSequencesItr.remove();
 
-					NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
-					if (nextMsgBean == null) {
-						String message = "Next message not set correctly. Removing invalid entry.";
-						log.debug(message);
-						allSequencesItr.remove();
+					// cleaning the invalid data of the all sequences.
+					allSequencesBean.setValue(allSequencesList.toString());
+					sequencePropMgr.update(allSequencesBean);
+					continue;
+				}
 
-						// cleaning the invalid data of the all sequences.
-						allSequencesBean.setValue(allSequencesList.toString());
-						sequencePropMgr.update(allSequencesBean);
-						continue;
-					}
+				long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
+				if (nextMsgno <= 0) {
+					if (log.isDebugEnabled())
+						log.debug("Invalid Next Message Number " + nextMsgno);
+					String message = SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.invalidMsgNumber, Long
+									.toString(nextMsgno));
+					throw new SandeshaException(message);
+				}
 
-					long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
-					if (nextMsgno <= 0) {
-						if (log.isDebugEnabled())
-							log.debug("Invalid Next Message Number " + nextMsgno);
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
-								.toString(nextMsgno));
-						throw new SandeshaException(message);
-					}
+				Iterator stMapIt = storageMapMgr.find(
+						new InvokerBean(null, nextMsgno, sequenceId))
+						.iterator();
 
-					Iterator stMapIt = storageMapMgr.find(new InvokerBean(null, nextMsgno, sequenceId)).iterator();
+				if (stMapIt.hasNext()) {
 
-					if (stMapIt.hasNext()) {
+					InvokerBean invokerBean = (InvokerBean) stMapIt.next();
 
-						InvokerBean invokerBean = (InvokerBean) stMapIt.next();
+					transaction.commit();
 
-						transaction.commit();
-						
-						//start a new worker thread and let it do the invocation.
-						InvokerWorker worker = new InvokerWorker (context,invokerBean);
-						threadPool.execute(worker);
-						
-					}
+					// start a new worker thread and let it do the invocation.
+					InvokerWorker worker = new InvokerWorker(context,
+							invokerBean);
+					threadPool.execute(worker);
 
-
-//				}
+				}
 
 			} catch (Exception e) {
 				if (transaction != null) {
@@ -240,20 +255,22 @@ public class Invoker extends Thread {
 						transaction.rollback();
 						rolebacked = true;
 					} catch (Exception e1) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1
-								.toString());
+						String message = SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.rollbackError, e1
+										.toString());
 						log.debug(message, e1);
 					}
 				}
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invokeMsgError);
+				String message = SandeshaMessageHelper
+						.getMessage(SandeshaMessageKeys.invokeMsgError);
 				log.debug(message, e);
 			} finally {
 				if (!rolebacked && transaction != null) {
 					try {
 						transaction.commit();
 					} catch (Exception e) {
-						String message = SandeshaMessageHelper
-								.getMessage(SandeshaMessageKeys.commitError, e.toString());
+						String message = SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.commitError, e.toString());
 						log.debug(message, e);
 					}
 				}

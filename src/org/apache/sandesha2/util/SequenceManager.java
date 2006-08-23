@@ -6,6 +6,8 @@
  */
 package org.apache.sandesha2.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
@@ -349,9 +351,27 @@ public class SequenceManager {
 		try {
 			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) ) {
 				
-				if (transportInProtocol == null)
-					throw new SandeshaException(SandeshaMessageHelper
-						.getMessage(SandeshaMessageKeys.cannotStartListenerForIncommingMsgs));
+				if (transportInProtocol == null){
+					EndpointReference toEPR = messageContext.getOptions().getTo();
+					if (toEPR==null) {
+						String message = SandeshaMessageHelper.getMessage(
+								SandeshaMessageKeys.toEPRNotSet);
+						throw new AxisFault (message);
+					}
+					
+					try {
+						URI uri = new URI (toEPR.getAddress());
+						String scheme = uri.getScheme();
+						
+						//this is a convention is Axis2. The name of the TransportInDescription has to be the
+						//scheme of a URI of that transport.
+						//Here we also assume that the Incoming transport will be same as the outgoing one.
+						transportInProtocol = scheme;
+					} catch (URISyntaxException e) {
+						throw new SandeshaException (e);
+					}
+					
+				}
 			
 				//TODO following code was taken from ServiceContext.gegMyEPR method.
 				//	   When a listner-starting method becomes available from Axis2, use that.

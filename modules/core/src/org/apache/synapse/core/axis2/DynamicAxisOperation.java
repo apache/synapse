@@ -260,13 +260,6 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                             //we need to call engine.receiveFault
                             AxisEngine engine = new AxisEngine(mc.getConfigurationContext());
                             engine.receiveFault(response);
-                            if (options.isExceptionToBeThrownOnSOAPFault()) {
-                                // does the SOAPFault has a detail element for Excpetion
-
-                                throw new AxisFault(soapFault.getCode(), soapFault.getReason(),
-                                        soapFault.getNode(), soapFault.getRole(), soapFault.getDetail());
-
-                            }
                         }
                     }
                     completed = true;

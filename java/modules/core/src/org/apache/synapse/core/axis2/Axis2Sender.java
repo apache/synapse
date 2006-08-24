@@ -70,41 +70,43 @@ public class Axis2Sender {
                         Constants.OUTFLOW_RM_POLICY),
 
                     // The Axis2 Message context of the Synapse MC
-                    ((Axis2MessageContext) synapseInMessageContext).
-                        getAxis2MessageContext());
+                    synapseInMessageContext);
 
-            //set the response Envelop as a property in Original axisMsgCtx
-            synapseInMessageContext.setProperty(org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,
-                                                axisOutMsgContext.getEnvelope());
+            if (axisOutMsgContext != null) {
+                //set the response Envelop as a property in Original axisMsgCtx
+                synapseInMessageContext.setProperty(
+                    org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,
+                    axisOutMsgContext.getEnvelope());
 
-            // create the synapse message context for the response
-            org.apache.synapse.MessageContext synapseOutMessageContext =
-                new Axis2MessageContext(
-                    axisOutMsgContext,
-                    synapseInMessageContext.getConfiguration(),
-                    synapseInMessageContext.getEnvironment());
-            synapseOutMessageContext.setResponse(true);
+                // create the synapse message context for the response
+                org.apache.synapse.MessageContext synapseOutMessageContext =
+                    new Axis2MessageContext(
+                        axisOutMsgContext,
+                        synapseInMessageContext.getConfiguration(),
+                        synapseInMessageContext.getEnvironment());
+                synapseOutMessageContext.setResponse(true);
 
-            // now set properties to co-relate to the request i.e. copy over
-            // correlate/* messgae properties from original message to response received
-            Iterator iter = synapseInMessageContext.getPropertyKeySet().iterator();
+                // now set properties to co-relate to the request i.e. copy over
+                // correlate/* messgae properties from original message to response received
+                Iterator iter = synapseInMessageContext.getPropertyKeySet().iterator();
 
-            while (iter.hasNext()) {
-                Object key = iter.next();
+                while (iter.hasNext()) {
+                    Object key = iter.next();
 
-                if (key instanceof String &&
-                    ((String) key).startsWith(Constants.CORRELATE)) {
+                    if (key instanceof String &&
+                        ((String) key).startsWith(Constants.CORRELATE)) {
 
-                    synapseOutMessageContext.setProperty(
-                            (String) key,
-                            synapseInMessageContext.getProperty((String) key)
-                    );
+                        synapseOutMessageContext.setProperty(
+                                (String) key,
+                                synapseInMessageContext.getProperty((String) key)
+                        );
+                    }
                 }
-            }
 
-            // send the response message through the synapse mediation flow
-            synapseInMessageContext.getEnvironment().
-                injectMessage(synapseOutMessageContext);
+                // send the response message through the synapse mediation flow
+                synapseInMessageContext.getEnvironment().
+                    injectMessage(synapseOutMessageContext);
+            }
 
         } catch (Exception e) {
             handleException("Unexpected error during Sending message onwards", e);

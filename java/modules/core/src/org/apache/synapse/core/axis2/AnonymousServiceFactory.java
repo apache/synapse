@@ -16,8 +16,8 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,29 +34,40 @@ public class AnonymousServiceFactory {
 
     private static final Log log = LogFactory.getLog(AnonymousServiceFactory.class);
 
-    private static final String NO_ADDRESSING   = "__NO_ADDRESSING__";
-    private static final String ADDRESSING_ONLY = "__ADDRESSING_ONLY__";
-    private static final String RM_ONLY         = "__RM_ONLY__";
-    private static final String SEC_ONLY        = "__SEC_ONLY__";
-    private static final String RM_AND_SEC      = "__RM_AND_SEC__";
+    private static final String NONE            = "__NONE__";
+    private static final String ADDR_ONLY       = "__ADDR_ONLY__";
+    private static final String RM_AND_ADDR     = "__RM_AND_ADDR__";
+    private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
+    private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
 
-    public static final String OPERATION_OUT_IN  = "__OPERATION_OUT_IN__";
+    public static final String DYNAMIC_OPERATION  = "__DYNAMIC_OPERATION__";
 
+    private static final SynapseCallbackReceiver synapseCallback = new SynapseCallbackReceiver();
+
+    /**
+     * Creates an AxisService for the requested QoS for sending out messages
+     * Callers must guarantee that if wsRMon or wsSecOn is required, that wsAddrOn is also set
+     * @param axisCfg Axis2 configuration
+     * @param wsAddrOn
+     * @param wsRMOn
+     * @param wsSecOn
+     * @return An Axis service for the requested QoS
+     */
     public static AxisService getAnonymousService(AxisConfiguration axisCfg,
         boolean wsAddrOn, boolean wsRMOn, boolean wsSecOn) {
 
         String servicekey = null;
         if (!wsAddrOn) {
-            servicekey = NO_ADDRESSING;
+            servicekey = NONE;
         } else {
             if (!wsSecOn && !wsRMOn) {
-                servicekey = ADDRESSING_ONLY;
+                servicekey = ADDR_ONLY;
             } else if (wsRMOn && !wsSecOn) {
-                servicekey = RM_ONLY;
+                servicekey = RM_AND_ADDR;
             } else if (wsSecOn && !wsRMOn) {
-                servicekey = SEC_ONLY;
+                servicekey = SEC_AND_ADDR;
             } else {
-                servicekey = RM_AND_SEC;
+                servicekey = RM_SEC_AND_ADDR;
             }
         }
 
@@ -95,11 +106,6 @@ public class AnonymousServiceFactory {
         throw new SynapseException(msg, e);
     }
 
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
     /**
      * Create a new Anonymous Axis service for OUT-IN as default MEP
      * @param axisCfg the Axis2 configuration
@@ -109,13 +115,15 @@ public class AnonymousServiceFactory {
         AxisConfiguration axisCfg, String serviceKey) {
 
         try {
-            OutInAxisOperation outInOperation =
-                new OutInAxisOperation(new QName(OPERATION_OUT_IN));
+            DynamicAxisOperation dynamicOperation =
+                new DynamicAxisOperation(new QName(DYNAMIC_OPERATION));
+            dynamicOperation.setMessageReceiver(synapseCallback);
             AxisService axisAnonymousService  = new AxisService(serviceKey);
-            axisAnonymousService.addOperation(outInOperation);
+            axisAnonymousService.addOperation(dynamicOperation);
             axisCfg.addService(axisAnonymousService);
-            axisCfg.getPhasesInfo().setOperationPhases(outInOperation);
+            axisCfg.getPhasesInfo().setOperationPhases(dynamicOperation);
             return axisAnonymousService;
+
         } catch (AxisFault e) {
             handleException(
                 "Error occured while creating an anonymous service for QoS : " +

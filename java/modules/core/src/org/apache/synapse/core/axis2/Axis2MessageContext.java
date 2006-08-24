@@ -222,6 +222,22 @@ public class Axis2MessageContext implements MessageContext {
             response = resp.booleanValue();
     }
 
+    public void setPaused(boolean value) {
+        axis2MessageContext.setPaused(value);
+    }
+
+    public boolean isPaused() {
+        return axis2MessageContext.isPaused();
+    }
+
+    public boolean isServerSide() {
+        return axis2MessageContext.isServerSide();
+    }
+
+    public void setServerSide(boolean value) {
+        axis2MessageContext.setServerSide(value);
+    }
+
     /**
      * Evaluates the given XPath expression against the SOAPEnvelope of the
      * current message and returns a String representation of the result

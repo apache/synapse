@@ -83,17 +83,17 @@ public class EndpointFactory implements XMLToObjectMapper {
             }
 
             OMElement wsAddr = elem.getFirstChildWithName(
-                new QName(Constants.NULL_NAMESPACE, "enableAddressing"));
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableAddressing"));
             if (wsAddr != null) {
                 endpoint.setAddressingOn(true);
             }
             OMElement wsSec = elem.getFirstChildWithName(
-                new QName(Constants.NULL_NAMESPACE, "enableSec"));
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableSec"));
             if (wsSec != null) {
                 endpoint.setSecurityOn(true);
             }
             OMElement wsRm = elem.getFirstChildWithName(
-                new QName(Constants.NULL_NAMESPACE, "enableRM"));
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableRM"));
             if (wsRm != null) {
                 endpoint.setReliableMessagingOn(true);
             }
@@ -107,7 +107,7 @@ public class EndpointFactory implements XMLToObjectMapper {
                 RampartSecurityBuilder.getSecurityParameter(elem, Constants.INFLOW_SECURITY));
 
             // if WS-RM is enabled, set it as requested
-            endpoint.setReliableMessagingOn(OutflowRMPolicyBuilder.isRMEnabled(elem));
+            //endpoint.setReliableMessagingOn(OutflowRMPolicyBuilder.isRMEnabled(elem));
             endpoint.setWsRMPolicy(OutflowRMPolicyBuilder.getRMPolicy(elem));
 
             return endpoint;

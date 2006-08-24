@@ -21,8 +21,10 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
+import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
@@ -60,7 +62,7 @@ public class Axis2FlexibleMEPClient {
      * @param outflowSecurityParameter
      * @param wsRMEnabled
      * @param wsRMPolicy
-     * @param axisMsgCtx
+     * @param synapseOutMessageContext
      * @return The Axis2 reponse message context
      */
     public static MessageContext send(
@@ -70,11 +72,20 @@ public class Axis2FlexibleMEPClient {
         Parameter inflowSecurityParameter,
         boolean wsRMEnabled,
         Policy wsRMPolicy,
-        MessageContext axisMsgCtx) throws AxisFault {
+        org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
 
-        TransportOutDescription savedTransportOut = axisMsgCtx.getTransportOut();
+        MessageContext axisOutMsgCtx =
+            ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
 
-        ConfigurationContext axisCfgCtx = axisMsgCtx.getConfigurationContext();
+        Object addDisabled = axisOutMsgCtx.getProperty(
+            AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
+        if (wsAddressingEnabled && addDisabled != null && Boolean.TRUE.equals(addDisabled)) {
+            axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+        }
+
+        TransportOutDescription savedTransportOut = axisOutMsgCtx.getTransportOut();
+
+        ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();
         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
 
         AxisService anoymousService =
@@ -84,25 +95,33 @@ public class Axis2FlexibleMEPClient {
             axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
 
-        if (axisMsgCtx.getMessageID() != null) {
-            axisMsgCtx.setMessageID(String.valueOf("uuid:" + UUIDGenerator.getUUID()));
+        if (axisOutMsgCtx.getMessageID() != null) {
+            axisOutMsgCtx.setMessageID(String.valueOf("uuid:" + UUIDGenerator.getUUID()));
         }
 
-        axisMsgCtx.setConfigurationContext(serviceCtx.getConfigurationContext());
+        axisOutMsgCtx.setConfigurationContext(serviceCtx.getConfigurationContext());
+        axisOutMsgCtx.setServerSide(false); // this will become a client
 
         // set SOAP envelope on the message context, removing WS-A headers
-        axisMsgCtx.setEnvelope(removeAddressingHeaders(axisMsgCtx));
+        axisOutMsgCtx.setEnvelope(removeAddressingHeaders(axisOutMsgCtx));
 
-        // get a reference to the OUT-IN operation of the Anonymous Axis2 service
+        // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
         AxisOperation axisAnonymousOperation = anoymousService.getOperation(
-            new QName(AnonymousServiceFactory.OPERATION_OUT_IN));
+            new QName(AnonymousServiceFactory.DYNAMIC_OPERATION));
 
         Options clientOptions = new Options();
+        clientOptions.setTransportInProtocol(org.apache.axis2.Constants.TRANSPORT_HTTP);
 
         // if RM is requested, and if a WS-RM policy is specified, use it
-        if (wsRMEnabled && wsRMPolicy != null) {
-            axisAnonymousOperation.getPolicyInclude().
-                addPolicyElement(PolicyInclude.OPERATION_POLICY, wsRMPolicy);
+        if (wsRMEnabled) {
+            if (wsRMPolicy != null) {
+                axisAnonymousOperation.getPolicyInclude().
+                    addPolicyElement(PolicyInclude.OPERATION_POLICY, wsRMPolicy);
+            }
+            clientOptions.setUseSeparateListener(true);
+
+            // always send each and every message in a new sequence and terminate sequence
+            clientOptions.setProperty("Sandesha2LastMessage", "true");
         }
 
         // if security is enabled,
@@ -124,30 +143,41 @@ public class Axis2FlexibleMEPClient {
 
         OperationClient mepClient = axisAnonymousOperation.createClient(
             serviceCtx, clientOptions);
-        mepClient.addMessageContext(axisMsgCtx);
-        mepClient.execute(true);
+        mepClient.addMessageContext(axisOutMsgCtx);
 
-        MessageContext response = mepClient.getMessageContext(
-            WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+        if (clientOptions.isUseSeparateListener()) {
+            mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
+            axisOutMsgCtx.getOperationContext().setProperty(
+                org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
+            mepClient.execute(false);
+            return null;
 
-        // set properties on response
-        response.setServerSide(true);
-        response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-        response.setProperty(MessageContext.TRANSPORT_OUT,
-            axisMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
-        response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-            axisMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-        response.setProperty(
-                org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
-                axisMsgCtx.getProperty(
-                        org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND));
-        response.setTransportIn(axisMsgCtx.getTransportIn());
-        response.setTransportOut(savedTransportOut);
+        } else {
 
-        // If request is REST assume that the response is REST too
-        response.setDoingREST(axisMsgCtx.isDoingREST());
+            mepClient.execute(true);
 
-        return response;
+            MessageContext response = mepClient.getMessageContext(
+                WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+            // set properties on response
+            response.setServerSide(true);
+            response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+            response.setProperty(MessageContext.TRANSPORT_OUT,
+                axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
+            response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
+                axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
+            response.setProperty(
+                    org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
+                    axisOutMsgCtx.getProperty(
+                            org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND));
+            response.setTransportIn(axisOutMsgCtx.getTransportIn());
+            response.setTransportOut(savedTransportOut);
+
+            // If request is REST assume that the response is REST too
+            response.setDoingREST(axisOutMsgCtx.isDoingREST());
+
+            return response;
+        }
     }
 
     /**

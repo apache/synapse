@@ -48,6 +48,7 @@
     <j:set var="src.dist.dir" value="target/dist-src/synapse-src"/>
     <j:set var="mediators.dist.dir" value="target/dist-mediators/synapse"/>
     <j:set var="extensions.dist.dir" value="target/dist-extensions/synapse"/>
+    <j:set var="nhttp.dist.dir" value="target/dist-nhttp/synapse"/>
 
     <tstamp>
         <format property="release_date" pattern="MMMM d, yyyy" locale="en"/>
@@ -346,7 +347,7 @@
         <ant:mkdir dir="${target/lib}/endorsed"/>
     </goal>
 
-    <goal name="release" prereqs="dist-src,dist-bin,dist-extensions"/>
+    <goal name="release" prereqs="dist-src,dist-bin,dist-extensions,dist-nhttp"/>
 
     <!-- ================================================================ -->
     <!--- Create the Distro -->
@@ -451,7 +452,7 @@
             	<ant:exclude name="**/synapse-${pom.currentVersion}.mar"/>
             </ant:fileset>
         </ant:copy>
-
+        
         <ant:copy todir="${bin.dist.dir}/samples" flatten="false">
             <ant:fileset dir="modules/samples/target/dist-bin/synapse/samples"/>
         </ant:copy>
@@ -768,6 +769,36 @@
 
         <ant:delete dir="target/temp"/>
         <ant:delete dir="target/dist-extensions"/>
+
+    </goal>
+
+    <!-- ================================================================ -->
+    <!--- Create the Async HTTP Distribution -->
+    <!-- ================================================================ -->
+
+    <goal name="dist-nhttp" >
+        <ant:echo>+----------------------------------------------</ant:echo>
+        <ant:echo>| Creating: Synapse nhttp Distribution</ant:echo>
+        <ant:echo>+----------------------------------------------</ant:echo>
+        <!-- todo fill up the  distribution-->
+        <ant:mkdir dir="target/temp/"/>
+
+        <ant:copy todir="${nhttp.dist.dir}/nhttp" flatten="false">
+            <ant:fileset dir="modules/nhttp/target/dist"/>
+        </ant:copy>
+
+        <ant:copy todir="target/temp/">
+            <ant:fileset dir="target/dist-nhttp/">
+                <include name="**"/>
+            </ant:fileset>
+        </ant:copy>
+
+
+        <ant:zip file="${dist.dir}/${dist.name}-nhttp-${pom.currentVersion}-bin.zip"
+                 basedir="target/temp"/>
+
+        <ant:delete dir="target/temp"/>
+        <ant:delete dir="target/dist-nhttp"/>
 
     </goal>
 </project>

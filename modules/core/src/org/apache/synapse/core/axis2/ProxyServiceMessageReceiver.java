@@ -78,7 +78,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         endpoint.getInflowSecurity(),
                         endpoint.isReliableMessagingOn(),
                         endpoint.getWsRMPolicy(),
-                        axisInMsgContext);
+                        synCtx);
 
                 axisOutMsgContext.setServerSide(true);
                 axisOutMsgContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT,

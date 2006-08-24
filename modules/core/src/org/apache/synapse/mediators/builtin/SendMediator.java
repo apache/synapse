@@ -91,6 +91,7 @@ public class SendMediator extends AbstractMediator {
 
             // if RM is turned on
             if (singleEndpoint.isReliableMessagingOn()) {
+                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
                 synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
                 if (singleEndpoint.getWsRMPolicy() != null) {
                     synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
@@ -100,6 +101,7 @@ public class SendMediator extends AbstractMediator {
 
             // if WS Security is specified
             if (singleEndpoint.isSecurityOn()) {
+                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
                 synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
                 if (singleEndpoint.getOutflowSecurity() != null) {
                     synCtx.setProperty(Constants.OUTFLOW_SEC_PARAMETER,

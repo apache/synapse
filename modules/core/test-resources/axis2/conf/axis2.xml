@@ -1,18 +1,33 @@
-<axisconfig name="AxisJava2.0_Provider_Endpint">
+<axisconfig name="AxisJava2.0">
     <!-- ================================================= -->
     <!-- Parameters -->
     <!-- ================================================= -->
     <parameter name="hotdeployment" locked="false">true</parameter>
     <parameter name="hotupdate" locked="false">false</parameter>
-    <parameter name="enableMTOM" locked="false">true</parameter>
+    <parameter name="enableMTOM" locked="false">false</parameter>
+
+    <!--During a fault, stacktrace can be sent with the fault message. The following flag will control -->
+    <!--that behaviour.-->
     <parameter name="sendStacktraceDetailsWithFaults" locked="false">true</parameter>
 
-    <!-- Uncomment this to enable REST support -->
-    <!--    <parameter name="enableREST" locked="false">true</parameter>-->
+    <!--If there aren't any information available to find out the fault reason, we set the message of the expcetion-->
+    <!--as the faultreason/Reason. But when a fault is thrown from a service or some where, it will be -->
+    <!--wrapped by different levels. Due to this the initial exception message can be lost. If this flag-->
+    <!--is set then, Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
+    <parameter name="DrillDownToRootCauseForFaultReason" locked="false">false</parameter>
 
 
+    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
+
+    <!--This is the user name and password of admin console-->
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
+
+    <!-- ==================================================== -->
+    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
+    <module ref="synapse"/>
+
+    <!-- ==================================================== -->
 
     <!-- ================================================= -->
     <!-- Message Receivers -->
@@ -30,13 +45,33 @@
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
-    <transportReceiver name="http"
+    <transportReceiver name="http" class="org.apache.axis2.transport.nhttp.AsyncHTTPListener"/>
+    <!--<transportReceiver name="http"
                        class="org.apache.axis2.transport.http.SimpleHTTPServer">
-        <parameter name="port" locked="false">6060</parameter>
-        <!--If you want to give your own host address for EPR generation-->
-        <!--uncommet following paramter , and set as you required.-->
-        <!--<parameter name="hostname" locked="false">http://myApp.com/ws</parameter>-->
-    </transportReceiver>
+        <parameter name="port" locked="false">6060</parameter>-->
+    <!-- Here is the complete list of supported parameters (see example settings further below):
+        port: the port to listen on (default 6060)
+        hostname:  if non-null, url prefix used in reply-to endpoint references                                 (default null)
+        originServer:  value of http Server header in outgoing messages                                         (default "Simple-Server/1.1")
+        requestTimeout:  value in millis of time that requests can wait for data                                (default 20000)
+        requestTcpNoDelay:  true to maximize performance and minimize latency                                   (default true)
+                            false to minimize bandwidth consumption by combining segments  
+        requestCoreThreadPoolSize:  number of threads available for request processing (unless queue fills up)  (default 25)
+        requestMaxThreadPoolSize:  number of threads available for request processing if queue fills us         (default 150)
+                                   note that default queue never fills up:  see HttpFactory
+        threadKeepAliveTime:  time to keep threads in excess of core size alive while inactive                  (default 180)
+                              note that no such threads can exist with default unbounded request queue
+        threadKeepAliveTimeUnit:  TimeUnit of value in threadKeepAliveTime (default SECONDS)                    (default SECONDS)
+    -->
+        <!-- <parameter name="hostname"                  locked="false">http://www.myApp.com/ws</parameter> -->
+        <!-- <parameter name="originServer"              locked="false">My-Server/1.1</parameter>           -->
+        <!-- <parameter name="requestTimeout"            locked="false">10000</parameter>                   -->
+        <!-- <parameter name="requestTcpNoDelay"         locked="false">false</parameter>                   -->
+        <!-- <parameter name="requestCoreThreadPoolSize" locked="false">50</parameter>                      -->
+        <!-- <parameter name="RequestMaxThreadPoolSize"  locked="false">100</parameter>                     -->
+        <!-- <parameter name="threadKeepAliveTime"       locked="false">240000</parameter>                  -->
+        <!-- <parameter name="threadKeepAliveTimeUnit"   locked="false">MILLISECONDS</parameter>            -->
+    <!--</transportReceiver>-->
 
     <transportReceiver name="tcp"
                        class="org.apache.axis2.transport.tcp.TCPServer">
@@ -45,6 +80,27 @@
         <!--uncommet following paramter , and set as you required.-->
         <!--<parameter name="hostname" locked="false">tcp://myApp.com/ws</parameter>-->
     </transportReceiver>
+    
+    <!--Uncomment this for JMS after setting up your JMS environment (e.g. ActiveMQ)
+    <transportReceiver name="jms" class="org.apache.axis2.transport.njms.JMSListener">
+        <parameter name="myTopicConnectionFactory" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">TopicConnectionFactory</parameter>
+        </parameter>
+
+        <parameter name="myQueueConnectionFactory" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">QueueConnectionFactory</parameter>
+        </parameter>
+
+        <parameter name="default" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">QueueConnectionFactory</parameter>
+        </parameter>
+    </transportReceiver>-->
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
@@ -55,11 +111,13 @@
     <transportSender name="local"
                      class="org.apache.axis2.transport.local.LocalTransportSender"/>
     <transportSender name="jms"
-                     class="org.apache.axis2.transport.jms.JMSSender"/>
+                     class="org.apache.axis2.transport.njms.JMSSender"/>
+    <!--<transportSender name="http"
+                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">-->
     <transportSender name="http"
-                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+                     class="org.apache.axis2.transport.nhttp.AsyncHTTPSender">
         <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
-        <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
+        <!--<parameter name="Transfer-Encoding" locked="false">chunked</parameter>-->
     </transportSender>
     <transportSender name="https"
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
@@ -75,11 +133,11 @@
          <phase name="Transport">
             <handler name="RequestURIBasedDispatcher"
                      class="org.apache.axis2.engine.RequestURIBasedDispatcher">
-                <order phase="Dispatch"/>
+                <order phase="Transport"/>
             </handler>
             <handler name="SOAPActionBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPActionBasedDispatcher">
-                <order phase="Dispatch"/>
+                <order phase="Transport"/>
             </handler>
         </phase>
         <phase name="Security"/>
@@ -100,13 +158,15 @@
             </handler>
         </phase>
         <!--  System pre defined phases       -->
-        <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
+        <phase name="RMPhase"/>
         <phase name="MUPhase"/>
+        <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
         <phase name="OperationInPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
         <phase name="MUPhase"/>
+        <phase name="RMPhase"/>
         <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
@@ -141,12 +201,14 @@
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
+        <phase name="RMPhase"/>
         <phase name="MUPhase"/>
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
         <phase name="MUPhase"/>
+        <phase name="RMPhase"/>
         <phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>

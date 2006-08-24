@@ -99,4 +99,4 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/synapse_repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.axis2.transport.http.SimpleHTTPServer $SYNAPSE_HOME/synapse_repository -p8080
+$JAVA_HOME/bin/java $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/synapse_repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseHTTPServer $SYNAPSE_HOME/synapse_repository -p8080

@@ -26,7 +26,6 @@
     <!-- ==================================================== -->
     <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
     <module ref="addressing"/>
-    <module ref="rampart"/>
     <module ref="synapse"/>
 
     <!-- ==================================================== -->
@@ -47,9 +46,10 @@
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
-    <transportReceiver name="http"
+    <transportReceiver name="http" class="org.apache.axis2.transport.nhttp.AsyncHTTPListener"/>
+    <!--<transportReceiver name="http"
                        class="org.apache.axis2.transport.http.SimpleHTTPServer">
-        <parameter name="port" locked="false">6060</parameter>
+        <parameter name="port" locked="false">6060</parameter>-->
     <!-- Here is the complete list of supported parameters (see example settings further below):
         port: the port to listen on (default 6060)
         hostname:  if non-null, url prefix used in reply-to endpoint references                                 (default null)
@@ -72,7 +72,7 @@
         <!-- <parameter name="RequestMaxThreadPoolSize"  locked="false">100</parameter>                     -->
         <!-- <parameter name="threadKeepAliveTime"       locked="false">240000</parameter>                  -->
         <!-- <parameter name="threadKeepAliveTimeUnit"   locked="false">MILLISECONDS</parameter>            -->
-    </transportReceiver>
+    <!--</transportReceiver>-->
 
     <transportReceiver name="tcp"
                        class="org.apache.axis2.transport.tcp.TCPServer">
@@ -81,6 +81,27 @@
         <!--uncommet following paramter , and set as you required.-->
         <!--<parameter name="hostname" locked="false">tcp://myApp.com/ws</parameter>-->
     </transportReceiver>
+    
+    <!--Uncomment this for JMS after setting up your JMS environment (e.g. ActiveMQ)
+    <transportReceiver name="jms" class="org.apache.axis2.transport.njms.JMSListener">
+        <parameter name="myTopicConnectionFactory" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">TopicConnectionFactory</parameter>
+        </parameter>
+
+        <parameter name="myQueueConnectionFactory" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">QueueConnectionFactory</parameter>
+        </parameter>
+
+        <parameter name="default" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">QueueConnectionFactory</parameter>
+        </parameter>
+    </transportReceiver>-->
 
     <!-- ================================================= -->
     <!-- Transport Outs -->
@@ -91,9 +112,11 @@
     <transportSender name="local"
                      class="org.apache.axis2.transport.local.LocalTransportSender"/>
     <transportSender name="jms"
-                     class="org.apache.axis2.transport.jms.JMSSender"/>
+                     class="org.apache.axis2.transport.njms.JMSSender"/>
+    <!--<transportSender name="http"
+                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">-->
     <transportSender name="http"
-                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
+                     class="org.apache.axis2.transport.nhttp.AsyncHTTPSender">
         <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
         <!--<parameter name="Transfer-Encoding" locked="false">chunked</parameter>-->
     </transportSender>

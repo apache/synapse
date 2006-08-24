@@ -27,7 +27,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.transport.nhttp.AsyncHTTPListener;
 import org.apache.synapse.Constants;
 import org.apache.synapse.utils.Services;
 
@@ -36,24 +36,27 @@ import javax.xml.namespace.QName;
 
 public class SynapseCommodityServiceTest extends TestCase {
 
-    private SimpleHTTPServer synapseServer = null;
-    private SimpleHTTPServer businessServer = null;
+    private AsyncHTTPListener synapseServer = null;
+    private AsyncHTTPListener businessServer = null;
 
     protected void setUp() throws java.lang.Exception {
         // Initializing Synapse repository
         System.setProperty(Constants.SYNAPSE_XML,
                            "target/testing_repository/conf/synapse.xml");
+        System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
+                           "target/testing_repository/conf/axis2.xml");
+
         ConfigurationContext synapseConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "target/testing_repository",
                         "target/testing_repository/conf/axis2.xml");
-
 
         // Initializing Bussiness Endpoint
         ConfigurationContext businessConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
                         "target/testing_repository",
                         "target/testing_repository/conf/axis2.xml");
+
         AxisService businessService =
                 AxisService.createService(Services.class.getName(),
                                           businessConfigCtx.getAxisConfiguration(),
@@ -61,25 +64,23 @@ public class SynapseCommodityServiceTest extends TestCase {
                                           "http://business.org", "http://business.org");
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
-        synapseServer = new SimpleHTTPServer(synapseConfigCtx, 10000);
-        businessServer = new SimpleHTTPServer(businessConfigCtx, 10001);
+        synapseServer = new AsyncHTTPListener(synapseConfigCtx, 10000);
+        businessServer = new AsyncHTTPListener(businessConfigCtx, 10001);
 
         //starting servers
         synapseServer.start();
         businessServer.start();
-
-
     }
 
     protected void tearDown() throws java.lang.Exception {
         businessServer.stop();
         synapseServer.stop();
-
     }
 
     public void testN2N() throws Exception {
         // Creating the Simple Commodity Client
-        ServiceClient businessClient = new ServiceClient();
+        System.getProperties().remove(org.apache.axis2.Constants.AXIS2_CONF);
+        ServiceClient businessClient = new ServiceClient(null, null);
         Options options = new Options();
         options.setTo(
                 new EndpointReference("http://127.0.0.1:10000/CommodityQuote"));

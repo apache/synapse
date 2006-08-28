@@ -122,7 +122,7 @@ public class AddressingVersionTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(15000);
+		Thread.sleep(10000);
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
@@ -163,7 +163,7 @@ public class AddressingVersionTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(15000);
+		Thread.sleep(10000);
 				
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));

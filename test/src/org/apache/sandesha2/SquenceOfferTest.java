@@ -141,7 +141,7 @@ public class SquenceOfferTest extends SandeshaTestCase {
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
         
-        Thread.sleep(22000);
+        Thread.sleep(10000);
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);

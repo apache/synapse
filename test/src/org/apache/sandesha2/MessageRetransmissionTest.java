@@ -52,7 +52,7 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 		super ("MessageRetransmissionTest");
 	}
 	
-	public void setUp () {
+	public void setUp () throws AxisFault {
 		String serverPortStr = getTestProperty("test.server.port");
 		if (serverPortStr!=null) {
 		
@@ -85,7 +85,7 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 	public void testMessageRetransmission () throws AxisFault,InterruptedException  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + 8070 + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";

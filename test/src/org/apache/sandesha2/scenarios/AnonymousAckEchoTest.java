@@ -117,7 +117,7 @@ public class AnonymousAckEchoTest extends SandeshaTestCase {
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
 		
         
-        Thread.sleep(40000);
+        Thread.sleep(10000);
 		
         //assertions for the out sequence.
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);

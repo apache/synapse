@@ -143,7 +143,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
 
         
-        Thread.sleep(45000);
+        Thread.sleep(10000);
 		
         //testing outgoing sequence reports
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -204,7 +204,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		
 		try {
 			//waiting till the messages exchange finishes.
-			Thread.sleep(18000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			throw new SandeshaException ("sleep interupted");
 		}

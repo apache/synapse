@@ -128,7 +128,7 @@ public class AddressablePingTest extends SandeshaTestCase {
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		try {
-			Thread.sleep(30000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

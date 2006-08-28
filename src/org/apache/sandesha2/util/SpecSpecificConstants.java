@@ -123,9 +123,7 @@ public class SpecSpecificConstants {
 	
 	public static String getAckRequestAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.emptyAckRequestSpecLevel,
-					specVersion));
+			return null;  //No action defined for ackRequests
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_10.Actions.ACTION_ACK_REQUEST;
 		else 

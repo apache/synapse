@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -272,12 +274,24 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, sequenceID,
 				storageManager);
-		SequenceAcknowledgement seqAck = (SequenceAcknowledgement) ackRMMessage
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, seqAck);
-
+		
+		Iterator iter = ackRMMessage.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		
+		if (iter.hasNext()) {
+			SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
+			if (seqAck==null) {
+				String message = "No SequenceAcknowledgement part is present";
+				throw new SandeshaException (message);
+			}
+		
+			terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, seqAck);
+		} else {
+			//TODO 
+		}
+		
 		terminateSeqResponseRMMsg.addSOAPEnvelope();
 
+		
 		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		terminateSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 

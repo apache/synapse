@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2.util;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -103,10 +106,11 @@ public class MsgInitializer {
 			rmNamespace = elements.getSequence().getNamespaceValue();
 		}
 
-		if (elements.getSequenceAcknowledgement() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, elements
-					.getSequenceAcknowledgement());
-			rmNamespace = elements.getSequenceAcknowledgement().getNamespaceValue();
+		
+		for (Iterator iter = elements.getSequenceAcknowledgements();iter.hasNext();) {
+			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
+			rmNamespace = sequenceAck.getNamespaceValue();
 		}
 
 		if (elements.getTerminateSequence() != null) {
@@ -168,8 +172,8 @@ public class MsgInitializer {
 				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 		TerminateSequenceResponse terminateSequenceResponse = (TerminateSequenceResponse) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
-		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Iterator sequenceAcknowledgementsIter = rmMsgCtx
+				.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		AckRequested ackRequest = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
 		CloseSequence closeSequence = (CloseSequence) rmMsgCtx
@@ -192,8 +196,11 @@ public class MsgInitializer {
 		} else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 			sequenceID = sequence.getIdentifier().getIdentifier();
-		} else if (sequenceAcknowledgement != null) {
+		} else if (sequenceAcknowledgementsIter.hasNext()) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAcknowledgementsIter.next();
+			
+			//picking the sequenceId of the first sequence ack.
 			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (ackRequest != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
@@ -218,6 +225,10 @@ public class MsgInitializer {
 			}
 		}
 
+		//In case of ack messages RM Namespace is decided based on the sequenceId of the first 
+		//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
+		//of different RM specifications in the same incoming message.
+		
 		String rmNamespace = rmMsgCtx.getRMNamespaceValue();
 		if (sequenceID != null) {
 			String specVersion = SandeshaUtil.getRMVersion(propertyKey, storageManager);

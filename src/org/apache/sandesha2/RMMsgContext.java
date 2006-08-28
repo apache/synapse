@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -32,6 +33,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;
+import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * This class is used to hold a MessageContext within Sandesha. This is used to
@@ -90,16 +92,25 @@ public class RMMsgContext {
 		SOAPEnvelope envelope = msgContext.getEnvelope();
 		Iterator keys = rmMessageParts.keySet().iterator();
 		while (keys.hasNext()) {
-			Object key = keys.next();
-			IOMRMPart rmPart = (IOMRMPart) rmMessageParts.get(key);
-			rmPart.toSOAPEnvelope(envelope);
+			Integer key = (Integer) keys.next();
+			int partId = key.intValue();
+			
+			if (isMultiPart(partId)) {
+				for (Iterator it=getMessageParts(partId);it.hasNext();) {
+					IOMRMPart rmPart = (IOMRMPart) it.next();
+					rmPart.toSOAPEnvelope(envelope);
+				}
+			} else {
+				IOMRMPart rmPart = (IOMRMPart) rmMessageParts.get(key);
+				rmPart.toSOAPEnvelope(envelope);
+			}
 		}
 	}
 
 	public int getMessageType() {
 		return messageType;
 	}
-
+	
 	
 	/**
 	 * The message type can be used to easily identify what this message is.
@@ -121,12 +132,51 @@ public class RMMsgContext {
 	 * @param part
 	 */
 	public void setMessagePart(int partId, IOMRMPart part) {
-		if (partId >= 0 && partId <= Sandesha2Constants.MessageParts.MAX_MSG_PART_ID)
-			rmMessageParts.put(new Integer(partId), part);
+		if (partId >= 0 && partId <= Sandesha2Constants.MessageParts.MAX_MSG_PART_ID) {
+			
+			if (partId==Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) {
+				ArrayList sequenceAckList = (ArrayList) rmMessageParts.get(new Integer (partId));
+				if (sequenceAckList==null) {
+					sequenceAckList = new ArrayList ();
+					rmMessageParts.put(new Integer (partId),sequenceAckList);
+				}
+			} else {
+				rmMessageParts.put(new Integer(partId), part); 
+			}
+		}
 	}
+	
 
-	public IOMRMElement getMessagePart(int partId) {
+	public IOMRMElement getMessagePart(int partId) throws SandeshaException {
+		if (isMultiPart(partId)) {
+			String message = "It is possible for a multiple MessageParts of this type to exit. Please call the 'getMessageParts' method";
+			throw new SandeshaException (message);
+		}
+		
 		return (IOMRMElement) rmMessageParts.get(new Integer(partId));
+	}
+	
+	public Iterator getMessageParts (int partId) {
+		Object obj = rmMessageParts.get(new Integer (partId));
+		if (obj==null)
+			return new ArrayList().iterator();
+		
+		if (obj instanceof ArrayList) {
+			return ((ArrayList) obj).iterator();
+		} else {
+			ArrayList arr = new ArrayList ();
+			arr.add(obj);
+			return arr.iterator();
+		}
+	}
+	
+	//checks weather there can be multiple elements of these parts,
+	//if so getMessageParts method has to be called to get a ArrayList of parts..
+	public boolean isMultiPart (int messagePartId) {
+		if (messagePartId==Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT)
+			return true;
+		
+		return false;
 	}
 
 	public EndpointReference getFrom() {

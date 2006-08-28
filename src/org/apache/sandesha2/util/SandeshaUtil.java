@@ -882,7 +882,7 @@ public class SandeshaUtil {
 		return propertyBean;
 	}
 
-	public static String getSequenceIDFromRMMessage(RMMsgContext rmMessageContext) {
+	public static String getSequenceIDFromRMMessage(RMMsgContext rmMessageContext) throws SandeshaException {
 		int messageType = rmMessageContext.getMessageType();
 
 		String sequenceID = null;
@@ -890,8 +890,14 @@ public class SandeshaUtil {
 			Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK) {
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) rmMessageContext
-					.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+			Iterator sequenceAckIter = rmMessageContext
+					.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+			
+			//In case of ack messages sequenceId is decided based on the sequenceId of the first 
+			//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
+			//of different RM specifications in the same incoming message.
+			
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
 			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
 			AckRequested ackRequested = (AckRequested) rmMessageContext

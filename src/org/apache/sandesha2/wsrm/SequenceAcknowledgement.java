@@ -69,23 +69,16 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement sequenceAckElement) throws OMException,SandeshaException {
 
-		OMElement sequenceAckPart = element;
-		if (sequenceAckPart == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.seqAckPartIsNull));
-
-		ackElement = sequenceAckPart;
-		
-		OMFactory factory = element.getOMFactory();
+		OMFactory factory = sequenceAckElement.getOMFactory();
 		if (factory==null)
 			factory = defaultFactory;
 		
 		identifier = new Identifier(defaultFactory,namespaceValue);
-		identifier.fromOMElement(sequenceAckPart);
+		identifier.fromOMElement(sequenceAckElement);
 
-		Iterator ackRangeParts = sequenceAckPart.getChildrenWithName(new QName(
+		Iterator ackRangeParts = sequenceAckElement.getChildrenWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_RANGE));
 
 		while (ackRangeParts.hasNext()) {
@@ -96,7 +89,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			acknowledgementRangeList.add(ackRange);
 		}
 
-		Iterator nackParts = sequenceAckPart.getChildrenWithName(new QName(
+		Iterator nackParts = sequenceAckElement.getChildrenWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.NACK));
 
 		while (nackParts.hasNext()) {
@@ -109,18 +102,18 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		String rmSpecVersion = SpecSpecificConstants.getSpecVersionString (namespaceValue);
 		
 		if (SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
-			OMElement ackFinalPart = sequenceAckPart.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.FINAL));
+			OMElement ackFinalPart = sequenceAckElement.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.FINAL));
 			if (ackFinalPart!=null) {
 				ackFinal = new AckFinal (defaultFactory,namespaceValue);
-				ackFinal.fromOMElement(sequenceAckPart);
+				ackFinal.fromOMElement(sequenceAckElement);
 			}
 		}
 		
 		if (SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
-			OMElement ackNonePart = sequenceAckPart.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.NONE));
+			OMElement ackNonePart = sequenceAckElement.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.NONE));
 			if (ackNonePart!=null) {
 				ackNone = new AckNone (defaultFactory,namespaceValue);
-				ackNone.fromOMElement(sequenceAckPart);
+				ackNone.fromOMElement(sequenceAckElement);
 			}
 		}
 		

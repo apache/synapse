@@ -64,6 +64,9 @@ public class SandeshaMessageKeys {
 	public static final String cannotInnitMessage="cannotInnitMessage";
 	public static final String propertyInvalidValue="propertyInvalidValue";
 	public static final String couldNotCopyParameters="couldNotCopyParameters";
+	public static final String senderBeanNotFound="couldNotCopyParameters";
+	public static final String workAlreadyAssigned="couldNotCopyParameters";
+	
 
 
 	public static final String rmNamespaceNotMatchSequence="rmNamespaceNotMatchSequence";

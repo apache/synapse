@@ -19,6 +19,7 @@ package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
@@ -55,22 +56,20 @@ import org.apache.sandesha2.wsrm.Sequence;
 public class Invoker extends Thread {
 
 	private boolean runInvoker = false;
-
 	private ArrayList workingSequences = new ArrayList();
-
 	private ConfigurationContext context = null;
-
 	private static final Log log = LogFactory.getLog(Invoker.class);
-
 	private boolean hasStopped = false;
-
+	
 	private transient ThreadFactory threadPool;
-
 	public int INVOKER_THREADPOOL_SIZE = 5;
 
+	private WorkerLock lock = null;
+	
 	public Invoker() {
 		threadPool = new ThreadPool(INVOKER_THREADPOOL_SIZE,
 				INVOKER_THREADPOOL_SIZE);
+		lock = new WorkerLock ();
 	}
 
 	public synchronized void stopInvokerForTheSequence(String sequenceID) {
@@ -207,15 +206,22 @@ public class Invoker extends Thread {
 				//TODO pick the sequence randomly.
 				ArrayList allSequencesList = SandeshaUtil
 						.getArrayListFromString(allSequencesBean.getValue());
-				Iterator allSequencesItr = allSequencesList.iterator();
-				String sequenceId = (String) allSequencesItr.next();
+
+
+				int size = allSequencesList.size();
+				Random r = new Random ();
+				int index = r.nextInt(size);
+				
+				String sequenceId = (String) allSequencesList.get(index);
+				
 
 				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 				if (nextMsgBean == null) {
 					String message = "Next message not set correctly. Removing invalid entry.";
 					log.debug(message);
-					allSequencesItr.remove();
-
+	
+					allSequencesList.remove(size);
+					
 					// cleaning the invalid data of the all sequences.
 					allSequencesBean.setValue(allSequencesList.toString());
 					sequencePropMgr.update(allSequencesBean);
@@ -236,17 +242,34 @@ public class Invoker extends Thread {
 						new InvokerBean(null, nextMsgno, sequenceId))
 						.iterator();
 
-				if (stMapIt.hasNext()) {
+				if (stMapIt.hasNext()) { //the next Msg entry is present.
 
-					InvokerBean invokerBean = (InvokerBean) stMapIt.next();
-
+					String workId = sequenceId + "::" + nextMsgno; //creating a workId to uniquely identify the
+																   //piece of work that will be assigned to the Worker.
+										
+					//check weather the bean is already assigned to a worker.
+					if (lock.isWorkPresent(workId)) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned);
+						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
+						log.debug(message);
+						continue;
+					}
+					
+					lock.addWork(workId);
+					
+					InvokerBean bean = (InvokerBean) stMapIt.next();
+					String messageContextKey = bean.getMessageContextRefKey();
+					
 					transaction.commit();
+					
 
 					// start a new worker thread and let it do the invocation.
-					InvokerWorker worker = new InvokerWorker(context,
-							invokerBean);
+					InvokerWorker worker = new InvokerWorker(context,messageContextKey);
+					
+					worker.setLock(lock);
+					worker.setWorkId(workId);
+					
 					threadPool.execute(worker);
-
 				}
 
 			} catch (Exception e) {

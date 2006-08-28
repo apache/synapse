@@ -51,8 +51,11 @@ public class Sender extends Thread {
     private transient ThreadFactory threadPool;
     public int SENDER_THREADPOOL_SIZE = 5;
     
+    private WorkerLock lock = null;
+    
     public Sender () {
     	threadPool = new ThreadPool (SENDER_THREADPOOL_SIZE,SENDER_THREADPOOL_SIZE);
+    	lock = new WorkerLock ();
     }
 
 	public synchronized void stopSenderForTheSequence(String sequenceID) {
@@ -159,20 +162,42 @@ public class Sender extends Thread {
 					throw new SandeshaException(message);
 				}
 
+				//TODO make sure this locks on reads.
 				transaction = storageManager.getTransaction();
 
 				SenderBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 				SenderBean senderBean = mgr.getNextMsgToSend();
 				if (senderBean == null) {
-					if (log.isDebugEnabled())
-						log.debug("SenderBean not found");
+					if (log.isDebugEnabled()) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
+						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
+						log.debug(message);
+					}
 					continue;
 				}
 				
+				String messageId = senderBean.getMessageID();
+				
+				//work Id is used to define the piece of work that will be assigned to the Worker thread,
+				//to handle this Sender bean.
+				String workId = messageId;
+				
+				//check weather the bean is already assigned to a worker.
+				if (lock.isWorkPresent(workId)) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned);
+					message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
+					log.debug(message);
+					continue;
+				}
+	
+				lock.addWork(workId);
+				
 				transaction.commit();
 				
-				//start a worker which will work on this message.s
-				SenderWorker worker = new SenderWorker (context,senderBean);
+				//start a worker which will work on this messages.
+				SenderWorker worker = new SenderWorker (context,messageId);
+				worker.setLock (lock);
+				worker.setWorkId(messageId);
 				threadPool.execute(worker);
 
 			} catch (Exception e) {

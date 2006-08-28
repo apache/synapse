@@ -21,15 +21,16 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Sequence;
 
-public class InvokerWorker implements Runnable {
+public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 	ConfigurationContext configurationContext = null;
-	InvokerBean invokerBean = null;
+	String messageContextKey;
+	
 	Log log = LogFactory.getLog(InvokerWorker.class);
 	
-	public InvokerWorker (ConfigurationContext configurationContext, InvokerBean invokerBean) {
+	public InvokerWorker (ConfigurationContext configurationContext, String messageContextKey) {
 		this.configurationContext = configurationContext;
-		this.invokerBean = invokerBean;
+		this.messageContextKey = messageContextKey;
 	}
 	
 	public void run() {
@@ -46,17 +47,18 @@ public class InvokerWorker implements Runnable {
 			//starting a transaction
 			transaction = storageManager.getTransaction();
 			
-			String key = invokerBean.getMessageContextRefKey();
+			InvokerBean invokerBean = invokerBeanMgr.retrieve(messageContextKey);
 			
-			msgToInvoke = storageManager.retrieveMessageContext(key, configurationContext);
+			String sequenceId = invokerBean.getSequenceID();
+			long messageNo = invokerBean.getMsgNo();
+			
+			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 
 			//endint the transaction before invocation.
 			transaction.commit();
 				
 			boolean invoked = false;
-			
-			long messageNo = invokerBean.getMsgNo();
 			
 			try {
 
@@ -82,12 +84,12 @@ public class InvokerWorker implements Runnable {
 				if (postFailureInvocation) {
 					makeMessageReadyForReinjection(msgToInvoke);
 					if (log.isDebugEnabled())
-						log.debug("Receiving message, key=" + key + ", msgCtx="
+						log.debug("Receiving message, key=" + messageContextKey + ", msgCtx="
 								+ msgToInvoke.getEnvelope().getHeader());
 					engine.receive(msgToInvoke);
 				} else {
 					if (log.isDebugEnabled())
-						log.debug("Resuming message, key=" + key + ", msgCtx="
+						log.debug("Resuming message, key=" + messageContextKey + ", msgCtx="
 								+ msgToInvoke.getEnvelope().getHeader());
 					msgToInvoke.setPaused(false);
 					engine.resumeReceive(msgToInvoke);
@@ -110,17 +112,17 @@ public class InvokerWorker implements Runnable {
 			// Service will be invoked only once. I.e. even if an
 			// exception get thrown in invocation
 			// the service will not be invoked again.
-			invokerBeanMgr.delete(key);
+			invokerBeanMgr.delete(messageContextKey);
 
 			// removing the corresponding message context as well.
-			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
+			MessageContext msgCtx = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
 			if (msgCtx != null) {
-				storageManager.removeMessageContext(key);
+				storageManager.removeMessageContext(messageContextKey);
 			}
 
 			// updating the next msg to invoke
 
-			String sequenceId = invokerBean.getSequenceID();
+			String s = invokerBean.getSequenceID();
 			NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 
 			
@@ -159,6 +161,10 @@ public class InvokerWorker implements Runnable {
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();
+			
+			if (workId !=null && lock!=null) {
+				lock.removeWork(workId);
+			}
 		}
 	}
 

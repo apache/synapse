@@ -31,18 +31,17 @@ import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
-import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
-public class SenderWorker implements Runnable {
+public class SenderWorker extends SandeshaWorker implements Runnable {
 
 	ConfigurationContext configurationContext = null;
-	SenderBean senderBean = null;
+	String messageId = null;
 	Log log = LogFactory.getLog(SenderWorker.class);
 	
-	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean) {
+	public SenderWorker (ConfigurationContext configurationContext, String messageId) {
 		this.configurationContext = configurationContext;
-		this.senderBean = senderBean;
+		this.messageId = messageId;
 	}
 	
 	public void run () {
@@ -55,6 +54,7 @@ public class SenderWorker implements Runnable {
 			
 			transaction = storageManager.getTransaction();
 
+			SenderBean senderBean = senderBeanMgr.retrieve(messageId);
 			String key = senderBean.getMessageContextRefKey();
 			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
@@ -197,6 +197,10 @@ public class SenderWorker implements Runnable {
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();
+			
+			if (lock!=null && workId!=null) {
+				lock.removeWork(workId);
+			}
 		}
 	}
 	

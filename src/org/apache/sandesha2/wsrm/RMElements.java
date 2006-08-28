@@ -18,7 +18,9 @@
 package org.apache.sandesha2.wsrm;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import javax.swing.text.StyledEditorKit.ItalicAction;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -43,7 +45,10 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
 public class RMElements {
 
 	private Sequence sequence = null;
-	private SequenceAcknowledgement sequenceAcknowledgement = null;
+	
+	//there can be more than one sequence acks in a single message.
+	private ArrayList sequenceAcknowledgements = null;
+	
 	private CreateSequence createSequence = null;
 	private CreateSequenceResponse createSequenceResponse = null;
 	private TerminateSequence terminateSequence = null;
@@ -56,10 +61,11 @@ public class RMElements {
 	private String addressingNamespaceValue = null;
 	
 	public RMElements () {
-		
+		sequenceAcknowledgements = new ArrayList ();
 	}
 	
 	public RMElements (String addressingNamespace) {
+		this ();
 		this.addressingNamespaceValue = addressingNamespace;
 	}
 	
@@ -168,14 +174,26 @@ public class RMElements {
 			closeSequenceResponse = new CloseSequenceResponse  (factory,rmNamespaceValue);
 			closeSequenceResponse.fromOMElement(envelope.getBody());
 		}
+		
+		Iterator sequenceAcknowledgementIter = envelope.getHeader()
+				.getChildrenWithName (new QName(rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
+		while (sequenceAcknowledgementIter.hasNext()) {
+			OMElement sequenceAckElement = (OMElement) sequenceAcknowledgementIter.next();
+			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement  (factory,rmNamespaceValue);
+			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
+			
+			sequenceAcknowledgements.add(sequenceAcknowledgement);
+		}
 	}
 
 	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException  {
 		if (sequence != null) {
 			sequence.toOMElement(envelope.getHeader());
 		}
-		if (sequenceAcknowledgement != null) {
-			sequenceAcknowledgement.toOMElement(envelope.getHeader());
+		for (Iterator iter=sequenceAcknowledgements.iterator();iter.hasNext();) {
+			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
+			sequenceAck.toOMElement(envelope.getHeader());
 		}
 		if (createSequence != null) {
 			createSequence.toOMElement(envelope.getBody());
@@ -217,8 +235,8 @@ public class RMElements {
 		return sequence;
 	}
 
-	public SequenceAcknowledgement getSequenceAcknowledgement() {
-		return sequenceAcknowledgement;
+	public Iterator getSequenceAcknowledgements() {
+		return sequenceAcknowledgements.iterator();
 	}
 
 	public TerminateSequence getTerminateSequence() {
@@ -242,9 +260,13 @@ public class RMElements {
 		this.sequence = sequence;
 	}
 
-	public void setSequenceAcknowledgement(
-			SequenceAcknowledgement sequenceAcknowledgement) {
-		this.sequenceAcknowledgement = sequenceAcknowledgement;
+	public void setSequenceAcknowledgements(
+			ArrayList sequenceAcknowledgements) {
+		this.sequenceAcknowledgements = sequenceAcknowledgements;
+	}
+	
+	public void addSequenceAcknowledgement (SequenceAcknowledgement sequenceAcknowledgement) {
+		sequenceAcknowledgements.add(sequenceAcknowledgement);
 	}
 
 	public void setTerminateSequence(TerminateSequence terminateSequence) {

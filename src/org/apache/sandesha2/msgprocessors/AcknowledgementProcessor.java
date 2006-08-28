@@ -49,6 +49,7 @@ import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Nack;
@@ -252,9 +253,11 @@ public class AcknowledgementProcessor {
 			}
 		}
 
-		// TODO - surely this is only appropriate for standalone ack messages?
-		// stopping the progress of the message further.
-		rmMsgCtx.pause();
+
+		String action = msgCtx.getOptions().getAction();
+		if (action!=null && action.equals(SpecSpecificConstants.getAckRequestAction(rmMsgCtx.getRMSpecVersion()))) {
+			rmMsgCtx.pause();
+		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementProcessor::processAckHeader");

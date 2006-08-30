@@ -166,8 +166,8 @@ public class Axis2AsyncWebProcessor implements HttpService {
         Worker(MessageContext msgContext, HttpRequest request) {
             this.msgContext = msgContext;
             this.request = request;
-            contextPath = configurationContext.getContextPath() + "/";
-            servicePath = configurationContext.getServicePath();
+            contextPath = configurationContext.getContextRoot() + "/";
+            servicePath = configurationContext.getServiceContextPath();
         }
 
         public void run() {

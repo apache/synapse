@@ -17,29 +17,22 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.util.OptionsParser;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.safehaus.asyncweb.container.basic.BasicServiceContainer;
-import org.safehaus.asyncweb.container.basic.HttpServiceHandler;
 import org.safehaus.asyncweb.container.ContainerLifecycleException;
-import org.safehaus.asyncweb.container.resolver.ServiceResolver;
 import org.safehaus.asyncweb.transport.nio.NIOTransport;
 import org.safehaus.asyncweb.transport.nio.HttpIOHandler;
-import org.safehaus.asyncweb.http.HttpRequest;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
-import java.io.File;
 
 public class AsyncHTTPListener implements TransportListener {
 
@@ -52,7 +45,7 @@ public class AsyncHTTPListener implements TransportListener {
     private int maxKeepAlives = 100;
     private int readIdleTime = 300;
     private String hostAddress = null;
-    private String contextPath;
+    private String serviceContextPath;
 
     public AsyncHTTPListener() {
     }
@@ -74,7 +67,7 @@ public class AsyncHTTPListener implements TransportListener {
 
     public void init(ConfigurationContext cfgCtx, TransportInDescription transprtIn) throws AxisFault {
         this.cfgCtx = cfgCtx;
-        contextPath = cfgCtx.getContextPath();
+        serviceContextPath = cfgCtx.getServiceContextPath();
 
         try {
             Parameter param = transprtIn.getParameter(PARAM_PORT);
@@ -128,6 +121,6 @@ public class AsyncHTTPListener implements TransportListener {
     }
 
     public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
-        return new EndpointReference("http://" + hostAddress + ":" + port + contextPath + "/" + serviceName);
+        return new EndpointReference("http://" + hostAddress + ":" + port + serviceContextPath + "/" + serviceName);
     }
 }

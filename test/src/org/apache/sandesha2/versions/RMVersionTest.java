@@ -135,7 +135,7 @@ public class RMVersionTest extends SandeshaTestCase {
 	public void testRMOASIS () throws AxisFault,InterruptedException  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:" + 8070 + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";

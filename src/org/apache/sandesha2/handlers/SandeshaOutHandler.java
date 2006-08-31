@@ -24,6 +24,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,11 +70,24 @@ public class SandeshaOutHandler extends AbstractHandler {
 			throw new AxisFault(message);
 		}
 
-		String unreliable = (String) msgCtx.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
-		if (null != unreliable && "true".equals(unreliable)) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
-			return;
+		//see if this message is unreliable i.e. WSRM not requried
+		//look at the msg ctx first
+		{
+			String unreliable = (String) msgCtx.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+			if (null != unreliable && "true".equals(unreliable)) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
+				return;
+			}			
+		}
+		//look at the operation ctx
+		{
+			Parameter unreliable = msgCtx.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+			if (null != unreliable && "true".equals(unreliable.getValue())) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
+				return;
+			}				
 		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);

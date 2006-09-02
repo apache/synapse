@@ -367,8 +367,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	private void doGlobalProcessing(RMMsgContext rmMsgCtx) throws SandeshaException {
 	}
 
-	public QName getName() {
-		return new QName(Sandesha2Constants.GLOBAL_IN_HANDLER_NAME);
+	public String getName() {
+		return Sandesha2Constants.GLOBAL_IN_HANDLER_NAME;
 	}
 
 	private AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart) {

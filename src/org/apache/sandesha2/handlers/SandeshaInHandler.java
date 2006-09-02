@@ -51,8 +51,8 @@ public class SandeshaInHandler extends AbstractHandler {
 
 	private static final Log log = LogFactory.getLog(SandeshaInHandler.class.getName());
 
-	public QName getName() {
-		return new QName(Sandesha2Constants.IN_HANDLER_NAME);
+	public String getName() {
+		return Sandesha2Constants.IN_HANDLER_NAME;
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {

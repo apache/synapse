@@ -78,11 +78,11 @@ public class Sandesha2TransportSender implements TransportSender  {
 
 	public void init(ConfigurationContext confContext, TransportOutDescription transportOut) throws AxisFault {}
 
-	public void cleanup() throws AxisFault {}
+	public void cleanup() {}
 
 	public HandlerDescription getHandlerDesc() {return null;}
 
-	public QName getName() { return null;}
+	public String getName() { return null;}
 
 	public Parameter getParameter(String name) {  return null; }
 

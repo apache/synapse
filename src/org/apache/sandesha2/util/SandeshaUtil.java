@@ -785,9 +785,8 @@ public class SandeshaUtil {
 		String executionChainStr = "";
 		while (iter.hasNext()) {
 			Handler handler = (Handler) iter.next();
-			QName name = handler.getName();
-			String handlerStr = SandeshaUtil.getStringFromQName(name);
-			executionChainStr = executionChainStr + Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR + handlerStr;
+			String name = handler.getName();
+			executionChainStr = executionChainStr + Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR + name;
 		}
 
 		return executionChainStr;
@@ -796,14 +795,13 @@ public class SandeshaUtil {
 	// TODO complete below.
 	public static ArrayList getExecutionChainFromString(String executionChainStr, ConfigurationContext configContext)
 			throws SandeshaException {
-		String[] QNameStrs = executionChainStr.split(Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR);
+		String[] nameStrs = executionChainStr.split(Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR);
 
 		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
 
-		int length = QNameStrs.length;
+		int length = nameStrs.length;
 		for (int i = 0; i < length; i++) {
-			String QNameStr = QNameStrs[i];
-			QName name = getQNameFromString(QNameStr);
+			String nameStr = nameStrs[i];
 			// axisConfiguration.get
 
 		}

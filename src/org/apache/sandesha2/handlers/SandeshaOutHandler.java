@@ -177,7 +177,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			log.debug("Exit: SandeshaOutHandler::invoke");
 	}
 
-	public QName getName() {
-		return new QName(Sandesha2Constants.OUT_HANDLER_NAME);
+	public String getName() {
+		return Sandesha2Constants.OUT_HANDLER_NAME;
 	}
 }

@@ -287,7 +287,7 @@ public class Axis2AsyncWebProcessor implements HttpService {
                         //run the population logic just to be sure
                         service.populateSchemaMappings();
                         //write out the correct schema
-                        Hashtable schemaTable = service.getSchemaMappingTable();
+                        Map schemaTable = service.getSchemaMappingTable();
                         final XmlSchema schema = (XmlSchema)schemaTable.get(schemaName);
                         //schema found - write it to the stream
                         if (schema != null) {

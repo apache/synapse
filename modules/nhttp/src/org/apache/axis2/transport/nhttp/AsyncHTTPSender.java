@@ -17,8 +17,10 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.TransportSender;
+import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.http.CommonsHTTPTransportSender;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
@@ -33,6 +35,7 @@ import org.safehaus.asyncweb.http.HttpRequest;
 import org.safehaus.asyncweb.http.HttpResponse;
 import org.safehaus.asyncweb.http.ResponseStatus;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
 
 /**
@@ -111,7 +114,11 @@ public class AsyncHTTPSender extends AbstractHandler implements TransportSender 
             }
         } else {
             if (msgContext.getProperty(Constants.OUT_TRANSPORT_INFO) != null) {
-                sendAsyncResponse(msgContext, format, dataOut);
+                if (msgContext.getProperty(Constants.OUT_TRANSPORT_INFO) instanceof HttpRequest) {
+                    sendAsyncResponse(msgContext, format, dataOut);
+                } else {
+                    sendUsingOutputStream(msgContext, format, dataOut);
+                }
             }
             else {
                 throw new AxisFault("Both the TO and Property MessageContext.TRANSPORT_OUT is Null, No where to send");
@@ -141,6 +148,50 @@ public class AsyncHTTPSender extends AbstractHandler implements TransportSender 
         }
 
         request.commitResponse(response);
+    }
+
+    private void sendUsingOutputStream(MessageContext msgContext,
+                                       OMOutputFormat format,
+                                       OMElement dataOut) throws AxisFault {
+        OutputStream out =
+                (OutputStream) msgContext
+                        .getProperty(MessageContext.TRANSPORT_OUT);
+
+        if (msgContext.isServerSide()) {
+            OutTransportInfo transportInfo =
+                    (OutTransportInfo) msgContext
+                            .getProperty(Constants.OUT_TRANSPORT_INFO);
+
+            if (transportInfo != null) {
+                String contentType;
+
+                Object contentTypeObject = msgContext.getProperty(Constants.Configuration.CONTENT_TYPE);
+                if (contentTypeObject != null) {
+                    contentType = (String) contentTypeObject;
+                } else if (msgContext.isDoingREST()) {
+                    contentType = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
+                } else {
+                    contentType = format.getContentType();
+                    format.setSOAP11(msgContext.isSOAP11());
+                }
+
+
+                String encoding = contentType + "; charset="
+                        + format.getCharSetEncoding();
+
+                transportInfo.setContentType(encoding);
+            } else {
+                throw new AxisFault(Constants.OUT_TRANSPORT_INFO +
+                        " has not been set");
+            }
+        }
+
+        format.setDoOptimize(msgContext.isDoingMTOM());
+        try {
+            dataOut.serializeAndConsume(out, format);
+        } catch (XMLStreamException e) {
+            throw new AxisFault(e);
+        }
     }
 
     public void cleanup(MessageContext msgContext) throws AxisFault {

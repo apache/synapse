@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.attachments.utils.ImageDataSource;
@@ -122,12 +123,10 @@ public class MTOMPingClient {
 		OMElement pingElem = fac.createOMElement(MTOMPing, namespace);
 		OMElement attachmentElem = fac.createOMElement("Attachment", namespace);
 		
-	    Image image;
 	    String imageName = "test-resources" + File.separator + "mtom-image.jpg";
-	    ImageDataSource dataSource;
+	    FileDataSource dataSource;
 		try {
-			image = new ImageIO().loadImage(new FileInputStream(imageName));
-			dataSource = new ImageDataSource("test.jpg",image);
+			dataSource = new FileDataSource (new File (imageName));
 		} catch (Exception e) {
 			throw new AxisFault (e);
 		}

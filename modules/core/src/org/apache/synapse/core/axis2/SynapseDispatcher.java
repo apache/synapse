@@ -43,7 +43,7 @@ public class SynapseDispatcher extends AbstractDispatcher {
 
     public void initDispatcher() {
         QName qn = new QName("http://synapse.apache.org", "SynapseDispatcher");
-        HandlerDescription hd = new HandlerDescription(qn);
+        HandlerDescription hd = new HandlerDescription(qn.getLocalPart());
         super.init(hd);
     }
 

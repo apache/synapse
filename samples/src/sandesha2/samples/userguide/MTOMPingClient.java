@@ -16,16 +16,12 @@
 
 package sandesha2.samples.userguide;
 
-import java.awt.Image;
 import java.io.File;
-import java.io.FileInputStream;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.attachments.utils.ImageDataSource;
-import org.apache.axiom.attachments.utils.ImageIO;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;

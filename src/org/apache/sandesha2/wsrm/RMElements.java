@@ -20,7 +20,6 @@ package org.apache.sandesha2.wsrm;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.text.StyledEditorKit.ItalicAction;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -56,7 +55,6 @@ public class RMElements {
 	private CloseSequence closeSequence = null;
 	private CloseSequenceResponse closeSequenceResponse = null;
 	private AckRequested ackRequested = null;
-	private SOAPFactory factory = null;
 	private String rmNamespaceValue = null;
 	private String addressingNamespaceValue = null;
 	
@@ -108,7 +106,7 @@ public class RMElements {
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequenceElement != null) {
-			sequence = new Sequence(factory,rmNamespaceValue);
+			sequence = new Sequence(rmNamespaceValue);
 			sequence.fromOMElement(envelope.getHeader());
 		}
 
@@ -135,7 +133,7 @@ public class RMElements {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 		if (terminateSeqElement != null) {
-			terminateSequence = new TerminateSequence(factory,rmNamespaceValue);
+			terminateSequence = new TerminateSequence(rmNamespaceValue);
 			terminateSequence.fromOMElement(envelope.getBody());
 		}
 		
@@ -144,7 +142,7 @@ public class RMElements {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE_RESPONSE));
 		if (terminateSeqResponseElement != null) {
-				terminateSequenceResponse = new TerminateSequenceResponse (factory,rmNamespaceValue);
+				terminateSequenceResponse = new TerminateSequenceResponse (rmNamespaceValue);
 				terminateSequenceResponse.fromOMElement(envelope.getBody());
 		}
 
@@ -153,7 +151,7 @@ public class RMElements {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
 		if (ackRequestedElement != null) {
-			ackRequested = new AckRequested(factory,rmNamespaceValue);
+			ackRequested = new AckRequested(rmNamespaceValue);
 			ackRequested.fromOMElement(envelope.getHeader());
 		}
 		
@@ -292,9 +290,9 @@ public class RMElements {
 			if (headers!=null && headers.size()>0)
 				return Sandesha2Constants.SPEC_2005_02.NS_URI;
 			
-			headers = header.getHeaderBlocksWithNSURI(Sandesha2Constants.SPEC_2005_10.NS_URI);
+			headers = header.getHeaderBlocksWithNSURI(Sandesha2Constants.SPEC_2006_08.NS_URI);
 			if (headers!=null && headers.size()>0)
-				return Sandesha2Constants.SPEC_2005_10.NS_URI;
+				return Sandesha2Constants.SPEC_2006_08.NS_URI;
 		}
 		
 		//rm control messages with parts in the body will be identified by the wsa:action.
@@ -310,20 +308,20 @@ public class RMElements {
 		if (action.equals(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE))
 			return Sandesha2Constants.SPEC_2005_02.NS_URI;
 		
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2005_10.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE_RESPONSE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
 		
 		return null;   //a version could not be found
 	}

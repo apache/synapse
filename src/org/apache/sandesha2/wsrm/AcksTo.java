@@ -38,25 +38,22 @@ public class AcksTo implements IOMRMElement {
 
 	private Address address;
 	
-	private OMFactory defaultFactory;
-	
 	private String rmNamespaceValue = null;
 	
 	private String addressingNamespaceValue = null;
 
-	public AcksTo(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
+	public AcksTo(String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					rmNamespaceValue));
 		
-		this.defaultFactory = factory;
 		this.rmNamespaceValue = rmNamespaceValue;
 		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
 	public AcksTo (Address address,SOAPFactory factory,String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
-		this (factory,rmNamespaceValue,addressingNamespaceValue);
+		this (rmNamespaceValue,addressingNamespaceValue);
 		this.address = address;
 	}
 
@@ -73,7 +70,7 @@ public class AcksTo implements IOMRMElement {
 					SandeshaMessageKeys.noAcksToPart,
 					element.toString()));
 
-		address = new Address(defaultFactory,addressingNamespaceValue);
+		address = new Address(addressingNamespaceValue);
 		address.fromOMElement(acksToPart);
 
 		return this;
@@ -87,8 +84,6 @@ public class AcksTo implements IOMRMElement {
 					null));
 
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement acksToElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
@@ -111,7 +106,7 @@ public class AcksTo implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

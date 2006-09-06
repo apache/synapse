@@ -118,7 +118,9 @@ public class AcknowledgementProcessor {
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
-			secManager.checkProofOfPossession(token, sequenceAck.getOMElement(), msgCtx);
+			
+			//TODO get the element from the SOAP Envelope
+//			secManager.checkProofOfPossession(token, sequsenceAck.getOMElement(), msgCtx);
 		}
 		
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();

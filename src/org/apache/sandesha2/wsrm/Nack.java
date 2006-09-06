@@ -35,8 +35,6 @@ public class Nack implements IOMRMElement {
 	
 	private long nackNumber;
 	
-	private SOAPFactory defaultFactory;
-	
 	private String namespaceValue = null;
 		
 	public Nack(SOAPFactory factory,String namespaceValue) throws SandeshaException {
@@ -45,7 +43,6 @@ public class Nack implements IOMRMElement {
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 	
@@ -80,8 +77,6 @@ public class Nack implements IOMRMElement {
 					SandeshaMessageKeys.nackDoesNotContainValidLongValue));
 		
 		OMFactory factory = sequenceAckElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement nackElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.NACK,rmNamespace);
@@ -103,7 +98,7 @@ public class Nack implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

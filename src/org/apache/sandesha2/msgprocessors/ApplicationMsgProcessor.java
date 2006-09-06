@@ -121,7 +121,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
 			OMElement body = msgCtx.getEnvelope().getBody();
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
-			secManager.checkProofOfPossession(token, sequence.getOMElement(), msgCtx);
+			
+			//TODO get the element from the SOAP Envelope
+//			secManager.checkProofOfPossession(token, sequence.getOMElement(), msgCtx);
+			
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 		
@@ -930,8 +933,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
-		Sequence sequence = new Sequence(factory, rmNamespaceValue);
-		MessageNumber msgNumber = new MessageNumber(factory, rmNamespaceValue);
+		Sequence sequence = new Sequence(rmNamespaceValue);
+		MessageNumber msgNumber = new MessageNumber(rmNamespaceValue);
 		msgNumber.setMessageNumber(messageNumber);
 		sequence.setMessageNumber(msgNumber);
 
@@ -957,7 +960,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			if (requestSequence.getLastMessage() != null) {
 				lastMessage = true;
-				sequence.setLastMessage(new LastMessage(factory, rmNamespaceValue));
+				sequence.setLastMessage(new LastMessage(rmNamespaceValue));
 
 			}
 
@@ -978,7 +981,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 					String specVersion = specVersionBean.getValue();
 					if (SpecSpecificConstants.isLastMessageIndicatorRequired(specVersion))
-						sequence.setLastMessage(new LastMessage(factory, rmNamespaceValue));
+						sequence.setLastMessage(new LastMessage(rmNamespaceValue));
 				}
 			}
 		}
@@ -1001,14 +1004,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			identifierStr = (String) outSequenceBean.getValue();
 		}
 
-		Identifier id1 = new Identifier(factory, rmNamespaceValue);
+		Identifier id1 = new Identifier(rmNamespaceValue);
 		id1.setIndentifer(identifierStr);
 		sequence.setIdentifier(id1);
 		rmMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
 
 		if (addAckRequested) {
-			ackRequested = new AckRequested(factory, rmNamespaceValue);
-			Identifier id2 = new Identifier(factory, rmNamespaceValue);
+			ackRequested = new AckRequested(rmNamespaceValue);
+			Identifier id2 = new Identifier(rmNamespaceValue);
 			id2.setIndentifer(identifierStr);
 			ackRequested.setIdentifier(id2);
 			rmMsg.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, ackRequested);

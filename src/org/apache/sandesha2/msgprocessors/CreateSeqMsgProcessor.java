@@ -102,7 +102,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 			MessageContext msgcontext = createSeqRMMsg.getMessageContext();
 			token = secManager.getSecurityToken(theSTR, msgcontext);
-			secManager.checkProofOfPossession(token, createSeqPart.getOMElement(), msgcontext);
+			
+			//TODO get the element from the SOAP Envelope
+//			secManager.checkProofOfPossession(token, createSeqPart.getOMElement(), msgcontext);
 		}
 
 		MessageContext outMessage = null;

@@ -42,21 +42,16 @@ public class CreateSequenceResponse implements IOMRMPart {
 	
 	private Expires expires;
 	
-	private OMFactory defaultFactory;
-	
 	private String rmNamespaceValue = null;
 	
 	private String addressingNamespaceValue = null;
 	
-	private OMElement element;
-
 	public CreateSequenceResponse(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					rmNamespaceValue));
 		
-		this.defaultFactory = factory;
 		this.rmNamespaceValue = rmNamespaceValue;
 		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
@@ -72,7 +67,6 @@ public class CreateSequenceResponse implements IOMRMPart {
 					SandeshaMessageKeys.createSeqResponseCannotBeAddedToNonBody));
 
 		SOAPBody SOAPBody = (SOAPBody) bodyElement;
-		element = bodyElement;
 
 		OMElement createSeqResponsePart = SOAPBody
 				.getFirstChildWithName(new QName(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
@@ -81,14 +75,14 @@ public class CreateSequenceResponse implements IOMRMPart {
 					SandeshaMessageKeys.noCreateSeqResponsePartInElement,
 					bodyElement.toString()));
 
-		identifier = new Identifier(defaultFactory,rmNamespaceValue);
+		identifier = new Identifier(rmNamespaceValue);
 		identifier.fromOMElement(createSeqResponsePart);
 
 		OMElement expiresPart = createSeqResponsePart.getFirstChildWithName(
 					new QName(rmNamespaceValue,
 					Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(defaultFactory,rmNamespaceValue);
+			expires = new Expires(rmNamespaceValue);
 			expires.fromOMElement(createSeqResponsePart);
 		}
 
@@ -96,7 +90,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 						new QName(rmNamespaceValue,
 						Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart != null) {
-			accept = new Accept(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
+			accept = new Accept(rmNamespaceValue,addressingNamespaceValue);
 			accept.fromOMElement(createSeqResponsePart);
 		}
 
@@ -118,8 +112,6 @@ public class CreateSequenceResponse implements IOMRMPart {
 					bodyElement.toString()));
 
 		OMFactory factory = bodyElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMNamespace addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
@@ -185,13 +177,10 @@ public class CreateSequenceResponse implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
 	}
 	
-	public OMElement getOMElement() {
-		return element;
-	}
 }

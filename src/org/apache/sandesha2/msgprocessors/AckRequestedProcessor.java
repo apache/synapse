@@ -94,7 +94,9 @@ public class AckRequestedProcessor implements MsgProcessor {
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
-			secManager.checkProofOfPossession(token, ackRequested.getOMElement(), msgContext);
+			
+			//TODO get the ackRequested element from the SOAPEnvelope.
+//			secManager.checkProofOfPossession(token, ackRequested.getOMElement(), msgContext);
 		}
 
 		// Setting the ack depending on AcksTo.

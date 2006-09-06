@@ -33,17 +33,14 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
  */
 public class AckFinal implements IOMRMElement {
 
-	private OMFactory defaultfactory;
-	
 	private String namespaceValue = null;
 	
-	public AckFinal(OMFactory factory,String namespaceValue) throws SandeshaException {
+	public AckFinal(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultfactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -54,8 +51,6 @@ public class AckFinal implements IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException {
 		
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultfactory;
 		
 		OMElement finalPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.FINAL));
@@ -71,8 +66,6 @@ public class AckFinal implements IOMRMElement {
 		//soapheaderblock element will be given
 
 		OMFactory factory = sequenceAckElement.getOMFactory();
-		if (factory==null)
-			factory = defaultfactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement finalElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.FINAL, rmNamespace);
@@ -87,7 +80,7 @@ public class AckFinal implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return false;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

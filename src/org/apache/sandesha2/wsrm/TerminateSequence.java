@@ -39,19 +39,14 @@ public class TerminateSequence implements IOMRMPart {
 
 	private Identifier identifier;
 	
-	private SOAPFactory defaultFactory;
-	
 	private String namespaceValue = null;
 	
-	private OMElement element;
-	
-	public TerminateSequence(SOAPFactory factory, String namespaceValue) throws SandeshaException {
+	public TerminateSequence(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -65,8 +60,6 @@ public class TerminateSequence implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.terminateSeqCannotBeAddedToNonBody));
 
-		element = body;
-		
 		OMElement terminateSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 
@@ -75,7 +68,7 @@ public class TerminateSequence implements IOMRMPart {
 					SandeshaMessageKeys.noTerminateSeqInElement,
 					body.toString()));
 
-		identifier = new Identifier(defaultFactory,namespaceValue);
+		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(terminateSeqPart);
 
 		return this;
@@ -92,8 +85,6 @@ public class TerminateSequence implements IOMRMPart {
 					SandeshaMessageKeys.nullMsgId));
 
 		OMFactory factory= body.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement terminateSequenceElement = factory.createOMElement(
@@ -129,13 +120,10 @@ public class TerminateSequence implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
 	}
 	
-	public OMElement getOMElement() {
-		return element;
-	}
 }

@@ -35,17 +35,14 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 public class LastMessage implements IOMRMElement {
 
-	private SOAPFactory defaultFactory;
-	
 	private String namespaceValue = null;
 	
-	public LastMessage(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public LastMessage(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -67,8 +64,6 @@ public class LastMessage implements IOMRMElement {
 	public OMElement toOMElement(OMElement sequenceElement) throws OMException {
 
 		OMFactory factory = sequenceElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement lastMessageElement = factory.createOMElement(
@@ -83,7 +78,7 @@ public class LastMessage implements IOMRMElement {
 			return true;
 		
 		//TODO is this optional or not required.
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

@@ -79,10 +79,6 @@ public class SandeshaInHandler extends AbstractHandler {
 					// handlers
 		}
 		
-		// Process Ack headers in the message
-		AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-		ackProcessor.processAckHeaders(msgCtx);
-
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
 		boolean withinTransaction = false;
@@ -99,6 +95,10 @@ public class SandeshaInHandler extends AbstractHandler {
 		boolean rolebacked = false;
 
 		try {
+
+			// Process Ack headers in the message
+			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
+			ackProcessor.processAckHeaders(msgCtx);
 
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {

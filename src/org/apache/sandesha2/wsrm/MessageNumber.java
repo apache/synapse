@@ -36,17 +36,14 @@ public class MessageNumber implements IOMRMElement {
 	
 	private long messageNumber;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
 	
-	public MessageNumber(OMFactory factory,String namespaceValue) throws SandeshaException {
+	public MessageNumber(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 	
@@ -78,8 +75,6 @@ public class MessageNumber implements IOMRMElement {
 		}
 		
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement messageNoElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MSG_NUMBER,rmNamespace);
@@ -97,7 +92,7 @@ public class MessageNumber implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

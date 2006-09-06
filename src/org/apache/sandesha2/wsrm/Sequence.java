@@ -42,18 +42,15 @@ public class Sequence implements IOMRMPart {
 	private Identifier identifier;
 	private MessageNumber messageNumber;
 	private LastMessage lastMessage = null;
-	private SOAPFactory defaultFactory;
 	private boolean mustUnderstand = true;
 	private String namespaceValue = null;
-	private OMElement element;
 	
-	public Sequence(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public Sequence(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -76,9 +73,8 @@ public class Sequence implements IOMRMPart {
 					SandeshaMessageKeys.noSequencePartInElement,
 					headerElement.toString()));
 		
-		element = sequencePart;
-		identifier = new Identifier(defaultFactory,namespaceValue);
-		messageNumber = new MessageNumber(defaultFactory,namespaceValue);
+		identifier = new Identifier(namespaceValue);
+		messageNumber = new MessageNumber(namespaceValue);
 		identifier.fromOMElement(sequencePart);
 		messageNumber.fromOMElement(sequencePart);
 
@@ -86,7 +82,7 @@ public class Sequence implements IOMRMPart {
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.LAST_MSG));
 
 		if (lastMessageElement != null) {
-			lastMessage = new LastMessage(defaultFactory,namespaceValue);
+			lastMessage = new LastMessage(namespaceValue);
 			lastMessage.fromOMElement(sequencePart);
 		}
 
@@ -109,8 +105,6 @@ public class Sequence implements IOMRMPart {
 					SandeshaMessageKeys.seqPartIsNull));
 
 		OMFactory factory = headerElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 
 		OMNamespace rmNamespace = factory.createOMNamespace(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
@@ -174,13 +168,10 @@ public class Sequence implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
 	}
 
-	public OMElement getOMElement() {
-		return element;
-	}
 }

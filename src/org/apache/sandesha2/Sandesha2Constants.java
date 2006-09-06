@@ -27,7 +27,7 @@ public interface Sandesha2Constants {
 	
 	public interface SPEC_VERSIONS {
 		String v1_0 = "Spec_2005_02";
-		String v1_1 = "Spec_2005_10";
+		String v1_1 = "Spec_2006_08";
 	}
 	
 	public interface SPEC_2005_02 {
@@ -56,41 +56,42 @@ public interface Sandesha2Constants {
 		}
 	}
 	
-	public interface SPEC_2005_10 {
+	public interface SPEC_2006_08 {
 		
-		String NS_URI = "http://docs.oasis-open.org/ws-rx/wsrm/200602";
+		String NS_URI = "http://docs.oasis-open.org/ws-rx/wsrm/200608";
+        String SEC_NS_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 		
 		public interface Actions {
 			
-			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequence";
+			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
 
-			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequenceResponse";
+			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequenceResponse";
 
-			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200602/SequenceAcknowledgement";
+			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement";
 
-			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequence";
+			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequence";
 			
-			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequenceResponse";
+			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequenceResponse";
 			
-			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested";
+			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested";
 			
-			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequence";
+			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence";
 			
-			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequenceResponse";
+			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequenceResponse";
 			
-			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequence";
+			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
 
-			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CreateSequenceResponse";
+			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequenceResponse";
 
-			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200602/SequenceAcknowledgement";
+			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement";
 
-			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequence";
+			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequence";
 			
-			String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/TerminateSequenceResponse";
+			String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequenceResponse";
 			
-			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200602/AckRequested";
+			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested";
 			
-			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200602/CloseSequence";
+			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence";
 		}
 	}
 	
@@ -147,6 +148,12 @@ public interface Sandesha2Constants {
 		String NONE = "None";
 		
 		String FINAL = "Final";
+		
+		String MAKE_CONNECTION = "MakeConnection";
+		
+		String MESSAGE_PENDING = "MessagePending";
+		
+		String PENDING = "pending";
 	}
 
 	public interface WSA {
@@ -507,6 +514,6 @@ public interface Sandesha2Constants {
 	
 	String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
-			SPEC_2005_10.NS_URI
+			SPEC_2006_08.NS_URI
 	};
 }

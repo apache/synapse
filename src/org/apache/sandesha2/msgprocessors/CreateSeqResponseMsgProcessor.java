@@ -254,7 +254,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(message);
 			}
 
-			Identifier identifier = new Identifier(factory, assumedRMNamespace);
+			Identifier identifier = new Identifier(assumedRMNamespace);
 			identifier.setIndentifer(newOutSequenceId);
 
 			sequencePart.setIdentifier(identifier);
@@ -262,7 +262,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg
 					.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
 			if (ackRequestedPart != null) {
-				Identifier id1 = new Identifier(factory, assumedRMNamespace);
+				Identifier id1 = new Identifier(assumedRMNamespace);
 				id1.setIndentifer(newOutSequenceId);
 				ackRequestedPart.setIdentifier(id1);
 			}

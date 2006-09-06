@@ -111,9 +111,9 @@ public class SOAPFaultEnvelopeCreator {
 			MessageContext faultMessageContext, FaultData faultData,
 			SOAPFactory factory, String rmNamespaceValue) throws SandeshaException {
 
-		SequenceFault sequenceFault = new SequenceFault(factory, rmNamespaceValue);
+		SequenceFault sequenceFault = new SequenceFault(rmNamespaceValue);
 
-		FaultCode faultCode = new FaultCode(factory, rmNamespaceValue);
+		FaultCode faultCode = new FaultCode(rmNamespaceValue);
 		faultCode.setFaultCode(faultData.getSubcode());
 		sequenceFault.setFaultCode(faultCode);
 	}

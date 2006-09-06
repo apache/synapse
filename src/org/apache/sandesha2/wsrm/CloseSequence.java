@@ -38,11 +38,7 @@ public class CloseSequence implements IOMRMPart {
 
 	private Identifier identifier;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
-	
-	private OMElement element = null;
 	
 	public CloseSequence(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -50,7 +46,6 @@ public class CloseSequence implements IOMRMPart {
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -64,8 +59,6 @@ public class CloseSequence implements IOMRMPart {
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.closeSeqCannotBeAddedToNonBody));
 
-		element = body;
-		
 		OMElement closeSeqPart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE));
 
@@ -74,7 +67,7 @@ public class CloseSequence implements IOMRMPart {
 					SandeshaMessageKeys.noCloseSequencePartInElement,
 					body.toString()));
 
-		identifier = new Identifier(defaultFactory,namespaceValue);
+		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(closeSeqPart);
 
 		return this;
@@ -92,8 +85,6 @@ public class CloseSequence implements IOMRMPart {
 					SandeshaMessageKeys.closeSeqPartNullID));
 
 		OMFactory factory = body.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement closeSequenceElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE, rmNamespace);
@@ -128,13 +119,10 @@ public class CloseSequence implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
 	}
-	
-	public OMElement getOMElement() {
-		return element;
-	}
+
 }

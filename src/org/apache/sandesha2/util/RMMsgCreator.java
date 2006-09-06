@@ -270,8 +270,8 @@ public class RMMsgCreator {
 			String offeredSequence = (String) applicationMsgContext
 					.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
-				SequenceOffer offerPart = new SequenceOffer(factory, rmNamespaceValue);
-				Identifier identifier = new Identifier(factory, rmNamespaceValue);
+				SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);
+				Identifier identifier = new Identifier(rmNamespaceValue);
 				identifier.setIndentifer(offeredSequence);
 				offerPart.setIdentifier(identifier);
 				createSequencePart.setSequenceOffer(offerPart);
@@ -425,8 +425,8 @@ public class RMMsgCreator {
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		terminateRMMessage.setSOAPEnvelop(envelope);
 
-		TerminateSequence terminateSequencePart = new TerminateSequence(factory, rmNamespaceValue);
-		Identifier identifier = new Identifier(factory, rmNamespaceValue);
+		TerminateSequence terminateSequencePart = new TerminateSequence(rmNamespaceValue);
+		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(sequenceId);
 		terminateSequencePart.setIdentifier(identifier);
 		terminateRMMessage.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ, terminateSequencePart);
@@ -478,7 +478,7 @@ public class RMMsgCreator {
 		CreateSequenceResponse response = new CreateSequenceResponse(factory, rmNamespaceValue,
 				addressingNamespaceValue);
 
-		Identifier identifier = new Identifier(factory, rmNamespaceValue);
+		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(newSequenceID);
 
 		response.setIdentifier(identifier);
@@ -489,10 +489,10 @@ public class RMMsgCreator {
 
 			if (outSequenceId != null && !"".equals(outSequenceId)) {
 
-				Accept accept = new Accept(factory, rmNamespaceValue, addressingNamespaceValue);
+				Accept accept = new Accept(rmNamespaceValue, addressingNamespaceValue);
 				EndpointReference acksToEPR = createSeqMessage.getTo();
-				AcksTo acksTo = new AcksTo(factory, rmNamespaceValue, addressingNamespaceValue);
-				Address address = new Address(factory, addressingNamespaceValue);
+				AcksTo acksTo = new AcksTo(rmNamespaceValue, addressingNamespaceValue);
+				Address address = new Address(addressingNamespaceValue);
 				address.setEpr(acksToEPR);
 				acksTo.setAddress(address);
 				accept.setAcksTo(acksTo);
@@ -547,8 +547,8 @@ public class RMMsgCreator {
 		String namespace = terminateSeqRMMsg.getRMNamespaceValue();
 		terminateSeqResponseRMMsg.setRMNamespaceValue(namespace);
 
-		TerminateSequenceResponse terminateSequenceResponse = new TerminateSequenceResponse(factory, namespace);
-		Identifier identifier = new Identifier(factory, namespace);
+		TerminateSequenceResponse terminateSequenceResponse = new TerminateSequenceResponse(namespace);
+		Identifier identifier = new Identifier(namespace);
 		identifier.setIndentifer(sequenceID);
 		terminateSequenceResponse.setIdentifier(identifier);
 
@@ -589,7 +589,7 @@ public class RMMsgCreator {
 		closeSeqResponseRMMsg.setRMNamespaceValue(namespace);
 
 		CloseSequenceResponse closeSequenceResponse = new CloseSequenceResponse(factory, namespace);
-		Identifier identifier = new Identifier(factory, namespace);
+		Identifier identifier = new Identifier(namespace);
 		identifier.setIndentifer(sequenceID);
 		closeSequenceResponse.setIdentifier(identifier);
 
@@ -641,7 +641,7 @@ public class RMMsgCreator {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
 		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory, rmNamespaceValue);
-		Identifier id = new Identifier(factory, rmNamespaceValue);
+		Identifier id = new Identifier(rmNamespaceValue);
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
 
@@ -664,7 +664,7 @@ public class RMMsgCreator {
 		if (sequenceClosedBean != null && Sandesha2Constants.VALUE_TRUE.equals(sequenceClosedBean.getValue())) {
 			// sequence is closed. so add the 'Final' part.
 			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
-				AckFinal ackFinal = new AckFinal(factory, rmNamespaceValue);
+				AckFinal ackFinal = new AckFinal(rmNamespaceValue);
 				sequenceAck.setAckFinal(ackFinal);
 			}
 		}

@@ -242,6 +242,9 @@ public class Invoker extends Thread {
 						new InvokerBean(null, nextMsgno, sequenceId))
 						.iterator();
 
+				
+				//TODO correct the locking mechanism to have one lock per sequence.
+				
 				if (stMapIt.hasNext()) { //the next Msg entry is present.
 
 					String workId = sequenceId + "::" + nextMsgno; //creating a workId to uniquely identify the
@@ -261,7 +264,6 @@ public class Invoker extends Thread {
 					String messageContextKey = bean.getMessageContextRefKey();
 					
 					transaction.commit();
-					
 
 					// start a new worker thread and let it do the invocation.
 					InvokerWorker worker = new InvokerWorker(context,messageContextKey);

@@ -445,7 +445,7 @@ public class SandeshaUtil {
 					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 
 		if (sequenceElem == null)
-			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_10.NS_URI,
+			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2006_08.NS_URI,
 					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 
 		if (sequenceElem != null)
@@ -460,13 +460,13 @@ public class SandeshaUtil {
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
+		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
+		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
+		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
 			rmGlobalMsg = true;
 
 		return rmGlobalMsg;
@@ -482,7 +482,7 @@ public class SandeshaUtil {
 		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
 
-		if (Sandesha2Constants.SPEC_2005_10.Actions.ACTION_CREATE_SEQUENCE.equals(action))
+		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE.equals(action))
 			rmGlobalMsg = true;
 
 		return rmGlobalMsg;

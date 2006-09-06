@@ -23,11 +23,10 @@ package org.apache.sandesha2.wsrm;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMException;
 
 public interface IOMRMElement {
 	public String getNamespaceValue();
-	public Object fromOMElement(OMElement element) throws OMException,SandeshaException ;
-	public OMElement toOMElement(OMElement element) throws OMException, SandeshaException ;
+	public Object fromOMElement(OMElement element) throws SandeshaException ;
+	public OMElement toOMElement(OMElement element) throws SandeshaException ;
 	public boolean isNamespaceSupported (String namespaceName);
 }

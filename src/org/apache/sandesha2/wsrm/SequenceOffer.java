@@ -39,17 +39,14 @@ public class SequenceOffer implements IOMRMElement {
 	
 	private Expires expires = null;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
 
-	public SequenceOffer(OMFactory factory,String namespaceValue) throws SandeshaException {
+	public SequenceOffer(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -67,13 +64,13 @@ public class SequenceOffer implements IOMRMElement {
 					SandeshaMessageKeys.noSeqOfferInElement,
 					createSequenceElement.toString()));
 
-		identifier = new Identifier(defaultFactory,namespaceValue);
+		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(sequenceOfferPart);
 
 		OMElement expiresPart = sequenceOfferPart
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.EXPIRES));
 		if (expiresPart != null) {
-			expires = new Expires(defaultFactory,namespaceValue);
+			expires = new Expires(namespaceValue);
 			expires.fromOMElement(sequenceOfferPart);
 		}
 
@@ -88,8 +85,6 @@ public class SequenceOffer implements IOMRMElement {
 					SandeshaMessageKeys.nullMsgId));
 
 		OMFactory factory = createSequenceElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement sequenceOfferElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER, rmNamespace);
@@ -117,7 +112,7 @@ public class SequenceOffer implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

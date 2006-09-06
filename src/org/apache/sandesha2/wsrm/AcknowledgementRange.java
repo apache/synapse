@@ -39,8 +39,6 @@ public class AcknowledgementRange implements IOMRMElement {
 	
 	private long lowerValue;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
 	
 	public AcknowledgementRange(OMFactory factory, String namespaceValue) throws SandeshaException {
@@ -49,7 +47,6 @@ public class AcknowledgementRange implements IOMRMElement {
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -103,8 +100,6 @@ public class AcknowledgementRange implements IOMRMElement {
 							upperValue + ":" + lowerValue));
 
 		OMFactory factory = sequenceAckElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMAttribute lowerAttrib = factory.createOMAttribute(
 				Sandesha2Constants.WSRM_COMMON.LOWER, null, Long.toString(lowerValue));
@@ -141,7 +136,7 @@ public class AcknowledgementRange implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

@@ -51,7 +51,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private boolean mustUnderstand = false;
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
-	private OMElement ackElement = null;
 	
 	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -75,7 +74,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		if (factory==null)
 			factory = defaultFactory;
 		
-		identifier = new Identifier(defaultFactory,namespaceValue);
+		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(sequenceAckElement);
 
 		Iterator ackRangeParts = sequenceAckElement.getChildrenWithName(new QName(
@@ -104,7 +103,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		if (SpecSpecificConstants.isAckFinalAllowed(rmSpecVersion)) {
 			OMElement ackFinalPart = sequenceAckElement.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.FINAL));
 			if (ackFinalPart!=null) {
-				ackFinal = new AckFinal (defaultFactory,namespaceValue);
+				ackFinal = new AckFinal (namespaceValue);
 				ackFinal.fromOMElement(sequenceAckElement);
 			}
 		}
@@ -112,7 +111,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		if (SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
 			OMElement ackNonePart = sequenceAckElement.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.NONE));
 			if (ackNonePart!=null) {
-				ackNone = new AckNone (defaultFactory,namespaceValue);
+				ackNone = new AckNone (namespaceValue);
 				ackNone.fromOMElement(sequenceAckElement);
 			}
 		}
@@ -164,7 +163,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		//setting a 'None' when nothing is there (for the correct RM version)
 		if (ackNone==null && acknowledgementRangeList.size()==0 && nackList.size()==0 && SpecSpecificConstants.isAckNoneAllowed(rmSpecVersion)) {
-			ackNone = new AckNone (factory,namespaceValue);
+			ackNone = new AckNone (namespaceValue);
 		}
 		
 		if (ackNone!=null) {
@@ -265,7 +264,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
@@ -287,7 +286,4 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		this.ackNone = ackNone;
 	}
 	
-	public OMElement getOMElement() {
-		return ackElement;
-	}
 }

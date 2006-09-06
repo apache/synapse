@@ -36,17 +36,14 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 
 	private String identifier = null;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
 	
-	public Identifier(OMFactory defaultFactory, String namespaceValue) throws SandeshaException {
+	public Identifier(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = defaultFactory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -65,8 +62,6 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException {
 		
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
@@ -94,8 +89,6 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		}
 		
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 			
 		OMNamespace wsrmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER, wsrmNamespace);
@@ -118,7 +111,7 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

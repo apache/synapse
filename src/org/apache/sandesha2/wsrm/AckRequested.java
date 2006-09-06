@@ -41,21 +41,16 @@ public class AckRequested implements IOMRMPart {
 	
 	private MessageNumber messageNumber;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
 	
 	private boolean mustUnderstand = false;
 	
-	private OMElement ackElement = null;
-
-	public AckRequested(OMFactory factory,String namespaceValue) throws SandeshaException {
+	public AckRequested(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -76,15 +71,15 @@ public class AckRequested implements IOMRMPart {
 					SandeshaMessageKeys.noAckRequestedElement,
 					header.toString()));
 
-		ackElement = ackReqPart;
-		identifier = new Identifier(defaultFactory,namespaceValue);
+//		ackElement = ackReqPart;
+		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(ackReqPart);
 
 		OMElement msgNoPart = ackReqPart.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
 
 		if (msgNoPart != null) {
-			messageNumber = new MessageNumber(defaultFactory,namespaceValue);
+			messageNumber = new MessageNumber(namespaceValue);
 			messageNumber.fromOMElement(ackReqPart);
 		}
 
@@ -158,13 +153,10 @@ public class AckRequested implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
 	}
 	
-	public OMElement getOMElement() {
-		return ackElement;
-	}
 }

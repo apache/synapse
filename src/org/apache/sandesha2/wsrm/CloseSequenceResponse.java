@@ -37,11 +37,7 @@ public class CloseSequenceResponse implements IOMRMPart {
 
 	private Identifier identifier;
 	
-	private OMFactory defaultFactory;
-	
 	private String namespaceValue = null;
-	
-	private OMElement element;
 	
 	public CloseSequenceResponse(OMFactory factory, String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -49,7 +45,6 @@ public class CloseSequenceResponse implements IOMRMPart {
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -64,8 +59,6 @@ public class CloseSequenceResponse implements IOMRMPart {
 					SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.closeSeqResponseCannotBeAddedToNonBody));
 
-		element = body;
-		
 		OMElement closeSeqResponsePart = body.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE));
 
@@ -74,7 +67,7 @@ public class CloseSequenceResponse implements IOMRMPart {
 					SandeshaMessageKeys.noCloseSeqResponsePartInElement,
 					body.toString()));
 
-		identifier = new Identifier(defaultFactory,namespaceValue);
+		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(closeSeqResponsePart);
 
 		return this;
@@ -93,8 +86,6 @@ public class CloseSequenceResponse implements IOMRMPart {
 							SandeshaMessageKeys.closeSeqResponsePartNullID));
 
 		OMFactory factory = body.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement closeSequenceResponseElement = factory.createOMElement(
@@ -129,14 +120,10 @@ public class CloseSequenceResponse implements IOMRMPart {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
-	}
-
-	public OMElement getOMElement() {
-		return element;
 	}
 
 }

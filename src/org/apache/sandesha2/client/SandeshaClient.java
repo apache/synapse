@@ -670,8 +670,8 @@ public class SandeshaClient {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
 
-		AckRequested ackRequested = new AckRequested(factory, rmNamespaceValue);
-		Identifier identifier = new Identifier(factory, rmNamespaceValue);
+		AckRequested ackRequested = new AckRequested(rmNamespaceValue);
+		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(outSequenceID);
 		ackRequested.setIdentifier(identifier);
 
@@ -778,7 +778,7 @@ public class SandeshaClient {
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
 
 		CloseSequence closeSequence = new CloseSequence(factory, rmNamespaceValue);
-		Identifier identifier = new Identifier(factory, rmNamespaceValue);
+		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(sequenceID);
 		closeSequence.setIdentifier(identifier);
 
@@ -1060,8 +1060,8 @@ public class SandeshaClient {
 		}
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
-		TerminateSequence terminateSequence = new TerminateSequence(factory, rmNamespaceValue);
-		Identifier identifier = new Identifier(factory, rmNamespaceValue);
+		TerminateSequence terminateSequence = new TerminateSequence(rmNamespaceValue);
+		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(sequenceID);
 		terminateSequence.setIdentifier(identifier);
 		terminateSequence.toSOAPEnvelope(dummyEnvelope);

@@ -24,7 +24,6 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -38,17 +37,14 @@ public class SequenceFault implements IOMRMElement {
 	
 	private FaultCode faultCode;
 	
-	private SOAPFactory defaultFactory;
-	
 	private String namespaceValue = null;
 
-	public SequenceFault(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public SequenceFault(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
-		this.defaultFactory = factory;
 		this.namespaceValue = namespaceValue;
 	}
 
@@ -75,7 +71,7 @@ public class SequenceFault implements IOMRMElement {
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
 
 		if (faultCodePart != null) {
-			faultCode = new FaultCode(defaultFactory,namespaceValue);
+			faultCode = new FaultCode(namespaceValue);
 			faultCode.fromOMElement(sequenceFaultPart);
 		}
 
@@ -89,9 +85,7 @@ public class SequenceFault implements IOMRMElement {
 					SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
 
 		OMFactory factory = body.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
-		
+
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement sequenceFaultElement =factory.createOMElement(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT, rmNamespace);
@@ -115,7 +109,7 @@ public class SequenceFault implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

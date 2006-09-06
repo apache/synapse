@@ -26,24 +26,21 @@ public class Address implements IOMRMElement {
 
 	private EndpointReference epr = null;
 	
-	private OMFactory defaultFactory;
+	private String namespaceValue = null;
 	
-	private String addressingNamespaceValue = null;
-	
-	public Address(OMFactory factory, String addressingNamespaceValue) {
-		this.defaultFactory = factory;
-		this.addressingNamespaceValue = addressingNamespaceValue;
+	public Address(String namespaceValue) {
+		this.namespaceValue = namespaceValue;
 	}
 	
 	public Address (EndpointReference epr,OMFactory factory,String addressingNamespaceValue) {
-		this(factory,addressingNamespaceValue);
+		this(addressingNamespaceValue);
 		this.epr = epr;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 
 		OMElement addressPart = element.getFirstChildWithName(new QName(
-				addressingNamespaceValue, Sandesha2Constants.WSA.ADDRESS));
+				namespaceValue, Sandesha2Constants.WSA.ADDRESS));
 		if (addressPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotFindAddressElement,
@@ -60,7 +57,7 @@ public class Address implements IOMRMElement {
 	}
 
 	public String getNamespaceValue(){
-		return addressingNamespaceValue;
+		return namespaceValue;
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
@@ -70,10 +67,8 @@ public class Address implements IOMRMElement {
 					SandeshaMessageKeys.addressNotValid));
 
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
-		OMNamespace addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
+		OMNamespace addressingNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
 		OMElement addressElement = factory.createOMElement(Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
 		
 		addressElement.setText(epr.getAddress());
@@ -94,7 +89,7 @@ public class Address implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

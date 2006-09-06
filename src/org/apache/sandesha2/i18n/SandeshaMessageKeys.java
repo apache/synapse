@@ -81,6 +81,7 @@ public class SandeshaMessageKeys {
 	public static final String cannotDecideRMVersion="cannotDecideRMVersion";
 	public static final String specVersionPropertyNotAvailable="specVersionPropertyNotAvailable";
 	public static final String specVersionNotSet="specVersionNotSet";
+	public static final String specDoesNotSupportElement="specDoesNotSupportElements";
 		
 	public static final String couldNotSendTerminate="couldNotSendTerminate";
 	public static final String couldNotSendClose="couldNotSendClose";
@@ -169,6 +170,7 @@ public class SandeshaMessageKeys {
 	public static final String invalidAckMessageEntry="invalidAckMessageEntry";
 	public static final String seqPartIsNull="seqPartIsNull";
 	public static final String incomingSequenceNotValidID="incomingSequenceNotValidID";
+	public static final String noMakeConnectionPartInElement="noCloseSequencePartInElement";
 
 	public static final String seqFaultCannotBeExtractedToNonHeader="seqFaultCannotBeExtractedToNonHeader";
 	public static final String seqElementCannotBeAddedToNonHeader="seqElementCannotBeAddedToNonHeader";
@@ -194,6 +196,7 @@ public class SandeshaMessageKeys {
 	public static final String cannotProcessExpires="cannotProcessExpires";
 	public static final String noFaultCode="noFaultCode";
 	public static final String seqAckNonHeader="seqAckNonHeader";
+	public static final String makeConnectionCannotBeAddedToNonBody="makeConnectionCannotBeAddedToNonBody";
 
 	public static final String cannotSetACksTo="cannotSetACksTo";
 	public static final String invalidMsgNumber="invalidMsgNumber";

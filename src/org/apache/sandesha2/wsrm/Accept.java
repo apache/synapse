@@ -37,20 +37,17 @@ public class Accept implements IOMRMElement {
 
 	private AcksTo acksTo;
 	
-	private OMFactory defaultFactory;
-	
 	private String rmNamespaceValue;
 	
 	private String addressingNamespaceValue;
 
 
-	public Accept(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+	public Accept(String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownNamespace,
 					rmNamespaceValue));
 		
-		this.defaultFactory = factory;
 		this.addressingNamespaceValue = addressingNamespaceValue;
 		this.rmNamespaceValue = rmNamespaceValue;
 	}
@@ -62,8 +59,6 @@ public class Accept implements IOMRMElement {
 	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
 
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
 				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACCEPT));
@@ -72,7 +67,7 @@ public class Accept implements IOMRMElement {
 					SandeshaMessageKeys.noAcceptPartInElement,
 					element.toString()));
 
-		acksTo = new AcksTo(defaultFactory,rmNamespaceValue,addressingNamespaceValue);
+		acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
 		acksTo.fromOMElement(acceptPart);
 
 		return this;
@@ -81,8 +76,6 @@ public class Accept implements IOMRMElement {
 	public OMElement toOMElement(OMElement element) throws OMException {
 
 		OMFactory factory = element.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		if (acksTo == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
@@ -109,7 +102,7 @@ public class Accept implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2005_10.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

@@ -36,7 +36,7 @@ public class TerminateSequenceTest extends SandeshaTestCase {
     }
 
     public void testFromOMElement() throws SandeshaException {
-        TerminateSequence terminateSequence =  new TerminateSequence(factory,rmNamespace);
+        TerminateSequence terminateSequence =  new TerminateSequence(rmNamespace);
         SOAPEnvelope env = getSOAPEnvelope("", "TerminateSequence.xml");
         terminateSequence.fromOMElement(env.getBody());
 
@@ -45,8 +45,8 @@ public class TerminateSequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope() throws SandeshaException {
-        TerminateSequence terminateSequence = new TerminateSequence(factory,rmNamespace);
-        Identifier identifier = new Identifier(factory,rmNamespace);
+        TerminateSequence terminateSequence = new TerminateSequence(rmNamespace);
+        Identifier identifier = new Identifier(rmNamespace);
         identifier.setIndentifer("uuid:59b0c910-1625-11da-bdfc-b09ed76a1f06");
         terminateSequence.setIdentifier(identifier);
 

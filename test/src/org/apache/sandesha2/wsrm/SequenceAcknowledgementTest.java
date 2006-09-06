@@ -76,7 +76,7 @@ public class SequenceAcknowledgementTest extends SandeshaTestCase {
 
     public void testToOMElement()  throws SandeshaException {
         SequenceAcknowledgement seqAck = new SequenceAcknowledgement(factory,rmNamespace);
-        Identifier identifier = new Identifier(factory,rmNamespace);
+        Identifier identifier = new Identifier(rmNamespace);
         identifier.setIndentifer("uuid:897ee740-1624-11da-a28e-b3b9c4e71445");
         seqAck.setIdentifier(identifier);
 

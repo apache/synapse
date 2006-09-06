@@ -55,14 +55,14 @@ public class CreateSequenceTest extends SandeshaTestCase {
     public void testToSOAPEnvelope()  throws SandeshaException {
         CreateSequence createSequence = new CreateSequence(factory,rmNamespaceValue,addressingNamespaceValue);
 
-        AcksTo acksTo = new AcksTo(factory,rmNamespaceValue,addressingNamespaceValue);
-        Address address = new Address(factory,addressingNamespaceValue);
+        AcksTo acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
+        Address address = new Address(addressingNamespaceValue);
         address.setEpr(new EndpointReference("http://127.0.0.1:9090/axis/services/RMService"));
         acksTo.setAddress(address);
         createSequence.setAcksTo(acksTo);
 
-        SequenceOffer sequenceOffer = new SequenceOffer(factory,rmNamespaceValue);
-        Identifier identifier = new Identifier(factory,rmNamespaceValue);
+        SequenceOffer sequenceOffer = new SequenceOffer(rmNamespaceValue);
+        Identifier identifier = new Identifier(rmNamespaceValue);
         identifier.setIndentifer("uuid:c3671020-15e0-11da-9b3b-f0439d4867bd");
         sequenceOffer.setIdentifier(identifier);
         createSequence.setSequenceOffer(sequenceOffer);

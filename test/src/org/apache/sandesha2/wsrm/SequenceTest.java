@@ -38,7 +38,7 @@ public class SequenceTest extends SandeshaTestCase {
 
     public void testFromOMElement()  throws SandeshaException {
         SOAPEnvelope env = getSOAPEnvelope("", "Sequence.xml");
-        Sequence sequence = new Sequence(factory,rmNamespace);
+        Sequence sequence = new Sequence(rmNamespace);
         sequence.fromOMElement(env.getHeader());
 
         Identifier identifier = sequence.getIdentifier();
@@ -49,13 +49,13 @@ public class SequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope()  throws SandeshaException {
-        Sequence sequence = new Sequence(factory,rmNamespace);
+        Sequence sequence = new Sequence(rmNamespace);
 
-        Identifier identifier = new Identifier(factory,rmNamespace);
+        Identifier identifier = new Identifier(rmNamespace);
         identifier.setIndentifer("uuid:879da420-1624-11da-bed9-84d13db13902");
         sequence.setIdentifier(identifier);
 
-        MessageNumber msgNo = new MessageNumber(factory,rmNamespace);
+        MessageNumber msgNo = new MessageNumber(rmNamespace);
         msgNo.setMessageNumber(1);
         sequence.setMessageNumber(msgNo);
 

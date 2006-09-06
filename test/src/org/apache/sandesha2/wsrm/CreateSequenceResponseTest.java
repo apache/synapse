@@ -57,13 +57,13 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     public void testToSOAPEnvelope()  throws SandeshaException {
         CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespaceValue,addressingNamespaceValue);
 
-        Identifier identifier = new Identifier(factory,rmNamespaceValue);
+        Identifier identifier = new Identifier(rmNamespaceValue);
         identifier.setIndentifer("uuid:88754b00-161a-11da-b6d6-8198de3c47c5");
         res.setIdentifier(identifier);
 
-        Accept accept = new Accept(factory,rmNamespaceValue,addressingNamespaceValue);
-        AcksTo acksTo = new AcksTo(factory,rmNamespaceValue,addressingNamespaceValue);
-        Address address = new Address(factory,addressingNamespaceValue);
+        Accept accept = new Accept(rmNamespaceValue,addressingNamespaceValue);
+        AcksTo acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
+        Address address = new Address(addressingNamespaceValue);
         address.setEpr(new EndpointReference("http://localhost:8070/axis/services/TestService"));
         acksTo.setAddress(address);
         accept.setAcksTo(acksTo);

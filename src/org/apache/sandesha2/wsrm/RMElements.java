@@ -55,6 +55,7 @@ public class RMElements {
 	private CloseSequence closeSequence = null;
 	private CloseSequenceResponse closeSequenceResponse = null;
 	private AckRequested ackRequested = null;
+	private UsesSequenceSTR usesSequenceSTR = null;
 	private String rmNamespaceValue = null;
 	private String addressingNamespaceValue = null;
 	
@@ -76,7 +77,7 @@ public class RMElements {
 		SOAPFactory factory;
 
 		//Yep, I know. Could hv done it directly :D (just to make it consistent)
-		if (envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
+		if (envelope.getNamespace().getNamespaceURI().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
 		else
 			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_2);
@@ -182,6 +183,15 @@ public class RMElements {
 			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
 			
 			sequenceAcknowledgements.add(sequenceAcknowledgement);
+		}
+
+		OMElement usesSequenceSTRElement = envelope.getHeader()
+		.getFirstChildWithName(
+				new QName(rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR));
+		if (usesSequenceSTRElement != null) {
+			usesSequenceSTR = new UsesSequenceSTR(factory, rmNamespaceValue);
+			usesSequenceSTR.fromOMElement(envelope.getHeader());
 		}
 	}
 
@@ -355,6 +365,14 @@ public class RMElements {
 
 	public void setCloseSequenceResponse(CloseSequenceResponse closeSequenceResponse) {
 		this.closeSequenceResponse = closeSequenceResponse;
+	}
+	
+	public UsesSequenceSTR getUsesSequenceSTR() {
+		return usesSequenceSTR;
+	}
+	
+	public void setUsesSequenceSTR(UsesSequenceSTR header) {
+		usesSequenceSTR = header;
 	}
 
 	public String getAddressingNamespaceValue() {

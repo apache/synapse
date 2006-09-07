@@ -154,6 +154,8 @@ public interface Sandesha2Constants {
 		String MESSAGE_PENDING = "MessagePending";
 		
 		String PENDING = "pending";
+		
+		String USES_SEQUENCE_STR = "UsesSequenceSTR";
 	}
 
 	public interface WSA {
@@ -215,7 +217,9 @@ public interface Sandesha2Constants {
 		
 		int ACK_REQUEST = 15;
 
-		int MAX_MSG_PART_ID = 15;
+		int USES_SEQUENCE_STR = 16;
+
+		int MAX_MSG_PART_ID = 16;
 	}
 
 	public interface SequenceProperties {

@@ -139,6 +139,11 @@ public class MsgInitializer {
 					.getCloseSequenceResponse());
 			rmNamespace = elements.getCloseSequenceResponse().getNamespaceValue();
 		}
+		
+		if (elements.getUsesSequenceSTR() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.USES_SEQUENCE_STR, elements
+					.getUsesSequenceSTR());
+		}
 
 		rmMsgContext.setRMNamespaceValue(rmNamespace);
 

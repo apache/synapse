@@ -26,6 +26,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -71,9 +72,17 @@ public class SecurityTest extends SandeshaTestCase {
 		Thread.sleep(300);
 		super.tearDown();
 	}
+	
+	// Test the create sequence flow for the 2 spec versions
+	public void testCreateSequence()
+	throws Exception
+	{
+		createSequence(Sandesha2Constants.SPEC_VERSIONS.v1_0);
+		createSequence(Sandesha2Constants.SPEC_VERSIONS.v1_1);
+	}
 
 	// Check that we can send a create sequence that includes a token reference.
-	public void testCreateSequence() throws Exception {
+	public void createSequence(String spec) throws Exception {
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 
 		String repoPath = "target" + File.separator + "repos" + File.separator + "secure-client";
@@ -88,6 +97,7 @@ public class SecurityTest extends SandeshaTestCase {
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,to);
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, spec);
 		serviceClient.setOptions(clientOptions);
 		
 		SandeshaClient.createSequence(serviceClient,false);

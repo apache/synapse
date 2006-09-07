@@ -58,7 +58,7 @@ public class UnitTestSecurityManager extends SecurityManager {
 	{
 		OMElement reference = theSTR.getFirstChildWithName(new QName(secNamespace, "Reference"));
 		String securityTokenURI = reference.getAttributeValue(new QName("URI"));
-		String key = securityTokenURI.substring(10);
+		String key = securityTokenURI;
 		return (SecurityToken) tokens.get(key);
 	}
 

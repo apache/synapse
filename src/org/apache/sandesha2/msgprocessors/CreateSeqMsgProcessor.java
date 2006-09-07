@@ -103,8 +103,10 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			MessageContext msgcontext = createSeqRMMsg.getMessageContext();
 			token = secManager.getSecurityToken(theSTR, msgcontext);
 			
-			//TODO get the element from the SOAP Envelope
-//			secManager.checkProofOfPossession(token, createSeqPart.getOMElement(), msgcontext);
+			// The create must be the body part of this message, so we check the
+			// security of that element.
+			OMElement body = msgcontext.getEnvelope().getBody();
+			secManager.checkProofOfPossession(token, body, msgcontext);
 		}
 
 		MessageContext outMessage = null;

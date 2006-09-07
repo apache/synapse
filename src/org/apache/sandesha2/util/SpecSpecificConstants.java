@@ -292,7 +292,11 @@ public class SpecSpecificConstants {
 		if(rmNamespace.equals(Sandesha2Constants.SPEC_2005_02.NS_URI)) {
 			return Sandesha2Constants.SPEC_2005_02.SEC_NS_URI;
 		}
-		// Other spec levels do not have security interop defined (yet)
+
+		if(rmNamespace.equals(Sandesha2Constants.SPEC_2006_08.NS_URI)) {
+			return Sandesha2Constants.SPEC_2006_08.SEC_NS_URI;
+		}
+
 		return null;
 	}
 }

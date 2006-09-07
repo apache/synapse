@@ -1,0 +1,27 @@
+<service name="RMInteropService">
+   <parameter name="ServiceClass" locked="xsd:false">sandesha2.interop.service.RMInteropService</parameter>
+
+    <description>
+        A simple service used for interops.
+    </description>
+
+    <module ref="sandesha2" />
+       
+    <operation name="ping" mep="http://www.w3.org/2004/08/wsdl/in-only">  
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+    </operation>
+    
+    <operation name="echoString">
+        <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+    </operation>
+       
+    <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />
+
+    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	    xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+	        
+    </wsp:Policy>
+    
+    
+</service>

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.wsrm_2006_02;
+package sandesha2.interop.rm1_1.clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -37,10 +38,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
-public class Scenario_1_2 {
+public class Scenario_1_1 {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
 	private static final String ping = "ping";
@@ -58,7 +56,7 @@ public class Scenario_1_2 {
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault,IOException {
+	public static void main(String[] args) throws AxisFault,IOException  {
 		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)
@@ -68,7 +66,7 @@ public class Scenario_1_2 {
 			AXIS2_CLIENT_PATH = axisClientRepo;
 			SANDESHA2_HOME = "";
 		}
-
+		
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("sandesha2_interop.properties");
 
 		Properties properties = new Properties();
@@ -78,8 +76,8 @@ public class Scenario_1_2 {
 		
 		toEPR = properties.getProperty("to");
 		transportToEPR = properties.getProperty("transportTo");
-		
-		new Scenario_1_2 ().run();
+
+		new Scenario_1_1 ().run();
 	}
 	
 	private void run () throws AxisFault {
@@ -101,10 +99,8 @@ public class Scenario_1_2 {
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
-
-//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
-		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
 		clientOptions.setAction("urn:wsrm:Ping");
@@ -113,46 +109,26 @@ public class Scenario_1_2 {
 		
 		serviceClient.setOptions(clientOptions);
 		
-		clientOptions.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_TRUE);
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		serviceClient.fireAndForget(getPingOMBlock("ping31"));
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
-		clientOptions.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_FALSE);
-
-		SequenceReport sequenceReport = null;
-		
-		boolean established = false;
-		while (!established) {
+		SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
 			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getSequenceStatus()>=SequenceReport.SEQUENCE_STATUS_ESTABLISHED) 
-				established = true;
-			else {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			} 
-		}
-		
-		SandeshaClient.sendAckRequest(serviceClient);
-		
-		SandeshaClient.terminateSequence(serviceClient);
-		
-		boolean terminated = false;
-		while (!terminated) {
-			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getSequenceStatus()==SequenceReport.SEQUENCE_STATUS_TERMINATED) 
-				terminated = true;
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
 			else {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
-				}
-			} 
-		}
+	    		}
+			}
+		} 		
 		
+		SandeshaClient.terminateSequence(serviceClient);
 		serviceClient.finalizeInvoke();
 	}
 	

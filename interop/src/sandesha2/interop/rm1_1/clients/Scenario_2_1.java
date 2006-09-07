@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.wsrm_2006_02;
+package sandesha2.interop.rm1_1.clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +40,10 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.util.SandeshaUtil;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
-public class Scenario_2_2 {
+public class Scenario_2_1 {
 	
 	private final static String applicationNamespaceName = "http://tempuri.org/"; 
 	private final static String echoString = "echoString";
@@ -58,7 +57,7 @@ public class Scenario_2_2 {
 	private static String transportToIP = "127.0.0.1";
 	private static String transportToPort = "8070";
 	private static String servicePart = "/axis2/services/RMInteropService";
-	private static String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
+	private static String toAddress = "http://" + toIP +  ":" + toPort + servicePart;
 	private static String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
@@ -84,10 +83,10 @@ public class Scenario_2_2 {
 			properties.load(in);
 		}
 		
-		toEPR = properties.getProperty("to");
+		toAddress = properties.getProperty("to");
 		transportToEPR = properties.getProperty("transportTo");
 		
-		new Scenario_2_2 ().run();
+		new Scenario_2_1 ().run();
 	}
 	
 	private void run () throws Exception {
@@ -106,7 +105,22 @@ public class Scenario_2_2 {
 		Options clientOptions = new Options ();
 		
 		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setTo(new EndpointReference (toEPR));
+		
+		EndpointReference toEPR = new EndpointReference (toAddress);
+		
+		
+		OMFactory factory = OMAbstractFactory.getOMFactory();
+		OMNamespace namespace = factory.createOMNamespace("urn:wsrm:InteropOptions","rmi");
+		OMElement acceptOfferElem = factory.createOMElement("acceptOffer",namespace);
+		OMElement useOfferElem = factory.createOMElement("useOffer",namespace);
+		acceptOfferElem.setText("true");
+		useOfferElem.setText("true");
+		toEPR.addReferenceParameter(acceptOfferElem);
+		toEPR.addReferenceParameter(useOfferElem);
+//		clientOptions.setManageSession(true); // without this reference params wont go.
+		serviceClient.setTargetEPR(toEPR);
+		
+		clientOptions.setTo(toEPR);
 		
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
@@ -116,17 +130,17 @@ public class Scenario_2_2 {
 		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
+		clientOptions.setAction("urn:wsrm:EchoString");
+		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
-//		clientOptions.setProperty(SandeshaClient.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
-		
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 
-		clientOptions.setAction("urn:wsrm:EchoString");
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
 		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
@@ -148,8 +162,23 @@ public class Scenario_2_2 {
             Thread.sleep(1000);
         }
         
+    	SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 	
        
         SandeshaClient.terminateSequence(serviceClient);
+//        serviceClient.finalizeInvoke();
         
 	}
 

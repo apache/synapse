@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.wsrm_2006_02;
+package sandesha2.interop.rm1_1.clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,10 +37,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
-public class Scenario_1_3 {
+public class Scenario_1_2 {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
 	private static final String ping = "ping";
@@ -68,7 +65,7 @@ public class Scenario_1_3 {
 			AXIS2_CLIENT_PATH = axisClientRepo;
 			SANDESHA2_HOME = "";
 		}
-		
+
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("sandesha2_interop.properties");
 
 		Properties properties = new Properties();
@@ -79,7 +76,7 @@ public class Scenario_1_3 {
 		toEPR = properties.getProperty("to");
 		transportToEPR = properties.getProperty("transportTo");
 		
-		new Scenario_1_3 ().run();
+		new Scenario_1_2 ().run();
 	}
 	
 	private void run () throws AxisFault {
@@ -101,29 +98,49 @@ public class Scenario_1_3 {
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
+//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
-//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
-
 		clientOptions.setAction("urn:wsrm:Ping");
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);		
-
+		
 		serviceClient.setOptions(clientOptions);
 		
-		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(1));
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		clientOptions.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_TRUE);
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		serviceClient.fireAndForget(getPingOMBlock("ping31"));
 		
-		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(3));
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		clientOptions.setProperty(SandeshaClientConstants.DUMMY_MESSAGE,Sandesha2Constants.VALUE_FALSE);
+
+		SequenceReport sequenceReport = null;
 		
-		boolean complete = false;
-		while (!complete) {
-			SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==2) 
-				complete = true;
+		boolean established = false;
+		while (!established) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getSequenceStatus()>=SequenceReport.SEQUENCE_STATUS_ESTABLISHED) 
+				established = true;
+			else {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			} 
+		}
+		
+		SandeshaClient.sendAckRequest(serviceClient);
+		
+		SandeshaClient.terminateSequence(serviceClient);
+		
+		boolean terminated = false;
+		while (!terminated) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getSequenceStatus()==SequenceReport.SEQUENCE_STATUS_TERMINATED) 
+				terminated = true;
 			else {
 				try {
 					Thread.sleep(1000);
@@ -132,13 +149,7 @@ public class Scenario_1_3 {
 				}
 			} 
 		}
-
-		SandeshaClient.closeSequence(serviceClient);
 		
-		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(4));
-		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
-
-		SandeshaClient.terminateSequence(serviceClient);		
 		serviceClient.finalizeInvoke();
 	}
 	

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.apache.sandesha2.wsrm_2006_02;
+package sandesha2.interop.rm1_1.clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,9 +42,6 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.util.SandeshaUtil;
 
-/**
- * @author Chamikara Jayalath <chamikaramj@gmail.com>
- */
 public class Scenario_2_3 {
 	
 	private final static String applicationNamespaceName = "http://tempuri.org/"; 

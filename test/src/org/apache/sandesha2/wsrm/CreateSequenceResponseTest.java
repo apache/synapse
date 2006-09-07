@@ -40,7 +40,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testFromOMElement() throws SandeshaException {
-        CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespaceValue,addressingNamespaceValue);
+        CreateSequenceResponse res = new CreateSequenceResponse(rmNamespaceValue,addressingNamespaceValue);
         SOAPEnvelope env = getSOAPEnvelope("", "CreateSequenceResponse.xml");
         res.fromOMElement(env.getBody());
 
@@ -55,7 +55,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope()  throws SandeshaException {
-        CreateSequenceResponse res = new CreateSequenceResponse(factory,rmNamespaceValue,addressingNamespaceValue);
+        CreateSequenceResponse res = new CreateSequenceResponse(rmNamespaceValue,addressingNamespaceValue);
 
         Identifier identifier = new Identifier(rmNamespaceValue);
         identifier.setIndentifer("uuid:88754b00-161a-11da-b6d6-8198de3c47c5");

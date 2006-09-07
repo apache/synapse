@@ -39,7 +39,7 @@ public class CreateSequenceTest extends SandeshaTestCase {
     }
 
     public void testfromOMElement()  throws SandeshaException {
-        CreateSequence createSequence = new CreateSequence(factory,rmNamespaceValue,addressingNamespaceValue);
+        CreateSequence createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
         createSequence.fromOMElement(getSOAPEnvelope("", "CreateSequence.xml").getBody());
 
         AcksTo acksTo = createSequence.getAcksTo();
@@ -53,7 +53,7 @@ public class CreateSequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope()  throws SandeshaException {
-        CreateSequence createSequence = new CreateSequence(factory,rmNamespaceValue,addressingNamespaceValue);
+        CreateSequence createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
 
         AcksTo acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
         Address address = new Address(addressingNamespaceValue);

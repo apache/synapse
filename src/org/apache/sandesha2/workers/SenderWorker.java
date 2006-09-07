@@ -35,9 +35,9 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class SenderWorker extends SandeshaWorker implements Runnable {
 
-	ConfigurationContext configurationContext = null;
-	String messageId = null;
-	Log log = LogFactory.getLog(SenderWorker.class);
+	private ConfigurationContext configurationContext = null;
+	private String messageId = null;
+	private static final Log log = LogFactory.getLog(SenderWorker.class);
 	
 	public SenderWorker (ConfigurationContext configurationContext, String messageId) {
 		this.configurationContext = configurationContext;
@@ -59,8 +59,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
 
-			MessageRetransmissionAdjuster retransmitterAdjuster = new MessageRetransmissionAdjuster();
-			boolean continueSending = retransmitterAdjuster.adjustRetransmittion(senderBean, configurationContext,
+			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+
+			boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(rmMsgCtx, senderBean, configurationContext,
 					storageManager);
 			if (!continueSending) {
 				return;
@@ -86,8 +87,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendHasUnavailableMsgEntry));
 				return;			
 			}
-
-			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
 			// operation is the lowest level Sandesha2 should be attached
 			ArrayList msgsNotToSend = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation()).getMsgTypesToDrop();

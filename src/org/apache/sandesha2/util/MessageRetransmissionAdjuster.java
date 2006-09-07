@@ -28,8 +28,6 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.client.SequenceReport;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
@@ -42,22 +40,17 @@ public class MessageRetransmissionAdjuster {
 
 	private static final Log log = LogFactory.getLog(MessageRetransmissionAdjuster.class);
 
-	public boolean adjustRetransmittion(SenderBean retransmitterBean, ConfigurationContext configContext,
+	public static boolean adjustRetransmittion(RMMsgContext rmMsgCtx, SenderBean retransmitterBean, ConfigurationContext configContext,
 			StorageManager storageManager) throws SandeshaException {
 
-		String storedKey = (String) retransmitterBean.getMessageContextRefKey();
-
-		if (storedKey == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.storedKeyNotPresent));
-
-		MessageContext messageContext = storageManager.retrieveMessageContext(storedKey, configContext);
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messageContext);
+		if (log.isDebugEnabled())
+			log.debug("Enter: MessageRetransmissionAdjuster::adjustRetransmittion");
 
 		String internalSequenceID = retransmitterBean.getInternalSequenceID();
 		String sequenceID = retransmitterBean.getSequenceID();
 
 		// operation is the lowest level Sandesha2 could be attached.
-		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(messageContext.getAxisOperation());
+		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation());
 
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
@@ -78,10 +71,12 @@ public class MessageRetransmissionAdjuster {
 
 			// Only messages of outgoing sequences get retransmitted. So named
 			// following method according to that.
-			finalizeTimedOutSequence(internalSequenceID, sequenceID, messageContext, storageManager);
+			finalizeTimedOutSequence(internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
 			continueSending = false;
 		}
 
+		if (log.isDebugEnabled())
+			log.debug("Exit: MessageRetransmissionAdjuster::adjustRetransmittion, " + continueSending);
 		return continueSending;
 	}
 
@@ -94,7 +89,7 @@ public class MessageRetransmissionAdjuster {
 	 * @param policyBean
 	 * @return
 	 */
-	private SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPropertyBean propertyBean) {
+	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPropertyBean propertyBean) {
 
 		// long lastSentTime = retransmitterBean.getTimeToSend();
 
@@ -117,11 +112,11 @@ public class MessageRetransmissionAdjuster {
 		return retransmitterBean;
 	}
 
-	private void stopRetransmission(SenderBean bean) {
+	private static void stopRetransmission(SenderBean bean) {
 		bean.setSend(false);
 	}
 
-	private long generateNextExponentialBackedoffDifference(int count, long initialInterval) {
+	private static long generateNextExponentialBackedoffDifference(int count, long initialInterval) {
 		long interval = initialInterval;
 		for (int i = 1; i < count; i++) {
 			interval = interval * 2;
@@ -130,7 +125,7 @@ public class MessageRetransmissionAdjuster {
 		return interval;
 	}
 
-	private void finalizeTimedOutSequence(String internalSequenceID, String sequenceID, MessageContext messageContext,
+	private static void finalizeTimedOutSequence(String internalSequenceID, String sequenceID, MessageContext messageContext,
 			StorageManager storageManager) throws SandeshaException {
 		ConfigurationContext configurationContext = messageContext.getConfigurationContext();
 

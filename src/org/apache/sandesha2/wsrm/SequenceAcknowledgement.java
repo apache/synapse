@@ -46,20 +46,18 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private Identifier identifier;
 	private ArrayList acknowledgementRangeList;
 	private ArrayList nackList;
-	private SOAPFactory defaultFactory;
 	private String namespaceValue = null;
 	private boolean mustUnderstand = false;
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
 	
-	public SequenceAcknowledgement(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public SequenceAcknowledgement(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					namespaceValue));
 		
 		this.namespaceValue = namespaceValue;
-		this.defaultFactory = factory;
 		acknowledgementRangeList = new ArrayList();
 		nackList = new ArrayList();
 	}
@@ -71,8 +69,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	public Object fromOMElement(OMElement sequenceAckElement) throws OMException,SandeshaException {
 
 		OMFactory factory = sequenceAckElement.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(sequenceAckElement);
@@ -83,7 +79,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		while (ackRangeParts.hasNext()) {
 			OMElement ackRangePart = (OMElement) ackRangeParts.next();
 
-			AcknowledgementRange ackRange = new AcknowledgementRange(defaultFactory,namespaceValue);
+			AcknowledgementRange ackRange = new AcknowledgementRange(namespaceValue);
 			ackRange.fromOMElement(ackRangePart);
 			acknowledgementRangeList.add(ackRange);
 		}
@@ -93,7 +89,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 		while (nackParts.hasNext()) {
 			OMElement nackPart = (OMElement) nackParts.next();
-			Nack nack = new Nack(defaultFactory,namespaceValue);
+			Nack nack = new Nack(namespaceValue);
 			nack.fromOMElement(nackPart);
 			nackList.add(nack);
 		}
@@ -125,8 +121,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			throw new OMException();
 
 		OMFactory factory = header.getOMFactory();
-		if (factory==null)
-			factory = defaultFactory;
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		

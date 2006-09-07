@@ -262,7 +262,7 @@ public class RMMsgCreator {
 		String addressingNamespaceValue = SandeshaUtil.getSequenceProperty(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 
-		CreateSequence createSequencePart = new CreateSequence(factory, rmNamespaceValue, addressingNamespaceValue);
+		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue, addressingNamespaceValue);
 
 		// Adding sequence offer - if present
 		OperationContext operationcontext = applicationMsgContext.getOperationContext();
@@ -475,7 +475,7 @@ public class RMMsgCreator {
 		String addressingNamespaceValue = SandeshaUtil.getSequenceProperty(newSequenceID,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 
-		CreateSequenceResponse response = new CreateSequenceResponse(factory, rmNamespaceValue,
+		CreateSequenceResponse response = new CreateSequenceResponse(rmNamespaceValue,
 				addressingNamespaceValue);
 
 		Identifier identifier = new Identifier(rmNamespaceValue);
@@ -588,7 +588,7 @@ public class RMMsgCreator {
 		String namespace = closeSeqRMMsg.getRMNamespaceValue();
 		closeSeqResponseRMMsg.setRMNamespaceValue(namespace);
 
-		CloseSequenceResponse closeSequenceResponse = new CloseSequenceResponse(factory, namespace);
+		CloseSequenceResponse closeSequenceResponse = new CloseSequenceResponse(namespace);
 		Identifier identifier = new Identifier(namespace);
 		identifier.setIndentifer(sequenceID);
 		closeSequenceResponse.setIdentifier(identifier);
@@ -640,7 +640,7 @@ public class RMMsgCreator {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
-		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(factory, rmNamespaceValue);
+		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
 		Identifier id = new Identifier(rmNamespaceValue);
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);

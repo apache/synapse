@@ -46,7 +46,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 	
 	private String addressingNamespaceValue = null;
 	
-	public CreateSequenceResponse(OMFactory factory, String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+	public CreateSequenceResponse(String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,

@@ -37,7 +37,7 @@ public class Nack implements IOMRMElement {
 	
 	private String namespaceValue = null;
 		
-	public Nack(SOAPFactory factory,String namespaceValue) throws SandeshaException {
+	public Nack(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,

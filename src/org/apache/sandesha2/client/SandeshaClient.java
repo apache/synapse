@@ -777,7 +777,7 @@ public class SandeshaClient {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
 
-		CloseSequence closeSequence = new CloseSequence(factory, rmNamespaceValue);
+		CloseSequence closeSequence = new CloseSequence(rmNamespaceValue);
 		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(sequenceID);
 		closeSequence.setIdentifier(identifier);

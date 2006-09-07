@@ -52,7 +52,7 @@ public class CreateSequence implements IOMRMPart {
 	
 	private OMElement securityTokenReference = null;
 	
-	public CreateSequence(OMFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
+	public CreateSequence(String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -64,7 +64,7 @@ public class CreateSequence implements IOMRMPart {
 	}
 	
 	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
-		this (factory,rmNamespaceValue,addressingNamespaceValue);
+		this (rmNamespaceValue,addressingNamespaceValue);
 		this.acksTo = acksTo;
 	}
 

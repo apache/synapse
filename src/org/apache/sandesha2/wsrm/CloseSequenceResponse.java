@@ -39,7 +39,7 @@ public class CloseSequenceResponse implements IOMRMPart {
 	
 	private String namespaceValue = null;
 	
-	public CloseSequenceResponse(OMFactory factory, String namespaceValue) throws SandeshaException {
+	public CloseSequenceResponse(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,

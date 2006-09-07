@@ -41,7 +41,7 @@ public class AcknowledgementRange implements IOMRMElement {
 	
 	private String namespaceValue = null;
 	
-	public AcknowledgementRange(OMFactory factory, String namespaceValue) throws SandeshaException {
+	public AcknowledgementRange(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,

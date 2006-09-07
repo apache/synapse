@@ -131,7 +131,7 @@ public class SandeshaUtil {
 				completed = false;
 			} else {
 				// add ackRange (lower,upper)
-				AcknowledgementRange ackRange = new AcknowledgementRange(factory, rmNamespaceValue);
+				AcknowledgementRange ackRange = new AcknowledgementRange(rmNamespaceValue);
 				ackRange.setLowerValue(lower);
 				ackRange.setUpperValue(upper);
 				ackRanges.add(ackRange);
@@ -143,7 +143,7 @@ public class SandeshaUtil {
 		}
 
 		if (!completed) {
-			AcknowledgementRange ackRange = new AcknowledgementRange(factory, rmNamespaceValue);
+			AcknowledgementRange ackRange = new AcknowledgementRange(rmNamespaceValue);
 			ackRange.setLowerValue(lower);
 			ackRange.setUpperValue(upper);
 			ackRanges.add(ackRange);

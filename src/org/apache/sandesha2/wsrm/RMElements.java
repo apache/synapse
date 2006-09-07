@@ -116,7 +116,7 @@ public class RMElements {
 						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		
 		if (createSeqElement != null) {
-			createSequence = new CreateSequence(factory,rmNamespaceValue,addressingNamespaceValue);
+			createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
 			createSequence.fromOMElement(envelope.getBody());
 		}
 
@@ -125,7 +125,7 @@ public class RMElements {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResElement != null) {
-			createSequenceResponse = new CreateSequenceResponse(factory,rmNamespaceValue,addressingNamespaceValue);
+			createSequenceResponse = new CreateSequenceResponse(rmNamespaceValue,addressingNamespaceValue);
 			createSequenceResponse.fromOMElement(envelope.getBody());
 		}
 
@@ -161,7 +161,7 @@ public class RMElements {
 				new QName(rmNamespaceValue,
 						Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE));
 		if (closeSequenceElement != null) {
-			closeSequence = new CloseSequence (factory,rmNamespaceValue);
+			closeSequence = new CloseSequence (rmNamespaceValue);
 			closeSequence.fromOMElement(envelope.getBody());
 		}
 
@@ -170,7 +170,7 @@ public class RMElements {
 					new QName(rmNamespaceValue,
 							Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE));
 		if (closeSequenceResponseElement != null) {
-			closeSequenceResponse = new CloseSequenceResponse  (factory,rmNamespaceValue);
+			closeSequenceResponse = new CloseSequenceResponse  (rmNamespaceValue);
 			closeSequenceResponse.fromOMElement(envelope.getBody());
 		}
 		
@@ -179,7 +179,7 @@ public class RMElements {
 						Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
 		while (sequenceAcknowledgementIter.hasNext()) {
 			OMElement sequenceAckElement = (OMElement) sequenceAcknowledgementIter.next();
-			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement  (factory,rmNamespaceValue);
+			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement  (rmNamespaceValue);
 			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
 			
 			sequenceAcknowledgements.add(sequenceAcknowledgement);

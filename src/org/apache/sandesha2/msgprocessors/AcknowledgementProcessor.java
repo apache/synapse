@@ -76,7 +76,7 @@ public class AcknowledgementProcessor {
 			Iterator acks = header.getChildrenWithName(headerName);
 			while(acks.hasNext()) {
 				OMElement ack = (OMElement) acks.next();
-				SequenceAcknowledgement seqAck = new SequenceAcknowledgement(null, headerName.getNamespaceURI());
+				SequenceAcknowledgement seqAck = new SequenceAcknowledgement(headerName.getNamespaceURI());
 			  seqAck.fromOMElement(ack);
 			  processAckHeader(message, seqAck);
 			}

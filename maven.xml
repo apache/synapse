@@ -12,22 +12,24 @@
     <ant:property name="build.samples.dir" value="${maven.build.dir}/samples"/>
     <ant:property name="build.samples.services.dir" value="${build.samples.dir}/services"/>
     <ant:property name="build.samples.clients.dir" value="${build.samples.dir}/clients"/>
+    <ant:property name="build.interop.dir" value="${maven.build.dir}/interop"/>
     
-	<ant:property name="mar.name" value="${dist.module.name}.mar"/>
-	<ant:property name="jar.name" value="${dist.name}.jar"/>
-	<ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
+    <ant:property name="mar.name" value="${dist.module.name}.mar"/>
+    <ant:property name="jar.name" value="${dist.name}.jar"/>
+    <ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
 	
-	<ant:property name="dir.samples" value="samples"/>
-	<ant:property name="dir.test.resources" value="test-resources"/>
-	<ant:property name="dir.config" value="config"/>
+    <ant:property name="dir.samples" value="samples"/>
+    <ant:property name="dir.test.resources" value="test-resources"/>
+    <ant:property name="dir.config" value="config"/>
+    <ant:property name="dir.interop" value="interop"/>
+
+    <ant:property name="apache.license.file" value="LICENSE.txt" />
+    <ant:property name="readme.file" value="README.txt" />
+    <ant:property name="release.notes.file" value="release-notes.html" />
 	
-	<ant:property name="apache.license.file" value="LICENSE.txt" />
-	<ant:property name="readme.file" value="README.txt" />
-	<ant:property name="release.notes.file" value="release-notes.html" />
-	
-	<ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
-	<ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
-	<ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
+    <ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
+    <ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
+    <ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
    
     <goal name="build:all" prereqs="mar,jar,client:jar,sample:create,repo:create,test:test" />
     
@@ -227,6 +229,34 @@
     	<!-- <delete dir="${build.temp.dir}" /> -->
     </goal>
     
+    <goal name="interop:compile" prereqs="java:compile" >
+        <ant:mkdir dir="${basedir}/target/interop/classes" />
+        <ant:mkdir dir="${basedir}/target/interop/services" />
+        
+        <ant:javac srcdir="${dir.interop}/src" destdir="${basedir}/target/interop/classes" debug="on">
+            <ant:classpath refid="maven.dependency.classpath" />
+	    	<ant:classpath path="${basedir}/target/classes" />
+        </ant:javac>
+    </goal>
+
+   <goal name="interop:create" prereqs="interop:compile,repo:create">
+        <ant:property name="dir.interop.service.temp" value="${build.temp.dir}/interopService" />
+        <ant:property name="interop.service.aar.name" value="RMInteropService.aar" />
+        
+        <ant:mkdir dir="${dir.interop.service.temp}" />
+        <ant:mkdir dir="${dir.interop.service.temp}/META-INF" />
+        <ant:copy file="${dir.interop}/conf/services.xml" todir="${dir.interop.service.temp}/META-INF" /> 
+        <ant:copy todir="${dir.interop.service.temp}" >
+            <ant:fileset dir="${maven.build.dir}/samples/classes">
+                <ant:include name="sandesha2/interop/service/*Service*.class" />
+            </ant:fileset>
+        </ant:copy>
+        
+        <ant:jar jarfile="${build.interop.dir}/${interop.service.aar.name}" basedir="${dir.interop.service.temp}" />
+        <ant:copy file="${build.interop.dir}/${interop.service.aar.name}" toDir="${build.repo.dir}/server/services" />
+	
+    </goal>
+
     <preGoal name="test:test" > 
        <!--
     	<attainGoal name="server:create"/>

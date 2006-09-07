@@ -189,8 +189,6 @@ public class Sender extends Thread {
 					log.debug(message);
 					continue;
 				}
-	
-				lock.addWork(workId);
 				
 				transaction.commit();
 				
@@ -199,6 +197,10 @@ public class Sender extends Thread {
 				worker.setLock (lock);
 				worker.setWorkId(messageId);
 				threadPool.execute(worker);
+				
+				//adding the workId to the lock after assigning it to a thread makes sure 
+				//that all the workIds in the Lock are handled by threads.
+				lock.addWork(workId);
 
 			} catch (Exception e) {
 

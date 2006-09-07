@@ -258,8 +258,6 @@ public class Invoker extends Thread {
 						continue;
 					}
 					
-					lock.addWork(workId);
-					
 					InvokerBean bean = (InvokerBean) stMapIt.next();
 					String messageContextKey = bean.getMessageContextRefKey();
 					
@@ -272,6 +270,10 @@ public class Invoker extends Thread {
 					worker.setWorkId(workId);
 					
 					threadPool.execute(worker);
+					
+					//adding the workId to the lock after assigning it to a thread makes sure 
+					//that all the workIds in the Lock are handled by threads.
+					lock.addWork(workId);
 				}
 
 			} catch (Exception e) {

@@ -307,7 +307,7 @@ public class RMMsgCreator {
 		if (replyToEPR != null)
 			createSeqRMMsg.setReplyTo(replyToEPR);
 
-		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR, factory, addressingNamespaceValue), factory,
+		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR, addressingNamespaceValue), factory,
 				rmNamespaceValue, addressingNamespaceValue));
 		
 		// Find the token that should be used to secure this new sequence. If there is a token, then we

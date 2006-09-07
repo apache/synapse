@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.util;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.axis2.addressing.AddressingConstants;
@@ -37,6 +36,7 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
+import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.RMElements;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -144,6 +144,16 @@ public class MsgInitializer {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.USES_SEQUENCE_STR, elements
 					.getUsesSequenceSTR());
 		}
+		
+		if (elements.getMakeConnection() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
+					elements.getMakeConnection());
+		}
+		
+		if (elements.getMessagePending() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MESSAGE_PENDING,
+					elements.getMessagePending());
+		}
 
 		rmMsgContext.setRMNamespaceValue(rmNamespace);
 
@@ -169,22 +179,26 @@ public class MsgInitializer {
 
 		String sequenceID = null;
 
-		CreateSequence createSequence = (CreateSequence) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		CreateSequenceResponse createSequenceResponse = (CreateSequenceResponse) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
-		TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
-		TerminateSequenceResponse terminateSequenceResponse = (TerminateSequenceResponse) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
-		Iterator sequenceAcknowledgementsIter = rmMsgCtx
-				.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-		AckRequested ackRequest = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
-		CloseSequence closeSequence = (CloseSequence) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
-		CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE);
+		CreateSequence createSequence = (CreateSequence) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.CREATE_SEQ);
+		CreateSequenceResponse createSequenceResponse = (CreateSequenceResponse) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+		TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+		TerminateSequenceResponse terminateSequenceResponse = (TerminateSequenceResponse) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
+		Iterator sequenceAcknowledgementsIter = rmMsgCtx.getMessageParts(
+				Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.SEQUENCE);
+		AckRequested ackRequest = (AckRequested) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.ACK_REQUEST);
+		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+		CloseSequenceResponse closeSequenceResponse = (CloseSequenceResponse) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE);
+		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(
+				Sandesha2Constants.MessageParts.MAKE_CONNECTION);
 
 		// Setting message type.
 		if (createSequence != null) {
@@ -215,7 +229,18 @@ public class MsgInitializer {
 			sequenceID = closeSequence.getIdentifier().getIdentifier();
 		} else if (closeSequenceResponse != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE);
-			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier();
+			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier(); 
+		} else if (makeConnection != null){ {
+			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
+			if (makeConnection.getIdentifier()!=null) {
+				sequenceID = makeConnection.getIdentifier().getIdentifier();
+			} else if (makeConnection.getAddress()!=null){
+				//TODO get sequenceId based on the anonymous address.
+			} else {
+				throw new SandeshaException (
+						"Invalid MakeConnection message. Either Address or Identifier must be present");
+			}
+		}
 		} else
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 

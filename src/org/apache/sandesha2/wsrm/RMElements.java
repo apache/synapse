@@ -56,6 +56,8 @@ public class RMElements {
 	private CloseSequenceResponse closeSequenceResponse = null;
 	private AckRequested ackRequested = null;
 	private UsesSequenceSTR usesSequenceSTR = null;
+	private MessagePending messagePending = null;
+	private MakeConnection makeConnection = null;
 	private String rmNamespaceValue = null;
 	private String addressingNamespaceValue = null;
 	
@@ -193,6 +195,22 @@ public class RMElements {
 			usesSequenceSTR = new UsesSequenceSTR(factory, rmNamespaceValue);
 			usesSequenceSTR.fromOMElement(envelope.getHeader());
 		}
+		
+		OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(
+				new QName (rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
+		if (makeConnectionElement!=null) {
+			makeConnection = new MakeConnection (rmNamespaceValue);
+			makeConnection.fromOMElement(makeConnectionElement);
+		}
+		
+		OMElement messagePendingElement = envelope.getHeader().getFirstChildWithName(
+				new QName (rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
+		if (messagePendingElement!=null) {
+			messagePending = new MessagePending (rmNamespaceValue);
+			messagePending.fromOMElement(messagePendingElement);
+		}
 	}
 
 	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException  {
@@ -226,6 +244,14 @@ public class RMElements {
 		
 		if (closeSequenceResponse != null) {
 			closeSequenceResponse.toOMElement(envelope.getBody());
+		}
+		
+		if (makeConnection!=null) {
+			makeConnection.toOMElement(envelope.getBody());
+		}
+		
+		if (messagePending!=null) {
+			messagePending.toOMElement(envelope.getHeader());
 		}
 		
 		return envelope;
@@ -293,6 +319,14 @@ public class RMElements {
 		this.ackRequested = ackRequested;
 	}
 	
+	public void setMakeConnection(MakeConnection makeConnection) {
+		this.makeConnection = makeConnection;
+	}
+	
+	public void setMessagePending(MessagePending messagePending) {
+		this.messagePending = messagePending;
+	}
+	
 	private String getRMNamespaceValue (SOAPEnvelope envelope, String action) {
 		SOAPHeader header = envelope.getHeader();
 		if (header!=null) {
@@ -331,6 +365,8 @@ public class RMElements {
 		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE))
 			return Sandesha2Constants.SPEC_2006_08.NS_URI;
 		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE))
+			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_MAKE_CONNECTION))
 			return Sandesha2Constants.SPEC_2006_08.NS_URI;
 		
 		return null;   //a version could not be found
@@ -377,5 +413,13 @@ public class RMElements {
 
 	public String getAddressingNamespaceValue() {
 		return addressingNamespaceValue;
+	}
+
+	public MakeConnection getMakeConnection() {
+		return makeConnection;
+	}
+
+	public MessagePending getMessagePending() {
+		return messagePending;
 	}
 }

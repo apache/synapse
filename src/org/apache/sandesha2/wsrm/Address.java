@@ -32,8 +32,8 @@ public class Address implements IOMRMElement {
 		this.namespaceValue = namespaceValue;
 	}
 	
-	public Address (EndpointReference epr,OMFactory factory,String addressingNamespaceValue) {
-		this(addressingNamespaceValue);
+	public Address (EndpointReference epr,String namespaceValue) {
+		this(namespaceValue);
 		this.epr = epr;
 	}
 

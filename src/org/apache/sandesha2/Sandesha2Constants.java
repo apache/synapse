@@ -79,6 +79,8 @@ public interface Sandesha2Constants {
 			
 			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequenceResponse";
 			
+			String ACTION_MAKE_CONNECTION = "http://docs.oasisopen.org/ws-rx/wsrm/200608/MakeConnection";
+			
 			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
 
 			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequenceResponse";
@@ -92,6 +94,8 @@ public interface Sandesha2Constants {
 			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested";
 			
 			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence";
+			
+			String SOAP_ACTION_MAKE_CONNECTION = "http://docs.oasisopen.org/ws-rx/wsrm/200608/MakeConnection";
 		}
 	}
 	
@@ -191,7 +195,9 @@ public interface Sandesha2Constants {
 
 		int FAULT_MSG = 10;
 		
-		int MAX_MESSAGE_TYPE = 10;
+		int MAKE_CONNECTION_MSG = 11;
+		
+		int MAX_MESSAGE_TYPE = 11;
 	}
 
 	public interface MessageParts {
@@ -218,8 +224,12 @@ public interface Sandesha2Constants {
 		int ACK_REQUEST = 15;
 
 		int USES_SEQUENCE_STR = 16;
+		
+		int MAKE_CONNECTION = 17;
+		
+		int MESSAGE_PENDING = 18;
 
-		int MAX_MSG_PART_ID = 16;
+		int MAX_MSG_PART_ID = 18;
 	}
 
 	public interface SequenceProperties {

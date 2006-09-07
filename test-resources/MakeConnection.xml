@@ -1,0 +1,15 @@
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope"
+xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200608"
+xmlns:wsa="http://www.w3.org/2005/08/addressing">
+<S:Header>
+<wsa:Action>http://docs.oasis-open.org/wsrx/
+wsrm/200608/MakeConnection</wsa:Action>
+<wsa:To> http://example.org/subscriptionService </wsa:To>
+</S:Header>
+<S:Body>
+<wsrm:MakeConnection>
+<wsrm:Identifier>urn:uuid:6367739C8350488CD411576188379313</wsrm:Identifier>
+<wsrm:Address>http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000</wsrm:Address>
+</wsrm:MakeConnection>
+</S:Body>
+</S:Envelope>s

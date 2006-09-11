@@ -95,6 +95,19 @@ public class SynapseConfiguration {
     }
 
     /**
+     * Deletes the mediator named with the given name
+     * @param name of the mediator to be deleted
+     */
+    public void deleteNamedSequence(String name) {
+        Object o = namedSequences.get(name);
+        if(o == null) {
+            handleException("Non existent sequence : " + name);
+        } else {
+            namedSequences.remove(name);
+        }
+    }
+
+    /**
      * Return the "main" (or default) mediator of synapse. The main mediator mediates each and every
      * message flowing through the system. In an XML based configuration, this is specified within the
      * <rules> section of the configuration

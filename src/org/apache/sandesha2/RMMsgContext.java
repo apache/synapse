@@ -147,13 +147,13 @@ public class RMMsgContext {
 	}
 	
 
-	public IOMRMElement getMessagePart(int partId) throws SandeshaException {
+	public IOMRMPart getMessagePart(int partId) throws SandeshaException {
 		if (isMultiPart(partId)) {
 			String message = "It is possible for a multiple MessageParts of this type to exit. Please call the 'getMessageParts' method";
 			throw new SandeshaException (message);
 		}
 		
-		return (IOMRMElement) rmMessageParts.get(new Integer(partId));
+		return (IOMRMPart) rmMessageParts.get(new Integer(partId));
 	}
 	
 	public Iterator getMessageParts (int partId) {

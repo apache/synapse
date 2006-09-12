@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.handlers;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -110,6 +108,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			RMMsgContext rmMsgCtx = null;
 			try {
 				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+				
 			} catch (SandeshaException ex) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInnitMessage);
 				log.debug(message);

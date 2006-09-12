@@ -29,6 +29,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.TerminateSequence;
@@ -103,8 +104,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 //				String sequenceID = sequence.getIdentifier().getIdentifier();
 //			}
 
-			// checking weather this message can carry piggybacked acks
-			if (isAckPiggybackableMsgType(messageType)) {
+//			if (AcknowledgementManager.ackRequired (rmMsgCtx)) {
+//				RMMsgCreator.addAckMessage(rmMsgCtx);
+			
+			//} else 
+				if (isAckPiggybackableMsgType(messageType)) { // checking weather this message can carry piggybacked acks
 				// piggybacking if an ack if available for the same
 				// sequence.
 				// TODO do piggybacking based on wsa:To

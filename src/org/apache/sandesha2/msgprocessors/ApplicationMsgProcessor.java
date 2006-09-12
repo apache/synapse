@@ -289,6 +289,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
 				msgCtx.getConfigurationContext().getAxisConfiguration()).isInOrder();
 
+
+		//setting properties for the messageContext
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceId);
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
+		
 		if (inOrderInvocation) {
 
 			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr.retrieve(
@@ -495,6 +500,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			if (lastAppMessage != null && "true".equals(lastAppMessage))
 				lastMessage = true;
 		}
+		
+		if (internalSequenceId!=null)
+			rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+
+		String propertyKey = SandeshaUtil.getPropertyKey(rmMsgCtx);
 
 		/*
 		 * checking weather the user has given the messageNumber (most of the

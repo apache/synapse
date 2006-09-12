@@ -952,4 +952,48 @@ public class SandeshaUtil {
 			throw new SandeshaException(message,e);
 		}
 	}
+	
+	/**This returns the Key used when store SequencePropertyBeans for the passed message.
+	 * For the sending side this will be the internal sequence ID.
+	 * For the receiving side this is the sequenceId.
+	 * 
+	 * @param rmMsgContext
+	 * @return
+	 */
+	
+	public static String getPropertyKey (RMMsgContext rmMsgContext) {
+		String sequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
+		String internalSequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
+		
+		String propertyKey = null;
+
+		int type = rmMsgContext.getMessageType();
+		int flow = rmMsgContext.getMessageContext().getFLOW();
+		
+		if (flow==MessageContext.OUT_FLOW) {
+			if (type==Sandesha2Constants.MessageTypes.UNKNOWN)
+				propertyKey = internalSequenceId;
+		} else if (flow==MessageContext.IN_FLOW) {
+			if (isSequenceResponseMessageType(type))
+				propertyKey = internalSequenceId;
+			else
+				propertyKey = sequenceId;
+		}
+		
+		//TODO handler faults
+		
+		return propertyKey;
+	}
+	
+	private static boolean isSequenceResponseMessageType (int messageType) {
+		if (messageType==Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE ||
+			messageType==Sandesha2Constants.MessageTypes.ACK ||
+			messageType==Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE ||
+			messageType==Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE) {
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

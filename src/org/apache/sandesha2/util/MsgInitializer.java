@@ -243,17 +243,11 @@ public class MsgInitializer {
 		}
 		} else
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
+		
+		if (sequenceID!=null)
+			rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceID);
 
-		String propertyKey = null;
-		if (rmMsgCtx.getMessageContext().getFLOW() == MessageContext.IN_FLOW) {
-			propertyKey = sequenceID;
-		} else {
-			SequencePropertyBean internalSequenceIDBean = sequencePropertyBeanMgr.retrieve(sequenceID,
-					Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-			if (internalSequenceIDBean != null) {
-				propertyKey = internalSequenceIDBean.getValue();
-			}
-		}
+		String propertyKey = SandeshaUtil.getPropertyKey(rmMsgCtx);
 
 		//In case of ack messages RM Namespace is decided based on the sequenceId of the first 
 		//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements

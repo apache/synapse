@@ -37,6 +37,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Sequence;
 
 /**
  * This is invoked in the inFlow of an RM endpoint. This is responsible for
@@ -108,7 +109,6 @@ public class SandeshaInHandler extends AbstractHandler {
 			RMMsgContext rmMsgCtx = null;
 			try {
 				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-				
 			} catch (SandeshaException ex) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInnitMessage);
 				log.debug(message);

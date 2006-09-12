@@ -530,4 +530,10 @@ public interface Sandesha2Constants {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI
 	};
+	
+	public interface MessageContextProperties{
+		public String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
+		String SEQUENCE_ID = "WSRMSequenceId";
+		String MESSAGE_NUMBER = "WSRMMessageNumber";
+	}
 }

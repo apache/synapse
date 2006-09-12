@@ -391,4 +391,8 @@ public class AcknowledgementManager {
 
 		return false;
 	}
+	
+	public static void addFinalAcknowledgement () {
+		
+	}
 }

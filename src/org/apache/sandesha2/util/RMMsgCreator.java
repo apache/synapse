@@ -672,10 +672,14 @@ public class RMMsgCreator {
 		applicationMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
 
 		sequenceAck.toOMElement(envelope.getHeader());
-		applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(SandeshaUtil.getRMVersion(
-				sequenceId, storageManager)));
-		applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(SandeshaUtil
-				.getRMVersion(sequenceId, storageManager)));
+		
+		if (applicationMsg.getWSAAction()==null) {
+			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(SandeshaUtil.getRMVersion(
+					sequenceId, storageManager)));
+			applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(SandeshaUtil
+					.getRMVersion(sequenceId, storageManager)));
+		}
+		
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 	}
 

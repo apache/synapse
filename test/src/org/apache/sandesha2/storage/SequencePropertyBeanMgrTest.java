@@ -75,12 +75,12 @@ public class SequencePropertyBeanMgrTest extends SandeshaTestCase {
         bean.setValue("Value2");
         Iterator iter = mgr.find(bean).iterator();
         SequencePropertyBean tmp = (SequencePropertyBean) iter.next();
-        if (tmp.getSequenceID().equals("SeqId2")) {
+        if (tmp.getSequencePropertyKey().equals("SeqId2")) {
             tmp = (SequencePropertyBean) iter.next();
-            assertTrue(tmp.getSequenceID().equals("SeqId3"));
+            assertTrue(tmp.getSequencePropertyKey().equals("SeqId3"));
         } else {
             tmp = (SequencePropertyBean) iter.next();
-            assertTrue(tmp.getSequenceID().equals("SeqId2"));
+            assertTrue(tmp.getSequencePropertyKey().equals("SeqId2"));
         }
     }
 

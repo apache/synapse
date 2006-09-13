@@ -199,7 +199,7 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String internalSequenceId,
+	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String sequencePropertyKey,
 			String acksTo, StorageManager storageManager) throws SandeshaException {
 
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
@@ -253,13 +253,13 @@ public class RMMsgCreator {
 
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
-		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId, storageManager);
+		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
-		String addressingNamespaceValue = SandeshaUtil.getSequenceProperty(internalSequenceId,
+		String addressingNamespaceValue = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 
 		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue, addressingNamespaceValue);
@@ -278,9 +278,9 @@ public class RMMsgCreator {
 			}
 		}
 
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(internalSequenceId,
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
-		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
+		SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.TO_EPR);
 
 		if (toBean == null || toBean.getValue() == null)
@@ -330,9 +330,9 @@ public class RMMsgCreator {
 		}
 
 		createSeqRMMsg.setAction(SpecSpecificConstants.getCreateSequenceAction(SandeshaUtil.getRMVersion(
-				internalSequenceId, storageManager)));
+				sequencePropertyKey, storageManager)));
 		createSeqRMMsg.setSOAPAction(SpecSpecificConstants.getCreateSequenceSOAPAction(SandeshaUtil.getRMVersion(
-				internalSequenceId, storageManager)));
+				sequencePropertyKey, storageManager)));
 
 		finalizeCreation(applicationMsgContext, createSeqmsgContext);
 
@@ -619,9 +619,9 @@ public class RMMsgCreator {
 	 * @param sequenceId
 	 * @throws SandeshaException
 	 */
-	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, StorageManager storageManager)
+	public static void addAckMessage(RMMsgContext applicationMsg, String sequencePropertyKey ,String sequenceId, StorageManager storageManager)
 			throws SandeshaException {
-
+		
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(applicationMsg
 				.getSOAPEnvelope()));
 
@@ -634,7 +634,7 @@ public class RMMsgCreator {
 
 		ConfigurationContext ctx = applicationMsg.getMessageContext().getConfigurationContext();
 
-		String rmVersion = SandeshaUtil.getRMVersion(sequenceId, storageManager);
+		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
@@ -647,7 +647,7 @@ public class RMMsgCreator {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequenceId,
+		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 		String msgNoList = (String) seqBean.getValue();
 
@@ -658,7 +658,7 @@ public class RMMsgCreator {
 			sequenceAck.addAcknowledgementRanges(ackRange);
 		}
 
-		SequencePropertyBean sequenceClosedBean = seqPropMgr.retrieve(sequenceId,
+		SequencePropertyBean sequenceClosedBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
 
 		if (sequenceClosedBean != null && Sandesha2Constants.VALUE_TRUE.equals(sequenceClosedBean.getValue())) {

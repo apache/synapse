@@ -73,7 +73,7 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void cleanReceivingSideOnTerminateMessage(ConfigurationContext configContext, String sequenceID,
+	public static void cleanReceivingSideOnTerminateMessage(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		// clean senderMap
 
@@ -83,14 +83,14 @@ public class TerminateManager {
 
 		if (!inOrderInvocation) {
 			// there is no invoking by Sandesha2. So clean invocations storages.
-			cleanReceivingSideAfterInvocation(configContext, sequenceID, storageManager);
+			cleanReceivingSideAfterInvocation(configContext, sequencePropertyKey, sequenceId, storageManager);
 		}
 
-		String cleanStatus = (String) receivingSideCleanMap.get(sequenceID);
+		String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
 		if (cleanStatus != null && CLEANED_AFTER_INVOCATION.equals(cleanStatus))
-			completeTerminationOfReceivingSide(configContext, sequenceID, storageManager);
+			completeTerminationOfReceivingSide(configContext, sequencePropertyKey, sequenceId, storageManager);
 		else {
-			receivingSideCleanMap.put(sequenceID, CLEANED_ON_TERMINATE_MSG);
+			receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
 		}
 	}
 
@@ -103,13 +103,13 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequenceID,
+	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
 
 		// removing storageMap entries
 		InvokerBean findStorageMapBean = new InvokerBean();
-		findStorageMapBean.setSequenceID(sequenceID);
+		findStorageMapBean.setSequenceID(sequenceId);
 		findStorageMapBean.setInvoked(true);
 		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
 		Iterator iterator = collection.iterator();
@@ -126,11 +126,11 @@ public class TerminateManager {
 
 		}
 
-		String cleanStatus = (String) receivingSideCleanMap.get(sequenceID);
+		String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
 		if (cleanStatus != null && CLEANED_ON_TERMINATE_MSG.equals(cleanStatus))
-			completeTerminationOfReceivingSide(configContext, sequenceID, storageManager);
+			completeTerminationOfReceivingSide(configContext, sequencePropertyKey, sequenceId, storageManager);
 		else {
-			receivingSideCleanMap.put(sequenceID, CLEANED_AFTER_INVOCATION);
+			receivingSideCleanMap.put(sequenceId, CLEANED_AFTER_INVOCATION);
 		}
 	}
 
@@ -139,14 +139,14 @@ public class TerminateManager {
 	 * methods.
 	 * 
 	 */
-	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequenceID,
+	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
 		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
 
 		// removing nextMsgMgr entries
 		NextMsgBean findNextMsgBean = new NextMsgBean();
-		findNextMsgBean.setSequenceID(sequenceID);
+		findNextMsgBean.setSequenceID(sequenceId);
 		Collection collection = nextMsgBeanMgr.find(findNextMsgBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
@@ -155,17 +155,17 @@ public class TerminateManager {
 		}
 
 		// removing the HighestInMessage entry.
-		String highestInMessageKey = SandeshaUtil.getSequenceProperty(sequenceID,
+		String highestInMessageKey = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, storageManager);
 		if (highestInMessageKey != null) {
 			storageManager.removeMessageContext(highestInMessageKey);
 		}
 
-		removeReceivingSideProperties(configContext, sequenceID, storageManager);
+		removeReceivingSideProperties(configContext, sequencePropertyKey, sequenceId, storageManager);
 	}
 
-	private static void removeReceivingSideProperties(ConfigurationContext configContext, String sequenceID,
-			StorageManager storageManager) throws SandeshaException {
+	private static void removeReceivingSideProperties(ConfigurationContext configContext, String sequencePropertyKey, 
+			String sequenceId, StorageManager storageManager) throws SandeshaException {
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(
 				Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
@@ -175,7 +175,7 @@ public class TerminateManager {
 			log.debug("AllSequence bean is null");
 
 			ArrayList allSequenceList = SandeshaUtil.getArrayListFromString(allSequenceBean.getValue());
-			allSequenceList.remove(sequenceID);
+			allSequenceList.remove(sequenceId);
 
 			// updating
 			allSequenceBean.setValue(allSequenceList.toString());

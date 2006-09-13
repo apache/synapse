@@ -154,7 +154,7 @@ public class SequenceManager {
 
 	}
 
-	public static void setupNewClientSequence(MessageContext firstAplicationMsgCtx, String internalSequenceId,
+	public static void setupNewClientSequence(MessageContext firstAplicationMsgCtx, String sequencePropertyKey,
 			String specVersion, StorageManager storageManager) throws SandeshaException {
 
 		ConfigurationContext configurationContext = firstAplicationMsgCtx.getConfigurationContext();
@@ -191,7 +191,7 @@ public class SequenceManager {
 																			// with
 																			// addressing.
 
-		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean(internalSequenceId,
+		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, addressingNamespace);
 		seqPropMgr.insert(addressingNamespaceBean);
 
@@ -206,7 +206,7 @@ public class SequenceManager {
 			throw new SandeshaException(message);
 		}
 
-		SequencePropertyBean toBean = new SequencePropertyBean(internalSequenceId,
+		SequencePropertyBean toBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.TO_EPR, toEPR.getAddress());
 		SequencePropertyBean replyToBean = null;
 		SequencePropertyBean acksToBean = null;
@@ -238,9 +238,9 @@ public class SequenceManager {
 																		// req
 																		// msg.
 				if (replyToEPR != null) {
-					replyToBean = new SequencePropertyBean(internalSequenceId,
+					replyToBean = new SequencePropertyBean(sequencePropertyKey,
 							Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
-					acksToBean = new SequencePropertyBean(internalSequenceId,
+					acksToBean = new SequencePropertyBean(sequencePropertyKey,
 							Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, replyToEPR.getAddress());
 				} else {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
@@ -260,7 +260,7 @@ public class SequenceManager {
 			acksTo = anonymousURI;
 		}
 
-		acksToBean = new SequencePropertyBean(internalSequenceId, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
+		acksToBean = new SequencePropertyBean(sequencePropertyKey, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
 				acksTo);
 
 		// start the in listner for the client side, if acksTo is not anonymous.
@@ -288,7 +288,7 @@ public class SequenceManager {
 		}
 
 		SequencePropertyBean msgsBean = new SequencePropertyBean();
-		msgsBean.setSequencePropertyKey(internalSequenceId);
+		msgsBean.setSequencePropertyKey(sequencePropertyKey);
 		msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		msgsBean.setValue("");
 
@@ -304,7 +304,7 @@ public class SequenceManager {
 		String transportTo = (String) firstAplicationMsgCtx.getProperty(MessageContextConstants.TRANSPORT_URL);
 		if (transportTo != null) {
 			SequencePropertyBean transportToBean = new SequencePropertyBean();
-			transportToBean.setSequencePropertyKey(internalSequenceId);
+			transportToBean.setSequencePropertyKey(sequencePropertyKey);
 			transportToBean.setName(Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
 			transportToBean.setValue(transportTo);
 
@@ -313,15 +313,15 @@ public class SequenceManager {
 
 		// setting the spec version for the client side.
 		SequencePropertyBean specVerionBean = new SequencePropertyBean();
-		specVerionBean.setSequencePropertyKey(internalSequenceId);
+		specVerionBean.setSequencePropertyKey(sequencePropertyKey);
 		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 		specVerionBean.setValue(specVersion);
 		seqPropMgr.insert(specVerionBean);
 
 		// updating the last activated time.
-		updateLastActivatedTime(internalSequenceId, storageManager);
+		updateLastActivatedTime(sequencePropertyKey, storageManager);
 
-		SandeshaUtil.startSenderForTheSequence(configurationContext, internalSequenceId);
+		SandeshaUtil.startSenderForTheSequence(configurationContext, sequencePropertyKey);
 
 		
 		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonymousURI);
@@ -406,13 +406,13 @@ public class SequenceManager {
 	 * @param configContext
 	 * @throws SandeshaException
 	 */
-	public static void updateLastActivatedTime(String propertyKey, StorageManager storageManager)
+	public static void updateLastActivatedTime(String sequencePropertyKey, StorageManager storageManager)
 			throws SandeshaException {
 		// Transaction lastActivatedTransaction =
 		// storageManager.getTransaction();
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(propertyKey,
+		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 
 		boolean added = false;
@@ -420,7 +420,7 @@ public class SequenceManager {
 		if (lastActivatedBean == null) {
 			added = true;
 			lastActivatedBean = new SequencePropertyBean();
-			lastActivatedBean.setSequencePropertyKey(propertyKey);
+			lastActivatedBean.setSequencePropertyKey(sequencePropertyKey);
 			lastActivatedBean.setName(Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 		}
 

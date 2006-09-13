@@ -190,7 +190,7 @@ public class AcknowledgementManager {
 		return completedMsgList;
 	}
 
-	public static RMMsgContext generateAckMessage(RMMsgContext referenceRMMessage, String sequenceID,
+	public static RMMsgContext generateAckMessage(RMMsgContext referenceRMMessage, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
@@ -199,7 +199,7 @@ public class AcknowledgementManager {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		// Setting the ack depending on AcksTo.
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceID,
+		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 
 		EndpointReference acksTo = new EndpointReference(acksToBean.getValue());
@@ -256,11 +256,11 @@ public class AcknowledgementManager {
 		ackMsgCtx.setTo(acksTo);
 
 		// adding the SequenceAcknowledgement part.
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceID, storageManager);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequencePropertyKey ,sequenceId, storageManager);
 
 		ackMsgCtx.setProperty(MessageContext.TRANSPORT_IN, null);
 
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 
@@ -307,7 +307,7 @@ public class AcknowledgementManager {
 			ackBean.setMessageContextRefKey(key);
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
-			ackBean.setSequenceID(sequenceID);
+			ackBean.setSequenceID(sequencePropertyKey);
 
 			// this will be set to true in the sender.
 			ackBean.setSend(true);
@@ -361,7 +361,7 @@ public class AcknowledgementManager {
 			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc());
 			RMMsgContext ackRMMessageCtx = MsgInitializer.initializeMessage(ackMsgCtx);
 
-			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceID);
+			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
 			return ackRMMessageCtx;
 		}
 	}

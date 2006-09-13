@@ -55,6 +55,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 
+			String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsg);
+			
 			//endint the transaction before invocation.
 			transaction.commit();
 				
@@ -130,7 +132,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 				if (sequence.getLastMessage() != null) {
-					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequenceId, storageManager);
+					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequencePropertyKey, sequenceId, storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
 					

@@ -95,13 +95,15 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		
+		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(terminateSeqRMMsg);
 
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		// Check that the sender of this TerminateSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 			OMElement body = terminateSeqRMMsg.getSOAPEnvelope().getBody();
@@ -129,7 +131,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 
 		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean();
-		terminateReceivedBean.setSequencePropertyKey(sequenceId);
+		terminateReceivedBean.setSequencePropertyKey(sequencePropertyKey);
 		terminateReceivedBean.setName(Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
 		terminateReceivedBean.setValue("true");
 
@@ -137,13 +139,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		// add the terminate sequence response if required.
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired(terminateSeqRMMsg.getRMSpecVersion()))
-			addTerminateSequenceResponse(terminateSeqRMMsg, sequenceId, storageManager);
+			addTerminateSequenceResponse(terminateSeqRMMsg, sequencePropertyKey, sequenceId, storageManager);
 
-		setUpHighestMsgNumbers(context, storageManager, sequenceId, terminateSeqRMMsg);
+		setUpHighestMsgNumbers(context, storageManager,sequencePropertyKey, sequenceId, terminateSeqRMMsg);
 
-		TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
+		TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequencePropertyKey, sequenceId, storageManager);
 
-		SequencePropertyBean terminatedBean = new SequencePropertyBean(sequenceId,
+		SequencePropertyBean terminatedBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED, Sandesha2Constants.VALUE_TRUE);
 
 		sequencePropertyBeanMgr.insert(terminatedBean);
@@ -151,7 +153,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		// removing an entry from the listener
 		String transport = terminateSeqMsg.getTransportIn().getName().getLocalPart();
 
-		SequenceManager.updateLastActivatedTime(sequenceId, storageManager);
+		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		terminateSeqMsg.pause();
 
@@ -160,31 +162,34 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 	}
 
 	private void setUpHighestMsgNumbers(ConfigurationContext configCtx, StorageManager storageManager,
-			String sequenceID, RMMsgContext terminateRMMsg) throws SandeshaException {
+			String requestSidesequencePropertyKey, String sequenceId, RMMsgContext terminateRMMsg) throws SandeshaException {
 
 		if (log.isDebugEnabled())
-			log.debug("Enter: TerminateSeqMsgProcessor::setUpHighestMsgNumbers, " + sequenceID);
+			log.debug("Enter: TerminateSeqMsgProcessor::setUpHighestMsgNumbers, " + sequenceId);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		String highestImMsgNumberStr = SandeshaUtil.getSequenceProperty(sequenceID,
+		String highestImMsgNumberStr = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, storageManager);
-		String highestImMsgKey = SandeshaUtil.getSequenceProperty(sequenceID,
+		String highestImMsgKey = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, storageManager);
 
 		long highestInMsgNo = 0;
 		if (highestImMsgNumberStr != null) {
 			if (highestImMsgKey == null)
 				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.highestMsgKeyNotStored, sequenceID));
+						SandeshaMessageKeys.highestMsgKeyNotStored, sequenceId));
 
 			highestInMsgNo = Long.parseLong(highestImMsgNumberStr);
 		}
 
 		// following will be valid only for the server side, since the obtained
 		// int. seq ID is only valid there.
-		String responseSideInternalSequenceID = SandeshaUtil.getOutgoingSideInternalSequenceID(sequenceID);
-
+		String responseSideInternalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(sequenceId);
+		
+		//sequencePropertyKey is equal to the internalSequenceId for the outgoing sequence.
+		String responseSideSequencePropertyKey = responseSideInternalSequenceId;
+		
 		long highestOutMsgNo = 0;
 		try {
 			boolean addResponseSideTerminate = false;
@@ -193,7 +198,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			} else {
 
 				// setting the last in message property
-				SequencePropertyBean lastInMsgBean = new SequencePropertyBean(sequenceID,
+				SequencePropertyBean lastInMsgBean = new SequencePropertyBean(requestSidesequencePropertyKey,
 						Sandesha2Constants.SequenceProperties.LAST_IN_MESSAGE_NO, highestImMsgNumberStr);
 				seqPropMgr.insert(lastInMsgBean);
 
@@ -222,7 +227,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 						// considered as the last out message.
 						highestOutMsgNo = seqPartOfOutMsg.getMessageNumber().getMessageNumber();
 						SequencePropertyBean highestOutMsgBean = new SequencePropertyBean(
-								responseSideInternalSequenceID,
+								responseSideSequencePropertyKey ,
 								Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, new Long(highestOutMsgNo)
 										.toString());
 
@@ -234,16 +239,16 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 			// If all the out message have been acked, add the outgoing
 			// terminate seq msg.
-			String outgoingSqunceID = SandeshaUtil.getSequenceProperty(responseSideInternalSequenceID,
+			String outgoingSqunceID = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
-			if (addResponseSideTerminate && highestOutMsgNo > 0 && responseSideInternalSequenceID != null
+			if (addResponseSideTerminate && highestOutMsgNo > 0 && responseSideSequencePropertyKey != null
 					&& outgoingSqunceID != null) {
-				boolean allAcked = SandeshaUtil.isAllMsgsAckedUpto(highestOutMsgNo, responseSideInternalSequenceID,
+				boolean allAcked = SandeshaUtil.isAllMsgsAckedUpto(highestOutMsgNo, responseSideSequencePropertyKey,
 						storageManager);
 
 				if (allAcked)
 					TerminateManager.addTerminateSequenceMessage(terminateRMMsg, outgoingSqunceID,
-							responseSideInternalSequenceID, storageManager);
+							responseSideSequencePropertyKey, storageManager);
 			}
 		} catch (AxisFault e) {
 			throw new SandeshaException(e);
@@ -252,11 +257,11 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			log.debug("Exit: TerminateSeqMsgProcessor::setUpHighestMsgNumbers");
 	}
 
-	private void addTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, String sequenceID,
+	private void addTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 
 		if (log.isDebugEnabled())
-			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceID);
+			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceId);
 
 		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
 		ConfigurationContext configCtx = terminateSeqMsg.getConfigurationContext();
@@ -272,8 +277,8 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg,
 				outMessage, storageManager);
 
-		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, sequenceID,
-				storageManager);
+		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, sequencePropertyKey, 
+				sequenceId,	storageManager);
 		
 		Iterator iter = ackRMMessage.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		
@@ -309,7 +314,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message, e);
 		}
 
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 

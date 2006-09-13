@@ -80,7 +80,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 
-		String sequenceID = ackRequested.getIdentifier().getIdentifier();
+		String sequenceId = ackRequested.getIdentifier().getIdentifier();
 
 		ConfigurationContext configurationContext = rmMsgCtx.getMessageContext().getConfigurationContext();
 
@@ -89,8 +89,12 @@ public class AckRequestedProcessor implements MsgProcessor {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
+		//not getting the sequencePropertyKey from the usual method since the ackRequest may be embedded in a message
+		//of a different sequence. (usua method SandeshaUtil.getSequencePropertyKey)
+		String sequencePropertyKey = sequenceId;
+		
 		// Check that the sender of this AckRequest holds the correct token
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
@@ -100,7 +104,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 		}
 
 		// Setting the ack depending on AcksTo.
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceID,
+		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 
 		EndpointReference acksTo = new EndpointReference(acksToBean.getValue());
@@ -148,7 +152,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceID, storageManager);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx,sequencePropertyKey,sequenceId, storageManager);
 		ackRMMsgCtx.getMessageContext().setServerSide(true);
 		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, msgContext
 				.getProperty(AddressingConstants.WS_ADDRESSING_VERSION)); // TODO
@@ -158,7 +162,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 																			// the
 																			// RMMsgCreator
 
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequenceID,
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 
@@ -204,7 +208,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 			ackBean.setMessageContextRefKey(key);
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
-			ackBean.setSequenceID(sequenceID);
+			ackBean.setSequenceID(sequenceId);
 
 			// this will be set to true in the sender.
 			ackBean.setSend(true);
@@ -269,7 +273,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 				throw new SandeshaException(e.getMessage());
 			}
 
-			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceID);
+			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
 
 			msgContext.pause();
 

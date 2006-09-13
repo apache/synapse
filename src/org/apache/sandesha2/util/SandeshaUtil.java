@@ -855,10 +855,10 @@ public class SandeshaUtil {
 			return sequencePropertyBean.getValue();
 	}
 
-	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String internalSequenceID,
+	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String sequencePropertyKey,
 			StorageManager storageManager) throws SandeshaException {
 
-		String clientCompletedMessages = getSequenceProperty(internalSequenceID,
+		String clientCompletedMessages = getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES, storageManager);
 		ArrayList ackedMsgsList = getArrayListFromString(clientCompletedMessages);
 

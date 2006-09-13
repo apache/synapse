@@ -332,4 +332,14 @@ public class RMMsgContext {
 		
 		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
+	
+	/**
+	 * This will return the sequenceId if it could be derived from the SOAP envelope, in the
+	 * message initiation.
+	 * 
+	 * @return
+	 */
+	public String getGeneratedSequenceId () {
+		return (String) msgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
+	}
 }

@@ -64,14 +64,15 @@ public class CloseSequenceProcessor implements MsgProcessor {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
-		String sequenceID = closeSequence.getIdentifier().getIdentifier();
-
+		String sequenceId = closeSequence.getIdentifier().getIdentifier();
+		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
+		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
 		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		// Check that the sender of this CloseSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
 			OMElement body = msgCtx.getEnvelope().getBody();
@@ -80,7 +81,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceID, storageManager);
+		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 		if (faultMessageContext != null) {
 			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
 			AxisEngine engine = new AxisEngine(configurationContext);
@@ -97,13 +98,13 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
-		sequenceClosedBean.setSequencePropertyKey(sequenceID);
+		sequenceClosedBean.setSequencePropertyKey(sequencePropertyKey);
 		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
 		sequenceClosedBean.setValue(Sandesha2Constants.VALUE_TRUE);
 
 		sequencePropMgr.insert(sequenceClosedBean);
 
-		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequenceID, storageManager);
+		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
 
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 
@@ -154,7 +155,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 			engine.send(closeSequenceResponseMsg);
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendTerminateResponse,
-					sequenceID, e.toString());
+					sequenceId, e.toString());
 			throw new SandeshaException(message, e);
 		}
 

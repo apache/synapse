@@ -348,7 +348,7 @@ public class RMMsgCreator {
 	 * @throws SandeshaException
 	 */
 	public static RMMsgContext createTerminateSequenceMessage(RMMsgContext referenceRMMessage, String sequenceId,
-			String internalSequenceID, StorageManager storageManager) throws SandeshaException {
+			String sequencePropertyKey, StorageManager storageManager) throws SandeshaException {
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 		if (referenceMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
@@ -389,7 +389,7 @@ public class RMMsgCreator {
 			terminateMsgOperation.setRemainingPhasesInFlow(teferenceMsgOperation.getRemainingPhasesInFlow());
 		}
 
-		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceID, storageManager);
+		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 

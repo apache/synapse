@@ -440,13 +440,14 @@ public class SandeshaUtil {
 		// TODO make this spec indipendent
 
 		OMElement sequenceElem = null;
-		if (header != null)
+		if (header != null) {
 			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
-					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 
-		if (sequenceElem == null)
-			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2006_08.NS_URI,
-					Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+			if (sequenceElem == null)
+				sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2006_08.NS_URI,
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
+		}
 
 		if (sequenceElem != null)
 			rmGlobalMsg = true;
@@ -961,7 +962,7 @@ public class SandeshaUtil {
 	 * @return
 	 */
 	
-	public static String getPropertyKey (RMMsgContext rmMsgContext) {
+	public static String getSequencePropertyKey (RMMsgContext rmMsgContext) {
 		String sequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
 		String internalSequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
 		

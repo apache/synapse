@@ -106,7 +106,9 @@ public class MsgInitializer {
 			rmNamespace = elements.getSequence().getNamespaceValue();
 		}
 
-		
+		//In case of ack messages RM Namespace is decided based on the sequenceId of the first 
+		//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
+		//of different RM specifications in the same incoming message
 		for (Iterator iter = elements.getSequenceAcknowledgements();iter.hasNext();) {
 			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
@@ -219,8 +221,9 @@ public class MsgInitializer {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAcknowledgementsIter.next();
 			
-			//picking the sequenceId of the first sequence ack.
-			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
+			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
+			if (!sequenceAcknowledgementsIter.hasNext())
+				sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (ackRequest != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
 			sequenceID = ackRequest.getIdentifier().getIdentifier();
@@ -246,28 +249,6 @@ public class MsgInitializer {
 		
 		if (sequenceID!=null)
 			rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceID);
-
-		String propertyKey = SandeshaUtil.getPropertyKey(rmMsgCtx);
-
-		//In case of ack messages RM Namespace is decided based on the sequenceId of the first 
-		//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
-		//of different RM specifications in the same incoming message.
-		
-		String rmNamespace = rmMsgCtx.getRMNamespaceValue();
-		if (sequenceID != null) {
-			String specVersion = SandeshaUtil.getRMVersion(propertyKey, storageManager);
-
-			String sequenceRMNamespace = null;
-			if (specVersion != null)
-				sequenceRMNamespace = SpecSpecificConstants.getRMNamespaceValue(specVersion);
-			if (sequenceRMNamespace != null && rmNamespace != null) {
-				if (!sequenceRMNamespace.equals(rmNamespace)) {
-					throw new SandeshaException(SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.rmNamespaceNotMatchSequence, rmNamespace, sequenceRMNamespace,
-							sequenceID));
-				}
-			}
-		}
 
 		return true;
 	}

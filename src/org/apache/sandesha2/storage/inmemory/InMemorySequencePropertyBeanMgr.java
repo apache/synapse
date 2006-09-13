@@ -60,7 +60,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	public synchronized boolean insert(SequencePropertyBean bean) {
-		table.put(bean.getSequenceID() + ":" + bean.getName(), bean);
+		table.put(bean.getSequencePropertyKey() + ":" + bean.getName(), bean);
 		return true;
 	}
 
@@ -83,8 +83,8 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 
 			boolean equal = true;
 
-			if (bean.getSequenceID() != null
-					&& !bean.getSequenceID().equals(temp.getSequenceID()))
+			if (bean.getSequencePropertyKey() != null
+					&& !bean.getSequencePropertyKey().equals(temp.getSequencePropertyKey()))
 				equal = false;
 
 			if (bean.getName() != null
@@ -121,7 +121,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 	}
 
 	private String getId(SequencePropertyBean bean) {
-		return bean.getSequenceID() + ":" + bean.getName();
+		return bean.getSequencePropertyKey() + ":" + bean.getName();
 	}
 	
 	public synchronized SequencePropertyBean findUnique(SequencePropertyBean bean) throws SandeshaException {

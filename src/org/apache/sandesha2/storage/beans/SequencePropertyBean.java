@@ -24,10 +24,14 @@ package org.apache.sandesha2.storage.beans;
 public class SequencePropertyBean extends RMBean {
 
 	/**
-	 * Comment for <code>sequenceID</code>
-	 * Sequence ID of the sequence this property belong to.
+	 * Comment for <code>sequencePropertyKey</code>
+	 * The key used to store properties of this sequence.
+	 * The value depends on the endpoint as given below.
+	 * 
+	 * RMS (sending side) - internalSequenceId
+	 * RMD - sequenceId
 	 */
-	private String sequenceID;
+	private String sequencePropertyKey;
 
 	/**
 	 * Comment for <code>name</code>
@@ -42,7 +46,7 @@ public class SequencePropertyBean extends RMBean {
 	private String value;
 
 	public SequencePropertyBean(String seqID, String propertyName, String value) {
-		this.sequenceID = seqID;
+		this.sequencePropertyKey = seqID;
 		this.name = propertyName;
 		this.value = value;
 	}
@@ -59,12 +63,12 @@ public class SequencePropertyBean extends RMBean {
 		this.name = name;
 	}
 
-	public String getSequenceID() {
-		return sequenceID;
+	public String getSequencePropertyKey() {
+		return sequencePropertyKey;
 	}
 
-	public void setSequenceID(String sequenceID) {
-		this.sequenceID = sequenceID;
+	public void setSequencePropertyKey(String sequencePropertyKey) {
+		this.sequencePropertyKey = sequencePropertyKey;
 	}
 
 	public String getValue() {

@@ -97,7 +97,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
-		sequenceClosedBean.setSequenceID(sequenceID);
+		sequenceClosedBean.setSequencePropertyKey(sequenceID);
 		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
 		sequenceClosedBean.setValue(Sandesha2Constants.VALUE_TRUE);
 

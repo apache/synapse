@@ -138,6 +138,7 @@ public class RMMsgContext {
 				ArrayList sequenceAckList = (ArrayList) rmMessageParts.get(new Integer (partId));
 				if (sequenceAckList==null) {
 					sequenceAckList = new ArrayList ();
+					sequenceAckList.add(part);
 					rmMessageParts.put(new Integer (partId),sequenceAckList);
 				}
 			} else {

@@ -116,8 +116,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		
+		String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
+		
 		// Check that both the Sequence header and message body have been secured properly
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(propertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
 			OMElement body = msgCtx.getEnvelope().getBody();
@@ -198,9 +200,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		// updating the last activated time of the sequence.
-		SequenceManager.updateLastActivatedTime(sequenceId, storageManager);
+		SequenceManager.updateLastActivatedTime(propertyKey, storageManager);
 
-		SequencePropertyBean msgsBean = seqPropMgr.retrieve(sequenceId,
+		SequencePropertyBean msgsBean = seqPropMgr.retrieve(propertyKey,
 				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
@@ -215,9 +217,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
-		String highetsInMsgNoStr = SandeshaUtil.getSequenceProperty(sequenceId,
+		String highetsInMsgNoStr = SandeshaUtil.getSequenceProperty(propertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, storageManager);
-		String highetsInMsgKey = SandeshaUtil.getSequenceProperty(sequenceId,
+		String highetsInMsgKey = SandeshaUtil.getSequenceProperty(propertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, storageManager);
 		if (highetsInMsgKey == null)
 			highetsInMsgKey = SandeshaUtil.getUUID();
@@ -231,9 +233,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			highestInMsgNo = msgNo;
 
 			String str = new Long(msgNo).toString();
-			SequencePropertyBean highestMsgNoBean = new SequencePropertyBean(sequenceId,
+			SequencePropertyBean highestMsgNoBean = new SequencePropertyBean(propertyKey,
 					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, str);
-			SequencePropertyBean highestMsgKeyBean = new SequencePropertyBean(sequenceId,
+			SequencePropertyBean highestMsgKeyBean = new SequencePropertyBean(propertyKey,
 					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, highetsInMsgKey);
 
 			// storing the new message as the highest in message.
@@ -254,7 +256,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			messagesStr = (String) msgsBean.getValue();
 		else {
 			msgsBean = new SequencePropertyBean();
-			msgsBean.setSequenceID(sequenceId);
+			msgsBean.setSequencePropertyKey(propertyKey);
 			msgsBean.setName(Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 			msgsBean.setValue(messagesStr);
 		}
@@ -303,7 +305,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			if (incomingSequenceListBean == null) {
 				ArrayList incomingSequenceList = new ArrayList();
 				incomingSequenceListBean = new SequencePropertyBean();
-				incomingSequenceListBean.setSequenceID(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
+				incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
 				incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 				incomingSequenceListBean.setValue(incomingSequenceList.toString());
 
@@ -504,7 +506,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (internalSequenceId!=null)
 			rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
 
-		String propertyKey = SandeshaUtil.getPropertyKey(rmMsgCtx);
+		String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
 
 		/*
 		 * checking weather the user has given the messageNumber (most of the
@@ -808,7 +810,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean();
 			offeredSequenceBean.setName(Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
-			offeredSequenceBean.setSequenceID(internalSequenceId);
+			offeredSequenceBean.setSequencePropertyKey(internalSequenceId);
 			offeredSequenceBean.setValue(offeredSequenceId);
 
 			seqPropMgr.insert(offeredSequenceBean);
@@ -1134,7 +1136,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (nextMsgNoBean == null) {
 			update = false;
 			nextMsgNoBean = new SequencePropertyBean();
-			nextMsgNoBean.setSequenceID(internalSequenceId);
+			nextMsgNoBean.setSequencePropertyKey(internalSequenceId);
 			nextMsgNoBean.setName(Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
 		}
 

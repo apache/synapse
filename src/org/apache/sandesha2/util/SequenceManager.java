@@ -139,7 +139,7 @@ public class SequenceManager {
 		}
 
 		SequencePropertyBean specVerionBean = new SequencePropertyBean();
-		specVerionBean.setSequenceID(sequenceId);
+		specVerionBean.setSequencePropertyKey(sequenceId);
 		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 		specVerionBean.setValue(specVersion);
 
@@ -288,7 +288,7 @@ public class SequenceManager {
 		}
 
 		SequencePropertyBean msgsBean = new SequencePropertyBean();
-		msgsBean.setSequenceID(internalSequenceId);
+		msgsBean.setSequencePropertyKey(internalSequenceId);
 		msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		msgsBean.setValue("");
 
@@ -304,7 +304,7 @@ public class SequenceManager {
 		String transportTo = (String) firstAplicationMsgCtx.getProperty(MessageContextConstants.TRANSPORT_URL);
 		if (transportTo != null) {
 			SequencePropertyBean transportToBean = new SequencePropertyBean();
-			transportToBean.setSequenceID(internalSequenceId);
+			transportToBean.setSequencePropertyKey(internalSequenceId);
 			transportToBean.setName(Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
 			transportToBean.setValue(transportTo);
 
@@ -313,7 +313,7 @@ public class SequenceManager {
 
 		// setting the spec version for the client side.
 		SequencePropertyBean specVerionBean = new SequencePropertyBean();
-		specVerionBean.setSequenceID(internalSequenceId);
+		specVerionBean.setSequencePropertyKey(internalSequenceId);
 		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 		specVerionBean.setValue(specVersion);
 		seqPropMgr.insert(specVerionBean);
@@ -420,7 +420,7 @@ public class SequenceManager {
 		if (lastActivatedBean == null) {
 			added = true;
 			lastActivatedBean = new SequencePropertyBean();
-			lastActivatedBean.setSequenceID(propertyKey);
+			lastActivatedBean.setSequencePropertyKey(propertyKey);
 			lastActivatedBean.setName(Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
 		}
 
@@ -470,34 +470,12 @@ public class SequenceManager {
 		return sequenceTimedOut;
 	}
 
-	public static long getOutGoingSequenceAckedMessageCount(String internalSequenceID, StorageManager storageManager)
+	public static long getOutGoingSequenceAckedMessageCount(String sequencePropertyKey, StorageManager storageManager)
 			throws SandeshaException {
 		// / Transaction transaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean findSeqIDBean = new SequencePropertyBean();
-		findSeqIDBean.setValue(internalSequenceID);
-		findSeqIDBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		Collection seqIDBeans = seqPropBeanMgr.find(findSeqIDBean);
-
-		if (seqIDBeans.size() == 0) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSequenceEstablished,
-					internalSequenceID);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		if (seqIDBeans.size() > 1) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotGenerateReportNonUniqueSequence, internalSequenceID);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
-		String sequenceID = seqIDBean.getSequenceID();
-
-		SequencePropertyBean ackedMsgBean = seqPropBeanMgr.retrieve(sequenceID,
+		SequencePropertyBean ackedMsgBean = seqPropBeanMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		if (ackedMsgBean == null)
 			return 0; // No acknowledgement has been received yet.
@@ -532,7 +510,7 @@ public class SequenceManager {
 		}
 
 		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
-		String sequenceID = seqIDBean.getSequenceID();
+		String sequenceID = seqIDBean.getSequencePropertyKey();
 
 		SequencePropertyBean terminateAddedBean = seqPropBeanMgr.retrieve(sequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);

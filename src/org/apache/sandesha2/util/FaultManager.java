@@ -288,50 +288,57 @@ public class FaultManager {
 
 		boolean invalidAck = false;
 		String reason = null;
-		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMessageContext
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
-		Iterator it = sequenceAckList.iterator();
+		
+		Iterator sequenceAckIter = ackRMMessageContext.getMessageParts(
+				Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		
+		while (sequenceAckIter.hasNext()) {
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
+			List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
+			Iterator it = sequenceAckList.iterator();
 
-		while (it.hasNext()) {
-			AcknowledgementRange acknowledgementRange = (AcknowledgementRange) it.next();
-			long upper = acknowledgementRange.getUpperValue();
-			long lower = acknowledgementRange.getLowerValue();
+			while (it.hasNext()) {
+				AcknowledgementRange acknowledgementRange = (AcknowledgementRange) it.next();
+				long upper = acknowledgementRange.getUpperValue();
+				long lower = acknowledgementRange.getLowerValue();
 
-			if (lower > upper) {
-				invalidAck = true;
-				reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalid, Long.toString(lower), Long
-						.toString(upper));
+				if (lower > upper) {
+					invalidAck = true;
+					reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalid, Long.toString(lower), Long
+							.toString(upper));
+				}
 			}
-		}
 
-		if (invalidAck) {
-			FaultData data = new FaultData();
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(ackMessageContext.getEnvelope());
-			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-			else
-				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+			if (invalidAck) {
+				FaultData data = new FaultData();
+				int SOAPVersion = SandeshaUtil.getSOAPVersion(ackMessageContext.getEnvelope());
+				if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+					data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+				else
+					data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
-			data.setReason(reason);
+				data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+				data.setReason(reason);
 
-			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
-			OMElement dummyElement = factory.createOMElement("dummyElem", null);
-			sequenceAcknowledgement.toOMElement(dummyElement);
+				SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+				OMElement dummyElement = factory.createOMElement("dummyElem", null);
+				sequenceAcknowledgement.toOMElement(dummyElement);
 
-			OMElement sequenceAckElement = dummyElement.getFirstChildWithName(new QName(
-					Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
-			data.setDetail(sequenceAckElement);
+				OMElement sequenceAckElement = dummyElement.getFirstChildWithName(new QName(
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
+				data.setDetail(sequenceAckElement);
 
-			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-			return getFault(ackRMMessageContext, data, ackRMMessageContext.getAddressingNamespaceValue(),
-					storageManager);
+				if (log.isDebugEnabled())
+					log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
+				return getFault(ackRMMessageContext, data, ackRMMessageContext.getAddressingNamespaceValue(),
+						storageManager);
+			}
+		
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement");
+		
 		return null;
 	}
 

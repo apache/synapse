@@ -129,7 +129,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 
 		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean();
-		terminateReceivedBean.setSequenceID(sequenceId);
+		terminateReceivedBean.setSequencePropertyKey(sequenceId);
 		terminateReceivedBean.setName(Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
 		terminateReceivedBean.setValue("true");
 
@@ -436,7 +436,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequenceID(outSequenceID);
+		terminateAdded.setSequencePropertyKey(outSequenceID);
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);

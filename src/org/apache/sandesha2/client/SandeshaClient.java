@@ -262,7 +262,7 @@ public class SandeshaClient {
 			Iterator iterator = collection.iterator();
 			while (iterator.hasNext()) {
 				SequencePropertyBean bean = (SequencePropertyBean) iterator.next();
-				String sequenceID = bean.getSequenceID();
+				String sequenceID = bean.getSequencePropertyKey();
 				sandeshaReport.addToOutgoingSequenceList(sequenceID);
 				sandeshaReport.addToOutgoingInternalSequenceMap(sequenceID, bean.getValue());
 
@@ -280,7 +280,7 @@ public class SandeshaClient {
 			Iterator iter = serverCompletedMsgsBeans.iterator();
 			while (iter.hasNext()) {
 				SequencePropertyBean serverCompletedMsgsBean = (SequencePropertyBean) iter.next();
-				String sequenceID = serverCompletedMsgsBean.getSequenceID();
+				String sequenceID = serverCompletedMsgsBean.getSequencePropertyKey();
 				sandeshaReport.addToIncomingSequenceList(sequenceID);
 
 				SequenceReport sequenceReport = getIncomingSequenceReport(sequenceID, configurationContext);
@@ -802,7 +802,7 @@ public class SandeshaClient {
 			return false;
 		}
 
-		String outSequenceID = internalSequenceBean.getSequenceID();
+		String outSequenceID = internalSequenceBean.getSequencePropertyKey();
 
 		SequencePropertyBean sequenceTerminatedBean = seqPropMgr.retrieve(outSequenceID,
 				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED);
@@ -828,7 +828,7 @@ public class SandeshaClient {
 			return false;
 		}
 
-		String outSequenceID = internalSequenceBean.getSequenceID();
+		String outSequenceID = internalSequenceBean.getSequencePropertyKey();
 		SequencePropertyBean sequenceTerminatedBean = seqPropMgr.retrieve(outSequenceID,
 				Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
 		if (sequenceTerminatedBean != null && Sandesha2Constants.VALUE_TRUE.equals(sequenceTerminatedBean.getValue())) {
@@ -855,7 +855,7 @@ public class SandeshaClient {
 
 		report.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_TERMINATED);
 
-		String outSequenceID = internalSequenceBean.getSequenceID();
+		String outSequenceID = internalSequenceBean.getSequencePropertyKey();
 		fillOutgoingSequenceInfo(report, outSequenceID, seqPropMgr);
 	}
 
@@ -875,7 +875,7 @@ public class SandeshaClient {
 		}
 
 		report.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_TIMED_OUT);
-		String outSequenceID = internalSequenceBean.getSequenceID();
+		String outSequenceID = internalSequenceBean.getSequencePropertyKey();
 		fillOutgoingSequenceInfo(report, outSequenceID, seqPropMgr);
 	}
 

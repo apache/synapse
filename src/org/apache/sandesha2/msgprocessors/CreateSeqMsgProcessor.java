@@ -183,13 +183,13 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					SequencePropertyBean outSequenceBean = new SequencePropertyBean();
 					outSequenceBean.setName(Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 					outSequenceBean.setValue(offeredSequenceID);
-					outSequenceBean.setSequenceID(outgoingSideInternalSequenceID);
+					outSequenceBean.setSequencePropertyKey(outgoingSideInternalSequenceID);
 					seqPropMgr.insert(outSequenceBean);
 
 					// setting the internal_sequence_id
 					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
 					internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-					internalSequenceBean.setSequenceID(offeredSequenceID);
+					internalSequenceBean.setSequencePropertyKey(offeredSequenceID);
 					internalSequenceBean.setValue(outgoingSideInternalSequenceID);
 					seqPropMgr.insert(internalSequenceBean);
 				} else {

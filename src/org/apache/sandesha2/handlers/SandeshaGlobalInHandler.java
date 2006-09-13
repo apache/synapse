@@ -236,7 +236,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 			long msgNo = sequence.getMessageNumber().getMessageNumber();
 			
-			String propertyKey = SandeshaUtil.getPropertyKey(rmMsgContext);
+			String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgContext);
 
 			if (propertyKey != null && msgNo > 0) {
 				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();

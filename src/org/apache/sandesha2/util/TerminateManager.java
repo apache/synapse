@@ -240,7 +240,7 @@ public class TerminateManager {
 			// so saving it with the sequenceID value being the out sequenceID.
 
 			SequencePropertyBean newBean = new SequencePropertyBean();
-			newBean.setSequenceID(sequenceID);
+			newBean.setSequencePropertyKey(sequenceID);
 			newBean.setName(propertyBean.getName());
 			newBean.setValue(propertyBean.getValue());
 
@@ -248,7 +248,7 @@ public class TerminateManager {
 			// TODO amazingly this property does not seem to get deleted without
 			// following - in the hibernate impl
 			// (even though the lines efter current methodcall do this).
-			seqPropMgr.delete(propertyBean.getSequenceID(), propertyBean.getName());
+			seqPropMgr.delete(propertyBean.getSequencePropertyKey(), propertyBean.getName());
 		}
 	}
 
@@ -341,7 +341,7 @@ public class TerminateManager {
 
 		// removing sequence properties
 		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean();
-		findSequencePropertyBean1.setSequenceID(internalSequenceID);
+		findSequencePropertyBean1.setSequencePropertyKey(internalSequenceID);
 		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean1);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
@@ -351,13 +351,13 @@ public class TerminateManager {
 			// TODO all properties which hv the temm:Seq:id as the key should be
 			// deletable.
 			if (isPropertyDeletable(sequencePropertyBean.getName())) {
-				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequenceID(), sequencePropertyBean.getName());
+				sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequencePropertyKey(), sequencePropertyBean.getName());
 			}
 		}
 	}
 
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String outSequenceId,
-			String internalSequenceId, StorageManager storageManager) throws SandeshaException {
+			String sequencePropertyKey, StorageManager storageManager) throws SandeshaException {
 
 		ConfigurationContext configurationContext = referenceMessage.getMessageContext().getConfigurationContext();
 
@@ -375,11 +375,11 @@ public class TerminateManager {
 		}
 
 		RMMsgContext terminateRMMessage = RMMsgCreator.createTerminateSequenceMessage(referenceMessage, outSequenceId,
-				internalSequenceId, storageManager);
+				sequencePropertyKey, storageManager);
 		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
 		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-		SequencePropertyBean toBean = seqPropMgr.retrieve(internalSequenceId,
+		SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.TO_EPR);
 
 		EndpointReference toEPR = new EndpointReference(toBean.getValue());
@@ -390,17 +390,17 @@ public class TerminateManager {
 
 		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
 
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(internalSequenceId,
+		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 
-		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId, storageManager);
+		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 		terminateRMMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
 		terminateRMMessage.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
 
-		SequencePropertyBean transportToBean = seqPropMgr.retrieve(internalSequenceId,
+		SequencePropertyBean transportToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
 		if (transportToBean != null) {
 			terminateRMMessage.setProperty(MessageContextConstants.TRANSPORT_URL, transportToBean.getValue());
@@ -441,7 +441,7 @@ public class TerminateManager {
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequenceID(outSequenceId);
+		terminateAdded.setSequencePropertyKey(outSequenceId);
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);

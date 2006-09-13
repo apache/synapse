@@ -112,6 +112,13 @@ public class AcknowledgementProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		
+		String internalSequenceId = SandeshaUtil.getSequenceProperty(outSequenceId,
+				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+
+		//here we cannot get the property key using the usual SandeshaUtil.getSequencePropertyKey function,
+		//because this can be a applicationMessage, which piggybacks the acknowledgement.
+		String sequencePropertyKey = internalSequenceId;
 
 		// Check that the sender of this Ack holds the correct token
 		SequencePropertyBean tokenBean = seqPropMgr.retrieve(outSequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
@@ -150,22 +157,8 @@ public class AcknowledgementProcessor {
 			return;
 		}
 
-		String internalSequenceID = SandeshaUtil.getSequenceProperty(outSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
-
 		// updating the last activated time of the sequence.
-		SequenceManager.updateLastActivatedTime(internalSequenceID, storageManager);
-
-		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(outSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-
-		if (internalSequenceBean == null || internalSequenceBean.getValue() == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.tempSeqIdNotSet);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		String internalSequenceId = (String) internalSequenceBean.getValue();
+		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		SenderBean input = new SenderBean();
 		input.setSend(true);
@@ -202,14 +195,14 @@ public class AcknowledgementProcessor {
 		// setting acked message date.
 		// TODO add details specific to each message.
 		long noOfMsgsAcked = getNoOfMessagesAcked(sequenceAck.getAcknowledgementRanges().iterator());
-		SequencePropertyBean noOfMsgsAckedBean = seqPropMgr.retrieve(outSequenceId,
+		SequencePropertyBean noOfMsgsAckedBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		boolean added = false;
 
 		if (noOfMsgsAckedBean == null) {
 			added = true;
 			noOfMsgsAckedBean = new SequencePropertyBean();
-			noOfMsgsAckedBean.setSequenceID(outSequenceId);
+			noOfMsgsAckedBean.setSequencePropertyKey(sequencePropertyKey);
 			noOfMsgsAckedBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
 		}
 
@@ -222,11 +215,11 @@ public class AcknowledgementProcessor {
 
 		// setting the completed_messages list. This gives all the messages of
 		// the sequence that were acked.
-		SequencePropertyBean allCompletedMsgsBean = seqPropMgr.retrieve(internalSequenceId,
+		SequencePropertyBean allCompletedMsgsBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 		if (allCompletedMsgsBean == null) {
 			allCompletedMsgsBean = new SequencePropertyBean();
-			allCompletedMsgsBean.setSequenceID(internalSequenceId);
+			allCompletedMsgsBean.setSequencePropertyKey(sequencePropertyKey);
 			allCompletedMsgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 
 			seqPropMgr.insert(allCompletedMsgsBean);
@@ -237,7 +230,7 @@ public class AcknowledgementProcessor {
 
 		seqPropMgr.update(allCompletedMsgsBean);
 
-		String lastOutMsgNoStr = SandeshaUtil.getSequenceProperty(internalSequenceId,
+		String lastOutMsgNoStr = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, storageManager);
 		if (lastOutMsgNoStr != null) {
 			long highestOutMsgNo = 0;
@@ -250,7 +243,7 @@ public class AcknowledgementProcessor {
 						.getAcknowledgementRanges().iterator(), highestOutMsgNo);
 
 				if (complete)
-					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, outSequenceId, internalSequenceId,
+					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, outSequenceId, sequencePropertyKey,
 							storageManager);
 			}
 		}

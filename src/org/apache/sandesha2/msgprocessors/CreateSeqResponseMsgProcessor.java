@@ -179,7 +179,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			EndpointReference acksToEPR = accept.getAcksTo().getAddress().getEpr();
 			SequencePropertyBean acksToBean = new SequencePropertyBean();
 			acksToBean.setName(Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
-			acksToBean.setSequenceID(offeredSequenceId);
+			acksToBean.setSequencePropertyKey(offeredSequenceId);
 			acksToBean.setValue(acksToEPR.getAddress());
 
 			sequencePropMgr.insert(acksToBean);
@@ -202,7 +202,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			sequencePropMgr.insert(receivedMsgBean);
 
 			SequencePropertyBean msgsBean = new SequencePropertyBean();
-			msgsBean.setSequenceID(offeredSequenceId);
+			msgsBean.setSequencePropertyKey(offeredSequenceId);
 			msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 			msgsBean.setValue("");
 			sequencePropMgr.insert(msgsBean);

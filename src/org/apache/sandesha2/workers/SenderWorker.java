@@ -68,10 +68,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				return;
 			}
 
-//			if (msgCtx == null) {
-//				String message = "Message context is not present in the storage";
-//			}
-
 			// sender will not send the message if following property is
 			// set and not true.
 			// But it will set if it is not set (null)

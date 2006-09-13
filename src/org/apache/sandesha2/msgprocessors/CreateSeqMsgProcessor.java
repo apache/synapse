@@ -164,13 +164,15 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// side.
 					CreateSeqBean createSeqBean = new CreateSeqBean();
 					createSeqBean.setSequenceID(offeredSequenceID);
-					String outgoingSideInternalSequenceID = SandeshaUtil
+					String outgoingSideInternalSequenceId = SandeshaUtil
 							.getOutgoingSideInternalSequenceID(newSequenceId);
-					createSeqBean.setInternalSequenceID(outgoingSideInternalSequenceID);
+					createSeqBean.setInternalSequenceID(outgoingSideInternalSequenceId);
 					createSeqBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); // this
 																				// is a
 																				// dummy
 																				// value.
+					
+					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
 					CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 					createSeqMgr.insert(createSeqBean);
@@ -183,14 +185,14 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					SequencePropertyBean outSequenceBean = new SequencePropertyBean();
 					outSequenceBean.setName(Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 					outSequenceBean.setValue(offeredSequenceID);
-					outSequenceBean.setSequencePropertyKey(outgoingSideInternalSequenceID);
+					outSequenceBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
 					seqPropMgr.insert(outSequenceBean);
 
 					// setting the internal_sequence_id
 					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
 					internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 					internalSequenceBean.setSequencePropertyKey(offeredSequenceID);
-					internalSequenceBean.setValue(outgoingSideInternalSequenceID);
+					internalSequenceBean.setValue(outgoingSideInternalSequenceId);
 					seqPropMgr.insert(internalSequenceBean);
 				} else {
 					// removing the accept part.
@@ -250,12 +252,12 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			log.debug("Exit: CreateSeqMsgProcessor::processInMessage");
 	}
 
-	private boolean offerAccepted(String sequenceID, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,
+	private boolean offerAccepted(String sequenceId, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,
 			StorageManager storageManager) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: CreateSeqMsgProcessor::offerAccepted, " + sequenceID);
+			log.debug("Enter: CreateSeqMsgProcessor::offerAccepted, " + sequenceId);
 
-		if ("".equals(sequenceID)) {
+		if ("".equals(sequenceId)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
 			return false;
@@ -264,7 +266,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		CreateSeqBean createSeqFindBean = new CreateSeqBean();
-		createSeqFindBean.setSequenceID(sequenceID);
+		createSeqFindBean.setSequenceID(sequenceId);
 		Collection arr = createSeqMgr.find(createSeqFindBean);
 
 		if (arr.size() > 0) {
@@ -272,7 +274,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
 			return false;
 		}
-		if (sequenceID.length() <= 1) {
+		if (sequenceId.length() <= 1) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: CreateSeqMsgProcessor::offerAccepted, " + false);
 			return false; // Single character offers are NOT accepted.

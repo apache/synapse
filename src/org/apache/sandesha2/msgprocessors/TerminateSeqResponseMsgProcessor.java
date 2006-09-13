@@ -53,9 +53,10 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		TerminateSequenceResponse tsResponse = (TerminateSequenceResponse)
 		  terminateResRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
 		String sequenceId = tsResponse.getIdentifier().getIdentifier();
+		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(terminateResRMMsg);
 
 		// Check that the sender of this TerminateSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 			OMElement body = terminateResRMMsg.getSOAPEnvelope().getBody();

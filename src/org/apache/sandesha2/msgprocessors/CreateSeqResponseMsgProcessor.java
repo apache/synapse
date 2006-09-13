@@ -128,7 +128,10 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
-
+		createSeqResponseRMMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+		
+		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(createSeqResponseRMMsgCtx);
+		
 		createSeqBean.setSequenceID(newOutSequenceId);
 		createSeqMgr.update(createSeqBean);
 
@@ -145,10 +148,10 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		// storing new out sequence id
 		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean outSequenceBean = new SequencePropertyBean(internalSequenceId,
+		SequencePropertyBean outSequenceBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, newOutSequenceId);
 		SequencePropertyBean internalSequenceBean = new SequencePropertyBean(newOutSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, internalSequenceId);
+				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, sequencePropertyKey);
 
 		sequencePropMgr.insert(outSequenceBean);
 		sequencePropMgr.insert(internalSequenceBean);
@@ -164,7 +167,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		Accept accept = createSeqResponsePart.getAccept();
 		if (accept != null) {
 			// Find offered sequence from internal sequence id.
-			SequencePropertyBean offeredSequenceBean = sequencePropMgr.retrieve(internalSequenceId,
+			SequencePropertyBean offeredSequenceBean = sequencePropMgr.retrieve(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
 
 			// TODO this should be detected in the Fault manager.
@@ -239,7 +242,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			if (applicationMsg == null)
 				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unavailableAppMsg));
 
-			String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId, storageManager);
+			String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 			if (rmVersion == null)
 				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
@@ -281,7 +284,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			storageManager.updateMessageContext(key, applicationMsg);
 		}
 
-		SequenceManager.updateLastActivatedTime(internalSequenceId, storageManager);
+		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext().setProperty(
 				org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");

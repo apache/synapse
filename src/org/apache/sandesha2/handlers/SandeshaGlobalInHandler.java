@@ -223,7 +223,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			log.debug("Exit: SandeshaGlobalInHandler::msgContext");
 	}
 
-	private boolean dropIfDuplicate(RMMsgContext rmMsgContext, StorageManager storageManager) throws SandeshaException {
+	private boolean dropIfDuplicate(RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::dropIfDuplicate");
 
@@ -335,7 +335,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	}
 
 	private void processDroppedMessage(RMMsgContext rmMsgContext, StorageManager storageManager)
-			throws SandeshaException {
+			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::processDroppedMessage");
 

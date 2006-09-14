@@ -64,7 +64,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqResponseMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext createSeqResponseRMMsgCtx) throws SandeshaException {
+	public void processInMessage(RMMsgContext createSeqResponseRMMsgCtx) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processInMessage");

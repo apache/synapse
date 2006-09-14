@@ -26,6 +26,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -88,7 +89,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(ApplicationMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processInMessage");
 
@@ -369,7 +370,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	}
 
 	public void sendAckIfNeeded(RMMsgContext rmMsgCtx, String messagesStr, StorageManager storageManager)
-			throws SandeshaException {
+			throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::sendAckIfNeeded");
@@ -406,7 +407,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			log.debug("Exit: ApplicationMsgProcessor::sendAckIfNeeded");
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processOutMessage");
 
@@ -793,14 +794,23 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (!dummyMessage)
 			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber, storageKey, storageManager);
 
-		msgContext.pause(); // the execution will be stopped.
-
+		
+		if (!isWSAAnonymous (to)) {
+			//If message has a real to address or if it is in the polling-mode it shoud be send by the sender or should
+			//be taken away by make connections, so pausing it.
+			
+			msgContext.pause(); // the execution will be stopped.
+		}
+		
+		//If to address is wsa:anonymous it wont be possible to send the this message so, letting it go in the current thread. 
+		//(it might get the the other end in the back-channel of the request message, no retransmissions possible).
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processOutMessage");
 	}
 
 	private void addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, String acksTo,
-			StorageManager storageManager) throws SandeshaException {
+			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::addCreateSequenceMessage, " + internalSequenceId);
@@ -1164,5 +1174,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::setNextMsgNo");
+	}
+	
+	private boolean isWSAAnonymous (String address) {
+		if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address) ||
+				AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address))
+			return true;
+		
+		return false;
 	}
 }

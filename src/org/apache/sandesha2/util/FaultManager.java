@@ -415,6 +415,7 @@ public class FaultManager {
 
 			// end hack
 
+			//TODO this fails when the in message is in only. Fault is thrown at the InOnlyAxisOperation
 			MessageContext faultMsgContext = Utils.createOutMessageContext(referenceMessage);
 
 			// setting contexts.

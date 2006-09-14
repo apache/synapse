@@ -962,7 +962,7 @@ public class SandeshaUtil {
 	 * @return
 	 */
 	
-	public static String getSequencePropertyKey (RMMsgContext rmMsgContext) {
+	public static String getSequencePropertyKey (RMMsgContext rmMsgContext) throws AxisFault {
 		String sequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
 		String internalSequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
 		
@@ -979,9 +979,11 @@ public class SandeshaUtil {
 				propertyKey = internalSequenceId;
 			else
 				propertyKey = sequenceId;
+		} else if (flow==MessageContext.OUT_FAULT_FLOW) {
+			propertyKey = internalSequenceId;
 		}
 		
-		//TODO handler faults
+		//TODO handler cases not covered from above.
 		
 		return propertyKey;
 	}

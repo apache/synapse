@@ -18,6 +18,7 @@
 package org.apache.sandesha2.msgprocessors;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
@@ -41,7 +42,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 	private static final Log log = LogFactory.getLog(TerminateSeqResponseMsgProcessor.class);
 	
 	public void processInMessage(RMMsgContext terminateResRMMsg)
-			throws SandeshaException { 
+			throws AxisFault { 
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processInMessage");
 		
 		MessageContext msgContext = terminateResRMMsg.getMessageContext();

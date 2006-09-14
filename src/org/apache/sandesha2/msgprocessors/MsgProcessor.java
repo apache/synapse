@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.SandeshaException;
 
@@ -25,6 +26,6 @@ import org.apache.sandesha2.SandeshaException;
  */
 
 public interface MsgProcessor {
-	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException;
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException;
+	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault;
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault;
 }

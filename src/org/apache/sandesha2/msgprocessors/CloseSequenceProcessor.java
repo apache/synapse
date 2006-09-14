@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.util.Iterator;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -54,7 +56,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CloseSequenceProcessor.class);
 
-	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CloseSequenceProcessor::processInMessage");
 
@@ -123,8 +125,8 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 
 		// adding the ack part to the envelope.
-		SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) ackRMMsgCtx
-				.getMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		Iterator sequenceAckIter = ackRMMsgCtx
+				.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 
 		MessageContext closeSequenceMsg = rmMsgCtx.getMessageContext();
 
@@ -139,9 +141,12 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, closeSequenceResponseMsg,
 				storageManager);
 
-		closeSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
-				sequenceAcknowledgement);
-
+		while (sequenceAckIter.hasNext()) {
+			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
+			closeSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT,
+					sequenceAcknowledgement);
+		}
+		
 		closeSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		closeSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 

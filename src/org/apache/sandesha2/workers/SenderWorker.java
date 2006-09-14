@@ -104,10 +104,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 //				RMMsgCreator.addAckMessage(rmMsgCtx);
 			
 			//} else 
-				if (isAckPiggybackableMsgType(messageType)) { // checking weather this message can carry piggybacked acks
+				
+			if (isAckPiggybackableMsgType(messageType)) { // checking weather this message can carry piggybacked acks
 				// piggybacking if an ack if available for the same
 				// sequence.
 				// TODO do piggybacking based on wsa:To
+					
+					
+					
 				AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager);
 			}
 

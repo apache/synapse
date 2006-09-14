@@ -36,6 +36,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -200,7 +201,7 @@ public class RMMsgCreator {
 	 * @throws SandeshaException
 	 */
 	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String sequencePropertyKey,
-			String acksTo, StorageManager storageManager) throws SandeshaException {
+			String acksTo, StorageManager storageManager) throws AxisFault {
 
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
 		if (applicationMsgContext == null)
@@ -222,7 +223,7 @@ public class RMMsgCreator {
 
 			createSeqmsgContext = SandeshaUtil
 					.createNewRelatedMessageContext(applicationRMMsg, createSequenceOperation);
-
+			
 			initializeCreation(applicationMsgContext, createSeqmsgContext);
 
 			OperationContext createSeqOpCtx = createSeqmsgContext.getOperationContext();
@@ -249,8 +250,24 @@ public class RMMsgCreator {
 		createSeqmsgContext.setAxisOperation(createSeqOperation);
 
 		createSeqmsgContext.setTo(applicationRMMsg.getTo());
-		createSeqmsgContext.setReplyTo(applicationRMMsg.getReplyTo());
-
+		
+//		createSeqmsgContext.setReplyTo(applicationRMMsg.getReplyTo());
+		//generating a new replyTo address for the CreateSequenceMessage.
+		//Otherwise there will be errors when the app msg is InOnly.
+		
+		QName axisOperationName = createSeqmsgContext.getAxisOperation().getName();
+		TransportInDescription transportIn = createSeqmsgContext.getTransportIn();
+		QName transportInName = null;
+		if (transportIn!=null)
+			transportInName = transportIn.getName();
+		
+        EndpointReference replyTo = context.getListenerManager().getEPRforService(
+        		createSeqmsgContext.getAxisService().getName(), 
+        		axisOperationName!=null?axisOperationName.getLocalPart():null, 
+        				transportInName!=null?transportInName.getLocalPart():null);
+        
+        createSeqmsgContext.setReplyTo(replyTo);
+        
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);

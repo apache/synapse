@@ -72,7 +72,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(TerminateSeqMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext terminateSeqRMMsg) throws SandeshaException {
+	public void processInMessage(RMMsgContext terminateSeqRMMsg) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::processInMessage");

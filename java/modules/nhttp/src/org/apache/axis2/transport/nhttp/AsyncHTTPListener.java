@@ -54,7 +54,7 @@ public class AsyncHTTPListener implements TransportListener {
         this.cfgCtx = cfgCtx;
         this.port = port;
         TransportInDescription httpDescription = new TransportInDescription(
-            new QName(Constants.TRANSPORT_HTTP));
+                new QName(Constants.TRANSPORT_HTTP));
         httpDescription.setReceiver(this);
 
         ListenerManager listenerManager = cfgCtx.getListenerManager();
@@ -65,7 +65,8 @@ public class AsyncHTTPListener implements TransportListener {
         cfgCtx.getListenerManager().addListener(httpDescription, true);
     }
 
-    public void init(ConfigurationContext cfgCtx, TransportInDescription transprtIn) throws AxisFault {
+    public void init(ConfigurationContext cfgCtx, TransportInDescription transprtIn)
+            throws AxisFault {
         this.cfgCtx = cfgCtx;
         serviceContextPath = cfgCtx.getServiceContextPath();
 
@@ -88,7 +89,7 @@ public class AsyncHTTPListener implements TransportListener {
     public void start() throws AxisFault {
         List svcHandlers = new ArrayList();
         svcHandlers.add(
-            new org.apache.axis2.transport.nhttp.HttpServiceHandler(cfgCtx, port));
+                new org.apache.axis2.transport.nhttp.HttpServiceHandler(cfgCtx, port));
 
         NIOTransport nioTransport = new NIOTransport();
         nioTransport.setPort(port);
@@ -111,7 +112,7 @@ public class AsyncHTTPListener implements TransportListener {
             log.info("Started AsyncHTTPListener on port : " + port);
         } catch (ContainerLifecycleException e) {
             throw new AxisFault("Error starting Async HTTP listener on port : "
-                + port + " : " + e.getMessage(), e);
+                                + port + " : " + e.getMessage(), e);
         }
     }
 
@@ -121,6 +122,15 @@ public class AsyncHTTPListener implements TransportListener {
     }
 
     public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
-        return new EndpointReference("http://" + hostAddress + ":" + port + serviceContextPath + "/" + serviceName);
+        return new EndpointReference(
+                "http://" + hostAddress + ":" + port + serviceContextPath + "/" + serviceName);
+    }
+
+    //TODO This should handle other endpoints too. Ex: If a rest call has made 
+    public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
+        EndpointReference[] endpointReferences = new EndpointReference[1];
+        endpointReferences[0] = new EndpointReference(
+                "http://" + hostAddress + ":" + port + serviceContextPath + "/" + serviceName);
+        return endpointReferences;
     }
 }

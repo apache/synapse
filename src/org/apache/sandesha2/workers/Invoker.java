@@ -164,6 +164,10 @@ public class Invoker extends Thread {
 	private void internalRun() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::internalRun");
+		
+		// If this invoker is working for several sequences, we use round-robin to
+		// try and give them all a chance to invoke messages.
+		int nextIndex = 0;
 
 		while (isInvokerStarted()) {
 
@@ -203,16 +207,15 @@ public class Invoker extends Thread {
 					continue;
 				}
 				
-				//TODO pick the sequence randomly.
+				// Pick a sequence using a round-robin approach
 				ArrayList allSequencesList = SandeshaUtil
 						.getArrayListFromString(allSequencesBean.getValue());
-
-
 				int size = allSequencesList.size();
-				Random r = new Random ();
-				int index = r.nextInt(size);
-				
-				String sequenceId = (String) allSequencesList.get(index);
+				if(nextIndex >= size) {
+					nextIndex = 0;
+					if (size == 0) continue;
+				}
+				String sequenceId = (String) allSequencesList.get(nextIndex++);
 				
 
 				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
@@ -252,8 +255,7 @@ public class Invoker extends Thread {
 										
 					//check weather the bean is already assigned to a worker.
 					if (lock.isWorkPresent(workId)) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned);
-						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
 						log.debug(message);
 						continue;
 					}

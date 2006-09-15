@@ -170,7 +170,6 @@ public class Sender extends Thread {
 				if (senderBean == null) {
 					if (log.isDebugEnabled()) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
-						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
 						log.debug(message);
 					}
 					continue;
@@ -184,9 +183,10 @@ public class Sender extends Thread {
 				
 				//check weather the bean is already assigned to a worker.
 				if (lock.isWorkPresent(workId)) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned);
-					message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
-					log.debug(message);
+					if (log.isDebugEnabled()) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
+						log.debug(message);
+					}
 					continue;
 				}
 				

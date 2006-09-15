@@ -20,10 +20,8 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.ArrayList;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -48,7 +46,6 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
-import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -75,7 +72,6 @@ import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
-import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.UsesSequenceSTR;
 
@@ -84,8 +80,6 @@ import org.apache.sandesha2.wsrm.UsesSequenceSTR;
  */
 
 public class ApplicationMsgProcessor implements MsgProcessor {
-
-	private boolean letInvoke = false;
 
 	private static final Log log = LogFactory.getLog(ApplicationMsgProcessor.class);
 
@@ -550,7 +544,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		else if (systemMessageNumber > 0) { // if system message number is valid
 											// use it.
 			messageNumber = systemMessageNumber + 1;
-		} else { // This is the fist message (systemMessageNumber = -1)
+		} else { // This is the first message (systemMessageNumber = -1)
 			messageNumber = 1;
 		}
 
@@ -652,7 +646,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 											// send.
 			}
 
-			// if fist message - setup the sending side sequence - both for the
+			// if first message - setup the sending side sequence - both for the
 			// server and the client sides
 			SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
 		}
@@ -917,8 +911,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId);
 
 		MessageContext msg = rmMsg.getMessageContext();
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(rmMsg.getSOAPEnvelope()));
-		ConfigurationContext configurationContext = rmMsg.getMessageContext().getConfigurationContext();
 
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
@@ -984,7 +976,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		msgNumber.setMessageNumber(messageNumber);
 		sequence.setMessageNumber(msgNumber);
 
-		boolean lastMessage = false;
 		// setting last message
 		if (msg.isServerSide()) {
 			MessageContext requestMsg = null;
@@ -1005,9 +996,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			if (requestSequence.getLastMessage() != null) {
-				lastMessage = true;
 				sequence.setLastMessage(new LastMessage(rmNamespaceValue));
-
 			}
 
 		} else {
@@ -1017,7 +1006,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			if (operationContext != null) {
 				Object obj = msg.getProperty(SandeshaClientConstants.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
-					lastMessage = true;
 
 					SequencePropertyBean specVersionBean = sequencePropertyMgr.retrieve(internalSequenceId,
 							Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);

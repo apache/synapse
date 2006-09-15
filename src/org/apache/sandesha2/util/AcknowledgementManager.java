@@ -71,6 +71,8 @@ public class AcknowledgementManager {
 	 */
 	public static void piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager)
 			throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
 
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 
@@ -105,6 +107,8 @@ public class AcknowledgementManager {
 					continue piggybackLoop;
 				}
 
+				if (log.isDebugEnabled()) log.debug("Adding ack headers");
+
 				// deleting the ack entry.
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
 
@@ -130,6 +134,9 @@ public class AcknowledgementManager {
 				}
 			}
 		}
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent");
 	}
 
 	/**
@@ -143,6 +150,8 @@ public class AcknowledgementManager {
 	 */
 	public static ArrayList getClientCompletedMessagesList(String sequenceID, SequencePropertyBeanMgr seqPropMgr)
 			throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::getClientCompletedMessagesList");
 
 		// first trying to get it from the internal sequence id.
 		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(sequenceID,
@@ -165,14 +174,20 @@ public class AcknowledgementManager {
 			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
 		} else {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.completedMsgBeanIsNull, sequenceID);
-			throw new SandeshaException(message);
+			SandeshaException e = new SandeshaException(message);
+			if(log.isDebugEnabled()) log.debug("Throwing exception", e);
+			throw e;
 		}
 
+		if (log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementManager::getClientCompletedMessagesList");
 		return completedMsgList;
 	}
 
 	public static ArrayList getServerCompletedMessagesList(String sequenceID, SequencePropertyBeanMgr seqPropMgr)
 			throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::getServerCompletedMessagesList");
 
 		SequencePropertyBean completedMessagesBean = null;
 
@@ -184,14 +199,20 @@ public class AcknowledgementManager {
 			completedMsgList = SandeshaUtil.getArrayListFromMsgsString(completedMessagesBean.getValue());
 		} else {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.completedMsgBeanIsNull, sequenceID);
-			throw new SandeshaException(message);
+			SandeshaException e = new SandeshaException(message);
+			if(log.isDebugEnabled()) log.debug("Throwing exception", e);
+			throw e;
 		}
 
+		if (log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementManager::getServerCompletedMessagesList");
 		return completedMsgList;
 	}
 
 	public static RMMsgContext generateAckMessage(RMMsgContext referenceRMMessage, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::generateAckMessage");
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 
@@ -292,7 +313,6 @@ public class AcknowledgementManager {
 			referenceRMMessage.getMessageContext().setProperty(Sandesha2Constants.ACK_WRITTEN, "true");
 
 			ackRMMsgCtx.getMessageContext().setServerSide(true);
-			return ackRMMsgCtx;
 
 		} else {
 
@@ -359,14 +379,20 @@ public class AcknowledgementManager {
 			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
 			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc());
-			RMMsgContext ackRMMessageCtx = MsgInitializer.initializeMessage(ackMsgCtx);
+			ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
 
 			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
-			return ackRMMessageCtx;
 		}
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementManager::generateAckMessage");
+		return ackRMMsgCtx;
 	}
 
 	public static boolean verifySequenceCompletion(Iterator ackRangesIterator, long lastMessageNo) {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::verifySequenceCompletion");
+
 		HashMap startMap = new HashMap();
 
 		while (ackRangesIterator.hasNext()) {
@@ -375,21 +401,22 @@ public class AcknowledgementManager {
 		}
 
 		long start = 1;
-		boolean loop = true;
-		while (loop) {
+		boolean result = false;
+		while (!result) {
 			AcknowledgementRange temp = (AcknowledgementRange) startMap.get(new Long(start));
 			if (temp == null) {
-				loop = false;
-				continue;
+				break;
 			}
 
 			if (temp.getUpperValue() >= lastMessageNo)
-				return true;
+				result = true;
 
 			start = temp.getUpperValue() + 1;
 		}
 
-		return false;
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::verifySequenceCompletion " + result);
+		return result;
 	}
 	
 	public static void addFinalAcknowledgement () {

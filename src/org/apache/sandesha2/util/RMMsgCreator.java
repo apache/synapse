@@ -130,8 +130,8 @@ public class RMMsgCreator {
 			}
 
 		} catch (AxisFault e) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotCopyParameters);
-			log.error(message);
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotCopyParameters, e.getLocalizedMessage());
+			log.error(message, e);
 			throw new SandeshaException(message, e);
 		}
 

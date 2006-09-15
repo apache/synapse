@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.handlers;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -89,6 +87,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 				return;
 			}				
 		}
+		// Also do not apply RM to fault messages
+		{
+			if(msgCtx.isProcessingFault()) {
+				if(log.isDebugEnabled())
+					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for fault message");
+				return;
+			}
+		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE)) {
@@ -116,11 +122,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		try {
 			// getting rm message
 			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-
-			String dummyMessageString = (String) msgCtx.getOptions().getProperty(SandeshaClientConstants.DUMMY_MESSAGE);
-			boolean dummyMessage = false;
-			if (dummyMessageString != null && Sandesha2Constants.VALUE_TRUE.equals(dummyMessageString))
-				dummyMessage = true;
 
 			MsgProcessor msgProcessor = null;
 			int messageType = rmMsgCtx.getMessageType();

@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
  * &lt;/class&gt;
  * </pre>
  */
-public class ClassMediatorFactory {
+public class ClassMediatorFactory implements MediatorFactory{
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 

@@ -21,8 +21,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -58,31 +62,49 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.AckRequested;
 
 /**
- * Responsible for processing an incoming Application message.
+ * Responsible for processing ack requested headers on incoming messages.
  */
 
-public class AckRequestedProcessor implements MsgProcessor {
+public class AckRequestedProcessor {
 
 	private static final Log log = LogFactory.getLog(AckRequestedProcessor.class);
 
-	public void processInMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processAckRequestedHeaders(MessageContext message) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AckRequestedProcessor::processInMessage");
+			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
-		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
-		if (ackRequested == null) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAckRequestedElement));
+		SOAPEnvelope envelope = message.getEnvelope();
+		SOAPHeader header = envelope.getHeader();
+		
+		for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+			QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED);
+			
+			Iterator acks = header.getChildrenWithName(headerName);
+			while(acks.hasNext()) {
+				OMElement ack = (OMElement) acks.next();
+				AckRequested ackReq = new AckRequested(headerName.getNamespaceURI());
+			  ackReq.fromOMElement(ack);
+			  processAckRequestedHeader(message, ackReq);
+			}
 		}
 
-		// settting must understand to false.
-		ackRequested.setMustUnderstand(false);
-		rmMsgCtx.addSOAPEnvelope();
+		if (log.isDebugEnabled())
+			log.debug("Exit: AckRequestedProcessor::processAckRequestHeaders");
+	}
 
-		MessageContext msgContext = rmMsgCtx.getMessageContext();
+	public void processAckRequestedHeader(MessageContext msgContext, AckRequested ackRequested) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader");
+
+		// TODO: Note that this RMMessageContext is not really any use - but we need to create it
+		// so that it can be passed to the fault handling chain. It's really no more than a
+		// container for the correct addressing and RM spec levels, so we'd be better off passing
+		// them in directly. Unfortunately that change ripples through the codebase...
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgContext);
 
 		String sequenceId = ackRequested.getIdentifier().getIdentifier();
 
-		ConfigurationContext configurationContext = rmMsgCtx.getMessageContext().getConfigurationContext();
+		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
 				configurationContext.getAxisConfiguration());
@@ -90,7 +112,7 @@ public class AckRequestedProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		//not getting the sequencePropertyKey from the usual method since the ackRequest may be embedded in a message
-		//of a different sequence. (usua method SandeshaUtil.getSequencePropertyKey)
+		//of a different sequence. (usual method SandeshaUtil.getSequencePropertyKey)
 		String sequencePropertyKey = sequenceId;
 		
 		// Check that the sender of this AckRequest holds the correct token
@@ -278,16 +300,8 @@ public class AckRequestedProcessor implements MsgProcessor {
 			msgContext.pause();
 
 			if (log.isDebugEnabled())
-				log.debug("Exit: AckRequestedProcessor::processInMessage");
+				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader");
 		}
-	}
-
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-		if (log.isDebugEnabled()) {
-			log.debug("Enter: AckRequestedProcessor::processOutMessage");
-			log.debug("Exit: AckRequestedProcessor::processOutMessage");
-		}
-
 	}
 
 }

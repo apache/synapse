@@ -262,14 +262,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			sequencePart.setIdentifier(identifier);
 
-			AckRequested ackRequestedPart = (AckRequested) applicaionRMMsg
-					.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
-			if (ackRequestedPart != null) {
-				Identifier id1 = new Identifier(assumedRMNamespace);
-				id1.setIndentifer(newOutSequenceId);
-				ackRequestedPart.setIdentifier(id1);
-			}
-
 			try {
 				applicaionRMMsg.addSOAPEnvelope();
 			} catch (AxisFault e) {

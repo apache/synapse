@@ -45,8 +45,9 @@ public class RMElements {
 
 	private Sequence sequence = null;
 	
-	//there can be more than one sequence acks in a single message.
+	//there can be more than one sequence ack or ack request in a single message.
 	private ArrayList sequenceAcknowledgements = null;
+	private ArrayList ackRequests = null;
 	
 	private CreateSequence createSequence = null;
 	private CreateSequenceResponse createSequenceResponse = null;
@@ -54,7 +55,6 @@ public class RMElements {
 	private TerminateSequenceResponse terminateSequenceResponse = null;
 	private CloseSequence closeSequence = null;
 	private CloseSequenceResponse closeSequenceResponse = null;
-	private AckRequested ackRequested = null;
 	private UsesSequenceSTR usesSequenceSTR = null;
 	private MessagePending messagePending = null;
 	private MakeConnection makeConnection = null;
@@ -63,6 +63,7 @@ public class RMElements {
 	
 	public RMElements () {
 		sequenceAcknowledgements = new ArrayList ();
+		ackRequests = new ArrayList();
 	}
 	
 	public RMElements (String addressingNamespace) {
@@ -100,12 +101,8 @@ public class RMElements {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownWSAVersion, envelope.toString());
 			throw new SandeshaException (message);
-//			return;
 		}
 		
-//		if (addressingNamespaceValue==null)
-//			addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;   //Final is the default version for addressing
-	
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequenceElement != null) {
@@ -149,15 +146,6 @@ public class RMElements {
 				terminateSequenceResponse.fromOMElement(envelope.getBody());
 		}
 
-		OMElement ackRequestedElement = envelope.getHeader()
-				.getFirstChildWithName(
-						new QName(rmNamespaceValue,
-								Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
-		if (ackRequestedElement != null) {
-			ackRequested = new AckRequested(rmNamespaceValue);
-			ackRequested.fromOMElement(envelope.getHeader());
-		}
-		
 		OMElement closeSequenceElement = envelope.getBody()
 			.getFirstChildWithName(
 				new QName(rmNamespaceValue,
@@ -185,6 +173,17 @@ public class RMElements {
 			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
 			
 			sequenceAcknowledgements.add(sequenceAcknowledgement);
+		}
+
+		Iterator ackRequestIter = envelope.getHeader()
+				.getChildrenWithName (new QName(rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
+		while (ackRequestIter.hasNext()) {
+			OMElement ackRequestElement = (OMElement) ackRequestIter.next();
+			AckRequested ackRequest = new AckRequested(rmNamespaceValue);
+			ackRequest.fromOMElement(ackRequestElement);
+			
+			ackRequests.add(ackRequest);
 		}
 
 		OMElement usesSequenceSTRElement = envelope.getHeader()
@@ -221,6 +220,10 @@ public class RMElements {
 			SequenceAcknowledgement sequenceAck = (SequenceAcknowledgement) iter.next();
 			sequenceAck.toOMElement(envelope.getHeader());
 		}
+		for (Iterator iter=ackRequests.iterator();iter.hasNext();) {
+			AckRequested ackReq = (AckRequested) iter.next();
+			ackReq.toOMElement(envelope.getHeader());
+		}
 		if (createSequence != null) {
 			createSequence.toOMElement(envelope.getBody());
 		}
@@ -230,10 +233,6 @@ public class RMElements {
 		if (terminateSequence != null) {
 			terminateSequence.toOMElement(envelope.getBody());
 		}
-		if (ackRequested != null) {
-			ackRequested.toOMElement(envelope.getBody());
-		}
-		
 		if (terminateSequenceResponse != null) {
 			terminateSequenceResponse.toOMElement(envelope.getBody());
 		}
@@ -311,12 +310,16 @@ public class RMElements {
 		this.terminateSequenceResponse = terminateSequenceResponse;
 	}
 
-	public AckRequested getAckRequested() {
-		return ackRequested;
+	public Iterator getAckRequests() {
+		return ackRequests.iterator();
 	}
 
-	public void setAckRequested(AckRequested ackRequested) {
-		this.ackRequested = ackRequested;
+	public void setAckRequested(ArrayList ackRequests) {
+		this.ackRequests = ackRequests;
+	}
+	
+	public void addAckRequested(AckRequested ackRequested) {
+		ackRequests.add(ackRequested);
 	}
 	
 	public void setMakeConnection(MakeConnection makeConnection) {

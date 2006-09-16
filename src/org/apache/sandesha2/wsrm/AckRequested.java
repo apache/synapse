@@ -33,16 +33,15 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Represent the AckRequested header block.
+ * The 2005/02 spec includes a 'MessageNumber' part in the ack request, but
+ * the 2006/08 spec does not. As the message number was never used in our
+ * implementation we simply ignore it.
  */
 
 public class AckRequested implements IOMRMPart {
 	
 	private Identifier identifier;
-	
-	private MessageNumber messageNumber;
-	
 	private String namespaceValue = null;
-	
 	private boolean mustUnderstand = false;
 	
 	public AckRequested(String namespaceValue) throws SandeshaException {
@@ -58,31 +57,11 @@ public class AckRequested implements IOMRMPart {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement header) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement ackReqElement) throws OMException,SandeshaException {
 
-		if (header == null || !(header instanceof SOAPHeader))
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.ackRequestedCannotBeAddedToNonHeader));
-
-		OMElement ackReqPart = header.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
-
-		if (ackReqPart == null)
-			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noAckRequestedElement,
-					header.toString()));
-
-//		ackElement = ackReqPart;
 		identifier = new Identifier(namespaceValue);
-		identifier.fromOMElement(ackReqPart);
-
-		OMElement msgNoPart = ackReqPart.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.MSG_NUMBER));
-
-		if (msgNoPart != null) {
-			messageNumber = new MessageNumber(namespaceValue);
-			messageNumber.fromOMElement(ackReqPart);
-		}
-
+		identifier.fromOMElement(ackReqElement);
+		
 		return this;
 	}
 
@@ -106,10 +85,6 @@ public class AckRequested implements IOMRMPart {
 
 		identifier.toOMElement(ackReqHdrBlock);
 
-		if (messageNumber != null) {
-			messageNumber.toOMElement(ackReqHdrBlock);
-		}
-
 		return header;
 	}
 
@@ -117,27 +92,12 @@ public class AckRequested implements IOMRMPart {
 		this.identifier = identifier;
 	}
 
-	public void setMessageNumber(MessageNumber messageNumber) {
-		this.messageNumber = messageNumber;
-	}
-
 	public Identifier getIdentifier() {
 		return identifier;
 	}
 
-	public MessageNumber getMessageNumber() {
-		return messageNumber;
-	}
-
 	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
-		
-		//detach if already exist.
-		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,
-				Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
-		if (elem!=null)
-			elem.detach();
-		
 		toOMElement(header);
 	}
 	

@@ -28,7 +28,6 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -68,8 +67,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 
 	public Object fromOMElement(OMElement sequenceAckElement) throws OMException,SandeshaException {
 
-		OMFactory factory = sequenceAckElement.getOMFactory();
-		
 		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(sequenceAckElement);
 
@@ -207,7 +204,7 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		acknowledgementRangeList = acknowledgementRagngesList;
 	}
 
-	public Nack addNackRangges(Nack nack) {
+	public Nack addNackRanges(Nack nack) {
 		nackList.add(nack);
 		return nack;
 	}
@@ -230,19 +227,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		return nackList;
 	}
 
-	public void addChildElement(OMElement element) {
-		acknowledgementRangeList.add(element);
-	}
-
 	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
 		SOAPHeader header = envelope.getHeader();
-
-		//detach if already exist.
-		OMElement elem = header.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
-		if (elem != null)
-			elem.detach();
-
 		toOMElement(header);
 	}
 

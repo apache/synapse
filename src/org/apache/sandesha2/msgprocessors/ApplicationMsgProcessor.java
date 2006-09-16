@@ -87,13 +87,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processInMessage");
 
-		// TODO process embedded ack requests
-		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
-		if (ackRequested != null) {
-			ackRequested.setMustUnderstand(false);
-			rmMsgCtx.addSOAPEnvelope();
-		}
-
 		// Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		if (msgCtx == null) {
@@ -376,14 +369,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
 		if (configCtx == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet));
-
-		AckRequested ackRequested = (AckRequested) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
-
-		if (ackRequested != null) {
-			// setting mustundestand=false for the ackRequested header block.
-			ackRequested.setMustUnderstand(false);
-			rmMsgCtx.addSOAPEnvelope();
-		}
 
 		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey ,sequenceId, storageManager);
 

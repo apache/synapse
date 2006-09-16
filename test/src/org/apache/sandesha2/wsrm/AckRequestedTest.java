@@ -16,28 +16,48 @@
 
 package org.apache.sandesha2.wsrm;
 
-import junit.framework.TestCase;
+import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.SandeshaTestCase;
 
-public class AckRequestedTest extends TestCase {
+public class AckRequestedTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
-	String rmNamespaceValue = Sandesha2Constants.SPEC_2005_02.NS_URI;
-	String addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;
+	String rmNamespace = Sandesha2Constants.SPEC_2005_02.NS_URI;
 	
-    public AckRequestedTest() {
-//        super("CreateSequenceResponseTest");
+	public AckRequestedTest() {
+		super("AckRequestedTest");
+	}
 
-    }
+	public void testFromOMElement() throws SandeshaException {
+		QName name = new QName(rmNamespace, "AckRequested");
+		AckRequested ackReq = new AckRequested(rmNamespace);
+		SOAPEnvelope env = getSOAPEnvelope("", "AckRequested.xml");
+		ackReq.fromOMElement(env.getHeader().getFirstChildWithName(name));
+		
+		Identifier identifier = ackReq.getIdentifier();
+		assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifier.getIdentifier());
+	}
 
-    public void testFromOMElement() throws SandeshaException {
-    	
-    }
-
-    public void testToSOAPEnvelope()  throws SandeshaException {}
+	public void testToSOAPEnvelope()  throws SandeshaException {
+		AckRequested ackReq = new AckRequested(rmNamespace);
+		Identifier identifier = new Identifier(rmNamespace);
+		identifier.setIndentifer("uuid:897ee740-1624-11da-a28e-b3b9c4e71445");
+		ackReq.setIdentifier(identifier);
+		
+		SOAPEnvelope env = getEmptySOAPEnvelope();
+		ackReq.toSOAPEnvelope(env);
+		
+		OMElement ackReqPart = env.getHeader().getFirstChildWithName(
+				new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
+		OMElement identifierPart = ackReqPart.getFirstChildWithName(
+				new QName(rmNamespace, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		assertEquals("uuid:897ee740-1624-11da-a28e-b3b9c4e71445", identifierPart.getText());
+	}
 }

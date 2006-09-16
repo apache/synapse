@@ -899,9 +899,14 @@ public class SandeshaUtil {
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
 			sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
-			AckRequested ackRequested = (AckRequested) rmMessageContext
-					.getMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST);
-			sequenceID = ackRequested.getIdentifier().getIdentifier();
+			Iterator ackRequestIter = rmMessageContext
+					.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+	
+			//In case of ack request messages sequenceId is decided based on the sequenceId of the first 
+			//AckRequested.
+			
+			AckRequested ackReq = (AckRequested) ackRequestIter.next();
+			sequenceID = ackReq.getIdentifier().getIdentifier();
 		} else if (messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
 			CloseSequence closeSequence = (CloseSequence) rmMessageContext
 					.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);

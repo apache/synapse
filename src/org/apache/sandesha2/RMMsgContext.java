@@ -133,14 +133,13 @@ public class RMMsgContext {
 	 */
 	public void setMessagePart(int partId, IOMRMPart part) {
 		if (partId >= 0 && partId <= Sandesha2Constants.MessageParts.MAX_MSG_PART_ID) {
-			
-			if (partId==Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT) {
-				ArrayList sequenceAckList = (ArrayList) rmMessageParts.get(new Integer (partId));
-				if (sequenceAckList==null) {
-					sequenceAckList = new ArrayList ();
-					sequenceAckList.add(part);
-					rmMessageParts.put(new Integer (partId),sequenceAckList);
+			if (isMultiPart(partId)) {
+				ArrayList partList = (ArrayList) rmMessageParts.get(new Integer (partId));
+				if (partList==null) {
+					partList = new ArrayList ();
+					rmMessageParts.put(new Integer (partId),partList);
 				}
+				partList.add(part);
 			} else {
 				rmMessageParts.put(new Integer(partId), part); 
 			}
@@ -174,7 +173,8 @@ public class RMMsgContext {
 	//checks weather there can be multiple elements of these parts,
 	//if so getMessageParts method has to be called to get a ArrayList of parts..
 	public boolean isMultiPart (int messagePartId) {
-		if (messagePartId==Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT)
+		if (messagePartId==Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT||
+			messagePartId==Sandesha2Constants.MessageParts.ACK_REQUEST)
 			return true;
 		
 		return false;

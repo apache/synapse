@@ -106,7 +106,7 @@ public class MsgInitializer {
 			rmNamespace = elements.getSequence().getNamespaceValue();
 		}
 
-		//In case of ack messages RM Namespace is decided based on the sequenceId of the first 
+		//In case of ack messages RM Namespace is decided based on the sequenceId of the last 
 		//sequence Ack. In other words Sandesha2 does not expect to receive two SequenceAcknowledgements
 		//of different RM specifications in the same incoming message
 		for (Iterator iter = elements.getSequenceAcknowledgements();iter.hasNext();) {
@@ -126,9 +126,12 @@ public class MsgInitializer {
 			rmNamespace = elements.getTerminateSequenceResponse().getNamespaceValue();
 		}
 
-		if (elements.getAckRequested() != null) {
-			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, elements.getAckRequested());
-			rmNamespace = elements.getAckRequested().getNamespaceValue();
+		//In case of ack request messages RM Namespace is decided based on the sequenceId of the last 
+		//ack request.
+		for (Iterator iter = elements.getAckRequests();iter.hasNext();) {
+			AckRequested ackRequest = (AckRequested) iter.next();
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, ackRequest);
+			rmNamespace = ackRequest.getNamespaceValue();
 		}
 
 		if (elements.getCloseSequence() != null) {
@@ -193,7 +196,7 @@ public class MsgInitializer {
 				Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(
 				Sandesha2Constants.MessageParts.SEQUENCE);
-		AckRequested ackRequest = (AckRequested) rmMsgCtx.getMessagePart(
+		Iterator ackRequestedIter = rmMsgCtx.getMessageParts(
 				Sandesha2Constants.MessageParts.ACK_REQUEST);
 		CloseSequence closeSequence = (CloseSequence) rmMsgCtx.getMessagePart(
 				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
@@ -224,9 +227,13 @@ public class MsgInitializer {
 			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
 			if (!sequenceAcknowledgementsIter.hasNext())
 				sequenceID = sequenceAcknowledgement.getIdentifier().getIdentifier();
-		} else if (ackRequest != null) {
+		} else if (ackRequestedIter.hasNext()) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
-			sequenceID = ackRequest.getIdentifier().getIdentifier();
+			AckRequested ackRequest = (AckRequested) ackRequestedIter.next();
+
+			//if there is only on sequenceAck, sequenceId will be set. Otherwise it will not be.
+			if (!ackRequestedIter.hasNext())
+				sequenceID = ackRequest.getIdentifier().getIdentifier();
 		} else if (closeSequence != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE);
 			sequenceID = closeSequence.getIdentifier().getIdentifier();

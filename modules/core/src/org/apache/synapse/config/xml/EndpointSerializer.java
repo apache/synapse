@@ -58,7 +58,7 @@ public class EndpointSerializer {
 
     private EndpointSerializer() {}
 
-    public static void serializeEndpoint(Endpoint endpt, OMElement parent) {
+    public static OMElement serializeEndpoint(Endpoint endpt, OMElement parent) {
 
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
         if (endpt.getAddress() != null) {
@@ -73,6 +73,7 @@ public class EndpointSerializer {
         if (parent != null) {
             parent.addChild(endpoint);
         }
+        return endpoint;
     }
 
     private static void handleException(String msg) {

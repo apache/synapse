@@ -164,6 +164,19 @@ public class SynapseConfiguration {
     }
 
     /**
+     * Deletes the mediator named with the given name
+     * @param name of the property to be deleted
+     */
+    public void deleteProperty(String name) {
+        Object o = globalProps.get(name);
+        if(o == null) {
+            handleException("Invalid property reference for key : " + name);
+        } else {
+            globalProps.remove(name);
+        }
+    }
+
+    /**
      * Return the raw DynamicProperty property with the given name if such an
      * object exists. This call does not load/re-load or check expiry of the
      * actual object from the registry for a DynamicProperty. If the given name
@@ -215,6 +228,19 @@ public class SynapseConfiguration {
     }
 
     /**
+     * Deletes the endpoint named with the given name
+     * @param name of the endpoint to be deleted
+     */
+    public void deleteNamedEndpoint(String name) {
+        Object o = namedEndpoints.get(name);
+        if(o == null) {
+            handleException("Invalid Endpoint for name : " + name + " from registry");
+        } else {
+            namedEndpoints.remove(name);
+        }
+    }
+
+    /**
      * Add a Proxy service to the configuration
      * @param name the name of the Proxy service
      * @param proxy the Proxy service instance
@@ -230,6 +256,19 @@ public class SynapseConfiguration {
      */
     public ProxyService getProxyService(String name) {
         return (ProxyService) proxyServices.get(name);
+    }
+
+    /**
+     * Deletes the Proxy Service named with the given name
+     * @param name of the Proxy Service to be deleted
+     */
+    public void deleteProxyService(String name) {
+        Object o = proxyServices.get(name);
+        if(o == null) {
+            handleException("Invalid proxyService for name : " + name + " from registry");
+        } else {
+            proxyServices.remove(name);
+        }
     }
 
     public Collection getProxyServices() {
@@ -284,6 +323,19 @@ public class SynapseConfiguration {
             handleException("Reference to non-existing registry named : " + name);
         }
         return reg;
+    }
+
+    /**
+     * Deletes the registry named with the given name
+     * @param name of the registry to be deleted
+     */
+    public void deleteRegistry(String name) {
+        Object o = registryMap.get(name);
+        if(o == null) {
+            handleException("Reference to non-existing registry named : " + name);
+        } else {
+            registryMap.remove(name);
+        }
     }
 
     /**

@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2;
 
+import javax.xml.namespace.QName;
+
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
  * Please see sub-interfaces to see grouped data.
@@ -536,4 +538,31 @@ public interface Sandesha2Constants {
 		String SEQUENCE_ID = "WSRMSequenceId";
 		String MESSAGE_NUMBER = "WSRMMessageNumber";
 	}
+    
+    public interface Assertions {
+        public static final String URI_RM_POLICY_NS = "http://ws.apache.org/sandesha2/policy";
+        
+        public static final String ELEM_ACK_INTERVAL = "AcknowledgementInterval";
+        public static final String ELEM_RETRANS_INTERVAL = "RetransmissionInterval";
+        public static final String ELEM_MAX_RETRANS_COUNT = "MaximumRetransmissionCount";
+        public static final String ELEM_EXP_BACKOFF = "ExponentialBackoff";
+        public static final String ELEM_INACTIVITY_TIMEOUT = "InactivityTimeout";
+        public static final String ELEM_INACTIVITY_TIMEOUT_MEASURES = "InactivityTimeoutMeasure";
+        public static final String ELEM_INVOKE_INORDER = "InvokeInOrder";
+        public static final String ELEM_MSG_TYPES_TO_DROP = "MessageTypesToDrop";
+        public static final String ELEM_STORAGE_MGR = "StorageManagers";
+        public static final String ELEM_SEC_MGR = "SecurityManager";
+        
+        public static final QName Q_ELEM__RMBEAN = new QName(URI_RM_POLICY_NS, "RMBean");
+        public static final QName Q_ELEM_ACK_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_ACK_INTERVAL);
+        public static final QName Q_ELEM_RETRANS_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_RETRANS_INTERVAL);
+        public static final QName Q_ELEM_MAX_RETRANS_COUNT = new QName(URI_RM_POLICY_NS, ELEM_MAX_RETRANS_COUNT);
+        public static final QName Q_ELEM_EXP_BACKOFF = new QName(URI_RM_POLICY_NS, ELEM_EXP_BACKOFF);
+        public static final QName Q_ELEM_INACTIVITY_TIMEOUT = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT);
+        public static final QName Q_ELEM_INACTIVITY_TIMEOUT_MEASURES = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT_MEASURES);
+        public static final QName Q_ELEM_INVOKE_INORDER = new QName(URI_RM_POLICY_NS, ELEM_INVOKE_INORDER);
+        public static final QName Q_ELEM_MSG_TYPES_TO_DROP = new QName(URI_RM_POLICY_NS, ELEM_MSG_TYPES_TO_DROP);
+        public static final QName Q_ELEM_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_STORAGE_MGR);
+        public static final QName Q_ELEM_SEC_MGR = new QName(URI_RM_POLICY_NS, ELEM_SEC_MGR);
+    }
 }

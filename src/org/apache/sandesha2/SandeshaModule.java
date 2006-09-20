@@ -27,9 +27,11 @@ import org.apache.axis2.modules.ModulePolicyExtension;
 import org.apache.axis2.modules.PolicyExtension;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.policy.RMPolicyExtension;
+import org.apache.sandesha2.policy1.RMPolicyExtension;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -160,5 +162,17 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		// cleaning sequence properties
 
 	}
+
+    public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
+        // TODO 
+        
+    }
+
+    public boolean canSupportAssertion(Assertion assertion) {
+        // TODO 
+        return true;
+    }
+    
+    
 
 }

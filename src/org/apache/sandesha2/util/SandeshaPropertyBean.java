@@ -19,14 +19,22 @@ package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
 
-import org.apache.sandesha2.policy.RMPolicyBean;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Constants;
+import org.apache.neethi.PolicyComponent;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.policy1.RMPolicyBean;
 
 /**
  * Used to hold peoperties loaded from sandesha2.properties file or
  * Sandesha2Constants.
  */
 
-public class SandeshaPropertyBean {
+public class SandeshaPropertyBean implements Assertion {
 
 	RMPolicyBean policyBean = new RMPolicyBean();
 
@@ -162,4 +170,28 @@ public class SandeshaPropertyBean {
 	public void setSecurityManagerClass(String className) {
 		this.securityManagerClass = className;
 	}
+
+    public QName getName() {
+        return Sandesha2Constants.Assertions.Q_ELEM__RMBEAN;
+    }
+
+    public boolean isOptional() {
+        return false;
+    }
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    public boolean equal(PolicyComponent policyComponent) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    public short getType() {
+        return Constants.TYPE_ASSERTION;
+    }
 }

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.axis2.description.AxisDescription;
@@ -28,14 +29,12 @@ import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.policy.PolicyEngineData;
-import org.apache.sandesha2.policy.RMPolicyProcessor;
-import org.apache.sandesha2.policy.RMProcessorContext;
-import org.apache.ws.policy.Policy;
 
 /**
  * Loads properties from sandesha2.properties file (from Sandesha2Constants if
@@ -180,156 +179,211 @@ public class PropertyManager {
 
 	public static SandeshaPropertyBean loadPropertiesFromModuleDescPolicy(AxisModule desc,
 			SandeshaPropertyBean parentPropertyBean) throws SandeshaException {
-		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+		
+        SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
 
 		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
 		if (policy == null) {
 			return null; // no pilicy is available in the module description
 		}
+        
+        Iterator iterator = policy.getAlternatives();
+        if (! iterator.hasNext()) {
+            throw new SandeshaException("No Policy Alternative found");
+        }
 
-		RMPolicyProcessor processor = new RMPolicyProcessor();
-
-		try {
-			processor.setup();
-		} catch (NoSuchMethodException e) {
-			throw new SandeshaException(e);
-		}
-
-		processor.processPolicy(policy);
-
-		RMProcessorContext ctx = processor.getContext();
-		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
-
-		if (data.isAcknowledgementIntervalSet())
-			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
-		else
-			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInterval());
-
-		if (data.isExponentialBackoffSet())
-			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
-		else
-			propertyBean.setExponentialBackoff(parentPropertyBean.isExponentialBackoff());
-
-		// Inactivity timeout given in the policy will affect only if it gives
-		// both the measure and the value.
-		// Otherwise value will be taken from the parent.
-		if (data.isInactivityTimeoutSet() && data.isInactivityTimeoutMeassureSet())
-			propertyBean.setInactiveTimeoutInterval(data.getInactivityTimeout(), data.getInactivityTimeoutMeassure());
-		else
-			propertyBean.setInactiveTimeoutInterval(parentPropertyBean.getInactiveTimeoutInterval());
-
-		if (data.isInvokeInOrderSet())
-			propertyBean.setInOrder(data.isInvokeInOrder());
-		else
-			propertyBean.setInOrder(parentPropertyBean.isInOrder());
-
-		if (data.isMaximumRetransmissionCountSet())
-			propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
-		else
-			propertyBean.setMaximumRetransmissionCount(parentPropertyBean.getMaximumRetransmissionCount());
-
-		if (data.isRetransmissionIntervalSet())
-			propertyBean.setRetransmissionInterval(data.getRetransmissionInterval());
-		else
-			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
-
-		if (data.isInMemoryStorageManagerSet())
-			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
-		else
-			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
-
-		if (data.isPermanentStorageManagerSet())
-			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
-		else
-			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
-
-		if (data.isMessageTypesToDropSet())
-			loadMessageTypesToDrop(data.getMessageTypesToDrop(), propertyBean);
-		else
-			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
-
-		propertyBean.setSecurityManagerClass(data.getSecurityManager());
+        List assertionList = (List) iterator.next();
+        Assertion assertion = null;
+        
+        boolean found = false;
+        
+        for (Iterator assertions = assertionList.iterator(); iterator.hasNext();) {
+            assertion = (Assertion) assertions.next();
+            
+            if (assertion instanceof SandeshaPropertyBean) {
+                found = true;
+                break;
+            }
+        }
+        
+        if (! found) {
+            // no RMAssertion found
+            return null;
+        }
+        
+        propertyBean = (SandeshaPropertyBean) assertion;
+        
+//		RMPolicyProcessor processor = new RMPolicyProcessor();
+//
+//		try {
+//			processor.setup();
+//		} catch (NoSuchMethodException e) {
+//			throw new SandeshaException(e);
+//		}
+//
+//		processor.processPolicy(policy);
+//
+//		RMProcessorContext ctx = processor.getContext();
+//		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
+//
+//		if (data.isAcknowledgementIntervalSet())
+//			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
+//		else
+//			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInterval());
+//
+//		if (data.isExponentialBackoffSet())
+//			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
+//		else
+//			propertyBean.setExponentialBackoff(parentPropertyBean.isExponentialBackoff());
+//
+//		// Inactivity timeout given in the policy will affect only if it gives
+//		// both the measure and the value.
+//		// Otherwise value will be taken from the parent.
+//		if (data.isInactivityTimeoutSet() && data.isInactivityTimeoutMeassureSet())
+//			propertyBean.setInactiveTimeoutInterval(data.getInactivityTimeout(), data.getInactivityTimeoutMeassure());
+//		else
+//			propertyBean.setInactiveTimeoutInterval(parentPropertyBean.getInactiveTimeoutInterval());
+//
+//		if (data.isInvokeInOrderSet())
+//			propertyBean.setInOrder(data.isInvokeInOrder());
+//		else
+//			propertyBean.setInOrder(parentPropertyBean.isInOrder());
+//
+//		if (data.isMaximumRetransmissionCountSet())
+//			propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
+//		else
+//			propertyBean.setMaximumRetransmissionCount(parentPropertyBean.getMaximumRetransmissionCount());
+//
+//		if (data.isRetransmissionIntervalSet())
+//			propertyBean.setRetransmissionInterval(data.getRetransmissionInterval());
+//		else
+//			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
+//
+//		if (data.isInMemoryStorageManagerSet())
+//			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
+//		else
+//			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
+//
+//		if (data.isPermanentStorageManagerSet())
+//			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
+//		else
+//			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
+//
+//		if (data.isMessageTypesToDropSet())
+//			loadMessageTypesToDrop(data.getMessageTypesToDrop(), propertyBean);
+//		else
+//			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
+//
+//		propertyBean.setSecurityManagerClass(data.getSecurityManager());
 
 		return propertyBean;
 	}
 
 	public static SandeshaPropertyBean loadPropertiesFromAxisDescription(AxisDescription desc,
 			SandeshaPropertyBean parentPropertyBean) throws SandeshaException {
-		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
-		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
+		
+        SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
 
-		if (policy == null) {
-			return null; // no policy is available in this axis description
-		}
+        Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
-		RMPolicyProcessor processor = new RMPolicyProcessor();
+        if (policy == null) {
+            return null; // no pilicy is available in the module description
+        }
+        
+        Iterator iterator = policy.getAlternatives();
+        if (! iterator.hasNext()) {
+            throw new SandeshaException("No Policy Alternative found");
+        }
 
-		try {
-			processor.setup();
-		} catch (NoSuchMethodException e) {
-			throw new SandeshaException(e.getMessage());
-		}
-
-		processor.processPolicy(policy);
-
-		RMProcessorContext ctx = processor.getContext();
-		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
-
-		if (data.isAcknowledgementIntervalSet())
-			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
-		else
-			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInterval());
-
-		if (data.isExponentialBackoffSet())
-			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
-		else
-			propertyBean.setExponentialBackoff(parentPropertyBean.isExponentialBackoff());
-
-		// Inactivity timeout given in the policy will affect only if it gives
-		// both the measure and the value.
-		// Otherwise value will be taken from the parent.
-		if (data.isInactivityTimeoutSet() && data.isInactivityTimeoutMeassureSet())
-			propertyBean.setInactiveTimeoutInterval(data.getInactivityTimeout(), data.getInactivityTimeoutMeassure());
-		else
-			propertyBean.setInactiveTimeoutInterval(parentPropertyBean.getInactiveTimeoutInterval());
-
-		if (data.isInvokeInOrderSet())
-			propertyBean.setInOrder(data.isInvokeInOrder());
-		else
-			propertyBean.setInOrder(parentPropertyBean.isInOrder());
-
-		if (data.isMaximumRetransmissionCountSet())
-			propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
-		else
-			propertyBean.setMaximumRetransmissionCount(parentPropertyBean.getMaximumRetransmissionCount());
-
-		if (data.isRetransmissionIntervalSet())
-			propertyBean.setRetransmissionInterval(data.getRetransmissionInterval());
-		else
-			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
-
-		// if (data.isStorageManagerSet())
-		// propertyBean.setStorageManagerClass(data.getStorageManager());
-		// else
-		// propertyBean.setStorageManagerClass(data.getStorageManager());
-
-		if (data.isInMemoryStorageManagerSet())
-			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
-		else
-			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
-
-		if (data.isPermanentStorageManagerSet())
-			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
-		else
-			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
-
-		if (data.isMessageTypesToDropSet())
-			loadMessageTypesToDrop(data.getMessageTypesToDrop(), propertyBean);
-		else
-			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
-
-		propertyBean.setSecurityManagerClass(data.getSecurityManager());
+        List assertionList = (List) iterator.next();
+        Assertion assertion = null;
+        
+        boolean found = false;
+        
+        for (Iterator assertions = assertionList.iterator(); iterator.hasNext();) {
+            assertion = (Assertion) assertions.next();
+            
+            if (assertion instanceof SandeshaPropertyBean) {
+                found = true;
+                break;
+            }
+        }
+        
+        if (! found) {
+            // no RMAssertion found
+            return null;
+        }
+        
+        propertyBean = (SandeshaPropertyBean) assertion;
+//
+//		RMPolicyProcessor processor = new RMPolicyProcessor();
+//
+//		try {
+//			processor.setup();
+//		} catch (NoSuchMethodException e) {
+//			throw new SandeshaException(e.getMessage());
+//		}
+//
+//		processor.processPolicy(policy);
+//
+//		RMProcessorContext ctx = processor.getContext();
+//		PolicyEngineData data = ctx.readCurrentPolicyEngineData();
+//
+//		if (data.isAcknowledgementIntervalSet())
+//			propertyBean.setAcknowledgementInterval(data.getAcknowledgementInterval());
+//		else
+//			propertyBean.setAcknowledgementInterval(parentPropertyBean.getAcknowledgementInterval());
+//
+//		if (data.isExponentialBackoffSet())
+//			propertyBean.setExponentialBackoff(data.isExponentialBackoff());
+//		else
+//			propertyBean.setExponentialBackoff(parentPropertyBean.isExponentialBackoff());
+//
+//		// Inactivity timeout given in the policy will affect only if it gives
+//		// both the measure and the value.
+//		// Otherwise value will be taken from the parent.
+//		if (data.isInactivityTimeoutSet() && data.isInactivityTimeoutMeassureSet())
+//			propertyBean.setInactiveTimeoutInterval(data.getInactivityTimeout(), data.getInactivityTimeoutMeassure());
+//		else
+//			propertyBean.setInactiveTimeoutInterval(parentPropertyBean.getInactiveTimeoutInterval());
+//
+//		if (data.isInvokeInOrderSet())
+//			propertyBean.setInOrder(data.isInvokeInOrder());
+//		else
+//			propertyBean.setInOrder(parentPropertyBean.isInOrder());
+//
+//		if (data.isMaximumRetransmissionCountSet())
+//			propertyBean.setMaximumRetransmissionCount(data.getMaximumRetransmissionCount());
+//		else
+//			propertyBean.setMaximumRetransmissionCount(parentPropertyBean.getMaximumRetransmissionCount());
+//
+//		if (data.isRetransmissionIntervalSet())
+//			propertyBean.setRetransmissionInterval(data.getRetransmissionInterval());
+//		else
+//			propertyBean.setRetransmissionInterval(parentPropertyBean.getRetransmissionInterval());
+//
+//		// if (data.isStorageManagerSet())
+//		// propertyBean.setStorageManagerClass(data.getStorageManager());
+//		// else
+//		// propertyBean.setStorageManagerClass(data.getStorageManager());
+//
+//		if (data.isInMemoryStorageManagerSet())
+//			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
+//		else
+//			propertyBean.setInMemoryStorageManagerClass(data.getInMemoryStorageManager());
+//
+//		if (data.isPermanentStorageManagerSet())
+//			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
+//		else
+//			propertyBean.setPermanentStorageManagerClass(data.getPermanentStorageManager());
+//
+//		if (data.isMessageTypesToDropSet())
+//			loadMessageTypesToDrop(data.getMessageTypesToDrop(), propertyBean);
+//		else
+//			propertyBean.setMsgTypesToDrop(parentPropertyBean.getMsgTypesToDrop());
+//
+//		propertyBean.setSecurityManagerClass(data.getSecurityManager());
 		
 		return propertyBean;
 	}

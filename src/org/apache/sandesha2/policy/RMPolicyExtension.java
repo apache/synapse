@@ -17,10 +17,12 @@
 
 package org.apache.sandesha2.policy;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.modules.PolicyExtension;
-import org.apache.ws.policy.Policy;
+import org.apache.neethi.Policy;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,5 +43,10 @@ public class RMPolicyExtension implements PolicyExtension {
 		
 		element.appendChild(methods);
 	}
+
+    public void addMethodsToStub(Document document, Element element, QName methodName, List assertions) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

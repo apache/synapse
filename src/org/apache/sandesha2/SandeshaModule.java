@@ -31,7 +31,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.policy1.RMPolicyExtension;
+import org.apache.sandesha2.policy.RMPolicyExtension;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;

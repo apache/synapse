@@ -27,7 +27,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.policy1.RMPolicyBean;
+import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
  * Used to hold peoperties loaded from sandesha2.properties file or

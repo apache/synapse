@@ -27,6 +27,7 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -61,6 +62,7 @@ public class SecurityTest extends SandeshaTestCase {
 		httpServer = new SimpleHTTPServer (configContext,serverPort);
 		httpServer.start();
 		Thread.sleep(300);
+		
 	}
 	
 	public void tearDown () throws Exception {

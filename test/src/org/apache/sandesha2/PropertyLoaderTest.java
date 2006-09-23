@@ -22,12 +22,12 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 
 public class PropertyLoaderTest extends TestCase {
 	
-	SandeshaPropertyBean propertyBean = null;
+	SandeshaPolicyBean propertyBean = null;
 	
 	public void setUp () {
 		String fileName = "./test-resources/sandesha2.properties";
@@ -62,7 +62,7 @@ public class PropertyLoaderTest extends TestCase {
 	}
 	
 	public void testInactivityTImeout () {
-		long value = propertyBean.getInactiveTimeoutInterval();
+		long value = propertyBean.getInactivityTimeoutInterval();
 		assertEquals(value,(60*60*3*1000));
 	}
 	

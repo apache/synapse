@@ -19,10 +19,10 @@ package org.apache.sandesha2.storage;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -42,7 +42,7 @@ public class RetransmitterBeanMgrTest extends SandeshaTestCase {
 
     public void setUp() throws Exception {
         AxisConfiguration axisConfig = new AxisConfiguration();
-        SandeshaPropertyBean propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+        SandeshaPolicyBean propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
         Parameter parameter = new Parameter ();
         parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
         parameter.setValue(propertyBean);

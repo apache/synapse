@@ -16,10 +16,10 @@
 
 package org.apache.sandesha2.storage;
 
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;
@@ -40,7 +40,7 @@ public class NextMsgBeanMgrTest extends SandeshaTestCase {
 
     public void setUp() throws Exception {
         AxisConfiguration axisConfig = new AxisConfiguration();
-        SandeshaPropertyBean propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+        SandeshaPolicyBean propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
         Parameter parameter = new Parameter ();
         parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
         parameter.setValue(propertyBean);

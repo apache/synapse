@@ -90,7 +90,7 @@ public class Scenario_1_3 {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
-		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
+//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence1";
@@ -132,10 +132,32 @@ public class Scenario_1_3 {
 
 		SandeshaClient.closeSequence(serviceClient);
 		
-		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(4));
-		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
+//		try {
+//			Thread.sleep(3000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+//		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(4));
+//		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
 
-		SandeshaClient.terminateSequence(serviceClient);		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		SandeshaClient.terminateSequence(serviceClient);
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		serviceClient.finalizeInvoke();
 	}
 	

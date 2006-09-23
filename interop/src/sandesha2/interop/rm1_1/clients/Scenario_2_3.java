@@ -117,7 +117,7 @@ public class Scenario_2_3 {
 //		clientOptions.setManageSession(true); // without this reference params wont go.
 		serviceClient.setTargetEPR(toEPR);
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+//		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(toEPR);
 		
 		clientOptions.setAction("urn:wsrm:EchoString");

@@ -8,6 +8,7 @@
 
     <ant:property name="build.dist.dir" value="${maven.build.dir}/dist"/>
     <ant:property name="build.temp.dir" value="${maven.build.dir}/temp"/>
+	<ant:property name="build.classes.dir" value="${maven.build.dir}/classes"/>
     <ant:property name="build.repo.dir" value="${maven.build.dir}/repos"/>
     <ant:property name="build.samples.dir" value="${maven.build.dir}/samples"/>
     <ant:property name="build.samples.services.dir" value="${build.samples.dir}/services"/>
@@ -15,7 +16,8 @@
     <ant:property name="build.interop.dir" value="${maven.build.dir}/interop"/>
     
     <ant:property name="mar.name" value="${dist.module.name}.mar"/>
-    <ant:property name="jar.name" value="${dist.name}.jar"/>
+    <ant:property name="policy.jar.name" value="${pom.artifactId}-policy-${sandesha2.version}.jar"/>
+	<ant:property name="jar.name" value="${dist.name}.jar"/>
     <ant:property name="client.jar.name" value="${pom.artifactId}-client-${sandesha2.version}.jar"/>
 	
     <ant:property name="dir.samples" value="samples"/>
@@ -31,7 +33,7 @@
     <ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
     <ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
    
-    <goal name="build:all" prereqs="mar,jar,client:jar,sample:create,repo:create,test:test" />
+    <goal name="build:all" prereqs="mar,jar,client:jar,policy:jar,sample:create,repo:create,test:test" />
     
     <goal name="all:jar" prereqs="mar,jar,client:jar" />
         
@@ -43,6 +45,14 @@
     <!-- Befor running the tests the repo should be created-->
     <preGoal name="test:test">
        <attainGoal name="repo:create"/>
+		
+	   <!-- Copying the policy Assertion files-->
+       <copy todir="${build.classes.dir}">
+		 <fileset dir="${dir.config}/rmpolicy/">
+    	      <include name="**/*" /> 
+    	 </fileset>
+	   </copy>
+		
     </preGoal>
     
     <goal name="mar" prereqs="java:compile">
@@ -90,6 +100,33 @@
         
         <delete dir="${build.temp.dir}" />
     </goal>
+	
+	<goal name="policy:jar" prereqs="java:compile">
+    	<ant:property name="policy.jar.temp.path" value="${build.temp.dir}/policyjar" />
+
+    	<ant:mkdir dir="${policy.jar.temp.path}" />
+
+        <copy todir="${policy.jar.temp.path}">
+            <fileset dir="${basedir}/target/classes" >
+            	<include name="**/policy/**/*.class"/>
+				<include name="**/*Sandesha2Constants*.class"/>
+            	<include name="**/*.properties" /> 
+            </fileset>
+        </copy>
+
+		<copy todir="${policy.jar.temp.path}" >
+			<fileset dir="${dir.config}/rmpolicy" >
+            	<include name="**/*"/>
+            </fileset>
+	    </copy>
+  
+        <ant:jar jarfile="${maven.build.dir}/${policy.jar.name}" basedir="${policy.jar.temp.path}" /> 
+        
+        <copy file="${maven.build.dir}/${policy.jar.name}" 
+            toDir="${maven.repo.local}/${pom.artifactId}/jars"/>
+		
+        <delete dir="${build.temp.dir}" />
+	</goal>
     
     <goal name="client:jar" prereqs="java:compile">
     	<ant:property name="client.path" value="${build.temp.dir}/client/" />

@@ -41,6 +41,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.inmemory.InMemorySenderBeanMgr;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class Scenario_2_1 {
@@ -104,10 +106,9 @@ public class Scenario_2_1 {
 		
 		Options clientOptions = new Options ();
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+//		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		
 		EndpointReference toEPR = new EndpointReference (toAddress);
-		
 		
 		OMFactory factory = OMAbstractFactory.getOMFactory();
 		OMNamespace namespace = factory.createOMNamespace("urn:wsrm:InteropOptions","rmi");
@@ -177,7 +178,9 @@ public class Scenario_2_1 {
 			}
 		} 	
        
+		Thread.sleep(6000);
         SandeshaClient.terminateSequence(serviceClient);
+        
 //        serviceClient.finalizeInvoke();
         
 	}

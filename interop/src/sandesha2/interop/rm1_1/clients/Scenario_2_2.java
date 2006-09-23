@@ -102,7 +102,7 @@ public class Scenario_2_2 {
 		
 		Options clientOptions = new Options ();
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
+//		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();

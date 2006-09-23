@@ -104,17 +104,19 @@ public class Scenario_1_4 {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,
 				transportToEPR);
 		
-		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean(true));
+//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean(true));
 		clientOptions.setTo(new EndpointReference(toEPR));
 		
 		clientOptions.setAction("urn:wsrm:Ping");
 		
 		ServiceClient serviceClient = new ServiceClient(configContext, null);
 		
-		String replyAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_ONLY_OP;
+//		String replyAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_ONLY_OP;
+		String acksToAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		
-		clientOptions.setProperty(SandeshaClientConstants.AcksTo,replyAddress);
-		clientOptions.setReplyTo(new EndpointReference (replyAddress));
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToAddress);
+		
+//		clientOptions.setReplyTo(new EndpointReference (replyAddress));
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 
 		String sequenceKey = "sequence1";

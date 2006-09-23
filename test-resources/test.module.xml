@@ -77,46 +77,48 @@
    <parameter name="sandesha2.db.password" locked="false"></parameter>  
    <parameter name="sandesha2.db.create.mode" locked="false">update</parameter> 
 
-   <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />
+	<supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />
 
-   <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
-	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-    xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
-         
-      <wsrm:AcknowledgementInterval>3000</wsrm:AcknowledgementInterval>
-       
-      <wsrm:RetransmissionInterval>6000</wsrm:RetransmissionInterval>
-      
-      <!-- '-1' conveys that there is no limit to the max. number of retransmissions.-->
-      <wsrm:MaximumRetransmissionCount>10</wsrm:MaximumRetransmissionCount>
-      
-      <wsrm:ExponentialBackoff>false</wsrm:ExponentialBackoff>
-      
-      <wsrm:InactivityTimeout>60</wsrm:InactivityTimeout>
-           
-      <wsrm:InactivityTimeoutMeasure>seconds</wsrm:InactivityTimeoutMeasure>
-      
-      <wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
-      
-      <!-- These will not be overriden by service level policies -->
-      <wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>  
-                              
-      <!-- This will not be overriden by service level policies -->
-      <wsrm:StorageManagers>
-                   
-          <wsrm:InMemoryStorageManager>
-              org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
-          </wsrm:InMemoryStorageManager> 
-
-          <wsrm:PermanentStorageManager>
-              org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
-          </wsrm:PermanentStorageManager> 
-      
-      </wsrm:StorageManagers>
-      
-      <!-- This will not be overriden by service level policies -->
-      <wsrm:SecurityManager>org.apache.sandesha2.security.UnitTestSecurityManager</wsrm:SecurityManager>
-   
-</wsp:Policy>
+	<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+			xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+			xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+		<wsrm:RMAssertion>
+			<wsp:Policy>
+				<wsrm:AcknowledgementInterval>3000</wsrm:AcknowledgementInterval>
+	
+				<wsrm:RetransmissionInterval>6000</wsrm:RetransmissionInterval>
+	      
+	      <!-- '-1' conveys that there is no limit to the max. number of retransmissions.-->
+				<wsrm:MaximumRetransmissionCount>10</wsrm:MaximumRetransmissionCount>
+	
+				<wsrm:ExponentialBackoff>false</wsrm:ExponentialBackoff>
+	
+				<wsrm:InactivityTimeout>60</wsrm:InactivityTimeout>
+	
+				<wsrm:InactivityTimeoutMeasure>seconds</wsrm:InactivityTimeoutMeasure>
+	
+				<wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
+	      
+	      <!-- These will not be overriden by service level policies -->
+				<wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>  
+	                              
+	      <!-- This will not be overriden by service level policies -->
+				<wsrm:StorageManagers>
+	
+					<wsrm:InMemoryStorageManager>
+					  org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
+					</wsrm:InMemoryStorageManager>
+	
+					<wsrm:PermanentStorageManager>
+					  org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
+					</wsrm:PermanentStorageManager>
+	
+				</wsrm:StorageManagers>
+	      
+	      <!-- This will not be overriden by service level policies -->
+				<wsrm:SecurityManager>org.apache.sandesha2.security.UnitTestSecurityManager</wsrm:SecurityManager>
+			</wsp:Policy>
+		</wsrm:RMAssertion>
+	</wsp:Policy>
 
 </module>

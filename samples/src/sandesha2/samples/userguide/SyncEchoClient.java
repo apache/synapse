@@ -103,11 +103,15 @@ public class SyncEchoClient {
 //		clientOptions.setProperty(SandeshaClient.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
 		
 		serviceClient.setOptions(clientOptions);
-
+		
 		Callback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+		
+		clientOptions.setAction("urn:wsrm:EchoString");
 		Callback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+		
+		clientOptions.setAction("urn:wsrm:EchoString");
 		
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		Callback callback3 = new TestCallback ("Callback 3");

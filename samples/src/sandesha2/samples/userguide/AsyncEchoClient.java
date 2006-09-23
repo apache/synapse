@@ -101,6 +101,8 @@ public class AsyncEchoClient {
 		String sequenceKey = SandeshaUtil.getUUID();  //sequence key for thie sequence.
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
+//		clientOptions.setReplyTo(new EndpointReference (AddressingConstants.Final.WSA_ANONYMOUS_URL));
+		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.

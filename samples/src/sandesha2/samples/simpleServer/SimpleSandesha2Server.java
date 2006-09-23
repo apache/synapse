@@ -25,7 +25,7 @@ import org.apache.axis2.transport.http.SimpleHTTPServer;
 
 public class SimpleSandesha2Server {
 
-	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
+	private static String SANDESHA2_HOME = "/home/chamikara/checkouts/sandesha2/java"; //Change this to ur path.
 	
 	private static String AXIS2_SERVER_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "server" + File.separator;   //this will be available after a maven build
 	
@@ -52,6 +52,5 @@ public class SimpleSandesha2Server {
 		SimpleHTTPServer server = new SimpleHTTPServer  (configContext,8080);
 		
 		server.start();
-		
 	}
 }

@@ -63,7 +63,6 @@ public class RMSampleService {
 		String resultText = (previousText==null)?textStr:previousText+textStr;
 		sequenceStrings.put(sequenceStr,resultText);
 		
-		
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 		OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
 		OMElement echoStringResponseElem = fac.createOMElement(echoStringResponse, applicationNamespace);

@@ -91,7 +91,7 @@ public class Scenario_1_1 {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
-		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
+//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String sequenceKey = "sequence1";
@@ -129,7 +129,7 @@ public class Scenario_1_1 {
 		} 		
 		
 		SandeshaClient.terminateSequence(serviceClient);
-		serviceClient.finalizeInvoke();
+//		serviceClient.finalizeInvoke();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

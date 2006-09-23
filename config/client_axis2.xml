@@ -16,17 +16,29 @@
     <!--is set then, Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
     <parameter name="DrillDownToRootCauseForFaultReason" locked="false">false</parameter>
 
-    <!-- Uncomment this to enable REST support -->
-    <!--    <parameter name="enableREST" locked="false">true</parameter>-->
-
     <!--This is the user name and password of admin console-->
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
-    
-    
-    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
-    
-    
+
+    <!--<parameter name="contextRoot" locked="false">axis2</parameter>-->
+    <!--<parameter name="servicePath" locked="false">services</parameter>-->
+    <!--Set the flag to true if you want to enable transport level session mangment-->
+    <parameter name="manageTransportSession" locked="false">false</parameter>
+
+    <!--Following two parameters will be used to handle REST in Axis2. The default settings will make Axis2 to have two-->
+    <!--different endpoints, one for REST (AxisRESTServlet) one for SOAP message handling (AxisServlet). But following-->
+    <!--parameters help to tweak the message handling of two main servlets. -->
+
+    <!-- If the enableRESTInAxis2MainServlet is true, then Axis2MainServlet will handle both SOAP and REST messages -->
+    <parameter name="enableRESTInAxis2MainServlet" locked="true">true</parameter>
+
+    <!-- Following parameter will completely disable REST handling in both the servlets-->
+    <parameter name="disableREST" locked="true">false</parameter>
+
+    <!-- This will disable the separate servlet we have for REST handling. -->
+    <parameter name="disableSeparateEndpointForREST" locked="true">false</parameter>
+
+
 
     <!-- ================================================= -->
     <!-- Message Receivers -->
@@ -41,6 +53,18 @@
         <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
     </messageReceivers>
+    
+    <!-- ================================================= -->
+    <!-- Target Resolvers -->
+    <!-- ================================================= -->
+    <!-- Uncomment the following and specify the class name for your TargetResolver to add -->
+    <!-- a TargetResolver. TargetResolvers are used to process the To EPR for example to -->
+    <!-- choose a server in a cluster -->
+    <!--<targetResolvers>-->
+    <!--<targetResolver class="" />-->
+    <!--</targetResolvers>-->
+    
+    
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
@@ -68,8 +92,6 @@
                      class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
     <transportSender name="local"
                      class="org.apache.axis2.transport.local.LocalTransportSender"/>
-    <transportSender name="jms"
-                     class="org.apache.axis2.transport.jms.JMSSender"/>
     <transportSender name="http"
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
         <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
@@ -81,9 +103,9 @@
         <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
     </transportSender>
 
-    <module ref="addressing" />
-    <module ref="sandesha2" />
-
+	<module ref="addressing" />
+	<module ref="sandesha2" />
+	
     <!-- ================================================= -->
     <!-- Phases  -->
     <!-- ================================================= -->
@@ -92,11 +114,11 @@
          <phase name="Transport">
             <handler name="RequestURIBasedDispatcher"
                      class="org.apache.axis2.engine.RequestURIBasedDispatcher">
-                <order phase="Dispatch"/>
+                <order phase="Transport"/>
             </handler>
             <handler name="SOAPActionBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPActionBasedDispatcher">
-                <order phase="Dispatch"/>
+                <order phase="Transport"/>
             </handler>
         </phase>
         <phase name="Security"/>
@@ -113,18 +135,18 @@
             </handler>
             <handler name="InstanceDispatcher"
                      class="org.apache.axis2.engine.InstanceDispatcher">
-                <order phase="PostDispatch"/>
+                <order phase="Dispatch"/>
             </handler>
         </phase>
         <!--  System pre defined phases       -->
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
-        <phase name="RMPhase"/>
         <phase name="OperationInPhase"/>
+		<phase name="RMPhase" />
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="OperationOutPhase"/>
-        <phase name="RMPhase"/>
+		<phase name="RMPhase" />
+	    <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
         <!--these phase will run irrespective of the service-->
         <phase name="PolicyDetermination"/>
@@ -154,17 +176,17 @@
             </handler>
             <handler name="InstanceDispatcher"
                      class="org.apache.axis2.engine.InstanceDispatcher">
-                <order phase="PostDispatch"/>
+                <order phase="Dispatch"/>
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
         <phase name="OperationInFaultPhase"/>
+		<phase name="RMPhase" />
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="OperationOutFaultPhase"/>
-        <phase name="RMPhase"/>
+        <phase name="RMPhase" />
+		<phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
     </phaseOrder>

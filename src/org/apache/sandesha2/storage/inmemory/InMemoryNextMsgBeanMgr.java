@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
@@ -67,7 +68,7 @@ public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
 				SandeshaMessageKeys.selectRSNotSupported));
 	}
 
-	public synchronized Collection find(NextMsgBean bean) {
+	public synchronized List find(NextMsgBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = table.values().iterator();
 

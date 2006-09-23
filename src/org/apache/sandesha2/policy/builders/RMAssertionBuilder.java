@@ -15,12 +15,15 @@
  */
 package org.apache.sandesha2.policy.builders;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.Constants;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
@@ -28,14 +31,14 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.neethi.builders.xml.XmlPrimtiveAssertion;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 
 public class RMAssertionBuilder implements AssertionBuilder {
 
     public Assertion build(OMElement element, AssertionBuilderFactory factory)
             throws IllegalArgumentException {
 
-        SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
         Policy policy = PolicyEngine.getPolicy(element.getFirstElement());
 
         processElements(policy.getPolicyComponents(), propertyBean);
@@ -48,7 +51,7 @@ public class RMAssertionBuilder implements AssertionBuilder {
     }
 
     private void processElements(List policyComponents,
-            SandeshaPropertyBean propertyBean) {
+            SandeshaPolicyBean propertyBean) {
 
         XmlPrimtiveAssertion xmlPrimtiveAssertion;
 
@@ -69,15 +72,64 @@ public class RMAssertionBuilder implements AssertionBuilder {
 
             } else if (Sandesha2Constants.Assertions.ELEM_INACTIVITY_TIMEOUT
                     .equals(name)) {
-                propertyBean.setInactiveTimeoutInterval(Long.parseLong(element
-                        .getText().trim()));
+
+            		propertyBean.setInactiveTimeoutValue (Long.parseLong(element
+            				.getText().trim()));
 
             } else if (Sandesha2Constants.Assertions.ELEM_INACTIVITY_TIMEOUT_MEASURES
                     .equals(name)) {
-                propertyBean
-                        .setInactiveTimeoutInterval(propertyBean
-                                .getInactiveTimeoutInterval(), element
-                                .getText().trim());
+            	//using the previously set Inavtivity Timeout
+                propertyBean.setInactivityTimeoutMeasure (element.getText().trim());
+
+            }  else if (Sandesha2Constants.Assertions.ELEM_INVOKE_INORDER
+                    .equals(name)) {
+            	String value = element.getText().trim();
+            	boolean inOrder = false;
+            	
+            	if (value!=null && Constants.VALUE_TRUE.equals(value))
+            		propertyBean.setInOrder(inOrder);
+            }  else if (Sandesha2Constants.Assertions.ELEM_MAX_RETRANS_COUNT
+                    .equals(name)) {
+                propertyBean.setMaximumRetransmissionCount (Integer.parseInt(element.getText().trim()));
+            }   else if (Sandesha2Constants.Assertions.ELEM_MSG_TYPES_TO_DROP
+                    .equals(name)) {
+            	ArrayList types = new ArrayList ();
+            	String str = element.getText().trim();
+            	String[] items  = str.split(Sandesha2Constants.LIST_SEPERATOR);
+            	if (items!=null) {
+            		int size = items.length;
+            		for (int i=0;i<size;i++) {
+            			String itemStr = items[i];
+            			if (!itemStr.equals("") && !itemStr.equals(Sandesha2Constants.VALUE_NONE) )
+            				types.add(new Integer (itemStr));
+            		}
+            	}
+                propertyBean.setMsgTypesToDrop (types);
+            }  else if (Sandesha2Constants.Assertions.ELEM_RETRANS_INTERVAL
+                    .equals(name)) {
+                propertyBean.setRetransmissionInterval (Long.parseLong (element.getText().trim()));
+            }  else if (Sandesha2Constants.Assertions.ELEM_SEC_MGR
+                    .equals(name)) {
+                propertyBean.setSecurityManagerClass (element.getText().trim());
+            }  else if (Sandesha2Constants.Assertions.ELEM_STORAGE_MGR
+                    .equals(name)) {
+            	
+                if (element!=null) {
+                    //finding out storage managers.
+                	
+                	OMElement inmemoryStorageManagerElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_INMEMORY_STORAGE_MGR);
+                	if (inmemoryStorageManagerElem!=null) {
+                		String inMemoryStorageMgr = inmemoryStorageManagerElem.getText().trim();
+                		propertyBean.setInMemoryStorageManagerClass(inMemoryStorageMgr);
+                	}
+                	
+                	OMElement permanentStorageManagerElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_PERMANENT_STORAGE_MGR);
+                	if (permanentStorageManagerElem!=null) {
+                		String permanentStorageMgr = permanentStorageManagerElem.getText().trim();
+                		propertyBean.setPermanentStorageManagerClass(permanentStorageMgr);
+                	}
+                	
+                }
             }
         }
     }

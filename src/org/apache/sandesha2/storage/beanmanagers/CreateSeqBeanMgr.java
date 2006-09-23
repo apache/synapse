@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -38,7 +38,7 @@ public interface CreateSeqBeanMgr extends RMBeanManager {
 
 	public boolean update(CreateSeqBean bean) throws SandeshaStorageException;
 
-	public Collection find(CreateSeqBean bean) throws SandeshaStorageException;
+	public List find(CreateSeqBean bean) throws SandeshaStorageException;
 	
 	public CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException;
 

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
@@ -64,7 +65,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return true;
 	}
 
-	public synchronized Collection find(String internalSequenceID) {
+	public synchronized List find(String internalSequenceID) {
 		
 		ArrayList arrayList = new ArrayList ();
 		if (internalSequenceID==null || "".equals(internalSequenceID))
@@ -81,7 +82,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 		return arrayList;
 	}
 
-	public synchronized Collection find(SenderBean bean) {
+	public synchronized List find(SenderBean bean) {
 		ArrayList beans = new ArrayList();
 		Iterator iterator = ((Hashtable) table).values().iterator();
 

@@ -23,7 +23,9 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
@@ -35,6 +37,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
@@ -50,6 +53,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckFinal;
@@ -62,6 +66,7 @@ import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
@@ -261,9 +266,17 @@ public class RMMsgCreator {
 		if (transportIn!=null)
 			transportInName = transportIn.getName();
 		
-        EndpointReference replyTo = context.getListenerManager().getEPRforService(
-        		createSeqmsgContext.getAxisService().getName(), 
-        		axisOperationName!=null?axisOperationName.getLocalPart():null, 
+		EndpointReference referenceTo = applicationMsgContext.getTo();
+		EndpointReference referenceReplyTo = applicationMsgContext.getReplyTo();
+		
+		EndpointReference replyTo = null;
+		
+		if (referenceReplyTo!=null && SandeshaUtil.isAnonymousURI (referenceReplyTo.getAddress()))
+			replyTo = new EndpointReference (referenceReplyTo.getAddress());
+		else
+			replyTo = context.getListenerManager().getEPRforService(
+					createSeqmsgContext.getAxisService().getName(), 
+					axisOperationName!=null?axisOperationName.getLocalPart():null, 
         				transportInName!=null?transportInName.getLocalPart():null);
         
         createSeqmsgContext.setReplyTo(replyTo);
@@ -295,6 +308,7 @@ public class RMMsgCreator {
 			}
 		}
 
+		//TODO remove setting addressing values following two beans.
 		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 		SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
@@ -698,6 +712,52 @@ public class RMMsgCreator {
 		}
 		
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
+	}
+	
+	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage, String internalSequenceId, String makeConnectionSeqId,
+			String makeConnectionAnonURI, StorageManager storageManager) throws AxisFault {
+		
+		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
+		ConfigurationContext configurationContext = referenceMessage.getConfigurationContext();
+		
+		String rmVersion = SandeshaUtil.getSequenceProperty(internalSequenceId, 
+				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, storageManager);
+		String addressingNamespace = SandeshaUtil.getSequenceProperty(internalSequenceId, 
+				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+		
+		AxisOperation makeConnectionOperation = AxisOperationFactory.getAxisOperation(
+				WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
+
+
+		MessageContext makeConnectionMessageCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,makeConnectionOperation);
+		RMMsgContext makeConnectionRMMessageCtx = MsgInitializer.initializeMessage(makeConnectionMessageCtx);
+		
+		MakeConnection makeConnection = new MakeConnection (rmNamespaceValue);
+		if (makeConnectionSeqId!=null) {
+			Identifier identifier = new Identifier (rmNamespaceValue);
+			identifier.setIndentifer(makeConnectionSeqId);
+			makeConnection.setIdentifier(identifier);
+		}
+		
+		if (makeConnectionAnonURI!=null) {
+			Address address = new Address (rmNamespaceValue);
+			address.setEpr(new EndpointReference (makeConnectionAnonURI));
+			makeConnection.setAddress(address);
+		}
+		
+		//setting the addressing properties
+		makeConnectionMessageCtx.setTo(new EndpointReference (referenceMessage.getTo().getAddress()));
+		makeConnectionMessageCtx.setWSAAction(SpecSpecificConstants.getMakeConnectionAction(rmVersion));
+		makeConnectionMessageCtx.setMessageID(SandeshaUtil.getUUID());
+		
+		makeConnectionRMMessageCtx.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
+				makeConnection);
+		
+		//generating the SOAP Envelope.
+		makeConnectionRMMessageCtx.addSOAPEnvelope();
+		
+		return makeConnectionRMMessageCtx;
 	}
 
 }

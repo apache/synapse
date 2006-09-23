@@ -43,6 +43,8 @@ public class MsgProcessorFactory {
 			return new CreateSeqResponseMsgProcessor();
 		case (Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE):
 			return new CloseSequenceProcessor();
+		case (Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG):
+			return new MakeConnectionProcessor ();
 		default:
 			return null;
 		}

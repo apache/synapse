@@ -39,10 +39,15 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	private ConfigurationContext configurationContext = null;
 	private String messageId = null;
 	private static final Log log = LogFactory.getLog(SenderWorker.class);
+	private TransportOutDescription transportOut = null;
 	
 	public SenderWorker (ConfigurationContext configurationContext, String messageId) {
 		this.configurationContext = configurationContext;
 		this.messageId = messageId;
+	}
+	
+	public void setTransportOut (TransportOutDescription transportOut) {
+		this.transportOut = transportOut;
 	}
 	
 	public void run () {
@@ -117,6 +122,13 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			// sending the message
 			TransportOutDescription transportOutDescription = msgCtx.getTransportOut();
+			
+			//if a different TransportOutDesc hs already been set, it will be used instead
+			//of the one from te MessageContext.
+			
+			if (transportOut!=null)
+				transportOutDescription = transportOut;
+			
 			TransportSender transportSender = transportOutDescription.getSender();
 
 			boolean successfullySent = false;

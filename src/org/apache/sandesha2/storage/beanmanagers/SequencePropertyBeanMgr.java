@@ -18,6 +18,7 @@
 package org.apache.sandesha2.storage.beanmanagers;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -35,7 +36,7 @@ public interface SequencePropertyBeanMgr extends RMBeanManager {
 
 	public boolean insert(SequencePropertyBean bean) throws SandeshaStorageException;
 
-	public Collection find(SequencePropertyBean bean) throws SandeshaStorageException;
+	public List find(SequencePropertyBean bean) throws SandeshaStorageException;
 	
 	public SequencePropertyBean findUnique (SequencePropertyBean bean) throws SandeshaException;
 

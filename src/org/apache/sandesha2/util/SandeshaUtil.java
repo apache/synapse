@@ -61,6 +61,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
+import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -238,6 +240,25 @@ public class SandeshaUtil {
 			context.setProperty(Sandesha2Constants.INVOKER,invoker);
 			invoker.runInvokerForTheSequence(context,sequenceID);
 		}
+	}
+	
+	public static void startPollingManager (ConfigurationContext configurationContext) throws SandeshaException {
+		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
+				Sandesha2Constants.POLLING_MANAGER);
+		
+		//assums that if somebody hs set the PollingManager, he must hv already started it.
+		if (pollingManager==null) {
+			pollingManager = new PollingManager ();
+			configurationContext.setProperty(Sandesha2Constants.POLLING_MANAGER,pollingManager);
+			pollingManager.start(configurationContext);
+		}
+	}
+	
+	public static void stopPollingManager (ConfigurationContext configurationContext) {
+		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
+				Sandesha2Constants.POLLING_MANAGER);
+		if (pollingManager!=null) 
+			pollingManager.stopPolling ();
 	}
 
 	private static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
@@ -601,13 +622,13 @@ public class SandeshaUtil {
 	
 
 	
-	public static SandeshaPropertyBean getDefaultPropertyBean (AxisConfiguration axisConfiguration) throws SandeshaException {
+	public static SandeshaPolicyBean getDefaultPropertyBean (AxisConfiguration axisConfiguration) throws SandeshaException {
 		Parameter parameter = axisConfiguration.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 		if (parameter==null)
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
-		SandeshaPropertyBean sandeshaPropertyBean = (SandeshaPropertyBean) parameter.getValue();
+		SandeshaPolicyBean sandeshaPropertyBean = (SandeshaPolicyBean) parameter.getValue();
 		return sandeshaPropertyBean;
 	}
 
@@ -871,13 +892,13 @@ public class SandeshaUtil {
 		return true; // all message upto the highest have been acked.
 	}
 	
-	public static SandeshaPropertyBean getPropertyBean (AxisDescription axisDescription) throws SandeshaException {
+	public static SandeshaPolicyBean getPropertyBean (AxisDescription axisDescription) throws SandeshaException {
 		Parameter parameter = axisDescription.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 		if (parameter==null)
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
-		SandeshaPropertyBean propertyBean = (SandeshaPropertyBean) parameter.getValue();
+		SandeshaPolicyBean propertyBean = (SandeshaPolicyBean) parameter.getValue();
 		return propertyBean;
 	}
 
@@ -1003,5 +1024,23 @@ public class SandeshaUtil {
 		} else {
 			return false;
 		}
+	}
+
+	public static boolean isWSRMAnonymousReplyTo (String replyTo) {
+		if (replyTo!=null && replyTo.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
+			return true;
+		else 
+			return false;
+	}
+
+	public static boolean isAnonymousURI (String address) {
+		if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address))
+			return true;
+		else if (AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address))
+			return true;
+		else if (isWSRMAnonymousReplyTo(address))
+			return true;
+		
+		return false;
 	}
 }

@@ -28,6 +28,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
@@ -50,7 +51,7 @@ public class MessageRetransmissionAdjuster {
 		String sequenceID = retransmitterBean.getSequenceID();
 
 		// operation is the lowest level Sandesha2 could be attached.
-		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation());
+		SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation());
 
 		retransmitterBean.setSentCount(retransmitterBean.getSentCount() + 1);
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
@@ -89,7 +90,7 @@ public class MessageRetransmissionAdjuster {
 	 * @param policyBean
 	 * @return
 	 */
-	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPropertyBean propertyBean) {
+	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPolicyBean propertyBean) {
 
 		// long lastSentTime = retransmitterBean.getTimeToSend();
 

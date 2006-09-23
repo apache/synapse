@@ -17,8 +17,7 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.util.Collection;
-
+import java.util.List;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -35,9 +34,9 @@ public interface SenderBeanMgr extends RMBeanManager {
 
 	public boolean insert(SenderBean bean) throws SandeshaStorageException;
 
-	public Collection find(SenderBean bean) throws SandeshaStorageException;
+	public List find(SenderBean bean) throws SandeshaStorageException;
 
-	public Collection find(String internalSequenceID) throws SandeshaStorageException;
+	public List find(String internalSequenceID) throws SandeshaStorageException;
 	
 	public SenderBean findUnique (SenderBean bean) throws SandeshaException;
 	

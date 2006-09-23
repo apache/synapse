@@ -139,10 +139,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		if (createSequenceSenderBean == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound));
 
-		// removing the Create Sequence Message from the storage
-		String createSeqStorageKey = createSequenceSenderBean.getMessageContextRefKey();
-		storageManager.removeMessageContext(createSeqStorageKey);
-
 		// deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
 

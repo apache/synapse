@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -35,7 +35,7 @@ public interface InvokerBeanMgr extends RMBeanManager {
 
 	public InvokerBean retrieve(String key) throws SandeshaStorageException;
 
-	public Collection find(InvokerBean bean) throws SandeshaStorageException;
+	public List find(InvokerBean bean) throws SandeshaStorageException;
 
 	public InvokerBean findUnique (InvokerBean bean) throws SandeshaException;
 	

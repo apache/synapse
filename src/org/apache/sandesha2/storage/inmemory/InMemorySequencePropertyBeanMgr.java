@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
@@ -69,7 +70,7 @@ public class InMemorySequencePropertyBeanMgr implements SequencePropertyBeanMgr 
 				SandeshaMessageKeys.selectRSNotSupported));
 	}
 
-	public synchronized Collection find(SequencePropertyBean bean) {
+	public synchronized List find(SequencePropertyBean bean) {
 		ArrayList beans = new ArrayList();
 
 		if (bean == null)

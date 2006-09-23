@@ -50,16 +50,25 @@ public class CreateSeqBean extends RMBean {
 	 * This is the security token data needed to reconstruct the token that secures this sequence.
 	 */
 	private String securityTokenData;
+	
+	/**
+	 * This tells weather this sequence is in the polling mode or not.
+	 * PollingManager will use this property decide the sequences that need
+	 * polling and will do MakeConnections on them.
+	 */
+	private boolean pollingMode;
 
+	
+	/**
+	 * The key that is used to store the CreateSequence message in the Message Storage.
+	 * This is stored here, so that the CreateSequence message can be used as a reference when Sandesha
+	 * want the generate new messages. (e.g. MakeConnection)
+	 */
+	private String createSequenceMsgStoreKey;
+	
 	public CreateSeqBean() {
 	}
 
-	public CreateSeqBean(String internalSeqID, String CreateSeqMsgID,
-			String sequenceID) {
-		this.internalSequenceID = internalSeqID;
-		this.createSeqMsgID = CreateSeqMsgID;
-		this.sequenceID = sequenceID;
-	}
 
 	public String getCreateSeqMsgID() {
 		return createSeqMsgID;
@@ -93,4 +102,20 @@ public class CreateSeqBean extends RMBean {
 		this.securityTokenData = securityTokenData;
 	}
 
+	public boolean isPollingMode() {
+		return pollingMode;
+	}
+
+	public void setPollingMode(boolean pollingMode) {
+		this.pollingMode = pollingMode;
+	}
+
+	public String getCreateSequenceMsgStoreKey() {
+		return createSequenceMsgStoreKey;
+	}
+
+	public void setCreateSequenceMsgStoreKey(String createSequenceMsgStoreKey) {
+		this.createSequenceMsgStoreKey = createSequenceMsgStoreKey;
+	}
+	
 }

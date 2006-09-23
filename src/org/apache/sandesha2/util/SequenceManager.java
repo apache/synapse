@@ -32,6 +32,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -194,6 +195,15 @@ public class SequenceManager {
 		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, addressingNamespace);
 		seqPropMgr.insert(addressingNamespaceBean);
+		
+		
+		//setting the SOAPVersion Bean.
+		String SOAPVersion = firstAplicationMsgCtx.getOptions().getSoapVersionURI();
+		SequencePropertyBean SOAPVersionBean = new SequencePropertyBean (sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.SOAP_VERSION, SOAPVersion);
+		
+		seqPropMgr.insert(SOAPVersionBean);
+		
 
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
 
@@ -454,17 +464,17 @@ public class SequenceManager {
 			throws SandeshaException {
 
 		// operation is the lowest level, Sandesha2 could be engaged.
-		SandeshaPropertyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext()
+		SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext()
 				.getAxisOperation());
 
-		if (propertyBean.getInactiveTimeoutInterval() <= 0)
+		if (propertyBean.getInactivityTimeoutInterval() <= 0)
 			return false;
 
 		boolean sequenceTimedOut = false;
 
 		long lastActivatedTime = getLastActivatedTime(propertyKey, storageManager);
 		long timeNow = System.currentTimeMillis();
-		if (lastActivatedTime > 0 && (lastActivatedTime + propertyBean.getInactiveTimeoutInterval() < timeNow))
+		if (lastActivatedTime > 0 && (lastActivatedTime + propertyBean.getInactivityTimeoutInterval() < timeNow))
 			sequenceTimedOut = true;
 
 		return sequenceTimedOut;

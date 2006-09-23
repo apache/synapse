@@ -310,6 +310,9 @@ public interface Sandesha2Constants {
 		String LAST_IN_MESSAGE_NO = "LastInMessage";
 		
 		String SECURITY_TOKEN = "SecurityToken";
+		
+		String SOAP_VERSION = "SOAPVersion";
+
 	}
 
 	public interface SOAPVersion {
@@ -516,6 +519,8 @@ public interface Sandesha2Constants {
 	
 	String INVOKER = "Invoker";
 	
+	String POLLING_MANAGER = "PollingManager";
+	
 	String WITHIN_TRANSACTION = "WithinTransaction";
 	
 	String STORAGE_MANAGER_PARAMETER  = "Sandesha2StorageManager";
@@ -527,6 +532,8 @@ public interface Sandesha2Constants {
 	String MODULE_CLASS_LOADER = "Sandesha2ModuleClassLoader";
 	
 	String SECURITY_MANAGER = "Sandesha2SecurityManager";
+	
+	String WSRM_ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsrm/200608/anonymous";
 	
 	String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
@@ -552,6 +559,8 @@ public interface Sandesha2Constants {
         public static final String ELEM_MSG_TYPES_TO_DROP = "MessageTypesToDrop";
         public static final String ELEM_STORAGE_MGR = "StorageManagers";
         public static final String ELEM_SEC_MGR = "SecurityManager";
+        public static final String ELEM_INMEMORY_STORAGE_MGR = "InMemoryStorageManager";
+        public static final String ELEM_PERMANENT_STORAGE_MGR = "PermanentStorageManager";
         
         public static final QName Q_ELEM__RMBEAN = new QName(URI_RM_POLICY_NS, "RMBean");
         public static final QName Q_ELEM_ACK_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_ACK_INTERVAL);
@@ -564,5 +573,7 @@ public interface Sandesha2Constants {
         public static final QName Q_ELEM_MSG_TYPES_TO_DROP = new QName(URI_RM_POLICY_NS, ELEM_MSG_TYPES_TO_DROP);
         public static final QName Q_ELEM_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_STORAGE_MGR);
         public static final QName Q_ELEM_SEC_MGR = new QName(URI_RM_POLICY_NS, ELEM_SEC_MGR);
+        public static final QName Q_ELEM_INMEMORY_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_INMEMORY_STORAGE_MGR);
+        public static final QName Q_ELEM_PERMANENT_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_PERMANENT_STORAGE_MGR);
     }
 }

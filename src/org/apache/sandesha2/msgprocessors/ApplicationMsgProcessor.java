@@ -825,7 +825,32 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqMsg.setRelationships(null); // create seq msg does not
 												// relateTo anything
 
-		CreateSeqBean createSeqBean = new CreateSeqBean(internalSequenceId, createSeqMsg.getMessageID(), null);
+		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key taht will be used to store 
+																	   //the create sequence message.
+		
+		CreateSeqBean createSeqBean = new CreateSeqBean();
+		createSeqBean.setInternalSequenceID(internalSequenceId);
+		createSeqBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
+		createSeqBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
+		
+		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
+		
+		//checking weather the sequence is in polling mode.
+		boolean pollingMode = false;
+		EndpointReference replyTo = applicationRMMsg.getReplyTo();
+		if (replyTo!=null && SandeshaUtil.isWSRMAnonymousReplyTo(replyTo.getAddress()))
+			pollingMode = true;
+		else if (replyTo!=null && offer!=null && 
+				(AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(replyTo.getAddress()) || 
+						AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(replyTo.getAddress())))
+			pollingMode = true;
+		
+		createSeqBean.setPollingMode(pollingMode);
+		
+		//if PollingMode is true, starting the pollingmanager.
+		if (pollingMode)
+			SandeshaUtil.startPollingManager(configCtx);
+		
 		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(token != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
@@ -848,11 +873,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (createSeqMsg.getReplyTo() == null)
 			createSeqMsg.setReplyTo(new EndpointReference(anonymousURI));
 
-		String key = SandeshaUtil.getUUID(); // the key used to store the
-												// create sequence message.
-
 		SenderBean createSeqEntry = new SenderBean();
-		createSeqEntry.setMessageContextRefKey(key);
+		createSeqEntry.setMessageContextRefKey(createSequenceMessageStoreKey);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());
 		createSeqEntry.setMessageID(createSeqRMMessage.getMessageId());
 		createSeqEntry.setInternalSequenceID(sequencePropertyKey);
@@ -863,17 +885,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
 		retransmitterMgr.insert(createSeqEntry);
 
-		storageManager.storeMessageContext(key, createSeqMsg); // storing the
+		storageManager.storeMessageContext(createSequenceMessageStoreKey, createSeqMsg); // storing the
 																// message.
 
 		// message will be stored in the Sandesha2TransportSender
-		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
+		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, createSequenceMessageStoreKey);
 
 		TransportOutDescription transportOut = createSeqMsg.getTransportOut();
 
 		createSeqMsg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
 		createSeqMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
+		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, createSequenceMessageStoreKey);
 
 		Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
 		createSeqMsg.setTransportOut(sandesha2TransportOutDesc);

@@ -143,6 +143,20 @@ public class SpecSpecificConstants {
 					specVersion));
 	}
 	
+	public static String getMakeConnectionAction (String specVersion) throws SandeshaException {
+		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) {
+			String message = "MakeConnection is not supported in this RM version";
+			throw new SandeshaException (message);
+		}
+		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
+			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_MAKE_CONNECTION;
+		else {
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					specVersion));
+		}
+	}
+	
 	public static String getCreateSequenceSOAPAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_CREATE_SEQUENCE;
@@ -299,4 +313,6 @@ public class SpecSpecificConstants {
 
 		return null;
 	}
+
+
 }

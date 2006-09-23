@@ -35,6 +35,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 
 /**
  * Loads properties from sandesha2.properties file (from Sandesha2Constants if
@@ -45,8 +46,8 @@ public class PropertyManager {
 
 	private static final Log log = LogFactory.getLog(PropertyManager.class);
 
-	public static SandeshaPropertyBean loadPropertiesFromDefaultValues() throws SandeshaException {
-		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+	public static SandeshaPolicyBean loadPropertiesFromDefaultValues() throws SandeshaException {
+		SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
 		propertyBean.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
 		propertyBean.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
 		propertyBean.setInactiveTimeoutInterval(Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,
@@ -70,8 +71,8 @@ public class PropertyManager {
 		return propertyBean;
 	}
 
-	public static SandeshaPropertyBean loadPropertiesFromPropertyFile(InputStream in) throws SandeshaException {
-		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+	public static SandeshaPolicyBean loadPropertiesFromPropertyFile(InputStream in) throws SandeshaException {
+		SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
 		try {
 			if (in == null)
 				in = Thread.currentThread().getContextClassLoader().getResourceAsStream(
@@ -125,8 +126,8 @@ public class PropertyManager {
 		return propertyBean;
 	}
 
-	public static SandeshaPropertyBean loadPropertiesFromModuleDesc(AxisModule desc) throws SandeshaException {
-		SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+	public static SandeshaPolicyBean loadPropertiesFromModuleDesc(AxisModule desc) throws SandeshaException {
+		SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
 
 		Parameter expoBackoffParam = desc.getParameter(Sandesha2Constants.Properties.ExponentialBackoff);
 		String expoBackoffStr = (String) expoBackoffParam.getValue();
@@ -177,10 +178,10 @@ public class PropertyManager {
 		return propertyBean;
 	}
 
-	public static SandeshaPropertyBean loadPropertiesFromModuleDescPolicy(AxisModule desc,
-			SandeshaPropertyBean parentPropertyBean) throws SandeshaException {
+	public static SandeshaPolicyBean loadPropertiesFromModuleDescPolicy(AxisModule desc,
+			SandeshaPolicyBean parentPropertyBean) throws SandeshaException {
 		
-        SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
 
 		Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
@@ -198,10 +199,10 @@ public class PropertyManager {
         
         boolean found = false;
         
-        for (Iterator assertions = assertionList.iterator(); iterator.hasNext();) {
+        for (Iterator assertions = assertionList.iterator(); assertions.hasNext();) {
             assertion = (Assertion) assertions.next();
             
-            if (assertion instanceof SandeshaPropertyBean) {
+            if (assertion instanceof SandeshaPolicyBean) {
                 found = true;
                 break;
             }
@@ -212,7 +213,7 @@ public class PropertyManager {
             return null;
         }
         
-        propertyBean = (SandeshaPropertyBean) assertion;
+        propertyBean = (SandeshaPolicyBean) assertion;
         
 //		RMPolicyProcessor processor = new RMPolicyProcessor();
 //
@@ -280,10 +281,10 @@ public class PropertyManager {
 		return propertyBean;
 	}
 
-	public static SandeshaPropertyBean loadPropertiesFromAxisDescription(AxisDescription desc,
-			SandeshaPropertyBean parentPropertyBean) throws SandeshaException {
+	public static SandeshaPolicyBean loadPropertiesFromAxisDescription(AxisDescription desc,
+			SandeshaPolicyBean parentPropertyBean) throws SandeshaException {
 		
-        SandeshaPropertyBean propertyBean = new SandeshaPropertyBean();
+        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
 
         Policy policy = desc.getPolicyInclude().getEffectivePolicy();
 
@@ -304,7 +305,7 @@ public class PropertyManager {
         for (Iterator assertions = assertionList.iterator(); iterator.hasNext();) {
             assertion = (Assertion) assertions.next();
             
-            if (assertion instanceof SandeshaPropertyBean) {
+            if (assertion instanceof SandeshaPolicyBean) {
                 found = true;
                 break;
             }
@@ -315,7 +316,7 @@ public class PropertyManager {
             return null;
         }
         
-        propertyBean = (SandeshaPropertyBean) assertion;
+        propertyBean = (SandeshaPolicyBean) assertion;
 //
 //		RMPolicyProcessor processor = new RMPolicyProcessor();
 //
@@ -397,7 +398,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private static void loadExponentialBackoff(String expoBackoffStr, SandeshaPropertyBean propertyBean)
+	private static void loadExponentialBackoff(String expoBackoffStr, SandeshaPolicyBean propertyBean)
 			throws SandeshaException {
 
 		if (expoBackoffStr != null) {
@@ -415,7 +416,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private static void loadRetransmissionInterval(String retransmissionIntStr, SandeshaPropertyBean propertyBean)
+	private static void loadRetransmissionInterval(String retransmissionIntStr, SandeshaPolicyBean propertyBean)
 			throws SandeshaException {
 
 		if (retransmissionIntStr != null) {
@@ -437,7 +438,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private static void loadAcknowledgementInterval(String acknowledgementIntStr, SandeshaPropertyBean propertyBean)
+	private static void loadAcknowledgementInterval(String acknowledgementIntStr, SandeshaPolicyBean propertyBean)
 			throws SandeshaException {
 
 		if (acknowledgementIntStr != null) {
@@ -460,7 +461,7 @@ public class PropertyManager {
 	 * @param properties
 	 */
 	private static void loadInactivityTimeout(String inactivityTimeoutStr, String inactivityTimeoutMeasure,
-			SandeshaPropertyBean propertyBean) throws SandeshaException {
+			SandeshaPolicyBean propertyBean) throws SandeshaException {
 
 		if (inactivityTimeoutStr != null && inactivityTimeoutMeasure != null) {
 			try {
@@ -497,7 +498,7 @@ public class PropertyManager {
 	 * @param properties
 	 */
 	private static void loadInMemoryStoragemanagerClass(String inMemoryStorageMgrClassStr,
-			SandeshaPropertyBean propertyBean) throws SandeshaException {
+			SandeshaPolicyBean propertyBean) throws SandeshaException {
 		if (inMemoryStorageMgrClassStr != null) {
 			inMemoryStorageMgrClassStr = inMemoryStorageMgrClassStr.trim();
 			propertyBean.setInMemoryStorageManagerClass(inMemoryStorageMgrClassStr);
@@ -510,14 +511,14 @@ public class PropertyManager {
 	 * @param properties
 	 */
 	private static void loadPermanentStoragemanagerClass(String permanentStorageMgrClassStr,
-			SandeshaPropertyBean propertyBean) throws SandeshaException {
+			SandeshaPolicyBean propertyBean) throws SandeshaException {
 		if (permanentStorageMgrClassStr != null) {
 			permanentStorageMgrClassStr = permanentStorageMgrClassStr.trim();
 			propertyBean.setPermanentStorageManagerClass(permanentStorageMgrClassStr);
 		}
 	}
 
-	private static void loadInOrderInvocation(String inOrderInvocation, SandeshaPropertyBean propertyBean)
+	private static void loadInOrderInvocation(String inOrderInvocation, SandeshaPolicyBean propertyBean)
 			throws SandeshaException {
 
 		if (inOrderInvocation != null) {
@@ -530,7 +531,7 @@ public class PropertyManager {
 		}
 	}
 
-	private static void loadMessageTypesToDrop(String messageTypesToDrop, SandeshaPropertyBean propertyBean)
+	private static void loadMessageTypesToDrop(String messageTypesToDrop, SandeshaPolicyBean propertyBean)
 			throws SandeshaException {
 
 		try {
@@ -558,7 +559,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private static void loadSecurityManagerClass(String securityManagerClassStr, SandeshaPropertyBean propertyBean) throws SandeshaException  {
+	private static void loadSecurityManagerClass(String securityManagerClassStr, SandeshaPolicyBean propertyBean) throws SandeshaException  {
 		if (securityManagerClassStr != null) {
 			securityManagerClassStr = securityManagerClassStr.trim();
 			propertyBean.setSecurityManagerClass(securityManagerClassStr);

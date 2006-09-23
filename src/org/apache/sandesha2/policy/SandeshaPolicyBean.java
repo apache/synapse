@@ -15,7 +15,7 @@
  *
  */
 
-package org.apache.sandesha2.util;
+package org.apache.sandesha2.policy;
 
 import java.util.ArrayList;
 
@@ -27,16 +27,13 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.policy.RMPolicyBean;
 
 /**
  * Used to hold peoperties loaded from sandesha2.properties file or
  * Sandesha2Constants.
  */
 
-public class SandeshaPropertyBean implements Assertion {
-
-	RMPolicyBean policyBean = new RMPolicyBean();
+public class SandeshaPolicyBean implements Assertion {
 
 	// String storageManagerClass = null;
 	boolean inOrder = true;
@@ -46,39 +43,28 @@ public class SandeshaPropertyBean implements Assertion {
 	private String inMemoryStorageManagerClass = null;
 
 	private String permanentStorageManagerClass = null;
-	
+
 	private String securityManagerClass = null;
 
-	public long getInactiveTimeoutInterval() {
-		return policyBean.getInactiveTimeoutInterval();
-	}
+	private long inactiveTimeoutValue;
 
-	public long getAcknowledgementInterval() {
-		return policyBean.getAcknowledgementInterval();
-	}
+	private String inactivityTimeoutMeasure;
 
-	public long getRetransmissionInterval() {
-		return policyBean.getRetransmissionInterval();
-	}
+	private long inactivityTimeoutInterval = -1;
 
-	public boolean isExponentialBackoff() {
-		return policyBean.isExponentialBackoff();
-	}
+	private long acknowledgementInterval;
 
-	public void setExponentialBackoff(boolean exponentialBackoff) {
-		policyBean.setExponentialBackoff(exponentialBackoff);
-	}
+	private long retransmissionInterval;
 
-	public void setRetransmissionInterval(long retransmissionInterval) {
-		policyBean.setRetransmissionInterval(retransmissionInterval);
-	}
+	private boolean exponentialBackoff;
+
+	private int maximumRetransmissionCount;
 
 	public void setInactiveTimeoutInterval(long value, String measure) {
 		long timeOut = -1;
 
 		if (measure == null) {
-			policyBean.setInactiveTimeoutInterval(timeOut);
-			return;
+			this.inactivityTimeoutInterval = value;
 		} else if ("seconds".equals(measure)) {
 			timeOut = value * 1000;
 		} else if ("minutes".equals(measure)) {
@@ -89,31 +75,20 @@ public class SandeshaPropertyBean implements Assertion {
 			timeOut = value * 24 * 60 * 60 * 1000;
 		}
 
-		policyBean.setInactiveTimeoutInterval(timeOut);
+		this.inactivityTimeoutInterval = timeOut;
 
-	}
-
-	public void setInactiveTimeoutInterval(long inactivityTimeoutInterval) {
-		policyBean.setInactiveTimeoutInterval(inactivityTimeoutInterval);
 	}
 
 	public void setAcknowledgementInterval(long acknowledgementInterval) {
-		policyBean.setAcknowledgementInterval(acknowledgementInterval);
+		this.acknowledgementInterval = acknowledgementInterval;
 	}
-
-	// public String getStorageManagerClass() {
-	// return storageManagerClass;
-	// }
-	//	
-	// public void setStorageManagerClass(String storageManagerClass) {
-	// this.storageManagerClass = storageManagerClass;
-	// }
 
 	public String getInMemoryStorageManagerClass() {
 		return inMemoryStorageManagerClass;
 	}
 
-	public void setInMemoryStorageManagerClass(String inMemoryStorageManagerClass) {
+	public void setInMemoryStorageManagerClass(
+			String inMemoryStorageManagerClass) {
 		this.inMemoryStorageManagerClass = inMemoryStorageManagerClass;
 	}
 
@@ -121,12 +96,9 @@ public class SandeshaPropertyBean implements Assertion {
 		return permanentStorageManagerClass;
 	}
 
-	public void setPermanentStorageManagerClass(String permanentStorageManagerClass) {
+	public void setPermanentStorageManagerClass(
+			String permanentStorageManagerClass) {
 		this.permanentStorageManagerClass = permanentStorageManagerClass;
-	}
-
-	public RMPolicyBean getPolicyBean() {
-		return policyBean;
 	}
 
 	public boolean isInOrder() {
@@ -156,42 +128,80 @@ public class SandeshaPropertyBean implements Assertion {
 	}
 
 	public int getMaximumRetransmissionCount() {
-		return policyBean.getMaximumRetransmissionCount();
+		return maximumRetransmissionCount;
 	}
 
 	public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
-		policyBean.setMaximumRetransmissionCount(maximumRetransmissionCount);
+		this.maximumRetransmissionCount = maximumRetransmissionCount;
 	}
-	
+
 	public String getSecurityManagerClass() {
 		return securityManagerClass;
 	}
-	
+
 	public void setSecurityManagerClass(String className) {
 		this.securityManagerClass = className;
 	}
 
-    public QName getName() {
-        return Sandesha2Constants.Assertions.Q_ELEM__RMBEAN;
-    }
+	public QName getName() {
+		return Sandesha2Constants.Assertions.Q_ELEM__RMBEAN;
+	}
 
-    public boolean isOptional() {
-        return false;
-    }
+	public boolean isOptional() {
+		return false;
+	}
 
-    public PolicyComponent normalize() {
-        throw new UnsupportedOperationException("TODO");
-    }
+	public PolicyComponent normalize() {
+		throw new UnsupportedOperationException("TODO");
+	}
 
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        throw new UnsupportedOperationException("TODO");
-    }
+	public void serialize(XMLStreamWriter writer) throws XMLStreamException {
+		throw new UnsupportedOperationException("TODO");
+	}
 
-    public boolean equal(PolicyComponent policyComponent) {
-        throw new UnsupportedOperationException("TODO");
-    }
+	public boolean equal(PolicyComponent policyComponent) {
+		throw new UnsupportedOperationException("TODO");
+	}
 
-    public short getType() {
-        return Constants.TYPE_ASSERTION;
-    }
+	public short getType() {
+		return Constants.TYPE_ASSERTION;
+	}
+
+	public boolean isExponentialBackoff() {
+		return exponentialBackoff;
+	}
+
+	public void setExponentialBackoff(boolean exponentialBackoff) {
+		this.exponentialBackoff = exponentialBackoff;
+	}
+
+	public long getRetransmissionInterval() {
+		return retransmissionInterval;
+	}
+
+	public void setRetransmissionInterval(long retransmissionInterval) {
+		this.retransmissionInterval = retransmissionInterval;
+	}
+
+	public long getAcknowledgementInterval() {
+		return acknowledgementInterval;
+	}
+
+	public long getInactivityTimeoutInterval() {
+		if (inactivityTimeoutInterval<0)
+			setInactiveTimeoutInterval(inactiveTimeoutValue, inactivityTimeoutMeasure);
+		
+		return inactivityTimeoutInterval;
+	}
+
+	public void setInactiveTimeoutValue(long inactiveTimeoutValue) {
+		this.inactiveTimeoutValue = inactiveTimeoutValue;
+	}
+
+	public void setInactivityTimeoutMeasure(String inactivityTimeoutMeasure) {
+		this.inactivityTimeoutMeasure = inactivityTimeoutMeasure;
+	}
+	
+	
+
 }

@@ -87,6 +87,11 @@ public class SenderBean extends RMBean {
 	//TODO fill this property correctly
 	private String sequenceID;
 	
+	/**
+	 * TODO use the value in CreateSequenceBean.
+	 */
+	private String wsrmAnonURI;
+	
 	public SenderBean() {
 
 	}
@@ -182,4 +187,13 @@ public class SenderBean extends RMBean {
 	public void setSequenceID(String sequenceID) {
 		this.sequenceID = sequenceID;
 	}
+
+	public String getWsrmAnonURI() {
+		return wsrmAnonURI;
+	}
+
+	public void setWsrmAnonURI(String wsrmAnonURI) {
+		this.wsrmAnonURI = wsrmAnonURI;
+	}
+	
 }

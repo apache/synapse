@@ -32,11 +32,11 @@ import org.apache.neethi.Policy;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.RMPolicyExtension;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
-import org.apache.sandesha2.util.SandeshaPropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
@@ -59,9 +59,14 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		
 		// continueUncompletedSequences (storageManager,configCtx);
 
-		SandeshaPropertyBean constantPropertyBean = PropertyManager.loadPropertiesFromDefaultValues();
-		SandeshaPropertyBean propertyBean = PropertyManager.loadPropertiesFromModuleDescPolicy(module,constantPropertyBean);
+		SandeshaPolicyBean constantPropertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+		SandeshaPolicyBean propertyBean = PropertyManager.loadPropertiesFromModuleDescPolicy(module,constantPropertyBean);
+		
 		if (propertyBean==null) {
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotFindModulePolicies);
+			log.debug(message);
+			
 			propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
 		}
 		
@@ -101,12 +106,12 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
 		
-		SandeshaPropertyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription);
+		SandeshaPolicyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription);
 		if (parentPropertyBean==null) 
 			throw new AxisFault (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
-		SandeshaPropertyBean axisDescPropertyBean = PropertyManager.loadPropertiesFromAxisDescription(axisDescription,parentPropertyBean);
+		SandeshaPolicyBean axisDescPropertyBean = PropertyManager.loadPropertiesFromAxisDescription(axisDescription,parentPropertyBean);
 		
 		if (axisDescPropertyBean!=null) {
 			Parameter parameter = new Parameter ();

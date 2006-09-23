@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
 import org.apache.commons.logging.Log;
@@ -69,7 +70,7 @@ public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
 		return table.put(bean.getCreateSeqMsgID(), bean) != null;
 	}
 
-	public synchronized Collection find(CreateSeqBean bean) {
+	public synchronized List find(CreateSeqBean bean) {
 		ArrayList beans = new ArrayList();
 		if (bean == null)
 			return beans;

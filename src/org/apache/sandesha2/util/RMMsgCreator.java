@@ -206,7 +206,7 @@ public class RMMsgCreator {
 	 * @throws SandeshaException
 	 */
 	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String sequencePropertyKey,
-			String acksTo, StorageManager storageManager) throws AxisFault {
+			EndpointReference acksTo, StorageManager storageManager) throws AxisFault {
 
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
 		if (applicationMsgContext == null)
@@ -319,14 +319,11 @@ public class RMMsgCreator {
 
 		EndpointReference toEPR = new EndpointReference(toBean.getValue());
 		EndpointReference replyToEPR = null;
-		EndpointReference acksToEPR = null;
 
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
 
-		if (acksTo == null || "".equals(acksTo))
-			acksTo = anonymousURI;
-
-		acksToEPR = new EndpointReference(acksTo);
+		if (acksTo==null || acksTo.getAddress() == null || "".equals(acksTo.getAddress()))
+			acksTo = new EndpointReference(anonymousURI);
 
 		if (replyToBean != null && replyToBean.getValue() != null)
 			replyToEPR = new EndpointReference(replyToBean.getValue());
@@ -338,7 +335,7 @@ public class RMMsgCreator {
 		if (replyToEPR != null)
 			createSeqRMMsg.setReplyTo(replyToEPR);
 
-		createSequencePart.setAcksTo(new AcksTo(new Address(acksToEPR, addressingNamespaceValue), factory,
+		createSequencePart.setAcksTo(new AcksTo(new Address(acksTo, addressingNamespaceValue), factory,
 				rmNamespaceValue, addressingNamespaceValue));
 		
 		// Find the token that should be used to secure this new sequence. If there is a token, then we

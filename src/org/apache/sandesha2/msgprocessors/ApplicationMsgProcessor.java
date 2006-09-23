@@ -640,6 +640,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		OperationContext operationContext = msgContext.getOperationContext();
 
 		// SENDING THE CREATE SEQUENCE.
+		EndpointReference acksToEPR = new EndpointReference(null); //use this to hold the acksTo EPR
 		if (sendCreateSequence) {
 			SequencePropertyBean responseCreateSeqAdded = seqPropMgr.retrieve(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
@@ -653,9 +654,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT, "true");
 				seqPropMgr.insert(responseCreateSeqAdded);
 
-				String acksTo = null;
 				if (serviceContext != null)
-					acksTo = (String) msgContext.getProperty(SandeshaClientConstants.AcksTo);
+						acksToEPR.setAddress((String) msgContext.getProperty(SandeshaClientConstants.AcksTo));
 
 				if (msgContext.isServerSide()) {
 					// we do not set acksTo value to anonymous when the create
@@ -673,19 +673,30 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						log.debug(message);
 						throw new SandeshaException(message);
 					}
-					acksTo = requestMessage.getTo().getAddress();
+					acksToEPR = requestMessage.getTo();
 
 				} else {
-					if (acksTo == null)
-						acksTo = anonymousURI;
+					if (acksToEPR.getAddress() == null){
+						EndpointReference replyToEPR = msgContext.getReplyTo();
+						if(Boolean.getBoolean((String)operationContext.getProperty(SandeshaClientConstants.USE_REPLY_TO_AS_ACKS_TO))
+							&& replyToEPR!=null && !replyToEPR.getAddress().equals("")){
+							//use the replyTo address as acksTo
+							if (log.isDebugEnabled())
+								log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + acksToEPR.getAddress());
+							acksToEPR = replyToEPR;
+						}
+						else{
+							acksToEPR.setAddress(anonymousURI);
+						}
+					}
 				}
 
-				if (!anonymousURI.equals(acksTo) && !serverSide) {
+				if (acksToEPR.getAddress()!=null && !anonymousURI.equals(acksToEPR.getAddress()) && !serverSide) {
 					String transportIn = (String) configContext // TODO verify
 							.getProperty(MessageContext.TRANSPORT_IN);
 					if (transportIn == null)
 						transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
-				} else if (acksTo == null && serverSide) {
+				} else if (acksToEPR.getAddress() == null && serverSide) {
 //					String incomingSequencId = SandeshaUtil
 //							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
 					
@@ -698,21 +709,21 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						SequencePropertyBean bean = seqPropMgr.retrieve(requestSideSequencePropertyKey,
 								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 						if (bean != null) {
-							EndpointReference acksToEPR = new EndpointReference(bean.getValue());
-							if (acksToEPR != null)
-								acksTo = (String) acksToEPR.getAddress();
+							String beanAcksToValue = bean.getValue();
+							if (beanAcksToValue != null)
+								acksToEPR.setAddress(beanAcksToValue);
 						}
 					} catch (AxisFault e) {
 						throw new SandeshaException (e);
 					}
-				} else if (anonymousURI.equals(acksTo)) {
+				} else if (anonymousURI.equals(acksToEPR.getAddress())) {
 					// set transport in.
 					Object trIn = msgContext.getProperty(MessageContext.TRANSPORT_IN);
 					if (trIn == null) {
 						// TODO
 					}
 				}
-				addCreateSequenceMessage(rmMsgCtx, sequencePropertyKey ,internalSequenceId, acksTo, storageManager);
+				addCreateSequenceMessage(rmMsgCtx, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
 			}
 		}
 
@@ -788,7 +799,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			log.debug("Exit: ApplicationMsgProcessor::processOutMessage");
 	}
 
-	private void addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, String acksTo,
+	private void addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())

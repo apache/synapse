@@ -70,17 +70,21 @@ public class AcknowledgementProcessor {
 		SOAPEnvelope envelope = message.getEnvelope();
 		SOAPHeader header = envelope.getHeader();
 		
-		for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
-			QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
-			
-			Iterator acks = header.getChildrenWithName(headerName);
-			while(acks.hasNext()) {
-				OMElement ack = (OMElement) acks.next();
-				SequenceAcknowledgement seqAck = new SequenceAcknowledgement(headerName.getNamespaceURI());
-			  seqAck.fromOMElement(ack);
-			  processAckHeader(message, seqAck);
-			}
+		if(header!=null)
+		{
+			for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+				QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
+				
+				Iterator acks = header.getChildrenWithName(headerName);
+				while(acks.hasNext()) {
+					OMElement ack = (OMElement) acks.next();
+					SequenceAcknowledgement seqAck = new SequenceAcknowledgement(headerName.getNamespaceURI());
+				  seqAck.fromOMElement(ack);
+				  processAckHeader(message, seqAck);
+				}
+			}			
 		}
+
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementProcessor::processAckHeaders");

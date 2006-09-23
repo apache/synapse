@@ -76,16 +76,19 @@ public class AckRequestedProcessor {
 		SOAPEnvelope envelope = message.getEnvelope();
 		SOAPHeader header = envelope.getHeader();
 		
-		for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
-			QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED);
-			
-			Iterator acks = header.getChildrenWithName(headerName);
-			while(acks.hasNext()) {
-				OMElement ack = (OMElement) acks.next();
-				AckRequested ackReq = new AckRequested(headerName.getNamespaceURI());
-			  ackReq.fromOMElement(ack);
-			  processAckRequestedHeader(message, ackReq);
-			}
+		if(header!=null)
+		{
+			for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+				QName headerName = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED);
+				
+				Iterator acks = header.getChildrenWithName(headerName);
+				while(acks.hasNext()) {
+					OMElement ack = (OMElement) acks.next();
+					AckRequested ackReq = new AckRequested(headerName.getNamespaceURI());
+				  ackReq.fromOMElement(ack);
+				  processAckRequestedHeader(message, ackReq);
+				}
+			}			
 		}
 
 		if (log.isDebugEnabled())

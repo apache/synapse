@@ -230,6 +230,8 @@ public class SandeshaMessageKeys {
 	
 	public static final String cannotFindTransportInDesc = "cannotFindTransportInDesc";
 	public static final String toEPRNotSet = "toEPRNotSet";
+    
+    public final static String errorRetrievingSecurityToken = "errorRetrievingSecurityToken";
 	
 	
 }

@@ -22,7 +22,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.SwitchCaseMediator;
 
-public class SwitchCaseMediatorSerializer extends AbstractListMediatorSerializer
+public class SwitchCaseMediatorSerializer extends BaseListMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(SwitchCaseMediatorSerializer.class);

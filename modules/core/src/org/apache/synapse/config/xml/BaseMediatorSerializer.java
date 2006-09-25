@@ -24,7 +24,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class AbstractMediatorSerializer {
+public class BaseMediatorSerializer {
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");

@@ -33,7 +33,7 @@ import org.apache.synapse.mediators.transform.HeaderMediator;
  *      &lt;header name="qname" action="remove"/&gt;
  *   </pre>
  */
-public class HeaderMediatorSerializer extends AbstractMediatorSerializer
+public class HeaderMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
     private static final Log log = LogFactory.getLog(FilterMediatorSerializer.class);
 

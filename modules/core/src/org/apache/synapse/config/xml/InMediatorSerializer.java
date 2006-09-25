@@ -22,7 +22,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.InMediator;
 
-public class InMediatorSerializer extends AbstractListMediatorSerializer
+public class InMediatorSerializer extends BaseListMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(InMediatorSerializer.class);

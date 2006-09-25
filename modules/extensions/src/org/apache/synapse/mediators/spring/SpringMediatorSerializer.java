@@ -21,14 +21,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorSerializer;
+import org.apache.synapse.config.xml.BaseMediatorSerializer;
 
 /**
  * <spring bean="exampleBean1" (config="spring1" | src="spring.xml)"/>
  */
-public class SpringMediatorSerializer extends AbstractMediatorSerializer
+public class SpringMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
 
     private static final OMNamespace sprNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE+"/spring", "spring");

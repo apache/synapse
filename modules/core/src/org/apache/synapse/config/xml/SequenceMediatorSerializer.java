@@ -35,7 +35,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  * &lt;sequence ref="name"/&gt;
  * </pre>
  */
-public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
+public class SequenceMediatorSerializer extends BaseListMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(SequenceMediatorSerializer.class);

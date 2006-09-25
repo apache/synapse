@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.MediatorSerializer;
+import org.apache.synapse.config.xml.BaseMediatorSerializer;
 
 /**
  * <pre>
@@ -30,7 +30,7 @@ import org.apache.synapse.config.xml.MediatorSerializer;
  * &lt;/transform&gt;
  * </pre>
  */
-public class XSLTMediatorSerializer extends AbstractMediatorSerializer
+public class XSLTMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(XSLTMediatorSerializer.class);
@@ -55,10 +55,10 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer
             !XSLTMediator.DEFAULT_XPATH.toString().equals(mediator.getSource().toString())) {
             xslt.addAttribute(fac.createOMAttribute(
                 "source", nullNS, mediator.getSource().toString()));
-            super.serializeNamespaces(xslt, mediator.getSource());
+            serializeNamespaces(xslt, mediator.getSource());
         }
 
-        super.serializeProperties(xslt, mediator.getProperties());
+        serializeProperties(xslt, mediator.getProperties());
 
         if (parent != null) {
             parent.addChild(xslt);

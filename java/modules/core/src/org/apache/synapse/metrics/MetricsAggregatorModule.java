@@ -22,6 +22,8 @@ import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 /*
  * 
  */
@@ -40,6 +42,14 @@ public class MetricsAggregatorModule implements Module {
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {}
+
+    public boolean canSupportAssertion(Assertion assertion) {
+        return false;
+    }
+
+    public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
+        // no implementation 
+    }
 
     // shutdown the module
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {}

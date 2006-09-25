@@ -27,7 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.safehaus.asyncweb.container.basic.BasicServiceContainer;
 import org.safehaus.asyncweb.container.ContainerLifecycleException;
-import org.safehaus.asyncweb.transport.nio.NIOTransport;
 import org.safehaus.asyncweb.transport.nio.HttpIOHandler;
 
 import javax.xml.namespace.QName;

@@ -31,11 +31,6 @@ public interface SynapseEnvironment {
     public void injectMessage(MessageContext smc);
 
     /**
-     * Mediators may get access to the relevant classloader through this
-     */
-    public ClassLoader getClassLoader();
-
-    /**
      * This method allows a message to be sent through the underlying SOAP engine.
      * <p/>
      * This will send request messages on (forward), and send the response messages back to the client

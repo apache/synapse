@@ -138,6 +138,22 @@ public class AsyncHTTPSender extends AbstractHandler implements TransportSender 
         HttpResponse response = request.createHttpResponse();
 
         response.setStatus(ResponseStatus.OK);
+
+        String contentType;
+        Object contentTypeObject = msgContext.getProperty(Constants.Configuration.CONTENT_TYPE);
+        if (contentTypeObject != null) {
+            contentType = (String) contentTypeObject;
+        } else if (msgContext.isDoingREST()) {
+            contentType = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
+        } else {
+            contentType = format.getContentType();
+            format.setSOAP11(msgContext.isSOAP11());
+        }
+
+        response.setHeader("Content-Type:",
+            contentType + "; charset=" + format.getCharSetEncoding());
+        //response.setHeader("Content-Type:", "text/xml; charset=UTF-8");
+
         OutputStream out = response.getOutputStream();
 
         format.setDoOptimize(msgContext.isDoingMTOM());

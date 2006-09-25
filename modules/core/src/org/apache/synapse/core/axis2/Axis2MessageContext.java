@@ -16,6 +16,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
@@ -303,6 +304,37 @@ public class Axis2MessageContext implements MessageContext {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        String separator = "\n";
+
+        if (getTo() != null)
+            sb.append("To: " + getTo().getAddress());
+        else
+            sb.append("To: ");
+        if (getFrom() != null)
+            sb.append(separator + "From: " + getFrom().getAddress());
+        if (getWSAAction() != null)
+            sb.append(separator + "WSAction: " + getWSAAction());
+        if (getSoapAction() != null)
+            sb.append(separator + "SOAPAction: " + getSoapAction());
+        if (getReplyTo() != null)
+            sb.append(separator + "ReplyTo: " + getReplyTo().getAddress());
+        if (getMessageID() != null)
+            sb.append(separator + "MessageID: " + getMessageID());
+
+        Iterator iter = getEnvelope().getHeader().examineAllHeaderBlocks();
+        if (iter.hasNext()) {
+            sb.append(separator + "Headers : ");
+            while (iter.hasNext()) {
+                SOAPHeader header = (SOAPHeader) iter.next();
+                sb.append(separator + header.getLocalName() + " : " + header.getText());
+            }
+        }
+
+        return sb.toString();
     }
 
     public static void setErrorInformation(MessageContext synCtx, SynapseException e) {

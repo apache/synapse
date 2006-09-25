@@ -23,11 +23,11 @@ import org.apache.axis2.context.SessionContext;
 import org.apache.axis2.Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.transport.njms.DefaultThreadFactory;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.transport.http.server.SessionManager;
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axis2.util.threadpool.DefaultThreadFactory;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.description.AxisService;
@@ -181,7 +181,7 @@ public class Axis2AsyncWebProcessor implements HttpService {
             } else if (HttpMethod.POST.equals(request.getMethod())) {
                 processPost(response);
 
-                // Finalize response
+                /*// Finalize response
                 OperationContext operationContext = msgContext.getOperationContext();
                 Object contextWritten = null;
                 if (operationContext != null) {
@@ -196,7 +196,7 @@ public class Axis2AsyncWebProcessor implements HttpService {
                         response.setStatus(ResponseStatus.ACCEPTED);
                     }
                     request.commitResponse(response);
-                }
+                }*/
 
             } else {
                 handleException("Unsupported method : " + request.getMethod(), null, response);

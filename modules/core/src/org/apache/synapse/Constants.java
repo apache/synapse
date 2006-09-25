@@ -35,6 +35,9 @@ public interface Constants {
     /** The name used to denote the Axis2 Parameter specifying the Synapse configuration */
     String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
 
+    /** The name used to denote the SynapseEnvironment implementation class */
+    String SYNAPSE_ENV_IMPL = "SynapseEnvironmentImpl";
+
     /** The system property used to specify/override the synapse configuration XML location */
     String SYNAPSE_XML = "synapse.xml";
 

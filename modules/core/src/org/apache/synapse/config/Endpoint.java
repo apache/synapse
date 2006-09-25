@@ -16,7 +16,7 @@
 package org.apache.synapse.config;
 
 import org.apache.axis2.description.Parameter;
-import org.apache.ws.policy.Policy;
+import org.apache.neethi.Policy;
 
 import java.net.URL;
 

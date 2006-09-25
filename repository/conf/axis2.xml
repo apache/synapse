@@ -83,7 +83,7 @@
     </transportReceiver>
     
     <!--Uncomment this for JMS after setting up your JMS environment (e.g. ActiveMQ)
-    <transportReceiver name="jms" class="org.apache.axis2.transport.njms.JMSListener">
+    <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
         <parameter name="myTopicConnectionFactory" locked="false">        	        	
         	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
         	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
@@ -112,7 +112,7 @@
     <transportSender name="local"
                      class="org.apache.axis2.transport.local.LocalTransportSender"/>
     <transportSender name="jms"
-                     class="org.apache.axis2.transport.njms.JMSSender"/>
+                     class="org.apache.axis2.transport.jms.JMSSender"/>
     <!--<transportSender name="http"
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">-->
     <transportSender name="http"
@@ -160,13 +160,13 @@
         </phase>
         <!--  System pre defined phases       -->
         <phase name="RMPhase"/>
-        <phase name="MUPhase"/>
+        <phase name="MUPhase"/>	<!-- Must Understand Header processing phase -->
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
         <phase name="OperationInPhase"/>
     </phaseOrder>
     <phaseOrder type="outflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="MUPhase"/>
+        <phase name="MUPhase"/> <!-- Must Understand Header processing phase -->
         <phase name="RMPhase"/>
         <phase name="OperationOutPhase"/>
         <!--system predefined phase-->
@@ -203,12 +203,12 @@
         </phase>
         <!--      user can add his own phases to this area  -->
         <phase name="RMPhase"/>
-        <phase name="MUPhase"/>
+        <phase name="MUPhase"/> <!-- Must Understand Header processing phase -->
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
     <phaseOrder type="Outfaultflow">
         <!--      user can add his own phases to this area  -->
-        <phase name="MUPhase"/>
+        <phase name="MUPhase"/> <!-- Must Understand Header processing phase -->
         <phase name="RMPhase"/>
         <phase name="OperationOutFaultPhase"/>
         <phase name="PolicyDetermination"/>

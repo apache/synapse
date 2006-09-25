@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.ws.policy.Policy;
+import org.apache.neethi.Policy;
 
 import java.util.Iterator;
 

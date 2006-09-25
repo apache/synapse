@@ -20,7 +20,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.ws.policy.Policy;
+import org.apache.neethi.Policy;
 import org.apache.ws.policy.util.OMPolicyReader;
 import org.apache.ws.policy.util.PolicyFactory;
 import org.apache.ws.policy.util.PolicyReader;
@@ -62,7 +62,8 @@ public class OutflowRMPolicyBuilder {
                 PolicyReader reader = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
                 try {
                     URL url = new URL(policyUrl.getAttributeValue());
-                    return reader.readPolicy(url.openStream());
+                    // TODO fix this return reader.readPolicy(url.openStream());
+                    return null;
                 } catch (MalformedURLException e) {
                     handleException("Invalid policy URL : " + policyUrl.getAttributeValue(), e);
                 } catch (IOException e) {
@@ -73,7 +74,8 @@ public class OutflowRMPolicyBuilder {
                     new QName(org.apache.axis2.namespace.Constants.URI_POLICY, "Policy"));
                 if (policy != null) {
                     OMPolicyReader reader = (OMPolicyReader) PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
-                    return reader.readPolicy(policy);
+                    // TODO fix this return reader.readPolicy(policy);
+                    return null;
                 }
             }
             return null;

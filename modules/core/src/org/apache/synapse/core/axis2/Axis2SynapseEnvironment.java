@@ -17,6 +17,8 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -27,33 +29,25 @@ import org.apache.synapse.core.SynapseEnvironment;
  */
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
-    private ClassLoader cl = null;
-    /** If synapse is initialized by the SynapseAxis2Interceptor, the Axis2
-     * class loaders were not initialized properly at init time. Hence in such
-     * a case, the axisCfg would be set to refer to the Axis configuration
-     * from which the correct and properly initialized classloader could be picked
-     * up at runtime. This would be used only if the explicit classloader referrenced
-     * by "cl" is null (i.e. has not been set) and the axisCfg is available.
-     */
-    private AxisConfiguration axisCfg = null;
     private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
 
-    public Axis2SynapseEnvironment() {
-        super();
+    private ConfigurationContext cfgCtx = null;
+    private ThreadFactory threadFactory = null;
+
+    public Axis2SynapseEnvironment() {}
+
+    public Axis2SynapseEnvironment(ConfigurationContext cfgCtx) {
+        this.cfgCtx = cfgCtx;
+        threadFactory = cfgCtx.getThreadPool();
     }
 
-    public Axis2SynapseEnvironment(ClassLoader cl) {
-        super();
-        this.cl = cl;
-    }
-
-    public Axis2SynapseEnvironment(AxisConfiguration axisCfg) {
-        super();
-        this.axisCfg = axisCfg;
-    }
-
-    public void injectMessage(MessageContext synCtx) {
+    public void injectMessage(final MessageContext synCtx) {
         synCtx.setEnvironment(this);
+        /*threadFactory.execute(new Runnable() {
+            public void run() {
+                synCtx.getConfiguration().getMainMediator().mediate(synCtx);
+            }
+        });*/
         synCtx.getConfiguration().getMainMediator().mediate(synCtx);
     }
 
@@ -62,19 +56,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             Axis2Sender.sendBack(synCtx);
         else
             Axis2Sender.sendOn(synCtx);
-    }
-
-    public ClassLoader getClassLoader() {
-        if (cl != null) {
-            return cl;
-        } else if (axisCfg != null) {
-            axisCfg.getServiceClassLoader();
-        }
-        return null;
-    }
-
-    public void setClassLoader(ClassLoader cl) {
-        this.cl = cl;
     }
 
 }

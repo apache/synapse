@@ -36,7 +36,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
-import org.apache.ws.policy.Policy;
+import org.apache.neethi.Policy;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;

@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.AbstractListMediatorSerializer;
 import org.apache.synapse.config.xml.MediatorSerializer;
+import org.apache.synapse.config.xml.BaseListMediatorSerializer;
 
 import java.util.Iterator;
 
@@ -34,7 +34,7 @@ import java.util.Iterator;
  *   </on-fail>
  * </validate>
  */
-public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
+public class ValidateMediatorSerializer extends BaseListMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(ValidateMediatorSerializer.class);
@@ -51,7 +51,7 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
         if (mediator.getSource() != null) {
             validate.addAttribute(fac.createOMAttribute(
                 "source", nullNS, mediator.getSource().toString()));
-            super.serializeNamespaces(validate, mediator.getSource());
+            serializeNamespaces(validate, mediator.getSource());
         }
 
         Iterator iter = mediator.getSchemaKeys().iterator();
@@ -61,10 +61,10 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
             schema.addAttribute(fac.createOMAttribute("key", nullNS, key));
         }
 
-        super.serializeProperties(validate, mediator.getProperties().entrySet());
+        serializeProperties(validate, mediator.getProperties().entrySet());
 
         OMElement onFail = fac.createOMElement("on-fail", synNS, validate);
-        super.serializeChildren(onFail, mediator.getList());        
+        serializeChildren(onFail, mediator.getList());        
 
         if (parent != null) {
             parent.addChild(validate);

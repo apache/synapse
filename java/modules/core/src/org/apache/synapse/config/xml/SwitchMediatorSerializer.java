@@ -37,7 +37,7 @@ import java.util.Iterator;
  * &lt;/switch&gt;
  * </pre>
  */
-public class SwitchMediatorSerializer extends AbstractMediatorSerializer
+public class SwitchMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(SwitchMediatorSerializer.class);

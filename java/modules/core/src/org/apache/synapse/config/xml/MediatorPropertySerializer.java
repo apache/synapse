@@ -24,7 +24,7 @@ import org.apache.synapse.mediators.MediatorProperty;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class MediatorPropertySerializer extends AbstractMediatorSerializer {
+public class MediatorPropertySerializer extends BaseMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(MediatorPropertySerializer.class);
 

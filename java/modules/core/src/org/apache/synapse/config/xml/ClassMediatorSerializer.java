@@ -30,7 +30,7 @@ import org.apache.synapse.mediators.filters.FilterMediator;
  * &lt;/class&gt;
  * </pre>
  */
-public class ClassMediatorSerializer extends AbstractMediatorSerializer implements MediatorSerializer {
+public class ClassMediatorSerializer extends BaseMediatorSerializer implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(ClassMediatorSerializer.class);
 

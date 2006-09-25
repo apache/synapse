@@ -29,7 +29,7 @@ import org.apache.synapse.mediators.base.SynapseMediator;
  * &lt;rules&gt;
  * </pre>
  */
-public class SynapseMediatorSerializer extends AbstractListMediatorSerializer
+public class SynapseMediatorSerializer extends BaseListMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(SynapseMediatorSerializer.class);

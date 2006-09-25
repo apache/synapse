@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
  * &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
  * </pre>
  */
-public class PropertyMediatorSerializer extends AbstractMediatorSerializer
+public class PropertyMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(PropertyMediatorSerializer.class);

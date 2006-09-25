@@ -33,7 +33,7 @@ import org.apache.synapse.mediators.transform.FaultMediator;
  * &lt;/makefault&gt;
  * </pre>
  */
-public class FaultMediatorSerializer extends AbstractMediatorSerializer
+public class FaultMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(FaultMediatorSerializer.class);

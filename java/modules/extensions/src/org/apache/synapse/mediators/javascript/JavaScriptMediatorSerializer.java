@@ -21,9 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorSerializer;
+import org.apache.synapse.config.xml.BaseMediatorSerializer;
 
 import javax.xml.stream.XMLStreamConstants;
 
@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamConstants;
  *     <![CDATA[ script here ]]>
  *  </javascript>
  */
-public class JavaScriptMediatorSerializer extends AbstractMediatorSerializer
+public class JavaScriptMediatorSerializer extends BaseMediatorSerializer
     implements MediatorSerializer {
 
     private static final OMNamespace jsNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE+"/js", "js");

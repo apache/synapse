@@ -42,7 +42,7 @@ public class XMLConfigurationSerializer {
     protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
 
 
-    public void serializeConfiguration(SynapseConfiguration synCfg, OutputStream outputStream)
+    public static void serializeConfiguration(SynapseConfiguration synCfg, OutputStream outputStream)
         throws XMLStreamException {
 
         OMElement synapse = fac.createOMElement("synapse", synNS);
@@ -90,7 +90,7 @@ public class XMLConfigurationSerializer {
         synapse.serialize(outputStream);
     }
 
-    private void serializeProperties(OMElement definitions, SynapseConfiguration synCfg) {
+    private static void serializeProperties(OMElement definitions, SynapseConfiguration synCfg) {
 
         Iterator iter = synCfg.getGlobalProps().keySet().iterator();
         while (iter.hasNext()) {
@@ -127,7 +127,7 @@ public class XMLConfigurationSerializer {
         }
     }
 
-    private void serializeEndpoints(OMElement definitions, SynapseConfiguration synCfg) {
+    private static void serializeEndpoints(OMElement definitions, SynapseConfiguration synCfg) {
 
         Iterator iter = synCfg.getNamedEndpoints().keySet().iterator();
         while (iter.hasNext()) {
@@ -151,7 +151,7 @@ public class XMLConfigurationSerializer {
         }
     }
 
-    private void handleException(String msg) {
+    private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }

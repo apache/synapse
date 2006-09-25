@@ -46,7 +46,7 @@ public class XMLConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(XMLConfigurationBuilder.class);
 
-    public SynapseConfiguration getConfiguration(InputStream is) {
+    public static SynapseConfiguration getConfiguration(InputStream is) {
 
         log.info("Generating the Synapse configuration model by parsing the XML configuration");
         SynapseConfiguration config = new SynapseConfiguration();
@@ -144,7 +144,7 @@ public class XMLConfigurationBuilder {
      * </pre>
      * @param elem
      */
-    public void defineProperty(SynapseConfiguration config, OMElement elem) {
+    public static void defineProperty(SynapseConfiguration config, OMElement elem) {
         OMAttribute name  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
         OMAttribute src   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));
@@ -202,7 +202,7 @@ public class XMLConfigurationBuilder {
      * </pre>
      * @param ele
      */
-    public void defineSequence(SynapseConfiguration config, OMElement ele) {
+    public static void defineSequence(SynapseConfiguration config, OMElement ele) {
         OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute key  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
         if (name != null && key != null) {
@@ -226,7 +226,7 @@ public class XMLConfigurationBuilder {
      * </pre>
      * @param ele the &lt;endpoint&gt; element
      */
-    public void defineEndpoint(SynapseConfiguration config, OMElement ele) {
+    public static void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
         OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute key  = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
@@ -241,12 +241,12 @@ public class XMLConfigurationBuilder {
         }
     }
 
-    private void handleException(String msg) {
+    private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }
 
-    private void handleException(String msg, Exception e) {
+    private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }

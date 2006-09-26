@@ -148,7 +148,8 @@ public class RampartBasedSecurityManager extends SecurityManager {
                     client.setAction(action);
                     client.setRstTemplate(rstTmpl);
                     client.setCryptoInfo(RampartUtil.getEncryptionCrypto(rpd
-                            .getRampartConfig()), RampartUtil.getPasswordCB(
+                            .getRampartConfig(), message.getAxisService()
+                            .getClassLoader()), RampartUtil.getPasswordCB(
                             message, rpd));
                     Token tok = client.requestSecurityToken(servicePolicy,
                             message.getTo().getAddress(), issuerPolicy, null);

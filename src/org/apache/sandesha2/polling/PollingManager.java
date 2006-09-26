@@ -62,6 +62,12 @@ public class PollingManager extends Thread {
 			
 			try {
 				
+				try {
+					Thread.sleep(POLLING_MANAGER_WAIT_TIME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
 				CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 				//geting the sequences to be polled.
 				//if shedule contains any requests, do the earliest one.
@@ -115,6 +121,7 @@ public class PollingManager extends Thread {
 				RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
 						internalSequenceId, incomingSequenceId, WSRMAnonReplyToURI,storageManager);
 				
+				makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
 				//storing the MakeConnection message.
 				String makeConnectionMsgStoreKey = SandeshaUtil.getUUID();
 				storageManager.storeMessageContext(makeConnectionMsgStoreKey,makeConnectionRMMessage.getMessageContext());

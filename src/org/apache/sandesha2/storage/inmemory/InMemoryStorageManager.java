@@ -111,7 +111,6 @@ public class InMemoryStorageManager extends StorageManager {
 		    key = SandeshaUtil.getUUID();
 		
 		storageMap.put(key,msgContext);
-		
 	}
 
 	public void updateMessageContext(String key,MessageContext msgContext) throws SandeshaStorageException { 

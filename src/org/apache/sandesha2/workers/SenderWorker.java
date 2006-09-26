@@ -249,7 +249,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// create the responseMessageContext
 
 			MessageContext responseMessageContext = new MessageContext();
-			responseMessageContext.setServerSide(false);
+			
+			//setting the message as serverSide will let it go through the MessageReceiver (may be callback MR).
+			responseMessageContext.setServerSide(true);
+			
 			responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
 			responseMessageContext.setTransportIn(msgCtx.getTransportIn());
 			responseMessageContext.setTransportOut(msgCtx.getTransportOut());
@@ -282,9 +285,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			SOAPEnvelope resenvelope = null;
 			try {
 				resenvelope = TransportUtils.createSOAPMessage(msgCtx, msgCtx.getEnvelope().getNamespace().getName());
-
 			} catch (AxisFault e) {
 				// TODO Auto-generated catch block
+				e.printStackTrace();
 				log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.soapEnvNotSet));
 				log.debug(e.getStackTrace().toString());
 			}

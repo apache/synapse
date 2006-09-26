@@ -136,8 +136,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			try {
 				engine.sendFault(faultMessageContext.getMessageContext());
 			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()));
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, 
+						e.toString()));
 			}
 
 			msgCtx.pause();
@@ -785,15 +785,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber, storageKey, storageManager);
 
 		
-		if (!isWSAAnonymous (to)) {
-			//If message has a real to address or if it is in the polling-mode it shoud be send by the sender or should
-			//be taken away by make connections, so pausing it.
-			
-			msgContext.pause(); // the execution will be stopped.
-		}
-		
-		//If to address is wsa:anonymous it wont be possible to send the this message so, letting it go in the current thread. 
-		//(it might get the the other end in the back-channel of the request message, no retransmissions possible).
+		//Users wont be able to get reliable response msgs in the back channel in the back channel of a 
+		//reliable message. If he doesn't have a endpoint he should use polling mechanisms.
+		msgContext.pause();
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processOutMessage");

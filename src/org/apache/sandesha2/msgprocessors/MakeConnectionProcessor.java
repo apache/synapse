@@ -96,6 +96,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		setTransportProperties (returnMessage, rmMsgCtx);
 		
+		//setting that the response gets written written.
+		//This will be used by transports. For e.g. CommonsHTTPTransportSender will send 200 OK, instead of 202.
+		rmMsgCtx.getMessageContext().getOperationContext().setProperty(Constants.RESPONSE_WRITTEN , Constants.VALUE_TRUE);
+		
+		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//	1. A message being sent by the Sender thread.

@@ -55,10 +55,8 @@ public class SynapseConfigurationBuilder implements Constants {
     public static SynapseConfiguration getConfiguration(String configFile) {
 
         // build the Synapse configuration parsing the XML config file
-        XMLConfigurationBuilder xmlBuilder = null;
         try {
-            xmlBuilder = new XMLConfigurationBuilder();
-            SynapseConfiguration synCfg = xmlBuilder.getConfiguration(new FileInputStream(configFile));
+            SynapseConfiguration synCfg = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
             log.info("Loaded Synapse configuration from : " + configFile);
             return synCfg;
 

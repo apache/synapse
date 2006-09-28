@@ -234,6 +234,10 @@ public class AckRequestedProcessor {
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
 			ackBean.setSequenceID(sequenceId);
+			
+			EndpointReference to = ackMsgCtx.getTo();
+			if (to!=null)
+				ackBean.setToAddress(to.getAddress());
 
 			// this will be set to true in the sender.
 			ackBean.setSend(true);

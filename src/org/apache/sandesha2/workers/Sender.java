@@ -19,6 +19,7 @@ package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
 
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.axis2.util.threadpool.ThreadPool;
@@ -176,6 +177,26 @@ public class Sender extends Thread {
 				}
 				
 				String messageId = senderBean.getMessageID();
+				
+				String toAddress = senderBean.getToAddress();
+				if (toAddress!=null) {
+					boolean unsendableAddress = false;
+					
+					if (toAddress.equals(AddressingConstants.Submission.WSA_ANONYMOUS_URL))
+						unsendableAddress = true;
+					else if (toAddress.equals(AddressingConstants.Final.WSA_ANONYMOUS_URL))
+						unsendableAddress = true;
+					else if (toAddress.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
+						unsendableAddress = true;
+					
+					if (unsendableAddress) {
+						if (log.isDebugEnabled()) {
+							String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendToTheAddress,toAddress);
+							log.debug(message);
+						}
+						continue;
+					}
+				}
 				
 				//work Id is used to define the piece of work that will be assigned to the Worker thread,
 				//to handle this Sender bean.

@@ -207,6 +207,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				log.debug(message);
 				throw new AxisFault(message);
 			}
+			
+			//TODO add createSequenceResponse message as the referenceMessage to the NextMsgBean.
+			
 
 			SequencePropertyBean acksToBean = new SequencePropertyBean(newSequenceId,
 					Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo.getAddress());

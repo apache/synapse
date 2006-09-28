@@ -35,6 +35,19 @@ public class NextMsgBean extends RMBean {
 	 * The next message to be invoked of the representing sequence.
 	 */
 	private long nextMsgNoToProcess;
+	
+	/**
+	 * This tells weather this sequence is in the polling mode or not.
+	 * PollingManager will use this property decide the sequences that need
+	 * polling and will do MakeConnections on them.
+	 */
+	private boolean pollingMode=false;
+	
+	/**
+	 * This will be used as a referenced 
+	 */
+	private String referenceMessageKey;
+	
 
 	public NextMsgBean() {
 
@@ -74,4 +87,21 @@ public class NextMsgBean extends RMBean {
 	public void setSequenceID(String sequenceID) {
 		this.sequenceID = sequenceID;
 	}
+
+	public boolean isPollingMode() {
+		return pollingMode;
+	}
+
+	public void setPollingMode(boolean pollingMode) {
+		this.pollingMode = pollingMode;
+	}
+
+	public String getReferenceMessageKey() {
+		return referenceMessageKey;
+	}
+
+	public void setReferenceMessageKey(String referenceMessageKey) {
+		this.referenceMessageKey = referenceMessageKey;
+	}
+	
 }

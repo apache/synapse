@@ -427,7 +427,11 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateBean.setTimeToSend(System.currentTimeMillis() + Sandesha2Constants.TERMINATE_DELAY);
 
 		terminateBean.setMessageID(msgContext.getMessageID());
-
+		
+		EndpointReference to = msgContext.getTo();
+		if (to!=null)
+			terminateBean.setToAddress(to.getAddress());
+		
 		// this will be set to true at the sender.
 		terminateBean.setSend(true);
 

@@ -274,10 +274,10 @@ public class RMMsgCreator {
 		if (referenceReplyTo!=null && SandeshaUtil.isAnonymousURI (referenceReplyTo.getAddress()))
 			replyTo = new EndpointReference (referenceReplyTo.getAddress());
 		else
-			replyTo = context.getListenerManager().getEPRforService(
-					createSeqmsgContext.getAxisService().getName(), 
-					axisOperationName!=null?axisOperationName.getLocalPart():null, 
-        				transportInName!=null?transportInName.getLocalPart():null);
+			replyTo = context.getListenerManager().getEPRforService (
+					createSeqmsgContext.getAxisService().getName(), null, null 
+					/*axisOperationName!=null?axisOperationName.getLocalPart():null, 
+        				transportInName!=null?transportInName.getLocalPart():null*/);
         
         createSeqmsgContext.setReplyTo(replyTo);
         
@@ -711,22 +711,16 @@ public class RMMsgCreator {
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 	}
 	
-	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage, String internalSequenceId, String makeConnectionSeqId,
+	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,  String makeConnectionSeqId,
 			String makeConnectionAnonURI, StorageManager storageManager) throws AxisFault {
 		
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
-		ConfigurationContext configurationContext = referenceMessage.getConfigurationContext();
-		
-		String rmVersion = SandeshaUtil.getSequenceProperty(internalSequenceId, 
-				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, storageManager);
-		String addressingNamespace = SandeshaUtil.getSequenceProperty(internalSequenceId, 
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+		String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
+		String rmVersion = referenceRMMessage.getRMSpecVersion();
 		
 		AxisOperation makeConnectionOperation = AxisOperationFactory.getAxisOperation(
 				WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
-
-
+		
 		MessageContext makeConnectionMessageCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,makeConnectionOperation);
 		RMMsgContext makeConnectionRMMessageCtx = MsgInitializer.initializeMessage(makeConnectionMessageCtx);
 		

@@ -51,12 +51,8 @@ public class CreateSeqBean extends RMBean {
 	 */
 	private String securityTokenData;
 	
-	/**
-	 * This tells weather this sequence is in the polling mode or not.
-	 * PollingManager will use this property decide the sequences that need
-	 * polling and will do MakeConnections on them.
-	 */
-	private boolean pollingMode;
+
+//	private boolean pollingMode;
 
 	
 	/**
@@ -100,14 +96,6 @@ public class CreateSeqBean extends RMBean {
 
 	public void setSecurityTokenData(String securityTokenData) {
 		this.securityTokenData = securityTokenData;
-	}
-
-	public boolean isPollingMode() {
-		return pollingMode;
-	}
-
-	public void setPollingMode(boolean pollingMode) {
-		this.pollingMode = pollingMode;
 	}
 
 	public String getCreateSequenceMsgStoreKey() {

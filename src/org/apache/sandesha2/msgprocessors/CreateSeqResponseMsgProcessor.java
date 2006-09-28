@@ -22,6 +22,7 @@ import java.util.Iterator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -186,7 +187,39 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			NextMsgBean nextMsgBean = new NextMsgBean();
 			nextMsgBean.setSequenceID(offeredSequenceId);
 			nextMsgBean.setNextMsgNoToProcess(1);
+			
 
+			boolean pollingMode = false;
+			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
+				String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
+								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
+				if (replyToAddress!=null) {
+					if (AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(replyToAddress))
+						pollingMode = true;
+					else if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(replyToAddress))
+						pollingMode = true;
+					else if (replyToAddress.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
+						pollingMode = true;
+				}
+			}
+			
+			//Storing the createSequence of the sending side sequence as the reference message.
+			//This can be used when creating new outgoing messages.
+			
+			String createSequenceMsgStoreKey = createSeqBean.getCreateSequenceMsgStoreKey();
+			MessageContext createSequenceMsg = storageManager.retrieveMessageContext(createSequenceMsgStoreKey, configCtx);
+			
+			String newMessageStoreKey = SandeshaUtil.getUUID();
+			storageManager.storeMessageContext(newMessageStoreKey,createSequenceMsg);
+			
+			nextMsgBean.setReferenceMessageKey(newMessageStoreKey);
+			
+			nextMsgBean.setPollingMode(pollingMode);
+			
+			//if PollingMode is true, starting the pollingmanager.
+			if (pollingMode)
+				SandeshaUtil.startPollingManager(configCtx);
+			
 			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 			nextMsgMgr.insert(nextMsgBean);
 

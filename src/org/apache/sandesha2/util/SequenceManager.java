@@ -263,7 +263,18 @@ public class SequenceManager {
 				log.error(e.getStackTrace());
 				throw new SandeshaException(message);
 			}
+		} else {
+			
+			EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
+			//setting replyTo and acksTo beans.
+					
+			if (replyToEPR!=null)		
+				replyToBean = new SequencePropertyBean(sequencePropertyKey,
+						Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
+		
+			//TODO set AcksToBean.
 		}
+		
 		// Default value for acksTo is anonymous (this happens only for the
 		// client side)
 		if (acksTo == null) {

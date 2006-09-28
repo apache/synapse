@@ -92,6 +92,12 @@ public class SenderBean extends RMBean {
 	 */
 	private String wsrmAnonURI;
 	
+	/**
+	 * Destination URL of the message to be sent. This can be used to decide weather the message cannot be sent,
+	 * before actyally reading the message from the storage.
+	 */
+	private String toAddress;
+	
 	public SenderBean() {
 
 	}
@@ -194,6 +200,14 @@ public class SenderBean extends RMBean {
 
 	public void setWsrmAnonURI(String wsrmAnonURI) {
 		this.wsrmAnonURI = wsrmAnonURI;
+	}
+
+	public String getToAddress() {
+		return toAddress;
+	}
+
+	public void setToAddress(String toAddress) {
+		this.toAddress = toAddress;
 	}
 	
 }

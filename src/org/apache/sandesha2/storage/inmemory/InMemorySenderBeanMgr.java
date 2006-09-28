@@ -31,8 +31,10 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 public class InMemorySenderBeanMgr implements SenderBeanMgr {
 	
@@ -91,6 +93,7 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 
 			temp = (SenderBean) iterator.next();
 
+			
 			boolean add = true;
 
 			if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
@@ -120,8 +123,8 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 			if (bean.isSend() != temp.isSend())
 				add = false;
 
-			if (bean.isReSend() != temp.isReSend())
-				add = false;
+//			if (bean.isReSend() != temp.isReSend())
+//				add = false;
 			
 			if (add)
 				beans.add(temp);

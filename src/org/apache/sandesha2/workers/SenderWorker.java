@@ -61,6 +61,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			transaction = storageManager.getTransaction();
 
 			SenderBean senderBean = senderBeanMgr.retrieve(messageId);
+			if (senderBean==null) {
+				String message = "SenderWorker has been assigned an unexisting work";
+				throw new SandeshaException (message);
+			}
 			String key = senderBean.getMessageContextRefKey();
 			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);

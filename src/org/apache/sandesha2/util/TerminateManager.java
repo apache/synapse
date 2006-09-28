@@ -434,6 +434,10 @@ public class TerminateManager {
 				Sandesha2Constants.VALUE_FALSE);
 
 		terminateBean.setReSend(false);
+		
+		EndpointReference to = terminateRMMessage.getTo();
+		if (to!=null)
+			terminateBean.setToAddress(to.getAddress());
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
 

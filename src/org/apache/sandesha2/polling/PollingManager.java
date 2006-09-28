@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
@@ -32,8 +33,10 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -68,58 +71,59 @@ public class PollingManager extends Thread {
 					e.printStackTrace();
 				}
 				
-				CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
+				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+				
 				//geting the sequences to be polled.
 				//if shedule contains any requests, do the earliest one.
 				//else pick one randomly.
 				
-				String internalSequenceId = null;
+				String sequenceId = null;
 				if (sheduledPollingRequests.size()>0) {
-					internalSequenceId = (String )sheduledPollingRequests.get(0);
+					sequenceId = (String )sheduledPollingRequests.get(0);
 					sheduledPollingRequests.remove(0);
 				}
 
-				CreateSeqBean createSeqBean = null;
+				NextMsgBean nextMsgBean = null;
 				
-				if (internalSequenceId==null) {
-					CreateSeqBean findBean = new CreateSeqBean ();
+				if (sequenceId==null) {
+					NextMsgBean findBean = new NextMsgBean ();
 					findBean.setPollingMode(true);
 					
-					List results = createSeqBeanMgr.find(findBean);
+					List results = nextMsgMgr.find(findBean);
 					int size = results.size();
 					if (size>0) {
 						Random random = new Random ();
 						int item = random.nextInt(size);
-						createSeqBean = (CreateSeqBean) results.get(item);
+						nextMsgBean = (NextMsgBean) results.get(item);
 					}
-				} else {
-					CreateSeqBean findBean = new CreateSeqBean ();
-					findBean.setPollingMode(true);
-					findBean.setInternalSequenceID(internalSequenceId);
 					
-					createSeqBean = createSeqBeanMgr.findUnique(findBean);
+					sequenceId = nextMsgBean.getSequenceID();
+				} else {
+					NextMsgBean findBean = new NextMsgBean ();
+					findBean.setPollingMode(true);
+					findBean.setSequenceID(sequenceId);
+					
+					nextMsgBean = nextMsgMgr.findUnique(findBean);
 				}
 				
 				//If not valid entry is found, try again later.
-				if (createSeqBean==null)
+				if (nextMsgBean==null)
 					continue;
 				
 				//create a MakeConnection message  
-				String createSeqMessageStoreKey = createSeqBean.getCreateSequenceMsgStoreKey();
-				internalSequenceId = createSeqBean.getInternalSequenceID();
+				String referenceMsgKey = nextMsgBean.getReferenceMessageKey();
 				
-				String incomingSequenceId = SandeshaUtil.getSequenceProperty(internalSequenceId,
-						Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE,storageManager);
-				String replyTo = SandeshaUtil.getSequenceProperty(internalSequenceId,
+				String sequencePropertyKey = sequenceId;
+				String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 						Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,storageManager);
 				String WSRMAnonReplyToURI = null;
 				if (SandeshaUtil.isWSRMAnonymousReplyTo(replyTo))
 					WSRMAnonReplyToURI = replyTo;
 				
-				MessageContext referenceMessage = storageManager.retrieveMessageContext(createSeqMessageStoreKey,configurationContext);
+				MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,configurationContext);
 				RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 				RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
-						internalSequenceId, incomingSequenceId, WSRMAnonReplyToURI,storageManager);
+						sequenceId , WSRMAnonReplyToURI,storageManager);
 				
 				makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
 				//storing the MakeConnection message.
@@ -128,13 +132,16 @@ public class PollingManager extends Thread {
 				
 				//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
 				SenderBean makeConnectionSenderBean = new SenderBean ();
-				makeConnectionSenderBean.setInternalSequenceID(internalSequenceId);
+//				makeConnectionSenderBean.setInternalSequenceID(internalSequenceId);
 				makeConnectionSenderBean.setMessageContextRefKey(makeConnectionMsgStoreKey);
 				makeConnectionSenderBean.setMessageID(makeConnectionRMMessage.getMessageId());
 				makeConnectionSenderBean.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
 				makeConnectionSenderBean.setReSend(false);
 				makeConnectionSenderBean.setSend(true);
-				makeConnectionSenderBean.setSequenceID(createSeqBean.getSequenceID());
+				makeConnectionSenderBean.setSequenceID(sequenceId);
+				EndpointReference to = makeConnectionRMMessage.getTo();
+				if (to!=null)
+					makeConnectionSenderBean.setToAddress(to.getAddress());
 
 				SenderBeanMgr senderBeanMgr = storageManager.getRetransmitterBeanMgr();
 				

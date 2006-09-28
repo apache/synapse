@@ -840,21 +840,21 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
 		
-		//checking weather the sequence is in polling mode.
-		boolean pollingMode = false;
-		EndpointReference replyTo = applicationRMMsg.getReplyTo();
-		if (replyTo!=null && SandeshaUtil.isWSRMAnonymousReplyTo(replyTo.getAddress()))
-			pollingMode = true;
-		else if (replyTo!=null && offer!=null && 
-				(AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(replyTo.getAddress()) || 
-						AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(replyTo.getAddress())))
-			pollingMode = true;
+//		//checking weather the sequence is in polling mode.
+//		boolean pollingMode = false;
+//		EndpointReference replyTo = applicationRMMsg.getReplyTo();
+//		if (replyTo!=null && SandeshaUtil.isWSRMAnonymousReplyTo(replyTo.getAddress()))
+//			pollingMode = true;
+//		else if (replyTo!=null && offer!=null && 
+//				(AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(replyTo.getAddress()) || 
+//						AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(replyTo.getAddress())))
+//			pollingMode = true;
+//		
+//		createSeqBean.setPollingMode(pollingMode);
 		
-		createSeqBean.setPollingMode(pollingMode);
-		
-		//if PollingMode is true, starting the pollingmanager.
-		if (pollingMode)
-			SandeshaUtil.startPollingManager(configCtx);
+//		//if PollingMode is true, starting the pollingmanager.
+//		if (pollingMode)
+//			SandeshaUtil.startPollingManager(configCtx);
 		
 		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(token != null) {
@@ -885,6 +885,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqEntry.setInternalSequenceID(sequencePropertyKey);
 		// this will be set to true in the sender
 		createSeqEntry.setSend(true);
+		EndpointReference to = createSeqRMMessage.getTo();
+		if (to!=null)
+			createSeqEntry.setToAddress(to.getAddress());
 
 		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
@@ -1085,7 +1088,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// Send will be set to true at the sender.
 			msg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 		}
-
+		EndpointReference to = rmMsg.getTo();
+		if (to!=null)
+			appMsgEntry.setToAddress(to.getAddress());
+		
 		appMsgEntry.setInternalSequenceID(internalSequenceId);
 		storageManager.storeMessageContext(storageKey, msg);
 		retransmitterMgr.insert(appMsgEntry);

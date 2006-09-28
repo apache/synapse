@@ -352,7 +352,7 @@
     <!-- ================================================================ -->
     <!--- Create the Distro -->
     <!-- ================================================================ -->
-    <goal name="dist-bin" prereqs="init,war,create-jar,javadocs">
+    <goal name="dist-bin" prereqs="init,war,create-jar,javadocs,dist-extensions,dist-nhttp">
         <ant:echo>+----------------------------------------------</ant:echo>
         <ant:echo>| Creating: Synapse Binary Distribution</ant:echo>
         <ant:echo>+----------------------------------------------</ant:echo>

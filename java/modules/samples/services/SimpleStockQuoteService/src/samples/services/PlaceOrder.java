@@ -14,20 +14,33 @@
 * limitations under the License.
 */
 package samples.services;
-import java.util.Date;
 
-public class SimpleStockQuoteService {
+public class PlaceOrder {
+    String symbol;
+    int quantity;
+    double price;
 
-    // in-out
-    public GetQuoteResponse getQuote(GetQuote request) {
-        System.out.println(new Date() + " :: Generating quote for : " + request.getSymbol());
-        return new GetQuoteResponse(request.getSymbol());
+    public String getSymbol() {
+        return symbol;
     }
 
-    // in only
-    public void placeOrder(PlaceOrder order) {
-        System.out.println(new Date() + " :: Accepted order for : " +
-            order.getQuantity() + " stocks of " + order.getSymbol() +
-            " at $ " + order.getPrice());
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.Util;
+import org.apache.synapse.config.Property;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
@@ -201,7 +201,7 @@ public class ValidateMediator extends AbstractListMediator {
         Iterator iter = schemaKeys.iterator();
         while (iter.hasNext()) {
             String propKey = (String) iter.next();
-            DynamicProperty dp = msgCtx.getConfiguration().getDynamicProperty(propKey);
+            Property dp = msgCtx.getConfiguration().getPropertyObject(propKey);
             if (dp != null) {
                 if (!dp.isCached() || dp.isExpired()) {
                     reCreate = true;       // request re-initialization of Validator

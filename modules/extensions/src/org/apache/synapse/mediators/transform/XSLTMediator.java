@@ -27,8 +27,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.Util;
+import org.apache.synapse.config.Property;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
@@ -128,7 +128,7 @@ public class XSLTMediator extends AbstractMediator {
         }
 
         // build transformer - if necessary
-        DynamicProperty dp = msgCtx.getConfiguration().getDynamicProperty(xsltKey);
+        Property dp = msgCtx.getConfiguration().getPropertyObject(xsltKey);
 
         // if the xsltKey refers to a dynamic property
         if (dp != null) {

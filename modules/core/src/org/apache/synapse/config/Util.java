@@ -106,6 +106,7 @@ public class Util {
                 OMElement omElem =  builder.getDocumentElement();
 
                 // detach from URL connection and keep in memory
+                // TODO remove this 
                 omElem.build();
 
                 if (xmlToObject != null) {

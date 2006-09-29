@@ -249,6 +249,12 @@
                   <!--toDir="target/"/>-->
     <!--</goal>-->
 
+    <preGoal name="jar:jar">
+        <copy todir="../../target/classes">
+            <fileset dir="target/classes"/>
+        </copy>
+    </preGoal>
+
     <goal name="jar">
         <attainGoal name="multiproject:install"/>
         <attainGoal name="jar:install"/>

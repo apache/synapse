@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.Util;
+import org.apache.synapse.config.Property;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -54,7 +54,7 @@ public class SpringMediator implements Mediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        DynamicProperty dp = synCtx.getConfiguration().getDynamicProperty(configKey);
+        Property dp = synCtx.getConfiguration().getPropertyObject(configKey);
 
         // if the configKey refers to a dynamic property
         if (dp != null) {

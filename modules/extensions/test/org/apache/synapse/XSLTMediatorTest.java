@@ -19,9 +19,11 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.transform.XSLTMediator;
+import org.apache.synapse.config.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +58,10 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         Map props = new HashMap();
-        props.put("xslt-key", new DynamicProperty("file:../core/test-resources/misc/transform.xslt"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/transform.xslt");
+        props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext(SOURCE, props);
@@ -93,7 +98,10 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         Map props = new HashMap();
-        props.put("xslt-key", new DynamicProperty("file:../core/test-resources/misc/transform.xslt"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/transform.xslt");
+        props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext(SOURCE, props);
@@ -131,8 +139,11 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         Map props = new HashMap();
-        props.put("xslt-key", new DynamicProperty("file:../core/test-resources/misc/transform.xslt"));
-
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/transform.xslt");
+        props.put("xslt-key", prop);
+        
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE, props);
         transformMediator.mediate(synCtx);

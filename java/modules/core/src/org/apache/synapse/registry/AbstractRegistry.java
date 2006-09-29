@@ -18,8 +18,8 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.Property;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public abstract class AbstractRegistry implements Registry {
      * @param dp the DynamicProperty for the registry lookup
      * @return the matching resultant object
      */
-    public Object getProperty(DynamicProperty dp) {
+    public Object getProperty(Property dp) {
 
         OMNode omNode = null;
         RegistryEntry re = null;

@@ -16,7 +16,7 @@
 package org.apache.synapse.registry;
 
 import org.apache.axiom.om.OMNode;
-import org.apache.synapse.config.DynamicProperty;
+import org.apache.synapse.config.Property;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public interface Registry {
      * @param dp the DynamicProperty
      * @return the value from the registry or local cache
      */
-    public Object getProperty(DynamicProperty dp);
+    public Object getProperty(Property dp);
 
     /**
      * Get the registry entry for the given key

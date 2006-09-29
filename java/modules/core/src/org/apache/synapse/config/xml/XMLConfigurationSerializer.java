@@ -22,15 +22,13 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Property;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 
 public class XMLConfigurationSerializer {
@@ -91,7 +89,6 @@ public class XMLConfigurationSerializer {
     }
 
     private static void serializeProperties(OMElement definitions, SynapseConfiguration synCfg) {
-
         Iterator iter = synCfg.getGlobalProps().keySet().iterator();
         while (iter.hasNext()) {
             String propertyName = (String) iter.next();
@@ -99,28 +96,22 @@ public class XMLConfigurationSerializer {
             property.addAttribute(fac.createOMAttribute(
                 "name", nullNS, propertyName));
 
-            DynamicProperty dp = synCfg.getDynamicProperty(propertyName);
-            if (dp != null) {
+            Property prop = synCfg.getPropertyObject(propertyName);
+            if (prop.getType() == Property.DYNAMIC_TYPE) {
                 property.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, dp.getKey()));
-
+                        "key", nullNS, prop.getKey()));
+            } else if (prop.getType() == Property.SRC_TYPE) {
+                property.addAttribute(fac.createOMAttribute(
+                        "src", nullNS, prop.getSrc().toString()));
+            } else if (prop.getType() == Property.VALUE_TYPE) {
+                property.addAttribute(fac.createOMAttribute(
+                        "value", nullNS, (String) prop.getValue()));
+            } else if (prop.getType() == Property.INLINE_XML_TYPE) {
+                property.addChild((OMElement) prop.getValue());
+            } else if (prop.getType() == Property.INLINE_STRING_TYPE) {
+                property.addChild(fac.createOMText((String) prop.getValue()));
             } else {
-                Object prop = synCfg.getProperty(propertyName);
-                if (prop instanceof String) {
-                    try {
-                        // this is a hack to test if the string is a URL
-                        new URL((String) prop);
-                        property.addAttribute(fac.createOMAttribute(
-                            "src", nullNS, (String) prop));
-
-                    } catch (MalformedURLException e) {
-                        property.addAttribute(fac.createOMAttribute(
-                            "value", nullNS, (String) prop));
-                    }
-
-                } else if (prop instanceof OMElement) {
-                    property.addChild((OMElement) prop);
-                }
+                handleException("Property type undefined");
             }
 
             definitions.addChild(property);
@@ -135,12 +126,12 @@ public class XMLConfigurationSerializer {
             Object endpt = synCfg.getNamedEndpoint(endpointName);
 
             OMElement endpoint = fac.createOMElement("endpoint", synNS);
-            if (endpt instanceof DynamicProperty) {
-                DynamicProperty dp = (DynamicProperty) endpt;
+            if (endpt instanceof Property) {
+                Property dp = (Property) endpt;
                 endpoint.addAttribute(fac.createOMAttribute(
-                    "name", nullNS, endpointName));
+                        "name", nullNS, endpointName));
                 endpoint.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, dp.getKey()));
+                        "key", nullNS, dp.getKey()));
 
             } else if (endpt instanceof Endpoint) {
                 EndpointSerializer.serializeEndpoint((Endpoint) endpt, definitions);

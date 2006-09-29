@@ -22,10 +22,13 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Property;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.registry.url.SimpleURLRegistry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -46,7 +49,7 @@ public class TestUtils {
             Iterator iter = props.keySet().iterator();
             while (iter.hasNext()) {
                 String key = (String) iter.next();
-                testConfig.addProperty(key, props.get(key));
+                testConfig.addProperty(key, (Property)props.get(key));
             }
         }
         synCtx.setConfiguration(testConfig);

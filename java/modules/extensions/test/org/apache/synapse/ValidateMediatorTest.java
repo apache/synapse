@@ -19,10 +19,10 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.config.DynamicProperty;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.validate.ValidateMediator;
 import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
+import org.apache.synapse.config.Property;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -149,7 +149,10 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key", prop);
 
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE, props));
@@ -176,8 +179,14 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
-        props.put("xsd-key-2", new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key-1", prop);
+        Property prop2 = new Property();
+        prop2.setType(Property.DYNAMIC_TYPE);
+        prop2.setKey("file:../core/test-resources/misc/validate2.xsd");
+        props.put("xsd-key-2", prop2);
 
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_TWO_SCHEMAS, props));
@@ -204,8 +213,14 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
-        props.put("xsd-key-2", new DynamicProperty("file:../core/test-resources/misc/validate2.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key-1", prop);
+        Property prop2 = new Property();
+        prop2.setType(Property.DYNAMIC_TYPE);
+        prop2.setKey("file:../core/test-resources/misc/validate2.xsd");
+        props.put("xsd-key-2", prop2);
 
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(INVALID_ENVELOPE_TWO_SCHEMAS, props));
@@ -231,7 +246,10 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE, props));
@@ -257,7 +275,10 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(VALID_ENVELOPE_NO_NS, props));
@@ -283,7 +304,10 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
         validate.mediate(TestUtils.getTestContext(IN_VALID_ENVELOPE_NO_NS, props));
@@ -334,7 +358,10 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        props.put("xsd-key-1", new DynamicProperty("file:../core/test-resources/misc/validate.xsd"));
+        Property prop = new Property();
+        prop.setType(Property.DYNAMIC_TYPE);
+        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        props.put("xsd-key-1", prop);
 
 
         // test validate mediator, with static enveope

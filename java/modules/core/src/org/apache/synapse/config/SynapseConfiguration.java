@@ -54,7 +54,7 @@ public class SynapseConfiguration {
 
     /**
      * This is the "main" (or default) synapse mediator which mediates each and every message
-     * It could/would hold a Mediator object or a DynamicProperty (if loaded from a registry)
+     * It could/would hold a Mediator object or a Property (if loaded from a registry)
      */
     private Object mainMediator = null;
 
@@ -73,7 +73,7 @@ public class SynapseConfiguration {
      * @param name the name of the sequence
      * @param dp a DynamicProperty reflecting the dynamic sequence
      */
-    public void addNamedSequence(String name, DynamicProperty dp) {
+    public void addNamedSequence(String name, Property dp) {
         namedSequences.put(name, dp);
     }
 
@@ -84,13 +84,14 @@ public class SynapseConfiguration {
      */
     public Mediator getNamedSequence(String name) {
         Object o = namedSequences.get(name);
-        if (o != null && o instanceof DynamicProperty) {
-            DynamicProperty dp = (DynamicProperty) o;
-            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+        if (o != null && o instanceof Property) {
+            Property dp = (Property) o;
+            o = getProperty(dp);
             if (o == null) {
                 handleException("Invalid DynamicSequence for name : " + name + " from registry");
             }
         }
+        // todo: do we need to check weather the o is a Mediator (DynamicProperty)
         return (Mediator) o;
     }
 
@@ -115,9 +116,9 @@ public class SynapseConfiguration {
      */
     public Mediator getMainMediator() {
         Object o = mainMediator;
-        if (o != null && o instanceof DynamicProperty) {
-            DynamicProperty dp = (DynamicProperty) o;
-            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+        if (o != null && o instanceof Property) {
+            Property dp = (Property) o;
+            o = getProperty(dp);
             if (o == null) {
                 handleException("Invalid Synapse Mainmediator from registry");
             }
@@ -133,7 +134,7 @@ public class SynapseConfiguration {
         this.mainMediator = mainMediator;
     }
 
-    public void setMainMediator(DynamicProperty dp) {
+    public void setMainMediator(Property dp) {
         this.mainMediator = dp;
     }
 
@@ -142,8 +143,16 @@ public class SynapseConfiguration {
      * @param name the name of the property
      * @param value its value
      */
-    public void addProperty(String name, Object value) {
-        globalProps.put(name, value);
+    public void addProperty(String name, Property value) {
+        if(name != null && value != null) {
+            if(globalProps.containsKey(name)) {
+                log.warn("Overiding the global property with name : " + name);
+            } else {
+                globalProps.put(name, value);
+            }
+        } else {
+            log.error("Name and the value of the property cannot be null");
+        }
     }
 
     /**
@@ -153,14 +162,49 @@ public class SynapseConfiguration {
      */
     public Object getProperty(String name) {
         Object o = globalProps.get(name);
-        if (o != null && o instanceof DynamicProperty) {
-            DynamicProperty dp = (DynamicProperty) o;
-            o = getRegistry(dp.getRegistryName()).getProperty(dp);
-            if (o == null) {
-                handleException("Invalid DynamicProperty reference for key : " + name);
+        Object obj = null;
+        if(o != null && o instanceof Property) {
+            Property prop = (Property) o;
+            if(prop.getType() == Property.DYNAMIC_TYPE) {
+                obj = getRegistry(prop.getRegistryName()).getProperty(prop);
+            } else {
+                obj = prop.getValue();
             }
         }
-        return o;
+        return obj;
+    }
+
+    /**
+     * Get the Property object of the named property
+     * @param name key of the property being looked up
+     * @return its value
+     */
+    public Property getPropertyObject(String name) {
+        Object o = globalProps.get(name);
+        Property prop = null;
+        if(o != null && o instanceof Property) {
+            prop = (Property) o;
+        } else {
+            handleException("Property with name " + name + " doesnt exists in the registry");
+        }
+        return prop;
+    }
+
+    /**
+     * Get the value of the named property
+     * @param prop key of the property being looked up
+     * @return its value
+     */
+    public Object getProperty(Property prop) {
+        Object obj = null;
+        if(prop != null) {
+            if(prop.getType() == Property.DYNAMIC_TYPE) {
+                obj = getRegistry(prop.getRegistryName()).getProperty(prop);
+            } else {
+                obj = prop.getValue();
+            }
+        }
+        return obj;
     }
 
     /**
@@ -177,22 +221,6 @@ public class SynapseConfiguration {
     }
 
     /**
-     * Return the raw DynamicProperty property with the given name if such an
-     * object exists. This call does not load/re-load or check expiry of the
-     * actual object from the registry for a DynamicProperty. If the given name
-     * does not map to a DynamicProperty, this method returns null
-     * @param name the name of a DynamicProperty
-     * @return raw DynamicProperty object, or null
-     */
-    public DynamicProperty getDynamicProperty(String name) {
-        Object o = globalProps.get(name);
-        if (o != null && o instanceof DynamicProperty) {
-            return (DynamicProperty) o;
-        }
-        return null;
-    }
-
-    /**
      * Define a named endpoint with the given name
      * @param name the name of the endpoint
      * @param endpoint the endpoint definition
@@ -206,7 +234,7 @@ public class SynapseConfiguration {
      * @param name name of Dynamic Endpoint
      * @param dp the DynamicProperty referencing the endpoint
      */
-    public void addNamedEndpoint(String name, DynamicProperty dp) {
+    public void addNamedEndpoint(String name, Property dp) {
         namedEndpoints.put(name, dp);
     }
 
@@ -217,9 +245,9 @@ public class SynapseConfiguration {
      */
     public Endpoint getNamedEndpoint(String name) {
         Object o = namedEndpoints.get(name);
-        if (o != null && o instanceof DynamicProperty) {
-            DynamicProperty dp = (DynamicProperty) o;
-            o = getRegistry(dp.getRegistryName()).getProperty(dp);
+        if (o != null && o instanceof Property) {
+            Property dp = (Property) o;
+            o = getProperty(dp);
             if (o == null) {
                 handleException("Invalid DynamicEndpoint for name : " + name + " from registry");
             }
@@ -255,7 +283,15 @@ public class SynapseConfiguration {
      * @return the Proxy service
      */
     public ProxyService getProxyService(String name) {
-        return (ProxyService) proxyServices.get(name);
+        Object o = proxyServices.get(name);
+        if (o != null && o instanceof Property) {
+            Property dp = (Property) o;
+            o = getProperty(dp);
+            if (o == null) {
+                handleException("Invalid DynamicEndpoint for name : " + name + " from registry");
+            }
+        }
+        return (ProxyService) o;
     }
 
     /**

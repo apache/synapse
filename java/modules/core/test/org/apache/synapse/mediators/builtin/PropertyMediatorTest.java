@@ -20,6 +20,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Property;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.TestUtils;
 
@@ -48,7 +49,11 @@ public class PropertyMediatorTest extends TestCase {
         MessageContext synCtx = TestUtils.getTestContext("<empty/>");
 
         SynapseConfiguration synCfg = new SynapseConfiguration();
-        synCfg.addProperty("name", "value");
+        Property prop = new Property();
+        prop.setName("name");
+        prop.setType(Property.VALUE_TYPE);
+        prop.setValue("value");
+        synCfg.addProperty("name", prop);
         synCtx.setConfiguration(synCfg);
 
         assertTrue(

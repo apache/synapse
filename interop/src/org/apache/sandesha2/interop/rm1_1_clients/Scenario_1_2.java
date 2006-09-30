@@ -14,7 +14,7 @@
  * the License.
  */
 
-package sandesha2.interop.rm1_1.clients;
+package org.apache.sandesha2.interop.rm1_1_clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,10 +72,10 @@ public class Scenario_1_2 {
 		Properties properties = new Properties();
 		if (in != null) {
 			properties.load(in);
+			
+			toEPR = properties.getProperty("to");
+			transportToEPR = properties.getProperty("transportTo");
 		}
-		
-		toEPR = properties.getProperty("to");
-		transportToEPR = properties.getProperty("transportTo");
 		
 		new Scenario_1_2 ().run();
 	}

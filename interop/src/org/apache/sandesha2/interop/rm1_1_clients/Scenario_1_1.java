@@ -14,11 +14,12 @@
  * the License.
  */
 
-package sandesha2.interop.rm1_1.clients;
+package org.apache.sandesha2.interop.rm1_1_clients;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.rmi.RemoteException;
 import java.util.Properties;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -33,15 +34,19 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.engine.AxisError;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.interop.RMInteropServiceStub;
+import org.tempuri.PingRequest;
 
 public class Scenario_1_1 {
 
 	private static final String applicationNamespaceName = "http://tempuri.org/"; 
-	private static final String ping = "ping";
+	private static final String PingRequest = "PingRequest";
 	private static final String Text = "Text";
 	
 	private static String toIP = "127.0.0.1";
@@ -56,7 +61,7 @@ public class Scenario_1_1 {
 	
 	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
 	
-	public static void main(String[] args) throws AxisFault,IOException  {
+	public static void main(String[] args) throws Exception  {
 		
 		String axisClientRepo = null;
 		if (args!=null && args.length>0)
@@ -72,24 +77,85 @@ public class Scenario_1_1 {
 		Properties properties = new Properties();
 		if (in != null) {
 			properties.load(in);
+			
+			toEPR = properties.getProperty("to");
+			transportToEPR = properties.getProperty("transportTo");
 		}
-		
-		toEPR = properties.getProperty("to");
-		transportToEPR = properties.getProperty("transportTo");
 
-		new Scenario_1_1 ().run();
+
+//		new Scenario_1_1 ().run();
+		new Scenario_1_1 ().runStub();
 	}
 	
-	private void run () throws AxisFault {
+	private void run () throws Exception {
 		
+		ConfigurationContext configurationContext = generateConfigContext();
+		
+		Options clientOptions = new Options ();
+		setUpOptions(clientOptions);
+		
+		ServiceClient serviceClient = new ServiceClient (configurationContext,null);		
+		
+		serviceClient.setOptions(clientOptions);
+		
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		
+		terminateSequence(serviceClient);
+		
+		serviceClient.finalizeInvoke();
+	}
+	
+	private static OMElement getPingOMBlock(String text) {
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement pingElem = fac.createOMElement(PingRequest, namespace);
+		OMElement textElem = fac.createOMElement(Text, null);
+		
+		textElem.setText(text);
+		pingElem.addChild(textElem);
+
+		return pingElem;
+	}
+	
+	private void runStub () throws Exception {
+		String targetEndpoint = toEPR;
+		ConfigurationContext configurationContext = generateConfigContext();
+		
+		RMInteropServiceStub stub = new RMInteropServiceStub (configurationContext, targetEndpoint);
+		setUpOptions(stub._getServiceClient().getOptions());
+		
+		PingRequest pingRequest = new PingRequest ();
+		pingRequest.setText("ping1");
+		stub.ping(pingRequest);
+		
+		pingRequest = new PingRequest ();
+		pingRequest.setText("ping2");
+		stub.ping(pingRequest);
+		
+		pingRequest = new PingRequest ();
+		pingRequest.setText("ping3");
+		stub.ping(pingRequest);
+		
+		terminateSequence(stub._getServiceClient());
+		stub._getServiceClient().finalizeInvoke();
+		
+	}
+	
+	private ConfigurationContext generateConfigContext () throws Exception {
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
-			return;
+			throw new Exception ("Client not set up correctly");
 		}
 		
 		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
-		Options clientOptions = new Options ();
+
+		return configContext;
+	}
+	
+	private void setUpOptions (Options clientOptions) {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 //		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toEPR));
@@ -105,14 +171,9 @@ public class Scenario_1_1 {
 		
 		clientOptions.setAction("urn:wsrm:Ping");
 		
-		ServiceClient serviceClient = new ServiceClient (configContext,null);		
-		
-		serviceClient.setOptions(clientOptions);
-		
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
-		serviceClient.fireAndForget(getPingOMBlock("ping2"));
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
-		
+	}
+	
+	private void terminateSequence (ServiceClient serviceClient) throws SandeshaException {
 		SequenceReport sequenceReport = null;		
 		boolean complete = false;
 		while (!complete) {
@@ -129,19 +190,6 @@ public class Scenario_1_1 {
 		} 		
 		
 		SandeshaClient.terminateSequence(serviceClient);
-//		serviceClient.finalizeInvoke();
-	}
-	
-	private static OMElement getPingOMBlock(String text) {
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(ping, namespace);
-		OMElement textElem = fac.createOMElement(Text, namespace);
-		
-		textElem.setText(text);
-		pingElem.addChild(textElem);
-
-		return pingElem;
 	}
 	
 }

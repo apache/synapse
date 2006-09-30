@@ -14,7 +14,7 @@
  * the License.
  */
 
-package sandesha2.interop.rm1_1.clients;
+package org.apache.sandesha2.interop.rm1_1_clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +40,8 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.util.SandeshaUtil;
 
-public class Scenario_2_3 {
+public class Scenario_2_2 {
 	
 	private final static String applicationNamespaceName = "http://tempuri.org/"; 
 	private final static String echoString = "echoString";
@@ -52,11 +51,11 @@ public class Scenario_2_3 {
 	private final static String EchoStringReturn = "EchoStringReturn";
 	
 	private static String toIP = "127.0.0.1";
-	private static String toPort = "9762";
+	private static String toPort = "8080";
 	private static String transportToIP = "127.0.0.1";
 	private static String transportToPort = "8070";
 	private static String servicePart = "/axis2/services/RMInteropService";
-	private static String toAddress = "http://" + toIP +  ":" + toPort + servicePart;
+	private static String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
 	private static String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
@@ -80,12 +79,11 @@ public class Scenario_2_3 {
 		Properties properties = new Properties();
 		if (in != null) {
 			properties.load(in);
+			toEPR = properties.getProperty("to");
+			transportToEPR = properties.getProperty("transportTo");
 		}
 		
-		toAddress = properties.getProperty("to");
-		transportToEPR = properties.getProperty("transportTo");
-		
-		new Scenario_2_3 ().run();
+		new Scenario_2_2 ().run();
 	}
 	
 	private void run () throws Exception {
@@ -103,24 +101,8 @@ public class Scenario_2_3 {
 		
 		Options clientOptions = new Options ();
 		
-		EndpointReference toEPR = new EndpointReference (toAddress);
-		
-		
-		OMFactory factory = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = factory.createOMNamespace("urn:wsrm:InteropOptions","rmi");
-		OMElement acceptOfferElem = factory.createOMElement("acceptOffer",namespace);
-		OMElement useOfferElem = factory.createOMElement("useOffer",namespace);
-		acceptOfferElem.setText("false");
-		useOfferElem.setText("false");
-		toEPR.addReferenceParameter(acceptOfferElem);
-		toEPR.addReferenceParameter(useOfferElem);
-//		clientOptions.setManageSession(true); // without this reference params wont go.
-		serviceClient.setTargetEPR(toEPR);
-		
 //		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setTo(toEPR);
-		
-		clientOptions.setAction("urn:wsrm:EchoString");
+		clientOptions.setTo(new EndpointReference (toEPR));
 		
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
@@ -134,11 +116,13 @@ public class Scenario_2_3 {
 		
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
-//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
-
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
 		
-		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //single characted offers are declined by the server
+//		clientOptions.setProperty(SandeshaClient.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
+		
+//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+
+		clientOptions.setAction("urn:wsrm:EchoString");
 		
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
@@ -162,7 +146,7 @@ public class Scenario_2_3 {
         
        
         SandeshaClient.terminateSequence(serviceClient);
-//        serviceClient.finalizeInvoke();
+        
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

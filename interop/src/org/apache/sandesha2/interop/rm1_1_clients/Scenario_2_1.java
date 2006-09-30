@@ -14,7 +14,7 @@
  * the License.
  */
 
-package sandesha2.interop.rm1_1.clients;
+package org.apache.sandesha2.interop.rm1_1_clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class Scenario_2_1 {
 	private final static String EchoStringReturn = "EchoStringReturn";
 	
 	private static String toIP = "127.0.0.1";
-	private static String toPort = "9762";
+	private static String toPort = "8080";
 	private static String transportToIP = "127.0.0.1";
 	private static String transportToPort = "8070";
 	private static String servicePart = "/axis2/services/RMInteropService";
@@ -83,10 +83,10 @@ public class Scenario_2_1 {
 		Properties properties = new Properties();
 		if (in != null) {
 			properties.load(in);
+			
+			toAddress = properties.getProperty("to");
+			transportToEPR = properties.getProperty("transportTo");
 		}
-		
-		toAddress = properties.getProperty("to");
-		transportToEPR = properties.getProperty("transportTo");
 		
 		new Scenario_2_1 ().run();
 	}
@@ -114,10 +114,13 @@ public class Scenario_2_1 {
 		OMNamespace namespace = factory.createOMNamespace("urn:wsrm:InteropOptions","rmi");
 		OMElement acceptOfferElem = factory.createOMElement("acceptOffer",namespace);
 		OMElement useOfferElem = factory.createOMElement("useOffer",namespace);
+		
 		acceptOfferElem.setText("true");
 		useOfferElem.setText("true");
-		toEPR.addReferenceParameter(acceptOfferElem);
-		toEPR.addReferenceParameter(useOfferElem);
+		
+//		toEPR.addReferenceParameter(acceptOfferElem);
+//		toEPR.addReferenceParameter(useOfferElem);
+		
 //		clientOptions.setManageSession(true); // without this reference params wont go.
 		serviceClient.setTargetEPR(toEPR);
 		
@@ -149,11 +152,11 @@ public class Scenario_2_1 {
 		
 		serviceClient.setOptions(clientOptions);
 
-		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
-		
-		Callback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+//		Callback callback1 = new TestCallback ("Callback 1");
+//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
+//		
+//		Callback callback2 = new TestCallback ("Callback 2");
+//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 
 		
 		Callback callback3 = new TestCallback ("Callback 3");
@@ -167,7 +170,7 @@ public class Scenario_2_1 {
 		boolean complete = false;
 		while (!complete) {
 			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==1) 
 				complete = true;
 			else {
 				try {
@@ -180,7 +183,7 @@ public class Scenario_2_1 {
        
 		Thread.sleep(6000);
         SandeshaClient.terminateSequence(serviceClient);
-        
+		Thread.sleep(60000000);
 //        serviceClient.finalizeInvoke();
         
 	}

@@ -14,7 +14,7 @@
  * the License.
  */
 
-package sandesha2.interop.rm1_1.clients;
+package org.apache.sandesha2.interop.rm1_1_clients;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +26,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -38,14 +37,12 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
-public class Scenario_1_4 {
+public class Scenario_1_3 {
 
-	private static final String applicationNamespaceName = "http://tempuri.org/";
-
+	private static final String applicationNamespaceName = "http://tempuri.org/"; 
 	private static final String ping = "ping";
-
 	private static final String Text = "Text";
-
+	
 	private static String toIP = "127.0.0.1";
 	private static String toPort = "9762";
 	private static String transportToIP = "127.0.0.1";
@@ -54,98 +51,75 @@ public class Scenario_1_4 {
 	private static String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
 	private static String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
-	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; // Change
-																											// this
-																											// to
-																											// ur
-																											// path.
-
-	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator
-			+ "target" + File.separator + "repos" + File.separator + "client"
-			+ File.separator; // this will be available after a maven build
-
+	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
+	
+	private static String AXIS2_CLIENT_PATH = SANDESHA2_HOME + File.separator + "target" + File.separator +"repos" + File.separator + "client" + File.separator;   //this will be available after a maven build
+	
 	public static void main(String[] args) throws AxisFault,IOException {
-
+		
 		String axisClientRepo = null;
-		if (args != null && args.length > 0)
+		if (args!=null && args.length>0)
 			axisClientRepo = args[0];
-
-		if (axisClientRepo != null && !"".equals(axisClientRepo)) {
+		
+		if (axisClientRepo!=null && !"".equals(axisClientRepo)) {
 			AXIS2_CLIENT_PATH = axisClientRepo;
 			SANDESHA2_HOME = "";
 		}
-
+		
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("sandesha2_interop.properties");
 
 		Properties properties = new Properties();
 		if (in != null) {
 			properties.load(in);
+			
+			toEPR = properties.getProperty("to");
+			transportToEPR = properties.getProperty("transportTo");
 		}
 		
-		toEPR = properties.getProperty("to");
-		transportToEPR = properties.getProperty("transportTo");
-		
-		new Scenario_1_4().run();
+		new Scenario_1_3 ().run();
 	}
-
-	private void run() throws AxisFault {
-
-		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)) {
-			System.out
-					.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
+	
+	private void run () throws AxisFault {
+		
+		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
+			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
 			return;
 		}
-
+		
 		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
-		ConfigurationContext configContext = ConfigurationContextFactory
-				.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,
-						axis2_xml);
-		Options clientOptions = new Options();
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,
-				transportToEPR);
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
+		Options clientOptions = new Options ();
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
+		clientOptions.setTo(new EndpointReference (toEPR));
 		
-//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean(true));
-		clientOptions.setTo(new EndpointReference(toEPR));
-		
-		clientOptions.setAction("urn:wsrm:Ping");
-		
-		ServiceClient serviceClient = new ServiceClient(configContext, null);
-		
-//		String replyAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_ONLY_OP;
-		String acksToAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-		
-		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToAddress);
-		
-//		clientOptions.setReplyTo(new EndpointReference (replyAddress));
-		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-
 		String sequenceKey = "sequence1";
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
-
-		// clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
-		// //uncomment this to send messages without chunking.
-
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+	    
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+		
+//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
+		
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 
-//		 clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		// //uncomment this to send messages in SOAP 1.2
-
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,
-				Sandesha2Constants.SPEC_VERSIONS.v1_1); // uncomment this to
-														// send the messages
-														// according to the v1_1
-														// spec.
+		clientOptions.setAction("urn:wsrm:Ping");
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);		
 
 		serviceClient.setOptions(clientOptions);
-
+		
+		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(1));
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
-		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		
+		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(3));
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
-
+		
 		boolean complete = false;
 		while (!complete) {
 			SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==2) 
 				complete = true;
 			else {
 				try {
@@ -153,23 +127,50 @@ public class Scenario_1_4 {
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
-			}
+			} 
 		}
 
-		SandeshaClient.terminateSequence(serviceClient);
-//		serviceClient.finalizeInvoke();
-	}
+		SandeshaClient.closeSequence(serviceClient);
+		
+//		try {
+//			Thread.sleep(3000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+//		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(4));
+//		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
 
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		SandeshaClient.terminateSequence(serviceClient);
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		serviceClient.finalizeInvoke();
+	}
+	
 	private static OMElement getPingOMBlock(String text) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,
-				"ns1");
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
 		OMElement pingElem = fac.createOMElement(ping, namespace);
 		OMElement textElem = fac.createOMElement(Text, namespace);
-
+		
 		textElem.setText(text);
 		pingElem.addChild(textElem);
 
 		return pingElem;
 	}
+	
 }

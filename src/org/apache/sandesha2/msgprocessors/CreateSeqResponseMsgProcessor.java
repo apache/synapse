@@ -70,9 +70,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processInMessage");
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(createSeqResponseRMMsgCtx
-				.getSOAPEnvelope()));
-
 		ConfigurationContext configCtx = createSeqResponseRMMsgCtx.getMessageContext().getConfigurationContext();
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx

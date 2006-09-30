@@ -19,6 +19,8 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.ArrayList;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -111,12 +113,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBean tokenBean = seqPropMgr.retrieve(propertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
-			OMElement body = msgCtx.getEnvelope().getBody();
+			
+			QName seqName = new QName(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.SEQUENCE);
+			
+			SOAPEnvelope envelope = msgCtx.getEnvelope();
+			OMElement body = envelope.getBody();
+			OMElement seqHeader = envelope.getHeader().getFirstChildWithName(seqName);
+			
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
 			
-			//TODO get the element from the SOAP Envelope
-//			secManager.checkProofOfPossession(token, sequence.getOMElement(), msgCtx);
-			
+			secManager.checkProofOfPossession(token, seqHeader, msgCtx);
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 		

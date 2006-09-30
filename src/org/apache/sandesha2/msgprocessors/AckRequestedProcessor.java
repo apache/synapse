@@ -85,8 +85,8 @@ public class AckRequestedProcessor {
 				while(acks.hasNext()) {
 					OMElement ack = (OMElement) acks.next();
 					AckRequested ackReq = new AckRequested(headerName.getNamespaceURI());
-				  ackReq.fromOMElement(ack);
-				  processAckRequestedHeader(message, ackReq);
+					ackReq.fromOMElement(ack);
+					processAckRequestedHeader(message, ack, ackReq);
 				}
 			}			
 		}
@@ -95,9 +95,9 @@ public class AckRequestedProcessor {
 			log.debug("Exit: AckRequestedProcessor::processAckRequestHeaders");
 	}
 
-	public void processAckRequestedHeader(MessageContext msgContext, AckRequested ackRequested) throws SandeshaException {
+	public void processAckRequestedHeader(MessageContext msgContext, OMElement soapHeader, AckRequested ackRequested) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader");
+			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader " + soapHeader);
 
 		// TODO: Note that this RMMessageContext is not really any use - but we need to create it
 		// so that it can be passed to the fault handling chain. It's really no more than a
@@ -124,8 +124,7 @@ public class AckRequestedProcessor {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
 			
-			//TODO get the ackRequested element from the SOAPEnvelope.
-//			secManager.checkProofOfPossession(token, ackRequested.getOMElement(), msgContext);
+			secManager.checkProofOfPossession(token, soapHeader, msgContext);
 		}
 
 		// Setting the ack depending on AcksTo.

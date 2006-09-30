@@ -79,8 +79,8 @@ public class AcknowledgementProcessor {
 				while(acks.hasNext()) {
 					OMElement ack = (OMElement) acks.next();
 					SequenceAcknowledgement seqAck = new SequenceAcknowledgement(headerName.getNamespaceURI());
-				  seqAck.fromOMElement(ack);
-				  processAckHeader(message, seqAck);
+					seqAck.fromOMElement(ack);
+					processAckHeader(message, ack, seqAck);
 				}
 			}			
 		}
@@ -90,11 +90,11 @@ public class AcknowledgementProcessor {
 			log.debug("Exit: AcknowledgementProcessor::processAckHeaders");
 	}
 	
-	private void processAckHeader(MessageContext msgCtx, SequenceAcknowledgement sequenceAck)
+	private void processAckHeader(MessageContext msgCtx, OMElement soapHeader, SequenceAcknowledgement sequenceAck)
 	throws SandeshaException
 	{
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementProcessor::processAckHeader");
+			log.debug("Enter: AcknowledgementProcessor::processAckHeader " + soapHeader);
 		
 		// TODO: Note that this RMMessageContext is not really any use - but we need to create it
 		// so that it can be passed to the fault handling chain. It's really no more than a
@@ -130,8 +130,7 @@ public class AcknowledgementProcessor {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
 			
-			//TODO get the element from the SOAP Envelope
-//			secManager.checkProofOfPossession(token, sequsenceAck.getOMElement(), msgCtx);
+			secManager.checkProofOfPossession(token, soapHeader, msgCtx);
 		}
 		
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();

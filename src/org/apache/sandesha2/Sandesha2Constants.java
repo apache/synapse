@@ -419,9 +419,9 @@ public interface Sandesha2Constants {
 		
 		public interface DefaultValues {
 			
-			int RetransmissionInterval = 20000;
+			int RetransmissionInterval = 6000;
 			
-			int AcknowledgementInterval = 4000;
+			int AcknowledgementInterval = 3000;
 			
 			boolean ExponentialBackoff = true;
 			

@@ -35,7 +35,7 @@
    
     <goal name="build:all" prereqs="mar,jar,client:jar,policy:jar,sample:create,repo:create,test:test" />
     
-    <goal name="all:jar" prereqs="mar,jar,client:jar" />
+    <goal name="all:jar" prereqs="mar,jar,client:jar,policy:jar" />
         
     <goal name="default">
         <attainGoal name="clean"/>
@@ -286,9 +286,10 @@
         <ant:mkdir dir="${dir.interop.service.temp}" />
         <ant:mkdir dir="${dir.interop.service.temp}/META-INF" />
         <ant:copy file="${dir.interop}/conf/services.xml" todir="${dir.interop.service.temp}/META-INF" /> 
+        <ant:copy file="${dir.interop}/conf/RMInteropService.wsdl" todir="${dir.interop.service.temp}/META-INF" /> 
         <ant:copy todir="${dir.interop.service.temp}" >
-            <ant:fileset dir="${maven.build.dir}/samples/classes">
-                <ant:include name="sandesha2/interop/service/*Service*.class" />
+            <ant:fileset dir="${maven.build.dir}/interop/classes">
+                <ant:exclude name="**/*clients*/**" />
             </ant:fileset>
         </ant:copy>
         

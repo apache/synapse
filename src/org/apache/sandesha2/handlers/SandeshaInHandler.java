@@ -56,7 +56,7 @@ public class SandeshaInHandler extends AbstractHandler {
 	}
 
 	public void invoke(MessageContext msgCtx) throws AxisFault {
-
+		
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaInHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 

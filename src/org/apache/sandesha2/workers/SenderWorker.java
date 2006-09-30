@@ -162,7 +162,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					// TODO Auto-generated catch block
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e
 							.toString());
-					log.debug(message, e);
+					log.error (message, e);
+
 				} finally {
 					transaction = storageManager.getTransaction();
 					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);

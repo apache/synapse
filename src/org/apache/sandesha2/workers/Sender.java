@@ -157,70 +157,83 @@ public class Sender extends Thread {
 
 			try {
 				if (context == null) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
-					message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotCointinueSender, message);
+					String message = SandeshaMessageHelper
+							.getMessage(SandeshaMessageKeys.configContextNotSet);
+					message = SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.cannotCointinueSender, message);
 					log.debug(message);
 					throw new SandeshaException(message);
 				}
 
-				//TODO make sure this locks on reads.
+				// TODO make sure this locks on reads.
 				transaction = storageManager.getTransaction();
 
 				SenderBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
 				SenderBean senderBean = mgr.getNextMsgToSend();
 				if (senderBean == null) {
 					if (log.isDebugEnabled()) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
+						String message = SandeshaMessageHelper
+								.getMessage(SandeshaMessageKeys.senderBeanNotFound);
 						log.debug(message);
 					}
 					continue;
 				}
-				
+
 				String messageId = senderBean.getMessageID();
-				
+
 				String toAddress = senderBean.getToAddress();
-				if (toAddress!=null) {
+				if (toAddress != null) {
 					boolean unsendableAddress = false;
-					
-					if (toAddress.equals(AddressingConstants.Submission.WSA_ANONYMOUS_URL))
+
+					if (toAddress
+							.equals(AddressingConstants.Submission.WSA_ANONYMOUS_URL))
 						unsendableAddress = true;
-					else if (toAddress.equals(AddressingConstants.Final.WSA_ANONYMOUS_URL))
+					else if (toAddress
+							.equals(AddressingConstants.Final.WSA_ANONYMOUS_URL))
 						unsendableAddress = true;
-					else if (toAddress.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
+					else if (toAddress
+							.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
 						unsendableAddress = true;
-					
+
 					if (unsendableAddress) {
 						if (log.isDebugEnabled()) {
-							String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendToTheAddress,toAddress);
+							String message = SandeshaMessageHelper.getMessage(
+									SandeshaMessageKeys.cannotSendToTheAddress,
+									toAddress);
 							log.debug(message);
 						}
 						continue;
 					}
 				}
-				
-				//work Id is used to define the piece of work that will be assigned to the Worker thread,
-				//to handle this Sender bean.
+
+				// work Id is used to define the piece of work that will be
+				// assigned to the Worker thread,
+				// to handle this Sender bean.
 				String workId = messageId;
-				
-				//check weather the bean is already assigned to a worker.
+
+				// check weather the bean is already assigned to a worker.
 				if (lock.isWorkPresent(workId)) {
 					if (log.isDebugEnabled()) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
+						String message = SandeshaMessageHelper
+								.getMessage(
+										SandeshaMessageKeys.workAlreadyAssigned,
+										workId);
 						log.debug(message);
 					}
 					continue;
 				}
-				
+
 				transaction.commit();
-				
-				//start a worker which will work on this messages.
-				SenderWorker worker = new SenderWorker (context,messageId);
-				worker.setLock (lock);
+
+				// start a worker which will work on this messages.
+				SenderWorker worker = new SenderWorker(context, messageId);
+				worker.setLock(lock);
 				worker.setWorkId(messageId);
 				threadPool.execute(worker);
-				
-				//adding the workId to the lock after assigning it to a thread makes sure 
-				//that all the workIds in the Lock are handled by threads.
+
+				// adding the workId to the lock after assigning it to a thread
+				// makes sure
+				// that all the workIds in the Lock are handled by threads.
 				lock.addWork(workId);
 
 			} catch (Exception e) {

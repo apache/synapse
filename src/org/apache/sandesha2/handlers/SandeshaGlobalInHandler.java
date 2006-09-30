@@ -229,6 +229,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		boolean drop = false;
 
+		
+		
 		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -289,6 +291,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
 							ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
+							
+							
+							drop = true;
 
 						}
 					}

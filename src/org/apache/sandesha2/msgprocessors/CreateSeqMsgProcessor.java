@@ -306,4 +306,5 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Exit: CreateSeqMsgProcessor::processOutMessage");
 	}
+	
 }

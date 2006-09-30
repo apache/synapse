@@ -36,6 +36,10 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -304,6 +308,9 @@ public class SandeshaClient {
 	}
 
 	public static void createSequence(ServiceClient serviceClient, boolean offer) throws SandeshaException {
+		
+		setUpServiceClientAnonymousOperation(serviceClient);
+		
 		Options options = serviceClient.getOptions();
 		if (options == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
@@ -376,6 +383,9 @@ public class SandeshaClient {
 	 * @throws SandeshaException
 	 */
 	public static void terminateSequence(ServiceClient serviceClient) throws SandeshaException {
+		
+		setUpServiceClientAnonymousOperation(serviceClient);
+		
 		ServiceContext serviceContext = serviceClient.getServiceContext();
 		if (serviceContext == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
@@ -432,6 +442,9 @@ public class SandeshaClient {
 	 * @throws SandeshaException
 	 */
 	public static void closeSequence(ServiceClient serviceClient) throws SandeshaException {
+		
+		setUpServiceClientAnonymousOperation(serviceClient);
+		
 		ServiceContext serviceContext = serviceClient.getServiceContext();
 		if (serviceContext == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
@@ -615,6 +628,8 @@ public class SandeshaClient {
 
 	public static void sendAckRequest(ServiceClient serviceClient) throws SandeshaException {
 
+		setUpServiceClientAnonymousOperation(serviceClient);
+		
 		Options options = serviceClient.getOptions();
 		if (options == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
@@ -1067,6 +1082,22 @@ public class SandeshaClient {
 		terminateSequence.toSOAPEnvelope(dummyEnvelope);
 
 		return dummyEnvelope;
+	}
+	
+	private static void setUpServiceClientAnonymousOperation (ServiceClient serviceClient) throws SandeshaException {
+		try {
+			AxisService service = serviceClient.getAxisService();
+			AxisOperation anonOutOnlyOperation = service.getOperation(ServiceClient.ANON_OUT_ONLY_OP);
+			
+			if (anonOutOnlyOperation==null) {
+				anonOutOnlyOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
+				anonOutOnlyOperation.setName(ServiceClient.ANON_OUT_ONLY_OP);
+				anonOutOnlyOperation.setParent(service);
+				service.addChild(anonOutOnlyOperation);
+			}
+		} catch (AxisFault e) {
+			throw new SandeshaException (e);
+		}
 	}
 
 }

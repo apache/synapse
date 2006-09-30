@@ -44,6 +44,8 @@
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</actionMapping>
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</actionMapping>
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/AckRequested</actionMapping>
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage</actionMapping>
 
         <!-- namespaces for the 2006-08 spec -->
         

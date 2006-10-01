@@ -105,16 +105,22 @@ public class RampartBasedSecurityManager extends SecurityManager {
                         // first verify the base token
                         Principal principal = wser.getPrincipal();
                         if(principal instanceof WSDerivedKeyTokenPrincipal) {
+                            //Get the id of the SCT that was used to create the DKT 
                             String baseTokenId = ((WSDerivedKeyTokenPrincipal)principal).getBasetokenId();
+                            //Get the token that matches the id
                             SecurityToken recoveredToken = this.recoverSecurityToken(baseTokenId);
-                            String recoverdTokenId = ((RampartSecurityToken)recoveredToken).getToken().getId();
-                            String id = ((RampartSecurityToken)token).getToken().getId();
-                            if(recoverdTokenId.equals(id)) {
-                                //Token matched with a token that signed the message part
-                                //Now check signature parts
-                                OMAttribute idattr = messagePart.getAttribute(new QName(WSConstants.WSU_NS, "Id"));
-                                verified = wser.getSignedElements().contains(idattr);
-                                break;
+                            if(recoveredToken != null) {
+                                //check whether the SCT used in the message is 
+                                //similar to the one given into the method
+                                String recoverdTokenId = ((RampartSecurityToken)recoveredToken).getToken().getId();
+                                String id = ((RampartSecurityToken)token).getToken().getId();
+                                if(recoverdTokenId.equals(id)) {
+                                    //Token matched with a token that signed the message part
+                                    //Now check signature parts
+                                    OMAttribute idattr = messagePart.getAttribute(new QName(WSConstants.WSU_NS, "Id"));
+                                    verified = wser.getSignedElements().contains(idattr);
+                                    break;
+                                }
                             }
                         }
                     }

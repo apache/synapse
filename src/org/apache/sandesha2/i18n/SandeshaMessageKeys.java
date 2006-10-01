@@ -233,6 +233,8 @@ public class SandeshaMessageKeys {
 	public static final String toEPRNotSet = "toEPRNotSet";
     
     public final static String errorRetrievingSecurityToken = "errorRetrievingSecurityToken";
-	
+	public final static String proofOfPossessionNotVerified = "proofOfPossessionNotVerified";
+    public final static String noSecurityResults = "noSecurityResults";
+    public final static String noSecConvTokenInPolicy = "noSecConvTokenInPolicy";
 	
 }

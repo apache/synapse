@@ -16,6 +16,7 @@
 
 package org.apache.sandesha2.security.rampart;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
@@ -42,13 +43,19 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.ws.secpolicy.WSSPolicyException;
 import org.apache.ws.secpolicy.model.SecureConversationToken;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSDerivedKeyTokenPrincipal;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.conversation.ConversationConstants;
+import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.Reference;
 import org.apache.ws.security.message.token.SecurityTokenReference;
 
 import javax.xml.namespace.QName;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Vector;
 
 
 public class RampartBasedSecurityManager extends SecurityManager {
@@ -68,7 +75,6 @@ public class RampartBasedSecurityManager extends SecurityManager {
             context.setProperty(
                     TokenStorage.TOKEN_STORAGE_KEY, this.storage);
         }
-
     }
 
     /* (non-Javadoc)
@@ -77,7 +83,50 @@ public class RampartBasedSecurityManager extends SecurityManager {
     public void checkProofOfPossession(SecurityToken token,
             OMElement messagePart, MessageContext message)
             throws SandeshaException {
-        //Rampart verifies this no need to check again :-?
+        
+        Vector results = null;
+        if ((results =
+                (Vector) message.getProperty(WSHandlerConstants.RECV_RESULTS))
+                == null) {
+            String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSecurityResults);
+            throw new SandeshaException(msg);
+        } else {
+            boolean verified = false;
+            for (int i = 0; i < results.size() && !verified; i++) {
+                WSHandlerResult rResult =
+                        (WSHandlerResult) results.get(i);
+                Vector wsSecEngineResults = rResult.getResults();
+    
+                for (int j = 0; j < wsSecEngineResults.size() && !verified; j++) {
+                    WSSecurityEngineResult wser =
+                            (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                    if (wser.getAction() == WSConstants.SIGN && wser.getPrincipal() != null) {
+                        
+                        // first verify the base token
+                        Principal principal = wser.getPrincipal();
+                        if(principal instanceof WSDerivedKeyTokenPrincipal) {
+                            String baseTokenId = ((WSDerivedKeyTokenPrincipal)principal).getBasetokenId();
+                            SecurityToken recoveredToken = this.recoverSecurityToken(baseTokenId);
+                            String recoverdTokenId = ((RampartSecurityToken)recoveredToken).getToken().getId();
+                            String id = ((RampartSecurityToken)token).getToken().getId();
+                            if(recoverdTokenId.equals(id)) {
+                                //Token matched with a token that signed the message part
+                                //Now check signature parts
+                                OMAttribute idattr = messagePart.getAttribute(new QName(WSConstants.WSU_NS, "Id"));
+                                verified = wser.getSignedElements().contains(idattr);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if(!verified) {
+                String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.proofOfPossessionNotVerified);
+                throw new SandeshaException(msg);
+            }
+        }
+        
     }
 
     /* (non-Javadoc)
@@ -162,7 +211,8 @@ public class RampartBasedSecurityManager extends SecurityManager {
                     identifier = tok.getId();
                     
                 } else {
-                    throw new SandeshaException("No SecureConversationToken in policy");
+                    String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSecConvTokenInPolicy);
+                    throw new SandeshaException(msg);
                 }
                 
             } catch (RampartException e) {
@@ -208,7 +258,7 @@ public class RampartBasedSecurityManager extends SecurityManager {
      * @see org.apache.sandesha2.security.SecurityManager#recoverSecurityToken(java.lang.String)
      */
     public SecurityToken recoverSecurityToken(String tokenData)
-            throws SandeshaException {
+            throws SandeshaException { 
         try {
             Token token = this.storage.getToken(tokenData);
             if(token != null) {

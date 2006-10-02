@@ -1094,6 +1094,18 @@ public class SandeshaClient {
 				anonOutOnlyOperation.setName(ServiceClient.ANON_OUT_ONLY_OP);
 				anonOutOnlyOperation.setParent(service);
 				service.addChild(anonOutOnlyOperation);
+				
+				Iterator iter = service.getOperations();
+				AxisOperation referenceOperation = null;
+				if (iter.hasNext())
+					referenceOperation = (AxisOperation) iter.next();
+				
+				if (referenceOperation!=null) {
+					anonOutOnlyOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());
+					anonOutOnlyOperation.setPhasesOutFaultFlow(referenceOperation.getPhasesOutFaultFlow());
+					anonOutOnlyOperation.setPhasesInFaultFlow(referenceOperation.getPhasesInFaultFlow());
+					anonOutOnlyOperation.setPhasesInFaultFlow(referenceOperation.getRemainingPhasesInFlow());
+				}
 			}
 		} catch (AxisFault e) {
 			throw new SandeshaException (e);

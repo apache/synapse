@@ -520,12 +520,6 @@ public class SandeshaUtil {
 
 			MessageContext newMessageContext = new MessageContext();
 			newMessageContext.setConfigurationContext(configContext);
-
-//			Options referenceMsgOptions = referenceMessage.getOptions();
-//			Options newOptions = null;
-//			if (referenceMsgOptions!=null)
-//				newOptions = new Options (referenceMsgOptions);
-//			else
 			
 			Options newOptions = new Options ();
 			
@@ -579,10 +573,11 @@ public class SandeshaUtil {
 			AxisService service = newMessageContext.getAxisService();
 
 			if (service != null && operation != null) {
-				service.addChild(operation);
+//				Adding this operation to the service is tricky.  
+//				service.addChild(operation);
+				
 				operation.setParent(service);
 			}
-			
 
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
@@ -610,6 +605,8 @@ public class SandeshaUtil {
 					.getProperty(MessageContext.TRANSPORT_IN));
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
+			
+			//TODO - move this to a property file.
             newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
                     .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
             

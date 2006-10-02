@@ -372,6 +372,7 @@ public class TerminateManager {
 		if (terminated != null && terminated.getValue() != null && "true".equals(terminated.getValue())) {
 			String message = "Terminate was added previously.";
 			log.debug(message);
+			return;
 		}
 
 		RMMsgContext terminateRMMessage = RMMsgCreator.createTerminateSequenceMessage(referenceMessage, outSequenceId,
@@ -387,11 +388,18 @@ public class TerminateManager {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
 			throw new SandeshaException(message);
 		}
-
+		
 		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
 
+		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
+		if (replyToBean!=null) {
+			terminateRMMessage.setReplyTo(new EndpointReference (replyToBean.getValue()));
+		}
+		
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
+
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);

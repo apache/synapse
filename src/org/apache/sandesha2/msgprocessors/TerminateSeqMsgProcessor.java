@@ -296,15 +296,14 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		
 		terminateSeqResponseRMMsg.addSOAPEnvelope();
 
-		
 		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		terminateSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
+		EndpointReference toEPR = terminateSeqMsg.getTo();
+		
 		outMessage.setResponseWritten(true);
 
 		AxisEngine engine = new AxisEngine(terminateSeqMsg.getConfigurationContext());
-
-		EndpointReference toEPR = terminateSeqMsg.getTo();
 
 		try {
 			engine.send(outMessage);
@@ -367,8 +366,16 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		try {
 			AxisOperation oldOPeration = msgContext.getAxisOperation();
 			AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
+			
+			AxisOperation referenceInOutOperation = msgContext.getAxisService().getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
+			if (referenceInOutOperation==null) {
+				String messge = "Cant find the recerence RM InOut operation";
+				throw new SandeshaException (messge);
+			}
+			
 			// setting flows
-			outInAxisOp.setRemainingPhasesInFlow(oldOPeration.getRemainingPhasesInFlow());
+			outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
+//			outInAxisOp.setRemainingPhasesInFlow(oldOPeration.getRemainingPhasesInFlow());
 
 			OperationContext opcontext = OperationContextFactory.createOperationContext(
 					WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);

@@ -191,8 +191,19 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					checkForSyncResponses(msgCtx);
 			}
 
-			if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-				// terminate sending side.
+			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)
+					/*&&
+					 (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmMsgCtx.getRMNamespaceValue()))*/) {
+				
+				//TODO - cant do below due to a bug. Since CreateSequenceResponsMsgProcessor does not get called
+				//currently. To fix this fix the 'todo' in the processOutMessage method of the TerminateSeqMsgProcesser.
+				
+				//terminate message sent using the SandeshaClient. Since the terminate message will simply get the
+				//InFlow of the reference message get called which could be zero sized (OutOnly operations).
+				
+				// terminate sending side if this is the WSRM 1.0 spec. 
+				// If the WSRM versoion is 1.1 termination will happen in the terminate sequence response message.
+				
 				TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
 						.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 				String sequenceID = terminateSequence.getIdentifier().getIdentifier();

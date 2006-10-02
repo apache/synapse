@@ -17,9 +17,12 @@
 
 package org.apache.sandesha2.handlers;
 
+import java.util.Iterator;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;

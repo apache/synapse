@@ -32,6 +32,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**
@@ -65,6 +66,11 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 			secManager.checkProofOfPossession(token, body, msgContext);
 		}
 
+		//doing the termination
+//		TODO - do termination correctly.
+//		TerminateManager.terminateSendingSide(configContext, sequencePropertyKey, msgCtx.isServerSide(),
+//				storageManager);
+		
 		// Stop this message travelling further through the Axis runtime
 		terminateResRMMsg.pause();
 

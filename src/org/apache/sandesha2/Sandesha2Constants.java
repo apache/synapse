@@ -535,6 +535,10 @@ public interface Sandesha2Constants {
 	
 	String WSRM_ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsrm/200608/anonymous";
 	
+	String RM_IN_OUT_OPERATION_NAME = "RMInOutOperation";
+	
+	String RM_IN_ONLY_OPERATION = "RMInOnlyOperation";
+	
 	String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI

@@ -97,7 +97,6 @@ public class PollingManager extends Thread {
 						nextMsgBean = (NextMsgBean) results.get(item);
 					}
 					
-					sequenceId = nextMsgBean.getSequenceID();
 				} else {
 					NextMsgBean findBean = new NextMsgBean ();
 					findBean.setPollingMode(true);
@@ -109,6 +108,8 @@ public class PollingManager extends Thread {
 				//If not valid entry is found, try again later.
 				if (nextMsgBean==null)
 					continue;
+
+				sequenceId = nextMsgBean.getSequenceID();
 				
 				//create a MakeConnection message  
 				String referenceMsgKey = nextMsgBean.getReferenceMessageKey();

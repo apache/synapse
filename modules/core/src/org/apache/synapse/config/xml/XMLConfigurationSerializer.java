@@ -92,29 +92,8 @@ public class XMLConfigurationSerializer {
         Iterator iter = synCfg.getGlobalProps().keySet().iterator();
         while (iter.hasNext()) {
             String propertyName = (String) iter.next();
-            OMElement property = fac.createOMElement("set-property", synNS);
-            property.addAttribute(fac.createOMAttribute(
-                "name", nullNS, propertyName));
-
-            Property prop = synCfg.getPropertyObject(propertyName);
-            if (prop.getType() == Property.DYNAMIC_TYPE) {
-                property.addAttribute(fac.createOMAttribute(
-                        "key", nullNS, prop.getKey()));
-            } else if (prop.getType() == Property.SRC_TYPE) {
-                property.addAttribute(fac.createOMAttribute(
-                        "src", nullNS, prop.getSrc().toString()));
-            } else if (prop.getType() == Property.VALUE_TYPE) {
-                property.addAttribute(fac.createOMAttribute(
-                        "value", nullNS, (String) prop.getValue()));
-            } else if (prop.getType() == Property.INLINE_XML_TYPE) {
-                property.addChild((OMElement) prop.getValue());
-            } else if (prop.getType() == Property.INLINE_STRING_TYPE) {
-                property.addChild(fac.createOMText((String) prop.getValue()));
-            } else {
-                handleException("Property type undefined");
-            }
-
-            definitions.addChild(property);
+            PropertySerializer.serializeProperty(
+                    synCfg.getPropertyObject(propertyName), definitions);
         }
     }
 

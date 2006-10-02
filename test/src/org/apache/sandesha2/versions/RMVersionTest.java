@@ -160,11 +160,14 @@ public class RMVersionTest extends SandeshaTestCase {
 		
 		serviceClient.setOptions(clientOptions);
 		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 
-		Thread.sleep(10000);
-				
+		Thread.sleep(5000);
+		
+		SandeshaClient.terminateSequence(serviceClient);
+		
+		Thread.sleep(5000);
+		
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);

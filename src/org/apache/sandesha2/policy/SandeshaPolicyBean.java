@@ -152,7 +152,7 @@ public class SandeshaPolicyBean implements Assertion {
     }
 
     public PolicyComponent normalize() {
-        throw new UnsupportedOperationException("TODO");
+        return this;
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
@@ -256,10 +256,6 @@ public class SandeshaPolicyBean implements Assertion {
         // </wsrm:RMAssertion>
         writer.writeEndElement();
 
-    }
-
-    public boolean equal(PolicyComponent policyComponent) {
-        throw new UnsupportedOperationException("TODO");
     }
 
     public short getType() {

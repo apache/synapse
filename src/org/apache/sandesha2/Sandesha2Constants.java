@@ -547,8 +547,15 @@ public interface Sandesha2Constants {
 	}
     
     public interface Assertions {
+        
+        public static final String URI_POLICY_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";
         public static final String URI_RM_POLICY_NS = "http://ws.apache.org/sandesha2/policy";
         
+        public static final String ATTR_WSRM = "wsrm";
+        public static final String ATTR_WSP = "wsp";
+        
+        public static final String ELEM_POLICY = "Policy";
+        public static final String ELEM_RMASSERTION = "RMAssertion";
         public static final String ELEM_ACK_INTERVAL = "AcknowledgementInterval";
         public static final String ELEM_RETRANS_INTERVAL = "RetransmissionInterval";
         public static final String ELEM_MAX_RETRANS_COUNT = "MaximumRetransmissionCount";
@@ -562,18 +569,20 @@ public interface Sandesha2Constants {
         public static final String ELEM_INMEMORY_STORAGE_MGR = "InMemoryStorageManager";
         public static final String ELEM_PERMANENT_STORAGE_MGR = "PermanentStorageManager";
         
-        public static final QName Q_ELEM__RMBEAN = new QName(URI_RM_POLICY_NS, "RMBean");
-        public static final QName Q_ELEM_ACK_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_ACK_INTERVAL);
-        public static final QName Q_ELEM_RETRANS_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_RETRANS_INTERVAL);
-        public static final QName Q_ELEM_MAX_RETRANS_COUNT = new QName(URI_RM_POLICY_NS, ELEM_MAX_RETRANS_COUNT);
-        public static final QName Q_ELEM_EXP_BACKOFF = new QName(URI_RM_POLICY_NS, ELEM_EXP_BACKOFF);
-        public static final QName Q_ELEM_INACTIVITY_TIMEOUT = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT);
-        public static final QName Q_ELEM_INACTIVITY_TIMEOUT_MEASURES = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT_MEASURES);
-        public static final QName Q_ELEM_INVOKE_INORDER = new QName(URI_RM_POLICY_NS, ELEM_INVOKE_INORDER);
-        public static final QName Q_ELEM_MSG_TYPES_TO_DROP = new QName(URI_RM_POLICY_NS, ELEM_MSG_TYPES_TO_DROP);
-        public static final QName Q_ELEM_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_STORAGE_MGR);
-        public static final QName Q_ELEM_SEC_MGR = new QName(URI_RM_POLICY_NS, ELEM_SEC_MGR);
-        public static final QName Q_ELEM_INMEMORY_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_INMEMORY_STORAGE_MGR);
-        public static final QName Q_ELEM_PERMANENT_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_PERMANENT_STORAGE_MGR);
+        public static final QName Q_ELEM_POLICY = new QName(URI_POLICY_NS, ELEM_POLICY, ATTR_WSP);
+        public static final QName Q_ELEM_RMASSERTION = new QName(URI_RM_POLICY_NS, ELEM_RMASSERTION, ATTR_WSRM);
+        public static final QName Q_ELEM__RMBEAN = new QName(URI_RM_POLICY_NS, "RMBean", ATTR_WSRM);
+        public static final QName Q_ELEM_ACK_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_ACK_INTERVAL, ATTR_WSRM);
+        public static final QName Q_ELEM_RETRANS_INTERVAL = new QName(URI_RM_POLICY_NS, ELEM_RETRANS_INTERVAL, ATTR_WSRM);
+        public static final QName Q_ELEM_MAX_RETRANS_COUNT = new QName(URI_RM_POLICY_NS, ELEM_MAX_RETRANS_COUNT, ATTR_WSRM);
+        public static final QName Q_ELEM_EXP_BACKOFF = new QName(URI_RM_POLICY_NS, ELEM_EXP_BACKOFF, ATTR_WSRM);
+        public static final QName Q_ELEM_INACTIVITY_TIMEOUT = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT, ATTR_WSRM);
+        public static final QName Q_ELEM_INACTIVITY_TIMEOUT_MEASURES = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT_MEASURES, ATTR_WSRM);
+        public static final QName Q_ELEM_INVOKE_INORDER = new QName(URI_RM_POLICY_NS, ELEM_INVOKE_INORDER, ATTR_WSRM);
+        public static final QName Q_ELEM_MSG_TYPES_TO_DROP = new QName(URI_RM_POLICY_NS, ELEM_MSG_TYPES_TO_DROP, ATTR_WSRM);
+        public static final QName Q_ELEM_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_STORAGE_MGR, ATTR_WSRM);
+        public static final QName Q_ELEM_SEC_MGR = new QName(URI_RM_POLICY_NS, ELEM_SEC_MGR, ATTR_WSRM);
+        public static final QName Q_ELEM_INMEMORY_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_INMEMORY_STORAGE_MGR, ATTR_WSRM);
+        public static final QName Q_ELEM_PERMANENT_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_PERMANENT_STORAGE_MGR, ATTR_WSRM);
     }
 }

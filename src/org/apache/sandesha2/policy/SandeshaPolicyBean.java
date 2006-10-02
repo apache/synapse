@@ -298,4 +298,8 @@ public class SandeshaPolicyBean implements Assertion {
         this.inactivityTimeoutMeasure = inactivityTimeoutMeasure;
     }
 
+    public boolean equal(PolicyComponent policyComponent) {
+        // TODO
+        return false;
+    }    
 }

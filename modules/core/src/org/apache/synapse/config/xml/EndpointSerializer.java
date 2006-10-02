@@ -54,10 +54,6 @@ public class EndpointSerializer {
     protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
     protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
 
-    private static final EndpointSerializer instance = new EndpointSerializer();
-
-    private EndpointSerializer() {}
-
     public static OMElement serializeEndpoint(Endpoint endpt, OMElement parent) {
 
         OMElement endpoint = fac.createOMElement("endpoint", synNS);

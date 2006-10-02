@@ -236,5 +236,5 @@ public class SandeshaMessageKeys {
 	public final static String proofOfPossessionNotVerified = "proofOfPossessionNotVerified";
     public final static String noSecurityResults = "noSecurityResults";
     public final static String noSecConvTokenInPolicy = "noSecConvTokenInPolicy";
-	
+    public final static String noServicePolicy = "noServicePolicy";
 }

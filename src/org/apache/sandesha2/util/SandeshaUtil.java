@@ -56,6 +56,7 @@ import org.apache.axis2.engine.Handler;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -609,6 +610,9 @@ public class SandeshaUtil {
 					.getProperty(MessageContext.TRANSPORT_IN));
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
+            newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
+                    .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
+            
 			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
 
 			return newMessageContext;

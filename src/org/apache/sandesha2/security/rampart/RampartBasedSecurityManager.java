@@ -20,6 +20,8 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axis2.Constants;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
@@ -32,10 +34,12 @@ import org.apache.rahas.TrustException;
 import org.apache.rahas.TrustUtil;
 import org.apache.rahas.client.STSClient;
 import org.apache.rampart.RampartException;
+import org.apache.rampart.RampartMessageData;
 import org.apache.rampart.policy.RampartPolicyBuilder;
 import org.apache.rampart.policy.RampartPolicyData;
 import org.apache.rampart.util.RampartUtil;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
@@ -110,15 +114,25 @@ public class RampartBasedSecurityManager extends SecurityManager {
                             //Get the token that matches the id
                             SecurityToken recoveredToken = this.recoverSecurityToken(baseTokenId);
                             if(recoveredToken != null) {
+                                Token rahasToken = ((RampartSecurityToken)recoveredToken).getToken();
                                 //check whether the SCT used in the message is 
                                 //similar to the one given into the method
-                                String recoverdTokenId = ((RampartSecurityToken)recoveredToken).getToken().getId();
+                                String recoverdTokenId = rahasToken.getId();
+                                String attRefId = null;
+                                String unattrefId = null;
+                                if(rahasToken.getAttachedReference() != null) {
+                                    attRefId = this.getUriFromSTR(rahasToken.getAttachedReference());
+                                }
+                                if(rahasToken.getUnattachedReference() != null) {
+                                    unattrefId = this.getUriFromSTR(rahasToken.getUnattachedReference());
+                                }
+                                
                                 String id = ((RampartSecurityToken)token).getToken().getId();
-                                if(recoverdTokenId.equals(id)) {
+                                if(recoverdTokenId.equals(id) || attRefId.equals(id) || unattrefId.equals(id)) {
                                     //Token matched with a token that signed the message part
                                     //Now check signature parts
                                     OMAttribute idattr = messagePart.getAttribute(new QName(WSConstants.WSU_NS, "Id"));
-                                    verified = wser.getSignedElements().contains(idattr);
+                                    verified = wser.getSignedElements().contains(idattr.getAttributeValue());
                                     break;
                                 }
                             }
@@ -133,6 +147,11 @@ public class RampartBasedSecurityManager extends SecurityManager {
             }
         }
         
+    }
+    
+    private String getUriFromSTR(OMElement str) {
+        OMElement refElem = str.getFirstChildWithName(Reference.TOKEN);
+        return refElem.getAttributeValue(new QName("URI")).substring(1);
     }
 
     /* (non-Javadoc)
@@ -178,9 +197,10 @@ public class RampartBasedSecurityManager extends SecurityManager {
                         RahasConstants.VERSION_05_02,
                         RahasConstants.RST_ACTION_SCT);
                 
-                Policy servicePolicy = message.getEffectivePolicy();
+                Policy servicePolicy = (Policy)message.getProperty(RampartMessageData.KEY_RAMPART_POLICY);
                 if(servicePolicy == null) {
-                    throw new SandeshaException("service policy missing");
+                    String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noServicePolicy);
+                    throw new SandeshaException(msg);
                 }
                 List it = (List)servicePolicy.getAlternatives().next();
                 RampartPolicyData rpd = RampartPolicyBuilder.build(it);
@@ -198,16 +218,23 @@ public class RampartBasedSecurityManager extends SecurityManager {
                 if(secConvTok != null) {
                     
                     Policy issuerPolicy = secConvTok.getBootstrapPolicy();
+                    issuerPolicy.addAssertion(rpd.getRampartConfig());
                     
                     STSClient client = new STSClient(message.getConfigurationContext());
+                    Options op = new Options();
+                    op.setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE, Constants.VALUE_TRUE);
+                    client.setOptions(op);
                     client.setAction(action);
                     client.setRstTemplate(rstTmpl);
                     client.setCryptoInfo(RampartUtil.getEncryptionCrypto(rpd
                             .getRampartConfig(), message.getAxisService()
                             .getClassLoader()), RampartUtil.getPasswordCB(
                             message, rpd));
+                    String address = message.getTo().getAddress();
                     Token tok = client.requestSecurityToken(servicePolicy,
-                            message.getTo().getAddress(), issuerPolicy, null);
+                            address, issuerPolicy, null);
+                    
+                    tok.setState(Token.ISSUED);
                     this.storage.add(tok);
                     
                     contextIdentifierKey = RampartUtil.getContextIdentifierKey(message);
@@ -243,7 +270,7 @@ public class RampartBasedSecurityManager extends SecurityManager {
 
         OMElement refElem = theSTR.getFirstChildWithName(Reference.TOKEN);
         String id = refElem.getAttributeValue(new QName("URI"));
-        return this.recoverSecurityToken(id);
+        return this.recoverSecurityToken(id.substring(1));
     }
 
     /* (non-Javadoc)
@@ -251,7 +278,7 @@ public class RampartBasedSecurityManager extends SecurityManager {
      */
     public String getTokenRecoveryData(SecurityToken token)
             throws SandeshaException {
-        return ((RampartSecurityToken)token).getToken().getId();
+        return ((RampartSecurityToken)token).getToken().getId().substring(1);
     }
 
     /* (non-Javadoc)

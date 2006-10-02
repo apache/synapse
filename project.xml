@@ -116,6 +116,18 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <type>mar</type>
         </dependency>
         <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>rampart</artifactId>
+            <version>${rampart.version}</version>
+            <type>mar</type>
+        </dependency>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>rahas</artifactId>
+            <version>${rahas.version}</version>
+            <type>mar</type>
+        </dependency>
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons.logging.version}</version>
@@ -223,7 +235,22 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
                 <module>true</module>
             </properties>
         </dependency>
-		
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>${xmlsec.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>bouncycastle</groupId>
+            <artifactId>bcprov</artifactId>
+            <version>${bcprov.version}</version>
+            <properties>
+                <module>true</module>
+            </properties>
+        </dependency>
     </dependencies>
 
     <!-- ======= -->

@@ -32,7 +32,10 @@
     <ant:property name="repo.addressing.mar.full.name" value="${repo.addressing.mar.name}-${addressing.version}.mar" />
     <ant:property name="repo.addressing.mar.path" value="${maven.repo.local}/axis2/mars" />
     <ant:property name="repo.addressing.mar" value="${repo.addressing.mar.path}/${repo.addressing.mar.full.name}" />
-   
+    <ant:property name="repo.rampart.mar" value="${maven.repo.local}/axis2/mars/rampart-${rampart.version}.mar" />
+	<ant:property name="repo.rahas.mar" value="${maven.repo.local}/axis2/mars/rahas-${rahas.version}.mar" />
+	
+	
     <goal name="build:all" prereqs="mar,jar,client:jar,policy:jar,sample:create,repo:create,test:test" />
     
     <goal name="all:jar" prereqs="mar,jar,client:jar,policy:jar" />
@@ -159,6 +162,7 @@
 		
 		<!-- Copying addressing mar file--> 
 		<ant:copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
+		<ant:copy file="${repo.rampart.mar}" toDir="${client.dist.path}/modules/" />
 	</goal>
 
 	<goal name="secure:create" prereqs="server:create,client:create">
@@ -209,7 +213,9 @@
         </ant:copy>
         
         <!-- Copying addressing mar file-->
-        <ant:copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" /> 
+        <ant:copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" />
+		<ant:copy file="${repo.rampart.mar}" toDir="${server.dist.path}/modules/" />
+		<ant:copy file="${repo.rahas.mar}" toDir="${server.dist.path}/modules/" />
 	</goal>
 	
     <goal name="sample:compile">
@@ -282,6 +288,7 @@
    <goal name="interop:create" prereqs="interop:compile,repo:create">
         <ant:property name="dir.interop.service.temp" value="${build.temp.dir}/interopService" />
         <ant:property name="interop.service.aar.name" value="RMInteropService.aar" />
+		<ant:property name="interop.sec.service.aar.name" value="SecRMInteropService.aar" />
         
         <ant:mkdir dir="${dir.interop.service.temp}" />
         <ant:mkdir dir="${dir.interop.service.temp}/META-INF" />
@@ -293,9 +300,15 @@
             </ant:fileset>
         </ant:copy>
         
-        <ant:jar jarfile="${build.interop.dir}/${interop.service.aar.name}" basedir="${dir.interop.service.temp}" />
-        <ant:copy file="${build.interop.dir}/${interop.service.aar.name}" toDir="${build.repo.dir}/server/services" />
-	
+        <ant:jar jarfile="${build.interop.dir}/${interop.service.aar.name}" basedir="${dir.interop.service.temp}"  overwrite="true"/>
+        <ant:copy file="${build.interop.dir}/${interop.service.aar.name}" toDir="${build.repo.dir}/server/services"  overwrite="true"/>
+
+        <ant:copy file="${dir.interop}/conf/sec-services.xml" toFile="${dir.interop.service.temp}/META-INF/services.xml" overwrite="true"/>
+		<ant:copy file="${dir.interop}/conf/store.jks" toFile="${dir.interop.service.temp}/META-INF/store.jks" overwrite="true"/>
+        <ant:jar jarfile="${build.interop.dir}/${interop.sec.service.aar.name}" basedir="${dir.interop.service.temp}"  overwrite="true"/>
+        <ant:copy file="${build.interop.dir}/${interop.sec.service.aar.name}" toDir="${build.repo.dir}/server/services"  overwrite="true"/>
+
+		
     </goal>
 
     <preGoal name="test:test" > 

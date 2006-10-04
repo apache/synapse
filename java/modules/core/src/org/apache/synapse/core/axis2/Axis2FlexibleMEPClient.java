@@ -19,12 +19,11 @@ package org.apache.synapse.core.axis2;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
@@ -36,7 +35,9 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyEngine;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -59,19 +60,18 @@ public class Axis2FlexibleMEPClient {
      *
      * @param wsAddressingEnabled
      * @param wsSecurityEnabled
-     * @param outflowSecurityParameter
+     * @param wsSecPolicyKey
      * @param wsRMEnabled
-     * @param wsRMPolicy
+     * @param wsRMPolicyKey
      * @param synapseOutMessageContext
      * @return The Axis2 reponse message context
      */
     public static MessageContext send(
         boolean wsAddressingEnabled,
         boolean wsSecurityEnabled,
-        Parameter outflowSecurityParameter,
-        Parameter inflowSecurityParameter,
+        String wsSecPolicyKey,
         boolean wsRMEnabled,
-        Policy wsRMPolicy,
+        String wsRMPolicyKey,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
 
         MessageContext axisOutMsgCtx =
@@ -112,11 +112,13 @@ public class Axis2FlexibleMEPClient {
         Options clientOptions = new Options();
         clientOptions.setTransportInProtocol(org.apache.axis2.Constants.TRANSPORT_HTTP);
 
-        // if RM is requested, and if a WS-RM policy is specified, use it
+        // if RM is requested,
         if (wsRMEnabled) {
-            if (wsRMPolicy != null) {
-                axisAnonymousOperation.getPolicyInclude().
-                    addPolicyElement(PolicyInclude.OPERATION_POLICY, wsRMPolicy);
+            // if a WS-RM policy is specified, use it
+            if (wsRMPolicyKey != null) {
+                clientOptions.setProperty(
+                    org.apache.synapse.config.xml.Constants.SANDESHA_POLICY,
+                    getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
             clientOptions.setUseSeparateListener(true);
 
@@ -126,18 +128,11 @@ public class Axis2FlexibleMEPClient {
 
         // if security is enabled,
         if (wsSecurityEnabled) {
-            // if a WS-Sec OutflowSecurity parameter is specified, use it
-            if (outflowSecurityParameter != null) {
+            // if a WS-Sec policy is specified, use it
+            if (wsSecPolicyKey != null) {
                 clientOptions.setProperty(
-                org.apache.synapse.config.xml.Constants.OUTFLOW_SECURITY,
-                outflowSecurityParameter);
-            }
-
-            // if a WS-Sec InflowSecurity parameter is specified, use it
-            if (inflowSecurityParameter != null) {
-                clientOptions.setProperty(
-                org.apache.synapse.config.xml.Constants.INFLOW_SECURITY,
-                inflowSecurityParameter);
+                    org.apache.synapse.config.xml.Constants.RAMPART_POLICY,
+                    getPolicy(synapseOutMessageContext, wsSecPolicyKey));
             }
         }
 
@@ -178,6 +173,27 @@ public class Axis2FlexibleMEPClient {
 
             return response;
         }
+    }
+
+    /**
+     * Get the Policy object for the given name from the Synapse configuration at runtime
+     * @param synCtx the current synapse configuration to get to the synapse configuration
+     * @param propertyKey the name of the property which holds the Policy required
+     * @return the Policy object with the given name, from the configuration
+     */
+    private static Policy getPolicy(org.apache.synapse.MessageContext synCtx, String propertyKey) {
+        Object property = synCtx.getConfiguration().getProperty(propertyKey);
+        if (property != null && property instanceof OMElement) {
+            return PolicyEngine.getPolicy((OMElement) property);
+        } else {
+            handleException("Cannot locate Policy from the property : " + propertyKey);
+        }
+        return null;
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
     /**

@@ -56,17 +56,14 @@ public interface Constants {
     /** If the message context contains a Boolean.TRUE with this key, RM would be turned on send */
     String OUTFLOW_RM_ON = "OUTFLOW_RM_ON";
 
-    /** The message context property name which holds the RM policy to be used for outgoing messages */
+    /** The message context property name which holds the RM 'Policy' object for outgoing messages */
     String OUTFLOW_RM_POLICY = "OUTFLOW_RM_POLICY";
 
     /** If the message context contains a Boolean.TRUE with this key, Rampart would be engaged on send */
     String OUTFLOW_SECURITY_ON = "OUTFLOW_SECURITY_ON";
 
-    /** The message context property name which holds the Security 'Parameter' object to be used for outgoing messages */
-    String OUTFLOW_SEC_PARAMETER = "OUTFLOW_SEC_PARAMETER";
-
-    /** The message context property name which holds the Security 'Parameter' object to be used for incoming messages */
-    String INFLOW_SEC_PARAMETER = "INFLOW_SEC_PARAMETER";
+    /** The message context property name which holds the Security 'Policy' object for outgoing messages */
+    String OUTFLOW_SEC_POLICY = "OUTFLOW_SEC_POLICY";
 
     /** The message context property name which holds the error code for the last encountered exception */
     String ERROR_CODE = "ERROR_CODE";

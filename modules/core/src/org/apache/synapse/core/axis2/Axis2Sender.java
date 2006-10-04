@@ -54,19 +54,15 @@ public class Axis2Sender {
                     // WS-Sec default is off
                     (wsSecOn != null && wsSecOn.booleanValue()),
 
-                    // The OutflowSecurity Parameter
-                    (Parameter) synapseInMessageContext.getProperty(
-                        Constants.OUTFLOW_SEC_PARAMETER),
-
-                    // The InflowSecurity Parameter
-                    (Parameter) synapseInMessageContext.getProperty(
-                        Constants.INFLOW_SEC_PARAMETER),
+                    // The Rampart security policy
+                    (String) synapseInMessageContext.getProperty(
+                        Constants.OUTFLOW_SEC_POLICY),
 
                     // WS-RM default is off
                     (wsRmOn != null && wsRmOn.booleanValue()),
 
-                    // The outflow RM Policy (or override)
-                    (Policy) synapseInMessageContext.getProperty(
+                    // The Sandesha security policy
+                    (String) synapseInMessageContext.getProperty(
                         Constants.OUTFLOW_RM_POLICY),
 
                     // The Axis2 Message context of the Synapse MC

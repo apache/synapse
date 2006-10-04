@@ -35,19 +35,8 @@ import java.net.URL;
  *
  *    .. extensibility ..
  *
- *    <!-- Axis2 Rampart configurations : may be obsolete soon -->
- *    <parameter name="OutflowSecurity">
- *      ...
- *    </parameter>+
- *
- *    <!-- Apache Sandesha configurations : may be obsolete soon -->
- *    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..
- *      xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
- *      ...
- *    </Policy>+
- *
- *    <enableRM/>+
- *    <enableSec/>+
+ *    <enableRM [policy="key"]/>+
+ *    <enableSec [policy="key"]/>+
  *    <enableAddressing/>+
  *
  * </endpoint>
@@ -91,24 +80,22 @@ public class EndpointFactory implements XMLToObjectMapper {
                 new QName(Constants.SYNAPSE_NAMESPACE, "enableSec"));
             if (wsSec != null) {
                 endpoint.setSecurityOn(true);
+                OMAttribute policy = wsSec.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, "policy"));
+                if (policy != null) {
+                    endpoint.setWsSecPolicyKey(policy.getAttributeValue());
+                }
             }
             OMElement wsRm = elem.getFirstChildWithName(
                 new QName(Constants.SYNAPSE_NAMESPACE, "enableRM"));
             if (wsRm != null) {
                 endpoint.setReliableMessagingOn(true);
+                OMAttribute policy = wsRm.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, "policy"));
+                if (policy != null) {
+                    endpoint.setWsRMPolicyKey(policy.getAttributeValue());
+                }
             }
-
-            // if a Rampart OutflowSecurity parameter is specified, digest it
-            endpoint.setOutflowSecurity(
-                RampartSecurityBuilder.getSecurityParameter(elem, Constants.OUTFLOW_SECURITY));
-
-            // if a Rampart InflowSecurity parameter is specified, digest it
-            endpoint.setInflowSecurity(
-                RampartSecurityBuilder.getSecurityParameter(elem, Constants.INFLOW_SECURITY));
-
-            // if WS-RM is enabled, set it as requested
-            //endpoint.setReliableMessagingOn(OutflowRMPolicyBuilder.isRMEnabled(elem));
-            endpoint.setWsRMPolicy(OutflowRMPolicyBuilder.getRMPolicy(elem));
 
             return endpoint;
         }

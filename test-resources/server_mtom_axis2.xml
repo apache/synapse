@@ -85,7 +85,7 @@
     <!-- ================================================= -->
     <!-- Phases  -->
     <!-- ================================================= -->
-    <phaseOrder type="inflow">
+    <phaseOrder type="InFlow">
         <!--  System pre defined phases       -->
          <phase name="Transport">
             <handler name="RequestURIBasedDispatcher"
@@ -119,7 +119,7 @@
         <phase name="RMPhase"/>
         <phase name="OperationInPhase"/>
     </phaseOrder>
-    <phaseOrder type="outflow">
+    <phaseOrder type="OutFlow">
         <!--      user can add his own phases to this area  -->
         <phase name="OperationOutPhase"/>
         <phase name="RMPhase"/>
@@ -128,7 +128,7 @@
         <phase name="PolicyDetermination"/>
         <phase name="MessageOut"/>
     </phaseOrder>
-    <phaseOrder type="INfaultflow">
+    <phaseOrder type="InFaultFlow">
         <phase name="PreDispatch"/>
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
             <handler name="RequestURIBasedDispatcher"
@@ -159,7 +159,7 @@
         <phase name="RMPhase"/>
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
-    <phaseOrder type="Outfaultflow">
+    <phaseOrder type="OutFaultFlow">
         <!--      user can add his own phases to this area  -->
         <phase name="OperationOutFaultPhase"/>
         <phase name="RMPhase"/>

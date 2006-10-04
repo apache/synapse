@@ -1,0 +1,1 @@
+The original file is in the SVN under Axis2/modules/integration/test

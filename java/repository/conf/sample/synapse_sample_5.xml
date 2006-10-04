@@ -1,0 +1,35 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+  
+  <definitions>
+    
+    <set-property name="policy_1" src="file:synapse_repository/conf/policy_1.xml"/>
+    <set-property name="policy_3" src="file:synapse_repository/conf/policy_3.xml"/>
+    
+    <endpoint name="secureEndpoint1" address="http://localhost:9001/axis2/services/SecureStockQuoteService1">
+   		<enableSec policy="policy_1"/>
+   	</endpoint>
+   	
+   	<endpoint name="secureEndpoint3" address="http://localhost:9001/axis2/services/SecureStockQuoteService3">
+   		<enableSec policy="policy_3"/>
+   	</endpoint>
+
+  </definitions>
+
+  <rules>
+  	<filter source="get-property('To')" regex=".*/SecureStockQuoteService1.*">
+  		<send>
+  			<endpoint ref="secureEndpoint1"/>
+  		</send>
+  		<drop/>
+  	</filter>
+  	
+  	<filter source="get-property('To')" regex=".*/SecureStockQuoteService3.*">
+  		<send>
+  			<endpoint ref="secureEndpoint3"/>
+  		</send>
+  		<drop/>
+  	</filter>
+  	<send/>
+  </rules>
+
+</synapse> 

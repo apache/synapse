@@ -93,9 +93,9 @@ public class SendMediator extends AbstractMediator {
             if (singleEndpoint.isReliableMessagingOn()) {
                 synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
                 synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
-                if (singleEndpoint.getWsRMPolicy() != null) {
+                if (singleEndpoint.getWsRMPolicyKey() != null) {
                     synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
-                        singleEndpoint.getWsRMPolicy());
+                        singleEndpoint.getWsRMPolicyKey());
                 }
             }
 
@@ -103,13 +103,9 @@ public class SendMediator extends AbstractMediator {
             if (singleEndpoint.isSecurityOn()) {
                 synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
                 synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
-                if (singleEndpoint.getOutflowSecurity() != null) {
-                    synCtx.setProperty(Constants.OUTFLOW_SEC_PARAMETER,
-                        singleEndpoint.getOutflowSecurity());
-                }
-                if (singleEndpoint.getInflowSecurity() != null) {
-                    synCtx.setProperty(Constants.INFLOW_SEC_PARAMETER,
-                        singleEndpoint.getInflowSecurity());
+                if (singleEndpoint.getWsSecPolicyKey() != null) {
+                    synCtx.setProperty(Constants.OUTFLOW_SEC_POLICY,
+                        singleEndpoint.getWsSecPolicyKey());
                 }
             }
 

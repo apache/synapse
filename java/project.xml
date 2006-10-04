@@ -109,7 +109,16 @@
         <dependency>
             <groupId>axis2</groupId>
             <artifactId>axis2-secpolicy</artifactId>
-            <version>${secpolicy.version}</version>
+            <version>${axis2.version}</version>
+            <properties>
+                <module>false</module>
+            </properties>
+        </dependency>
+        
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2-security</artifactId>
+            <version>${axis2.version}</version>
             <properties>
                 <module>false</module>
             </properties>

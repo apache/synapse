@@ -67,8 +67,6 @@
     <!--        <parameter name="RSS_URL" locked="false">http://127.0.0.1/rss</parameter>-->
     <!--    </listener>-->
 
-    <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
-    
     <!-- ================================================= -->
     <!-- Message Receivers -->
     <!-- ================================================= -->
@@ -111,6 +109,28 @@
         <!-- <parameter name="RequestMaxThreadPoolSize"  locked="false">100</parameter>                     -->
         <!-- <parameter name="threadKeepAliveTime"       locked="false">240000</parameter>                  -->
         <!-- <parameter name="threadKeepAliveTimeUnit"   locked="false">MILLISECONDS</parameter>            -->
+    <!--</transportReceiver>-->
+    
+    <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
+    <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
+        <parameter name="myTopicConnectionFactory" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">TopicConnectionFactory</parameter>
+        </parameter>
+
+        <parameter name="myQueueConnectionFactory" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">QueueConnectionFactory</parameter>
+        </parameter>
+
+        <parameter name="default" locked="false">        	        	
+        	<parameter name="java.naming.factory.initial" locked="false">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
+        	<parameter name="java.naming.provider.url" locked="false">tcp://localhost:61616</parameter>        	
+        	<parameter name="transport.jms.ConnectionFactoryJNDIName" locked="false">QueueConnectionFactory</parameter>
+        </parameter>
+    </transportReceiver>-->
 
     <!--Uncomment if you want to have SMTP transport support-->
     <!--<transportReceiver name="mail" class="org.apache.axis2.transport.mail.SimpleMailListener">-->
@@ -197,7 +217,7 @@
     <!-- ================================================= -->
     <!-- Phases  -->
     <!-- ================================================= -->
-    <phaseOrder type="inflow">
+    <phaseOrder type="InFlow">
         <!--  System pre defined phases       -->
          <phase name="Transport">
             <handler name="RequestURIBasedDispatcher"
@@ -232,7 +252,7 @@
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
         <phase name="OperationInPhase"/>
     </phaseOrder>
-    <phaseOrder type="outflow">
+    <phaseOrder type="OutFlow">
         <!--      user can add his own phases to this area  -->
         <phase name="MUPhase"/> <!-- Must Understand Header processing phase -->
         <phase name="RMPhase"/>
@@ -243,7 +263,7 @@
         <phase name="MessageOut"/>
         <phase name="Security"/>
     </phaseOrder>
-    <phaseOrder type="INfaultflow">
+    <phaseOrder type="InFaultFlow">
         <phase name="PreDispatch"/>
         <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
             <handler name="RequestURIBasedDispatcher"
@@ -275,7 +295,7 @@
         <phase name="MUPhase"/> <!-- Must Understand Header processing phase -->
         <phase name="OperationInFaultPhase"/>
     </phaseOrder>
-    <phaseOrder type="Outfaultflow">
+    <phaseOrder type="OutFaultFlow">
         <!--      user can add his own phases to this area  -->
         <phase name="MUPhase"/> <!-- Must Understand Header processing phase -->
         <phase name="RMPhase"/>

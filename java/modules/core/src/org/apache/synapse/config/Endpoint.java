@@ -15,8 +15,6 @@
 */
 package org.apache.synapse.config;
 
-import org.apache.axis2.description.Parameter;
-import org.apache.neethi.Policy;
 
 import java.net.URL;
 
@@ -41,12 +39,10 @@ public class Endpoint {
     private boolean addressingOn = false;
     /** Should messages be sent using WS-Security? */
     private boolean securityOn = false;
-    /** Any WS-RM Policy overrides to be used when communicating with this endpoint */
-    private Policy wsRMPolicy = null;
-    /** The Apache Rampart OutflowSecurity configuration to be used */
-    private Parameter outflowSecurity = null;
-    /** The Apache Rampart InflowSecurity configuration to be used */
-    private Parameter inflowSecurity = null;
+    /** The "key" for any WS-RM Policy overrides to be used */
+    private String wsRMPolicyKey = null;
+    /** The "key" for any Rampart Security Policy to be used */
+    private String wsSecPolicyKey = null;
 
     /**
      * Return the name of the endpoint
@@ -145,50 +141,34 @@ public class Endpoint {
     }
 
     /**
-     * Return the OutflowSecurity configuration to be used (See Rampart)
-     * @return the OutflowSecurity to be used, or null if WS-Sec is not on
+     * Return the Rampart Security configuration policys' 'key' to be used (See Rampart)
+     * @return the ORampart Security configuration policys' 'key' to be used (See Rampart)
      */
-    public Parameter getOutflowSecurity() {
-        return outflowSecurity;
+    public String getWsSecPolicyKey() {
+        return wsSecPolicyKey;
     }
 
     /**
-     * Set the OutflowSecurity configuration to be used (See Apache Rampart)
-     * @param outflowSecurity the Rampart OutflowSecurity configuration to be used if any
+     * Set the Rampart Security configuration policys' 'key' to be used (See Rampart)
+     * @param wsSecPolicyKey the Rampart Security configuration policys' 'key' to be used (See Rampart)
      */
-    public void setOutflowSecurity(Parameter outflowSecurity) {
-        this.outflowSecurity = outflowSecurity;
+    public void setWsSecPolicyKey(String wsSecPolicyKey) {
+        this.wsSecPolicyKey = wsSecPolicyKey;
     }
 
     /**
-     * Return the InflowSecurity configuration to be used (See Rampart)
-     * @return the InflowSecurity to be used, or null if WS-Sec is not on
+     * Get the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     * @return the WS-RM configuration policys' 'key' to be used (See Sandesha2)
      */
-    public Parameter getInflowSecurity() {
-        return inflowSecurity;
+    public String getWsRMPolicyKey() {
+        return wsRMPolicyKey;
     }
 
     /**
-     * Set the InflowSecurity configuration to be used (See Apache Rampart)
-     * @param inflowSecurity the Rampart InflowSecurity configuration to be used if any
+     * Set the WS-RM configuration policys' 'key' to be used (See Sandesha2)
+     * @param wsRMPolicyKey the WS-RM configuration policys' 'key' to be used (See Sandesha2)
      */
-    public void setInflowSecurity(Parameter inflowSecurity) {
-        this.inflowSecurity = inflowSecurity;
-    }
-
-    /**
-     * Get the WS-RM Policy overrides
-     * @return the WS-RM Policy to be used when communicating with this endpoint
-     */
-    public Policy getWsRMPolicy() {
-        return wsRMPolicy;
-    }
-
-    /**
-     * Set the WS-RM Policy to be used when communicating with this endpoint
-     * @param wsRMPolicy the Policy override
-     */
-    public void setWsRMPolicy(Policy wsRMPolicy) {
-        this.wsRMPolicy = wsRMPolicy;
+    public void setWsRMPolicyKey(String wsRMPolicyKey) {
+        this.wsRMPolicyKey = wsRMPolicyKey;
     }
 }

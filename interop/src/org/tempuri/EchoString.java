@@ -17,40 +17,38 @@
 package org.tempuri;
 
 /**
- * EchoStringResponseBodyType0 bean class
+ * EchoString bean class
  */
 
-public class EchoStringResponseBodyType0 implements
-		org.apache.axis2.databinding.ADBBean {
+public class EchoString implements org.apache.axis2.databinding.ADBBean {
 
 	public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-			"http://tempuri.org/", "EchoStringResponse.BodyType", "ns1");
+			"http://tempuri.org/", "echoString", "ns1");
 
 	/**
-	 * field for EchoStringResponseBodyType
+	 * field for EchoString
 	 */
 
-	protected org.tempuri.EchoStringResponseBodyType localEchoStringResponseBodyType;
+	protected org.tempuri.EchoStringRequestBodyType localEchoString;
 
 	/**
 	 * Auto generated getter method
 	 * 
-	 * @return org.tempuri.EchoStringResponseBodyType
+	 * @return org.tempuri.EchoStringRequestBodyType
 	 */
-	public org.tempuri.EchoStringResponseBodyType getEchoStringResponseBodyType() {
-		return localEchoStringResponseBodyType;
+	public org.tempuri.EchoStringRequestBodyType getEchoString() {
+		return localEchoString;
 	}
 
 	/**
 	 * Auto generated setter method
 	 * 
 	 * @param param
-	 *            EchoStringResponseBodyType
+	 *            EchoString
 	 */
-	public void setEchoStringResponseBodyType(
-			org.tempuri.EchoStringResponseBodyType param) {
+	public void setEchoString(org.tempuri.EchoStringRequestBodyType param) {
 
-		this.localEchoStringResponseBodyType = param;
+		this.localEchoString = param;
 
 	}
 
@@ -73,7 +71,7 @@ public class EchoStringResponseBodyType0 implements
 				// We can safely assume an element has only one type associated
 				// with it
 
-				if (localEchoStringResponseBodyType == null) {
+				if (localEchoString == null) {
 					java.lang.String namespace = "http://tempuri.org/";
 
 					if (!namespace.equals("")) {
@@ -84,19 +82,18 @@ public class EchoStringResponseBodyType0 implements
 							prefix = org.apache.axis2.databinding.utils.BeanUtil
 									.getUniquePrefix();
 
-							xmlWriter.writeStartElement(prefix,
-									"EchoStringResponse.BodyType", namespace);
+							xmlWriter.writeStartElement(prefix, "echoString",
+									namespace);
 							xmlWriter.writeNamespace(prefix, namespace);
 							xmlWriter.setPrefix(prefix, namespace);
 
 						} else {
-							xmlWriter.writeStartElement(namespace,
-									"EchoStringResponse.BodyType");
+							xmlWriter
+									.writeStartElement(namespace, "echoString");
 						}
 
 					} else {
-						xmlWriter
-								.writeStartElement("EchoStringResponse.BodyType");
+						xmlWriter.writeStartElement("echoString");
 					}
 
 					// write the nil attribute
@@ -105,8 +102,8 @@ public class EchoStringResponseBodyType0 implements
 							"true", xmlWriter);
 					xmlWriter.writeEndElement();
 				} else {
-					localEchoStringResponseBodyType.getOMElement(MY_QNAME,
-							factory).serialize(xmlWriter);
+					localEchoString.getOMElement(MY_QNAME, factory).serialize(
+							xmlWriter);
 				}
 
 			}
@@ -136,10 +133,12 @@ public class EchoStringResponseBodyType0 implements
 					java.lang.String attName, java.lang.String attValue,
 					javax.xml.stream.XMLStreamWriter xmlWriter)
 					throws javax.xml.stream.XMLStreamException {
-
-				registerPrefix(xmlWriter, namespace);
-
-				xmlWriter.writeAttribute(namespace, attName, attValue);
+				if (namespace.equals("")) {
+					xmlWriter.writeAttribute(attName, attValue);
+				} else {
+					registerPrefix(xmlWriter, namespace);
+					xmlWriter.writeAttribute(namespace, attName, attValue);
+				}
 			}
 
 			/**
@@ -189,11 +188,11 @@ public class EchoStringResponseBodyType0 implements
 
 		// We can safely assume an element has only one type associated with it
 
-		if (localEchoStringResponseBodyType == null) {
+		if (localEchoString == null) {
 			return new org.apache.axis2.databinding.utils.reader.NullXMLStreamReader(
 					MY_QNAME);
 		} else {
-			return localEchoStringResponseBodyType.getPullParser(MY_QNAME);
+			return localEchoString.getPullParser(MY_QNAME);
 		}
 
 	}
@@ -213,10 +212,9 @@ public class EchoStringResponseBodyType0 implements
 		 * is a complex type, the reader is positioned at the end element of its
 		 * outer element
 		 */
-		public static EchoStringResponseBodyType0 parse(
-				javax.xml.stream.XMLStreamReader reader)
+		public static EchoString parse(javax.xml.stream.XMLStreamReader reader)
 				throws java.lang.Exception {
-			EchoStringResponseBodyType0 object = new EchoStringResponseBodyType0();
+			EchoString object = new EchoString();
 			int event;
 			try {
 
@@ -252,12 +250,11 @@ public class EchoStringResponseBodyType0 implements
 
 						if (reader.isStartElement()
 								&& new javax.xml.namespace.QName(
-										"http://tempuri.org/",
-										"EchoStringResponse.BodyType")
+										"http://tempuri.org/", "echoString")
 										.equals(reader.getName())) {
 
 							object
-									.setEchoStringResponseBodyType(org.tempuri.EchoStringResponseBodyType.Factory
+									.setEchoString(org.tempuri.EchoStringRequestBodyType.Factory
 											.parse(reader));
 
 						} // End of if for expected property start element

@@ -28,6 +28,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -40,6 +41,12 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.interop.RMInteropServiceCallbackHandlerImpl;
+import org.apache.sandesha2.interop.RMInteropServiceStub;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.tempuri.EchoString;
+import org.tempuri.EchoStringRequestBodyType;
 
 public class Scenario_2_2 {
 	
@@ -55,8 +62,8 @@ public class Scenario_2_2 {
 	private static String transportToIP = "127.0.0.1";
 	private static String transportToPort = "8070";
 	private static String servicePart = "/axis2/services/RMInteropService";
-	private static String toEPR = "http://" + toIP +  ":" + toPort + servicePart;
-	private static String transportToEPR = "http://" + transportToIP +  ":" + transportToPort + servicePart;
+	private static String toAddress = "http://" + toIP +  ":" + toPort + servicePart;
+	private static String transportToAddress = "http://" + transportToIP +  ":" + transportToPort + servicePart;
 	
 	private static String SANDESHA2_HOME = "<SANDESHA2_HOME>"; //Change this to ur path.
 	
@@ -79,11 +86,12 @@ public class Scenario_2_2 {
 		Properties properties = new Properties();
 		if (in != null) {
 			properties.load(in);
-			toEPR = properties.getProperty("to");
-			transportToEPR = properties.getProperty("transportTo");
+			toAddress = properties.getProperty("to");
+			transportToAddress = properties.getProperty("transportTo");
 		}
 		
-		new Scenario_2_2 ().run();
+//		new Scenario_2_2 ().run();
+		new Scenario_2_2 ().runStubBased ();
 	}
 	
 	private void run () throws Exception {
@@ -102,7 +110,7 @@ public class Scenario_2_2 {
 		Options clientOptions = new Options ();
 		
 //		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
-		clientOptions.setTo(new EndpointReference (toEPR));
+		clientOptions.setTo(new EndpointReference (toAddress));
 		
 		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
@@ -110,7 +118,7 @@ public class Scenario_2_2 {
 		String sequenceKey = "sequence4";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToAddress);
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
@@ -197,6 +205,110 @@ public class Scenario_2_2 {
 			System.out.println("Error reported for test call back");
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private ConfigurationContext getConfigurationContext () throws AxisFault {
+
+		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
+			System.out.println("ERROR: Please set the directory you unzipped Sandesha2 as the first option.");
+			return null;
+		}
+
+		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
+     
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
+		return configContext;
+	}
+	
+	private void setUpOptions (Options clientOptions, String sequenceKey, String acksTo) {
+
+		EndpointReference toEPR = new EndpointReference (toAddress);
+		clientOptions.setTo(toEPR);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToAddress);
+		clientOptions.setAction("urn:wsrm:EchoString");
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+		
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
+		
+		//You must set the following two properties in the request-reply case.
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		clientOptions.setUseSeparateListener(true);
+				
+	}
+	
+	
+	private void runStubBased () throws Exception {
+		ConfigurationContext configurationContext = getConfigurationContext();
+		
+		RMInteropServiceStub stub = new RMInteropServiceStub (configurationContext, toAddress);
+		ServiceClient stubServiceClient = stub._getServiceClient();
+		
+		String sequenceKey = "sequence4";
+		String acksTo = stubServiceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		
+		Options options = stubServiceClient.getOptions();
+		setUpOptions(options, sequenceKey, acksTo);
+		
+		EchoString echoString = new EchoString ();
+		echoString.setEchoString (new EchoStringRequestBodyType ());
+		echoString.getEchoString().setSequence(sequenceKey);
+		echoString.getEchoString().setText("echo1");
+		
+		RMInteropServiceCallbackHandlerImpl callback1 = new RMInteropServiceCallbackHandlerImpl ("callback1");
+		stub.startEchoString(echoString, callback1);
+		
+		echoString = new EchoString ();
+		echoString.setEchoString (new EchoStringRequestBodyType ());
+		echoString.getEchoString().setSequence(sequenceKey);
+		echoString.getEchoString().setText("echo2");
+		
+		RMInteropServiceCallbackHandlerImpl callback2 = new RMInteropServiceCallbackHandlerImpl ("callback2");
+		stub.startEchoString(echoString, callback2);
+		
+		echoString = new EchoString ();
+		echoString.setEchoString (new EchoStringRequestBodyType ());
+		echoString.getEchoString().setSequence(sequenceKey);
+		echoString.getEchoString().setText("echo3");
+		
+		RMInteropServiceCallbackHandlerImpl callback3 = new RMInteropServiceCallbackHandlerImpl ("callback3");
+		stub.startEchoString(echoString, callback3);
+		
+		while (!callback3.isCompleted()) {
+			Thread.sleep(2000);
+		}
+		
+		terminateSequence (stubServiceClient);
+		
+	}
+	
+	private void terminateSequence (ServiceClient serviceClient) throws Exception {
+		
+    	SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 	
+       
+		Thread.sleep(6000);
+		
+        SandeshaClient.terminateSequence(serviceClient);
+//        serviceClient.finalizeInvoke();
+        		
 	}
 
 	

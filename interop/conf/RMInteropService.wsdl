@@ -7,11 +7,14 @@
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	targetNamespace="http://tempuri.org/">
+	
 	<wsdl:types>
+	
 		<xsd:schema targetNamespace="http://tempuri.org/"
 			attributeFormDefault="unqualified"
-			elementFormDefault="unqualified">
-			<xsd:element name="PingRequest">
+			elementFormDefault="qualified" >
+			
+			<xsd:element name="Ping">
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element name="Text" minOccurs="0"
@@ -19,14 +22,7 @@
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="EchoStringRequest">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="echoString" minOccurs="0"
-							type="tns:EchoStringRequest.BodyType" nillable="true" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
+			
 			<xsd:complexType name="EchoStringRequest.BodyType">
 				<xsd:sequence>
 					<xsd:element name="Text" minOccurs="0"
@@ -35,58 +31,51 @@
 						type="xsd:string" nillable="true" />
 				</xsd:sequence>
 			</xsd:complexType>
-			<xsd:element name="EchoStringRequest.BodyType"
-				type="tns:EchoStringRequest.BodyType" nillable="true" />
-			<xsd:element name="EchoStringResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="echoStringResponse"
-							minOccurs="0" type="tns:EchoStringResponse.BodyType"
-							nillable="true" />
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
+			
+			<xsd:element name="echoString" type="tns:EchoStringRequest.BodyType" nillable="true" /> 
+
 			<xsd:complexType name="EchoStringResponse.BodyType">
 				<xsd:sequence>
 					<xsd:element name="EchoStringReturn" minOccurs="0"
 						type="xsd:string" nillable="true" />
 				</xsd:sequence>
 			</xsd:complexType>
-			<xsd:element name="EchoStringResponse.BodyType"
-				type="tns:EchoStringResponse.BodyType" nillable="true" />
-		</xsd:schema>
+			
+			<xsd:element name="echoStringResponse" type="tns:EchoStringResponse.BodyType" nillable="true"/>
+
+        </xsd:schema>
+		
 	</wsdl:types>
+	
+	
 	<wsdl:message name="EchoStringRequest">
-		<wsdl:part name="part1" element="tns:EchoStringRequest" />
+		<wsdl:part name="part1" element="tns:echoString" />
 	</wsdl:message>
+	
 	<wsdl:message name="EchoStringResponse">
-		<wsdl:part name="part1" element="tns:EchoStringResponse" />
+		<wsdl:part name="part1" element="tns:echoStringResponse" />
 	</wsdl:message>
+	
 	<wsdl:message name="PingRequest">
-		<wsdl:part name="part1" element="tns:PingRequest" />
+		<wsdl:part name="part1" element="tns:Ping" />
 	</wsdl:message>
-	<wsdl:portType name="RMInteropServicePortType">
+	
+    <wsdl:portType name="RMInteropServicePortType">
+	
 		<wsdl:operation name="EchoString">
 			<wsdl:input message="tns:EchoStringRequest"
 				wsaw:Action="urn:wsrm:EchoString" />
 			<wsdl:output message="tns:EchoStringResponse"
 				wsaw:Action="urn:wsrm:EchoStringResponse" />
 		</wsdl:operation>
+		
 		<wsdl:operation name="Ping">
 			<wsdl:input message="tns:PingRequest"
 				wsaw:Action="urn:wsrm:Ping" />
 		</wsdl:operation>
-		<wsdl:operation name="echoString">
-			<wsdl:input message="tns:EchoStringRequest"
-				wsaw:Action="urn:wsrm:EchoString" />
-			<wsdl:output message="tns:EchoStringResponse"
-				wsaw:Action="urn:wsrm:EchoStringResponse" />
-		</wsdl:operation>
-		<wsdl:operation name="ping">
-			<wsdl:input message="tns:PingRequest"
-				wsaw:Action="urn:wsrm:Ping" />
-		</wsdl:operation>
-	</wsdl:portType>
+		
+    </wsdl:portType>
+	
 	<wsdl:binding name="RMInteropServiceSOAP11Binding"
 		type="tns:RMInteropServicePortType">
 		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
@@ -107,27 +96,13 @@
 				<soap:body use="literal" />
 			</wsdl:input>
 		</wsdl:operation>
-		<wsdl:operation name="echoString">
-			<soap:operation soapAction="urn:wsrm:EchoString"
-				style="document" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="ping">
-			<soap:operation soapAction="urn:wsrm:Ping" style="document" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-		</wsdl:operation>
 	</wsdl:binding>
+	
 	<wsdl:binding name="RMInteropServiceSOAP12Binding"
 		type="tns:RMInteropServicePortType">
 		<soap12:binding transport="http://schemas.xmlsoap.org/soap/http"
 			style="document" />
+			
 		<wsdl:operation name="EchoString">
 			<soap12:operation soapAction="urn:wsrm:EchoString"
 				style="document" />
@@ -138,6 +113,7 @@
 				<soap12:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
+		
 		<wsdl:operation name="Ping">
 			<soap12:operation soapAction="urn:wsrm:Ping"
 				style="document" />
@@ -145,24 +121,9 @@
 				<soap12:body use="literal" />
 			</wsdl:input>
 		</wsdl:operation>
-		<wsdl:operation name="echoString">
-			<soap12:operation soapAction="urn:wsrm:EchoString"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap12:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="ping">
-			<soap12:operation soapAction="urn:wsrm:Ping"
-				style="document" />
-			<wsdl:input>
-				<soap12:body use="literal" />
-			</wsdl:input>
-		</wsdl:operation>
+		
 	</wsdl:binding>
+	
 	<wsdl:service name="RMInteropService">
 		<wsdl:port name="RMInteropServiceSOAP11port_http"
 			binding="tns:RMInteropServiceSOAP11Binding">
@@ -173,4 +134,5 @@
 			<soap12:address location="http://www.example.org/" />
 		</wsdl:port>
 	</wsdl:service>
+	
 </wsdl:definitions>

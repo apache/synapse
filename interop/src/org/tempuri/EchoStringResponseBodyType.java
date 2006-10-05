@@ -106,7 +106,7 @@ public class EchoStringResponseBodyType implements
 				}
 
 				if (localEchoStringReturnTracker) {
-					namespace = "";
+					namespace = "http://tempuri.org/";
 
 					if (!namespace.equals("")) {
 						prefix = xmlWriter.getPrefix(namespace);
@@ -174,10 +174,12 @@ public class EchoStringResponseBodyType implements
 					java.lang.String attName, java.lang.String attValue,
 					javax.xml.stream.XMLStreamWriter xmlWriter)
 					throws javax.xml.stream.XMLStreamException {
-
-				registerPrefix(xmlWriter, namespace);
-
-				xmlWriter.writeAttribute(namespace, attName, attValue);
+				if (namespace.equals("")) {
+					xmlWriter.writeAttribute(attName, attValue);
+				} else {
+					registerPrefix(xmlWriter, namespace);
+					xmlWriter.writeAttribute(namespace, attName, attValue);
+				}
 			}
 
 			/**
@@ -228,8 +230,8 @@ public class EchoStringResponseBodyType implements
 		java.util.ArrayList attribList = new java.util.ArrayList();
 
 		if (localEchoStringReturnTracker) {
-			elementList.add(new javax.xml.namespace.QName("",
-					"EchoStringReturn"));
+			elementList.add(new javax.xml.namespace.QName(
+					"http://tempuri.org/", "EchoStringReturn"));
 
 			elementList.add(localEchoStringReturn == null ? null
 					: org.apache.axis2.databinding.utils.ConverterUtil
@@ -313,8 +315,8 @@ public class EchoStringResponseBodyType implements
 					reader.next();
 
 				if (reader.isStartElement()
-						&& new javax.xml.namespace.QName("", "EchoStringReturn")
-								.equals(reader.getName())) {
+						&& new javax.xml.namespace.QName("http://tempuri.org/",
+								"EchoStringReturn").equals(reader.getName())) {
 
 					if (!"true"
 							.equals(reader

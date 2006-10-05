@@ -28,7 +28,7 @@ public class RMInteropServiceSkeleton {
 	 * 
 	 */
 	public org.tempuri.EchoStringResponse EchoString(
-			org.tempuri.EchoStringRequest param0)
+			org.tempuri.EchoString param0)
 
 	{
 		// Todo fill this with the necessary business logic
@@ -42,35 +42,7 @@ public class RMInteropServiceSkeleton {
 	 * @param param2
 	 * 
 	 */
-	public void Ping(org.tempuri.PingRequest param2)
-
-	{
-		// Todo fill this with the necessary business logic
-
-	}
-
-	/**
-	 * Auto generated method signature
-	 * 
-	 * @param param3
-	 * 
-	 */
-	public org.tempuri.EchoStringResponse echoString(
-			org.tempuri.EchoStringRequest param3)
-
-	{
-		// Todo fill this with the necessary business logic
-		throw new java.lang.UnsupportedOperationException("Please implement "
-				+ this.getClass().getName() + "#echoString");
-	}
-
-	/**
-	 * Auto generated method signature
-	 * 
-	 * @param param5
-	 * 
-	 */
-	public void ping(org.tempuri.PingRequest param5)
+	public void Ping(org.tempuri.Ping param2)
 
 	{
 		// Todo fill this with the necessary business logic

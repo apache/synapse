@@ -26,7 +26,7 @@ public abstract class RMInteropServiceCallbackHandler {
 
 	/**
 	 * User can pass in any object that needs to be accessed once the
-	 * NonBlocking Web service call is finished and appropreate method of this
+	 * NonBlocking Web service call is finished and appropriate method of this
 	 * CallBack is called.
 	 * 
 	 * @param clientData
@@ -35,6 +35,13 @@ public abstract class RMInteropServiceCallbackHandler {
 	 */
 	public RMInteropServiceCallbackHandler(Object clientData) {
 		this.clientData = clientData;
+	}
+
+	/**
+	 * Please use this constructor if you don't want to set any clientData
+	 */
+	public RMInteropServiceCallbackHandler() {
+		this.clientData = null;
 	}
 
 	/**
@@ -49,7 +56,7 @@ public abstract class RMInteropServiceCallbackHandler {
 	 * auto generated Axis2 call back method for EchoString method
 	 * 
 	 */
-	public void receiveResultEchoString(org.tempuri.EchoStringResponse param43) {
+	public void receiveResultEchoString(org.tempuri.EchoStringResponse param22) {
 	}
 
 	/**
@@ -57,22 +64,6 @@ public abstract class RMInteropServiceCallbackHandler {
 	 * 
 	 */
 	public void receiveErrorEchoString(java.lang.Exception e) {
-	}
-
-	// No methods generated for meps other than in-out
-
-	/**
-	 * auto generated Axis2 call back method for echoString method
-	 * 
-	 */
-	public void receiveResultechoString(org.tempuri.EchoStringResponse param46) {
-	}
-
-	/**
-	 * auto generated Axis2 Error handler
-	 * 
-	 */
-	public void receiveErrorechoString(java.lang.Exception e) {
 	}
 
 	// No methods generated for meps other than in-out

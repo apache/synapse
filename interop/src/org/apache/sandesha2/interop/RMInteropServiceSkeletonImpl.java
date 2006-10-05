@@ -18,41 +18,69 @@ package org.apache.sandesha2.interop;
 
 import java.util.HashMap;
 
-import org.tempuri.EchoStringRequest;
 import org.tempuri.EchoStringResponse;
-import org.tempuri.PingRequest;
+import org.tempuri.EchoStringResponseBodyType;
 
 public class RMInteropServiceSkeletonImpl extends RMInteropServiceSkeleton {
 
-	HashMap sequenceTextMap = new HashMap ();
-	
-	public EchoStringResponse echoString(EchoStringRequest echoStringRequest) {
-		String sequence = echoStringRequest.getEchoString().getSequence();
-		String text = echoStringRequest.getEchoString().getText();
-		
-		System.out.println("EchoString got text '" + text + "', for the sequence '" + sequence + "'.") ;
-		
+	HashMap sequenceTextMap = new HashMap();
+
+	public EchoStringResponse EchoString(org.tempuri.EchoString echoString) {
+
+		String sequence = echoString.getEchoString().getSequence();
+		String text = echoString.getEchoString().getText();
+
+		System.out.println("EchoString got text '" + text
+				+ "', for the sequence '" + sequence + "'.");
+
 		String oldText = (String) sequenceTextMap.get(sequence);
-		String newText = oldText==null?text:oldText+text;
+		String newText = oldText == null ? text : oldText + text;
+
 		sequenceTextMap.put(sequence, newText);
-		
-		EchoStringResponse echoStringResponse = new EchoStringResponse ();
+
+		EchoStringResponse echoStringResponse = new EchoStringResponse();
+		echoStringResponse
+				.setEchoStringResponse(new EchoStringResponseBodyType());
 		echoStringResponse.getEchoStringResponse().setEchoStringReturn(newText);
-		
+
 		return echoStringResponse;
 	}
 
-	public EchoStringResponse EchoString(EchoStringRequest echoStringRequest) {
-		return echoString(echoStringRequest);
-	}
-
-	public void ping(PingRequest pingRequest) {
-		String text = pingRequest.getText();
+	public void Ping(org.tempuri.Ping ping) {
+		String text = ping.getText();
 		System.out.println("Ping got text '" + text + "'");
 	}
 
-	public void Ping(PingRequest pingRequest) {
-		ping(pingRequest);
-	}
+	// public EchoStringResponse echoString(EchoStringRequest echoStringRequest)
+	// {
+	// String sequence = echoStringRequest.getEchoString().getSequence();
+	// String text = echoStringRequest.getEchoString().getText();
+	//		
+	// System.out.println("EchoString got text '" + text + "', for the sequence
+	// '" + sequence + "'.") ;
+	//		
+	// String oldText = (String) sequenceTextMap.get(sequence);
+	// String newText = oldText==null?text:oldText+text;
+	// sequenceTextMap.put(sequence, newText);
+	//		
+	// EchoStringResponse echoStringResponse = new EchoStringResponse ();
+	// echoStringResponse.getEchoStringResponse().setEchoStringReturn(newText);
+	//		
+	// return echoStringResponse;
+	// }
+	//
+	// public EchoStringResponse EchoString(EchoStringRequest echoStringRequest)
+	// {
+	// return echoString(echoStringRequest);
+	// }
+	//
+	// public void ping(PingRequest pingRequest) {
+	// String text = pingRequest.getText();
+	// System.out.println("Ping got text '" + text + "'");
+	// }
+	//
+	// public void Ping(PingRequest pingRequest) {
+	// ping(pingRequest);
+	// }
 
 }

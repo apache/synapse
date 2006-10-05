@@ -55,19 +55,9 @@ public class RMInteropServiceMessageReceiverInOnly extends
 				if ("Ping".equals(methodName)) {
 
 					// doc style
-					skel.Ping((org.tempuri.PingRequest) fromOM(inMessage
-							.getEnvelope().getBody().getFirstElement(),
-							org.tempuri.PingRequest.class,
-							getEnvelopeNamespaces(inMessage.getEnvelope())));
-
-				}
-
-				if ("ping".equals(methodName)) {
-
-					// doc style
-					skel.ping((org.tempuri.PingRequest) fromOM(inMessage
-							.getEnvelope().getBody().getFirstElement(),
-							org.tempuri.PingRequest.class,
+					skel.Ping((org.tempuri.Ping) fromOM(inMessage.getEnvelope()
+							.getBody().getFirstElement(),
+							org.tempuri.Ping.class,
 							getEnvelopeNamespaces(inMessage.getEnvelope())));
 
 				}
@@ -79,10 +69,10 @@ public class RMInteropServiceMessageReceiverInOnly extends
 	}
 
 	//
-	private org.apache.axiom.om.OMElement toOM(
-			org.tempuri.EchoStringRequest param, boolean optimizeContent) {
+	private org.apache.axiom.om.OMElement toOM(org.tempuri.EchoString param,
+			boolean optimizeContent) {
 
-		return param.getOMElement(org.tempuri.EchoStringRequest.MY_QNAME,
+		return param.getOMElement(org.tempuri.EchoString.MY_QNAME,
 				org.apache.axiom.om.OMAbstractFactory.getOMFactory());
 
 	}
@@ -95,10 +85,10 @@ public class RMInteropServiceMessageReceiverInOnly extends
 
 	}
 
-	private org.apache.axiom.om.OMElement toOM(org.tempuri.PingRequest param,
+	private org.apache.axiom.om.OMElement toOM(org.tempuri.Ping param,
 			boolean optimizeContent) {
 
-		return param.getOMElement(org.tempuri.PingRequest.MY_QNAME,
+		return param.getOMElement(org.tempuri.Ping.MY_QNAME,
 				org.apache.axiom.om.OMAbstractFactory.getOMFactory());
 
 	}
@@ -129,9 +119,9 @@ public class RMInteropServiceMessageReceiverInOnly extends
 
 		try {
 
-			if (org.tempuri.EchoStringRequest.class.equals(type)) {
+			if (org.tempuri.EchoString.class.equals(type)) {
 
-				return org.tempuri.EchoStringRequest.Factory.parse(param
+				return org.tempuri.EchoString.Factory.parse(param
 						.getXMLStreamReaderWithoutCaching());
 
 			}
@@ -143,30 +133,9 @@ public class RMInteropServiceMessageReceiverInOnly extends
 
 			}
 
-			if (org.tempuri.PingRequest.class.equals(type)) {
+			if (org.tempuri.Ping.class.equals(type)) {
 
-				return org.tempuri.PingRequest.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.EchoStringRequest.class.equals(type)) {
-
-				return org.tempuri.EchoStringRequest.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.EchoStringResponse.class.equals(type)) {
-
-				return org.tempuri.EchoStringResponse.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.PingRequest.class.equals(type)) {
-
-				return org.tempuri.PingRequest.Factory.parse(param
+				return org.tempuri.Ping.Factory.parse(param
 						.getXMLStreamReaderWithoutCaching());
 
 			}

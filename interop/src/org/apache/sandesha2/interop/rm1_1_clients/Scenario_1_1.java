@@ -41,7 +41,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.interop.RMInteropServiceStub;
-import org.tempuri.PingRequest;
+import org.tempuri.Ping;
 
 public class Scenario_1_1 {
 
@@ -84,7 +84,8 @@ public class Scenario_1_1 {
 
 
 //		new Scenario_1_1 ().run();
-		new Scenario_1_1 ().runStub();
+		
+		new Scenario_1_1 ().runStubBased ();
 	}
 	
 	private void run () throws Exception {
@@ -102,7 +103,22 @@ public class Scenario_1_1 {
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
-		terminateSequence(serviceClient);
+		SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==1) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 		
+		
+		SandeshaClient.terminateSequence(serviceClient);
 		
 		serviceClient.finalizeInvoke();
 	}
@@ -119,28 +135,47 @@ public class Scenario_1_1 {
 		return pingElem;
 	}
 	
-	private void runStub () throws Exception {
+	private void runStubBased () throws Exception {
 		String targetEndpoint = toEPR;
 		ConfigurationContext configurationContext = generateConfigContext();
 		
 		RMInteropServiceStub stub = new RMInteropServiceStub (configurationContext, targetEndpoint);
-		setUpOptions(stub._getServiceClient().getOptions());
+		ServiceClient stubServiceClient = stub._getServiceClient();
+		setUpOptions(stubServiceClient.getOptions());
 		
-		PingRequest pingRequest = new PingRequest ();
-		pingRequest.setText("ping1");
-		stub.ping(pingRequest);
+		Ping ping = new Ping ();
+		ping.setText("ping1");
+		stub.Ping (ping);
 		
-		pingRequest = new PingRequest ();
-		pingRequest.setText("ping2");
-		stub.ping(pingRequest);
+		ping = new Ping ();
+		ping.setText("ping2");
+		stub.Ping (ping);
 		
-		pingRequest = new PingRequest ();
-		pingRequest.setText("ping3");
-		stub.ping(pingRequest);
+		ping = new Ping ();
+		ping.setText("ping3");
+		stub.Ping (ping);
 		
-		terminateSequence(stub._getServiceClient());
+		
+		SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(stubServiceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 		
+		
+		SandeshaClient.terminateSequence(stubServiceClient);
+		
+		Thread.sleep(3000);
+		
 		stub._getServiceClient().finalizeInvoke();
-		
 	}
 	
 	private ConfigurationContext generateConfigContext () throws Exception {
@@ -173,23 +208,5 @@ public class Scenario_1_1 {
 		
 	}
 	
-	private void terminateSequence (ServiceClient serviceClient) throws SandeshaException {
-		SequenceReport sequenceReport = null;		
-		boolean complete = false;
-		while (!complete) {
-			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
-				complete = true;
-			else {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-	    		}
-			}
-		} 		
-		
-		SandeshaClient.terminateSequence(serviceClient);
-	}
 	
 }

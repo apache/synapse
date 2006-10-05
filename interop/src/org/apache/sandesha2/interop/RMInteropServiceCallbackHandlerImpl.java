@@ -20,9 +20,11 @@ import org.tempuri.EchoStringResponse;
 
 public class RMInteropServiceCallbackHandlerImpl extends
 		RMInteropServiceCallbackHandler {
-	
+
+	private boolean completed = false;
+
 	public RMInteropServiceCallbackHandlerImpl(Object clientData) {
-		super (clientData);
+		super(clientData);
 	}
 
 	public Object getClientData() {
@@ -30,23 +32,25 @@ public class RMInteropServiceCallbackHandlerImpl extends
 		return super.getClientData();
 	}
 
-	public void receiveErrorechoString(Exception e) {
+	public void receiveErrorEchoString(Exception e) {
 		System.out.println("EchoString callback got error:");
 		e.printStackTrace();
-	}
-
-	public void receiveErrorEchoString(Exception e) {
-		receiveErrorEchoString(e);
-	}
-
-	public void receiveResultechoString(EchoStringResponse echoStringResponse) {
-		String text = echoStringResponse.getEchoStringResponse().getEchoStringReturn();
-		System.out.println("EchoSting callback got text:" + text);
+		completed = true;
 	}
 
 	public void receiveResultEchoString(EchoStringResponse echoStringResponse) {
-		receiveResultechoString(echoStringResponse);
+		String text = echoStringResponse.getEchoStringResponse()
+				.getEchoStringReturn();
+		System.out.println("EchoSting callback got text:" + text);
+		completed = true;
 	}
-	
-	
+
+	public boolean isCompleted() {
+		return completed;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
+	}
+
 }

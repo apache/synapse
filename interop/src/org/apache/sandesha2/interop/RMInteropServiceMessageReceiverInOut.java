@@ -14,7 +14,6 @@
  * the License.
  */
 
-
 package org.apache.sandesha2.interop;
 
 /**
@@ -56,36 +55,18 @@ public class RMInteropServiceMessageReceiverInOut extends
 
 				if ("EchoString".equals(methodName)) {
 
-					org.tempuri.EchoStringResponse param7 = null;
+					org.tempuri.EchoStringResponse param4 = null;
 
 					// doc style
-					org.tempuri.EchoStringRequest wrappedParam = (org.tempuri.EchoStringRequest) fromOM(
+					org.tempuri.EchoString wrappedParam = (org.tempuri.EchoString) fromOM(
 							msgContext.getEnvelope().getBody()
 									.getFirstElement(),
-							org.tempuri.EchoStringRequest.class,
+							org.tempuri.EchoString.class,
 							getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-					param7 = skel.EchoString(wrappedParam);
+					param4 = skel.EchoString(wrappedParam);
 
-					envelope = toEnvelope(getSOAPFactory(msgContext), param7,
-							false);
-
-				}
-
-				if ("echoString".equals(methodName)) {
-
-					org.tempuri.EchoStringResponse param9 = null;
-
-					// doc style
-					org.tempuri.EchoStringRequest wrappedParam = (org.tempuri.EchoStringRequest) fromOM(
-							msgContext.getEnvelope().getBody()
-									.getFirstElement(),
-							org.tempuri.EchoStringRequest.class,
-							getEnvelopeNamespaces(msgContext.getEnvelope()));
-
-					param9 = skel.echoString(wrappedParam);
-
-					envelope = toEnvelope(getSOAPFactory(msgContext), param9,
+					envelope = toEnvelope(getSOAPFactory(msgContext), param4,
 							false);
 
 				}
@@ -98,10 +79,10 @@ public class RMInteropServiceMessageReceiverInOut extends
 	}
 
 	//
-	private org.apache.axiom.om.OMElement toOM(
-			org.tempuri.EchoStringRequest param, boolean optimizeContent) {
+	private org.apache.axiom.om.OMElement toOM(org.tempuri.EchoString param,
+			boolean optimizeContent) {
 
-		return param.getOMElement(org.tempuri.EchoStringRequest.MY_QNAME,
+		return param.getOMElement(org.tempuri.EchoString.MY_QNAME,
 				org.apache.axiom.om.OMAbstractFactory.getOMFactory());
 
 	}
@@ -114,10 +95,10 @@ public class RMInteropServiceMessageReceiverInOut extends
 
 	}
 
-	private org.apache.axiom.om.OMElement toOM(org.tempuri.PingRequest param,
+	private org.apache.axiom.om.OMElement toOM(org.tempuri.Ping param,
 			boolean optimizeContent) {
 
-		return param.getOMElement(org.tempuri.PingRequest.MY_QNAME,
+		return param.getOMElement(org.tempuri.Ping.MY_QNAME,
 				org.apache.axiom.om.OMAbstractFactory.getOMFactory());
 
 	}
@@ -148,9 +129,9 @@ public class RMInteropServiceMessageReceiverInOut extends
 
 		try {
 
-			if (org.tempuri.EchoStringRequest.class.equals(type)) {
+			if (org.tempuri.EchoString.class.equals(type)) {
 
-				return org.tempuri.EchoStringRequest.Factory.parse(param
+				return org.tempuri.EchoString.Factory.parse(param
 						.getXMLStreamReaderWithoutCaching());
 
 			}
@@ -162,30 +143,9 @@ public class RMInteropServiceMessageReceiverInOut extends
 
 			}
 
-			if (org.tempuri.PingRequest.class.equals(type)) {
+			if (org.tempuri.Ping.class.equals(type)) {
 
-				return org.tempuri.PingRequest.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.EchoStringRequest.class.equals(type)) {
-
-				return org.tempuri.EchoStringRequest.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.EchoStringResponse.class.equals(type)) {
-
-				return org.tempuri.EchoStringResponse.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.PingRequest.class.equals(type)) {
-
-				return org.tempuri.PingRequest.Factory.parse(param
+				return org.tempuri.Ping.Factory.parse(param
 						.getXMLStreamReaderWithoutCaching());
 
 			}

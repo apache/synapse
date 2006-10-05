@@ -37,7 +37,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.interop.RMInteropServiceStub;
-import org.tempuri.PingRequest;
+import org.tempuri.Ping;
 
 import javax.xml.namespace.QName;
 
@@ -134,17 +134,17 @@ public class Scenario_4_1 {
         //engage Rampart
         stub._getServiceClient().engageModule(new QName("rampart"));
         
-        PingRequest pingRequest = new PingRequest ();
-        pingRequest.setText("ping1");
-        stub.ping(pingRequest);
-        
-        pingRequest = new PingRequest ();
-        pingRequest.setText("ping2");
-        stub.ping(pingRequest);
-        
-        pingRequest = new PingRequest ();
-        pingRequest.setText("ping3");
-        stub.ping(pingRequest);
+		Ping ping = new Ping ();
+		ping.setText("ping1");
+		stub.Ping (ping);
+		
+		ping = new Ping ();
+		ping.setText("ping2");
+		stub.Ping (ping);
+		
+		ping = new Ping ();
+		ping.setText("ping3");
+		stub.Ping (ping);
         
         terminateSequence(stub._getServiceClient());
         stub._getServiceClient().finalizeInvoke();

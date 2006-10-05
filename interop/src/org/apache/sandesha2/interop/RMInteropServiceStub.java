@@ -30,7 +30,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 	private java.util.HashMap faultMessageMap = new java.util.HashMap();
 
-	private void populateAxisService() {
+	private void populateAxisService() throws org.apache.axis2.AxisFault {
 
 		// creating the Service with a unique name
 		_service = new org.apache.axis2.description.AxisService(
@@ -39,35 +39,25 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 		// creating the operations
 		org.apache.axis2.description.AxisOperation __operation;
 
-		_operations = new org.apache.axis2.description.AxisOperation[4];
+		_operations = new org.apache.axis2.description.AxisOperation[2];
 
 		__operation = new org.apache.axis2.description.OutInAxisOperation();
 
 		__operation.setName(new javax.xml.namespace.QName("", "EchoString"));
 
 		_operations[0] = __operation;
+
 		_service.addOperation(__operation);
+		__operation.applyPolicy(new org.apache.neethi.Policy());
 
 		__operation = new org.apache.axis2.description.OutOnlyAxisOperation();
 
 		__operation.setName(new javax.xml.namespace.QName("", "Ping"));
 
 		_operations[1] = __operation;
+
 		_service.addOperation(__operation);
-
-		__operation = new org.apache.axis2.description.OutInAxisOperation();
-
-		__operation.setName(new javax.xml.namespace.QName("", "echoString"));
-
-		_operations[2] = __operation;
-		_service.addOperation(__operation);
-
-		__operation = new org.apache.axis2.description.OutOnlyAxisOperation();
-
-		__operation.setName(new javax.xml.namespace.QName("", "ping"));
-
-		_operations[3] = __operation;
-		_service.addOperation(__operation);
+		__operation.applyPolicy(new org.apache.neethi.Policy());
 
 	}
 
@@ -118,12 +108,12 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 	 * Auto generated method signature
 	 * 
 	 * @see org.apache.sandesha2.interop.RMInteropService#EchoString
-	 * @param param48
+	 * @param param24
 	 * 
 	 */
 	public org.tempuri.EchoStringResponse EchoString(
 
-	org.tempuri.EchoStringRequest param48) throws java.rmi.RemoteException
+	org.tempuri.EchoString param24) throws java.rmi.RemoteException
 
 	{
 		try {
@@ -139,7 +129,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 			// Style is Doc.
 
 			env = toEnvelope(getFactory(_operationClient.getOptions()
-					.getSoapVersionURI()), param48,
+					.getSoapVersionURI()), param24,
 					optimizeContent(new javax.xml.namespace.QName("",
 							"EchoString")));
 
@@ -230,12 +220,12 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 	 * Auto generated method signature for Asynchronous Invocations
 	 * 
 	 * @see org.apache.sandesha2.interop.RMInteropService#startEchoString
-	 * @param param48
+	 * @param param24
 	 * 
 	 */
 	public void startEchoString(
 
-			org.tempuri.EchoStringRequest param48,
+			org.tempuri.EchoString param24,
 			final org.apache.sandesha2.interop.RMInteropServiceCallbackHandler callback)
 
 	throws java.rmi.RemoteException {
@@ -252,7 +242,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 		env = toEnvelope(
 				getFactory(_operationClient.getOptions().getSoapVersionURI()),
-				param48,
+				param24,
 				optimizeContent(new javax.xml.namespace.QName("", "EchoString")));
 
 		// adding SOAP headers
@@ -295,7 +285,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 	}
 
-	public void Ping(org.tempuri.PingRequest param50
+	public void Ping(org.tempuri.Ping param26
 
 	) throws java.rmi.RemoteException {
 
@@ -309,219 +299,8 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 		// Style is Doc.
 
 		env = toEnvelope(getFactory(_operationClient.getOptions()
-				.getSoapVersionURI()), param50,
+				.getSoapVersionURI()), param26,
 				optimizeContent(new javax.xml.namespace.QName("", "Ping")));
-
-		// adding SOAP headers
-		_serviceClient.addHeadersToEnvelope(env);
-		// create message context with that soap envelope
-		org.apache.axis2.context.MessageContext _messageContext = new org.apache.axis2.context.MessageContext();
-		_messageContext.setEnvelope(env);
-
-		// add the message contxt to the operation client
-		_operationClient.addMessageContext(_messageContext);
-
-		_operationClient.execute(true);
-		return;
-	}
-
-	/**
-	 * Auto generated method signature
-	 * 
-	 * @see org.apache.sandesha2.interop.RMInteropService#echoString
-	 * @param param51
-	 * 
-	 */
-	public org.tempuri.EchoStringResponse echoString(
-
-	org.tempuri.EchoStringRequest param51) throws java.rmi.RemoteException
-
-	{
-		try {
-			org.apache.axis2.client.OperationClient _operationClient = _serviceClient
-					.createClient(_operations[2].getName());
-			_operationClient.getOptions().setAction("urn:wsrm:EchoString");
-			_operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(
-					true);
-
-			// create SOAP envelope with that payload
-			org.apache.axiom.soap.SOAPEnvelope env = null;
-
-			// Style is Doc.
-
-			env = toEnvelope(getFactory(_operationClient.getOptions()
-					.getSoapVersionURI()), param51,
-					optimizeContent(new javax.xml.namespace.QName("",
-							"echoString")));
-
-			// adding SOAP headers
-			_serviceClient.addHeadersToEnvelope(env);
-			// create message context with that soap envelope
-			org.apache.axis2.context.MessageContext _messageContext = new org.apache.axis2.context.MessageContext();
-			_messageContext.setEnvelope(env);
-
-			// add the message contxt to the operation client
-			_operationClient.addMessageContext(_messageContext);
-
-			// execute the operation client
-			_operationClient.execute(true);
-
-			org.apache.axis2.context.MessageContext _returnMessageContext = _operationClient
-					.getMessageContext(org.apache.axis2.wsdl.WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-			org.apache.axiom.soap.SOAPEnvelope _returnEnv = _returnMessageContext
-					.getEnvelope();
-
-			java.lang.Object object = fromOM(_returnEnv.getBody()
-					.getFirstElement(), org.tempuri.EchoStringResponse.class,
-					getEnvelopeNamespaces(_returnEnv));
-			_messageContext.getTransportOut().getSender().cleanup(
-					_messageContext);
-			return (org.tempuri.EchoStringResponse) object;
-
-		} catch (org.apache.axis2.AxisFault f) {
-			org.apache.axiom.om.OMElement faultElt = f.getDetail();
-			if (faultElt != null) {
-				if (faultExeptionNameMap.containsKey(faultElt.getQName())) {
-					// make the fault by reflection
-					try {
-						java.lang.String exceptionClassName = (java.lang.String) faultExeptionClassNameMap
-								.get(faultElt.getQName());
-						java.lang.Class exceptionClass = java.lang.Class
-								.forName(exceptionClassName);
-						java.lang.Exception ex = (java.lang.Exception) exceptionClass
-								.newInstance();
-						// message class
-						java.lang.String messageClassName = (java.lang.String) faultMessageMap
-								.get(faultElt.getQName());
-						java.lang.Class messageClass = java.lang.Class
-								.forName(messageClassName);
-						java.lang.Object messageObject = fromOM(faultElt,
-								messageClass, null);
-						java.lang.reflect.Method m = exceptionClass.getMethod(
-								"setFaultMessage",
-								new java.lang.Class[] { messageClass });
-						m.invoke(ex, new java.lang.Object[] { messageObject });
-
-						throw new java.rmi.RemoteException(ex.getMessage(), ex);
-					} catch (java.lang.ClassCastException e) {
-						// we cannot intantiate the class - throw the original
-						// Axis fault
-						throw f;
-					} catch (java.lang.ClassNotFoundException e) {
-						// we cannot intantiate the class - throw the original
-						// Axis fault
-						throw f;
-					} catch (java.lang.NoSuchMethodException e) {
-						// we cannot intantiate the class - throw the original
-						// Axis fault
-						throw f;
-					} catch (java.lang.reflect.InvocationTargetException e) {
-						// we cannot intantiate the class - throw the original
-						// Axis fault
-						throw f;
-					} catch (java.lang.IllegalAccessException e) {
-						// we cannot intantiate the class - throw the original
-						// Axis fault
-						throw f;
-					} catch (java.lang.InstantiationException e) {
-						// we cannot intantiate the class - throw the original
-						// Axis fault
-						throw f;
-					}
-				} else {
-					throw f;
-				}
-			} else {
-				throw f;
-			}
-		}
-	}
-
-	/**
-	 * Auto generated method signature for Asynchronous Invocations
-	 * 
-	 * @see org.apache.sandesha2.interop.RMInteropService#startechoString
-	 * @param param51
-	 * 
-	 */
-	public void startechoString(
-
-			org.tempuri.EchoStringRequest param51,
-			final org.apache.sandesha2.interop.RMInteropServiceCallbackHandler callback)
-
-	throws java.rmi.RemoteException {
-
-		org.apache.axis2.client.OperationClient _operationClient = _serviceClient
-				.createClient(_operations[2].getName());
-		_operationClient.getOptions().setAction("urn:wsrm:EchoString");
-		_operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
-
-		// create SOAP envelope with that payload
-		org.apache.axiom.soap.SOAPEnvelope env = null;
-
-		// Style is Doc.
-
-		env = toEnvelope(
-				getFactory(_operationClient.getOptions().getSoapVersionURI()),
-				param51,
-				optimizeContent(new javax.xml.namespace.QName("", "echoString")));
-
-		// adding SOAP headers
-		_serviceClient.addHeadersToEnvelope(env);
-		// create message context with that soap envelope
-		org.apache.axis2.context.MessageContext _messageContext = new org.apache.axis2.context.MessageContext();
-		_messageContext.setEnvelope(env);
-
-		// add the message contxt to the operation client
-		_operationClient.addMessageContext(_messageContext);
-
-		_operationClient
-				.setCallback(new org.apache.axis2.client.async.Callback() {
-					public void onComplete(
-							org.apache.axis2.client.async.AsyncResult result) {
-						java.lang.Object object = fromOM(result
-								.getResponseEnvelope().getBody()
-								.getFirstElement(),
-								org.tempuri.EchoStringResponse.class,
-								getEnvelopeNamespaces(result
-										.getResponseEnvelope()));
-						callback
-								.receiveResultechoString((org.tempuri.EchoStringResponse) object);
-					}
-
-					public void onError(java.lang.Exception e) {
-						callback.receiveErrorechoString(e);
-					}
-				});
-
-		org.apache.axis2.util.CallbackReceiver _callbackReceiver = null;
-		if (_operations[2].getMessageReceiver() == null
-				&& _operationClient.getOptions().isUseSeparateListener()) {
-			_callbackReceiver = new org.apache.axis2.util.CallbackReceiver();
-			_operations[2].setMessageReceiver(_callbackReceiver);
-		}
-
-		// execute the operation client
-		_operationClient.execute(false);
-
-	}
-
-	public void ping(org.tempuri.PingRequest param53
-
-	) throws java.rmi.RemoteException {
-
-		org.apache.axis2.client.OperationClient _operationClient = _serviceClient
-				.createClient(_operations[3].getName());
-		_operationClient.getOptions().setAction("urn:wsrm:Ping");
-		_operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
-
-		org.apache.axiom.soap.SOAPEnvelope env = null;
-
-		// Style is Doc.
-
-		env = toEnvelope(getFactory(_operationClient.getOptions()
-				.getSoapVersionURI()), param53,
-				optimizeContent(new javax.xml.namespace.QName("", "ping")));
 
 		// adding SOAP headers
 		_serviceClient.addHeadersToEnvelope(env);
@@ -567,10 +346,10 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 	}
 
 	// http://www.example.org/
-	private org.apache.axiom.om.OMElement toOM(
-			org.tempuri.EchoStringRequest param, boolean optimizeContent) {
+	private org.apache.axiom.om.OMElement toOM(org.tempuri.EchoString param,
+			boolean optimizeContent) {
 
-		return param.getOMElement(org.tempuri.EchoStringRequest.MY_QNAME,
+		return param.getOMElement(org.tempuri.EchoString.MY_QNAME,
 				org.apache.axiom.om.OMAbstractFactory.getOMFactory());
 
 	}
@@ -583,35 +362,34 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 	}
 
-	private org.apache.axiom.om.OMElement toOM(org.tempuri.PingRequest param,
+	private org.apache.axiom.om.OMElement toOM(org.tempuri.Ping param,
 			boolean optimizeContent) {
 
-		return param.getOMElement(org.tempuri.PingRequest.MY_QNAME,
+		return param.getOMElement(org.tempuri.Ping.MY_QNAME,
 				org.apache.axiom.om.OMAbstractFactory.getOMFactory());
 
 	}
 
 	private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
 			org.apache.axiom.soap.SOAPFactory factory,
-			org.tempuri.EchoStringRequest param, boolean optimizeContent) {
+			org.tempuri.EchoString param, boolean optimizeContent) {
 		org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory
 				.getDefaultEnvelope();
 
 		emptyEnvelope.getBody().addChild(
-				param.getOMElement(org.tempuri.EchoStringRequest.MY_QNAME,
-						factory));
+				param.getOMElement(org.tempuri.EchoString.MY_QNAME, factory));
 
 		return emptyEnvelope;
 	}
 
 	private org.apache.axiom.soap.SOAPEnvelope toEnvelope(
-			org.apache.axiom.soap.SOAPFactory factory,
-			org.tempuri.PingRequest param, boolean optimizeContent) {
+			org.apache.axiom.soap.SOAPFactory factory, org.tempuri.Ping param,
+			boolean optimizeContent) {
 		org.apache.axiom.soap.SOAPEnvelope emptyEnvelope = factory
 				.getDefaultEnvelope();
 
 		emptyEnvelope.getBody().addChild(
-				param.getOMElement(org.tempuri.PingRequest.MY_QNAME, factory));
+				param.getOMElement(org.tempuri.Ping.MY_QNAME, factory));
 
 		return emptyEnvelope;
 	}
@@ -629,9 +407,9 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 		try {
 
-			if (org.tempuri.EchoStringRequest.class.equals(type)) {
+			if (org.tempuri.EchoString.class.equals(type)) {
 
-				return org.tempuri.EchoStringRequest.Factory.parse(param
+				return org.tempuri.EchoString.Factory.parse(param
 						.getXMLStreamReaderWithoutCaching());
 
 			}
@@ -643,30 +421,9 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 			}
 
-			if (org.tempuri.PingRequest.class.equals(type)) {
+			if (org.tempuri.Ping.class.equals(type)) {
 
-				return org.tempuri.PingRequest.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.EchoStringRequest.class.equals(type)) {
-
-				return org.tempuri.EchoStringRequest.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.EchoStringResponse.class.equals(type)) {
-
-				return org.tempuri.EchoStringResponse.Factory.parse(param
-						.getXMLStreamReaderWithoutCaching());
-
-			}
-
-			if (org.tempuri.PingRequest.class.equals(type)) {
-
-				return org.tempuri.PingRequest.Factory.parse(param
+				return org.tempuri.Ping.Factory.parse(param
 						.getXMLStreamReaderWithoutCaching());
 
 			}

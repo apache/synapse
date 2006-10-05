@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -37,6 +38,8 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
+import org.apache.sandesha2.interop.RMInteropServiceStub;
+import org.tempuri.Ping;
 
 public class Scenario_1_4 {
 
@@ -64,7 +67,7 @@ public class Scenario_1_4 {
 			+ "target" + File.separator + "repos" + File.separator + "client"
 			+ File.separator; // this will be available after a maven build
 
-	public static void main(String[] args) throws AxisFault,IOException {
+	public static void main(String[] args) throws Exception {
 
 		String axisClientRepo = null;
 		if (args != null && args.length > 0)
@@ -85,56 +88,21 @@ public class Scenario_1_4 {
 			transportToEPR = properties.getProperty("transportTo");
 		}
 		
-		new Scenario_1_4().run();
+//		new Scenario_1_4().run();
+		new Scenario_1_4().runStubBased ();
 	}
 
-	private void run() throws AxisFault {
+	private void run() throws Exception {
 
-		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)) {
-			System.out
-					.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
-			return;
-		}
-
-		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
-		ConfigurationContext configContext = ConfigurationContextFactory
-				.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,
-						axis2_xml);
-		Options clientOptions = new Options();
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,
-				transportToEPR);
+		ConfigurationContext configurationContext = generateConfigContext();
 		
-//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean(true));
-		clientOptions.setTo(new EndpointReference(toEPR));
-		
-		clientOptions.setAction("urn:wsrm:Ping");
-		
-		ServiceClient serviceClient = new ServiceClient(configContext, null);
+		ServiceClient serviceClient = new ServiceClient(configurationContext, null);
 		
 //		String replyAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_ONLY_OP;
 		String acksToAddress = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		
-		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksToAddress);
-		
-//		clientOptions.setReplyTo(new EndpointReference (replyAddress));
-		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-
-		String sequenceKey = "sequence1";
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
-
-		// clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);
-		// //uncomment this to send messages without chunking.
-
-//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
-
-//		 clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		// //uncomment this to send messages in SOAP 1.2
-
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,
-				Sandesha2Constants.SPEC_VERSIONS.v1_1); // uncomment this to
-														// send the messages
-														// according to the v1_1
-														// spec.
+		Options clientOptions = new Options();
+		setUpOptions(clientOptions,acksToAddress);
 
 		serviceClient.setOptions(clientOptions);
 
@@ -157,7 +125,10 @@ public class Scenario_1_4 {
 		}
 
 		SandeshaClient.terminateSequence(serviceClient);
-//		serviceClient.finalizeInvoke();
+		
+		Thread.sleep(3000);
+		
+		serviceClient.finalizeInvoke();
 	}
 
 	private static OMElement getPingOMBlock(String text) {
@@ -171,5 +142,84 @@ public class Scenario_1_4 {
 		pingElem.addChild(textElem);
 
 		return pingElem;
+	}
+	
+	private void runStubBased () throws Exception {
+		String targetEndpoint = toEPR;
+		ConfigurationContext configurationContext = generateConfigContext();
+		
+		RMInteropServiceStub stub = new RMInteropServiceStub (configurationContext, targetEndpoint);
+		ServiceClient stubServiceClient = stub._getServiceClient();
+		
+		String acksToAddress = stubServiceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		
+		setUpOptions(stubServiceClient.getOptions(),acksToAddress);
+		
+		
+		Ping ping = new Ping ();
+		ping.setText("ping1");
+		stub.Ping(ping);
+		
+		ping = new Ping ();
+		ping.setText("ping2");
+		stub.Ping(ping);
+		
+		ping = new Ping ();
+		ping.setText("ping3");
+		stub.Ping(ping);
+		
+		SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(stubServiceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 		
+		
+		SandeshaClient.terminateSequence(stubServiceClient);
+		stub._getServiceClient().finalizeInvoke();
+		
+	}
+	
+	private ConfigurationContext generateConfigContext () throws Exception {
+		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
+			System.out.println("ERROR: Please change <SANDESHA2_HOME> to your Sandesha2 installation directory.");
+			throw new Exception ("Client not set up correctly");
+		}
+		
+		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(AXIS2_CLIENT_PATH,axis2_xml);
+
+		return configContext;
+	}
+	
+	private void setUpOptions (Options clientOptions, String acksTo) {
+		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
+//		clientOptions.setProperty(Options.COPY_PROPERTIES, new Boolean (true));
+		clientOptions.setTo(new EndpointReference (toEPR));
+		
+		String sequenceKey = "sequence1";
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+	    
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+		
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+//		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
+		
+		clientOptions.setAction("urn:wsrm:Ping");
+		
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+		
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo, acksTo);
+
+		
 	}
 }

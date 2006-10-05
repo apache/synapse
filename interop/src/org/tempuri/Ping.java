@@ -13,16 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package org.tempuri;
 
 /**
- * PingRequest bean class
+ * Ping bean class
  */
 
-public class PingRequest implements org.apache.axis2.databinding.ADBBean {
+public class Ping implements org.apache.axis2.databinding.ADBBean {
 
 	public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-			"http://tempuri.org/", "PingRequest", "ns1");
+			"http://tempuri.org/", "Ping", "ns1");
 
 	/**
 	 * field for Text
@@ -102,7 +103,7 @@ public class PingRequest implements org.apache.axis2.databinding.ADBBean {
 				}
 
 				if (localTextTracker) {
-					namespace = "";
+					namespace = "http://tempuri.org/";
 
 					if (!namespace.equals("")) {
 						prefix = xmlWriter.getPrefix(namespace);
@@ -169,10 +170,12 @@ public class PingRequest implements org.apache.axis2.databinding.ADBBean {
 					java.lang.String attName, java.lang.String attValue,
 					javax.xml.stream.XMLStreamWriter xmlWriter)
 					throws javax.xml.stream.XMLStreamException {
-
-				registerPrefix(xmlWriter, namespace);
-
-				xmlWriter.writeAttribute(namespace, attName, attValue);
+				if (namespace.equals("")) {
+					xmlWriter.writeAttribute(attName, attValue);
+				} else {
+					registerPrefix(xmlWriter, namespace);
+					xmlWriter.writeAttribute(namespace, attName, attValue);
+				}
 			}
 
 			/**
@@ -224,7 +227,8 @@ public class PingRequest implements org.apache.axis2.databinding.ADBBean {
 		java.util.ArrayList attribList = new java.util.ArrayList();
 
 		if (localTextTracker) {
-			elementList.add(new javax.xml.namespace.QName("", "Text"));
+			elementList.add(new javax.xml.namespace.QName(
+					"http://tempuri.org/", "Text"));
 
 			elementList.add(localText == null ? null
 					: org.apache.axis2.databinding.utils.ConverterUtil
@@ -251,9 +255,9 @@ public class PingRequest implements org.apache.axis2.databinding.ADBBean {
 		 * is a complex type, the reader is positioned at the end element of its
 		 * outer element
 		 */
-		public static PingRequest parse(javax.xml.stream.XMLStreamReader reader)
+		public static Ping parse(javax.xml.stream.XMLStreamReader reader)
 				throws java.lang.Exception {
-			PingRequest object = new PingRequest();
+			Ping object = new Ping();
 			int event;
 			try {
 
@@ -273,12 +277,12 @@ public class PingRequest implements org.apache.axis2.databinding.ADBBean {
 
 						java.lang.String type = fullTypeName
 								.substring(fullTypeName.indexOf(":") + 1);
-						if (!"PingRequest".equals(type)) {
+						if (!"Ping".equals(type)) {
 							// find namespace for the prefix
 							java.lang.String nsUri = reader
 									.getNamespaceContext().getNamespaceURI(
 											nsPrefix);
-							return (PingRequest) org.tempuri.ExtensionMapper
+							return (Ping) org.tempuri.ExtensionMapper
 									.getTypeObject(nsUri, type, reader);
 						}
 
@@ -307,8 +311,8 @@ public class PingRequest implements org.apache.axis2.databinding.ADBBean {
 					reader.next();
 
 				if (reader.isStartElement()
-						&& new javax.xml.namespace.QName("", "Text")
-								.equals(reader.getName())) {
+						&& new javax.xml.namespace.QName("http://tempuri.org/",
+								"Text").equals(reader.getName())) {
 
 					if (!"true"
 							.equals(reader

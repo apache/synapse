@@ -1,42 +1,25 @@
-<!-- This file was auto-generated from WSDL -->
-<!-- by the Apache Axis2 version: #axisVersion# #today# -->
-<serviceGroup>
-	<service name="RMInteropService">
+<service name="RMInteropService">
+
+	<module ref="sandesha2" />
 	
-	    <module ref="sandesha2" />
-	    
-		<messageReceivers>
-			<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
-				class="org.apache.sandesha2.interop.RMInteropServiceMessageReceiverInOut" />
-			<messageReceiver
-				mep="http://www.w3.org/2004/08/wsdl/in-only"
-				class="org.apache.sandesha2.interop.RMInteropServiceMessageReceiverInOnly" />
-		</messageReceivers>
-		
-		<parameter locked="false" name="ServiceClass">
-			org.apache.sandesha2.interop.RMInteropServiceSkeletonImpl
-		</parameter>
-		<operation name="EchoString"
-			mep="http://www.w3.org/2004/08/wsdl/in-out">
-			<actionMapping>urn:wsrm:EchoString</actionMapping>
-			<outputActionMapping>
-				urn:wsrm:EchoStringResponse
-			</outputActionMapping>
-		</operation>
-		<operation name="Ping"
-			mep="http://www.w3.org/2004/08/wsdl/in-only">
-			<actionMapping>urn:wsrm:Ping</actionMapping>
-		</operation>
-		<operation name="echoString"
-			mep="http://www.w3.org/2004/08/wsdl/in-out">
-			<actionMapping>urn:wsrm:EchoString</actionMapping>
-			<outputActionMapping>
-				urn:wsrm:EchoStringResponse
-			</outputActionMapping>
-		</operation>
-		<operation name="ping"
-			mep="http://www.w3.org/2004/08/wsdl/in-only">
-			<actionMapping>urn:wsrm:Ping</actionMapping>
-		</operation>
-	</service>
-</serviceGroup>
+	<messageReceivers>
+		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+			class="org.apache.sandesha2.interop.RMInteropServiceMessageReceiverInOut" />
+		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+			class="org.apache.sandesha2.interop.RMInteropServiceMessageReceiverInOnly" />
+	</messageReceivers>
+	<parameter locked="false" name="ServiceClass">
+		org.apache.sandesha2.interop.RMInteropServiceSkeletonImpl
+	</parameter>
+	<operation name="EchoString"
+		mep="http://www.w3.org/2004/08/wsdl/in-out">
+		<actionMapping>urn:wsrm:EchoString</actionMapping>
+		<outputActionMapping>
+			urn:wsrm:EchoStringResponse
+		</outputActionMapping>
+	</operation>
+	<operation name="Ping"
+		mep="http://www.w3.org/2004/08/wsdl/in-only">
+		<actionMapping>urn:wsrm:Ping</actionMapping>
+	</operation>
+</service>

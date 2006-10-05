@@ -143,7 +143,7 @@ public class EchoStringRequestBodyType implements
 				}
 
 				if (localTextTracker) {
-					namespace = "";
+					namespace = "http://tempuri.org/";
 
 					if (!namespace.equals("")) {
 						prefix = xmlWriter.getPrefix(namespace);
@@ -181,7 +181,7 @@ public class EchoStringRequestBodyType implements
 					xmlWriter.writeEndElement();
 				}
 				if (localSequenceTracker) {
-					namespace = "";
+					namespace = "http://tempuri.org/";
 
 					if (!namespace.equals("")) {
 						prefix = xmlWriter.getPrefix(namespace);
@@ -248,10 +248,12 @@ public class EchoStringRequestBodyType implements
 					java.lang.String attName, java.lang.String attValue,
 					javax.xml.stream.XMLStreamWriter xmlWriter)
 					throws javax.xml.stream.XMLStreamException {
-
-				registerPrefix(xmlWriter, namespace);
-
-				xmlWriter.writeAttribute(namespace, attName, attValue);
+				if (namespace.equals("")) {
+					xmlWriter.writeAttribute(attName, attValue);
+				} else {
+					registerPrefix(xmlWriter, namespace);
+					xmlWriter.writeAttribute(namespace, attName, attValue);
+				}
 			}
 
 			/**
@@ -302,14 +304,16 @@ public class EchoStringRequestBodyType implements
 		java.util.ArrayList attribList = new java.util.ArrayList();
 
 		if (localTextTracker) {
-			elementList.add(new javax.xml.namespace.QName("", "Text"));
+			elementList.add(new javax.xml.namespace.QName(
+					"http://tempuri.org/", "Text"));
 
 			elementList.add(localText == null ? null
 					: org.apache.axis2.databinding.utils.ConverterUtil
 							.convertToString(localText));
 		}
 		if (localSequenceTracker) {
-			elementList.add(new javax.xml.namespace.QName("", "Sequence"));
+			elementList.add(new javax.xml.namespace.QName(
+					"http://tempuri.org/", "Sequence"));
 
 			elementList.add(localSequence == null ? null
 					: org.apache.axis2.databinding.utils.ConverterUtil
@@ -393,8 +397,8 @@ public class EchoStringRequestBodyType implements
 					reader.next();
 
 				if (reader.isStartElement()
-						&& new javax.xml.namespace.QName("", "Text")
-								.equals(reader.getName())) {
+						&& new javax.xml.namespace.QName("http://tempuri.org/",
+								"Text").equals(reader.getName())) {
 
 					if (!"true"
 							.equals(reader
@@ -421,8 +425,8 @@ public class EchoStringRequestBodyType implements
 					reader.next();
 
 				if (reader.isStartElement()
-						&& new javax.xml.namespace.QName("", "Sequence")
-								.equals(reader.getName())) {
+						&& new javax.xml.namespace.QName("http://tempuri.org/",
+								"Sequence").equals(reader.getName())) {
 
 					if (!"true"
 							.equals(reader

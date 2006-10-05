@@ -23,20 +23,13 @@ package org.tempuri;
 public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean {
 
 	public static final javax.xml.namespace.QName MY_QNAME = new javax.xml.namespace.QName(
-			"http://tempuri.org/", "EchoStringResponse", "ns1");
+			"http://tempuri.org/", "echoStringResponse", "ns1");
 
 	/**
 	 * field for EchoStringResponse
 	 */
 
 	protected org.tempuri.EchoStringResponseBodyType localEchoStringResponse;
-
-	/*
-	 * This tracker boolean wil be used to detect whether the user called the
-	 * set method for this attribute. It will be used to determine whether to
-	 * include this field in the serialized XML
-	 */
-	protected boolean localEchoStringResponseTracker = false;
 
 	/**
 	 * Auto generated getter method
@@ -55,9 +48,6 @@ public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean 
 	 */
 	public void setEchoStringResponse(
 			org.tempuri.EchoStringResponseBodyType param) {
-
-		// update the setting tracker
-		localEchoStringResponseTracker = true;
 
 		this.localEchoStringResponse = param;
 
@@ -79,71 +69,43 @@ public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean 
 			public void serialize(javax.xml.stream.XMLStreamWriter xmlWriter)
 					throws javax.xml.stream.XMLStreamException {
 
-				java.lang.String prefix = parentQName.getPrefix();
-				java.lang.String namespace = parentQName.getNamespaceURI();
+				// We can safely assume an element has only one type associated
+				// with it
 
-				if (namespace != null) {
-					java.lang.String writerPrefix = xmlWriter
-							.getPrefix(namespace);
-					if (writerPrefix != null) {
-						xmlWriter.writeStartElement(namespace, parentQName
-								.getLocalPart());
-					} else {
+				if (localEchoStringResponse == null) {
+					java.lang.String namespace = "http://tempuri.org/";
+
+					if (!namespace.equals("")) {
+						java.lang.String prefix = xmlWriter
+								.getPrefix(namespace);
+
 						if (prefix == null) {
 							prefix = org.apache.axis2.databinding.utils.BeanUtil
 									.getUniquePrefix();
-						}
 
-						xmlWriter.writeStartElement(prefix, parentQName
-								.getLocalPart(), namespace);
-						xmlWriter.writeNamespace(prefix, namespace);
-						xmlWriter.setPrefix(prefix, namespace);
-					}
-				} else {
-					xmlWriter.writeStartElement(parentQName.getLocalPart());
-				}
-
-				if (localEchoStringResponseTracker) {
-					if (localEchoStringResponse == null) {
-
-						java.lang.String namespace2 = "";
-
-						if (!namespace2.equals("")) {
-							java.lang.String prefix2 = xmlWriter
-									.getPrefix(namespace2);
-
-							if (prefix2 == null) {
-								prefix2 = org.apache.axis2.databinding.utils.BeanUtil
-										.getUniquePrefix();
-
-								xmlWriter.writeStartElement(prefix2,
-										"echoStringResponse", namespace2);
-								xmlWriter.writeNamespace(prefix2, namespace2);
-								xmlWriter.setPrefix(prefix2, namespace2);
-
-							} else {
-								xmlWriter.writeStartElement(namespace2,
-										"echoStringResponse");
-							}
+							xmlWriter.writeStartElement(prefix,
+									"echoStringResponse", namespace);
+							xmlWriter.writeNamespace(prefix, namespace);
+							xmlWriter.setPrefix(prefix, namespace);
 
 						} else {
-							xmlWriter.writeStartElement("echoStringResponse");
+							xmlWriter.writeStartElement(namespace,
+									"echoStringResponse");
 						}
 
-						// write the nil attribute
-						writeAttribute("xsi",
-								"http://www.w3.org/2001/XMLSchema-instance",
-								"nil", "true", xmlWriter);
-						xmlWriter.writeEndElement();
 					} else {
-						localEchoStringResponse.getOMElement(
-								new javax.xml.namespace.QName("",
-										"echoStringResponse"), factory)
-								.serialize(xmlWriter);
+						xmlWriter.writeStartElement("echoStringResponse");
 					}
-				}
 
-				xmlWriter.writeEndElement();
+					// write the nil attribute
+					writeAttribute("xsi",
+							"http://www.w3.org/2001/XMLSchema-instance", "nil",
+							"true", xmlWriter);
+					xmlWriter.writeEndElement();
+				} else {
+					localEchoStringResponse.getOMElement(MY_QNAME, factory)
+							.serialize(xmlWriter);
+				}
 
 			}
 
@@ -172,10 +134,12 @@ public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean 
 					java.lang.String attName, java.lang.String attValue,
 					javax.xml.stream.XMLStreamWriter xmlWriter)
 					throws javax.xml.stream.XMLStreamException {
-
-				registerPrefix(xmlWriter, namespace);
-
-				xmlWriter.writeAttribute(namespace, attName, attValue);
+				if (namespace.equals("")) {
+					xmlWriter.writeAttribute(attName, attValue);
+				} else {
+					registerPrefix(xmlWriter, namespace);
+					xmlWriter.writeAttribute(namespace, attName, attValue);
+				}
 			}
 
 			/**
@@ -223,19 +187,14 @@ public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean 
 	public javax.xml.stream.XMLStreamReader getPullParser(
 			javax.xml.namespace.QName qName) {
 
-		java.util.ArrayList elementList = new java.util.ArrayList();
-		java.util.ArrayList attribList = new java.util.ArrayList();
+		// We can safely assume an element has only one type associated with it
 
-		if (localEchoStringResponseTracker) {
-			elementList.add(new javax.xml.namespace.QName("",
-					"echoStringResponse"));
-
-			elementList.add(localEchoStringResponse == null ? null
-					: localEchoStringResponse);
+		if (localEchoStringResponse == null) {
+			return new org.apache.axis2.databinding.utils.reader.NullXMLStreamReader(
+					MY_QNAME);
+		} else {
+			return localEchoStringResponse.getPullParser(MY_QNAME);
 		}
-
-		return new org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl(
-				qName, elementList.toArray(), attribList.toArray());
 
 	}
 
@@ -264,30 +223,13 @@ public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean 
 				while (!reader.isStartElement() && !reader.isEndElement())
 					reader.next();
 
-				if (reader.getAttributeValue(
-						"http://www.w3.org/2001/XMLSchema-instance", "type") != null) {
-					java.lang.String fullTypeName = reader
-							.getAttributeValue(
-									"http://www.w3.org/2001/XMLSchema-instance",
-									"type");
-					if (fullTypeName != null) {
-						java.lang.String nsPrefix = fullTypeName.substring(0,
-								fullTypeName.indexOf(":"));
-						nsPrefix = nsPrefix == null ? "" : nsPrefix;
-
-						java.lang.String type = fullTypeName
-								.substring(fullTypeName.indexOf(":") + 1);
-						if (!"EchoStringResponse".equals(type)) {
-							// find namespace for the prefix
-							java.lang.String nsUri = reader
-									.getNamespaceContext().getNamespaceURI(
-											nsPrefix);
-							return (EchoStringResponse) org.tempuri.ExtensionMapper
-									.getTypeObject(nsUri, type, reader);
-						}
-
-					}
-
+				if ("true".equals(reader.getAttributeValue(
+						"http://www.w3.org/2001/XMLSchema-instance", "nil"))) {
+					// Skip the element and report the null value. It cannot
+					// have subelements.
+					while (!reader.isEndElement())
+						reader.next();
+					return null;
 				}
 
 				// Note all attributes that were handled. Used to differ normal
@@ -305,30 +247,32 @@ public class EchoStringResponse implements org.apache.axis2.databinding.ADBBean 
 					isReaderMTOMAware = false;
 				}
 
-				reader.next();
+				while (!reader.isEndElement()) {
+					if (reader.isStartElement()) {
 
-				while (!reader.isStartElement() && !reader.isEndElement())
-					reader.next();
+						if (reader.isStartElement()
+								&& new javax.xml.namespace.QName(
+										"http://tempuri.org/",
+										"echoStringResponse").equals(reader
+										.getName())) {
 
-				if (reader.isStartElement()
-						&& new javax.xml.namespace.QName("",
-								"echoStringResponse").equals(reader.getName())) {
+							object
+									.setEchoStringResponse(org.tempuri.EchoStringResponseBodyType.Factory
+											.parse(reader));
 
-					object
-							.setEchoStringResponse(org.tempuri.EchoStringResponseBodyType.Factory
-									.parse(reader));
+						} // End of if for expected property start element
 
-					reader.next();
+						else {
+							// A start element we are not expecting indicates an
+							// invalid parameter was passed
+							throw new java.lang.RuntimeException(
+									"Unexpected subelement "
+											+ reader.getLocalName());
+						}
 
-				} // End of if for expected property start element
-
-				while (!reader.isStartElement() && !reader.isEndElement())
-					reader.next();
-				if (reader.isStartElement())
-					// A start element we are not expecting indicates a trailing
-					// invalid property
-					throw new java.lang.RuntimeException(
-							"Unexpected subelement " + reader.getLocalName());
+					} else
+						reader.next();
+				} // end of while loop
 
 			} catch (javax.xml.stream.XMLStreamException e) {
 				throw new java.lang.Exception(e);

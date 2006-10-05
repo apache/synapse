@@ -2,14 +2,14 @@
   
   <definitions>
     
-    <set-property name="policy_1" src="file:synapse_repository/conf/policy_1.xml"/>
-    <set-property name="policy_3" src="file:synapse_repository/conf/policy_3.xml"/>
+    <set-property name="policy_1" src="file:synapse_repository/conf/sample/policy_1.xml"/>
+    <set-property name="policy_3" src="file:synapse_repository/conf/sample/policy_3.xml"/>
     
-    <endpoint name="secureEndpoint1" address="http://localhost:9001/axis2/services/SecureStockQuoteService1">
+    <endpoint name="secureEndpoint1" address="http://localhost:9000/axis2/services/SecureStockQuoteService1">
    		<enableSec policy="policy_1"/>
    	</endpoint>
    	
-   	<endpoint name="secureEndpoint3" address="http://localhost:9001/axis2/services/SecureStockQuoteService3">
+   	<endpoint name="secureEndpoint3" address="http://localhost:9000/axis2/services/SecureStockQuoteService3">
    		<enableSec policy="policy_3"/>
    	</endpoint>
 

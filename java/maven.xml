@@ -353,12 +353,12 @@
         <ant:mkdir dir="${target/lib}/endorsed"/>
     </goal>
 
-    <goal name="release" prereqs="dist-src,dist-bin,dist-extensions,dist-nhttp"/>
+    <goal name="release" prereqs="dist-src,dist-bin,dist-extensions,dist-nhttp,javadocs"/>
 
     <!-- ================================================================ -->
     <!--- Create the Distro -->
     <!-- ================================================================ -->
-    <goal name="dist-bin" prereqs="init,war,create-jar,javadocs,dist-extensions,dist-nhttp">
+    <goal name="dist-bin" prereqs="init,war,create-jar,dist-nhttp">
         <ant:echo>+----------------------------------------------</ant:echo>
         <ant:echo>| Creating: Synapse Binary Distribution</ant:echo>
         <ant:echo>+----------------------------------------------</ant:echo>
@@ -429,6 +429,8 @@
                 <ant:include name="*.txt"/>
             </ant:fileset>
         </ant:copy>
+        <ant:copy file="modules/nhttp/target/synapse-nhttp-${pom.currentVersion}.jar"
+                  tofile="${bin.dist.dir}/lib/Apache-Synapse-nhttp-${pom.currentVersion}.zip"/>
 
         <ant:copy todir="${bin.dist.dir}/licenses" flatten="true">
             <ant:fileset dir="licenses">

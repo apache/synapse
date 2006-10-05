@@ -539,6 +539,8 @@ public interface Sandesha2Constants {
 	
 	String RM_IN_ONLY_OPERATION = "RMInOnlyOperation";
 	
+	String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
+	
 	String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI

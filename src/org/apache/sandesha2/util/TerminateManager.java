@@ -357,7 +357,7 @@ public class TerminateManager {
 	}
 
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String outSequenceId,
-			String sequencePropertyKey, StorageManager storageManager) throws SandeshaException {
+			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
 
 		ConfigurationContext configurationContext = referenceMessage.getMessageContext().getConfigurationContext();
 
@@ -414,11 +414,7 @@ public class TerminateManager {
 			terminateRMMessage.setProperty(MessageContextConstants.TRANSPORT_URL, transportToBean.getValue());
 		}
 
-		try {
-			terminateRMMessage.addSOAPEnvelope();
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
+		terminateRMMessage.addSOAPEnvelope();
 
 		String key = SandeshaUtil.getUUID();
 
@@ -458,20 +454,10 @@ public class TerminateManager {
 
 		seqPropMgr.insert(terminateAdded);
 
-		// This should be dumped to the storage by the sender
-		TransportOutDescription transportOut = terminateRMMessage.getMessageContext().getTransportOut();
-		terminateRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
-		terminateRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-		terminateRMMessage.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc());
+		
 		// / addTerminateSeqTransaction.commit();
-
-		AxisEngine engine = new AxisEngine(configurationContext);
-		try {
-			engine.send(terminateRMMessage.getMessageContext());
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
+		SandeshaUtil.executeAndStore(terminateRMMessage, key);
 	}
 
 }

@@ -408,13 +408,16 @@ public class RMMsgCreator {
 																								// messages
 																								// correctly.
 
-		AxisOperation teferenceMsgOperation = referenceMessage.getAxisOperation();
+		//using the Sandesha2 RMOutInOperation as the reference operation.
+		AxisOperation referenceOperation = referenceMessage.getAxisService()
+					.getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
+		
 		AxisOperation terminateMsgOperation = terminateMessage.getAxisOperation();
-		if (teferenceMsgOperation != null) {
-			terminateMsgOperation.setPhasesOutFlow(teferenceMsgOperation.getPhasesOutFlow());
-			terminateMsgOperation.setPhasesOutFaultFlow(teferenceMsgOperation.getPhasesOutFaultFlow());
-			terminateMsgOperation.setPhasesInFaultFlow(teferenceMsgOperation.getPhasesInFaultFlow());
-			terminateMsgOperation.setRemainingPhasesInFlow(teferenceMsgOperation.getRemainingPhasesInFlow());
+		if (referenceOperation != null) {
+			terminateMsgOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());
+			terminateMsgOperation.setPhasesOutFaultFlow(referenceOperation.getPhasesOutFaultFlow());
+			terminateMsgOperation.setPhasesInFaultFlow(referenceOperation.getPhasesInFaultFlow());
+			terminateMsgOperation.setRemainingPhasesInFlow(referenceOperation.getRemainingPhasesInFlow());
 		}
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);

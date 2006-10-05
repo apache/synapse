@@ -122,7 +122,7 @@ public class SandeshaInHandler extends AbstractHandler {
 				log.debug(message);
 				throw new AxisFault(message);
 			}
-
+			
 			// validating the message
 			MessageValidator.validateMessage(rmMsgCtx, storageManager);
 

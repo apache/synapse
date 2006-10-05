@@ -149,20 +149,9 @@ public class PollingManager extends Thread {
 				//this message should not be sent until it is qualified. I.e. till it is sent through the Sandesha2TransportSender.
 				makeConnectionRMMessage.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 				
-				makeConnectionRMMessage.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, makeConnectionMsgStoreKey);
-				
 				senderBeanMgr.insert(makeConnectionSenderBean);
 				
-				TransportOutDescription transportOut = makeConnectionRMMessage.getMessageContext().getTransportOut();
-				makeConnectionRMMessage.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
-
-				Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
-				makeConnectionRMMessage.getMessageContext().setTransportOut(sandesha2TransportOutDesc);
-
-				// sending the message once through Sandesha2TransportSender.
-				AxisEngine engine = new AxisEngine(configurationContext);
-				engine.resumeSend(makeConnectionRMMessage.getMessageContext());
-				
+				SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey);
 			} catch (SandeshaStorageException e) {
 				e.printStackTrace();
 			} catch (SandeshaException e) {

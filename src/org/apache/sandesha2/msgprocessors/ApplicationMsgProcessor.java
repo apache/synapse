@@ -378,14 +378,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey ,sequenceId, storageManager);
 
-		AxisEngine engine = new AxisEngine(configCtx);
-
-		try {
+		//if the ack is anonymous send it right now.
+		
+		EndpointReference to = ackRMMessage.getTo();
+		if (to!=null && SandeshaUtil.isAnonymousURI(to.getAddress())) {
+			AxisEngine engine = new AxisEngine(configCtx);
 			engine.send(ackRMMessage.getMessageContext());
-		} catch (AxisFault e) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendAck, sequenceId, e
-					.toString());
-			throw new SandeshaException(message, e);
 		}
 
 		if (log.isDebugEnabled())
@@ -896,38 +894,18 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			createSeqEntry.setToAddress(to.getAddress());
 
 		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
+		storageManager.storeMessageContext(createSequenceMessageStoreKey, createSeqMsg); // storing the message
+		
 		retransmitterMgr.insert(createSeqEntry);
 
-		storageManager.storeMessageContext(createSequenceMessageStoreKey, createSeqMsg); // storing the
-																// message.
-
-		// message will be stored in the Sandesha2TransportSender
-		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, createSequenceMessageStoreKey);
-
-		TransportOutDescription transportOut = createSeqMsg.getTransportOut();
-
-		createSeqMsg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
-		createSeqMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-		createSeqMsg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, createSequenceMessageStoreKey);
-
-		Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
-		createSeqMsg.setTransportOut(sandesha2TransportOutDesc);
-
-		// sending the message once through Sandesha2TransportSender.
-		AxisEngine engine = new AxisEngine(createSeqMsg.getConfigurationContext());
-		try {
-			engine.resumeSend(createSeqMsg);
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
-
+		SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey);
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage");
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg, String internalSequenceId, long messageNumber,
-			String storageKey, StorageManager storageManager) throws SandeshaException {
+			String storageKey, StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId);
 
@@ -966,14 +944,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		String newToStr = null;
 		if (msg.isServerSide()) {
-			try {
-				MessageContext requestMsg = msg.getOperationContext().getMessageContext(
-						OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
-				if (requestMsg != null) {
-					newToStr = requestMsg.getReplyTo().getAddress();
-				}
-			} catch (AxisFault e) {
-				throw new SandeshaException(e.getMessage());
+
+			MessageContext requestMsg = msg.getOperationContext().getMessageContext(
+					OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+			if (requestMsg != null) {
+				newToStr = requestMsg.getReplyTo().getAddress();
 			}
 		}
 
@@ -1001,12 +976,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (msg.isServerSide()) {
 			MessageContext requestMsg = null;
 
-			try {
-				requestMsg = msg.getOperationContext()
-						.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
-			} catch (AxisFault e) {
-				throw new SandeshaException(e.getMessage());
-			}
+			requestMsg = msg.getOperationContext()
+					.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
 
 			RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsg);
 			Sequence requestSequence = (Sequence) reqRMMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -1072,11 +1043,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsg.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, ackRequested);
 		}
 
-		try {
-			rmMsg.addSOAPEnvelope();
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1.getMessage());
-		}
+
+		rmMsg.addSOAPEnvelope();
+
 
 		// Retransmitter bean entry for the application message
 		SenderBean appMsgEntry = new SenderBean();
@@ -1094,38 +1063,22 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// Send will be set to true at the sender.
 			msg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 		}
+		
 		EndpointReference to = rmMsg.getTo();
 		if (to!=null)
 			appMsgEntry.setToAddress(to.getAddress());
 		
 		appMsgEntry.setInternalSequenceID(internalSequenceId);
 		storageManager.storeMessageContext(storageKey, msg);
-		retransmitterMgr.insert(appMsgEntry);
+
 		msg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-
-		// changing the sender. This will set send to true.
-		TransportSender sender = msg.getTransportOut().getSender();
-
-		if (sender != null) {
-			Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
-			msg.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
-			msg.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, msg.getTransportOut());
-			msg.setTransportOut(sandesha2TransportOutDesc);
-
-		}
+		retransmitterMgr.insert(appMsgEntry);
 
 		// increasing the current handler index, so that the message will not be
 		// going throught the SandeshaOutHandler again.
 		msg.setCurrentHandlerIndex(msg.getCurrentHandlerIndex() + 1);
 
-		// sending the message through, other handlers and the
-		// Sandesha2TransportSender so that it get dumped to the storage.
-		AxisEngine engine = new AxisEngine(msg.getConfigurationContext());
-		try {
-			engine.resumeSend(msg);
-		} catch (AxisFault e) {
-			throw new SandeshaException(e);
-		}
+		SandeshaUtil.executeAndStore(rmMsg, storageKey);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processResponseMessage");

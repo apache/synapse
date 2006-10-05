@@ -210,7 +210,7 @@ public class AcknowledgementManager {
 	}
 
 	public static RMMsgContext generateAckMessage(RMMsgContext referenceRMMessage, String sequencePropertyKey ,String sequenceId,
-			StorageManager storageManager) throws SandeshaException {
+			StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::generateAckMessage");
 
@@ -231,12 +231,7 @@ public class AcknowledgementManager {
 
 		AxisOperation ackOperation = null;
 
-		try {
-			ackOperation = AxisOperationFactory.getOperationDescription(WSDL20_2004Constants.MEP_URI_IN_ONLY);
-		} catch (AxisFault e) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisOperationError, e
-					.toString()), e);
-		}
+		ackOperation = AxisOperationFactory.getOperationDescription(WSDL20_2004Constants.MEP_URI_IN_ONLY);
 
 		AxisOperation rmMsgOperation = referenceRMMessage.getMessageContext().getAxisOperation();
 		if (rmMsgOperation != null) {
@@ -268,11 +263,8 @@ public class AcknowledgementManager {
 
 		// Setting new envelope
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		try {
-			ackMsgCtx.setEnvelope(envelope);
-		} catch (AxisFault e3) {
-			throw new SandeshaException(e3.getMessage());
-		}
+
+		ackMsgCtx.setEnvelope(envelope);
 
 		ackMsgCtx.setTo(acksTo);
 
@@ -297,14 +289,11 @@ public class AcknowledgementManager {
 			if (referenceRMMessage.getMessageContext().getOperationContext() == null) {
 				// operation context will be null when doing in a GLOBAL
 				// handler.
-				try {
-					AxisOperation op = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_IN_OUT);
-					OperationContext opCtx = new OperationContext(op);
-					referenceRMMessage.getMessageContext().setAxisOperation(op);
-					referenceRMMessage.getMessageContext().setOperationContext(opCtx);
-				} catch (AxisFault e2) {
-					throw new SandeshaException(e2.getMessage());
-				}
+
+				AxisOperation op = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_IN_OUT);
+				OperationContext opCtx = new OperationContext(op);
+				referenceRMMessage.getMessageContext().setAxisOperation(op);
+				referenceRMMessage.getMessageContext().setOperationContext(opCtx);
 			}
 
 			referenceRMMessage.getMessageContext().getOperationContext().setProperty(
@@ -373,17 +362,18 @@ public class AcknowledgementManager {
 			ackBean.setTimeToSend(timeToSend);
 			storageManager.storeMessageContext(key, ackMsgCtx);
 
+			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
+			
 			// inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
 			// / asyncAckTransaction.commit();
 
 			// passing the message through sandesha2sender
-			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, ackMsgCtx.getTransportOut());
 			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
-			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc());
 			ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
-
+			
+			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
+			
 			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
 		}
 

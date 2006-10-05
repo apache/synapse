@@ -104,6 +104,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			updateMessage(msgCtx);
 
 			int messageType = senderBean.getMessageType();
+			
 //			if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
 //				Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 //				String sequenceID = sequence.getIdentifier().getIdentifier();
@@ -119,59 +120,66 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				// sequence.
 				// TODO do piggybacking based on wsa:To
 					
-					
-					
 				AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager);
 			}
 
 			// sending the message
-			TransportOutDescription transportOutDescription = msgCtx.getTransportOut();
 			
 			//if a different TransportOutDesc hs already been set, it will be used instead
 			//of the one from te MessageContext.
 			
 			if (transportOut!=null)
-				transportOutDescription = transportOut;
+				msgCtx.setTransportOut(transportOut);
 			
-			TransportSender transportSender = transportOutDescription.getSender();
 
 			boolean successfullySent = false;
-			if (transportSender != null) {
 
-				// have to commit the transaction before sending. This may
-				// get changed when WS-AT is available.
-				transaction.commit();
-				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-				
-				try {
+			// have to commit the transaction before sending. This may
+			// get changed when WS-AT is available.
+			transaction.commit();
+			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
+					Sandesha2Constants.VALUE_FALSE);
 
-					// had to fully build the SOAP envelope to support
-					// retransmissions.
-					// Otherwise a 'parserAlreadyAccessed' exception could
-					// get thrown in retransmissions.
-					// But this has a performance reduction.
-					msgCtx.getEnvelope().build();
+			try {
 
-					if (log.isDebugEnabled())
-						log.debug("Invoking using transportSender " + transportSender + ", msgCtx="
-								+ msgCtx.getEnvelope().getHeader());
-					// TODO change this to cater for security.
-					transportSender.invoke(msgCtx);
-					successfullySent = true;
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e
-							.toString());
-					log.error (message, e);
+				// had to fully build the SOAP envelope to support
+				// retransmissions.
+				// Otherwise a 'parserAlreadyAccessed' exception could
+				// get thrown in retransmissions.
+				// But this has a performance reduction.
+				msgCtx.getEnvelope().build();
 
-				} finally {
-					transaction = storageManager.getTransaction();
-					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+				ArrayList retransmittablePhases = (ArrayList) msgCtx.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
+				if (retransmittablePhases!=null) {
+					msgCtx.setExecutionChain(retransmittablePhases);
+				} else {
+					ArrayList emptyExecutionChain = new ArrayList ();
+					msgCtx.setExecutionChain(emptyExecutionChain);
 				}
+				
+				msgCtx.setCurrentHandlerIndex(0);
+				msgCtx.setCurrentPhaseIndex(0);
+				msgCtx.setPaused(false);
+			
+				AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
+				engine.resumeSend(msgCtx);
+				
+				successfullySent = true;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.sendMsgError, e.toString());
+				log.error(message, e);
+
+			} finally {
+				transaction = storageManager.getTransaction();
+				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
+						Sandesha2Constants.VALUE_TRUE);
 			}
 
 			// update or delete only if the object is still present.
-			SenderBean bean1 = senderBeanMgr.retrieve(senderBean.getMessageID());
+			SenderBean bean1 = senderBeanMgr
+					.retrieve(senderBean.getMessageID());
 			if (bean1 != null) {
 				if (senderBean.isReSend()) {
 					bean1.setSentCount(senderBean.getSentCount());

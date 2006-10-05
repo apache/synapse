@@ -18,6 +18,9 @@
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
@@ -126,6 +129,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 																										// created
 																										// sequnceID.
 
+
+			
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 					newSequenceId, storageManager); // converting the blank out
 													// message in to a create

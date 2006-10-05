@@ -65,11 +65,10 @@ public class Sandesha2TransportSender implements TransportSender  {
 		AxisConfiguration axisConfiguration = configurationContext.getAxisConfiguration();
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,axisConfiguration);
-
+		
 		msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING,Sandesha2Constants.VALUE_TRUE);
 		
 		storageManager.updateMessageContext(key,msgContext);
-		
 
 	}
 

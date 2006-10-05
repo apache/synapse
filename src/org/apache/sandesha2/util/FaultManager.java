@@ -415,8 +415,11 @@ public class FaultManager {
 
 			// end hack
 
+			AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
+
+			
 			//TODO this fails when the in message is in only. Fault is thrown at the InOnlyAxisOperation
-			MessageContext faultMsgContext = Utils.createOutMessageContext(referenceMessage);
+			MessageContext faultMsgContext = SandeshaUtil.createNewRelatedMessageContext(referenceRMMsgContext, operation); //Utils.createOutMessageContext(referenceMessage);
 
 			// setting contexts.
 			faultMsgContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
@@ -427,7 +430,6 @@ public class FaultManager {
 			faultMsgContext.setServiceContext(referenceMessage.getServiceContext());
 			faultMsgContext.setServiceContextID(referenceMessage.getServiceContextID());
 
-			AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 
 			OperationContext operationContext = new OperationContext(operation);
 
@@ -465,6 +467,8 @@ public class FaultManager {
 					.getRMNamespaceValue());
 
 			RMMsgContext faultRMMsgCtx = MsgInitializer.initializeMessage(faultMsgContext);
+			
+			faultRMMsgCtx.setAction(SpecSpecificConstants.getFaultAction (addressingNamespaceURI));
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::getFault");

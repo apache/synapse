@@ -95,6 +95,10 @@ public class SandeshaOutHandler extends AbstractHandler {
 				return;
 			}
 		}
+		
+		//this will change the execution chain of this message to work correctly in retransmissions.
+		//For e.g. Phases like security will be removed to be called in each retransmission.
+		SandeshaUtil.modifyExecutionChainForStoring(msgCtx);
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE)) {
@@ -102,7 +106,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 				log.debug("Exit: SandeshaOutHandler::invoke, Application processing done");
 			return;
 		}
-
+		
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 

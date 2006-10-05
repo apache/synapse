@@ -51,7 +51,9 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
@@ -68,6 +70,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.workers.Invoker;
 import org.apache.sandesha2.workers.Sender;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -1044,4 +1047,75 @@ public class SandeshaUtil {
 		
 		return false;
 	}
+	
+	public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey) throws AxisFault {
+		
+		MessageContext msgContext = rmMsgContext.getMessageContext();
+		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
+		
+		rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
+
+
+		// message will be stored in the Sandesha2TransportSender
+		msgContext.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
+
+		TransportOutDescription transportOut = msgContext.getTransportOut();
+
+		msgContext.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
+		msgContext.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
+		msgContext.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
+
+		Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
+		msgContext.setTransportOut(sandesha2TransportOutDesc);
+
+ 		// sending the message once through Sandesha2TransportSender.
+ 		AxisEngine engine = new AxisEngine(configurationContext);
+
+		if (msgContext.isPaused())
+			engine.resumeSend(msgContext);
+		else
+			engine.send(msgContext);
+
+
+	}
+	
+	public static void modifyExecutionChainForStoring (MessageContext message) {
+		
+		Object property = message.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
+		if (property!=null)
+			return; //Phases are already set. Dont hv to redo.
+		
+		TransportOutDescription transportOutDescription = message.getTransportOut();
+		if (!(transportOutDescription instanceof Sandesha2TransportOutDesc))
+			return; //This message is aimed to be stored only if, Sandesha2TransportOutDescription is set.
+		
+		ArrayList executionChain = message.getExecutionChain();
+		ArrayList retransmittablePhaseNames = getRetransmittablePhaseNameList();
+		ArrayList retransmittablePhases = new ArrayList ();
+		
+		for (Iterator it=executionChain.iterator();it.hasNext();) {
+			Handler handler = (Handler) it.next();
+			
+			if (retransmittablePhaseNames.contains(handler.getName())) {
+				retransmittablePhases.add(handler);
+				
+				it.remove();
+			}
+		}
+		
+		message.setProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES, retransmittablePhases);
+	}
+	
+	private static ArrayList getRetransmittablePhaseNameList () {
+		
+		//TODO get this phase list from a property
+		
+		String security = "Security";
+		
+		ArrayList phases = new ArrayList ();
+		phases.add(security);
+		
+		return phases;
+	}
+	
 }

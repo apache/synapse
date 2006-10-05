@@ -314,5 +314,13 @@ public class SpecSpecificConstants {
 		return null;
 	}
 
+	public static String getFaultAction (String addressingNamespace) {
+		if (AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNamespace))
+			return AddressingConstants.Final.WSA_FAULT_ACTION;
+		else if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNamespace))
+			return AddressingConstants.Submission.WSA_FAULT_ACTION;
+		
+		return null;
+	}
 
 }

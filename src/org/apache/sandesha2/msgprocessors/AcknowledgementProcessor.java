@@ -40,8 +40,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -63,7 +65,7 @@ public class AcknowledgementProcessor {
 
 	private static final Log log = LogFactory.getLog(AcknowledgementProcessor.class);
 
-	public void processAckHeaders(MessageContext message) throws SandeshaException {
+	public void processAckHeaders(MessageContext message) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeaders");
 
@@ -91,8 +93,7 @@ public class AcknowledgementProcessor {
 	}
 	
 	private void processAckHeader(MessageContext msgCtx, OMElement soapHeader, SequenceAcknowledgement sequenceAck)
-	throws SandeshaException
-	{
+		throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeader " + soapHeader);
 		
@@ -245,9 +246,15 @@ public class AcknowledgementProcessor {
 				boolean complete = AcknowledgementManager.verifySequenceCompletion(sequenceAck
 						.getAcknowledgementRanges().iterator(), highestOutMsgNo);
 
-				if (complete)
+				if (complete) {
+					
+					//using create sequence message as the reference message.
+//					CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
+//					CreateSeqBean createSeqBean = createSeqBeanMgr.retrieve(msgId);
+//					
 					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, outSequenceId, sequencePropertyKey,
 							storageManager);
+				}
 			}
 		}
 

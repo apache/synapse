@@ -69,7 +69,7 @@ public class AckRequestedProcessor {
 
 	private static final Log log = LogFactory.getLog(AckRequestedProcessor.class);
 
-	public void processAckRequestedHeaders(MessageContext message) throws SandeshaException {
+	public void processAckRequestedHeaders(MessageContext message) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
@@ -95,7 +95,7 @@ public class AckRequestedProcessor {
 			log.debug("Exit: AckRequestedProcessor::processAckRequestHeaders");
 	}
 
-	public void processAckRequestedHeader(MessageContext msgContext, OMElement soapHeader, AckRequested ackRequested) throws SandeshaException {
+	public void processAckRequestedHeader(MessageContext msgContext, OMElement soapHeader, AckRequested ackRequested) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader " + soapHeader);
 
@@ -281,25 +281,14 @@ public class AckRequestedProcessor {
 			ackBean.setTimeToSend(timeToSend);
 
 			storageManager.storeMessageContext(key, ackMsgCtx);
-
+			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
+			
 			// inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
 
 			// passing the message through sandesha2sender
 
-			ackMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, ackMsgCtx.getTransportOut());
-			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-
-			ackMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
-
-			ackMsgCtx.setTransportOut(new Sandesha2TransportOutDesc());
-
-			AxisEngine engine = new AxisEngine(configurationContext);
-			try {
-				engine.send(ackMsgCtx);
-			} catch (AxisFault e) {
-				throw new SandeshaException(e.getMessage());
-			}
+			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
 
 			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
 

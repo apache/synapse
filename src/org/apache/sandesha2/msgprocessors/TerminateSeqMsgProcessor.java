@@ -258,7 +258,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 	}
 
 	private void addTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, String sequencePropertyKey,String sequenceId,
-			StorageManager storageManager) throws SandeshaException {
+			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceId);
@@ -305,16 +305,11 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		AxisEngine engine = new AxisEngine(terminateSeqMsg.getConfigurationContext());
 
-		try {
-			engine.send(outMessage);
-		} catch (AxisFault e) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendTerminateResponse, e
-					.toString());
-			throw new SandeshaException(message, e);
-		}
+		engine.send(outMessage);
 
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
+
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 
 		if (anonymousURI.equals(toEPR.getAddress())) {
@@ -327,7 +322,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			log.debug("Exit: TerminateSeqMsgProcessor::addTerminateSequenceResponse");
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::processOutMessage");
@@ -363,28 +358,29 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		// TODO do processing of terminateMessagesCorrectly., create a new
 		// message instead of sendign the one given by the serviceClient
 		// TODO important
-		try {
-			AxisOperation oldOPeration = msgContext.getAxisOperation();
-			AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
-			
-			AxisOperation referenceInOutOperation = msgContext.getAxisService().getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
-			if (referenceInOutOperation==null) {
-				String messge = "Cant find the recerence RM InOut operation";
-				throw new SandeshaException (messge);
-			}
-			
-			// setting flows
-			outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
-//			outInAxisOp.setRemainingPhasesInFlow(oldOPeration.getRemainingPhasesInFlow());
 
-			OperationContext opcontext = OperationContextFactory.createOperationContext(
-					WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);
-			opcontext.setParent(msgContext.getServiceContext());
-			configurationContext.registerOperationContext(rmMsgCtx.getMessageId(), opcontext);
-		} catch (AxisFault e1) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.axisOperationRegisterError, e1.toString()));
+		AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
+
+		AxisOperation referenceInOutOperation = msgContext.getAxisService()
+				.getOperation(
+						new QName(Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
+		if (referenceInOutOperation == null) {
+			String messge = "Cant find the recerence RM InOut operation";
+			throw new SandeshaException(messge);
 		}
+
+		// setting flows
+		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
+		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
+				.getRemainingPhasesInFlow());
+
+		OperationContext opcontext = OperationContextFactory
+				.createOperationContext(
+						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);
+		opcontext.setParent(msgContext.getServiceContext());
+		configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),
+				opcontext);
+
 
 		if (terminated != null && "true".equals(terminated)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);
@@ -457,20 +453,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		seqPropMgr.insert(terminateAdded);
 
-		// This should be dumped to the storage by the sender
-		TransportOutDescription transportOut = msgContext.getTransportOut();
-		rmMsgCtx.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
-		rmMsgCtx.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, key);
 		rmMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-		rmMsgCtx.getMessageContext().setTransportOut(new Sandesha2TransportOutDesc());
-		// / addTerminateSeqTransaction.commit();
 
-		AxisEngine engine = new AxisEngine(configurationContext);
-		try {
-			engine.send(msgContext);
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
-		}
+		SandeshaUtil.executeAndStore(rmMsgCtx, key);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage");

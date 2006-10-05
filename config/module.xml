@@ -4,7 +4,7 @@
         This module implements WS-ReliableMessaging for Axis2. This implements both the WSRM submitted spec and the new spec being developed under the OASIS WSRX group.
     </Description>
     
-    <inflow>
+    <InFlow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
             <!-- Global In handler should come before instance dispatching -->
             <order phase="Dispatch" before="InstanceDispatcher" />
@@ -12,15 +12,15 @@
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">
             <order phase="RMPhase"/>
         </handler>
-    </inflow>
+    </InFlow>
 
-    <outflow>        
+    <OutFlow>        
         <handler name="SandeshaOutHandler" class="org.apache.sandesha2.handlers.SandeshaOutHandler">
             <order phase="RMPhase"/>
         </handler>   
-    </outflow>
+    </OutFlow>
     
-    <INfaultflow>        
+    <InFaultFlow>        
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
             <!-- Global In handler should come before instance dispatching -->
             <order phase="Dispatch" before="InstanceDispatcher" />
@@ -28,13 +28,13 @@
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">
             <order phase="RMPhase"/>
         </handler>
-    </INfaultflow>
+    </InFaultFlow>
     
-    <OUTfaultflow>        
+    <OutFaultFlow>        
         <handler name="SandeshaOutHandler" class="org.apache.sandesha2.handlers.SandeshaOutHandler">
             <order phase="RMPhase"/>
         </handler>   
-    </OUTfaultflow>
+    </OutFaultFlow>
 
     <operation name="RMInOnlyOperation" mep="http://www.w3.org/2004/08/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>

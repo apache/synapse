@@ -358,7 +358,7 @@
     <!-- ================================================================ -->
     <!--- Create the Distro -->
     <!-- ================================================================ -->
-    <goal name="dist-bin" prereqs="init,war,create-jar,dist-nhttp">
+    <goal name="dist-bin" prereqs="init,war,create-jar,dist-nhttp,dist-extensions">
         <ant:echo>+----------------------------------------------</ant:echo>
         <ant:echo>| Creating: Synapse Binary Distribution</ant:echo>
         <ant:echo>+----------------------------------------------</ant:echo>
@@ -430,7 +430,7 @@
             </ant:fileset>
         </ant:copy>
         <ant:copy file="modules/nhttp/target/synapse-nhttp-${pom.currentVersion}.jar"
-                  tofile="${bin.dist.dir}/lib/Apache-Synapse-nhttp-${pom.currentVersion}.zip"/>
+                  tofile="${bin.dist.dir}/lib/${dist.name}-nhttp-${pom.currentVersion}.jar"/>
 
         <ant:copy todir="${bin.dist.dir}/licenses" flatten="true">
             <ant:fileset dir="licenses">

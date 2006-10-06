@@ -22,14 +22,19 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContextConstants;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
+import org.apache.rahas.RahasConstants;
 import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -129,10 +134,11 @@ public class Scenario_4_1 {
         ConfigurationContext configurationContext = generateConfigContext();
         
         RMInteropServiceStub stub = new RMInteropServiceStub (configurationContext, targetEndpoint);
-        setUpOptions(stub._getServiceClient().getOptions());
+        ServiceClient serviceClient = stub._getServiceClient();
+        setUpOptions(serviceClient.getOptions());
         
         //engage Rampart
-        stub._getServiceClient().engageModule(new QName("rampart"));
+        serviceClient.engageModule(new QName("rampart"));
         
 		Ping ping = new Ping ();
 		ping.setText("ping1");
@@ -146,8 +152,15 @@ public class Scenario_4_1 {
 		ping.setText("ping3");
 		stub.Ping (ping);
         
-        terminateSequence(stub._getServiceClient());
-        stub._getServiceClient().finalizeInvoke();
+        terminateSequence(serviceClient);
+        Thread.sleep(5000);
+        
+        serviceClient.getOptions().setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE, Constants.VALUE_TRUE);
+        serviceClient.getOptions().setProperty(RampartMessageData.CANCEL_REQUEST, Constants.VALUE_TRUE);
+        stub.Ping(ping);
+        
+        Thread.sleep(10000);
+//        stub._getServiceClient().finalizeInvoke();
         
     }
     

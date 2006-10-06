@@ -93,8 +93,8 @@ public class Scenario_4_1 {
         }
 
 
-//      new Scenario_1_1 ().run();
-        new Scenario_4_1().runStub();
+      new Scenario_4_1 ().run();
+//        new Scenario_4_1().runStub();
     }
     
     private void run () throws Exception {
@@ -104,7 +104,10 @@ public class Scenario_4_1 {
         Options clientOptions = new Options ();
         setUpOptions(clientOptions);
         
-        ServiceClient serviceClient = new ServiceClient (configurationContext,null);        
+        ServiceClient serviceClient = new ServiceClient (configurationContext,null);
+        
+//      engage Rampart
+        serviceClient.engageModule(new QName("rampart"));
         
         serviceClient.setOptions(clientOptions);
         
@@ -114,14 +117,22 @@ public class Scenario_4_1 {
         
         terminateSequence(serviceClient);
         
+        Thread.sleep(5000);
+        
+        serviceClient.getOptions().setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE, Constants.VALUE_TRUE);
+        serviceClient.getOptions().setProperty(RampartMessageData.CANCEL_REQUEST, Constants.VALUE_TRUE);
+        serviceClient.fireAndForget(getPingOMBlock("cancel"));
+        
+        Thread.sleep(10000);
+        
         serviceClient.finalizeInvoke();
     }
     
     private static OMElement getPingOMBlock(String text) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-        OMElement pingElem = fac.createOMElement(PingRequest, namespace);
-        OMElement textElem = fac.createOMElement(Text, null);
+        OMElement pingElem = fac.createOMElement("Ping", namespace);
+        OMElement textElem = fac.createOMElement(Text, namespace);
         
         textElem.setText(text);
         pingElem.addChild(textElem);

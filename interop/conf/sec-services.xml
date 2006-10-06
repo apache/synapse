@@ -28,18 +28,6 @@
 		mep="http://www.w3.org/2004/08/wsdl/in-only">
 		<actionMapping>urn:wsrm:Ping</actionMapping>
 	</operation>
-	<operation name="echoString"
-		mep="http://www.w3.org/2004/08/wsdl/in-out">
-		<actionMapping>urn:wsrm:EchoString</actionMapping>
-		<outputActionMapping>
-			urn:wsrm:EchoStringResponse
-		</outputActionMapping>
-	</operation>
-	<operation name="ping"
-		mep="http://www.w3.org/2004/08/wsdl/in-only">
-		<actionMapping>urn:wsrm:Ping</actionMapping>
-	</operation>
-	
 	
 	<!-- Rampart and Rahas configurations -->
 	<wsp:Policy wsu:Id="Scenario51Policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">

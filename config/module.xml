@@ -116,7 +116,7 @@
 				</wsrm:StorageManagers>
 	      
 	      <!-- This will not be overriden by service level policies -->
-				<wsrm:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</wsrm:SecurityManager>
+				<wsrm:SecurityManager>org.apache.sandesha2.security.rampart.RampartBasedSecurityManager</wsrm:SecurityManager>
 			</wsp:Policy>
 		</wsrm:RMAssertion>
 	</wsp:Policy>

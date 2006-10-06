@@ -199,8 +199,8 @@ public class RampartBasedSecurityManager extends SecurityManager {
                 
                 Policy servicePolicy = (Policy)message.getProperty(RampartMessageData.KEY_RAMPART_POLICY);
                 if(servicePolicy == null) {
-                    String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noServicePolicy);
-                    throw new SandeshaException(msg);
+                    //Missing service policy means no security requirement
+                    return null;
                 }
                 List it = (List)servicePolicy.getAlternatives().next();
                 RampartPolicyData rpd = RampartPolicyBuilder.build(it);

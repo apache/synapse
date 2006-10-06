@@ -79,6 +79,7 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
  * Contains utility methods that are used in many plases of Sandesha2.
@@ -609,9 +610,12 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			
-			//TODO - move this to a property file.
+			//TODO - move these to a property file.
             newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
                     .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
+            
+            newMessageContext.setProperty(WSHandlerConstants.RECV_RESULTS, 
+                    referenceMessage.getProperty(WSHandlerConstants.RECV_RESULTS));
             
 			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
 

@@ -128,7 +128,7 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo3",sequenceKey),callback3);
 
         
-        Thread.sleep(10000);
+        Thread.sleep(15000);
 		
         //assertions for the out sequence.
 		SequenceReport outgoingSequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
@@ -208,7 +208,7 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo3",sequenceKey),callback3);
 
         
-        Thread.sleep(10000);
+        Thread.sleep(15000);
 		
         //assertions for the out sequence.
         //assertions for the out sequence.

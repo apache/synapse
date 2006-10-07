@@ -33,6 +33,7 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**
@@ -56,6 +57,9 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		  terminateResRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
 		
 		String sequenceId = tsResponse.getIdentifier().getIdentifier();
+		String internalSequenceID = SandeshaUtil.getSequenceProperty(sequenceId,
+				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceID);
 		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(terminateResRMMsg);
 
 		// Check that the sender of this TerminateSequence holds the correct token
@@ -67,10 +71,11 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 			secManager.checkProofOfPossession(token, body, msgContext);
 		}
 
-		//doing the termination
-//		TODO - do termination correctly.
-//		TerminateManager.terminateSendingSide(configContext, sequencePropertyKey, msgCtx.isServerSide(),
-//				storageManager);
+		ConfigurationContext configContext = msgContext.getConfigurationContext();
+
+
+		TerminateManager.terminateSendingSide (configContext, sequencePropertyKey,internalSequenceID, msgContext.isServerSide(),
+				storageManager);
 		
 		// Stop this message travelling further through the Axis runtime
 		terminateResRMMsg.pause();

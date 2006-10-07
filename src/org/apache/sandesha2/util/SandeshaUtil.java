@@ -613,6 +613,8 @@ public class SandeshaUtil {
 			//TODO - move these to a property file.
             newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
                     .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
+            newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
+                    .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
             
             newMessageContext.setProperty(WSHandlerConstants.RECV_RESULTS, 
                     referenceMessage.getProperty(WSHandlerConstants.RECV_RESULTS));
@@ -904,7 +906,7 @@ public class SandeshaUtil {
 		Parameter parameter = axisDescription.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 		if (parameter==null)
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.defaultPropertyBeanNotSet));
+					SandeshaMessageKeys.propertyBeanNotSet));
 		
 		SandeshaPolicyBean propertyBean = (SandeshaPolicyBean) parameter.getValue();
 		return propertyBean;

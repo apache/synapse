@@ -201,7 +201,7 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void terminateSendingSide(ConfigurationContext configContext, String internalSequenceID,
+	public static void terminateSendingSide(ConfigurationContext configContext, String sequencePropertyKey, String internalSequenceID,
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
@@ -210,7 +210,7 @@ public class TerminateManager {
 				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED, Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
 
-		cleanSendingSideData(configContext, internalSequenceID, serverSide, storageManager);
+		cleanSendingSideData (configContext, sequencePropertyKey , internalSequenceID, serverSide, storageManager);
 	}
 
 	private static void doUpdatesIfNeeded(String sequenceID, SequencePropertyBean propertyBean,
@@ -280,33 +280,33 @@ public class TerminateManager {
 		return deleatable;
 	}
 
-	public static void timeOutSendingSideSequence(ConfigurationContext context, String internalSequenceID,
+	public static void timeOutSendingSideSequence(ConfigurationContext context, String sequencePropertyKey,String internalSequenceId,
 			boolean serverside, StorageManager storageManager) throws SandeshaException {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean(internalSequenceID,
+		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT, Sandesha2Constants.VALUE_TRUE);
 		seqPropMgr.insert(seqTerminatedBean);
 
-		cleanSendingSideData(context, internalSequenceID, serverside, storageManager);
+		cleanSendingSideData(context, sequencePropertyKey,internalSequenceId, serverside, storageManager);
 	}
 
-	private static void cleanSendingSideData(ConfigurationContext configContext, String internalSequenceID,
+	private static void cleanSendingSideData(ConfigurationContext configContext, String sequencePropertyKey,String internalSequenceId,
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 
-		String outSequenceID = SandeshaUtil.getSequenceProperty(internalSequenceID,
+		String outSequenceID = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
 
 		if (!serverSide) {
 			boolean stopListnerForAsyncAcks = false;
-			SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,
+			SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 
-			String addressingNamespace = SandeshaUtil.getSequenceProperty(internalSequenceID,
+			String addressingNamespace = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
 
@@ -319,7 +319,7 @@ public class TerminateManager {
 		}
 
 		// removing retransmitterMgr entries and corresponding message contexts.
-		Collection collection = retransmitterBeanMgr.find(internalSequenceID);
+		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			SenderBean retransmitterBean = (SenderBean) iterator.next();
@@ -331,7 +331,7 @@ public class TerminateManager {
 
 		// removing the createSeqMgrEntry
 		CreateSeqBean findCreateSequenceBean = new CreateSeqBean();
-		findCreateSequenceBean.setInternalSequenceID(internalSequenceID);
+		findCreateSequenceBean.setInternalSequenceID(internalSequenceId);
 		collection = createSeqBeanMgr.find(findCreateSequenceBean);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {
@@ -341,7 +341,7 @@ public class TerminateManager {
 
 		// removing sequence properties
 		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean();
-		findSequencePropertyBean1.setSequencePropertyKey(internalSequenceID);
+		findSequencePropertyBean1.setSequencePropertyKey(sequencePropertyKey);
 		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean1);
 		iterator = collection.iterator();
 		while (iterator.hasNext()) {

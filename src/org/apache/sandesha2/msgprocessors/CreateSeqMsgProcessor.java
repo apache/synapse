@@ -65,7 +65,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext createSeqRMMsg) throws SandeshaException {
+	public void processInMessage(RMMsgContext createSeqRMMsg) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
 
@@ -82,19 +82,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager.checkForCreateSequenceRefused(createSeqMsg, storageManager);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = createSeqMsg.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault), e);
-			}
-
-			createSeqMsg.pause();
-			return;
+		SandeshaException fault = faultManager.checkForCreateSequenceRefused(createSeqMsg, storageManager);
+		if (fault != null) {
+			throw fault;
 		}
 		
 		// If the inbound CreateSequence includes a SecurityTokenReference then

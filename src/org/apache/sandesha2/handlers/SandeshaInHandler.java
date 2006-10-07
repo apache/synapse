@@ -132,12 +132,10 @@ public class SandeshaInHandler extends AbstractHandler {
 				if (msgProcessor != null)
 					msgProcessor.processInMessage(rmMsgCtx);
 			} catch (SandeshaException se) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgError, se.toString());
-				log.debug(message, se);
-				throw new AxisFault(message, se);
+				throw se;
 			}
 
-		} catch (Exception e) {
+		} catch (AxisFault e) {
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
 
@@ -152,8 +150,7 @@ public class SandeshaInHandler extends AbstractHandler {
 				}
 			}
 
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
-			throw new AxisFault(message, e);
+			throw e;
 		} finally {
 			if (!withinTransaction && !rolebacked) {
 				try {

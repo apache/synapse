@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -347,6 +348,11 @@ public class RMMsgCreator {
 			OMElement str = secMgr.createSecurityTokenReference(token, createSeqmsgContext);
 			createSequencePart.setSecurityTokenReference(str);
 			createSeqRMMsg.setProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, token);
+			
+			//adding the UseSequenceSTR header
+			SOAPFactory createSeqFactory = (SOAPFactory) createSeqRMMsg.getSOAPEnvelope().getOMFactory();
+			OMNamespace namespace = createSeqFactory.createOMNamespace(Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM, createSeqRMMsg.getRMNamespaceValue());
+			createSeqFactory.createSOAPHeaderBlock(Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR, namespace);
 		}
 
 		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, createSequencePart);

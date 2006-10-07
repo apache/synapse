@@ -138,27 +138,13 @@ public class AcknowledgementProcessor {
 		Iterator nackIterator = sequenceAck.getNackList().iterator();
 
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager
+		SandeshaException fault = faultManager
 				.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager);
-		if(faultMessageContext == null) {
-			faultMessageContext = faultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
+		if(fault == null) {
+			fault = faultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
 		}
-		if (faultMessageContext != null) {
-
-			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(
-						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e.toString()),
-						e);
-			}
-
-			// TODO: Should a bad ack stop processing of the message?
-			msgCtx.pause();
-			return;
+		if (fault != null) {
+			throw fault;
 		}
 
 		// updating the last activated time of the sequence.

@@ -27,6 +27,13 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPFaultCode;
+import org.apache.axiom.soap.SOAPFaultDetail;
+import org.apache.axiom.soap.SOAPFaultReason;
+import org.apache.axiom.soap.SOAPFaultSubCode;
+import org.apache.axiom.soap.SOAPFaultText;
+import org.apache.axiom.soap.SOAPFaultValue;
+import org.apache.axiom.soap.impl.dom.SOAPTextImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -77,8 +84,8 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public RMMsgContext checkForCreateSequenceRefused(MessageContext createSequenceMessage,
-			StorageManager storageManager) throws SandeshaException {
+	public SandeshaException checkForCreateSequenceRefused(MessageContext createSequenceMessage,
+			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForCreateSequenceRefused");
@@ -108,6 +115,10 @@ public class FaultManager {
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
 			data.setReason(reason);
+			
+			//Adding the create sequencePart as the detail.
+			data.setDetail(createSequenceMessage.getEnvelope().getBody().getFirstElement());
+			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForCreateSequenceRefused, refused sequence");
 			return getFault(createSequenceRMMsg, data, createSequenceRMMsg.getAddressingNamespaceValue(),
@@ -127,8 +138,8 @@ public class FaultManager {
 	 * @param msgCtx
 	 * @return
 	 */
-	public RMMsgContext checkForLastMsgNumberExceeded(RMMsgContext applicationRMMessage, StorageManager storageManager)
-			throws SandeshaException {
+	public SandeshaException checkForLastMsgNumberExceeded(RMMsgContext applicationRMMessage, StorageManager storageManager)
+			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForLastMsgNumberExceeded");
 		Sequence sequence = (Sequence) applicationRMMessage.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -162,6 +173,15 @@ public class FaultManager {
 
 			faultData.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED);
 			faultData.setReason(reason);
+			
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			String rmNamespace = applicationRMMessage.getRMNamespaceValue();
+			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
+					rmNamespace, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			identifierElement.setText(sequenceID);
+			
+			faultData.setDetail(identifierElement);
+			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForLastMsgNumberExceeded, lastMessageNumberExceeded");
 			return getFault(applicationRMMessage, faultData, applicationRMMessage.getAddressingNamespaceValue(),
@@ -186,8 +206,8 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public RMMsgContext checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
-			StorageManager storageManager) throws SandeshaException {
+	public SandeshaException checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
+			StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForUnknownSequence, " + sequenceID);
 
@@ -242,12 +262,11 @@ public class FaultManager {
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE);
 
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
-			// Identifier identifier = new Identifier(factory,rmNamespaceValue);
-			// identifier.setIndentifer(sequenceID);
-			// OMElement identifierOMElem = identifier.getOMElement();
 
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
 					rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			identifierElement.setText(sequenceID);
+			
 			data.setDetail(identifierElement);
 
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSequenceEstablished, sequenceID));
@@ -271,8 +290,8 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public RMMsgContext checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, StorageManager storageManager)
-			throws SandeshaException {
+	public SandeshaException checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, StorageManager storageManager)
+			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForInvalidAcknowledgement");
 
@@ -342,8 +361,8 @@ public class FaultManager {
 		return null;
 	}
 
-	public RMMsgContext checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
-			StorageManager storageManager) throws SandeshaException {
+	public SandeshaException checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
+			StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
@@ -371,6 +390,14 @@ public class FaultManager {
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED);
 			data.setReason(reason);
+			
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
+			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
+					rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			identifierElement.setText(sequenceID);
+			
+			data.setDetail(identifierElement);
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
@@ -379,8 +406,53 @@ public class FaultManager {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForSequenceClosed");
+		
 		return null;
 
+	}
+	
+	
+	public SandeshaException getFault (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
+			StorageManager storageManager) throws AxisFault {
+		
+		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
+		
+		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
+		SOAPFaultSubCode faultSubCode = factory.createSOAPFaultSubCode(faultCode);
+		
+		SOAPFaultValue faultColdValue = factory.createSOAPFaultValue(faultCode);
+		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
+		
+		faultColdValue.setText(data.getCode());
+		faultSubcodeValue.setText(data.getSubcode());
+
+		faultCode.setSubCode(faultSubCode);
+		
+		SOAPFaultReason reason = factory.createSOAPFaultReason();
+		SOAPFaultText reasonText = factory.createSOAPFaultText();
+		reasonText.setText(data.getReason());
+		reason.addSOAPText(reasonText);
+		
+		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
+		detail.addDetailEntry(data.getDetail());
+		System.out.println("Detail:" + data.getDetail());
+		
+		String SOAPNamespaceValue = factory.getSoapVersionURI();
+		
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+		} else {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
+			throw new SandeshaException (message);
+		}
+		
+		SandeshaException fault = new SandeshaException("");
+		return fault;
 	}
 
 	/**
@@ -392,7 +464,7 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public RMMsgContext getFault(RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
+	public RMMsgContext getFaultMessage (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
 			StorageManager storageManager) throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::getFault");
@@ -472,6 +544,10 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::getFault");
+			
+			//setting the serverSide property
+			faultMsgContext.setServerSide(true);
+			
 			return faultRMMsgCtx;
 
 		} catch (AxisFault e) {

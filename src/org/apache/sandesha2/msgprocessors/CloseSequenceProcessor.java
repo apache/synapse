@@ -83,20 +83,9 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()), e);
-			}
-
-			msgCtx.pause();
-			return;
+		SandeshaException fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		if (fault != null) {
+			throw fault;
 		}
 
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();

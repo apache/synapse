@@ -162,6 +162,7 @@ public interface Sandesha2Constants {
 		String PENDING = "pending";
 		
 		String USES_SEQUENCE_STR = "UsesSequenceSTR";
+		
 	}
 
 	public interface WSA {

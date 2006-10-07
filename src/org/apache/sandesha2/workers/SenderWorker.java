@@ -200,11 +200,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)
-					/*&&
-					 (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmMsgCtx.getRMNamespaceValue()))*/) {
-				
-				//TODO - cant do below due to a bug. Since CreateSequenceResponsMsgProcessor does not get called
-				//currently. To fix this fix the 'todo' in the processOutMessage method of the TerminateSeqMsgProcesser.
+					&&
+					 (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmMsgCtx.getRMNamespaceValue()))) {
 				
 				//terminate message sent using the SandeshaClient. Since the terminate message will simply get the
 				//InFlow of the reference message get called which could be zero sized (OutOnly operations).
@@ -219,7 +216,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 				String internalSequenceID = SandeshaUtil.getSequenceProperty(sequenceID,
 						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
-				TerminateManager.terminateSendingSide(configContext, internalSequenceID, msgCtx.isServerSide(),
+				String sequencePropertyKey = internalSequenceID; //property key of the sending side is the internal sequence Id.
+				TerminateManager.terminateSendingSide(configContext, sequencePropertyKey ,internalSequenceID, msgCtx.isServerSide(),
 						storageManager);
 			}
 
@@ -228,10 +226,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} catch (SandeshaException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MissingResourceException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AxisFault e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (transaction!=null && transaction.isActive())

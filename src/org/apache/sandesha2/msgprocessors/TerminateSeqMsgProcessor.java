@@ -112,21 +112,10 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		}
 
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId,
+		SandeshaException fault = faultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId,
 				storageManager);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = terminateSeqMsg.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()), e);
-			}
-
-			terminateSeqMsg.pause();
-			return;
+		if (fault != null) {
+			throw fault;
 		}
 
 
@@ -299,7 +288,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		terminateSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-		EndpointReference toEPR = terminateSeqMsg.getTo();
+		EndpointReference toEPR = terminateSeqResponseRMMsg.getTo();
 		
 		outMessage.setResponseWritten(true);
 
@@ -369,6 +358,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(messge);
 		}
 
+		outInAxisOp.setParent(msgContext.getAxisService());
 		// setting flows
 		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
 		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
@@ -381,7 +371,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),
 				opcontext);
 
-
+		msgContext.setOperationContext(opcontext);
+		msgContext.setAxisOperation(outInAxisOp);
+		
 		if (terminated != null && "true".equals(terminated)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);
 			log.debug(message);

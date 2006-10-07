@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.util;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
@@ -42,7 +43,7 @@ public class MessageRetransmissionAdjuster {
 	private static final Log log = LogFactory.getLog(MessageRetransmissionAdjuster.class);
 
 	public static boolean adjustRetransmittion(RMMsgContext rmMsgCtx, SenderBean retransmitterBean, ConfigurationContext configContext,
-			StorageManager storageManager) throws SandeshaException {
+			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: MessageRetransmissionAdjuster::adjustRetransmittion");
@@ -50,6 +51,11 @@ public class MessageRetransmissionAdjuster {
 		String internalSequenceID = retransmitterBean.getInternalSequenceID();
 		String sequenceID = retransmitterBean.getSequenceID();
 
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceID);
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, sequenceID);
+		
+		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
+		
 		// operation is the lowest level Sandesha2 could be attached.
 		SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation());
 
@@ -72,7 +78,8 @@ public class MessageRetransmissionAdjuster {
 
 			// Only messages of outgoing sequences get retransmitted. So named
 			// following method according to that.
-			finalizeTimedOutSequence(internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
+			
+			finalizeTimedOutSequence(sequencePropertyKey,internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
 			continueSending = false;
 		}
 
@@ -126,14 +133,14 @@ public class MessageRetransmissionAdjuster {
 		return interval;
 	}
 
-	private static void finalizeTimedOutSequence(String internalSequenceID, String sequenceID, MessageContext messageContext,
+	private static void finalizeTimedOutSequence(String sequencePropertyKey ,String internalSequenceID, String sequenceID, MessageContext messageContext,
 			StorageManager storageManager) throws SandeshaException {
 		ConfigurationContext configurationContext = messageContext.getConfigurationContext();
 
 		configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, messageContext
 				.getProperty(Sandesha2Constants.WITHIN_TRANSACTION));
 		SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configurationContext);
-		TerminateManager.timeOutSendingSideSequence(configurationContext, internalSequenceID, false, storageManager);
+		TerminateManager.timeOutSendingSideSequence(configurationContext,sequencePropertyKey ,internalSequenceID, false, storageManager);
 
 		SandeshaListener listener = (SandeshaListener) messageContext
 				.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);

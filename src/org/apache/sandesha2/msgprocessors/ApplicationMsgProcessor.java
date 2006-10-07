@@ -134,20 +134,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		FaultManager faultManager = new FaultManager();
-		RMMsgContext faultMessageContext = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, 
-						e.toString()));
-			}
-
-			msgCtx.pause();
-			return;
+		SandeshaException fault = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
+		if (fault != null) {
+			throw fault;
 		}
 
 		// setting acked msg no range
@@ -158,20 +147,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
-		faultMessageContext = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.send(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()));
-			}
-
-			msgCtx.pause();
-			return;
+		fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		if (fault != null) {
+			throw fault;
 		}
 
 		// setting mustUnderstand to false.
@@ -179,19 +157,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		rmMsgCtx.addSOAPEnvelope();
 
 		// throwing a fault if the sequence is closed.
-		faultMessageContext = faultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
-		if (faultMessageContext != null) {
-			ConfigurationContext configurationContext = msgCtx.getConfigurationContext();
-			AxisEngine engine = new AxisEngine(configurationContext);
-
-			try {
-				engine.sendFault(faultMessageContext.getMessageContext());
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFault, e
-						.toString()));
-			}
-
-			return;
+		fault = faultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
+		if (fault != null) {
+			throw fault;
 		}
 
 		// updating the last activated time of the sequence.

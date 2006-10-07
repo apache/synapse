@@ -25,6 +25,7 @@ public class SandeshaMessageKeys {
 	public static final String classLoaderNotFound="classLoaderNotFound";
 
 	public static final String defaultPropertyBeanNotSet="defaultPropertyBeanNotSet";
+	public static final String propertyBeanNotSet="propertyBeanNotSet";
 	public static final String optionsObjectNotSet="optionsObjectNotSet";
 	public static final String serviceContextNotSet="serviceContextNotSet";
 	public static final String sequenceIdBeanNotSet="sequenceIdBeanNotSet";

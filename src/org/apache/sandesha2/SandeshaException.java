@@ -17,6 +17,9 @@
 
 package org.apache.sandesha2;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 
 /**
@@ -32,9 +35,11 @@ public class SandeshaException extends AxisFault  {
 	public SandeshaException (Exception e) {
 		super (e);
 	}
-	
+
 	public SandeshaException (String message,Exception e) {
 		super (message,e);
 	}
+	
+	
 	
 }

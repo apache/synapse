@@ -121,6 +121,22 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		
+		//If there already is an ack for this sequence it will be removed. 
+		//We do not allow to send two sequenceAcknowledgements for the same sequence in the same message.
+		Iterator oldAckIter = header.getChildrenWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
+		while (oldAckIter.hasNext()) {
+			
+			OMElement oldAckElement = (OMElement) oldAckIter.next();
+			
+			SequenceAcknowledgement oldSequenceAcknowledgement = new SequenceAcknowledgement (namespaceValue);
+			oldSequenceAcknowledgement.fromOMElement(oldAckElement);
+			
+			String oldAckIdentifier = oldSequenceAcknowledgement.getIdentifier().getIdentifier();
+			if (oldAckIdentifier!=null && oldAckIdentifier.equals(this.identifier.getIdentifier())) {
+				oldAckElement.detach();
+			}
+		}
+		
 		SOAPHeader SOAPHeader = (SOAPHeader) header;
 		SOAPHeaderBlock sequenceAcknowledgementHeaderBlock = SOAPHeader.addHeaderBlock(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,rmNamespace);
@@ -191,8 +207,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			ackFinal.toOMElement(sequenceAcknowledgementHeaderBlock);
 		}
 		
-		SOAPHeader.addChild(sequenceAcknowledgementHeaderBlock);
-
 		return header;
 	}
 

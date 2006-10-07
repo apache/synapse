@@ -68,6 +68,7 @@ public class SandeshaMessageKeys {
 	public static final String couldNotCopyParameters="couldNotCopyParameters";
 	public static final String senderBeanNotFound="senderBeanNotFound";
 	public static final String workAlreadyAssigned="workAlreadyAssigned";
+	public static final String workNotPresent="workNotPresent";
 	public static final String cannotSendToTheAddress="cannotSendToTheAddress";
 	
 

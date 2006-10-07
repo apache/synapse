@@ -62,8 +62,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			SenderBean senderBean = senderBeanMgr.retrieve(messageId);
 			if (senderBean==null) {
-				String message = "SenderWorker has been assigned an unexisting work";
-				throw new SandeshaException (message);
+				//the work is not present. May be invalid now. So should return.
+				if (log.isDebugEnabled())
+					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workNotPresent,workId));
+				return;
 			}
 			String key = senderBean.getMessageContextRefKey();
 			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
@@ -90,7 +92,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 			if (msgCtx == null) {
-				log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendHasUnavailableMsgEntry));
+				if (log.isDebugEnabled())
+					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendHasUnavailableMsgEntry));
 				return;			
 			}
 

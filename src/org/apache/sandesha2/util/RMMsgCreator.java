@@ -23,10 +23,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
@@ -38,7 +36,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
@@ -54,7 +51,6 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckFinal;
@@ -270,17 +266,11 @@ public class RMMsgCreator {
 		EndpointReference referenceTo = applicationMsgContext.getTo();
 		EndpointReference referenceReplyTo = applicationMsgContext.getReplyTo();
 		
-		EndpointReference replyTo = null;
 		
-		if (referenceReplyTo!=null && SandeshaUtil.isAnonymousURI (referenceReplyTo.getAddress()))
-			replyTo = new EndpointReference (referenceReplyTo.getAddress());
-		else
-			replyTo = context.getListenerManager().getEPRforService (
-					createSeqmsgContext.getAxisService().getName(), null, null 
-					/*axisOperationName!=null?axisOperationName.getLocalPart():null, 
-        				transportInName!=null?transportInName.getLocalPart():null*/);
-        
-        createSeqmsgContext.setReplyTo(replyTo);
+		if (referenceReplyTo!=null) {
+			EndpointReference createSeqReplyTo = new EndpointReference (referenceReplyTo.getAddress());
+        	createSeqmsgContext.setReplyTo(createSeqReplyTo);
+		}
         
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
@@ -659,14 +649,10 @@ public class RMMsgCreator {
 	public static void addAckMessage(RMMsgContext applicationMsg, String sequencePropertyKey ,String sequenceId, StorageManager storageManager)
 			throws SandeshaException {
 		
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(applicationMsg
-				.getSOAPEnvelope()));
-
+		SOAPFactory factory = null;
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
-		if (envelope == null) {
-			SOAPEnvelope newEnvelope = factory.getDefaultEnvelope();
-			applicationMsg.setSOAPEnvelop(newEnvelope);
-		}
+		factory = (SOAPFactory) envelope.getOMFactory();
+		
 		envelope = applicationMsg.getSOAPEnvelope();
 
 		ConfigurationContext ctx = applicationMsg.getMessageContext().getConfigurationContext();
@@ -718,6 +704,9 @@ public class RMMsgCreator {
 		}
 		
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
+		
+		//generating the SOAP envelope.
+		applicationMsg.addSOAPEnvelope();
 	}
 	
 	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,  String makeConnectionSeqId,

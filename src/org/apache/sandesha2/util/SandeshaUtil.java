@@ -1044,9 +1044,12 @@ public class SandeshaUtil {
 	}
 
 	public static boolean isAnonymousURI (String address) {
-		if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address))
+		if (address==null)
+			return false;
+		
+		if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address.trim()))
 			return true;
-		else if (AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address))
+		else if (AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address.trim()))
 			return true;
 		else if (isWSRMAnonymousReplyTo(address))
 			return true;

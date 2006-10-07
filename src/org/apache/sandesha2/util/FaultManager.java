@@ -411,7 +411,18 @@ public class FaultManager {
 
 	}
 	
-	
+	/**
+	 * Adds the necessary Fault elements as properties to the message context.
+	 * Returns a dummy Fault which will be throw by this method caller.
+	 * 
+	 * @param referenceRMMsgContext - Message in reference to which the fault will be generated.
+	 * @param data - data for the fault
+	 * @param addressingNamespaceURI
+	 * @param storageManager
+	 * @return - The dummy fault to be thrown out.
+	 * 
+	 * @throws AxisFault
+	 */
 	public SandeshaException getFault (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
 			StorageManager storageManager) throws AxisFault {
 		
@@ -435,7 +446,6 @@ public class FaultManager {
 		
 		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
 		detail.addDetailEntry(data.getDetail());
-		System.out.println("Detail:" + data.getDetail());
 		
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
@@ -453,106 +463,6 @@ public class FaultManager {
 		
 		SandeshaException fault = new SandeshaException("");
 		return fault;
-	}
-
-	/**
-	 * Returns a RMMessageContext for the fault message. Data for generating the
-	 * fault is given in the data parameter.
-	 * 
-	 * @param referenceRMMsgContext
-	 * @param data
-	 * @return
-	 * @throws SandeshaException
-	 */
-	public RMMsgContext getFaultMessage (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
-			StorageManager storageManager) throws SandeshaException {
-		if (log.isDebugEnabled())
-			log.debug("Enter: FaultManager::getFault");
-
-		try {
-			MessageContext referenceMessage = referenceRMMsgContext.getMessageContext();
-			ConfigurationContext configCtx = referenceRMMsgContext.getConfigurationContext();
-
-			// This is to hack to remove NPE. TODO remove this.
-			if (referenceMessage.getServiceGroupContext() == null) {
-				ServiceGroupContext serviceGroupContext = new ServiceGroupContext(referenceMessage
-						.getConfigurationContext(), referenceMessage.getAxisServiceGroup());
-				referenceMessage.setServiceGroupContext(serviceGroupContext);
-			}
-			if (referenceMessage.getServiceContext() == null) {
-				ServiceContext serviceContext = new ServiceContext(referenceMessage.getAxisService(), referenceMessage
-						.getServiceGroupContext());
-				referenceMessage.setServiceContext(serviceContext);
-			}
-
-			// end hack
-
-			AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
-
-			
-			//TODO this fails when the in message is in only. Fault is thrown at the InOnlyAxisOperation
-			MessageContext faultMsgContext = SandeshaUtil.createNewRelatedMessageContext(referenceRMMsgContext, operation); //Utils.createOutMessageContext(referenceMessage);
-
-			// setting contexts.
-			faultMsgContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
-			faultMsgContext.setAxisService(referenceMessage.getAxisService());
-			faultMsgContext.setAxisServiceGroup(referenceMessage.getAxisServiceGroup());
-			faultMsgContext.setServiceGroupContext(referenceMessage.getServiceGroupContext());
-			faultMsgContext.setServiceGroupContextId(referenceMessage.getServiceGroupContextId());
-			faultMsgContext.setServiceContext(referenceMessage.getServiceContext());
-			faultMsgContext.setServiceContextID(referenceMessage.getServiceContextID());
-
-
-			OperationContext operationContext = new OperationContext(operation);
-
-			faultMsgContext.setAxisOperation(operation);
-			faultMsgContext.setOperationContext(operationContext);
-
-			String acksToStr = null;
-			if (referenceRMMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.CREATE_SEQ) {
-				CreateSequence createSequence = (CreateSequence) referenceRMMsgContext
-						.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-				acksToStr = createSequence.getAcksTo().getAddress().getEpr().getAddress();
-			} else {
-				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
-				// TODO get the acksTo value using the property key.
-
-				String sequenceId = data.getSequenceId();
-				SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequenceId,
-						Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
-				if (acksToBean != null) {
-					EndpointReference epr = new EndpointReference(acksToBean.getValue());
-					if (epr != null)
-						acksToStr = epr.getAddress();
-				}
-			}
-
-			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-
-			if (acksToStr != null && !acksToStr.equals(anonymousURI)) {
-				faultMsgContext.setTo(new EndpointReference(acksToStr));
-			}
-
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
-			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMsgContext, SOAPVersion, data, referenceRMMsgContext
-					.getRMNamespaceValue());
-
-			RMMsgContext faultRMMsgCtx = MsgInitializer.initializeMessage(faultMsgContext);
-			
-			faultRMMsgCtx.setAction(SpecSpecificConstants.getFaultAction (addressingNamespaceURI));
-
-			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::getFault");
-			
-			//setting the serverSide property
-			faultMsgContext.setServerSide(true);
-			
-			return faultRMMsgCtx;
-
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage(), e);
-		}
 	}
 
 }

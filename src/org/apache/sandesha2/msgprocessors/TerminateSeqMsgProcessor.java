@@ -127,8 +127,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		sequencePropertyBeanMgr.insert(terminateReceivedBean);
 
 		// add the terminate sequence response if required.
+		RMMsgContext terminateSequenceResponse = null;
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired(terminateSeqRMMsg.getRMSpecVersion()))
-			addTerminateSequenceResponse(terminateSeqRMMsg, sequencePropertyKey, sequenceId, storageManager);
+			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, sequencePropertyKey, sequenceId, storageManager);
 
 		setUpHighestMsgNumbers(context, storageManager,sequencePropertyKey, sequenceId, terminateSeqRMMsg);
 
@@ -144,6 +145,35 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
+		//sending the terminate sequence response
+		if (terminateSequenceResponse != null) {
+			
+			MessageContext outMessage = terminateSequenceResponse.getMessageContext();
+			EndpointReference toEPR = outMessage.getTo();
+			
+			AxisEngine engine = new AxisEngine(terminateSeqMsg
+					.getConfigurationContext());
+			engine.send(outMessage);
+
+			String addressingNamespaceURI = SandeshaUtil
+					.getSequenceProperty(
+							sequencePropertyKey,
+							Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,
+							storageManager);
+
+			String anonymousURI = SpecSpecificConstants
+					.getAddressingAnonymousURI(addressingNamespaceURI);
+
+			if (anonymousURI.equals(toEPR.getAddress())) {
+				terminateSeqMsg.getOperationContext().setProperty(
+						org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+			} else {
+				terminateSeqMsg.getOperationContext().setProperty(
+						org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+			}
+
+		}
+		
 		terminateSeqMsg.pause();
 
 		if (log.isDebugEnabled())
@@ -246,14 +276,13 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			log.debug("Exit: TerminateSeqMsgProcessor::setUpHighestMsgNumbers");
 	}
 
-	private void addTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, String sequencePropertyKey,String sequenceId,
+	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceId);
 
 		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
-		ConfigurationContext configCtx = terminateSeqMsg.getConfigurationContext();
 
 		MessageContext outMessage = null;
 
@@ -288,27 +317,14 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateSeqResponseRMMsg.setFlow(MessageContext.OUT_FLOW);
 		terminateSeqResponseRMMsg.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-		EndpointReference toEPR = terminateSeqResponseRMMsg.getTo();
-		
 		outMessage.setResponseWritten(true);
-
-		AxisEngine engine = new AxisEngine(terminateSeqMsg.getConfigurationContext());
-
-		engine.send(outMessage);
-
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-
-		if (anonymousURI.equals(toEPR.getAddress())) {
-			terminateSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-		} else {
-			terminateSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-		}
-
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: TerminateSeqMsgProcessor::addTerminateSequenceResponse");
+
+		return terminateSeqResponseRMMsg;
+
+
 	}
 
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {

@@ -83,14 +83,18 @@ public class TerminateManager {
 
 		if (!inOrderInvocation) {
 			// there is no invoking by Sandesha2. So clean invocations storages.
-			cleanReceivingSideAfterInvocation(configContext, sequencePropertyKey, sequenceId, storageManager);
-		}
-
-		String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
-		if (cleanStatus != null && CLEANED_AFTER_INVOCATION.equals(cleanStatus))
-			completeTerminationOfReceivingSide(configContext, sequencePropertyKey, sequenceId, storageManager);
-		else {
+			
 			receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
+			cleanReceivingSideAfterInvocation(configContext, sequencePropertyKey, sequenceId, storageManager);
+		} else {
+
+			String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
+			if (cleanStatus != null
+					&& CLEANED_AFTER_INVOCATION.equals(cleanStatus))
+				completeTerminationOfReceivingSide(configContext,
+						sequencePropertyKey, sequenceId, storageManager);
+			else
+				receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
 		}
 	}
 

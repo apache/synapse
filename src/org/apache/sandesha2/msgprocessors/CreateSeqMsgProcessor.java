@@ -119,7 +119,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 																										// created
 																										// sequnceID.
 
-
+			
 			
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 					newSequenceId, storageManager); // converting the blank out

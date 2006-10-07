@@ -131,6 +131,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+				
+				//TODO support WSRM 1.1 spce here ( there is no last message concept)
 				if (sequence.getLastMessage() != null) {
 					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequencePropertyKey, sequenceId, storageManager);
 					// exit from current iteration. (since an entry

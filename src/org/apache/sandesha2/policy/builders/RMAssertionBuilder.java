@@ -87,7 +87,10 @@ public class RMAssertionBuilder implements AssertionBuilder {
             	boolean inOrder = false;
             	
             	if (value!=null && Constants.VALUE_TRUE.equals(value))
-            		propertyBean.setInOrder(inOrder);
+            		inOrder = true;
+            	
+            	propertyBean.setInOrder(inOrder);
+            	
             }  else if (Sandesha2Constants.Assertions.ELEM_MAX_RETRANS_COUNT
                     .equals(name)) {
                 propertyBean.setMaximumRetransmissionCount (Integer.parseInt(element.getText().trim()));

@@ -136,13 +136,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
 					Constants.VALUE_FALSE);
 		}
-
-		FaultManager faultManager = new FaultManager();
-		SandeshaException fault = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
-		if (fault != null) {
-			throw fault;
-		}
-
+		
 		// setting acked msg no range
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
 		if (configCtx == null) {
@@ -151,7 +145,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(message);
 		}
 
-		fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		FaultManager faultManager = new FaultManager();
+		SandeshaException fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 		if (fault != null) {
 			throw fault;
 		}
@@ -162,6 +157,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// throwing a fault if the sequence is closed.
 		fault = faultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
+		if (fault != null) {
+			throw fault;
+		}
+
+		fault = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 		if (fault != null) {
 			throw fault;
 		}

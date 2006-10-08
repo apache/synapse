@@ -141,7 +141,7 @@
 			<ramp:RampartConfig xmlns:ramp="http://ws.apache.org/rampart/policy"> 
 				<ramp:user>bob</ramp:user>
 				<ramp:encryptionUser>alice</ramp:encryptionUser>
-				<ramp:passwordCallbackClass>org.apache.rampart.PWCallback</ramp:passwordCallbackClass>
+				<ramp:passwordCallbackClass>org.apache.sandesha2.interop.PWCallback</ramp:passwordCallbackClass>
 				
 				<ramp:signatureCrypto>
 					<ramp:crypto provider="org.apache.ws.security.components.crypto.Merlin">

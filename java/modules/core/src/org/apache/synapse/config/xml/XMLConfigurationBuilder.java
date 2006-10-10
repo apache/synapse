@@ -151,67 +151,16 @@ public class XMLConfigurationBuilder {
      * @param elem
      */
     public static void defineProperty(SynapseConfiguration config, OMElement elem) {
-        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-        OMAttribute src = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "src"));
-        OMAttribute key = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-        if (name == null) {
-            handleException("The 'name' attribute is required for a property definition");
-        } else {
-            if ((value != null && src != null) || (value != null && key != null) ||
-                    (src != null && key != null)) {
-                // if more than one attribute of (value|src|key) is specified
-                handleException("A property must use exactly one of 'value', " +
-                        "'src' or 'key' attributes");
-            } else if (value == null && src == null && key == null) {
-                // if no attribute of (value|src|key) is specified, check if this is a TextNode
-                if (elem.getFirstOMChild() != null) {
-                    Property prop = new Property();
-                    prop.setName(name.getAttributeValue());
-                    if (elem.getFirstElement() instanceof OMText) {
-                        // Inline String literal
-                        prop.setType(Property.INLINE_STRING_TYPE);
-                        prop.setValue(elem.getFirstElement().getText());
-                    } else {
-                        // Inline XML fragment as the property
-                        prop.setType(Property.INLINE_XML_TYPE);
-                        prop.setValue(elem.getFirstElement());
-                    }
-                    config.addProperty(name.getAttributeValue(), prop);
-                } else {
-                    handleException("A property must use exactly one of 'value', " +
-                            "'src' or 'key' attributes");
-                }
-            } else if (value != null) {
-                // a simple string literal property
-                Property prop = new Property();
-                prop.setName(name.getAttributeValue());
-                prop.setType(Property.VALUE_TYPE);
-                prop.setValue(value.getAttributeValue());
-                config.addProperty(name.getAttributeValue(), prop);
-            } else if (src != null) {
-                // a property (XML) loaded once through the given URL as an OMNode
-                try {
-                    Property prop = new Property();
-                    prop.setName(name.getAttributeValue());
-                    prop.setType(Property.SRC_TYPE);
-                    prop.setSrc(new URL(src.getAttributeValue()));
-                    prop.setValue(org.apache.synapse.config.Util.getObject(
-                            new URL(src.getAttributeValue())));
-                    config.addProperty(name.getAttributeValue(), prop);
-                } catch (MalformedURLException e) {
-                    handleException("Invalid URL specified by 'src' attribute : " +
-                            src.getAttributeValue(), e);
-                }
-            } else {
-                // a DynamicProperty which refers to an XML resource on a remote registry
-                Property prop = new Property();
-                prop.setName(name.getAttributeValue());
-                prop.setType(Property.DYNAMIC_TYPE);
-                prop.setKey(key.getAttributeValue());
-                config.addProperty(name.getAttributeValue(), prop);
+        Property prop = PropertyFactory.createProperty(elem);
+        if(prop.getType() == Property.SRC_TYPE) {
+            try {
+                prop.setValue(org.apache.synapse.config.Util.getObject(
+                        new URL(prop.getSrc().toString())));
+            } catch (MalformedURLException e) {
+                handleException("Source URL is not valid");
             }
         }
+        config.addProperty(prop.getName(), prop);
     }
 
     /**

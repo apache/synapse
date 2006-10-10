@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.SynapseException;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+import javax.xml.stream.XMLStreamConstants;
 
 public class PropertySerializer {
 
@@ -41,9 +43,11 @@ public class PropertySerializer {
      */
     public static OMElement serializeProperty(Property property, OMElement parent) {
 
-        OMElement propertyElement = fac.createOMElement("set-property", synNS);
+        OMElement propertyElement = fac.createOMElement("property", synNS);
         propertyElement.addAttribute(fac.createOMAttribute(
                 "name", nullNS, property.getName()));
+	propertyElement.addAttribute(fac.createOMAttribute(
+                "type", nullNS, "" + property.getType()));
 
         if (property.getType() == Property.DYNAMIC_TYPE) {
             propertyElement.addAttribute(fac.createOMAttribute(
@@ -57,11 +61,15 @@ public class PropertySerializer {
         } else if (property.getType() == Property.INLINE_XML_TYPE) {
             propertyElement.addChild((OMElement) property.getValue());
         } else if (property.getType() == Property.INLINE_STRING_TYPE) {
-            propertyElement.addChild(fac.createOMText((String) property.getValue()));
+            OMTextImpl textData = (OMTextImpl) fac.createOMText((String)property.getValue());
+            textData.setType(XMLStreamConstants.CDATA);
+            propertyElement.addChild(textData);
         } else {
             handleException("Property type undefined");
         }
-        parent.addChild(propertyElement);
+        if(parent != null) {
+            parent.addChild(propertyElement);
+        }
         return propertyElement;
     }
 

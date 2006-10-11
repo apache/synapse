@@ -85,7 +85,7 @@ public class SandeshaMessageKeys {
 	public static final String cannotDecideRMVersion="cannotDecideRMVersion";
 	public static final String specVersionPropertyNotAvailable="specVersionPropertyNotAvailable";
 	public static final String specVersionNotSet="specVersionNotSet";
-	public static final String specDoesNotSupportElement="specDoesNotSupportElements";
+	public static final String specDoesNotSupportElement="specDoesNotSupportElement";
 		
 	public static final String couldNotSendTerminate="couldNotSendTerminate";
 	public static final String couldNotSendClose="couldNotSendClose";

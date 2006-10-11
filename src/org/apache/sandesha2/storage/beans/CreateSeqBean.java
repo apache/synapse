@@ -62,6 +62,13 @@ public class CreateSeqBean extends RMBean {
 	 */
 	private String createSequenceMsgStoreKey;
 	
+	/**
+	 * This is stored here, so that the message pointed by this can be used as a reference when Sandesha
+	 * want the generate new messages. (e.g. MakeConnection). Create sequence message could not be used 
+	 * here since it may be subjected to things like encryption.
+	 */
+	private String referenceMessageStoreKey;
+	
 	public CreateSeqBean() {
 	}
 
@@ -104,6 +111,15 @@ public class CreateSeqBean extends RMBean {
 
 	public void setCreateSequenceMsgStoreKey(String createSequenceMsgStoreKey) {
 		this.createSequenceMsgStoreKey = createSequenceMsgStoreKey;
+	}
+
+
+	public String getReferenceMessageStoreKey() {
+		return referenceMessageStoreKey;
+	}
+
+	public void setReferenceMessageStoreKey(String referenceMessageStoreKey) {
+		this.referenceMessageStoreKey = referenceMessageStoreKey;
 	}
 	
 }

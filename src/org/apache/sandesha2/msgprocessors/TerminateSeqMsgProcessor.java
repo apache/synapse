@@ -32,7 +32,6 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.OutInAxisOperation;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
@@ -51,7 +50,6 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -140,9 +138,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		sequencePropertyBeanMgr.insert(terminatedBean);
 
-		// removing an entry from the listener
-		String transport = terminateSeqMsg.getTransportIn().getName().getLocalPart();
-
 		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		//sending the terminate sequence response
@@ -153,6 +148,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			
 			AxisEngine engine = new AxisEngine(terminateSeqMsg
 					.getConfigurationContext());
+			
+			
+			outMessage.setServerSide(false);
 			engine.send(outMessage);
 
 			String addressingNamespaceURI = SandeshaUtil
@@ -421,7 +419,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		try {
 			rmMsgCtx.addSOAPEnvelope();
 		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
+			throw new SandeshaException(e.getMessage(),e);
 		}
 
 		String key = SandeshaUtil.getUUID();

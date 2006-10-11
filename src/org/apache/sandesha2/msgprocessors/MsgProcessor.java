@@ -19,7 +19,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.SandeshaException;
 
 /**
  * The message processor interface.

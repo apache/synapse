@@ -313,10 +313,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			try {
 				resenvelope = TransportUtils.createSOAPMessage(msgCtx, msgCtx.getEnvelope().getNamespace().getName());
 			} catch (AxisFault e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.soapEnvNotSet));
-				log.debug(e.getStackTrace().toString());
+				//Cannot find a valid SOAP envelope.
+				if (log.isDebugEnabled()) {
+					log.debug(SandeshaMessageHelper
+							.getMessage(SandeshaMessageKeys.soapEnvNotSet));
+					log.debug(e);
+				}
+				
+				return;
 			}
 
 			// if the request msg ctx is withina a transaction, processing if

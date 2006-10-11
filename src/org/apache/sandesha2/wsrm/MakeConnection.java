@@ -28,6 +28,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 public class MakeConnection implements IOMRMPart {
 
@@ -38,10 +39,11 @@ public class MakeConnection implements IOMRMPart {
 	Address address = null;
 	
 	public MakeConnection (String namespaceValue) throws SandeshaException {
+		
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.specDoesNotSupportElement,
-					namespaceValue,Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
+					namespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
 		this.namespaceValue = namespaceValue;
 	}
 

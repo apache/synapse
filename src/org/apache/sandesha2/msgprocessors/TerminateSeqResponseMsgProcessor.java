@@ -33,7 +33,6 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
-import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
 
 /**

@@ -17,12 +17,9 @@
 
 package org.apache.sandesha2.handlers;
 
-import java.util.Iterator;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
@@ -41,7 +38,6 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.wsrm.Sequence;
 
 /**
  * This is invoked in the inFlow of an RM endpoint. This is responsible for
@@ -71,8 +67,11 @@ public class SandeshaInHandler extends AbstractHandler {
 		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
-		if (null != DONE && "true".equals(DONE))
+		if (null != DONE && "true".equals(DONE)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaInHandler::invoke, Application processing done");
 			return;
+		}
 
 		String reinjectedMessage = (String) msgCtx.getProperty(Sandesha2Constants.REINJECTED_MESSAGE);
 		if (reinjectedMessage != null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage)) {
@@ -120,7 +119,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			} catch (SandeshaException ex) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInnitMessage);
 				log.debug(message);
-				throw new AxisFault(message);
+				throw new AxisFault(message, ex);
 			}
 			
 			// validating the message
@@ -128,12 +127,8 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 
-			try {
-				if (msgProcessor != null)
-					msgProcessor.processInMessage(rmMsgCtx);
-			} catch (SandeshaException se) {
-				throw se;
-			}
+			if (msgProcessor != null)
+				msgProcessor.processInMessage(rmMsgCtx);
 
 		} catch (AxisFault e) {
 			// message should not be sent in a exception situation.

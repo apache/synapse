@@ -302,7 +302,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 			} catch (Exception ex) {
-				throw new SandeshaException(ex.getMessage());
+				throw new SandeshaException(ex.getMessage(), ex);
 			}
 
 			// pause the message
@@ -910,6 +910,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqBean.setInternalSequenceID(internalSequenceId);
 		createSeqBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
 		createSeqBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
+		
+		//cloning the message and storing it as a reference.
+		MessageContext clonedMessage = SandeshaUtil.cloneMessageContext(createSeqMsg);
+		String clonedMsgStoreKey = SandeshaUtil.getUUID();
+		storageManager.storeMessageContext(clonedMsgStoreKey, clonedMessage);
+		createSeqBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
+		
 		
 		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
 		

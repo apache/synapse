@@ -20,7 +20,6 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -46,16 +45,13 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
-import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
-import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Responsible for processing an incoming Create Sequence Response message.
@@ -200,14 +196,15 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				}
 			}
 			
-			//Storing the createSequence of the sending side sequence as the reference message.
+			//Storing the referenceMessage of the sending side sequence as the reference message
+			//of the receiving side as well.
 			//This can be used when creating new outgoing messages.
 			
-			String createSequenceMsgStoreKey = createSeqBean.getCreateSequenceMsgStoreKey();
-			MessageContext createSequenceMsg = storageManager.retrieveMessageContext(createSequenceMsgStoreKey, configCtx);
+			String referenceMsgStoreKey = createSeqBean.getReferenceMessageStoreKey();
+			MessageContext referenceMsg = storageManager.retrieveMessageContext(referenceMsgStoreKey, configCtx);
 			
 			String newMessageStoreKey = SandeshaUtil.getUUID();
-			storageManager.storeMessageContext(newMessageStoreKey,createSequenceMsg);
+			storageManager.storeMessageContext(newMessageStoreKey,referenceMsg);
 			
 			nextMsgBean.setReferenceMessageKey(newMessageStoreKey);
 			
@@ -291,7 +288,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			try {
 				applicaionRMMsg.addSOAPEnvelope();
 			} catch (AxisFault e) {
-				throw new SandeshaException(e.getMessage());
+				throw new SandeshaException(e.getMessage(), e);
 			}
 
 			// asking to send the application msssage

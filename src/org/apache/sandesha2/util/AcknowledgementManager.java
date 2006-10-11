@@ -115,17 +115,25 @@ public class AcknowledgementManager {
 				// Adding the ack(s) to the application message
 				boolean acks = false;
 				SOAPHeader appMsgHeaders = rmMessageContext.getMessageContext().getEnvelope().getHeader();
+				
 				SOAPHeader headers = ackMsgContext.getEnvelope().getHeader();
 				if(headers != null) {
 					for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+
 						QName name = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
 						Iterator iter = headers.getChildrenWithName(name);
 						while(iter.hasNext()) {
-							appMsgHeaders.addChild((OMElement) iter.next());
+							OMElement ackElement = (OMElement) iter.next();
+
+							SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement (Sandesha2Constants.SPEC_NS_URIS[i]);
+							sequenceAcknowledgement.fromOMElement(ackElement);
+							
+							sequenceAcknowledgement.toOMElement(appMsgHeaders);
 							acks = true;
 						}
 					}
 				}
+				
 				if (!acks) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckMessageEntry,
 							ackMsgContext.getEnvelope().toString());

@@ -41,6 +41,7 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -68,6 +69,7 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
+import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
  * Used to create new RM messages.
@@ -560,7 +562,7 @@ public class RMMsgCreator {
 
 	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg, MessageContext outMessage,
 			StorageManager storageManager) throws SandeshaException {
-
+        
 		RMMsgContext terminateSeqResponseRMMsg = new RMMsgContext(outMessage);
 		ConfigurationContext configurationContext = terminateSeqRMMsg.getMessageContext().getConfigurationContext();
 
@@ -595,7 +597,7 @@ public class RMMsgCreator {
 
 		finalizeCreation(terminateSeqRMMsg.getMessageContext(), outMessage);
 
-		terminateSeqResponseRMMsg.getMessageContext().setServerSide(true);
+//		terminateSeqResponseRMMsg.getMessageContext().setServerSide(true);
 		return terminateSeqResponseRMMsg;
 	}
 

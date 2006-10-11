@@ -123,8 +123,8 @@ public class InMemorySenderBeanMgr implements SenderBeanMgr {
 			if (bean.isSend() != temp.isSend())
 				add = false;
 
-//			if (bean.isReSend() != temp.isReSend())
-//				add = false;
+			if (bean.isReSend() != temp.isReSend())
+				add = false;
 			
 			if (add)
 				beans.add(temp);

@@ -17,7 +17,11 @@
 
 package org.apache.sandesha2.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringBufferInputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,8 +29,10 @@ import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axiom.om.OMElement;
@@ -35,6 +41,7 @@ import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -613,9 +620,6 @@ public class SandeshaUtil {
 			//TODO - move these to a property file.
             newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
                     .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
-            newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
-                    .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
-            
             newMessageContext.setProperty(WSHandlerConstants.RECV_RESULTS, 
                     referenceMessage.getProperty(WSHandlerConstants.RECV_RESULTS));
             
@@ -1125,6 +1129,38 @@ public class SandeshaUtil {
 		phases.add(security);
 		
 		return phases;
+	}
+	
+	public static MessageContext cloneMessageContext (MessageContext oldMsg) throws AxisFault {
+		MessageContext newMsg = new MessageContext ();
+		newMsg.setOptions(new Options (oldMsg.getOptions()));
+		
+		
+		//TODO hd to use following hack since a 'clone' method was not available for SOAPEnvelopes.
+		//Do it the correct way when that becomes available.
+		OMElement newElement = oldMsg.getEnvelope().cloneOMElement();
+		String elementString = newElement.toString();
+		
+		try {
+			ByteArrayInputStream stream = new ByteArrayInputStream(
+					elementString.getBytes());
+			StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(
+					XMLInputFactory.newInstance().createXMLStreamReader(stream),
+					null);
+			SOAPEnvelope envelope = builder.getSOAPEnvelope();
+
+			newMsg.setEnvelope(envelope);
+		} catch (XMLStreamException e) {
+			throw new AxisFault (e);
+		}
+		
+		newMsg.setConfigurationContext(oldMsg.getConfigurationContext());
+		newMsg.setAxisService(oldMsg.getAxisService());
+		newMsg.setTransportOut(oldMsg.getTransportOut());
+		newMsg.setTransportIn(oldMsg.getTransportIn());
+		
+		return newMsg;
+		
 	}
 	
 }

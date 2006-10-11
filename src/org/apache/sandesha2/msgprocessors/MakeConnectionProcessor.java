@@ -17,11 +17,13 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.SenderWorker;
 import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MakeConnection;
+import org.apache.sandesha2.wsrm.MessagePending;
 
 /**
  * This class is responsible for processing MakeConnection request messages that come to the system.
@@ -58,16 +60,31 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			findSenderBean.setSequenceID(identifier.getIdentifier());
 		
 		//finding the beans that go with the criteria of the passed SenderBean
+		
+		//beans with reSend=true
+		findSenderBean.setReSend(true);
 		Collection collection = senderBeanMgr.find(findSenderBean);
+		
+		//beans with reSend=false
+		findSenderBean.setReSend (false);
+		Collection collection2 = senderBeanMgr.find(findSenderBean);
+		
+		//all possible beans
+		collection.addAll(collection2);
 		
 		//selecting a bean to send RANDOMLY. TODO- Should use a better mechanism.
 		int size = collection.size();
 		int itemToPick=-1;
 		
+		boolean pending = false;
 		if (size>0) {
 			Random random = new Random ();
 			itemToPick = random.nextInt(size);
 		}
+
+		if (size>1)
+			pending = true;  //there are more than one message to be delivered using the makeConnection.
+							 //So the MessagePending header should have value true;
 		
 		Iterator it = collection.iterator();
 		
@@ -91,8 +108,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			
 		String messageStorageKey = senderBean.getMessageContextRefKey();
 		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,configurationContext);
+		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
 		
-		addMessagePendingHeader ();
+		
+		addMessagePendingHeader (returnRMMsg,pending);
 		
 		setTransportProperties (returnMessage, rmMsgCtx);
 		
@@ -111,7 +130,13 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		worker.run();
 	}
 	
-	private void addMessagePendingHeader (){
+	private void addMessagePendingHeader (RMMsgContext returnMessage, boolean pending) throws SandeshaException {
+		String rmNamespace = returnMessage.getRMNamespaceValue();
+		MessagePending messagePending = new MessagePending (rmNamespace);
+		messagePending.setPending(pending);
+		
+		messagePending.toSOAPEnvelope(returnMessage.getSOAPEnvelope());
+		
 	}
 
 	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {

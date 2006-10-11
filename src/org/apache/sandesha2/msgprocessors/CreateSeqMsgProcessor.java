@@ -18,13 +18,9 @@
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;

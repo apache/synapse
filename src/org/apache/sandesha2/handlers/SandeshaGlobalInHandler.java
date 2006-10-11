@@ -20,8 +20,6 @@ package org.apache.sandesha2.handlers;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
@@ -64,7 +62,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	public void invoke(MessageContext msgContext) throws AxisFault {
 
 		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaGlobalInHandler::msgContext, " + msgContext.getEnvelope().getHeader());
+			log.debug("Enter: SandeshaGlobalInHandler::invoke, " + msgContext.getEnvelope().getHeader());
 
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 		if (configContext == null)
@@ -89,7 +87,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 		} catch (SandeshaException e1) {
 			// TODO make this a log
-			log.debug("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager");
+			log.debug("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager", e1);
 			return;
 		}
 
@@ -148,7 +146,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 								msgContext.pause(); // TODO let this go in the
 								// last try
 								if (log.isDebugEnabled())
-									log.debug("Exit: SandeshaGlobalInHandler::msgContext");
+									log.debug("Exit: SandeshaGlobalInHandler::invoke");
 
 								return;
 							}
@@ -162,7 +160,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 			if (!isRMGlobalMessage) {
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaGlobalInHandler::msgContext, !isRMGlobalMessage");
+					log.debug("Exit: SandeshaGlobalInHandler::invoke, !isRMGlobalMessage");
 				return;
 			}
 
@@ -173,7 +171,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			if (dropped) {
 				processDroppedMessage(rmMessageContext, storageManager);
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaGlobalInHandler::msgContext, dropped");
+					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped");
 				return;
 			}
 
@@ -206,7 +204,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
 			if (log.isDebugEnabled())
-				log.debug("Exit: SandeshaGlobalInHandler::msgContext ", e);
+				log.debug("Exit: SandeshaGlobalInHandler::invoke ", e);
 			throw new AxisFault(message, e);
 		} finally {
 			if (!withinTransaction && !rolebacked) {
@@ -220,16 +218,14 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 		}
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaGlobalInHandler::msgContext");
+			log.debug("Exit: SandeshaGlobalInHandler::invoke");
 	}
 
 	private boolean dropIfDuplicate(RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::dropIfDuplicate");
 
-		boolean drop = false;
-
-		
+		boolean drop = false;		
 		
 		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
@@ -277,7 +273,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 								seqPropMgr.insert(receivedMsgsBean);
 							}
 
-							String receivedMsgStr = (String) receivedMsgsBean.getValue();
+							String receivedMsgStr = receivedMsgsBean.getValue();
 							if (receivedMsgStr != "" && receivedMsgStr != null)
 								receivedMsgStr = receivedMsgStr + "," + Long.toString(msgNo);
 							else

@@ -8,15 +8,16 @@
 			
 	<messageReceivers>
 		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
-			class="org.apache.sandesha2.interop.RMInteropServiceMessageReceiverInOut" />
+			class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
 		<messageReceiver
 			mep="http://www.w3.org/2004/08/wsdl/in-only"
-			class="org.apache.sandesha2.interop.RMInteropServiceMessageReceiverInOnly" />
+			class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
 	</messageReceivers>
 	
 	<parameter locked="false" name="ServiceClass">
-		org.apache.sandesha2.interop.RMInteropServiceSkeletonImpl
+		org.apache.sandesha2.interop.securerm.SecRMServiceImpl
 	</parameter>
+	
 	<operation name="EchoString"
 		mep="http://www.w3.org/2004/08/wsdl/in-out">
 		<actionMapping>urn:wsrm:EchoString</actionMapping>
@@ -24,6 +25,7 @@
 			urn:wsrm:EchoStringResponse
 		</outputActionMapping>
 	</operation>
+	
 	<operation name="Ping"
 		mep="http://www.w3.org/2004/08/wsdl/in-only">
 		<actionMapping>urn:wsrm:Ping</actionMapping>

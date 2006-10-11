@@ -1,17 +1,17 @@
 /*
  * Copyright 2004,2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.sandesha2.interop;
@@ -44,20 +44,16 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 		__operation = new org.apache.axis2.description.OutInAxisOperation();
 
 		__operation.setName(new javax.xml.namespace.QName("", "EchoString"));
+		_service.addOperation(__operation);
 
 		_operations[0] = __operation;
-
-		_service.addOperation(__operation);
-		__operation.applyPolicy(new org.apache.neethi.Policy());
 
 		__operation = new org.apache.axis2.description.OutOnlyAxisOperation();
 
 		__operation.setName(new javax.xml.namespace.QName("", "Ping"));
+		_service.addOperation(__operation);
 
 		_operations[1] = __operation;
-
-		_service.addOperation(__operation);
-		__operation.applyPolicy(new org.apache.neethi.Policy());
 
 	}
 
@@ -78,6 +74,8 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 		_serviceClient = new org.apache.axis2.client.ServiceClient(
 				configurationContext, _service);
+		_service.applyPolicy();
+
 		configurationContext = _serviceClient.getServiceContext()
 				.getConfigurationContext();
 
@@ -108,12 +106,12 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 	 * Auto generated method signature
 	 * 
 	 * @see org.apache.sandesha2.interop.RMInteropService#EchoString
-	 * @param param24
+	 * @param param30
 	 * 
 	 */
 	public org.tempuri.EchoStringResponse EchoString(
 
-	org.tempuri.EchoString param24) throws java.rmi.RemoteException
+	org.tempuri.EchoString param30) throws java.rmi.RemoteException
 
 	{
 		try {
@@ -129,7 +127,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 			// Style is Doc.
 
 			env = toEnvelope(getFactory(_operationClient.getOptions()
-					.getSoapVersionURI()), param24,
+					.getSoapVersionURI()), param30,
 					optimizeContent(new javax.xml.namespace.QName("",
 							"EchoString")));
 
@@ -220,12 +218,12 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 	 * Auto generated method signature for Asynchronous Invocations
 	 * 
 	 * @see org.apache.sandesha2.interop.RMInteropService#startEchoString
-	 * @param param24
+	 * @param param30
 	 * 
 	 */
 	public void startEchoString(
 
-			org.tempuri.EchoString param24,
+			org.tempuri.EchoString param30,
 			final org.apache.sandesha2.interop.RMInteropServiceCallbackHandler callback)
 
 	throws java.rmi.RemoteException {
@@ -242,7 +240,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 		env = toEnvelope(
 				getFactory(_operationClient.getOptions().getSoapVersionURI()),
-				param24,
+				param30,
 				optimizeContent(new javax.xml.namespace.QName("", "EchoString")));
 
 		// adding SOAP headers
@@ -285,9 +283,11 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 
 	}
 
-	public void Ping(org.tempuri.Ping param26
+	public void Ping(org.tempuri.Ping param32
 
-	) throws java.rmi.RemoteException {
+	) throws java.rmi.RemoteException
+
+	{
 
 		org.apache.axis2.client.OperationClient _operationClient = _serviceClient
 				.createClient(_operations[1].getName());
@@ -299,7 +299,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 		// Style is Doc.
 
 		env = toEnvelope(getFactory(_operationClient.getOptions()
-				.getSoapVersionURI()), param26,
+				.getSoapVersionURI()), param32,
 				optimizeContent(new javax.xml.namespace.QName("", "Ping")));
 
 		// adding SOAP headers
@@ -312,6 +312,7 @@ public class RMInteropServiceStub extends org.apache.axis2.client.Stub {
 		_operationClient.addMessageContext(_messageContext);
 
 		_operationClient.execute(true);
+
 		return;
 	}
 

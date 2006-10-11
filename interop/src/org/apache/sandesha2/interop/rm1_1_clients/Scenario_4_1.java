@@ -115,9 +115,26 @@ public class Scenario_4_1 {
         serviceClient.fireAndForget(getPingOMBlock("ping2"));
         serviceClient.fireAndForget(getPingOMBlock("ping3"));
         
+		SequenceReport sequenceReport = null;		
+		boolean complete = false;
+		while (!complete) {
+			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			if (sequenceReport!=null && sequenceReport.getCompletedMessages().size()==3) 
+				complete = true;
+			else {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+	    		}
+			}
+		} 	
+		
+        Thread.sleep(3000);
+        
         terminateSequence(serviceClient);
         
-        Thread.sleep(5000);
+        Thread.sleep(3000);
         
         serviceClient.getOptions().setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE, Constants.VALUE_TRUE);
         serviceClient.getOptions().setProperty(RampartMessageData.CANCEL_REQUEST, Constants.VALUE_TRUE);

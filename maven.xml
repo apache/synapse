@@ -304,7 +304,8 @@
         <ant:copy file="${build.interop.dir}/${interop.service.aar.name}" toDir="${build.repo.dir}/server/services"  overwrite="true"/>
 
         <ant:copy file="${dir.interop}/conf/sec-services.xml" toFile="${dir.interop.service.temp}/META-INF/services.xml" overwrite="true"/>
-		<ant:copy file="${dir.interop}/conf/store.jks" toFile="${dir.interop.service.temp}/META-INF/store.jks" overwrite="true"/>
+        <ant:copy file="${dir.interop}/conf/SecRMInteropService.wsdl" toFile="${dir.interop.service.temp}/META-INF/RMInteropService.wsdl" overwrite="true"/>
+		<ant:copy file="${dir.interop}/conf/store.jks" toFile="${dir.interop.service.temp}/store.jks" overwrite="true"/>
         <ant:jar jarfile="${build.interop.dir}/${interop.sec.service.aar.name}" basedir="${dir.interop.service.temp}"  overwrite="true"/>
         <ant:copy file="${build.interop.dir}/${interop.sec.service.aar.name}" toDir="${build.repo.dir}/server/services"  overwrite="true"/>
 

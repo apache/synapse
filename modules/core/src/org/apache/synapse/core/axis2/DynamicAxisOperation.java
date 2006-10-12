@@ -247,7 +247,17 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                 // Options object reused so soapAction needs to be removed so
                 // that soapAction+wsa:Action on response don't conflict
                 options.setAction("");
+
             } else {
+
+                SynapseCallbackReceiver callbackReceiver = (SynapseCallbackReceiver) axisOp.getMessageReceiver();
+                callbackReceiver.addCallback(mc.getMessageID(), callback);
+                AxisEngine engine = new AxisEngine(cc);
+                mc.getConfigurationContext().registerOperationContext(mc.getMessageID(), oc);
+                engine.send(mc);
+
+            }
+            /*} else {
                 if (block) {
                     // Send the SOAP Message and receive a response
                     MessageContext response = send(mc);
@@ -267,7 +277,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                     sc.getConfigurationContext().getThreadPool().execute(
                             new NonBlockingInvocationWorker(callback, mc));
                 }
-            }
+            }*/
         }
 
         private void addReferenceParameters(MessageContext msgctx) {

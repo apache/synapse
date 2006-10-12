@@ -134,14 +134,19 @@ public class NHttpListener implements TransportListener, HttpService {
         log.debug("@@@@ Got new HTTP request : " + request.toStringLine());
 
         MessageContext msgContext = new MessageContext();
+        msgContext.setConfigurationContext(cfgCtx);
         msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
-        try {
-            TransportOutDescription transportOut = cfgCtx.getAxisConfiguration()
-                .getTransportOut(new QName(Constants.TRANSPORT_HTTP));
-            TransportInDescription transportIn = cfgCtx.getAxisConfiguration()
-                .getTransportIn(new QName(Constants.TRANSPORT_HTTP));
+        msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
+        msgContext.setServerSide(true);
+        msgContext.setProperty(Constants.Configuration.TRANSPORT_IN_URL, request.getPath());
+        msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, request.getHeaders());
+        msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, request);
 
-            msgContext.setConfigurationContext(cfgCtx);
+        try {
+            msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
+                .getTransportOut(new QName(Constants.TRANSPORT_HTTP)));
+            msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
+                .getTransportIn(new QName(Constants.TRANSPORT_HTTP)));
 
             /* TODO session handling
             String sessionKey = request.getSession(true).getId();
@@ -149,16 +154,6 @@ public class NHttpListener implements TransportListener, HttpService {
                 SessionContext sessionContext = sessionManager.getSessionContext(sessionKey);
                 msgContext.setSessionContext(sessionContext);
             }*/
-
-            msgContext.setTransportIn(transportIn);
-            msgContext.setTransportOut(transportOut);
-            msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
-            msgContext.setServerSide(true);
-            msgContext.setProperty(Constants.Configuration.TRANSPORT_IN_URL, request.getPath());
-
-            msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, request.getHeaders());
-            msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, request);
-
             workerPool.execute(new Worker(cfgCtx, msgContext, request));
 
         } catch (AxisFault e) {
@@ -194,8 +189,11 @@ public class NHttpListener implements TransportListener, HttpService {
     public void handleResponse(HttpResponse response, Runnable callback) {
 
         log.debug("@@@@ Got new HTTP response : " + response.toStringLine());
-        //callback.setResponse(response);
-        callback.run();
+        if (callback instanceof Axis2CallbackImpl) {
+            Axis2CallbackImpl cb = (Axis2CallbackImpl) callback;
+            cb.setResponse(response);
+            cb.run();
+        }
     }
 
 }

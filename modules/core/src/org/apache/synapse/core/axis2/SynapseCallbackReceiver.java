@@ -21,10 +21,12 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.AxisFault;
+import org.apache.synapse.Constants;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.Iterator;
 
 public class SynapseCallbackReceiver implements MessageReceiver {
 

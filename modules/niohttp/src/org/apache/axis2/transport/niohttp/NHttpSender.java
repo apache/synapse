@@ -86,17 +86,11 @@ public class NHttpSender extends AbstractHandler implements TransportSender {
                         // TODO
                     }
                     populateHttpMessage(req, msgContext, format, dataOut);
-
-                    Axis2CallbackImpl cb = new Axis2CallbackImpl(req, msgContext);
-                    reactor.send(req, cb);
+                    reactor.send(req, new Axis2CallbackImpl(req, msgContext));
 
                 } else {
                     // TODO
                 }
-
-                //new CommonsHTTPTransportSender().writeMessageWithCommons(
-                //    msgContext, epr, dataOut, format);
-
             } else {
                 // TODO handle
             }
@@ -107,17 +101,12 @@ public class NHttpSender extends AbstractHandler implements TransportSender {
                     instanceof HttpRequest) {
                     sendAsyncResponse(msgContext, format, dataOut);
                 } else {
-                    sendUsingOutputStream(msgContext, format, dataOut);
+                    // TODO handle
                 }
             } else {
                 throw new AxisFault("Both message 'TO' and Property MessageContext.TRANSPORT_OUT" +
                     " is Null, Do not know where to send");
             }
-        }
-
-        if (msgContext.getOperationContext() != null) {
-            msgContext.getOperationContext().setProperty(
-                Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
         }
     }
 
@@ -185,50 +174,6 @@ public class NHttpSender extends AbstractHandler implements TransportSender {
         } catch (Exception e) {
             throw new AxisFault(e);
         }        
-    }
-
-    private void sendUsingOutputStream(MessageContext msgContext,
-        OMOutputFormat format,
-        OMElement dataOut) throws AxisFault {
-        OutputStream out =
-            (OutputStream) msgContext
-                .getProperty(MessageContext.TRANSPORT_OUT);
-
-        if (msgContext.isServerSide()) {
-            OutTransportInfo transportInfo =
-                (OutTransportInfo) msgContext
-                    .getProperty(Constants.OUT_TRANSPORT_INFO);
-
-            if (transportInfo != null) {
-                String contentType;
-
-                Object contentTypeObject = msgContext.getProperty(Constants.Configuration.CONTENT_TYPE);
-                if (contentTypeObject != null) {
-                    contentType = (String) contentTypeObject;
-                } else if (msgContext.isDoingREST()) {
-                    contentType = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
-                } else {
-                    contentType = format.getContentType();
-                    format.setSOAP11(msgContext.isSOAP11());
-                }
-
-
-                String encoding = contentType + "; charset="
-                    + format.getCharSetEncoding();
-
-                transportInfo.setContentType(encoding);
-            } else {
-                throw new AxisFault(Constants.OUT_TRANSPORT_INFO +
-                    " has not been set");
-            }
-        }
-
-        format.setDoOptimize(msgContext.isDoingMTOM());
-        try {
-            dataOut.serializeAndConsume(out, format);
-        } catch (XMLStreamException e) {
-            throw new AxisFault(e);
-        }
     }
 
     public void cleanup(MessageContext msgContext) throws AxisFault {

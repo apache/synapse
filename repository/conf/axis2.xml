@@ -83,7 +83,8 @@
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
-    <transportReceiver name="http" class="org.apache.axis2.transport.nhttp.AsyncHTTPListener"/>
+    <!--<transportReceiver name="http" class="org.apache.axis2.transport.nhttp.AsyncHTTPListener"/>-->
+    <transportReceiver name="http" class="org.apache.axis2.transport.niohttp.NHttpListener"/>
     <!--<transportReceiver name="http"
                        class="org.apache.axis2.transport.http.SimpleHTTPServer">
         <parameter name="port" locked="false">6060</parameter>-->
@@ -180,8 +181,10 @@
                      class="org.apache.axis2.transport.local.LocalTransportSender"/>
     <!--<transportSender name="http"
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">-->
+    <!--<transportSender name="http"
+                     class="org.apache.axis2.transport.nhttp.AsyncHTTPSender">-->
     <transportSender name="http"
-                     class="org.apache.axis2.transport.nhttp.AsyncHTTPSender">
+                     class="org.apache.axis2.transport.niohttp.NHttpSender">
         <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
         <!--<parameter name="Transfer-Encoding" locked="false">chunked</parameter>-->
     </transportSender>

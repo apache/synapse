@@ -213,9 +213,9 @@ public abstract class HttpMessage {
         sb.append(Constants.CRLF);
 
         if (buffer.limit() > 0) {
+            buffer.position(bodyStart);
             ByteBuffer bodyBuf = buffer;
             if (bodyStart > 0) {
-                buffer.position(bodyStart);
                 bodyBuf = buffer.slice();
             }
 

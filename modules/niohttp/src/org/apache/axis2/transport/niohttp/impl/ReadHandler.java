@@ -131,7 +131,8 @@ public class ReadHandler {
             return processIncomingMessage();
 
         } catch (IOException e) {
-            log.warn("Unexpected error reading from socket. Closing connection : " + e.getMessage());
+            log.warn("Unexpected error reading from socket: " + socket +
+                " Closing connection : " + e.getMessage());
             try {
                 socket.close();
             } catch (IOException e1) {

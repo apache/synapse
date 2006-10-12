@@ -121,19 +121,6 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             log.debug("Using default 'main' mediator for message mediation");
             synCtx.getEnvironment().injectMessage(synCtx);
         }
-
-        // Response handling mechanism for 200/202 and 5XX
-        // if smc.isResponse = true then the response will be handled with 200 OK
-        // else, response will be 202 OK without an http body
-        // if smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
-
-        if (synCtx.isResponse()) {
-            mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-        }
-        if (synCtx.isFaultResponse()) {
-            // todo: is there a better way to inject faultSoapEnv to the Axis2 Transport
-            throw new AxisFault("Synapse Encountered an Error - See Log for More Details");
-        }
     }
 
     /**

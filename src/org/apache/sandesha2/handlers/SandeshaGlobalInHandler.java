@@ -274,7 +274,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							}
 
 							String receivedMsgStr = receivedMsgsBean.getValue();
-							if (receivedMsgStr != "" && receivedMsgStr != null)
+							if (!receivedMsgStr.equals("") && receivedMsgStr != null)
 								receivedMsgStr = receivedMsgStr + "," + Long.toString(msgNo);
 							else
 								receivedMsgStr = Long.toString(msgNo);

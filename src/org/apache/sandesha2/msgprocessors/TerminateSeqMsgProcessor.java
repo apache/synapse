@@ -150,7 +150,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 					.getConfigurationContext());
 			
 			
-			outMessage.setServerSide(false);
+			outMessage.setServerSide(true);
+			
+			
 			engine.send(outMessage);
 
 			String addressingNamespaceURI = SandeshaUtil

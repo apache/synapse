@@ -37,9 +37,7 @@ import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,7 +61,6 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -220,7 +217,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		String messagesStr = "";
 		if (msgsBean != null)
-			messagesStr = (String) msgsBean.getValue();
+			messagesStr = msgsBean.getValue();
 		else {
 			msgsBean = new SequencePropertyBean();
 			msgsBean.setSequencePropertyKey(propertyKey);
@@ -235,7 +232,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsgCtx.pause();
 		}
 
-		if (messagesStr != "" && messagesStr != null)
+		if (messagesStr != null && !"".equals(messagesStr))
 			messagesStr = messagesStr + "," + Long.toString(msgNo);
 		else
 			messagesStr = Long.toString(msgNo);
@@ -265,7 +262,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		if (inOrderInvocation) {
 
-			SequencePropertyBean incomingSequenceListBean = (SequencePropertyBean) seqPropMgr.retrieve(
+			SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
 					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
 					Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 
@@ -521,7 +518,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			String incomingSeqId = reqSequence.getIdentifier().getIdentifier();
-			if (incomingSeqId == null || incomingSeqId == "") {
+			if (incomingSeqId == null || "".equals(incomingSeqId)) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.incomingSequenceNotValidID, "''"
 						+ incomingSeqId + "''");
 				log.debug(message);
@@ -1012,7 +1009,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			replyToEPR = new EndpointReference(replyToBean.getValue());
 		}
 
-		if (toEPR == null || toEPR.getAddress() == null || toEPR.getAddress() == "") {
+		if (toEPR == null || toEPR.getAddress() == null || "".equals(toEPR.getAddress())) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
 			log.debug(message);
 			throw new SandeshaException(message);
@@ -1103,7 +1100,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			identifierStr = Sandesha2Constants.TEMP_SEQUENCE_ID;
 
 		} else {
-			identifierStr = (String) outSequenceBean.getValue();
+			identifierStr = outSequenceBean.getValue();
 		}
 
 		Identifier id1 = new Identifier(rmNamespaceValue);

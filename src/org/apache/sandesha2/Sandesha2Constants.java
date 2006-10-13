@@ -548,9 +548,10 @@ public interface Sandesha2Constants {
 	};
 	
 	public interface MessageContextProperties{
-		public String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
+		String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
 		String SEQUENCE_ID = "WSRMSequenceId";
 		String MESSAGE_NUMBER = "WSRMMessageNumber";
+		String SEQUENCE_PROPERTY_KEY = "SequencePropertyKey";
 	}
     
     public interface Assertions {

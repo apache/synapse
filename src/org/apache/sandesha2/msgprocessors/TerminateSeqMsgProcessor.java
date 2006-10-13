@@ -417,6 +417,12 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		if (transportTo != null) {
 			rmMsgCtx.setProperty(MessageContextConstants.TRANSPORT_URL, transportTo);
 		}
+		
+		
+		//setting msg context properties
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, outSequenceID);
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSeqenceID);
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY , sequenceKey);
 
 		try {
 			rmMsgCtx.addSOAPEnvelope();

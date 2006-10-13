@@ -460,6 +460,9 @@ public class TerminateManager {
 
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 		
+		//the propertyKey of the ackMessage will be the propertyKey for the terminate message as well.
+		terminateRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY, sequencePropertyKey);
+		
 		// / addTerminateSeqTransaction.commit();
 		SandeshaUtil.executeAndStore(terminateRMMessage, key);
 	}

@@ -748,11 +748,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				} else {
 					if (acksToEPR.getAddress() == null){
 						EndpointReference replyToEPR = msgContext.getReplyTo();
-						if(Boolean.getBoolean((String)operationContext.getProperty(SandeshaClientConstants.USE_REPLY_TO_AS_ACKS_TO))
-							&& replyToEPR!=null && !replyToEPR.getAddress().equals("")){
+						
+						if(replyToEPR!=null && !replyToEPR.getAddress().equals("")){
 							//use the replyTo address as acksTo
 							if (log.isDebugEnabled())
 								log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + acksToEPR.getAddress());
+							
 							acksToEPR = replyToEPR;
 						}
 						else{

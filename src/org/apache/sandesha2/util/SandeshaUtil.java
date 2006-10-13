@@ -305,6 +305,10 @@ public class SandeshaUtil {
 			return "CloseSequenceResponse";
 		case Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE:
 			return "TerminateSequenceResponse";
+		case Sandesha2Constants.MessageTypes.FAULT_MSG:
+			return "Fault";
+		case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
+			return "MakeConnection";
 		case Sandesha2Constants.MessageTypes.UNKNOWN:
 			return "Unknown";
 		default:
@@ -1003,16 +1007,22 @@ public class SandeshaUtil {
 	 */
 	
 	public static String getSequencePropertyKey (RMMsgContext rmMsgContext) throws AxisFault {
+		String propertyKey = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY);
+		if (propertyKey!=null)
+			return propertyKey;
+		
 		String sequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
 		String internalSequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
 		
-		String propertyKey = null;
+		
 
 		int type = rmMsgContext.getMessageType();
 		int flow = rmMsgContext.getMessageContext().getFLOW();
 		
 		if (flow==MessageContext.OUT_FLOW) {
-			if (type==Sandesha2Constants.MessageTypes.UNKNOWN)
+			if (isSequenceResponseMessageType(type))
+				propertyKey = sequenceId;
+			else
 				propertyKey = internalSequenceId;
 		} else if (flow==MessageContext.IN_FLOW) {
 			if (isSequenceResponseMessageType(type))
@@ -1024,6 +1034,12 @@ public class SandeshaUtil {
 		}
 		
 		//TODO handler cases not covered from above.
+		
+		if (propertyKey==null) {
+			String typeStr = SandeshaUtil.getMessageTypeString(rmMsgContext.getMessageType());
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotFindPropertyKey,typeStr);
+			throw new SandeshaException (message);
+		}
 		
 		return propertyKey;
 	}

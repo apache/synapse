@@ -129,6 +129,10 @@ public class PollingManager extends Thread {
 				makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
 				//storing the MakeConnection message.
 				String makeConnectionMsgStoreKey = SandeshaUtil.getUUID();
+				
+				makeConnectionRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY,
+						sequencePropertyKey);
+				
 				storageManager.storeMessageContext(makeConnectionMsgStoreKey,makeConnectionRMMessage.getMessageContext());
 				
 				//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)

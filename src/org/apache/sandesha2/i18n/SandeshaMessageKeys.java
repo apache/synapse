@@ -43,6 +43,7 @@ public class SandeshaMessageKeys {
 	public static final String transportOutNotPresent="transportOutNotPresent";
 	public static final String storedKeyNotPresent="storedKeyNotPresent";
 	public static final String invalidQName="invalidQName";
+	public static final String couldNotFindPropertyKey="couldNotFindPropertyKey";
 
 	public static final String dummyCallback="dummyCallback";
 	public static final String cannotFindSequenceID="cannotFindSequenceID";

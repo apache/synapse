@@ -121,18 +121,17 @@ public class ReadHandler {
                 return false;
             }
 
-            //if (log.isDebugEnabled()) {
-            debug("Read from socket to buffer position: " + readPos + " to: " + buffer.position());
-            debug(Util.dumpAsHex(buffer.array(), readPos));
-            //}
+            if (log.isDebugEnabled()) {
+                debug("Read from socket to buffer position: " + readPos + " to: " + buffer.position());
+                debug(Util.dumpAsHex(buffer.array(), readPos));
+            }
 
             // save position for next read
             readPos = buffer.position();
             return processIncomingMessage();
 
         } catch (IOException e) {
-            log.warn("Unexpected error reading from socket: " + socket +
-                " Closing connection : " + e.getMessage());
+            log.warn(e.getMessage() + " Closing socket: " + socket);
             try {
                 socket.close();
             } catch (IOException e1) {

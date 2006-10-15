@@ -192,7 +192,7 @@ public class NHttpListener implements TransportListener, HttpService {
         if (callback instanceof Axis2CallbackImpl) {
             Axis2CallbackImpl cb = (Axis2CallbackImpl) callback;
             cb.setResponse(response);
-            cb.run();
+            workerPool.execute(cb);
         }
     }
 

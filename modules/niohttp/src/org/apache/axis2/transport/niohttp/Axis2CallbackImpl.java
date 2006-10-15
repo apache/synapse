@@ -27,24 +27,13 @@ import org.apache.axiom.soap.SOAPEnvelope;
 
 public class Axis2CallbackImpl implements Callback {
 
-    /** The HttpRequest for which we received this HttpResponse */
-    private HttpRequest request;
     /** The HttpResponse to be handled */
     private HttpResponse response;
     /** The original Axis2 MessageContext (request) */
     private MessageContext outMsgCtx;
 
     public Axis2CallbackImpl(HttpRequest request, MessageContext msgCtx) {
-        this.request = request;
         this.outMsgCtx = msgCtx;
-    }
-
-    public HttpRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpRequest request) {
-        this.request = request;
     }
 
     public HttpResponse getResponse() {
@@ -65,13 +54,7 @@ public class Axis2CallbackImpl implements Callback {
 
     public void run() {
 
-        outMsgCtx.getOperationContext().getAxisOperation();
-
         MessageContext responseMsgCtx = new MessageContext();
-        //responseMsgCtx.setOptions(outMsgCtx.getOptions()); // this is called a hack.. why?
-        // Options object reused above so soapAction needs to be removed so
-        // that soapAction+wsa:Action on response don't conflict
-        responseMsgCtx.setSoapAction("");
         responseMsgCtx.setServerSide(true);
         responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
         responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN, outMsgCtx
@@ -86,13 +69,18 @@ public class Axis2CallbackImpl implements Callback {
         responseMsgCtx.setTo(null);
 
         try {
-            SOAPEnvelope resenvelope = TransportUtils.createSOAPMessage(
-                        responseMsgCtx,
-                        response.getInputStream(),
-                        outMsgCtx.getEnvelope().getNamespace().getNamespaceURI());
-            responseMsgCtx.setEnvelope(resenvelope);
+            SOAPEnvelope envelope = TransportUtils.createSOAPMessage(
+                responseMsgCtx,
+                response.getInputStream(),
+                outMsgCtx.getEnvelope().getNamespace().getNamespaceURI());
+            responseMsgCtx.setEnvelope(envelope);
+
             AxisEngine engine = new AxisEngine(outMsgCtx.getConfigurationContext());
-            engine.receive(responseMsgCtx);
+            if (envelope.getBody().hasFault()) {
+                engine.receiveFault(responseMsgCtx);
+            } else {
+                engine.receive(responseMsgCtx);
+            }
         } catch (AxisFault af) {
             af.printStackTrace();
         }

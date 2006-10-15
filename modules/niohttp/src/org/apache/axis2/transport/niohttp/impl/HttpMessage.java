@@ -207,7 +207,7 @@ public abstract class HttpMessage {
         Iterator iter = headers.keySet().iterator();
         while (iter.hasNext()) {
             String headerName = (String) iter.next();
-            sb.append(headerName + Constants.STRING_COLON +
+            sb.append(headerName + Constants.STRING_COLON + Constants.STRING_SP +
                 headers.get(headerName) + Constants.CRLF);
         }
         sb.append(Constants.CRLF);

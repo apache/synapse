@@ -24,8 +24,33 @@ public class ReactorTester {
 
     public static void main(String[] args) throws Exception {
         ReactorTester rt = new ReactorTester();
-        rt.runDemo();
+        //rt.runDemo();
+        rt.simpleGet();
     }
+
+    private void simpleGet() throws IOException {
+        HttpRequest request = new HttpRequest(
+            new URL("https://localhost:8443/"));
+        request.setMethod(Constants.GET);
+        request.addHeader("Host", "127.0.0.1:8443");
+        request.setEmptyBody();
+        request.setSecure(true);
+        request.setConnectionClose();
+
+        r = Reactor.createReactor(null, 9001, false, new HttpService() {
+            public void handleRequest(HttpRequest request) {
+                System.out.println("?");
+            }
+
+            public void handleResponse(HttpResponse response, Runnable callback) {
+                System.out.println("Response : " + response);
+            }
+        });
+        new Thread(r).start();
+        r.send(request, null);
+    }
+
+
 
     private void runDemo() throws IOException {
 

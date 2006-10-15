@@ -40,6 +40,7 @@ public class HttpRequest extends HttpMessage {
     private String method;
     private String protocol;
     private Map requestParams;
+    private boolean secure = false;
 
     /** A pointer to a runnable to be executed once a response is received for this httpMessage */
     private Runnable onResponse = null;
@@ -111,6 +112,15 @@ public class HttpRequest extends HttpMessage {
         return path;
     }
 
+
+    public boolean isSecure() {
+        return secure;
+    }
+
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
     public void setPath(String path) {
         this.path = path;
         requestParams = new HashMap();
@@ -170,6 +180,14 @@ public class HttpRequest extends HttpMessage {
         } else {
             return Constants.CLOSE.equals(headers.get(Constants.CONNECTION));
         }
+    }
+
+    /**
+     * Causes the request to contain an empty body (i.e. for a GET etc)
+     */
+    public void setEmptyBody() {
+        buffer.position(bodyStart);
+        buffer.flip();
     }
 
     //------------------------------ TESTING CODE ------------------------

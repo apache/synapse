@@ -111,6 +111,13 @@ public class ReadHandler {
             // set position within buffer to read from channel
             buffer.position(readPos);
 
+            if (readPos == buffer.capacity()) {
+                ByteBuffer newBuf = ByteBuffer.allocate(buffer.capacity() * 2);
+                log.debug("Expanding ByteBuffer to " + newBuf.capacity() + " bytes");
+                buffer.flip();
+                buffer = newBuf.put(buffer);
+            }
+
             // perform read from channel to this location
             int bytesRead = socket.read(buffer);
             if (bytesRead == -1) {

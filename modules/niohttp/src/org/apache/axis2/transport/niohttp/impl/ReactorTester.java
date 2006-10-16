@@ -24,15 +24,15 @@ public class ReactorTester {
 
     public static void main(String[] args) throws Exception {
         ReactorTester rt = new ReactorTester();
-        //rt.runDemo();
-        rt.simpleGet();
+        rt.runDemo();
+        //rt.simpleGet();
     }
 
     private void simpleGet() throws IOException {
         HttpRequest request = new HttpRequest(
-            new URL("https://localhost:8443/"));
+            new URL("http://localhost:8080/"));
         request.setMethod(Constants.GET);
-        request.addHeader("Host", "127.0.0.1:8443");
+        request.addHeader("Host", "127.0.0.1:8080");
         request.setEmptyBody();
         request.setSecure(true);
         request.setConnectionClose();
@@ -59,7 +59,6 @@ public class ReactorTester {
 
                 public void handleRequest(HttpRequest request) {
                     try {
-                        System.out.println("Processing Request : " + request);
                         // create new HttpRequest
                         HttpRequest forwardReq = new HttpRequest(
                             new URL("http://localhost:9000/axis2/services/SimpleStockQuoteService"));

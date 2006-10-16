@@ -42,7 +42,11 @@ public class OutgoingHandler implements Runnable {
         this.httpService = httpService;
         this.socket = socket;
         this.sk = sk;
-        writeHandler.setMessage(request.getBuffer(), true /* connection close */);
+        request.getWireBuffer().position(0);
+        if (!request.isChunked()) {
+            request.addHeader(Constants.CONTENT_LENGTH, Integer.toString(request.getBuffer().limit()));
+        }
+        writeHandler.setMessage(request.getWireBuffer(), true /* connection close */);
     }
 
     public Runnable getCallback() {

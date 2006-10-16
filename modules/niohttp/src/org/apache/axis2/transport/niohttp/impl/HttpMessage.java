@@ -38,6 +38,8 @@ import java.util.Map;
  */
 public abstract class HttpMessage {
 
+    private static final int DEFAULT_BUFFER_SIZE = 4096;
+
     private static final Log log = LogFactory.getLog(HttpMessage.class);
 
     /**
@@ -47,11 +49,7 @@ public abstract class HttpMessage {
     /**
      * holder of the body content of this message
      */
-    protected ByteBuffer buffer = ByteBuffer.allocate(4096);
-    /**
-     * position at the main buffer where the body starts (e.g. for requests)
-     */
-    protected int bodyStart;
+    protected ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
 
     /**
      * A flag to detect if the getOutputStream() caller did not properly close() the stream
@@ -106,7 +104,7 @@ public abstract class HttpMessage {
      */
     public InputStream getInputStream() {
         // position to the start of the body
-        buffer.position(bodyStart);
+        buffer.position(0);
 
         // Returns an input stream for a ByteBuffer.
         // The read() methods use the relative ByteBuffer get() methods.
@@ -135,7 +133,7 @@ public abstract class HttpMessage {
         // position for body
         buffer.clear();
         outputStreamOpened = true;
-        buffer.position(bodyStart);
+        buffer.position(0);
 
         // Returns an output stream for a ByteBuffer.
         // The write() methods use the relative ByteBuffer put() methods.
@@ -180,19 +178,6 @@ public abstract class HttpMessage {
     }
 
     /**
-     * Set the given buffer and the start position within that buffer as the
-     * body of this httpMessage
-     *
-     * @param buffer an externally allocated [and populated] buffer containing the message body
-     * @param bodyStart the start position of the actual body content within the buffer (default 0)
-     */
-    public void setBuffer(ByteBuffer buffer, int bodyStart) {
-        log.debug("HttpMessage.setBuffer() - buffer : " + buffer + " bodyStart: " + bodyStart);
-        this.buffer = buffer;
-        this.bodyStart = bodyStart;
-    }
-
-    /**
      * Return a string representation of the message in HTTP wire-format
      * @return a String representation of the message in HTTP wire-format
      */
@@ -213,16 +198,12 @@ public abstract class HttpMessage {
         sb.append(Constants.CRLF);
 
         if (buffer.limit() > 0) {
-            buffer.position(bodyStart);
-            ByteBuffer bodyBuf = buffer;
-            if (bodyStart > 0) {
-                bodyBuf = buffer.slice();
-            }
+            buffer.position(0);
 
             Charset set = Charset.forName("us-ascii");
             CharsetDecoder dec = set.newDecoder();
             try {
-                sb.append(dec.decode(bodyBuf));
+                sb.append(dec.decode(buffer));
             } catch (CharacterCodingException e) {
                 e.printStackTrace();
             }
@@ -240,4 +221,31 @@ public abstract class HttpMessage {
      * @return the first line of text for the toString()
      */
     public abstract String toStringLine();
+
+    /**
+     * Reset the internal state of this message to be reused
+     */
+    public void reset() {
+        if (buffer.capacity() > DEFAULT_BUFFER_SIZE) {
+            buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+        } else {
+            buffer.clear();
+        }
+    }
+
+    /**
+     * Return a reference to the internal ByteBuffer of this message
+     * @return the reference to the internal ByteBuffer used
+     */
+    public ByteBuffer getBuffer() {
+        return buffer;
+    }
+
+    /**
+     * Set the internal buffer to the given ByteBuffer
+     * @param buffer
+     */
+    public void setBuffer(ByteBuffer buffer) {
+        this.buffer = buffer;
+    }
 }

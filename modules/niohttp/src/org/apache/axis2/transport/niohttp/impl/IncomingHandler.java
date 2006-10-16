@@ -41,8 +41,8 @@ public class IncomingHandler implements Runnable {
     private SelectionKey sk;
     private SocketChannel socket;
 
-    private ReadHandler incomingHandler = new ReadHandler(true);
-    private WriteHandler responseHandler = new WriteHandler();
+    private ReadHandler readHandler = new ReadHandler(true);
+    private WriteHandler writeHandler = new WriteHandler();
 
     private HttpService httpService;
 
@@ -60,7 +60,7 @@ public class IncomingHandler implements Runnable {
     }
 
     public void setResponse(HttpResponse response) {
-        responseHandler.setMessage(response.getBuffer(), response.isConnectionClose());
+        writeHandler.setMessage(response.getWireBuffer(), response.isConnectionClose());
         sk.interestOps(SelectionKey.OP_WRITE);
         sk.selector().wakeup();
         log.debug("\tIncomingHandler.setResponse()");
@@ -73,27 +73,27 @@ public class IncomingHandler implements Runnable {
 
         if (sk.isReadable()) {
             log.debug("\tIncomingHandler run() - READABLE");
-            if (incomingHandler.handle(socket, sk)) {
+            if (readHandler.handle(socket, sk)) {
                 log.debug("\tA httpMessage has been read completely");
                 // if httpMessage processing is complete
-                HttpRequest request = (HttpRequest) incomingHandler.getHttpMessage();
+                HttpRequest request = (HttpRequest) readHandler.getHttpMessage();
                 request.setHandler(this);
                 log.debug("\tFire event for received httpMessage");
                 httpService.handleRequest(request);
 
                 // if pipelining is used
-                if (!incomingHandler.isConnectionClose()) {
+                if (!readHandler.isConnectionClose()) {
                     // prepare to read another httpMessage - reset and reuse
-                    incomingHandler.reset();
+                    readHandler.reset();
                     log.debug("\tReset read handler to read next pipelined httpMessage");
                 }
             }
         } else if (sk.isWritable()) {
             log.debug("\tIncomingHandler run() - WRITEABLE");
-            if (responseHandler.handle(socket)) {
+            if (writeHandler.handle(socket)) {
                 log.debug("\tThe response has been written completely");
                 // response has been written completely
-                if (responseHandler.isConnectionClose()) {
+                if (writeHandler.isConnectionClose()) {
                     log.debug("\tClosing connection normally");
                     sk.cancel();
                     try {

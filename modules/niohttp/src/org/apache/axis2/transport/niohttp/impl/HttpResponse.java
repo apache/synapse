@@ -101,7 +101,7 @@ public class HttpResponse extends HttpMessage {
      * Return a ByteBuffer representation of this message in HTTP wire-format for transmission
      * @return the ByteBuffer representation of this message
      */
-    public ByteBuffer getBuffer() {
+    public ByteBuffer getWireBuffer() {
         if (buffer.limit() > 0) {
             headers.put(Constants.CONTENT_LENGTH, Integer.toString(buffer.limit()));
         }

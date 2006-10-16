@@ -52,9 +52,8 @@ public class ReadHandler {
 
     CharsetDecoder asciiDecoder = Charset.forName("us-ascii").newDecoder();
 
-    ByteBuffer buffer = ByteBuffer.allocate(4096);
-    ByteBuffer chunkedBuffer = ByteBuffer.allocate(4096);
     HttpMessage httpMessage;
+    ByteBuffer buffer;
 
     // where should new bytes read from the incoming channel be stored
     int readPos;
@@ -63,7 +62,6 @@ public class ReadHandler {
     // holders for parsed data
     String curHeaderName = null;
     StringBuffer curHeaderValue = new StringBuffer();
-    int bodyStart;
     int contentLength;
     int currentChunkRemainder;
     boolean lastChunkReceived = false;
@@ -76,8 +74,8 @@ public class ReadHandler {
     private boolean messageComplete = false;
 
     public void reset() {
-        buffer.clear();
-        chunkedBuffer.clear();
+        httpMessage.reset();
+        buffer = httpMessage.getBuffer();
         if (requestMode) {
             httpMessage = new HttpRequest();
         } else {
@@ -87,7 +85,6 @@ public class ReadHandler {
         processPos = 0;
         curHeaderName = null;
         curHeaderValue = new StringBuffer();
-        bodyStart = 0;
         contentLength = 0;
         currentChunkRemainder = 0;
         lastChunkReceived = false;
@@ -104,6 +101,7 @@ public class ReadHandler {
         } else {
             httpMessage = new HttpResponse();
         }
+        buffer = httpMessage.getBuffer();
     }
 
     public boolean handle(SocketChannel socket, SelectionKey sk) {
@@ -386,9 +384,15 @@ public class ReadHandler {
                 debug("\t\t\theaders parsed");
                 parsingHeader = false;
 
-                // prepare to parse body
-                bodyStart = processPos;
-                debug("\t\t\tparsed headers. begin parsing body to buffer position:" + bodyStart);
+                buffer.position(processPos);
+                ByteBuffer body = buffer.slice();
+                buffer.position(0);
+                buffer.put(body);
+
+                readPos -= processPos;
+                processPos = 0;
+                
+                debug("\t\t\tparsed headers. begin parsing body to buffer");
 
                 if (httpMessage.isChunked()) {
                     parsingChunks = true;
@@ -402,36 +406,20 @@ public class ReadHandler {
         return true;
     }
 
-    private String parseHeaderName(ByteBuffer buf) {
-        return readToColon(buf);
-    }
-
-    private String parseHeaderValue(ByteBuffer buf) {
-        int firstChar;
-        do {
-            String value = readToCRLF(buf);
-            if (value != null) {
-                curHeaderValue.append(value);
-            }
-            firstChar = buf.get(buf.position());
-        } while (firstChar == Constants.SP || firstChar == Constants.HT);
-        return curHeaderValue.toString();
-    }
-
     private boolean parseNextChunk() {
         debug("\t\t\tparseNextChunk(currentChunkRemainder: " + currentChunkRemainder +
             " processPos: " + processPos + " readPos: " + readPos);
-        if (currentChunkRemainder > 0) {
-            // now start processing from where we left off until we reach the end
-            buffer.position(processPos);
 
-            byte b;
-            while (currentChunkRemainder > 0 && buffer.position() < readPos) {
-                b = buffer.get();
-                chunkedBuffer.put(b);
-                processPos++;
-                currentChunkRemainder--;
+        if (currentChunkRemainder > 0) {
+            // have we read the full chunk?
+            if (readPos > processPos + currentChunkRemainder) {
+                processPos += currentChunkRemainder;
+                currentChunkRemainder = 0;
+            } else {
+                currentChunkRemainder -= (readPos - processPos);
+                processPos = readPos;
             }
+            buffer.position(processPos);
 
             if (currentChunkRemainder == 0) {
                 // read to end of data CRLF and discard trailing CRLF
@@ -440,6 +428,9 @@ public class ReadHandler {
             }
         }
         if (currentChunkRemainder == 0) {
+            // save the position we are at
+            int chunkHeadStart = processPos;
+
             // is there another chunk?
             String chunkHead = readToCRLF(buffer);
             debug("\t\t\treading chunkHead : " + chunkHead);
@@ -456,11 +447,20 @@ public class ReadHandler {
                 return true;
             }
 
+            // we need to discard the chunk head from our buffer now
+            buffer.position(processPos);
+            ByteBuffer remainder = buffer.slice();
+            buffer.position(chunkHeadStart);
+            buffer.put(remainder);
+            readPos -= (processPos - chunkHeadStart);
+            processPos = chunkHeadStart;
+
+            //System.out.println(Util.dumpAsHex(buffer.array(), buffer.limit()));
+
             // did we encounter the "0" chunk?
             if (currentChunkRemainder == 0) {
 
                 debug("\t\t\tall chunks received");
-                chunkedBuffer.flip();
 
                 // read upto end of next CRLF
                 String footer;
@@ -496,25 +496,21 @@ public class ReadHandler {
             }
 
             if (lastChunkReceived && messageComplete) {
-                // copy chunked body to main buffer, to start at the bodyStart position
-                buffer.position(bodyStart);
-                chunkedBuffer.position(0);
-                buffer.put(chunkedBuffer);
                 buffer.flip();
-                httpMessage.setBuffer(buffer, bodyStart);
+                httpMessage.setBuffer(buffer);
+                debug("\t\t\tfinish reading. body ends at : " + processPos + " in buffer : " + buffer);
             }
 
         } else {
 
-            if (readPos >= bodyStart + contentLength) {
+            if (readPos >= contentLength) {
                 // do we have the whole body in our buffer?
                 processPos = readPos;
                 buffer.position(processPos);
                 buffer.flip();
+                httpMessage.setBuffer(buffer);
 
-                debug("\t\t\tfinish reading. body starts from: " +
-                    bodyStart + " and ends: " + processPos + " in buffer : " + buffer);
-                httpMessage.setBuffer(buffer, bodyStart);
+                debug("\t\t\tfinish reading. body ends at : " + processPos + " in buffer : " + buffer);
                 messageComplete = true;
             }
         }

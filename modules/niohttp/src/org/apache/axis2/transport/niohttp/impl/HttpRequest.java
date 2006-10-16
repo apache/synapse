@@ -165,7 +165,7 @@ public class HttpRequest extends HttpMessage {
      * Return a ByteBuffer representation of this message in HTTP wire-format
      * @return the ByteBuffer representation of this message
      */
-    public ByteBuffer getBuffer() {
+    public ByteBuffer getWireBuffer() {
         return ByteBuffer.wrap(toString().getBytes());
     }
 
@@ -186,7 +186,7 @@ public class HttpRequest extends HttpMessage {
      * Causes the request to contain an empty body (i.e. for a GET etc)
      */
     public void setEmptyBody() {
-        buffer.position(bodyStart);
+        buffer.position(0);
         buffer.flip();
     }
 
@@ -196,7 +196,7 @@ public class HttpRequest extends HttpMessage {
      * @param body
      */
     public void setBody(String body) {
-        buffer.position(bodyStart);
+        buffer.position(0);
         buffer.put(body.getBytes());
         buffer.flip();
     }

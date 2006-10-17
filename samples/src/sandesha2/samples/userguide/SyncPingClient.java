@@ -125,7 +125,7 @@ public class SyncPingClient {
 			}
 		}
 		
-		serviceClient.finalizeInvoke();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

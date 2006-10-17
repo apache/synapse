@@ -12,7 +12,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -123,13 +122,13 @@ public class Scenario_4_2 {
 		Callback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
-//		Callback callback2 = new TestCallback ("Callback 2");
-//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
-//		
-//		Callback callback3 = new TestCallback ("Callback 3");
-//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+		Callback callback2 = new TestCallback ("Callback 2");
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
 		
-        while (!callback1.isComplete()) {
+		Callback callback3 = new TestCallback ("Callback 3");
+		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+		
+        while (!callback3.isComplete()) {
             Thread.sleep(1000);
         }
         
@@ -223,7 +222,7 @@ public class Scenario_4_2 {
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
-		clientOptions.setProperty(OutInAxisOperation.USE_CUSTOM_LISTNER,new Boolean (true));
+		//clientOptions.setProperty(OutInAxisOperation.USE_CUSTOM_LISTNER,new Boolean (true));
 		
         clientOptions.setProperty(RampartMessageData.KEY_RAMPART_POLICY, loadPolicy(CLIENT_POLICY_PATH));
 	}

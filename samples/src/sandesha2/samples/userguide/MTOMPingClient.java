@@ -91,11 +91,8 @@ public class MTOMPingClient {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
-		
 //		clientOptions.setProperty(SandeshaClient.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
-		
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 		
 		clientOptions.setProperty(SandeshaClientConstants.SANDESHA_LISTENER, new SandeshaListenerImpl ());
@@ -110,7 +107,7 @@ public class MTOMPingClient {
 		serviceClient.fireAndForget(getPingOMBlock());
 		SandeshaClient.waitUntilSequenceCompleted(serviceClient);
 		
-		serviceClient.finalizeInvoke();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock() throws AxisFault {

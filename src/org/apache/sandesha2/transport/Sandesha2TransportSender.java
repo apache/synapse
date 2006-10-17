@@ -95,4 +95,6 @@ public class Sandesha2TransportSender implements TransportSender  {
 
 	public void init(HandlerDescription handlerdesc) {}
 
+	public void flowComplete(MessageContext msgContext) {}
+
 }

@@ -128,7 +128,7 @@ public class Scenario_1_4 {
 		
 		Thread.sleep(3000);
 		
-		serviceClient.finalizeInvoke();
+		serviceClient.cleanup();
 	}
 
 	private static OMElement getPingOMBlock(String text) {
@@ -154,7 +154,6 @@ public class Scenario_1_4 {
 		String acksToAddress = stubServiceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		
 		setUpOptions(stubServiceClient.getOptions(),acksToAddress);
-		
 		
 		Ping ping = new Ping ();
 		ping.setText("ping1");
@@ -183,8 +182,13 @@ public class Scenario_1_4 {
 			}
 		} 		
 		
+		Thread.sleep(3000);
+		
 		SandeshaClient.terminateSequence(stubServiceClient);
-		stub._getServiceClient().finalizeInvoke();
+		
+		Thread.sleep(6000);
+		
+		stub._getServiceClient().cleanup();
 		
 	}
 	
@@ -219,6 +223,7 @@ public class Scenario_1_4 {
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo, acksTo);
+		clientOptions.setReplyTo(new EndpointReference (acksTo)); //making replyTo value same as AcksTo.
 
 		
 	}

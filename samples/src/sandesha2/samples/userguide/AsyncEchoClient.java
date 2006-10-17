@@ -102,15 +102,14 @@ public class AsyncEchoClient {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 //		clientOptions.setReplyTo(new EndpointReference (AddressingConstants.Final.WSA_ANONYMOUS_URL));
-		
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
+//		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
+//		serviceClient.engageModule(new QName ("sandesha2"));
+
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
-//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
-		
-//		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
-		
+
 		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //Uncomment this to offer a sequenceID for the incoming sequence.
 		clientOptions.setAction("urn:wsrm:EchoString");
@@ -118,23 +117,21 @@ public class AsyncEchoClient {
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
-
-		
 		clientOptions.setUseSeparateListener(true);
 		
 		serviceClient.setOptions(clientOptions);
 
-		Callback callback1 = new TestCallback ("Callback 1");
-		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
-		
-		Callback callback2 = new TestCallback ("Callback 2");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
-
-		Callback callback3 = new TestCallback ("Callback 3");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
-		
-		Callback callback4 = new TestCallback ("Callback 4");
-		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo4",sequenceKey),callback4);
+//		Callback callback1 = new TestCallback ("Callback 1");
+//		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo1",sequenceKey),callback1);
+//		
+//		Callback callback2 = new TestCallback ("Callback 2");
+//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo2",sequenceKey),callback2);
+//
+//		Callback callback3 = new TestCallback ("Callback 3");
+//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo3",sequenceKey),callback3);
+//		
+//		Callback callback4 = new TestCallback ("Callback 4");
+//		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo4",sequenceKey),callback4);
 
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		Callback callback5 = new TestCallback ("Callback 5");
@@ -145,6 +142,9 @@ public class AsyncEchoClient {
         }
         
         Thread.sleep(4000);
+        
+        configContext.getListenerManager().stop();
+        serviceClient.cleanup();
         
 	}
 

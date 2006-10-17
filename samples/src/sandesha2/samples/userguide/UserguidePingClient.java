@@ -58,7 +58,7 @@ public class UserguidePingClient {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping3"));
 		
-		serviceClient.finalizeInvoke();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

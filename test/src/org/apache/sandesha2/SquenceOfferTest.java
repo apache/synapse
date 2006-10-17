@@ -158,7 +158,8 @@ public class SquenceOfferTest extends SandeshaTestCase {
 		assertEquals(incomingSeqList.size(),1);
 		assertEquals(incomingSeqList.get(0),offeredSequenceID);	
 	
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

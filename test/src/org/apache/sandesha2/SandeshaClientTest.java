@@ -126,7 +126,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		assertNotNull(sequenceReport.getSequenceID());
 		assertFalse(sequenceReport.isSecureSequence());
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 	
 //	public void testCreateSequenceWithoutOffer () {

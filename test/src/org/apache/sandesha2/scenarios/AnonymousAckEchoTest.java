@@ -127,7 +127,8 @@ public class AnonymousAckEchoTest extends SandeshaTestCase {
 		
 		assertEquals(callback1.getResult(),"echo1");
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

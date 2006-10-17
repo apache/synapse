@@ -164,7 +164,8 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		
 		assertEquals(incomingSequenceReport.getSequenceID(),incomingSequenceReport.getInternalSequenceID());  //for the incoming side, internalSequenceID==sequenceID
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 	
 	public void testRMReport () throws AxisFault,InterruptedException {
@@ -237,7 +238,8 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 	 	assertEquals(sequence1Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 	 	assertEquals(sequence2Report.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_ESTABLISHED);	
 	
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {

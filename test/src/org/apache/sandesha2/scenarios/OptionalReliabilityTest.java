@@ -112,7 +112,8 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		List inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		assertTrue(inboundReports.isEmpty());
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 
 	public void testSyncEcho () throws AxisFault, InterruptedException {
@@ -146,7 +147,8 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		List inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		assertTrue(inboundReports.isEmpty());
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 
 	public void testAsyncEcho () throws AxisFault, InterruptedException {
@@ -184,7 +186,8 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		List inboundReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		assertTrue(inboundReports.isEmpty());
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getEchoOMBlock(String text, String appSeq) {

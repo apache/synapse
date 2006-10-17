@@ -98,6 +98,7 @@ public class AsyncEchoWithPollingClient {
 		
 //		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress() + "/" + ServiceClient.ANON_OUT_IN_OP;
 //		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
 		String sequenceKey = SandeshaUtil.getUUID();  //sequence key for thie sequence.
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
@@ -105,8 +106,6 @@ public class AsyncEchoWithPollingClient {
 		clientOptions.setReplyTo(new EndpointReference (AddressingConstants.Submission.WSA_ANONYMOUS_URL));
 		
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
-		
-//		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
 		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 		
@@ -191,7 +190,6 @@ public class AsyncEchoWithPollingClient {
 		}
 
 		public void onError (Exception e) {
-			// TODO Auto-generated method stub
 			System.out.println("Error reported for test call back");
 			e.printStackTrace();
 		}

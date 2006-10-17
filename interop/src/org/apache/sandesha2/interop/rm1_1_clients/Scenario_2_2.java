@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -112,7 +113,7 @@ public class Scenario_2_2 {
 //		clientOptions.setProperty(Options.COPY_PROPERTIES,new Boolean (true));
 		clientOptions.setTo(new EndpointReference (toAddress));
 		
-		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		String acksTo = null; //serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 		
 		String sequenceKey = "sequence4";
@@ -152,7 +153,8 @@ public class Scenario_2_2 {
             Thread.sleep(1000);
         }
         
-       
+		Thread.sleep(3000);
+		
         SandeshaClient.terminateSequence(serviceClient);
         
 	}
@@ -228,10 +230,11 @@ public class Scenario_2_2 {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToAddress);
 		clientOptions.setAction("urn:wsrm:EchoString");
+		
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
@@ -250,7 +253,7 @@ public class Scenario_2_2 {
 		ServiceClient stubServiceClient = stub._getServiceClient();
 		
 		String sequenceKey = "sequence4";
-		String acksTo = stubServiceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		String acksTo = null; //serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		
 		Options options = stubServiceClient.getOptions();
 		setUpOptions(options, sequenceKey, acksTo);
@@ -263,25 +266,27 @@ public class Scenario_2_2 {
 		RMInteropServiceCallbackHandlerImpl callback1 = new RMInteropServiceCallbackHandlerImpl ("callback1");
 		stub.startEchoString(echoString, callback1);
 		
-		echoString = new EchoString ();
-		echoString.setEchoString (new EchoStringRequestBodyType ());
-		echoString.getEchoString().setSequence(sequenceKey);
-		echoString.getEchoString().setText("echo2");
+//		echoString = new EchoString ();
+//		echoString.setEchoString (new EchoStringRequestBodyType ());
+//		echoString.getEchoString().setSequence(sequenceKey);
+//		echoString.getEchoString().setText("echo2");
+//		
+//		RMInteropServiceCallbackHandlerImpl callback2 = new RMInteropServiceCallbackHandlerImpl ("callback2");
+//		stub.startEchoString(echoString, callback2);
+//		
+//		echoString = new EchoString ();
+//		echoString.setEchoString (new EchoStringRequestBodyType ());
+//		echoString.getEchoString().setSequence(sequenceKey);
+//		echoString.getEchoString().setText("echo3");
+//		
+//		RMInteropServiceCallbackHandlerImpl callback3 = new RMInteropServiceCallbackHandlerImpl ("callback3");
+//		stub.startEchoString(echoString, callback3);
 		
-		RMInteropServiceCallbackHandlerImpl callback2 = new RMInteropServiceCallbackHandlerImpl ("callback2");
-		stub.startEchoString(echoString, callback2);
-		
-		echoString = new EchoString ();
-		echoString.setEchoString (new EchoStringRequestBodyType ());
-		echoString.getEchoString().setSequence(sequenceKey);
-		echoString.getEchoString().setText("echo3");
-		
-		RMInteropServiceCallbackHandlerImpl callback3 = new RMInteropServiceCallbackHandlerImpl ("callback3");
-		stub.startEchoString(echoString, callback3);
-		
-		while (!callback3.isCompleted()) {
+		while (!callback1.isCompleted()) {
 			Thread.sleep(2000);
 		}
+		
+		Thread.sleep(3000);
 		
 		terminateSequence (stubServiceClient);
 		
@@ -307,7 +312,7 @@ public class Scenario_2_2 {
 		Thread.sleep(6000);
 		
         SandeshaClient.terminateSequence(serviceClient);
-//        serviceClient.finalizeInvoke();
+//        serviceClient.cleanup();
         		
 	}
 

@@ -26,6 +26,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -120,7 +121,7 @@ public class Scenario_1_1 {
 		
 		SandeshaClient.terminateSequence(serviceClient);
 		
-		serviceClient.finalizeInvoke();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {
@@ -171,11 +172,20 @@ public class Scenario_1_1 {
 			}
 		} 		
 		
-		SandeshaClient.terminateSequence(stubServiceClient);
+//		SandeshaClient.closeSequence (stubServiceClient);
+		
+		Thread.sleep(1000);
+		
+		SandeshaClient.terminateSequence  (stubServiceClient);
 		
 		Thread.sleep(3000);
 		
-		stub._getServiceClient().finalizeInvoke();
+//		ping = new Ping ();
+//		ping.setText("ping4");
+//		stub.Ping (ping);
+//		Thread.sleep(3000000);
+		
+		stub._getServiceClient().cleanup();
 	}
 	
 	private ConfigurationContext generateConfigContext () throws Exception {

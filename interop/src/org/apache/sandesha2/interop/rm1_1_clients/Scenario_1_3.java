@@ -118,20 +118,9 @@ public class Scenario_1_3 {
 
 		SandeshaClient.closeSequence(serviceClient);
 		
-//		try {
-//			Thread.sleep(3000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-//		clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(4));
-//		serviceClient.fireAndForget(getPingOMBlock("ping4"));	
-
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -140,11 +129,10 @@ public class Scenario_1_3 {
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		serviceClient.finalizeInvoke();
+		serviceClient.cleanup();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {
@@ -208,7 +196,7 @@ public class Scenario_1_3 {
 			e.printStackTrace();
 		}
 		
-		stubServiceClient.finalizeInvoke();
+		stubServiceClient.cleanup();
 		
 		
 	}
@@ -234,7 +222,6 @@ public class Scenario_1_3 {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 	    
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-		
 		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.

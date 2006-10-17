@@ -112,7 +112,8 @@ public class SecurityTest extends SandeshaTestCase {
 		}
 		assertTrue(sequenceReport.isSecureSequence());
 		
-		serviceClient.finalizeInvoke();
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
 	}
 
 }

@@ -129,13 +129,9 @@ public class Scenario_2_3 {
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-		
 //		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
-		
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
-
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
-		
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());  //single characted offers are declined by the server
 		
 		//You must set the following two properties in the request-reply case.
@@ -160,7 +156,7 @@ public class Scenario_2_3 {
         
        
         SandeshaClient.terminateSequence(serviceClient);
-//        serviceClient.finalizeInvoke();
+//        serviceClient.cleanup();
 	}
 
 	private static OMElement getEchoOMBlock(String text, String sequenceKey) {
@@ -314,7 +310,7 @@ public class Scenario_2_3 {
 		Thread.sleep(6000);
 		
         SandeshaClient.terminateSequence(serviceClient);
-//        serviceClient.finalizeInvoke();
+//        serviceClient.cleanup();
         		
 	}
 	

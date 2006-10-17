@@ -142,7 +142,7 @@ public class Scenario_4_1 {
         
         Thread.sleep(10000);
         
-        serviceClient.finalizeInvoke();
+        serviceClient.cleanup();
     }
     
     private static OMElement getPingOMBlock(String text) {
@@ -188,7 +188,7 @@ public class Scenario_4_1 {
         stub.Ping(ping);
         
         Thread.sleep(10000);
-//        stub._getServiceClient().finalizeInvoke();
+//        stub._getServiceClient().cleanup();
         
     }
     

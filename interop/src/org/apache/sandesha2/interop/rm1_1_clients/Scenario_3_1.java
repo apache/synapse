@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -205,7 +206,7 @@ public class Scenario_3_1 {
 
 		if ("<SANDESHA2_HOME>".equals(SANDESHA2_HOME)){
 			System.out.println("ERROR: Please set the directory you unzipped Sandesha2 as the first option.");
-			return null;
+			throw new AxisFault ("Client not set up correctly");
 		}
 
 		String axis2_xml = AXIS2_CLIENT_PATH + "client_axis2.xml";
@@ -223,7 +224,7 @@ public class Scenario_3_1 {
 		clientOptions.setAction("urn:wsrm:EchoString");
 
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
@@ -233,7 +234,7 @@ public class Scenario_3_1 {
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
-		clientOptions.setProperty(OutInAxisOperation.USE_CUSTOM_LISTNER,new Boolean (true));
+		clientOptions.setProperty(Constants.Configuration.USE_CUSTOM_LISTNER, new Boolean (true));
 				
 	}
 	

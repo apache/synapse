@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -107,7 +108,9 @@ public class Scenario_2_1 {
 		Options clientOptions = new Options ();
 
 		String sequenceKey = "sequence4";
-		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		
+		//acksTo will be picked from replyTo
+		String acksTo = null; //serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		
 		setUpOptions(clientOptions, sequenceKey,acksTo);
 
@@ -187,7 +190,6 @@ public class Scenario_2_1 {
 		}
 
 		public void onError (Exception e) {
-			// TODO Auto-generated method stub
 			System.out.println("Error reported for test call back");
 			e.printStackTrace();
 		}
@@ -213,10 +215,11 @@ public class Scenario_2_1 {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportToEPR);
 		clientOptions.setAction("urn:wsrm:EchoString");
+		
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 
 //		clientOptions.setProperty(MessageContextConstants.CHUNKED,Constants.VALUE_FALSE);   //uncomment this to send messages without chunking.
-//		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
+		clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);   //uncomment this to send messages in SOAP 1.2
 //		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
 		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);  //uncomment this to send the messages according to the v1_1 spec.
@@ -225,6 +228,20 @@ public class Scenario_2_1 {
 		//You must set the following two properties in the request-reply case.
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
+		
+		
+		
+//		OMFactory factory = OMAbstractFactory.getOMFactory();
+//		OMNamespace namespace = factory.createOMNamespace("urn:wsrm:InteropOptions","rmi");
+//		OMElement acceptOfferElem = factory.createOMElement("acceptOffer",namespace);
+//		OMElement useOfferElem = factory.createOMElement("useOffer",namespace);
+//		acceptOfferElem.setText("true");
+//		useOfferElem.setText("true");
+//		toEPR.addReferenceParameter(acceptOfferElem);
+//		toEPR.addReferenceParameter(useOfferElem);
+//		clientOptions.setManageSession(true); // without this reference params wont go.
+//		
+		
 				
 	}
 	
@@ -236,7 +253,9 @@ public class Scenario_2_1 {
 		ServiceClient stubServiceClient = stub._getServiceClient();
 		
 		String sequenceKey = "sequence4";
-		String acksTo = stubServiceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		
+		//acksTo will be pickedup from replyTo
+		String acksTo = null;  //stubServiceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 		
 		Options options = stubServiceClient.getOptions();
 		setUpOptions(options, sequenceKey, acksTo);
@@ -293,7 +312,7 @@ public class Scenario_2_1 {
 		Thread.sleep(6000);
 		
         SandeshaClient.terminateSequence(serviceClient);
-//        serviceClient.finalizeInvoke();
+//        serviceClient.cleanup();
         		
 	}
 

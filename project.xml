@@ -110,19 +110,19 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${axis2.version}</version>
         </dependency>
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>rampart</artifactId>
             <version>${rampart.version}</version>
             <type>mar</type>
         </dependency>
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>rahas</artifactId>
             <version>${rahas.version}</version>
             <type>mar</type>
@@ -213,17 +213,17 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${geronimo.spec.javamail.version}</version>
         </dependency>
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-security</artifactId>
             <version>${axis2.security.version}</version>
         </dependency>
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-rahas</artifactId>
             <version>${axis2.rahas.version}</version>
         </dependency>
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-secpolicy</artifactId>
             <version>${axis2.secpolicy.version}</version>
         </dependency>

@@ -66,7 +66,7 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence</actionMapping>
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequenceResponse</actionMapping>
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequenceResponse</actionMapping>
-        <actionMapping>http://docs.oasisopen.org/ws-rx/wsrm/200608/MakeConnection</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection</actionMapping>
     </operation>
 
    <!-- Database connection parameters -->

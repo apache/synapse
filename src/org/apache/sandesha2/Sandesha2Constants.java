@@ -97,7 +97,8 @@ public interface Sandesha2Constants {
 			
 			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence";
 			
-			String SOAP_ACTION_MAKE_CONNECTION = "http://docs.oasisopen.org/ws-rx/wsrm/200608/MakeConnection";
+			String SOAP_ACTION_MAKE_CONNECTION = "http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection";
+			                                      
 		}
 	}
 	

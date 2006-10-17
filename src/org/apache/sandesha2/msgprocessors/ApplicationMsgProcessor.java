@@ -225,20 +225,25 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			msgsBean.setValue(messagesStr);
 		}
 
-		if (msgNoPresentInList(messagesStr, msgNo)
+    boolean msgNoPresentInList = msgNoPresentInList(messagesStr, msgNo);
+		
+		if (msgNoPresentInList
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			// this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 			rmMsgCtx.pause();
 		}
 
-		if (messagesStr != null && !"".equals(messagesStr))
-			messagesStr = messagesStr + "," + Long.toString(msgNo);
-		else
-			messagesStr = Long.toString(msgNo);
-
-		msgsBean.setValue(messagesStr);
-		seqPropMgr.update(msgsBean);
+		if (!msgNoPresentInList)
+		{
+			if (messagesStr != null && !"".equals(messagesStr))
+				messagesStr = messagesStr + "," + Long.toString(msgNo);
+			else
+				messagesStr = Long.toString(msgNo);
+	
+			msgsBean.setValue(messagesStr);
+			seqPropMgr.update(msgsBean);
+		}
 
 		// Pause the messages bean if not the right message to invoke.
 		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
@@ -260,7 +265,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceId);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
 		
-		if (inOrderInvocation) {
+		if (inOrderInvocation && !msgNoPresentInList) {
 
 			SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
 					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,

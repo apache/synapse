@@ -464,5 +464,32 @@ public class FaultManager {
 		SandeshaException fault = new SandeshaException("");
 		return fault;
 	}
+	
+	public static boolean isRMFault (String faultSubcodeValue) {
+		if (faultSubcodeValue==null)
+			return false;
+		
+		if (Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED.equalsIgnoreCase (faultSubcodeValue) ||
+			Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT.equalsIgnoreCase (faultSubcodeValue) ||	
+			Sandesha2Constants.SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED.equalsIgnoreCase (faultSubcodeValue) ||
+			Sandesha2Constants.SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER.equalsIgnoreCase (faultSubcodeValue) ||
+			Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED.equalsIgnoreCase (faultSubcodeValue) ||
+			Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED.equalsIgnoreCase (faultSubcodeValue) ||
+			Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE.equalsIgnoreCase (faultSubcodeValue) ) {
+		
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
+	public void manageIncomingRMFault (AxisFault fault, MessageContext msgContext) {
+		
+		//TODO implement code to handle the rm fault
+		
+		log.error(fault);
+		
+	}
 
 }

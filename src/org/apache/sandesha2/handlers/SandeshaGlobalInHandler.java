@@ -23,6 +23,9 @@ import java.util.Iterator;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
+import org.apache.axiom.soap.SOAPFaultCode;
+import org.apache.axiom.soap.SOAPFaultSubCode;
+import org.apache.axiom.soap.SOAPFaultValue;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -44,6 +47,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -116,43 +120,26 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			SOAPFault faultPart = envelope.getBody().getFault();
 
 			if (faultPart != null) {
-				RelatesTo relatesTo = msgContext.getRelatesTo();
-				if (relatesTo != null) {
-					String relatesToValue = relatesTo.getValue();
-					OperationContext operationContext = configContext.getOperationContext(relatesToValue);
-					if (operationContext != null) {
-						MessageContext requestMessage = operationContext
-								.getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
-						if (requestMessage != null) {
-							if (SandeshaUtil.isRetriableOnFaults(requestMessage)) {
 
-								SandeshaListener faultCallback = (SandeshaListener) operationContext
-										.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
-								if (faultCallback != null) {
+				// constructing the fault
+				AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
 
-									// constructing the fault
-									AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
-
-									// reporting the fault
-									// log.error(axisFault);
-									if (faultCallback != null) {
-										faultCallback.onError(axisFault);
-									}
-
-								}
-
-								// stopping the fault from going further and
-								// getting dispatched
-								msgContext.pause(); // TODO let this go in the
-								// last try
-								if (log.isDebugEnabled())
-									log.debug("Exit: SandeshaGlobalInHandler::invoke");
-
-								return;
-							}
-						}
-					}
+				//If this is a RM related fault. I.e. one that was defined in the WSRM spec. It will be 
+				//handled at this point.
+				SOAPFaultCode faultCode = axisFault.getFaultCodeElement();
+				SOAPFaultSubCode faultSubCode = faultCode!=null?faultCode.getSubCode():null;
+				SOAPFaultValue faultSubcodeValue = faultSubCode!=null?faultSubCode.getValue():null;
+				String subCodeText = faultSubcodeValue!=null?faultSubcodeValue.getText():null;
+				
+				if (subCodeText!=null && FaultManager.isRMFault(subCodeText)) {
+					//handling the fault here and pausing the message.
+					
+					FaultManager faultManager = new FaultManager ();
+					faultManager.manageIncomingRMFault (axisFault, msgContext);
+					
+					msgContext.pause();
 				}
+				
 			}
 
 			// Quitting the message with minimum processing if not intended for

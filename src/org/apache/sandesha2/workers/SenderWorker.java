@@ -169,11 +169,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 				successfullySent = true;
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.sendMsgError, e.toString());
 				log.error(message, e);
-
 			} finally {
 				transaction = storageManager.getTransaction();
 				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
@@ -311,7 +309,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			SOAPEnvelope resenvelope = null;
 			try {
-				resenvelope = TransportUtils.createSOAPMessage(msgCtx, msgCtx.getEnvelope().getNamespace().getName());
+				resenvelope = TransportUtils.createSOAPMessage(msgCtx, msgCtx.getEnvelope().getNamespace().getNamespaceURI());
 			} catch (AxisFault e) {
 				//Cannot find a valid SOAP envelope.
 				if (log.isDebugEnabled()) {

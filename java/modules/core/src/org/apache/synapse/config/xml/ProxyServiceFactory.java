@@ -119,7 +119,7 @@ public class ProxyServiceFactory {
                 OMElement prop = (OMElement) o;
                 OMAttribute pname = prop.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
                 OMAttribute value = prop.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-                if (name != null && value != null) {
+                if (pname != null && value != null) {
                     proxy.addProperty(pname.getAttributeValue(), value.getAttributeValue());
                 } else {
                     handleException("Invalid property specified for proxy service : " + name);

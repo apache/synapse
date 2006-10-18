@@ -160,19 +160,16 @@ public class ProxyService {
         while (iter.hasNext()) {
             String name  = (String) iter.next();
             String value = (String) properties.get(name);
-            if (JMSConstants.CONFAC_PARAM.equals(name) ||
-                JMSConstants.DEST_PARAM.equals(name)) {
 
-                Parameter p = new Parameter();
-                p.setName(name);
-                p.setValue(value);
+            Parameter p = new Parameter();
+            p.setName(name);
+            p.setValue(value);
 
-                try {
-                    proxyService.addParameter(p);
-                } catch (AxisFault af) {
-                    handleException("Error setting property : " + name + "" +
-                        "to proxy service as a Parameter", af);
-                }
+            try {
+                proxyService.addParameter(p);
+            } catch (AxisFault af) {
+                handleException("Error setting property : " + name + "" +
+                    "to proxy service as a Parameter", af);
             }
         }
 

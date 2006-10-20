@@ -17,6 +17,7 @@ package org.apache.synapse.mediators.javascript;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * A Synapse mediator using a JavaScript function.
@@ -30,9 +31,10 @@ public class JavaScriptMediator extends AbstractMediator {
 
     private RhinoFunctionInvoker mediateFunction;
     private String script;
+    private Scriptable scope;
 
     public boolean mediate(MessageContext synCtx) {
-        Boolean b = (Boolean) mediateFunction.invoke(new Object[] { synCtx });
+        Boolean b = (Boolean) mediateFunction.invoke(new Object[] { new E4XMessageContext(synCtx, scope) });
         return b == null ? true : b.booleanValue(); // default response to true
     }
 
@@ -42,6 +44,7 @@ public class JavaScriptMediator extends AbstractMediator {
         rhinoScript.setResponseClass("mediate", Boolean.class);
         RhinoScriptInstance scriptInstance = rhinoScript.createRhinoScriptInstance();
         this.mediateFunction = scriptInstance.createRhinoFunctionInvoker("mediate");
+        this.scope = scriptInstance.getScope();
     }
 
     public String getScript() {

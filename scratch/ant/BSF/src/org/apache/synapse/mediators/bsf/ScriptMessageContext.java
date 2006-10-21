@@ -15,13 +15,10 @@
  */
 package org.apache.synapse.mediators.bsf;
 
-import java.io.ByteArrayInputStream;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -29,6 +26,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 
 /**
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the message payload XML.
@@ -37,18 +35,20 @@ public class ScriptMessageContext implements MessageContext {
 
     private MessageContext mc;
 
-    public ScriptMessageContext(MessageContext mc) {
+    private OMElementConvertor convertor;
+
+    public ScriptMessageContext(MessageContext mc, OMElementConvertor convertor) {
         this.mc = mc;
+        this.convertor = convertor;
     }
 
     /**
-     * Get the SOAP Body payload. 
-     * The payload is the first element inside the SOAP <Body> tags
+     * Get the SOAP Body payload. The payload is the first element inside the SOAP <Body> tags
      * 
      * @return the XML SOAP Body
      */
-    public String getPayloadXML() {
-        return mc.getEnvelope().getBody().getFirstElement().toString();
+    public Object getPayloadXML() {
+        return convertor.toScript(mc.getEnvelope().getBody().getFirstElement());
     }
 
     /**
@@ -58,10 +58,22 @@ public class ScriptMessageContext implements MessageContext {
      * @throws XMLStreamException
      */
     public void setPayloadXML(Object payload) throws XMLStreamException {
-        byte[] xmlBytes = payload.toString().getBytes();
-        StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xmlBytes));
-        OMElement omElement = builder.getDocumentElement();
-        mc.getEnvelope().getBody().setFirstChild(omElement);
+        mc.getEnvelope().getBody().setFirstChild(convertor.fromScript(payload));
+    }
+
+    // helpers to set EPRs from a script string    
+    
+    public void setTo(String reference) {
+        mc.setTo(new EndpointReference(reference));
+    }
+    public void setFaultTo(String reference) {
+        mc.setFaultTo(new EndpointReference(reference));
+    }
+    public void setFrom(String reference) {
+        mc.setFrom(new EndpointReference(reference));
+    }
+    public void setReplyTo(String reference) {
+        mc.setReplyTo(new EndpointReference(reference));
     }
 
     // -- all the remainder just use the underlying MessageContext

@@ -31,11 +31,14 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class ScriptMediator extends AbstractMediator {
 
     private String scriptKey;
+    
+    private String functionName;
 
     private BSFEngine bsfEngine;
 
-    public ScriptMediator(String scriptKey) {
+    public ScriptMediator(String scriptKey, String functionName) {
         this.scriptKey = scriptKey;
+        this.functionName = functionName;
     }
 
     public boolean mediate(MessageContext synCtx) {
@@ -44,7 +47,7 @@ public class ScriptMediator extends AbstractMediator {
             Object[] args = new Object[] { new ScriptMessageContext(synCtx) };
             SynapseConfiguration synapseConfig = synCtx.getConfiguration();
 
-            Object response = getBSFEngine(synapseConfig).call(null, "mediate", args);
+            Object response = getBSFEngine(synapseConfig).call(null, functionName, args);
             if (response instanceof Boolean) {
                 return ((Boolean) response).booleanValue();
             }

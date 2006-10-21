@@ -28,7 +28,7 @@ import org.apache.synapse.config.xml.MediatorFactory;
  * Creates an instance of a Script mediator. <p/>
  * 
  * <pre>
- *  &lt;script key=&quot;property-key&quot; &lt;script/&gt;
+ *  &lt;script key=&quot;property-key&quot; function=&quot;script-function-name&quot; &lt;script/&gt;
  * </pre>
  * 
  */
@@ -42,7 +42,11 @@ public class ScriptMediatorFactory implements MediatorFactory {
         if (scriptKey == null) {
             throw new SynapseException("must specify 'key' for script source");
         }
-        ScriptMediator sm = new ScriptMediator(scriptKey.getAttributeValue());
+
+        OMAttribute function = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "function"));
+        String functionName = (function == null) ? "mediate" : function.getAttributeValue();
+
+        ScriptMediator sm = new ScriptMediator(scriptKey.getAttributeValue(), functionName);
         return sm;
     }
 

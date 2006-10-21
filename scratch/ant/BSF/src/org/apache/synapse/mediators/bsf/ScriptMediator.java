@@ -24,6 +24,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.bsf.convertors.DefaultOMElementConvertor;
+import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supportted by BSF.
@@ -35,6 +37,8 @@ public class ScriptMediator extends AbstractMediator {
     private String functionName;
 
     private BSFEngine bsfEngine;
+    
+    protected OMElementConvertor convertor;
 
     public ScriptMediator(String scriptKey, String functionName) {
         this.scriptKey = scriptKey;
@@ -44,10 +48,12 @@ public class ScriptMediator extends AbstractMediator {
     public boolean mediate(MessageContext synCtx) {
         try {
 
-            Object[] args = new Object[] { new ScriptMessageContext(synCtx) };
             SynapseConfiguration synapseConfig = synCtx.getConfiguration();
+            BSFEngine engine = getBSFEngine(synapseConfig);
 
-            Object response = getBSFEngine(synapseConfig).call(null, functionName, args);
+            Object[] args = new Object[] { new ScriptMessageContext(synCtx, convertor) };
+
+            Object response = engine.call(null, functionName, args);
             if (response instanceof Boolean) {
                 return ((Boolean) response).booleanValue();
             }
@@ -67,7 +73,9 @@ public class ScriptMediator extends AbstractMediator {
         if (bsfEngine == null || requiresRefresh) {
             OMElement el = (OMElement) synapseConfig.getProperty(scriptKey);
             String scriptSrc = el.getText();
-            this.bsfEngine = createBSFEngine(dp.getSrc().toString(), scriptSrc);
+            String scriptName = dp.getSrc().toString();
+            this.bsfEngine = createBSFEngine(scriptName, scriptSrc);
+            this.convertor = createOMElementConvertor(scriptName);
         }
 
         return bsfEngine;
@@ -88,6 +96,27 @@ public class ScriptMediator extends AbstractMediator {
         } catch (BSFException e) {
             throw new SynapseException(e.getTargetException());
         }
+    }
+
+    protected OMElementConvertor createOMElementConvertor(String scriptName) {
+        OMElementConvertor oc = null;
+        int lastDot = scriptName.lastIndexOf('.');
+        if (lastDot > -1) {
+            String suffix = scriptName.substring(lastDot+1).toUpperCase();
+            String className = OMElementConvertor.class.getName();
+            int i = className.lastIndexOf('.');
+            String packageName = className.substring(0, i+1);
+            String convertorClassName = packageName + suffix + className.substring(i+1);
+            try {
+                oc = (OMElementConvertor) Class.forName(convertorClassName, true, getClass().getClassLoader()).newInstance();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+        if (oc == null) {
+            oc = new DefaultOMElementConvertor();
+        }
+        return oc;
     }
 
 }

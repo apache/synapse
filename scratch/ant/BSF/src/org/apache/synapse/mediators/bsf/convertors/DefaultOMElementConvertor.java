@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.bsf.BSFEngine;
 import org.apache.synapse.SynapseException;
 
 /**
@@ -43,6 +44,11 @@ public class DefaultOMElementConvertor implements OMElementConvertor {
 
     public Object toScript(OMElement omElement) {
         return omElement.toString();
+    }
+
+    public void setEngine(BSFEngine e) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

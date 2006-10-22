@@ -68,20 +68,21 @@ public class ScriptMediator extends AbstractMediator {
     public synchronized BSFEngine getBSFEngine(SynapseConfiguration synapseConfig) {
 
         Property dp = synapseConfig.getPropertyObject(scriptKey);
-        boolean requiresRefresh = (dp != null) && (!dp.isCached() || dp.isExpired());
-
-        if (bsfEngine == null || requiresRefresh) {
+//        boolean requiresRefresh = (dp != null) && (!dp.isCached() || dp.isExpired());
+//        if (bsfEngine == null || requiresRefresh) { TODO: sort out caching
+        if (bsfEngine == null) {
             OMElement el = (OMElement) synapseConfig.getProperty(scriptKey);
             String scriptSrc = el.getText();
             String scriptName = dp.getSrc().toString();
             this.bsfEngine = createBSFEngine(scriptName, scriptSrc);
             this.convertor = createOMElementConvertor(scriptName);
+            convertor.setEngine(bsfEngine);
         }
 
         return bsfEngine;
     }
 
-    public BSFEngine createBSFEngine(String scriptName, String scriptSrc) {
+    protected BSFEngine createBSFEngine(String scriptName, String scriptSrc) {
         try {
 
             BSFManager bsfManager = new BSFManager();

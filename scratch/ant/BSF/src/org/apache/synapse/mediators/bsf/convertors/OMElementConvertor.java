@@ -16,6 +16,7 @@
 package org.apache.synapse.mediators.bsf.convertors;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.bsf.BSFEngine;
 
 /**
  * The OMElementConvertor interface enables customizing the conversion of 
@@ -34,6 +35,7 @@ import org.apache.axiom.om.OMElement;
  */
 public interface OMElementConvertor {
     
+    public void setEngine(BSFEngine e);
     public Object toScript(OMElement omElement);
     
     public OMElement fromScript(Object o);

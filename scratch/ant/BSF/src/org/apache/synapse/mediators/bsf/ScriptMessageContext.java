@@ -43,7 +43,8 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     /**
-     * Get the SOAP Body payload. The payload is the first element inside the SOAP <Body> tags
+     * Get the XML representation of SOAP Body payload. 
+     * The payload is the first element inside the SOAP <Body> tags
      * 
      * @return the XML SOAP Body
      */
@@ -52,13 +53,20 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     /**
-     * Set the SOAP body payload from a String
+     * Set the SOAP body payload from XML
      * 
      * @param payload
      * @throws XMLStreamException
      */
     public void setPayloadXML(Object payload) throws XMLStreamException {
         mc.getEnvelope().getBody().setFirstChild(convertor.fromScript(payload));
+    }
+
+    /**
+     * Get the XML representation of the complete SOAP envelope
+     */
+    public Object getEnvelopeXML() {
+        return convertor.toScript(mc.getEnvelope());
     }
 
     // helpers to set EPRs from a script string    

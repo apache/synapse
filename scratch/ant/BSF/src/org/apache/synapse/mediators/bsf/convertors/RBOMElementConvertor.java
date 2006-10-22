@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.bsf.BSFEngine;
 import org.apache.bsf.BSFException;
-import org.apache.bsf.BSFManager;
 import org.apache.synapse.SynapseException;
 
 /**
@@ -37,20 +36,18 @@ public class RBOMElementConvertor implements OMElementConvertor {
     protected BSFEngine bsfEngine;
 
     public RBOMElementConvertor() {
-        try {
-            this.bsfEngine = new BSFManager().loadScriptingEngine("ruby");
-        } catch (BSFException e) {
-            throw new SynapseException(e);
-        }
     }
 
     public Object toScript(OMElement omElement) {
         try {
 
-            StringBuilder srcFragment = new StringBuilder("Document.new(\"");
+            StringBuilder srcFragment = new StringBuilder("Document.new(<<EOF\n");
             srcFragment.append(omElement.toString());
-            srcFragment.append("\")");
-            return bsfEngine.eval("RBOMElementConvertor", 0, 0, srcFragment.toString());
+            srcFragment.append("\nEOF\n");
+            srcFragment.append(")");
+            
+            Object o = bsfEngine.eval("RBOMElementConvertor", 0, 0, srcFragment.toString());
+            return o;
 
         } catch (BSFException e) {
             throw new SynapseException(e);
@@ -69,5 +66,9 @@ public class RBOMElementConvertor implements OMElementConvertor {
         } catch (XMLStreamException e) {
             throw new SynapseException(e);
         }
+    }
+
+    public void setEngine(BSFEngine e) {
+        this.bsfEngine = e;
     }
 }

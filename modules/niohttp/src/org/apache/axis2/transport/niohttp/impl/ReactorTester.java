@@ -16,7 +16,10 @@
 package org.apache.axis2.transport.niohttp.impl;
 
 import java.net.URL;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.ByteBuffer;
 
 public class ReactorTester {
 
@@ -24,15 +27,79 @@ public class ReactorTester {
 
     public static void main(String[] args) throws Exception {
         ReactorTester rt = new ReactorTester();
-        rt.runDemo();
+        //rt.runDemo();
         //rt.simpleGet();
+        rt.simplePost();
+    }
+
+    private void simplePost() throws IOException {
+
+        HttpRequest request = new HttpRequest(
+            new URL("http://localhost:9000/axis2/services/SimpleStockQuoteService"));
+        request.setMethod(Constants.POST);
+        request.addHeader("Host", "localhost:9000");
+        request.setSecure(true);
+        request.setConnectionClose();
+        request.addHeader(Constants.TRANSFER_ENCODING, Constants.CHUNKED);
+        request.addHeader(Constants.CONTENT_TYPE, "text/xml; charset=utf-8");
+        OutputStream os = request.getOutputStream();
+        
+        r = Reactor.createReactor(null, 9001, false, new HttpService() {
+            public void handleRequest(HttpRequest request) {
+                System.out.println("?");
+            }
+
+            public void handleResponse(final HttpResponse response, Runnable callback) {
+
+                Runnable r = new Runnable() {
+                    public void run() {
+                        System.out.println("Response : " + response);
+                        InputStream in = response.getInputStream();
+
+                        try {
+                            byte[] buf = new byte[1024];
+                            int len;
+
+                            Charset set = Charset.forName("us-ascii");
+                            CharsetDecoder dec = set.newDecoder();
+
+                            while ((len = in.read(buf)) > 0) {
+                                //System.out.println("Stream : " + Util.dumpAsHex(buf, len));
+                                System.out.println("Stream Chunk : " + dec.decode(ByteBuffer.wrap(buf, 0, len)));
+                            }
+                            in.close();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("*** TEST COMPLETED ***");
+                    }
+                };
+                Thread t = new Thread(r);
+                t.start();
+            }
+        });
+        new Thread(r).start();
+        r.send(request, null);
+
+        byte[] bodyBytes = body.getBytes();
+        int incr = 32;
+        for (int i=0; i<bodyBytes.length ; i += incr) {
+            os.write(bodyBytes, i,
+                bodyBytes.length - i < incr ? bodyBytes.length - i : incr);
+        }
+        os.flush();
+        os.close();
     }
 
     private void simpleGet() throws IOException {
         HttpRequest request = new HttpRequest(
-            new URL("http://localhost:8080/"));
+            //new URL("http://localhost:8080/data.jsp")); // content length
+            new URL("http://www.asankha.com:80/data.php")); // chunked
         request.setMethod(Constants.GET);
-        request.addHeader("Host", "127.0.0.1:8080");
+        //request.addHeader("Host", "localhost:8080");
+        request.addHeader("Host", "www.asankha.com:80");
         request.setEmptyBody();
         request.setSecure(true);
         request.setConnectionClose();
@@ -42,8 +109,35 @@ public class ReactorTester {
                 System.out.println("?");
             }
 
-            public void handleResponse(HttpResponse response, Runnable callback) {
-                System.out.println("Response : " + response);
+            public void handleResponse(final HttpResponse response, Runnable callback) {
+
+                Runnable r = new Runnable() {
+                    public void run() {
+                        System.out.println("Response : " + response);
+                        InputStream in = response.getInputStream();
+
+                        try {
+                            byte[] buf = new byte[1024];
+                            int len;
+
+                            Charset set = Charset.forName("us-ascii");
+                            CharsetDecoder dec = set.newDecoder();
+
+                            while ((len = in.read(buf)) > 0) {
+                                //System.out.println("Stream : " + Util.dumpAsHex(buf, len));
+                                System.out.println("Stream Chunk : " + dec.decode(ByteBuffer.wrap(buf, 0, len)));
+                            }
+                            in.close();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("*** TEST COMPLETED ***");
+                    }
+                };
+                Thread t = new Thread(r);
+                t.start();
             }
         });
         new Thread(r).start();
@@ -63,7 +157,8 @@ public class ReactorTester {
                         HttpRequest forwardReq = new HttpRequest(
                             new URL("http://localhost:9000/axis2/services/SimpleStockQuoteService"));
 
-                        Util.copyStreams(request.getInputStream(), forwardReq.getOutputStream());
+                        //Util.copyStreams(request.getInputStream(), forwardReq.getOutputStream());
+
                         SimpleCallback cb = new SimpleCallback(request);
                         r.send(forwardReq, cb);
 
@@ -113,4 +208,15 @@ public class ReactorTester {
         }
     }
 
+    private static final String body =
+            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+            "  <soapenv:Header/>\n" +
+            "  <soapenv:Body>\n" +
+            "     <m0:getQuote xmlns:m0=\"http://services.samples/xsd\">\n" +
+            "        <m0:request>\n" +
+            "           <m0:symbol>IBM</m0:symbol>\n" +
+            "        </m0:request>\n" +
+            "     </m0:getQuote>\n" +
+            "  </soapenv:Body>\n" +
+            "</soapenv:Envelope>";
 }

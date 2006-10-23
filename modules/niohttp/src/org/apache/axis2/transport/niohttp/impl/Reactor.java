@@ -30,6 +30,15 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+//import org.apache.mina.filter.thread.LeaderFollowersThreadPool;
 
 /**
  * dynamic buffer expansion on need - done
@@ -41,6 +50,19 @@ import java.util.Set;
 public class Reactor implements Runnable {
 
     private static final Log log = LogFactory.getLog(Reactor.class);
+
+    /**
+     * The maximum number of threads used for the worker thread pool
+     */
+    private static final int WORKERS_MAX_THREADS = 100;
+    /**
+     * The keep alive time of an idle worker thread
+     */
+    private static final long WORKER_KEEP_ALIVE = 60L;
+    /**
+     * The worker thread timeout time unit
+     */
+    private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     /**
      * The [single] main selector
@@ -65,6 +87,10 @@ public class Reactor implements Runnable {
     private HttpService httpService;
 
     private static Reactor _httpReactor, _httpsReactor;
+
+    private ExecutorService workerPool = null;
+
+    //private LeaderFollowersThreadPool lfPool = null;
 
     public static synchronized Reactor getInstance(boolean secure) {
         if (secure) {
@@ -111,8 +137,20 @@ public class Reactor implements Runnable {
 
         SelectionKey sk = serverSocketChannel.register(
             selector, SelectionKey.OP_ACCEPT);
-        sk.attach(new Acceptor());
+        sk.attach(new Acceptor(this.httpService));
         log.info("Reactor Created for host : " + host + " on port : " + port);
+
+        // create thread pool of workers
+        workerPool = new ThreadPoolExecutor(
+            10,
+            WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TIME_UNIT,
+            new LinkedBlockingQueue(),
+            new org.apache.axis2.util.threadpool.DefaultThreadFactory(
+                    new ThreadGroup("NioHttp Worker thread group"),
+                    "NioHttpWorker"));
+
+        //lfPool = new LeaderFollowersThreadPool("LeaderFollower", 10);
+        //lfPool.init();
     }
 
     /**
@@ -142,15 +180,31 @@ public class Reactor implements Runnable {
      * @param k the selection key for the event
      */
     void dispatch(SelectionKey k) {
-        Runnable r = (Runnable) (k.attachment());
-        if (r != null)
-            r.run();
+        Runnable r = (Runnable) k.attachment();
+        if (r != null && r instanceof GenericIOHandler) {
+            GenericIOHandler h = (GenericIOHandler) r;
+            if (!h.isBeingProcessed()) {
+                h.lock();
+                //r.run();
+                workerPool.execute(r);
+                //lfPool.submit(r);
+            }
+        /*} else {
+            if (r != null) {
+                workerPool.execute(r);
+            }*/
+        }
     }
 
     /**
      * Accepts a new connection and hands it off to a new IncomingHandler instance
      */
-    class Acceptor implements Runnable {
+    class Acceptor extends GenericIOHandler implements Runnable {
+        private HttpService httpService = null;
+
+        public Acceptor(HttpService httpService) {
+            this.httpService = httpService;
+        }
 
         public void run() {
             SocketChannel socket;

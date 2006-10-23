@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
@@ -26,17 +27,12 @@ import java.nio.channels.SocketChannel;
  * This handler owns sending of a httpMessage to an external endpoint using a WriteHandler
  * and reading back the response. This does not handle persistent/pipelined connections
  */
-public class OutgoingHandler implements Runnable {
+public class OutgoingHandler extends GenericIOHandler implements Runnable {
 
     private static final Log log = LogFactory.getLog(OutgoingHandler.class);
 
-    private SelectionKey sk;
-    private SocketChannel socket;
-    private HttpService httpService;
-
-    private WriteHandler writeHandler = new WriteHandler();
-    private ReadHandler readHandler = new ReadHandler(false); /* no response from this TODO*/
     private Runnable callback = null;
+    private MessageReader msgReader = new MessageReader(false);
 
     OutgoingHandler(SocketChannel socket, SelectionKey sk, HttpRequest request, HttpService httpService) {
         this.httpService = httpService;
@@ -46,7 +42,9 @@ public class OutgoingHandler implements Runnable {
         if (!request.isChunked()) {
             request.addHeader(Constants.CONTENT_LENGTH, Integer.toString(request.getBuffer().limit()));
         }
-        writeHandler.setMessage(request.getWireBuffer(), true /* connection close */);
+
+        msgWriter = new MessageWriter(true, request);
+        //writeHandler.setMessage(request.getWireBuffer(), true /* connection close */);
     }
 
     public Runnable getCallback() {
@@ -65,7 +63,12 @@ public class OutgoingHandler implements Runnable {
 
             } else if (sk.isWritable()) {
                 log.debug("\tIncomingHandler run() - WRITEABLE");
-                if (writeHandler.handle(socket)) {
+
+                writeApplicationBuffer();
+                writeNetworkBuffer();
+                writeToNetwork();
+
+                if (nwWritePos == 0 && appWritePos == 0 && !msgWriter.isStreamingBody()) {
                     log.debug("\tRequest written completely");
                     // response has been written completely
                     // now read response or at least result code
@@ -73,27 +76,57 @@ public class OutgoingHandler implements Runnable {
                 }
 
             } else if (sk.isReadable()) {
-                log.debug("\tIncomingHandler run() - READABLE");
-                if (readHandler.handle(socket, sk)) {
-                    log.debug("\tResponse read completely");
-                    // if httpMessage processing is complete
-                    log.debug("\tFire event for response read");
-                    httpService.handleResponse((HttpResponse) readHandler.getHttpMessage(), callback);
+                log.debug("\tOutgoingHandler run() - READABLE");
 
-                    // if pipelining is used
-                    /*if (!readHandler.isConnectionClose()) {
-                        // prepare to read another httpMessage
-                        readHandler.reset(this);
-                        log.debug("\thandler reset");
-                    }*/
-                    socket.close();
-                    sk.cancel();
-                    log.debug("Socket closed and SelectionKey cancelled");
+                if (msgReader.availableForWrite() == 0) {
+                    return; // reject read
+                }
+
+                if (readNetworkBuffer(msgReader.availableForWrite()) > 0) {
+                    //System.out.println("NW Buffer read : \n" + Util.dumpAsHex(nwReadBuffer.array(), nwReadPos));
+                    readApplicationBuffer();
+                    
+                    //System.out.println(Thread.currentThread().getName() + " Processing App Buffer : \n" + Util.dumpAsHex(appReadBuffer.array(), appReadPos));
+                    processAppReadBuffer();
                 }
             }
         }
         catch (IOException e) {
             log.error("Error in OutGoingHandler : " + e.getMessage(), e);
+        } finally{
+            if (isBeingProcessed())
+                unlock();
         }
     }
+
+    private void processAppReadBuffer() {
+        boolean readHeader = msgReader.isStreamingBody();
+
+        try {
+            int pos = msgReader.process(appReadBuffer);
+            // if the handler digested any bytes, discard and compact the buffer
+            if (pos > 0) {
+                appReadBuffer.position(pos);
+                appReadBuffer.compact();
+                appReadPos = appReadBuffer.position();
+            }
+
+            // if we hadn't read the full header earlier, and read it just now
+            if (!readHeader && msgReader.isStreamingBody()) {
+                log.debug("\tFire event for received HttpResponse");
+                unlock();
+                httpService.handleResponse((HttpResponse) msgReader.getHttpMessage(), callback);
+            }
+
+            /*socket.close();
+            sk.cancel();
+            log.debug("Socket closed and SelectionKey cancelled");*/
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NHttpException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

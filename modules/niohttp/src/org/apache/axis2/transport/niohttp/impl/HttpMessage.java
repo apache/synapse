@@ -17,10 +17,15 @@ package org.apache.axis2.transport.niohttp.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axis2.transport.niohttp.impl.io.PipedOutputStream;
+import org.apache.axis2.transport.niohttp.impl.io.ChunkedOutputStream;
+import org.apache.axis2.transport.niohttp.impl.io.ContentLengthOutputStream;
+import org.apache.axis2.transport.niohttp.impl.io.PipedInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.nio.charset.CharacterCodingException;
@@ -33,7 +38,7 @@ import java.util.Map;
 /**
  * This represents an abstract HttpMessage - which may be a HttpRequest or a
  * HttpResponse. This class defines the headers and the ByteBuffer that holds
- * the message body in memory, along with an optional starting position within
+ * the message body inputStream memory, along with an optional starting position within
  * the buffer.
  */
 public abstract class HttpMessage {
@@ -41,6 +46,43 @@ public abstract class HttpMessage {
     private static final int DEFAULT_BUFFER_SIZE = 4096;
 
     private static final Log log = LogFactory.getLog(HttpMessage.class);
+
+    private InputStream inputStream;
+
+    private OutputStream outputStream;
+
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public OutputStream createOutputStream() {
+        PipedOutputStream pipedOS = new PipedOutputStream();
+        try {
+            inputStream = new PipedInputStream(pipedOS);
+        } catch (IOException e) {
+            // this will never occur with our implementation of [new] piped streams
+        }
+
+        if (isChunked()) {
+            outputStream = new ChunkedOutputStream(pipedOS);
+        } else if (getContentLength() > 0) {
+            outputStream = new ContentLengthOutputStream(pipedOS, getContentLength());
+        } else {
+            throw new UnsupportedOperationException("Unsupported body streaming");
+        }
+        return outputStream;
+    }
+
+    public OutputStream getOutputStream() {
+        if (outputStream == null) {
+            return createOutputStream();
+        }
+        return outputStream;
+    }
 
     /**
      * http headers of this message
@@ -98,38 +140,10 @@ public abstract class HttpMessage {
     }
 
     /**
-     * Return an InputStream to read the body from the main ByteBuffer of this message
-     *
-     * @return an InputStream into the main ByteBuffer starting at the body
-     */
-    public InputStream getInputStream() {
-        // position to the start of the body
-        buffer.position(0);
-
-        // Returns an input stream for a ByteBuffer.
-        // The read() methods use the relative ByteBuffer get() methods.
-        return new InputStream() {
-            public synchronized int read() throws IOException {
-                if (!buffer.hasRemaining()) {
-                    return -1;
-                }
-                return buffer.get();
-            }
-
-            public synchronized int read(byte[] bytes, int off, int len) throws IOException {
-                // Read only what's left
-                len = Math.min(len, buffer.remaining());
-                buffer.get(bytes, off, len);
-                return len;
-            }
-        };
-    }
-
-    /**
      * Get an OutputStream to write the body of this httpMessage
      * @return an OutputStream to write the body
      */
-    public OutputStream getOutputStream() {
+/*    public OutputStream getOutputStream() {
         // position for body
         buffer.clear();
         outputStreamOpened = true;
@@ -165,7 +179,7 @@ public abstract class HttpMessage {
                 outputStreamOpened = false;
             }
         };
-    }
+    }*/
 
     /**
      * Expand (double) the main ByteBuffer of this message
@@ -178,8 +192,8 @@ public abstract class HttpMessage {
     }
 
     /**
-     * Return a string representation of the message in HTTP wire-format
-     * @return a String representation of the message in HTTP wire-format
+     * Return a string representation of the message inputStream HTTP wire-format
+     * @return a String representation of the message inputStream HTTP wire-format
      */
     public String toString() {
 
@@ -195,20 +209,6 @@ public abstract class HttpMessage {
             sb.append(headerName + Constants.STRING_COLON + Constants.STRING_SP +
                 headers.get(headerName) + Constants.CRLF);
         }
-        sb.append(Constants.CRLF);
-
-        if (buffer.limit() > 0) {
-            buffer.position(0);
-
-            Charset set = Charset.forName("us-ascii");
-            CharsetDecoder dec = set.newDecoder();
-            try {
-                sb.append(dec.decode(buffer));
-            } catch (CharacterCodingException e) {
-                e.printStackTrace();
-            }
-        }
-
         sb.append(Constants.CRLF);
 
         return sb.toString();

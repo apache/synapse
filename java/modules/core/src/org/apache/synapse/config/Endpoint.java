@@ -16,7 +16,6 @@
 package org.apache.synapse.config;
 
 
-import java.net.URL;
 
 /**
  * An endpoint can be used to give a logical name to an endpoint address, and possibly reused.
@@ -30,7 +29,7 @@ public class Endpoint {
     /** The name of this endpoint instance */
     private String name = null;
     /** The simple address this endpoint resolves to - if explicitly specified */
-    private URL address = null;
+    private String address = null;
     /** The name of the actual endpoint to which this instance refers to */
     private String ref = null;
     /** Should messages be sent in an WS-RM Sequence ? */
@@ -64,7 +63,7 @@ public class Endpoint {
      * This should return the absolute EPR address referenced by the named endpoint. This may be possibly computed.
      * @return an absolute address to be used to reference the named endpoint
      */
-    public URL getAddress() {
+    public String getAddress() {
         return address;
     }
 
@@ -72,7 +71,7 @@ public class Endpoint {
      * Set an absolute URL as the address for this named endpoint
      * @param address the absolute address to be used
      */
-    public void setAddress(URL address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 

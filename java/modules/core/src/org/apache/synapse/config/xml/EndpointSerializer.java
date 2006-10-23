@@ -59,7 +59,7 @@ public class EndpointSerializer {
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
         if (endpt.getAddress() != null) {
             endpoint.addAttribute(fac.createOMAttribute(
-                "address", nullNS, endpt.getAddress().toString()));
+                "address", nullNS, endpt.getAddress()));
         } else {
             handleException("Invalid Endpoint. Address is required");
         }

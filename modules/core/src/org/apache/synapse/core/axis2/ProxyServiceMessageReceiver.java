@@ -66,7 +66,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 // what else can/should we do instead of just logging the message as an error?
                 log.error("The endpoint named '" + targetEndpoint + "' is not defined. Dropping current message");
             } else {
-                synCtx.setTo(new EndpointReference(endpoint.getAddress().toString()));
+                synCtx.setTo(new EndpointReference(endpoint.getAddress()));
                 log.debug("Forwarding message directly to the endpoint named : " + targetEndpoint);
 
                 org.apache.axis2.context.MessageContext axisInMsgContext =
@@ -97,7 +97,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     axisOutMsgContext.setProperty(org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
                     mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
                     // check for addressing is alredy engaged for this message.
-                    // if engage we should use the address enable Configuraion context.
+                    // if engage we sho 	uld use the address enable Configuraion context.
                     ae.send(axisOutMsgContext);
 
                 } catch (AxisFault e) {

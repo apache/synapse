@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -38,13 +39,13 @@ public class CreateSequenceTest extends SandeshaTestCase {
         super("CreateSequenceTest");
     }
 
-    public void testfromOMElement()  throws SandeshaException {
+    public void testfromOMElement()  throws AxisFault {
+    	
         CreateSequence createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
         createSequence.fromOMElement(getSOAPEnvelope("", "CreateSequence.xml").getBody());
 
         AcksTo acksTo = createSequence.getAcksTo();
-        Address address = acksTo.getAddress();
-        assertEquals("http://127.0.0.1:9090/axis/services/RMService", address.getEpr().getAddress());
+        assertEquals("http://127.0.0.1:9090/axis/services/RMService", acksTo.getEPR().getAddress());
 
         SequenceOffer offer = createSequence.getSequenceOffer();
         Identifier identifier = offer.getIdentifer();
@@ -52,13 +53,11 @@ public class CreateSequenceTest extends SandeshaTestCase {
 
     }
 
-    public void testToSOAPEnvelope()  throws SandeshaException {
+    public void testToSOAPEnvelope()  throws AxisFault {
         CreateSequence createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
 
         AcksTo acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
-        Address address = new Address(addressingNamespaceValue);
-        address.setEpr(new EndpointReference("http://127.0.0.1:9090/axis/services/RMService"));
-        acksTo.setAddress(address);
+        acksTo.setAddress(new EndpointReference("http://127.0.0.1:9090/axis/services/RMService"));
         createSequence.setAcksTo(acksTo);
 
         SequenceOffer sequenceOffer = new SequenceOffer(rmNamespaceValue);

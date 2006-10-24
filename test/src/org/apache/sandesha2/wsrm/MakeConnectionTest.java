@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -38,7 +39,7 @@ public class MakeConnectionTest extends SandeshaTestCase {
         super("MakeConnectionTest");
     }
     
-    public void testfromOMElement()  throws SandeshaException {
+    public void testfromOMElement()  throws AxisFault {
         MakeConnection makeConnection = new MakeConnection(rmNamespaceValue);
         SOAPEnvelope envelope = getSOAPEnvelope("", "MakeConnection.xml");
         OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
@@ -50,16 +51,15 @@ public class MakeConnectionTest extends SandeshaTestCase {
         
         Address address = makeConnection.getAddress();
         assertNotNull(address);
-        assertEquals(address.getEpr().getAddress(),"http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
+        assertEquals(address.getAddress(),"http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
 
     }
 
     public void testToSOAPEnvelope()  throws SandeshaException {
         MakeConnection makeConnection = new MakeConnection (rmNamespaceValue);
 
-        Address address = new Address (new EndpointReference (
-        		"http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000") 
-        		,rmNamespaceValue);
+        Address address = new Address (rmNamespaceValue);
+        address.setAddress("http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
         Identifier identifier = new Identifier (rmNamespaceValue);
         identifier.setIndentifer("uuid:c3671020-15e0-11da-9b3b-f0439d4867bd");
         

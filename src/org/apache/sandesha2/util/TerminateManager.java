@@ -363,8 +363,6 @@ public class TerminateManager {
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String outSequenceId,
 			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
 
-		ConfigurationContext configurationContext = referenceMessage.getMessageContext().getConfigurationContext();
-
 		// / Transaction addTerminateSeqTransaction =
 		// storageManager.getTransaction();
 
@@ -384,17 +382,36 @@ public class TerminateManager {
 		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
 		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-		SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
-
-		EndpointReference toEPR = new EndpointReference(toBean.getValue());
-		if (toEPR == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-			throw new SandeshaException(message);
+		
+		//setting the To EPR.
+		//First try to get it from an Endpoint property.
+		//If not get it from the To property.
+		
+		EndpointReference toEPR = null;
+		
+		SequencePropertyBean endpointBean = seqPropMgr.retrieve(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.OFFERED_ENDPOINT);
+		if (endpointBean!=null) {
+			toEPR = new EndpointReference (endpointBean.getValue());
 		}
 		
-		terminateRMMessage.setTo(new EndpointReference(toEPR.getAddress()));
+		if (toEPR==null) {
+			
+			SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.TO_EPR);
 
+			if (toBean!=null) {
+				toEPR = new EndpointReference(toBean.getValue());
+				if (toEPR == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
+					throw new SandeshaException(message);
+				}
+			}
+		}
+
+		if (toEPR!=null)
+			terminateRMMessage.setTo(toEPR);
+		
 		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 		if (replyToBean!=null) {

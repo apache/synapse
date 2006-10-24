@@ -169,7 +169,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			String offeredSequenceId = (String) offeredSequenceBean.getValue();
 
-			EndpointReference acksToEPR = accept.getAcksTo().getAddress().getEpr();
+			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
 			SequencePropertyBean acksToBean = new SequencePropertyBean();
 			acksToBean.setName(Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
 			acksToBean.setSequencePropertyKey(offeredSequenceId);

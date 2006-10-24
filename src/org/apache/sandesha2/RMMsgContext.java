@@ -74,7 +74,7 @@ public class RMMsgContext {
 	 * 
 	 * @throws SandeshaException
 	 */
-	public void addSOAPEnvelope() throws SandeshaException {
+	public void addSOAPEnvelope() throws AxisFault {
 		int SOAPVersion = Sandesha2Constants.SOAPVersion.v1_1;
 
 		if (!msgContext.isSOAP11())

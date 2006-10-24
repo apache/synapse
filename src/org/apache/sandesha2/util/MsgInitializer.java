@@ -19,6 +19,7 @@ package org.apache.sandesha2.util;
 
 import java.util.Iterator;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -63,7 +64,7 @@ public class MsgInitializer {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext initializeMessage(MessageContext ctx) throws SandeshaException {
+	public static RMMsgContext initializeMessage(MessageContext ctx) throws AxisFault {
 		RMMsgContext rmMsgCtx = new RMMsgContext(ctx);
 
 		populateRMMsgContext(ctx, rmMsgCtx);
@@ -77,7 +78,7 @@ public class MsgInitializer {
 	 * @param msgCtx
 	 * @param rmMsgContext
 	 */
-	private static void populateRMMsgContext(MessageContext msgCtx, RMMsgContext rmMsgContext) throws SandeshaException {
+	private static void populateRMMsgContext(MessageContext msgCtx, RMMsgContext rmMsgContext) throws AxisFault {
 
 		// if client side and the addressing version is not set. assuming the
 		// default addressing version

@@ -55,6 +55,7 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
+import org.apache.sandesha2.wsrm.Endpoint;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 
 /**
@@ -119,6 +120,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 																										// created
 																										// sequnceID.
 
+			
+			
+			
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 					newSequenceId, storageManager); // converting the blank out
 													// message in to a create
@@ -166,6 +170,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 																				// dummy
 																				// value.
 					
+					
 					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
 					CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
@@ -188,6 +193,19 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					internalSequenceBean.setSequencePropertyKey(offeredSequenceID);
 					internalSequenceBean.setValue(outgoingSideInternalSequenceId);
 					seqPropMgr.insert(internalSequenceBean);
+					
+					Endpoint endpoint = offer.getEndpoint();
+					if (endpoint!=null) {
+						// setting the OfferedEndpoint
+						SequencePropertyBean offeredEndpointBean = new SequencePropertyBean();
+						offeredEndpointBean.setName(Sandesha2Constants.SequenceProperties.OFFERED_ENDPOINT);
+					
+						//currently we can only serialize the Address part of the Endpoint.
+						//TODO correct this to serialize the whole EPR.
+						offeredEndpointBean.setValue(endpoint.getEPR().getAddress());  
+						offeredEndpointBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
+						seqPropMgr.insert(offeredEndpointBean);
+					}
 				} else {
 					// removing the accept part.
 					createSeqResPart.setAccept(null);
@@ -195,7 +213,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				}
 			}
 
-			EndpointReference acksTo = createSeqPart.getAcksTo().getAddress().getEpr();
+			EndpointReference acksTo = createSeqPart.getAcksTo().getEPR();
 			if (acksTo == null || acksTo.getAddress() == null || "".equals(acksTo.getAddress())) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence);
 				log.debug(message);

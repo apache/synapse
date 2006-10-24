@@ -28,6 +28,7 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -71,7 +72,7 @@ public class RMElements {
 		this.addressingNamespaceValue = addressingNamespace;
 	}
 	
-	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws SandeshaException {
+	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws AxisFault {
 
 		if (envelope == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
@@ -212,7 +213,7 @@ public class RMElements {
 		}
 	}
 
-	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException  {
+	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws AxisFault  {
 		if (sequence != null) {
 			sequence.toOMElement(envelope.getHeader());
 		}

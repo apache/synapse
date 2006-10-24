@@ -81,7 +81,7 @@ public interface Sandesha2Constants {
 			
 			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequenceResponse";
 			
-			String ACTION_MAKE_CONNECTION = "http://docs.oasisopen.org/ws-rx/wsrm/200608/MakeConnection";
+			String ACTION_MAKE_CONNECTION = "http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection";
 			
 			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
 
@@ -105,8 +105,6 @@ public interface Sandesha2Constants {
 	public interface WSRM_COMMON {
 		
 		String NS_PREFIX_RM = "wsrm";
-
-		
 
 		String MSG_NUMBER = "MessageNumber";
 
@@ -158,12 +156,15 @@ public interface Sandesha2Constants {
 		
 		String MAKE_CONNECTION = "MakeConnection";
 		
+		String ADDRESS = "Address";
+		
 		String MESSAGE_PENDING = "MessagePending";
 		
 		String PENDING = "pending";
 		
 		String USES_SEQUENCE_STR = "UsesSequenceSTR";
 		
+		String ENDPOINT = "Endpoint";
 	}
 
 	public interface WSA {
@@ -314,6 +315,8 @@ public interface Sandesha2Constants {
 		String SECURITY_TOKEN = "SecurityToken";
 		
 		String SOAP_VERSION = "SOAPVersion";
+		
+		String OFFERED_ENDPOINT = "OfferedEndpoint";
 
 	}
 

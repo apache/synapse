@@ -121,6 +121,11 @@ public class SandeshaInHandler extends AbstractHandler {
 				log.debug(message);
 				throw new AxisFault(message, ex);
 			}
+
+			//Ack messages will be paused
+			if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK) {
+				rmMsgCtx.pause();
+			}
 			
 			// validating the message
 			MessageValidator.validateMessage(rmMsgCtx, storageManager);
@@ -130,6 +135,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			if (msgProcessor != null)
 				msgProcessor.processInMessage(rmMsgCtx);
 
+			
 		} catch (AxisFault e) {
 			// message should not be sent in a exception situation.
 			msgCtx.pause();

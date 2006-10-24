@@ -22,8 +22,9 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.EndpointReferenceHelper;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -36,13 +37,13 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 public class AcksTo implements IOMRMElement {
 
-	private Address address;
+	private EndpointReference epr;
 	
 	private String rmNamespaceValue = null;
 	
 	private String addressingNamespaceValue = null;
 
-	public AcksTo(String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
+	public AcksTo (String rmNamespaceValue,String addressingNamespaceValue) throws AxisFault {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -52,16 +53,16 @@ public class AcksTo implements IOMRMElement {
 		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
-	public AcksTo (Address address,SOAPFactory factory,String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+	public AcksTo (EndpointReference epr ,String rmNamespaceValue, String addressingNamespaceValue) throws AxisFault {
 		this (rmNamespaceValue,addressingNamespaceValue);
-		this.address = address;
+		this.epr = epr;
 	}
 
 	public String getNamespaceValue(){
 		return rmNamespaceValue;
 	}
 
-	public Object fromOMElement(OMElement element) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement element) throws OMException,AxisFault {
 		OMElement acksToPart = element.getFirstChildWithName(new QName(
 				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACKS_TO));
 
@@ -70,36 +71,33 @@ public class AcksTo implements IOMRMElement {
 					SandeshaMessageKeys.noAcksToPart,
 					element.toString()));
 
-		address = new Address(addressingNamespaceValue);
-		address.fromOMElement(acksToPart);
+		epr = EndpointReferenceHelper.fromOM (acksToPart);
 
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement element) throws OMException {
+	public OMElement toOMElement(OMElement element) throws OMException,AxisFault {
 
-		if (address == null)
+		if (epr == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotSetACksTo,
+					SandeshaMessageKeys.cannotSetAcksTo,
 					null));
 
 		OMFactory factory = element.getOMFactory();
 		
-		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		OMElement acksToElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ACKS_TO, rmNamespace);
+		QName acksTo = new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.ACKS_TO, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+	    OMElement endpointElement =	EndpointReferenceHelper.toOM (factory,epr, acksTo ,addressingNamespaceValue);
 		
-		address.toOMElement(acksToElement);
-		
-		element.addChild(acksToElement);
+		element.addChild(endpointElement);
 		return element;
 	}
 
-	public Address getAddress() {
-		return address;
+	public EndpointReference getEPR() {
+		return epr;
 	}
 
-	public void setAddress(Address address) {
-		this.address = address;
+	public void setAddress(EndpointReference epr) {
+		this.epr = epr;
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {

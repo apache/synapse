@@ -19,6 +19,7 @@ package org.apache.sandesha2.wsrm;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
 
 /**
  * This is the base interface for RM infoset objects that are added directly so 
@@ -26,5 +27,5 @@ import org.apache.axiom.soap.SOAPEnvelope;
  */
 
 public interface IOMRMPart extends IOMRMElement {
-	public void toSOAPEnvelope (SOAPEnvelope envelope) throws SandeshaException;
+	public void toSOAPEnvelope (SOAPEnvelope envelope) throws AxisFault;
 }

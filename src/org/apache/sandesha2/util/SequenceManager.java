@@ -71,7 +71,7 @@ public class SequenceManager {
 			throw new AxisFault(message);
 		}
 
-		EndpointReference acksTo = createSequence.getAcksTo().getAddress().getEpr();
+		EndpointReference acksTo = createSequence.getAcksTo().getEPR();
 
 		if (acksTo == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence);

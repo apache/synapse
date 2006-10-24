@@ -54,7 +54,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		findSenderBean.setSend(true);
 		
 		if (address!=null)
-			findSenderBean.setWsrmAnonURI(address.getEpr().getAddress());
+			findSenderBean.setWsrmAnonURI(address.getAddress());
 		
 		if (identifier!=null)
 			findSenderBean.setSequenceID(identifier.getIdentifier());

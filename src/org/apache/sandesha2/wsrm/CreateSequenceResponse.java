@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -60,7 +61,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 		return rmNamespaceValue;
 	}
 
-	public Object fromOMElement(OMElement bodyElement) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement bodyElement) throws OMException,AxisFault {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
 			throw new OMException(SandeshaMessageHelper.getMessage(
@@ -97,7 +98,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement bodyElement) throws OMException {
+	public OMElement toOMElement(OMElement bodyElement) throws OMException, AxisFault {
 
 		if (bodyElement == null || !(bodyElement instanceof SOAPBody))
 			throw new OMException(
@@ -161,7 +162,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 		this.expires = expires;
 	}
 
-	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+	public void toSOAPEnvelope(SOAPEnvelope envelope) throws AxisFault {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.

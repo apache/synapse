@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -39,7 +41,11 @@ public class SequenceOffer implements IOMRMElement {
 	
 	private Expires expires = null;
 	
+	private Endpoint endpoint = null;
+	
 	private String namespaceValue = null;
+	
+	private String addressingNamespace = null;
 
 	public SequenceOffer(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -55,7 +61,7 @@ public class SequenceOffer implements IOMRMElement {
 	}
 
 	public Object fromOMElement(OMElement createSequenceElement)
-			throws OMException,SandeshaException {
+			throws OMException,AxisFault {
 		
 		OMElement sequenceOfferPart = createSequenceElement
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
@@ -73,12 +79,24 @@ public class SequenceOffer implements IOMRMElement {
 			expires = new Expires(namespaceValue);
 			expires.fromOMElement(sequenceOfferPart);
 		}
+		
+		OMElement endpointPart = sequenceOfferPart
+				.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.ENDPOINT));
+		if (endpointPart != null) {
+			if (addressingNamespace==null) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.addressingNamespaceNotSet);
+				throw new SandeshaException (message);
+			}
+			
+			endpoint = new Endpoint (namespaceValue, addressingNamespace);
+			endpoint.fromOMElement (endpointPart);
+		}
 
 		return this;
 	}
 
 	public OMElement toOMElement(OMElement createSequenceElement)
-			throws OMException {
+			throws OMException,AxisFault {
 
 		if (identifier == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
@@ -91,6 +109,17 @@ public class SequenceOffer implements IOMRMElement {
 		
 		identifier.toOMElement(sequenceOfferElement);
 
+		if (endpoint!=null) {
+			endpoint.toOMElement(sequenceOfferElement);
+		} else {
+			if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceValue)) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.elementMustForSpec,
+						Sandesha2Constants.WSRM_COMMON.ENDPOINT,
+						Sandesha2Constants.SPEC_2006_08.NS_URI);
+				throw new SandeshaException (message);
+			}
+		}
+		
 		if (expires != null) {
 			expires.toOMElement(sequenceOfferElement);
 		}
@@ -108,6 +137,14 @@ public class SequenceOffer implements IOMRMElement {
 		this.identifier = identifier;
 	}
 	
+	public Endpoint getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(Endpoint endpoint) {
+		this.endpoint = endpoint;
+	}
+
 	public boolean isNamespaceSupported (String namespaceName) {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
@@ -118,4 +155,12 @@ public class SequenceOffer implements IOMRMElement {
 		return false;
 	}
 
+	public String getAddressingNamespace() {
+		return addressingNamespace;
+	}
+
+	public void setAddressingNamespace(String addressingNamespace) {
+		this.addressingNamespace = addressingNamespace;
+	}
+	
 }

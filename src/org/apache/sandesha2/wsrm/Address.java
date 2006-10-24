@@ -13,7 +13,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
@@ -24,65 +23,61 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 public class Address implements IOMRMElement {
 
-	private EndpointReference epr = null;
+	private String address = null;
 	
-	private String namespaceValue = null;
+	private String rmNamespaceValue = null;
 	
-	public Address(String namespaceValue) {
-		this.namespaceValue = namespaceValue;
-	}
-	
-	public Address (EndpointReference epr,String namespaceValue) {
-		this(namespaceValue);
-		this.epr = epr;
+	public Address(String rmNamespaceValue) {
+		this.rmNamespaceValue = rmNamespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException {
 
 		OMElement addressPart = element.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSA.ADDRESS));
+				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ADDRESS));
 		if (addressPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotFindAddressElement,
 					element.toString()));
+		
 		String addressText = addressPart.getText();
-		if (addressText == null || addressText == "")
+		if (addressText == null || "".equals(addressText))
 			throw new OMException(
 					SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.cannotFindAddressText,
 							element.toString()));
 
-		epr = new EndpointReference(addressText);
+		this.address = addressText;
 		return this;
 	}
 
 	public String getNamespaceValue(){
-		return namespaceValue;
+		return rmNamespaceValue;
 	}
 
 	public OMElement toOMElement(OMElement element) throws OMException {
 
-		if (epr == null || epr.getAddress() == null || epr.getAddress() == "")
+		if (address == null ||  "".equals(address))
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.addressNotValid));
 
 		OMFactory factory = element.getOMFactory();
 		
-		OMNamespace addressingNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
-		OMElement addressElement = factory.createOMElement(Sandesha2Constants.WSA.ADDRESS, addressingNamespace);
+		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMElement addressElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ADDRESS, rmNamespace);
 		
-		addressElement.setText(epr.getAddress());
+		addressElement.setText(address);
 		element.addChild(addressElement);
 
 		return element;
 	}
 
-	public EndpointReference getEpr() {
-		return epr;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setEpr(EndpointReference epr) {
-		this.epr = epr;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {

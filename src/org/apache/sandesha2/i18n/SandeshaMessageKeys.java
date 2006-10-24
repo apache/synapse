@@ -199,12 +199,14 @@ public class SandeshaMessageKeys {
 	public static final String createSeqNullAcksTo="createSeqNullAcksTo";
 	public static final String acceptNullAcksTo="acceptNullAcksTo";
 	public static final String noAcksToPart="noAcksToPart";
+	public static final String noElementPart="noElementPart";
 	public static final String cannotProcessExpires="cannotProcessExpires";
 	public static final String noFaultCode="noFaultCode";
 	public static final String seqAckNonHeader="seqAckNonHeader";
 	public static final String makeConnectionCannotBeAddedToNonBody="makeConnectionCannotBeAddedToNonBody";
 
-	public static final String cannotSetACksTo="cannotSetACksTo";
+	public static final String cannotSetAcksTo="cannotSetAcksTo";
+	public static final String cannotSetEndpoint="cannotSetEndpoint";
 	public static final String invalidMsgNumber="invalidMsgNumber";
 	public static final String addressNotValid="addressNotValid";
 
@@ -240,4 +242,10 @@ public class SandeshaMessageKeys {
     public final static String noSecurityResults = "noSecurityResults";
     public final static String noSecConvTokenInPolicy = "noSecConvTokenInPolicy";
     public final static String noServicePolicy = "noServicePolicy";
+    
+    public final static String elementMustForSpec = "elementMustForSpec";
+    public final static String addressingNamespaceNotSet = "addressingNamespaceNotSet";
+    public final static String invalidOfferNoResponseEndpoint = "invalidOfferNoResponseEndpoint";
+    public final static String invalidElementFoundWithinElement = "invalidElementFoundWithinElement";
+    
 }

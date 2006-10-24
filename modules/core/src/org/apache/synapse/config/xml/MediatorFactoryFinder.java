@@ -46,7 +46,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
         SequenceMediatorFactory.class,
         LogMediatorFactory.class,
         SendMediatorFactory.class,
-        RestMediatorFactory.class,
+        //RestMediatorFactory.class,
         FilterMediatorFactory.class,
         SynapseMediatorFactory.class,
         DropMediatorFactory.class,

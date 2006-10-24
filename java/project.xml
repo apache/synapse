@@ -57,18 +57,17 @@
             <version>${axis2.version}</version>
         </dependency>
         <dependency>
-            <groupId>ws-commons</groupId>
+            <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
             <version>${axiom.version}</version>
         </dependency>
         <dependency>
-            <groupId>ws-commons</groupId>
+            <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
             <version>${axiom.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>ws-commons</groupId>
+            <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-dom</artifactId>
             <version>${axiom.version}</version>
         </dependency>
@@ -80,7 +79,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.ws.commons</groupId>
+            <groupId>org.apache.ws.commons.schema</groupId>
             <artifactId>XmlSchema</artifactId>
             <version>${XmlSchema.version}</version>
             <properties>
@@ -89,7 +88,7 @@
         </dependency>
 
         <dependency>
-            <groupId>ws-commons</groupId>
+            <groupId>org.apache.ws.commons.neethi</groupId>
             <artifactId>neethi</artifactId>
             <version>${neethi.version}</version>
             <properties>
@@ -143,7 +142,7 @@
 
         <!-- external MARs -->
         <dependency>
-            <groupId>org.apache.axis2</groupId>
+            <groupId>axis2</groupId>
             <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
             <type>mar</type>
@@ -157,7 +156,7 @@
         </dependency>
         
         <dependency>
-            <groupId>org.apache.axis2</groupId>
+            <groupId>axis2</groupId>
             <artifactId>rampart</artifactId>
             <version>${rampart.version}</version>
             <type>mar</type>

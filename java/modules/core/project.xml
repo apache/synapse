@@ -15,7 +15,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.axis2</groupId>
+            <groupId>axis2</groupId>
             <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
             <type>mar</type>

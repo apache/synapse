@@ -129,7 +129,7 @@ public class AsyncHTTPListener implements TransportListener {
     public EndpointReference[] getEPRsForService(String serviceName, String ip) throws AxisFault {
         EndpointReference[] endpointReferences = new EndpointReference[1];
         endpointReferences[0] = new EndpointReference(
-                "http://" + hostAddress + ":" + port + serviceContextPath + "/" + serviceName);
+                "http://" + hostAddress + ":" + port + "/" + serviceContextPath + "/" + serviceName);
         return endpointReferences;
     }
 }

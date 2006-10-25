@@ -111,7 +111,7 @@ public class ProxyService {
 
                     assert wsdlToAxisServiceBuilder != null;
                     proxyService = wsdlToAxisServiceBuilder.populateService();
-                    proxyService.setWsdlfound(true);
+                    proxyService.setWsdlFound(true);
 
                 } else {
                     handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");

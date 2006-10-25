@@ -26,11 +26,43 @@ import org.apache.synapse.config.xml.MediatorFactory;
 
 /**
  * Creates an instance of a Script mediator. <p/>
- * 
+ * <p>
+ * There are two ways of defining a script mediator, either using a registry property or 
+ * inline in the Synapse config XML.
+ * <p>
+ * A script mediator using a registry property is defined as follows: 
+ * <p>
  * <pre>
  *  &lt;script key=&quot;property-key&quot; function=&quot;script-function-name&quot; &lt;script/&gt;
  * </pre>
- * 
+ * <p>
+ * The property-key is a Synapse registry property containing the script source. The function is an 
+ * optional attribute defining the name of the script function to call, if not specified it
+ * defaults to a function named 'mediate'. The function takes a single parameter which is the 
+ * Synapse MessageContext. The function may return a boolean, if it does not then true is assumed.
+ * <p>
+ * An inline script mediator has the script source embedded in the config XML:
+ * <pre>
+ *  &lt;script.LL&gt...src code...&lt;script.LL/&gt;
+ * </pre>
+ * <p>
+ * where LL is the script language name extension. The environment of the script has the Synapse
+ * MessageContext predefined in a script variable named 'mc'.
+ * <p>
+ * An example of an inline mediator using JavaScript/E4X which returns false if the SOAP message
+ * body contains an element named 'symbol' which has a value of 'IBM' would be:
+ * <p>
+ * <pre>
+ *  &lt;script.js&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script.js/&gt;
+ * </pre>
+ * <p>
+ * The boolean response from the inlined mediator is either the response from the evaluation of the
+ * script statements or if that result is not a boolean then a response of true is assumed.
+ * <p>
+ * The MessageContext passed in to the script mediator has additional methods over the Synapse
+ * MessageContext to enable working with the XML in a way natural to the scripting language. For
+ * example when using JavaScript get/setPayloadXML use E4X XML objects, when using Ruby they
+ * use REXML documents.
  */
 public class ScriptMediatorFactory implements MediatorFactory {
 
@@ -38,15 +70,20 @@ public class ScriptMediatorFactory implements MediatorFactory {
 
     public Mediator createMediator(OMElement elem) {
 
+        ScriptMediator sm;
+
         OMAttribute scriptKey = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-        if (scriptKey == null) {
-            throw new SynapseException("must specify 'key' for script source");
+        if (scriptKey != null) {
+            OMAttribute function = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "function"));
+            String functionName = (function == null) ? "mediate" : function.getAttributeValue();
+            sm = new ScriptMediator(scriptKey.getAttributeValue(), functionName);
+        } else if (elem.getLocalName().indexOf('.') > -1){
+            sm = new InlineScriptMediator(elem.getLocalName(), elem.getText());
+            ((InlineScriptMediator)sm).init();
+        } else {
+            throw new SynapseException("must specify 'key' attribute or inline script source");
         }
 
-        OMAttribute function = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "function"));
-        String functionName = (function == null) ? "mediate" : function.getAttributeValue();
-
-        ScriptMediator sm = new ScriptMediator(scriptKey.getAttributeValue(), functionName);
         return sm;
     }
 

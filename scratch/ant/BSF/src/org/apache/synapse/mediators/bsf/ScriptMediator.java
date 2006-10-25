@@ -28,28 +28,40 @@ import org.apache.synapse.mediators.bsf.convertors.DefaultOMElementConvertor;
 import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 
 /**
- * A Synapse mediator that calls a function in any scripting language supportted by BSF.
+ * A Synapse mediator that calls a function in any scripting language supported by BSF. The ScriptMediator using a registry property to define the
+ * registry property which contains the script source.
+ * <p>
+ * 
+ * <pre>
+ *    &lt;script key=&quot;property-key&quot; function=&quot;script-function-name&quot; &lt;script/&gt;
+ * </pre>
+ * 
+ * <p>
+ * The function is an optional attribute defining the name of the script function to call, if not specified it defaults to a function named 'mediate'.
+ * The function takes a single parameter which is the Synapse MessageContext. The function may return a boolean, if it does not then true is assumed.
  */
 public class ScriptMediator extends AbstractMediator {
 
-    private String scriptKey;
-    
-    private String functionName;
+    protected String scriptKey;
 
-    private BSFEngine bsfEngine;
-    
+    protected String functionName;
+
+    protected BSFEngine bsfEngine;
+
     protected OMElementConvertor convertor;
+
+    protected BSFManager bsfManager;
 
     public ScriptMediator(String scriptKey, String functionName) {
         this.scriptKey = scriptKey;
         this.functionName = functionName;
+        bsfManager = new BSFManager();
     }
 
     public boolean mediate(MessageContext synCtx) {
         try {
 
-            SynapseConfiguration synapseConfig = synCtx.getConfiguration();
-            BSFEngine engine = getBSFEngine(synapseConfig);
+            BSFEngine engine = getBSFEngine(synCtx.getConfiguration());
 
             Object[] args = new Object[] { new ScriptMessageContext(synCtx, convertor) };
 
@@ -68,8 +80,8 @@ public class ScriptMediator extends AbstractMediator {
     public synchronized BSFEngine getBSFEngine(SynapseConfiguration synapseConfig) {
 
         Property dp = synapseConfig.getPropertyObject(scriptKey);
-//        boolean requiresRefresh = (dp != null) && (!dp.isCached() || dp.isExpired());
-//        if (bsfEngine == null || requiresRefresh) { TODO: sort out caching
+        // boolean requiresRefresh = (dp != null) && (!dp.isCached() || dp.isExpired());
+        // if (bsfEngine == null || requiresRefresh) { TODO: sort out caching
         if (bsfEngine == null) {
             OMElement el = (OMElement) synapseConfig.getProperty(scriptKey);
             String scriptSrc = el.getText();
@@ -84,9 +96,6 @@ public class ScriptMediator extends AbstractMediator {
 
     protected BSFEngine createBSFEngine(String scriptName, String scriptSrc) {
         try {
-
-            BSFManager bsfManager = new BSFManager();
-            bsfManager.setClassLoader(BSFManager.class.getClassLoader());
 
             String scriptLanguage = BSFManager.getLangFromFilename(scriptName);
             BSFEngine bsfEngine = bsfManager.loadScriptingEngine(scriptLanguage);
@@ -103,11 +112,11 @@ public class ScriptMediator extends AbstractMediator {
         OMElementConvertor oc = null;
         int lastDot = scriptName.lastIndexOf('.');
         if (lastDot > -1) {
-            String suffix = scriptName.substring(lastDot+1).toUpperCase();
+            String suffix = scriptName.substring(lastDot + 1).toUpperCase();
             String className = OMElementConvertor.class.getName();
             int i = className.lastIndexOf('.');
-            String packageName = className.substring(0, i+1);
-            String convertorClassName = packageName + suffix + className.substring(i+1);
+            String packageName = className.substring(0, i + 1);
+            String convertorClassName = packageName + suffix + className.substring(i + 1);
             try {
                 oc = (OMElementConvertor) Class.forName(convertorClassName, true, getClass().getClassLoader()).newInstance();
             } catch (Exception e) {

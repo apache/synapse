@@ -29,7 +29,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 
 /**
- * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the message payload XML.
+ * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the message payload XML in a way natural to the scripting language.
  */
 public class ScriptMessageContext implements MessageContext {
 
@@ -58,7 +58,7 @@ public class ScriptMessageContext implements MessageContext {
      * @param payload
      * @throws XMLStreamException
      */
-    public void setPayloadXML(Object payload) throws XMLStreamException {
+    public void setPayloadXML(Object payload) {
         mc.getEnvelope().getBody().setFirstChild(convertor.fromScript(payload));
     }
 

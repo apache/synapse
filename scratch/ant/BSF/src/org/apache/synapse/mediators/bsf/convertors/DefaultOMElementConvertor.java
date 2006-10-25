@@ -47,8 +47,6 @@ public class DefaultOMElementConvertor implements OMElementConvertor {
     }
 
     public void setEngine(BSFEngine e) {
-        // TODO Auto-generated method stub
-        
     }
 
 }

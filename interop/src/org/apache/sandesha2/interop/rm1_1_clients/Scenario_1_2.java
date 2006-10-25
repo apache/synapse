@@ -128,7 +128,8 @@ public class Scenario_1_2 {
 			} 
 		}
 		
-//		serviceClient.cleanup();
+		serviceClient.cleanup();
+		configurationContext.getListenerManager().stop();
 	}
 	
 	private static OMElement getPingOMBlock(String text) {

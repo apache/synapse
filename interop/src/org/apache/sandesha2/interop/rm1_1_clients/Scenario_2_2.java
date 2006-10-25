@@ -266,23 +266,23 @@ public class Scenario_2_2 {
 		RMInteropServiceCallbackHandlerImpl callback1 = new RMInteropServiceCallbackHandlerImpl ("callback1");
 		stub.startEchoString(echoString, callback1);
 		
-//		echoString = new EchoString ();
-//		echoString.setEchoString (new EchoStringRequestBodyType ());
-//		echoString.getEchoString().setSequence(sequenceKey);
-//		echoString.getEchoString().setText("echo2");
-//		
-//		RMInteropServiceCallbackHandlerImpl callback2 = new RMInteropServiceCallbackHandlerImpl ("callback2");
-//		stub.startEchoString(echoString, callback2);
-//		
-//		echoString = new EchoString ();
-//		echoString.setEchoString (new EchoStringRequestBodyType ());
-//		echoString.getEchoString().setSequence(sequenceKey);
-//		echoString.getEchoString().setText("echo3");
-//		
-//		RMInteropServiceCallbackHandlerImpl callback3 = new RMInteropServiceCallbackHandlerImpl ("callback3");
-//		stub.startEchoString(echoString, callback3);
+		echoString = new EchoString ();
+		echoString.setEchoString (new EchoStringRequestBodyType ());
+		echoString.getEchoString().setSequence(sequenceKey);
+		echoString.getEchoString().setText("echo2");
 		
-		while (!callback1.isCompleted()) {
+		RMInteropServiceCallbackHandlerImpl callback2 = new RMInteropServiceCallbackHandlerImpl ("callback2");
+		stub.startEchoString(echoString, callback2);
+		
+		echoString = new EchoString ();
+		echoString.setEchoString (new EchoStringRequestBodyType ());
+		echoString.getEchoString().setSequence(sequenceKey);
+		echoString.getEchoString().setText("echo3");
+		
+		RMInteropServiceCallbackHandlerImpl callback3 = new RMInteropServiceCallbackHandlerImpl ("callback3");
+		stub.startEchoString(echoString, callback3);
+		
+		while (!callback1.isCompleted() || !callback2.isCompleted() || !callback3.isCompleted()) {
 			Thread.sleep(2000);
 		}
 		

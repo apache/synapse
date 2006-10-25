@@ -234,7 +234,7 @@ public class Scenario_3_1 {
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
-		clientOptions.setProperty(Constants.Configuration.USE_CUSTOM_LISTNER, new Boolean (true));
+//		clientOptions.setProperty(Constants.Configuration.USE_CUSTOM_LISTENER, new Boolean (true));
 				
 	}
 	

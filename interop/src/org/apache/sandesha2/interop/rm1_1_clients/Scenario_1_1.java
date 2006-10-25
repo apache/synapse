@@ -42,6 +42,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.interop.RMInteropServiceStub;
+import org.apache.sandesha2.util.SandeshaUtil;
 import org.tempuri.Ping;
 
 public class Scenario_1_1 {
@@ -185,6 +186,7 @@ public class Scenario_1_1 {
 //		stub.Ping (ping);
 //		Thread.sleep(3000000);
 		
+		configurationContext.getListenerManager().stop();
 		stub._getServiceClient().cleanup();
 	}
 	

@@ -222,7 +222,7 @@ public class Scenario_4_2 {
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
 		
-		//clientOptions.setProperty(OutInAxisOperation.USE_CUSTOM_LISTNER,new Boolean (true));
+//		clientOptions.setProperty(Constants.Configuration.USE_CUSTOM_LISTENER,new Boolean (true));
 		
         clientOptions.setProperty(RampartMessageData.KEY_RAMPART_POLICY, loadPolicy(CLIENT_POLICY_PATH));
 	}

@@ -128,6 +128,7 @@ public class Scenario_1_4 {
 		
 		Thread.sleep(3000);
 		
+		configurationContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}
 

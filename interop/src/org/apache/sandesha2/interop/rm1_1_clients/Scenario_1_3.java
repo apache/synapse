@@ -131,7 +131,8 @@ public class Scenario_1_3 {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+	
+		configurationContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}
 	

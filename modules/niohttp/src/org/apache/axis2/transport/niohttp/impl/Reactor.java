@@ -54,7 +54,7 @@ public class Reactor implements Runnable {
     /**
      * The maximum number of threads used for the worker thread pool
      */
-    private static final int WORKERS_MAX_THREADS = 100;
+    private static final int WORKERS_MAX_THREADS = 4;
     /**
      * The keep alive time of an idle worker thread
      */
@@ -142,7 +142,7 @@ public class Reactor implements Runnable {
 
         // create thread pool of workers
         workerPool = new ThreadPoolExecutor(
-            10,
+            4,
             WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TIME_UNIT,
             new LinkedBlockingQueue(),
             new org.apache.axis2.util.threadpool.DefaultThreadFactory(
@@ -181,25 +181,21 @@ public class Reactor implements Runnable {
      */
     void dispatch(SelectionKey k) {
         Runnable r = (Runnable) k.attachment();
-        if (r != null && r instanceof GenericIOHandler) {
-            GenericIOHandler h = (GenericIOHandler) r;
+        if (r != null && r instanceof IOHandler) {
+            IOHandler h = (IOHandler) r;
             if (!h.isBeingProcessed()) {
                 h.lock();
                 //r.run();
                 workerPool.execute(r);
                 //lfPool.submit(r);
             }
-        /*} else {
-            if (r != null) {
-                workerPool.execute(r);
-            }*/
         }
     }
 
     /**
      * Accepts a new connection and hands it off to a new IncomingHandler instance
      */
-    class Acceptor extends GenericIOHandler implements Runnable {
+    class Acceptor extends AbstractIOHandler {
         private HttpService httpService = null;
 
         public Acceptor(HttpService httpService) {
@@ -221,33 +217,52 @@ public class Reactor implements Runnable {
         }
     }
 
+    /**
+     * Queue this HttpRequest to be sent to its destination, and invoke the Callback
+     * on recepit of a response
+     * @param request the HttpRequest which is to be sent. The body of this message could
+     *      be streamed before or after the invocation of this method, and the end of the
+     *      body would be determined when the output stream is closed.
+     * @param callback an optional call back to be invoked when a response is received
+     *      for this request
+     */
     public void send(HttpRequest request, Runnable callback) {
+        SocketChannel socket = null;
         try {
             InetSocketAddress addr = new InetSocketAddress(
                 request.getHost(), request.getPort());
 
-            SocketChannel socket = SocketChannel.open();
+            socket = SocketChannel.open();
             socket.configureBlocking(false);
             socket.connect(addr);
 
-            SelectionKey sk = socket.register(selector, SelectionKey.OP_CONNECT);
-            OutgoingHandler outHandler = new OutgoingHandler(socket, sk, request, httpService);
-            if (callback != null) {
-                outHandler.setCallback(callback);
-            }
-            sk.attach(outHandler);
+            OutgoingHandler outHandler = new OutgoingHandler(socket, selector, httpService);
+
+            outHandler.setRequest(request);
+            outHandler.setCallback(callback);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            // close the socket if we opened it, selection key would be cancelled if invoked
+            if (socket != null && socket.isOpen()) {
+                try {
+                    socket.close();
+                } catch (IOException ioe) {}
+            }
+            handleException("IO Exception : " + e.getMessage() +
+                " sending request : " + request + " : " , e);
         }
     }
 
     private static void handleException(String msg, Exception e) {
+        // todo decide how to handle exceptions and cleanup resources etc
         log.error(msg, e);
-        e.printStackTrace(); // TODO
-        // throw new xxxx TODO
+        e.printStackTrace();
     }
 
+    /**
+     * Request to shutdown the reactor
+     * @param shutdownRequested if true, will request the reactor to shutdown
+     */
     public void setShutdownRequested(boolean shutdownRequested) {
         this.shutdownRequested = shutdownRequested;
     }

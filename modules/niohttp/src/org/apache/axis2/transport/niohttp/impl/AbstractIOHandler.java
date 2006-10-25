@@ -15,18 +15,19 @@
 */
 package org.apache.axis2.transport.niohttp.impl;
 
-import java.nio.ByteBuffer;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.Date;
+public abstract class AbstractIOHandler implements IOHandler {
+    
+    private boolean beingProcessed = false;
 
-public interface IOHandler extends Runnable {
+    public boolean isBeingProcessed() {
+        return beingProcessed;
+    }
 
-    public boolean isBeingProcessed();
+    public synchronized void lock() {
+        beingProcessed = true;
+    }
 
-    public void lock();
-
-    public void unlock();
-
-    public void run();
+    public synchronized void unlock() {
+        beingProcessed = false;
+    }
 }

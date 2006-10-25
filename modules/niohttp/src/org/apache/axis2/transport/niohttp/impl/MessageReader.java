@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import java.nio.ByteBuffer;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.StringTokenizer;
 
 /**
  * TODO
@@ -156,11 +157,19 @@ public class MessageReader {
             // this effectively skips any blank lines
             messageLine = getNextLine(buffer);
         }
-        String[] parts = messageLine.split("\\s");
-        if (parts.length != 3) {
-            throw new NHttpException("Invalid " +
-                (requestMode ? "request" : "response") + " line : " + messageLine);
+
+        String[] parts = new String[3];
+        for (int i=0; i<2; i++) {
+            int sep = messageLine.indexOf(' ');
+            if (sep == -1) {
+                throw new NHttpException("Invalid " +
+                    (requestMode ? "request" : "response") + " line : " + messageLine);
+            } else {
+                parts[i] = messageLine.substring(0, sep);
+                messageLine = messageLine.substring(sep+1);
+            }
         }
+        parts[2] = messageLine;
 
         if (requestMode) {
             HttpRequest req = (HttpRequest) httpMessage;
@@ -295,6 +304,14 @@ public class MessageReader {
      */
     public boolean isStreamingBody() {
         return streamingBody;
+    }
+
+    /**
+     * Should we close the connection?
+     * @return true if we should close the connection
+     */
+    public boolean isConnectionClose() {
+        return httpMessage.isConnectionClose();
     }
 
     /**

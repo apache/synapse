@@ -38,15 +38,13 @@ public class IncomingHandler extends GenericIOHandler {
 
     private static final Log log = LogFactory.getLog(IncomingHandler.class);
 
-    private MessageReader msgReader = new MessageReader(true);
-
     public IncomingHandler(SocketChannel socket, Selector selector,
         HttpService httpService) throws IOException {
 
+        this.msgReader = new MessageReader(true); // set up in 'request' parse mode
         this.httpService = httpService;
         this.socket = socket;
-        socket.configureBlocking(false);
-        // Optionally try first read now
+        this.socket.configureBlocking(false);
         sk = socket.register(selector, 0);
         sk.attach(this);
         sk.interestOps(SelectionKey.OP_READ);   // we are only interested to read
@@ -54,87 +52,43 @@ public class IncomingHandler extends GenericIOHandler {
     }
 
     public void setResponse(HttpResponse response) {
-        // TODO writeHandler.setMessage(response.getWireBuffer(), response.isConnectionClose());
         sk.interestOps(SelectionKey.OP_WRITE);
         sk.selector().wakeup();
-        log.debug("\tIncomingHandler.setResponse()");
     }
 
-    /**
-     * The main handler routine
+    /** acp
+     * The main handler routine for incoming requests and responses
      */
     public void run() {
 
-        if (sk.isReadable()) {
-            log.debug("\tIncomingHandler run() - READABLE");
-            
-            if (msgReader.availableForWrite() == 0) {
-                //System.out.println("Reject read");
-                return;
-            } else {
-                //System.out.println("Accept read");
+        try {
+            if (sk.isReadable()) {
+                log.debug("readable");
+                processReadyRead();
+
+            } else if (sk.isWritable()) {
+                log.debug("writable");
+                processReadyWrite(true);
             }
 
-            if (readNetworkBuffer(msgReader.availableForWrite()) > 0) {
-                //System.out.println("NW Buffer read : \n" + Util.dumpAsHex(nwReadBuffer.array(), nwReadPos));
-                readApplicationBuffer();
-
-                //System.out.println(Thread.currentThread().getName() + " Processing App Buffer : \n" + Util.dumpAsHex(appReadBuffer.array(), appReadPos));
-                processAppReadBuffer();
-            }
-
-        } else if (sk.isWritable()) {
-            log.debug("\tIncomingHandler run() - WRITEABLE");
-
-            log.debug("\tIncomingHandler run() - WRITEABLE");
-
-            writeApplicationBuffer();
-            writeNetworkBuffer();
-            writeToNetwork();
-
-            if (nwWritePos == 0 && appWritePos == 0 && !msgWriter.isStreamingBody()) {
-                log.debug("\tRequest written completely");
-                if (msgWriter.isConnectionClose()) {
-                    log.debug("\tClosing connection normally");
-                    sk.cancel();
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        log.warn("Error during socket close : " + e.getMessage(), e);
-                    }
-                } else {
-                    // response has been written completely
-                    // now read response or at least result code
-                    sk.interestOps(SelectionKey.OP_READ);
-                }
-            }
-
-            /*if (writeHandler.handle(socket)) {
-                log.debug("\tThe response has been written completely");
-                // response has been written completely
-                if (writeHandler.isConnectionClose()) {
-                    log.debug("\tClosing connection normally");
-                    sk.cancel();
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        log.warn("Error during socket close : " + e.getMessage(), e);
-                    }
-                } else {
-                    // now we are again interested to read
-                    sk.interestOps(SelectionKey.OP_READ);
-                }
-            }*/
-        } else {
-            log.warn("IncomingHandler run(!!!unknown event!!!) : " + sk.readyOps());
+        } finally{
+            if (isBeingProcessed())
+                unlock();
         }
     }
 
-    private void processAppReadBuffer() {
+    /** acp
+     * Process the App buffer which has been read. If we just read the message
+     * header right now, then this method fires the handleRequest() call on the
+     * http service passing. However, at this point, the body may not have been
+     * read completely.
+     */
+    protected void processAppReadBuffer() {
         boolean readHeader = msgReader.isStreamingBody();
 
         try {
             int pos = msgReader.process(appReadBuffer);
+
             // if the handler digested any bytes, discard and compact the buffer
             if (pos > 0) {
                 appReadBuffer.position(pos);
@@ -146,18 +100,14 @@ public class IncomingHandler extends GenericIOHandler {
             if (!readHeader && msgReader.isStreamingBody()) {
                 HttpRequest request = (HttpRequest) msgReader.getHttpMessage();
                 request.setHandler(this);
-                log.debug("\tFire event for received HttpRequest");
+                log.debug("fire event for received HttpResponse");
                 httpService.handleRequest(request);
             }
 
-            /*socket.close();
-            sk.cancel();
-            log.debug("Socket closed and SelectionKey cancelled");*/
-
         } catch (IOException e) {
-            e.printStackTrace();
+            handleException("Error piping the received App buffer : " + e. getMessage(), e);
         } catch (NHttpException e) {
-            e.printStackTrace();
+            handleException(e.getMessage(), e);
         }
     }
 

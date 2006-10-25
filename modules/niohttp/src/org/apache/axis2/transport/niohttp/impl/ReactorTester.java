@@ -81,7 +81,7 @@ public class ReactorTester {
             }
         });
         new Thread(r).start();
-        r.send(request, null);
+        //r.send(request, null);
 
         byte[] bodyBytes = body.getBytes();
         int incr = 32;
@@ -91,6 +91,8 @@ public class ReactorTester {
         }
         os.flush();
         os.close();
+
+        r.send(request, null);
     }
 
     private void simpleGet() throws IOException {

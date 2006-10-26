@@ -26,11 +26,12 @@ import org.apache.axis2.handlers.AbstractHandler;
 
 public class GlobalRequestCountHandler extends AbstractHandler {
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         msgContext
                 .setProperty(Constants.REQUEST_RECEIVED_TIME, new Long(System.currentTimeMillis()));
         // global increment
         ((Counter) msgContext.getParameter(Constants.GLOBAL_REQUEST_COUNTER).getValue())
                 .increment();
+        return InvocationResponse.CONTINUE;
     }
 }

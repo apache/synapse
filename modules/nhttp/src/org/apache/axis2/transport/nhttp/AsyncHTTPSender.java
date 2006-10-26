@@ -44,7 +44,7 @@ import java.io.OutputStream;
  */
 public class AsyncHTTPSender extends AbstractHandler implements TransportSender {
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
         OMOutputFormat format = new OMOutputFormat();
         String charSetEnc = (String) msgContext.getProperty(
@@ -130,6 +130,8 @@ public class AsyncHTTPSender extends AbstractHandler implements TransportSender 
                     .setProperty(Constants.RESPONSE_WRITTEN,
                             Constants.VALUE_TRUE);
         }
+
+        return InvocationResponse.CONTINUE;
     }
 
     private void sendAsyncResponse(MessageContext msgContext, OMOutputFormat format, OMElement dataOut) throws AxisFault {

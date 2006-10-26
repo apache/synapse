@@ -70,7 +70,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(TerminateSeqMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext terminateSeqRMMsg) throws AxisFault {
+	public boolean processInMessage(RMMsgContext terminateSeqRMMsg) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::processInMessage");
@@ -177,7 +177,8 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateSeqMsg.pause();
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: TerminateSeqMsgProcessor::processInMessage");
+			log.debug("Exit: TerminateSeqMsgProcessor::processInMessage " + Boolean.TRUE);
+		return true;
 	}
 
 	private void setUpHighestMsgNumbers(ConfigurationContext configCtx, StorageManager storageManager,
@@ -327,7 +328,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::processOutMessage");
@@ -393,7 +394,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		if (terminated != null && "true".equals(terminated)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);
 			log.debug(message);
-			return;
+			return false;
 		}
 
 		TerminateSequence terminateSequencePart = (TerminateSequence) rmMsgCtx
@@ -472,7 +473,8 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		SandeshaUtil.executeAndStore(rmMsgCtx, key);
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage");
+			log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage " + Boolean.FALSE);
+		return false;
 	}
 
 }

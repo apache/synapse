@@ -53,7 +53,6 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -69,13 +68,13 @@ public class AckRequestedProcessor {
 
 	private static final Log log = LogFactory.getLog(AckRequestedProcessor.class);
 
-	public void processAckRequestedHeaders(MessageContext message) throws AxisFault {
+	public boolean processAckRequestedHeaders(MessageContext message) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
 		SOAPEnvelope envelope = message.getEnvelope();
 		SOAPHeader header = envelope.getHeader();
-		
+		boolean msgCtxPaused = false;
 		if(header!=null)
 		{
 			for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
@@ -86,16 +85,29 @@ public class AckRequestedProcessor {
 					OMElement ack = (OMElement) acks.next();
 					AckRequested ackReq = new AckRequested(headerName.getNamespaceURI());
 					ackReq.fromOMElement(ack);
-					processAckRequestedHeader(message, ack, ackReq);
+					boolean paused = processAckRequestedHeader(message, ack, ackReq);
+					//if nto already paused we might be now
+					if(!msgCtxPaused){
+						msgCtxPaused = paused;
+					}
 				}
 			}			
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AckRequestedProcessor::processAckRequestHeaders");
+			log.debug("Exit: AckRequestedProcessor::processAckRequestHeaders " + msgCtxPaused);
+		return msgCtxPaused;
 	}
 
-	public void processAckRequestedHeader(MessageContext msgContext, OMElement soapHeader, AckRequested ackRequested) throws AxisFault {
+	/**
+	 * 
+	 * @param msgContext
+	 * @param soapHeader
+	 * @param ackRequested
+	 * @return true if the msg context was paused
+	 * @throws AxisFault
+	 */
+	public boolean processAckRequestedHeader(MessageContext msgContext, OMElement soapHeader, AckRequested ackRequested) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader " + soapHeader);
 
@@ -295,8 +307,10 @@ public class AckRequestedProcessor {
 			msgContext.pause();
 
 			if (log.isDebugEnabled())
-				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader");
+				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader " + Boolean.TRUE);
+			return true;
 		}
+		return false;
 	}
 
 }

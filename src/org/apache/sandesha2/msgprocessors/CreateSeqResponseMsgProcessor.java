@@ -61,7 +61,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqResponseMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext createSeqResponseRMMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext createSeqResponseRMMsgCtx) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processInMessage");
@@ -307,14 +307,16 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		createSeqResponseRMMsgCtx.pause();
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: CreateSeqResponseMsgProcessor::processInMessage");
+			log.debug("Exit: CreateSeqResponseMsgProcessor::processInMessage " + Boolean.TRUE);
+		return true;
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processOutMessage");
-			log.debug("Exit: CreateSeqResponseMsgProcessor::processOutMessage");
+			log.debug("Exit: CreateSeqResponseMsgProcessor::processOutMessage " + Boolean.FALSE);
 		}
+		return false;
 
 	}
 }

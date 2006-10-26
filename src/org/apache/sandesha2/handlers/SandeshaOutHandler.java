@@ -50,10 +50,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 	private static final Log log = LogFactory.getLog(SandeshaOutHandler.class.getName());
 
-	public void invoke(MessageContext msgCtx) throws AxisFault {
+	public InvocationResponse invoke(MessageContext msgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaOutHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 
+		InvocationResponse returnValue = InvocationResponse.CONTINUE;
+		
 		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
@@ -74,8 +76,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 			String unreliable = (String) msgCtx.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 			if (null != unreliable && "true".equals(unreliable)) {
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
-				return;
+					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message " + returnValue);
+				return returnValue;
 			}			
 		}
 		//look at the operation ctx
@@ -83,16 +85,16 @@ public class SandeshaOutHandler extends AbstractHandler {
 			Parameter unreliable = msgCtx.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 			if (null != unreliable && "true".equals(unreliable.getValue())) {
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message");
-				return;
+					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message " + returnValue);
+				return returnValue;
 			}				
 		}
 		// Also do not apply RM to fault messages
 		{
 			if(msgCtx.isProcessingFault()) {
 				if(log.isDebugEnabled())
-					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for fault message");
-				return;
+					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for fault message " + returnValue);
+				return returnValue ;
 			}
 		}
 		
@@ -103,8 +105,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE)) {
 			if (log.isDebugEnabled())
-				log.debug("Exit: SandeshaOutHandler::invoke, Application processing done");
-			return;
+				log.debug("Exit: SandeshaOutHandler::invoke, Application processing done " + returnValue);
+			return returnValue;
 		}
 		
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
@@ -146,12 +148,18 @@ public class SandeshaOutHandler extends AbstractHandler {
 				msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 			}
 
-			if (msgProcessor != null)
-				msgProcessor.processOutMessage(rmMsgCtx);
+			if (msgProcessor != null){
+				if(msgProcessor.processOutMessage(rmMsgCtx)){
+					//the msg was paused
+					returnValue = InvocationResponse.SUSPEND;
+				}
+			}
+				
 
 		} catch (Exception e) {
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
+			returnValue = InvocationResponse.SUSPEND;
 
 			// rolling back the transaction
 			if (!withinTransaction) {
@@ -179,7 +187,8 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 		}
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaOutHandler::invoke");
+			log.debug("Exit: SandeshaOutHandler::invoke " + returnValue);
+		return returnValue;
 	}
 
 	public String getName() {

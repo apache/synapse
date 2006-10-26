@@ -86,10 +86,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(ApplicationMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	
+	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processInMessage");
 
+		boolean msgCtxPaused = false;
+		
 		// Processing the application message.
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		if (msgCtx == null) {
@@ -100,7 +103,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		if (rmMsgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE) != null
 				&& rmMsgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE).equals("true")) {
-			return;
+			return msgCtxPaused;
 		}
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
@@ -232,6 +235,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 			rmMsgCtx.pause();
+			msgCtxPaused = true;
 		}
 
 		if (!msgNoPresentInList)
@@ -309,6 +313,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			// pause the message
 			rmMsgCtx.pause();
+			msgCtxPaused = true;
 
 			// Starting the invoker if stopped.
 			SandeshaUtil.startInvokerForTheSequence(msgCtx.getConfigurationContext(), sequenceId);
@@ -319,7 +324,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		sendAckIfNeeded(rmMsgCtx, messagesStr, storageManager);
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: ApplicationMsgProcessor::processInMessage");
+			log.debug("Exit: ApplicationMsgProcessor::processInMessage " + msgCtxPaused);
+		return msgCtxPaused;
 	}
 
 	// TODO convert following from INT to LONG
@@ -461,7 +467,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			log.debug("Exit: ApplicationMsgProcessor::sendAckIfNeeded");
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processOutMessage");
 
@@ -866,7 +872,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		msgContext.pause();
 		
 		if (log.isDebugEnabled())
-			log.debug("Exit: ApplicationMsgProcessor::processOutMessage");
+			log.debug("Exit: ApplicationMsgProcessor::processOutMessage " + Boolean.TRUE);
+		return true;
 	}
 
 	private void addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,

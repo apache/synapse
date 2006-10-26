@@ -56,7 +56,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CloseSequenceProcessor.class);
 
-	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CloseSequenceProcessor::processInMessage");
 
@@ -154,14 +154,16 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: CloseSequenceProcessor::processInMessage");
+			log.debug("Exit: CloseSequenceProcessor::processInMessage " + Boolean.FALSE);
+		return false;
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: CloseSequenceProcessor::processOutMessage");
-			log.debug("Exit: CloseSequenceProcessor::processOutMessage");
+			log.debug("Exit: CloseSequenceProcessor::processOutMessage " + Boolean.FALSE);
 		}
+		return false;
 
 	}
 

@@ -46,7 +46,7 @@ public class Sandesha2TransportSender implements TransportSender  {
 
 	}
 
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 		
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sandesha2TransportSender::invoke, " + msgContext.getEnvelope().getHeader());
@@ -77,7 +77,7 @@ public class Sandesha2TransportSender implements TransportSender  {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: Sandesha2TransportSender::invoke");
-
+		return InvocationResponse.CONTINUE;
 	}
 
 	//Below methods are not used

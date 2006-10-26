@@ -66,7 +66,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqMsgProcessor.class);
 
-	public void processInMessage(RMMsgContext createSeqRMMsg) throws AxisFault {
+	public boolean processInMessage(RMMsgContext createSeqRMMsg) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
 
@@ -264,7 +264,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		createSeqRMMsg.pause();
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: CreateSeqMsgProcessor::processInMessage");
+			log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.TRUE);
+		return true;
 	}
 
 	private boolean offerAccepted(String sequenceId, ConfigurationContext configCtx, RMMsgContext createSeqRMMsg,
@@ -300,7 +301,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processOutMessage");
 
@@ -316,7 +317,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			}
 		}
 		if (log.isDebugEnabled())
-			log.debug("Exit: CreateSeqMsgProcessor::processOutMessage");
+			log.debug("Exit: CreateSeqMsgProcessor::processOutMessage " + Boolean.FALSE);
+		return false;
 	}
 	
 }

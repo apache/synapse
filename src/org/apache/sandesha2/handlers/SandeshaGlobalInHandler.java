@@ -31,15 +31,12 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
@@ -62,12 +59,14 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	private static final long serialVersionUID = -7187928423123306156L;
 
 	private static final Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
-
-	public void invoke(MessageContext msgContext) throws AxisFault {
+	
+	public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::invoke, " + msgContext.getEnvelope().getHeader());
 
+		InvocationResponse returnValue = InvocationResponse.CONTINUE;
+		
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 		if (configContext == null)
 			throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet));
@@ -78,21 +77,21 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		String reinjectedMessage = (String) msgContext.getProperty(Sandesha2Constants.REINJECTED_MESSAGE);
 		if (reinjectedMessage != null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage))
-			return; // Reinjected messages are not processed by Sandesha2 inflow
-					// handlers
+			return returnValue; // Reinjected messages are not processed by Sandesha2 inflow
+													// handlers
 
 		StorageManager storageManager = null;
 		try {
 			storageManager = SandeshaUtil
 					.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
 			if (storageManager == null) {
-				log.debug("Sandesha2 cannot proceed. The StorageManager is not available");
-				return;
+				log.debug("Sandesha2 cannot proceed. The StorageManager is not available " + returnValue);
+				return returnValue;
 			}
 		} catch (SandeshaException e1) {
 			// TODO make this a log
 			log.debug("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager", e1);
-			return;
+			return returnValue;
 		}
 
 		boolean withinTransaction = false;
@@ -138,6 +137,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					faultManager.manageIncomingRMFault (axisFault, msgContext);
 					
 					msgContext.pause();
+					returnValue = InvocationResponse.SUSPEND;
 				}
 				
 			}
@@ -147,8 +147,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
 			if (!isRMGlobalMessage) {
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaGlobalInHandler::invoke, !isRMGlobalMessage");
-				return;
+					log.debug("Exit: SandeshaGlobalInHandler::invoke, !isRMGlobalMessage " + returnValue);
+				return returnValue;
 			}
 
 			RMMsgContext rmMessageContext = MsgInitializer.initializeMessage(msgContext);
@@ -156,10 +156,11 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			// Dropping duplicates
 			boolean dropped = dropIfDuplicate(rmMessageContext, storageManager);
 			if (dropped) {
+				returnValue = InvocationResponse.SUSPEND; //the msg has been paused
 				processDroppedMessage(rmMessageContext, storageManager);
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped");
-				return;
+					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped " + returnValue);
+				return returnValue;
 			}
 
 			// Persisting the application messages
@@ -177,6 +178,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		} catch (Exception e) {
 			// message should not be sent in a exception situation.
 			msgContext.pause();
+			returnValue = InvocationResponse.SUSPEND;
 
 			if (!withinTransaction) {
 				try {
@@ -205,7 +207,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 		}
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaGlobalInHandler::invoke");
+			log.debug("Exit: SandeshaGlobalInHandler::invoke " + returnValue);
+		return returnValue;
 	}
 
 	private boolean dropIfDuplicate(RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {

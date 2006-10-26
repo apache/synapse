@@ -29,7 +29,6 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -40,10 +39,8 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -65,13 +62,18 @@ public class AcknowledgementProcessor {
 
 	private static final Log log = LogFactory.getLog(AcknowledgementProcessor.class);
 
-	public void processAckHeaders(MessageContext message) throws AxisFault {
+	/**
+	 * @param message
+	 * @return true if the msg context was paused
+	 * @throws AxisFault
+	 */
+	public boolean processAckHeaders(MessageContext message) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeaders");
 
 		SOAPEnvelope envelope = message.getEnvelope();
 		SOAPHeader header = envelope.getHeader();
-		
+		boolean returnValue = false;
 		if(header!=null)
 		{
 			for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
@@ -82,20 +84,34 @@ public class AcknowledgementProcessor {
 					OMElement ack = (OMElement) acks.next();
 					SequenceAcknowledgement seqAck = new SequenceAcknowledgement(headerName.getNamespaceURI());
 					seqAck.fromOMElement(ack);
-					processAckHeader(message, ack, seqAck);
+					boolean ackPaused = processAckHeader(message, ack, seqAck);
+					//if not already paused we might be now
+					if(!returnValue){
+						returnValue = ackPaused;
+					}
 				}
 			}			
 		}
 
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementProcessor::processAckHeaders");
+			log.debug("Exit: AcknowledgementProcessor::processAckHeaders " + returnValue);
+		return returnValue;
 	}
 	
-	private void processAckHeader(MessageContext msgCtx, OMElement soapHeader, SequenceAcknowledgement sequenceAck)
+	/**
+	 * @param msgCtx
+	 * @param soapHeader
+	 * @param sequenceAck
+	 * @return true if the msg context was paused
+	 * @throws AxisFault
+	 */
+	private boolean processAckHeader(MessageContext msgCtx, OMElement soapHeader, SequenceAcknowledgement sequenceAck)
 		throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeader " + soapHeader);
+		
+		boolean returnValue = false;
 		
 		// TODO: Note that this RMMessageContext is not really any use - but we need to create it
 		// so that it can be passed to the fault handling chain. It's really no more than a
@@ -247,11 +263,13 @@ public class AcknowledgementProcessor {
 
 		String action = msgCtx.getOptions().getAction();
 		if (action!=null && action.equals(SpecSpecificConstants.getAckRequestAction(rmMsgCtx.getRMSpecVersion()))) {
+			returnValue = true;
 			rmMsgCtx.pause();
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementProcessor::processAckHeader");
+			log.debug("Exit: AcknowledgementProcessor::processAckHeader " + returnValue);
+		return returnValue;
 	}
 
 	private SenderBean getRetransmitterEntry(Collection collection, long msgNo) {

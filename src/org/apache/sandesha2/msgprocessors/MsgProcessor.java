@@ -25,6 +25,19 @@ import org.apache.sandesha2.RMMsgContext;
  */
 
 public interface MsgProcessor {
-	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault;
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault;
+	
+	/**
+	 * @param rmMsgCtx
+	 * @return true if the msg context has been paused
+	 * @throws AxisFault
+	 */
+	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault;
+	
+	/**
+	 * 
+	 * @param rmMsgCtx
+	 * @return true if the msg context has been paused
+	 * @throws AxisFault
+	 */
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault;
 }

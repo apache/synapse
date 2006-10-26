@@ -42,7 +42,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(TerminateSeqResponseMsgProcessor.class);
 	
-	public void processInMessage(RMMsgContext terminateResRMMsg)
+	public boolean processInMessage(RMMsgContext terminateResRMMsg)
 			throws AxisFault { 
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processInMessage");
 		
@@ -79,11 +79,13 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		// Stop this message travelling further through the Axis runtime
 		terminateResRMMsg.pause();
 
-		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processInMessage");
+		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processInMessage " + Boolean.TRUE);
+		return true;
   }
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processOutMessage");
-		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processOutMessage");
+		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processOutMessage " + Boolean.FALSE);
+		return false;
 	}
 }

@@ -38,7 +38,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	 * A message is selected by the set of SenderBeans that are waiting to be sent.
 	 * This is processed using a SenderWorker. 
 	 */
-	public void processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		
 		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION);
 		Address address = makeConnection.getAddress();
@@ -97,7 +97,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		}
 
 		if (senderBean==null) 
-			return;
+			return false;
 			
 		TransportOutDescription transportOut = rmMsgCtx.getMessageContext().getTransportOut();
 		if (transportOut==null) {
@@ -128,6 +128,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		worker.setTransportOut(rmMsgCtx.getMessageContext().getTransportOut());
 		
 		worker.run();
+		return false;
 	}
 	
 	private void addMessagePendingHeader (RMMsgContext returnMessage, boolean pending) throws SandeshaException {
@@ -139,7 +140,8 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 	}
 
-	public void processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+		return false;
 	}
 
 	private void setTransportProperties (MessageContext returnMessage, RMMsgContext makeConnectionMessage) {

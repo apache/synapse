@@ -53,12 +53,14 @@ public class SandeshaInHandler extends AbstractHandler {
 	public String getName() {
 		return Sandesha2Constants.IN_HANDLER_NAME;
 	}
-
-	public void invoke(MessageContext msgCtx) throws AxisFault {
+	
+	public InvocationResponse invoke(MessageContext msgCtx) throws AxisFault {
 		
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaInHandler::invoke, " + msgCtx.getEnvelope().getHeader());
 
+		InvocationResponse returnValue = InvocationResponse.CONTINUE;
+		
 		ConfigurationContext context = msgCtx.getConfigurationContext();
 		if (context == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
@@ -69,15 +71,15 @@ public class SandeshaInHandler extends AbstractHandler {
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE)) {
 			if (log.isDebugEnabled())
-				log.debug("Exit: SandeshaInHandler::invoke, Application processing done");
-			return;
+				log.debug("Exit: SandeshaInHandler::invoke, Application processing done " + returnValue);
+			return returnValue;
 		}
 
 		String reinjectedMessage = (String) msgCtx.getProperty(Sandesha2Constants.REINJECTED_MESSAGE);
 		if (reinjectedMessage != null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage)) {
 			if (log.isDebugEnabled())
-				log.debug("Exit: SandeshaInHandler::invoke, reinjectedMessage");
-			return; // Reinjected messages are not processed by Sandesha2 inflow
+				log.debug("Exit: SandeshaInHandler::invoke, reinjectedMessage " + returnValue);
+			return returnValue; // Reinjected messages are not processed by Sandesha2 inflow
 					// handlers
 		}
 		
@@ -100,11 +102,15 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			// Process Ack headers in the message
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-			ackProcessor.processAckHeaders(msgCtx);
+			if(ackProcessor.processAckHeaders(msgCtx)){
+				returnValue = InvocationResponse.SUSPEND;
+			}
 
 			// Process Ack Request headers in the message
 			AckRequestedProcessor reqProcessor = new AckRequestedProcessor();
-			reqProcessor.processAckRequestedHeaders(msgCtx);
+			if(reqProcessor.processAckRequestedHeaders(msgCtx)){
+				returnValue = InvocationResponse.SUSPEND;
+			}
 
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
@@ -125,6 +131,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			//Ack messages will be paused
 			if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK) {
 				rmMsgCtx.pause();
+				returnValue = InvocationResponse.SUSPEND;
 			}
 			
 			// validating the message
@@ -132,14 +139,20 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 
-			if (msgProcessor != null)
-				msgProcessor.processInMessage(rmMsgCtx);
+			if (msgProcessor != null){
+				if(msgProcessor.processInMessage(rmMsgCtx)){
+					//this paused the msg
+					returnValue = InvocationResponse.SUSPEND;
+				}
+			}
+				
 
 			
 		} catch (AxisFault e) {
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
-
+			returnValue = InvocationResponse.SUSPEND;
+			
 			if (!withinTransaction) {
 				try {
 					transaction.rollback();
@@ -164,7 +177,8 @@ public class SandeshaInHandler extends AbstractHandler {
 			}
 		}
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaInHandler::invoke");
+			log.debug("Exit: SandeshaInHandler::invoke " + returnValue);
+		return returnValue;
 	}
 
 }

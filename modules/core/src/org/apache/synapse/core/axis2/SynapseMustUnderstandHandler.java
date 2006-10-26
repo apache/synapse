@@ -28,22 +28,22 @@ import java.util.Iterator;
 
 public class SynapseMustUnderstandHandler extends AbstractHandler {
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         Object obj = msgContext.getProperty(
                 org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND);
         if (obj != null && ((Boolean) obj).booleanValue()) {
             // second phase so return
-            return;
+            return InvocationResponse.CONTINUE;
         }
         msgContext.setProperty(
                 org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
                 Boolean.TRUE);
         if (!msgContext.isHeaderPresent()) {
-            return;
+            return InvocationResponse.CONTINUE;
         }
         SOAPEnvelope envelope = msgContext.getEnvelope();
         if (envelope.getHeader() == null) {
-            return;
+            return InvocationResponse.CONTINUE;
         }
         Iterator headerBlocks = envelope.getHeader().examineAllHeaderBlocks();
         while (headerBlocks.hasNext()) {
@@ -56,6 +56,6 @@ public class SynapseMustUnderstandHandler extends AbstractHandler {
             headerBlock.setProcessed();
 
         }
-
+        return InvocationResponse.CONTINUE;
     }
 }

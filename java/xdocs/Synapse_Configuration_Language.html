@@ -28,8 +28,7 @@ mechanism for mediators (see below for details).</p>
    &lt;rules [key="string"]&gt;
      mediator*
    &lt;/rules&gt;
- &lt;/synapse&gt;
-</pre>
+ &lt;/synapse&gt;</pre>
 
 <h3>Registries</h3>
 
@@ -57,8 +56,7 @@ mediators that every message passes through during mediation.</p>
 follows:</p>
 <pre>  &lt;set-property name="string" [value="string"] [src="url"] [key="string"]&gt;
         &lt;inline-xml/&gt;?
-  &lt;set-property/&gt;
-</pre>
+  &lt;set-property/&gt;</pre>
 
 <p>These properties are top level properties which are set globally for the
 entire system. Values of these properties can be retrieved via the extension
@@ -88,7 +86,7 @@ sequence of mediators.</p>
 
 <p>If an optional error handler sequence name is specified through the
 attribute 'onError', an exception on this sequence will invoke the sequence
-specified by this name. </p>
+specified by this name.</p>
 
 <p>A Dynamic Sequence may be defined by specifying a Dynamic Property as its
 definition. As the dynamic property changes, the sequence will dynamically be
@@ -101,18 +99,10 @@ to give a logical name to an endpoint address. If the address is not just a
 simple URL, then extensibility elements may be used to indicate the address
 (i.e. to compute the address at runtime).</p>
 <pre> &lt;endpoint name="string" [address="url"] [key="string"]&gt;
-   &lt;parameter name="OutflowSecurity"&gt;
-    ...
-   &lt;/parameter&gt;?
-   &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..
-     xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy"&gt;
-     ...
-   &lt;/Policy&gt;?
-   &lt;enableRM/&gt;?
+   &lt;enableRM [policy="key"]/&gt;?
    &lt;enableSec/&gt;?
    .. extensibility ..
- &lt;/endpoint&gt;
-</pre>
+ &lt;/endpoint&gt;</pre>
 
 <p>An Axis2 Parameter element within an endpoint definition with the name "
 OutflowSecurity" describes the Apache Rampart security configuration to be
@@ -148,13 +138,13 @@ define a Synapse Proxy service.</p>
 <pre> &lt;proxy name="string" [description="string"] [transports="(http |https |jms )+|all"]&gt;
    &lt;target sequence="name" | endpoint="name"/&gt;? // defaults to the synapse main sequence
    &lt;wsdl key="string"&gt;?
-   &lt;schema key="string"&gt;* // not yet used
-   &lt;policy key="string"&gt;*
-   &lt;property name="string" value="string"/&gt;*
    &lt;enableRM/&gt;?
    &lt;enableSec/&gt;?
- &lt;/proxy&gt;
-</pre>
+   &lt;policy key="string"&gt;*                       // optional service level policies
+                                                // (e.g. WS-Security and/or WS-RM policies)
+   &lt;property name="string" value="string"/&gt;*    // optional service parameters 
+                                                // (e.g. transport.jms.ConnectionFactory)
+ &lt;/proxy&gt;</pre>
 
 <p>A proxy service is created and exposed on the specified transports through
 the underlying Axis2 instance, exposing service EPR's as per the standard
@@ -201,23 +191,19 @@ text labels. See example 1 for more details.</p>
 <p>In the simplest case, the place to send the message to is implicit in the
 message (via a property of the message itself)- that is indicated by the
 following:</p>
-<pre> &lt;send/&gt;
-</pre>
+<pre> &lt;send/&gt;</pre>
 
 <p>If the message is to be sent to one or more endpoints, then the following
 is used:</p>
 <pre> &lt;send&gt;
    (endpointref | endpoint)+
- &lt;/send&gt;
-</pre>
+ &lt;/send&gt;</pre>
 
 <p>where the endpointref token refers to the following:</p>
-<pre> &lt;endpoint ref="name"/&gt;
-</pre>
+<pre> &lt;endpoint ref="name"/&gt;</pre>
 
 <p>and the endpoint token refers to an anonymous endpoint defined inline:</p>
-<pre> &lt;endpoint address="url"/&gt;
-</pre>
+<pre> &lt;endpoint address="url"/&gt;</pre>
 
 <p>If the message is to be sent to an endpoint selected by load balancing
 across a set of endpoints, then it is indicated by the following:</p>
@@ -225,8 +211,7 @@ across a set of endpoints, then it is indicated by the following:</p>
    &lt;load-balance algorithm="uri"&gt;
      (endpointref | endpoint)+
    &lt;/load-balance&gt;
- &lt;/send&gt;
-</pre>
+ &lt;/send&gt;</pre>
 
 <p>Similarly, if the message is to be sent to an endpoint with failover
 semantics, then it is indicated by the following:</p>
@@ -234,8 +219,7 @@ semantics, then it is indicated by the following:</p>
    &lt;failover&gt;
      (endpointref | endpoint)+
    &lt;/failover&gt;
- &lt;/send&gt;
-</pre>
+ &lt;/send&gt;</pre>
 
 <p>Once the &lt;send&gt; mediator executes, further processing of the current
 message stops.</p>
@@ -247,8 +231,7 @@ semantics, and supports only a single endpoint reference.</p>
 
 <p>The drop token refers to a &lt;drop&gt; element which is used to drop a
 message:</p>
-<pre> &lt;drop/&gt;
-</pre>
+<pre> &lt;drop/&gt;</pre>
 
 <p>Once the &lt;drop&gt; mediator executes, further processing of the current
 message stops.</p>
@@ -259,13 +242,12 @@ message stops.</p>
 messages being mediated:</p>
 <pre> &lt;log [level="string"] [separator="string"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
- &lt;/log&gt;
-</pre>
+ &lt;/log&gt;</pre>
 
 <p>The optional level attribute selects a pre-defined subset of properties to
 be logged.</p>
 
-<p>e.g. </p>
+<p>e.g.</p>
 <ul>
   <li>simple = To, From, WSAction, SOAPAction, ReplyTo, MessageID and any
     properties</li>
@@ -287,8 +269,7 @@ logged. The default separator is the ',' comma.</p>
    &lt;node&gt;?
    &lt;role&gt;?
    &lt;detail&gt;?
- &lt;/makefault&gt;
-</pre>
+ &lt;/makefault&gt;</pre>
 
 <p>The &lt;makefault&gt; mediator transforms the current message into a fault
 message, but does NOT send it. The &lt;send&gt; mediator needs to be invoked
@@ -300,8 +281,7 @@ message.</p>
 <h5>XSLT</h5>
 <pre> &lt;xslt key="string" [source="xpath"]&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
- &lt;/transform&gt;
-</pre>
+ &lt;/transform&gt;</pre>
 
 <p>The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
 given element. If the source element is not specified, it defaults to the
@@ -310,8 +290,7 @@ into the transformations through the &lt;property&gt; elements.</p>
 
 <h5>Headers</h5>
 <pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
- &lt;header name="qname" action="remove"/&gt;
-</pre>
+ &lt;header name="qname" action="remove"/&gt;</pre>
 
 <p>The &lt;header&gt; mediator sets or removes a specified header from the
 current soap message. Currently the set header only supports simple valued
@@ -325,8 +304,7 @@ omitted, it defaults to a set-header.</p>
 <h5>Filters</h5>
 <pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
    mediator+
- &lt;/filter&gt;
-</pre>
+ &lt;/filter&gt;</pre>
 
 <p>The &lt;filter&gt; mediator either test the given xpath expression as a
 boolean expression, or match the evaluation result of a source xpath
@@ -341,8 +319,7 @@ filter mediator will execute the enclosed mediators in sequence.</p>
    &lt;default&gt;
      mediator+
    &lt;/default&gt;?
- &lt;/switch&gt;
-</pre>
+ &lt;/switch&gt;</pre>
 
 <p>The &lt;switch&gt; mediator will evaluate the given source xpath
 expression into its string value, and match it against the given regular
@@ -354,8 +331,7 @@ it will be executed.</p>
    &lt;on-fail&gt;
      mediator+
    &lt;/on-fail&gt;
- &lt;/validate&gt;
-</pre>
+ &lt;/validate&gt;</pre>
 
 <p>The &lt;validate&gt; mediator validates the result of the evaluation of
 the source xpath expression, against the schema specified. If the source
@@ -368,8 +344,7 @@ parser, it is bundled with the Synapse extensions, so that the Synapse core
 will remain simple and lightweight.</p>
 
 <h4>Properties</h4>
-<pre> &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
-</pre>
+<pre> &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;</pre>
 
 <p>The setproperty token refers to a &lt;set-property&gt; element which is a
 mediator that has no direct impact on the message but rather on the message
@@ -380,8 +355,7 @@ through the synapse:get-property(prop-name) extension function.</p>
 <h4>Class Mediators</h4>
 <pre> &lt;class name="class-name"&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
- &lt;/class&gt; 
-</pre>
+ &lt;/class&gt; </pre>
 
 <p>The class mediator creates an instance of the specified class and sets it
 as a mediator. The class must implement the org.apache.synapse.api.Mediator
@@ -390,8 +364,7 @@ are invoked on the class. However, Synapse will only support String
 properties.</p>
 
 <h4>Reusing Sequences</h4>
-<pre> &lt;sequence ref="name"/&gt;
-</pre>
+<pre> &lt;sequence ref="name"/&gt;</pre>
 
 <p>A sequenceref token refers to a &lt;sequence&gt; element which is used to
 invoke a named sequence of mediators.</p>
@@ -417,8 +390,7 @@ the mediators which reference this configuration.</p>
 src, key or inlined XML references to the Spring configuration</p>
 
 <h4>Spring mediator</h4>
-<pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;
-</pre>
+<pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;</pre>
 
 <p>The &lt;spring&gt; element creates an instance of a mediator, which is
 managed by Spring. This Spring bean must implement the Mediator interface for
@@ -502,8 +474,7 @@ always.</p>
     &lt;switch&gt;
  &lt;/rules&gt;
  
-&lt;/synapse&gt; 
-</pre>
+&lt;/synapse&gt; </pre>
 
 <h3>Example 0.</h3>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -545,8 +516,7 @@ always.</p>
           &lt;send/&gt;
   &lt;/rules&gt;
 
-&lt;/synapse&gt;  
-</pre>
+&lt;/synapse&gt;  </pre>
 
 <p>The above configuration is available with the Synapse distribution and
 illustrates the usual Stock quote examples. The client code for these are
@@ -805,7 +775,6 @@ extension is dependent on the Xerces parser.</p>
     &lt;spring:spring bean="springtest" key="springconfig1"/&gt;
     &lt;spring:spring bean="springtest" key="springconfig2"/&gt;
   &lt;/rules&gt;
-&lt;/synapse&gt; 
-</pre>
+&lt;/synapse&gt; </pre>
 </body>
 </html>

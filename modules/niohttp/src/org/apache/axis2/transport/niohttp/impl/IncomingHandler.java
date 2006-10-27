@@ -52,6 +52,9 @@ public class IncomingHandler extends GenericIOHandler {
     }
 
     public void setResponse(HttpResponse response) {
+        if (msgWriter == null) {
+            msgWriter = new MessageWriter(false, response);
+        }
         sk.interestOps(SelectionKey.OP_WRITE);
         sk.selector().wakeup();
     }
@@ -61,6 +64,11 @@ public class IncomingHandler extends GenericIOHandler {
      */
     public void run() {
 
+        if (!sk.isValid()) {
+            sk.cancel();
+            return;
+        }
+        
         try {
             if (sk.isReadable()) {
                 log.debug("readable");

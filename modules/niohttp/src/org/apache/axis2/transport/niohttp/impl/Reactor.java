@@ -19,26 +19,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-//import org.apache.mina.filter.thread.LeaderFollowersThreadPool;
 
 /**
  * dynamic buffer expansion on need - done
@@ -90,8 +82,6 @@ public class Reactor implements Runnable {
 
     private ExecutorService workerPool = null;
 
-    //private LeaderFollowersThreadPool lfPool = null;
-
     public static synchronized Reactor getInstance(boolean secure) {
         if (secure) {
             return _httpsReactor;
@@ -103,15 +93,9 @@ public class Reactor implements Runnable {
     public static synchronized Reactor createReactor(
         String host, int port, boolean secure, HttpService httpService) throws IOException {
         if (secure) {
-            if (_httpsReactor != null) {
-                _httpsReactor.setShutdownRequested(true);
-            }
             _httpsReactor = new Reactor(host, port, secure, httpService);
             return _httpsReactor;
         } else {
-            if (_httpReactor != null) {
-                _httpReactor.setShutdownRequested(true);
-            }
             _httpReactor = new Reactor(host, port, secure, httpService);
             return _httpReactor;
         }
@@ -148,9 +132,6 @@ public class Reactor implements Runnable {
             new org.apache.axis2.util.threadpool.DefaultThreadFactory(
                     new ThreadGroup("NioHttp Worker thread group"),
                     "NioHttpWorker"));
-
-        //lfPool = new LeaderFollowersThreadPool("LeaderFollower", 10);
-        //lfPool.init();
     }
 
     /**
@@ -168,8 +149,21 @@ public class Reactor implements Runnable {
                     selected.clear();
                 }
             }
+            log.info("Reactor shutting down as a shutdown has been requested..");
+
         } catch (IOException e) {
-            e.printStackTrace();
+            log.fatal("Reactor encountered an error while selecting : " + e.getMessage(), e);
+
+        } finally {
+            if (serverSocketChannel != null && serverSocketChannel.isOpen()) {
+                try {
+                    serverSocketChannel.close();
+                } catch (IOException e) {}
+                try {
+                    selector.close();
+                } catch (IOException e) {}
+            }
+            log.info("Reactor shutdown. Server socket channel and the main selector closed..");
         }
     }
 
@@ -185,9 +179,7 @@ public class Reactor implements Runnable {
             IOHandler h = (IOHandler) r;
             if (!h.isBeingProcessed()) {
                 h.lock();
-                //r.run();
                 workerPool.execute(r);
-                //lfPool.submit(r);
             }
         }
     }
@@ -212,7 +204,7 @@ public class Reactor implements Runnable {
                     new IncomingHandler(socket, selector, httpService);
                 }
             } catch (IOException e) {
-                handleException("Exception while accepting a connection : " + e.getMessage(), e);
+                log.warn("Error accepting a connection : " + e.getMessage(), e);
             }
         }
     }
@@ -227,6 +219,7 @@ public class Reactor implements Runnable {
      *      for this request
      */
     public void send(HttpRequest request, Runnable callback) {
+                
         SocketChannel socket = null;
         try {
             InetSocketAddress addr = new InetSocketAddress(
@@ -248,15 +241,9 @@ public class Reactor implements Runnable {
                     socket.close();
                 } catch (IOException ioe) {}
             }
-            handleException("IO Exception : " + e.getMessage() +
+            log.error("IO Exception : " + e.getMessage() +
                 " sending request : " + request + " : " , e);
         }
-    }
-
-    private static void handleException(String msg, Exception e) {
-        // todo decide how to handle exceptions and cleanup resources etc
-        log.error(msg, e);
-        e.printStackTrace();
     }
 
     /**
@@ -264,6 +251,7 @@ public class Reactor implements Runnable {
      * @param shutdownRequested if true, will request the reactor to shutdown
      */
     public void setShutdownRequested(boolean shutdownRequested) {
+        log.info("reactor shudown requested..");
         this.shutdownRequested = shutdownRequested;
     }
 }

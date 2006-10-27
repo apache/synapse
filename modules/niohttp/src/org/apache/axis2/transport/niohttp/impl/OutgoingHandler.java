@@ -45,10 +45,6 @@ public class OutgoingHandler extends GenericIOHandler {
     }
 
     public void setRequest(HttpRequest request) {
-        if (!request.isChunked()) {
-            request.addHeader(Constants.CONTENT_LENGTH,
-                Integer.toString(request.getBuffer().limit()));
-        }
         msgWriter = new MessageWriter(true, request);
     }
 
@@ -64,6 +60,12 @@ public class OutgoingHandler extends GenericIOHandler {
      * The main handler routing for outgoing messages and responses
      */
     public void run() {
+
+        if (!sk.isValid()) {
+            sk.cancel();
+            return;
+        }
+
         try {
             if (sk.isConnectable() && socket.finishConnect()) {
                 log.debug("socket was connectable and now connected");

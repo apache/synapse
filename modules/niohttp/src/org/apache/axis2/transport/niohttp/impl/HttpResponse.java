@@ -45,7 +45,6 @@ public class HttpResponse extends HttpMessage {
         if (request.isConnectionClose()) {
             addHeader(Constants.CONNECTION, Constants.CLOSE);
         }
-        buffer.flip();
     }
 
     /**
@@ -76,7 +75,6 @@ public class HttpResponse extends HttpMessage {
     public void commit() {
         if (outputStreamOpened) {
             // if someone didnt properly close the OutputStream after writing, flip buffer
-            buffer.flip();
             outputStreamOpened = false;
         }
         if (request != null) {
@@ -95,17 +93,6 @@ public class HttpResponse extends HttpMessage {
 
     public ResponseStatus getStatus() {
         return status;
-    }
-
-    /**
-     * Return a ByteBuffer representation of this message in HTTP wire-format for transmission
-     * @return the ByteBuffer representation of this message
-     */
-    public ByteBuffer getWireBuffer() {
-        if (buffer.limit() > 0) {
-            headers.put(Constants.CONTENT_LENGTH, Integer.toString(buffer.limit()));
-        }
-        return ByteBuffer.wrap(toString().getBytes());
     }
 
     public String toStringLine() {

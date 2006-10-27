@@ -58,7 +58,7 @@ public abstract class GenericIOHandler extends AbstractIOHandler {
         log.trace("attempting to read into NW a maximum of "
             + msgReader.availableForWrite() + " bytes");
 
-        if (readFromPhysicalNetwork() > 0) {
+        if (readFromPhysicalNetwork(msgReader.availableForWrite()) >= 0) {
 
             if (log.isTraceEnabled()) {
                 log.trace("read into NW buffer : \n" +
@@ -80,9 +80,10 @@ public abstract class GenericIOHandler extends AbstractIOHandler {
 
     /** acp
      * Read from the physical NW until the NW read buffer is filled up
+     * @param maxBytes maximum number of bytes to read from the NW
      * @return the number of bytes actually read
      */
-    protected int readFromPhysicalNetwork() {
+    protected int readFromPhysicalNetwork(int maxBytes) {
 
         log.debug("attempting to read from the physical NW");
 
@@ -91,7 +92,15 @@ public abstract class GenericIOHandler extends AbstractIOHandler {
         int bytesRead = 0;
 
         try {
-            bytesRead = socket.read(nwReadBuffer);
+            // dont bite more than we can chew.. if nwReadBuffer cannot accomodate what
+            // can digest, read only what we can
+            if (maxBytes < appReadPos + nwReadPos) {
+                return 0;
+                
+            } else {
+                bytesRead = socket.read(nwReadBuffer);
+            }
+
         } catch (IOException e) {
             handleException("Error reading into NW buffer from socket : " + e.getMessage(), e);
         }
@@ -149,6 +158,8 @@ public abstract class GenericIOHandler extends AbstractIOHandler {
 
     /** acp
      * Process a ready write event
+     * @param closeConnectionIfDone close the connection if all data is written
+     * to the wire and a connection close has been requested after the write
      */
     protected void processReadyWrite(boolean closeConnectionIfDone) {
 
@@ -209,6 +220,12 @@ public abstract class GenericIOHandler extends AbstractIOHandler {
             log.debug("attempting to write from message body into App buffer");
 
             InputStream is = msgWriter.getInputStream();
+            // does this message have a body? i.e. this could be a GET
+            if (is == null) {
+                log.debug("message has an empty body");
+                msgWriter.setStreamingBody(false);   // indicate end of body
+                return;
+            }
             appWriteBuffer.position(appWritePos);
 
             try {
@@ -305,7 +322,7 @@ public abstract class GenericIOHandler extends AbstractIOHandler {
             }
         } catch (IOException e1) {}
 
-        //TODO throw new ();
+        //throw new NHttpException(msg, e);
     }
     
 }

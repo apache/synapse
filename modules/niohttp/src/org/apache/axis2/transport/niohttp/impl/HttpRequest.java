@@ -182,22 +182,4 @@ public class HttpRequest extends HttpMessage {
         }
     }
 
-    /**
-     * Causes the request to contain an empty body (i.e. for a GET etc)
-     */
-    public void setEmptyBody() {
-        buffer.position(0);
-        buffer.flip();
-    }
-
-    //------------------------------ TESTING CODE ------------------------
-    /**
-     * Convenience method for testing etc
-     * @param body
-     */
-    public void setBody(String body) {
-        buffer.position(0);
-        buffer.put(body.getBytes());
-        buffer.flip();
-    }
 }

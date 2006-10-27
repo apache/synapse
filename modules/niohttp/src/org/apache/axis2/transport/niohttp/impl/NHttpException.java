@@ -20,4 +20,12 @@ public class NHttpException extends Exception {
     public NHttpException(String msg) {
         super(msg);
     }
+
+    public NHttpException(String msg, Exception e) {
+        super(msg, e);
+    }
+
+    public NHttpException(Throwable throwable) {
+        super(throwable);
+    }
 }

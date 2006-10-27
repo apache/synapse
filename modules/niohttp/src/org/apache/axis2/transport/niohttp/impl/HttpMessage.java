@@ -43,8 +43,6 @@ import java.util.Map;
  */
 public abstract class HttpMessage {
 
-    private static final int DEFAULT_BUFFER_SIZE = 4096;
-
     private static final Log log = LogFactory.getLog(HttpMessage.class);
 
     private InputStream inputStream;
@@ -71,6 +69,8 @@ public abstract class HttpMessage {
             outputStream = new ChunkedOutputStream(pipedOS);
         } else if (getContentLength() > 0) {
             outputStream = new ContentLengthOutputStream(pipedOS, getContentLength());
+        } else if (getContentLength() == 0) {
+            return null; // no body.. e.g. a GET
         } else {
             throw new UnsupportedOperationException("Unsupported body streaming");
         }
@@ -88,10 +88,6 @@ public abstract class HttpMessage {
      * http headers of this message
      */
     protected Map headers = new HashMap();
-    /**
-     * holder of the body content of this message
-     */
-    protected ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
 
     /**
      * A flag to detect if the getOutputStream() caller did not properly close() the stream
@@ -140,58 +136,6 @@ public abstract class HttpMessage {
     }
 
     /**
-     * Get an OutputStream to write the body of this httpMessage
-     * @return an OutputStream to write the body
-     */
-/*    public OutputStream getOutputStream() {
-        // position for body
-        buffer.clear();
-        outputStreamOpened = true;
-        buffer.position(0);
-
-        // Returns an output stream for a ByteBuffer.
-        // The write() methods use the relative ByteBuffer put() methods.
-        return new OutputStream() {
-            public synchronized void write(int b) throws IOException {
-                while (true) {
-                    try {
-                        buffer.put((byte) b);
-                        return;
-                    } catch (BufferOverflowException bo) {
-                        expandBuffer();
-                    }
-                }
-            }
-
-            public synchronized void write(byte[] bytes, int off, int len) throws IOException {
-                while (true) {
-                    try {
-                        buffer.put(bytes, off, len);
-                        return;
-                    } catch (BufferOverflowException bo) {
-                        expandBuffer();
-                    }
-                }
-            }
-
-            public void close() throws IOException {
-                buffer.flip();
-                outputStreamOpened = false;
-            }
-        };
-    }*/
-
-    /**
-     * Expand (double) the main ByteBuffer of this message
-     */
-    private void expandBuffer() {
-        ByteBuffer newBuf = ByteBuffer.allocate(buffer.capacity() * 2);
-        log.debug("Expanding ByteBuffer to " + newBuf.capacity() + " bytes");
-        buffer.flip();
-        buffer = newBuf.put(buffer);
-    }
-
-    /**
      * Return a string representation of the message inputStream HTTP wire-format
      * @return a String representation of the message inputStream HTTP wire-format
      */
@@ -221,31 +165,4 @@ public abstract class HttpMessage {
      * @return the first line of text for the toString()
      */
     public abstract String toStringLine();
-
-    /**
-     * Reset the internal state of this message to be reused
-     */
-    public void reset() {
-        if (buffer.capacity() > DEFAULT_BUFFER_SIZE) {
-            buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-        } else {
-            buffer.clear();
-        }
-    }
-
-    /**
-     * Return a reference to the internal ByteBuffer of this message
-     * @return the reference to the internal ByteBuffer used
-     */
-    public ByteBuffer getBuffer() {
-        return buffer;
-    }
-
-    /**
-     * Set the internal buffer to the given ByteBuffer
-     * @param buffer
-     */
-    public void setBuffer(ByteBuffer buffer) {
-        this.buffer = buffer;
-    }
 }

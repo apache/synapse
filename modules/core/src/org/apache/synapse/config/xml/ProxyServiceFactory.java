@@ -26,6 +26,8 @@ import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.ArrayList;
 
 /**
  * Creates a ProxyService instance using the XML fragment specification
@@ -55,14 +57,22 @@ public class ProxyServiceFactory {
             proxy.setName(name.getAttributeValue());
         }
 
-        OMAttribute desc = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "description"));
-        if (desc != null) {
-            proxy.setDescription(desc.getAttributeValue());
-        }
-
         OMAttribute trans = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "transports"));
         if (trans != null) {
-            proxy.setTransports(trans.getAttributeValue());
+            String transports = trans.getAttributeValue();
+            if (transports == null || ProxyService.ALL_TRANSPORTS.equals(transports)) {
+                        // default to all transports using service name as destination
+            } else {
+                StringTokenizer st = new StringTokenizer(transports, " ,");
+                ArrayList transportList = new ArrayList();
+                while(st.hasMoreTokens()) {
+                    String token = st.nextToken();
+                    if(token.length() != 0) {
+                        transportList.add(token);
+                    }
+                }
+                proxy.setTransports(transportList);
+            }
         }
 
         // read definition of the target of this proxy service. The target could be an 'endpoint'

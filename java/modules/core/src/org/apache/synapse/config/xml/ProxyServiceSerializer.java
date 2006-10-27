@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
@@ -60,10 +61,13 @@ public class ProxyServiceSerializer {
                 "description", nullNS, service.getDescription()));
         }
 
-        if (service.getTransports() != null &&
-            !ProxyService.ALL_TRANSPORTS.equals(service.getTransports())) {
-            proxy.addAttribute(fac.createOMAttribute(
-                "transports", nullNS, service.getTransports()));
+        if (service.getTransports() != null && service.getTransports().size() != 0) {
+            ArrayList transports = service.getTransports();
+            String transportStr = "" + transports.get(0);
+            for(int i = 1; i < transports.size(); i++) {
+                transportStr = transportStr + " " + transports.get(i);
+            }
+            proxy.addAttribute(fac.createOMAttribute("transports", nullNS, transportStr));
         }
 
         if (service.getTargetEndpoint() != null) {

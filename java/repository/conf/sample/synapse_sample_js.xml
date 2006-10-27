@@ -1,0 +1,35 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:js="http://ws.apache.org/ns/synapse/js">
+  <rules>
+
+    <in>
+       <js:javascript><![CDATA[
+          function mediate(msg) {
+             msg.setPayloadXML(
+                <ns1:getQuote xmlns:ns1="urn:xmethods-delayed-quotes" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+                   <symbol xsi:type="xsd:string"> { msg.getPayloadXML()..*::symbol.toString() } </symbol>
+                </ns1:getQuote>);
+          }
+       ]]></js:javascript>
+
+       <header name="To" value="http://64.124.140.30:9090/soap"/>
+
+    </in>
+
+    <out>
+       <js:javascript><![CDATA[
+          function mediate(msg) {
+             msg.setPayloadXML(
+                <ns:getQuoteResponse xmlns:ns="http://services.samples/xsd">
+                   <ns:return>
+                      <ns:last> { msg.getPayloadXML()..Result.toString() } </ns:last>
+                    </ns:return>
+                </ns:getQuoteResponse>);
+          }
+       ]]></js:javascript>
+    </out>
+
+    <send/>
+
+  </rules>
+</synapse> 
+

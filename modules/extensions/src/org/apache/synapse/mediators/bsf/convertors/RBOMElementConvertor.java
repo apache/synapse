@@ -41,7 +41,7 @@ public class RBOMElementConvertor implements OMElementConvertor {
     public Object toScript(OMElement omElement) {
         try {
 
-            StringBuilder srcFragment = new StringBuilder("Document.new(<<EOF\n");
+            StringBuffer srcFragment = new StringBuffer("Document.new(<<EOF\n");
             srcFragment.append(omElement.toString());
             srcFragment.append("\nEOF\n");
             srcFragment.append(")");

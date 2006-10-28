@@ -39,7 +39,7 @@ import java.net.MalformedURLException;
 
 public class NHttpSender extends AbstractHandler implements TransportSender {
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
         OMOutputFormat format = getOMOutputFormat(msgContext);
 
@@ -108,6 +108,7 @@ public class NHttpSender extends AbstractHandler implements TransportSender {
                     " is Null, Do not know where to send");
             }
         }
+        return InvocationResponse.CONTINUE;
     }
 
     private OMOutputFormat getOMOutputFormat(MessageContext msgContext) {

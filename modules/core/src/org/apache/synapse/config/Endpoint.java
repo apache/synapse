@@ -16,7 +16,6 @@
 package org.apache.synapse.config;
 
 
-import java.net.URL;
 
 /**
  * An endpoint can be used to give a logical name to an endpoint address, and possibly reused.

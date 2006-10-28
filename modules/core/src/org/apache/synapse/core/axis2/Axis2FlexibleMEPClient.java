@@ -140,9 +140,39 @@ public class Axis2FlexibleMEPClient {
             serviceCtx, clientOptions);
         mepClient.addMessageContext(axisOutMsgCtx);
 
-        mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
-        mepClient.execute(false);
-        return null;
+        if (clientOptions.isUseSeparateListener()) {
+            mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
+            axisOutMsgCtx.getOperationContext().setProperty(
+                org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
+            mepClient.execute(false);
+            return null;
+
+        } else {
+
+            mepClient.execute(true);
+
+            MessageContext response = mepClient.getMessageContext(
+                WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+            // set properties on response
+            response.setServerSide(true);
+            response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+            response.setProperty(MessageContext.TRANSPORT_OUT,
+                axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
+            response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
+                axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
+            response.setProperty(
+                    org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
+                    axisOutMsgCtx.getProperty(
+                            org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND));
+            response.setTransportIn(axisOutMsgCtx.getTransportIn());
+            response.setTransportOut(savedTransportOut);
+
+            // If request is REST assume that the response is REST too
+            response.setDoingREST(axisOutMsgCtx.isDoingREST());
+
+            return response;
+        }
     }
 
     /**

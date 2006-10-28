@@ -21,13 +21,10 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.Constants;
-import org.apache.axiom.soap.SOAPFault;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
-import java.util.Iterator;
 
 public class SynapseCallbackReceiver implements MessageReceiver {
 
@@ -49,15 +46,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
         if (callback != null) {
             callbackStore.remove(messageID);
-            if (messageCtx.getEnvelope().getBody().hasFault()) {
-                SOAPFault fault = messageCtx.getEnvelope().getBody().getFault();
-                AxisFault axisFault = new AxisFault(fault.getCode(), fault.getReason(),
-                    fault.getNode(), fault.getRole(), fault.getDetail());
-                callback.onError(axisFault);
-            } else {
-                callback.onComplete(new AsyncResult(messageCtx));
-            }
-            callback.setComplete(true);
+            callback.onComplete(new AsyncResult(messageCtx));
         }
     }
 }

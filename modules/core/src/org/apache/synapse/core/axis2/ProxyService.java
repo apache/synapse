@@ -109,9 +109,11 @@ public class ProxyService {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                     }
 
-                    assert wsdlToAxisServiceBuilder != null;
+                    if (wsdlToAxisServiceBuilder == null) {
+                        throw new SynapseException("Could not get the WSDL to Axis Service Builder");
+                    }
                     proxyService = wsdlToAxisServiceBuilder.populateService();
-                    proxyService.setWsdlfound(true);
+                    proxyService.setWsdlFound(true);
 
                 } else {
                     handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
@@ -135,7 +137,9 @@ public class ProxyService {
 
         // Set the name and description. Currently Axis2 uses the name as the
         // default Service destination
-        assert proxyService != null;
+        if (proxyService == null) {
+            throw new SynapseException("Could not create a proxy service");
+        }
         proxyService.setName(name);
         if (description != null) {
             proxyService.setServiceDescription(description);
@@ -160,19 +164,16 @@ public class ProxyService {
         while (iter.hasNext()) {
             String name  = (String) iter.next();
             String value = (String) properties.get(name);
-            if (JMSConstants.CONFAC_PARAM.equals(name) ||
-                JMSConstants.DEST_PARAM.equals(name)) {
 
-                Parameter p = new Parameter();
-                p.setName(name);
-                p.setValue(value);
+            Parameter p = new Parameter();
+            p.setName(name);
+            p.setValue(value);
 
-                try {
-                    proxyService.addParameter(p);
-                } catch (AxisFault af) {
-                    handleException("Error setting property : " + name + "" +
-                        "to proxy service as a Parameter", af);
-                }
+            try {
+                proxyService.addParameter(p);
+            } catch (AxisFault af) {
+                handleException("Error setting property : " + name + "" +
+                    "to proxy service as a Parameter", af);
             }
         }
 

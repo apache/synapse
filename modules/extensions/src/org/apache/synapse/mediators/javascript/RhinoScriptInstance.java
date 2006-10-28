@@ -98,5 +98,9 @@ public class RhinoScriptInstance {
 
         return (Function) handleObj;
     }
+    
+    public Scriptable getScope() {
+    	return instanceScope;
+    }
 
 }

@@ -45,7 +45,7 @@ public class SynapseJsonSender extends AbstractHandler
 
     private static final Log log = LogFactory.getLog(SynapseJsonSender.class);
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
         //Fix Me For Sending Only
         // Trasnport URL can be different from the WSA-To. So processing
         // that now.
@@ -119,7 +119,7 @@ public class SynapseJsonSender extends AbstractHandler
             throw new AxisFault(e);
         }
 
-
+		return InvocationResponse.CONTINUE;
     }
 
     public void cleanup(MessageContext msgContext) throws AxisFault {

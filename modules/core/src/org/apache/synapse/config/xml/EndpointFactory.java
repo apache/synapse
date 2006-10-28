@@ -26,7 +26,7 @@ import org.apache.synapse.config.XMLToObjectMapper;
 
 import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
-import java.net.URL;
+
 
 /**
  * Creates an Endpoint instance using the XML fragment specification
@@ -60,12 +60,7 @@ public class EndpointFactory implements XMLToObjectMapper {
 
             OMAttribute address = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "address"));
             if (address != null) {
-                try {
-                    endpoint.setAddress(new URL(address.getAttributeValue()));
-                } catch (MalformedURLException e) {
-                    handleException("Invalid URL specified for 'address' : " +
-                        address.getAttributeValue(), e);
-                }
+                endpoint.setAddress(address.getAttributeValue());
             } else {
                 // right now an address is *required*
                 handleException("The 'address' attribute is required for an endpoint");

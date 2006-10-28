@@ -98,13 +98,9 @@ public class SendMediatorFactory implements MediatorFactory {
             if (ref != null) {
                 endpt.setRef(ref.getAttributeValue());
             } else if (address != null) {
-                try {
-                    endpt.setAddress(new URL(address.getAttributeValue()));
-                } catch (MalformedURLException e) {
-                    String msg = "Invalid endpoint address : " + address.getAttributeValue();
-                    log.error(msg, e);
-                    throw new SynapseException(msg, e);
-                }
+                
+                    endpt.setAddress(address.getAttributeValue());
+                
             } else {
                 String msg = "An endpoint used within a send mediator definition must contain a " +
                     "'ref' (reference) or 'address' (absolute URL) attribute";

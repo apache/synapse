@@ -18,6 +18,7 @@ package org.apache.synapse.core.axis2;
 
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.util.UUIDGenerator;
@@ -225,11 +226,16 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             }
             addReferenceParameters(mc);
             if (options.isUseSeparateListener()) {
+
+                //options.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+                options.setTransportIn(mc.getConfigurationContext()
+                    .getAxisConfiguration().getTransportIn(new QName(Constants.TRANSPORT_HTTP)));
+
                 SynapseCallbackReceiver callbackReceiver = (SynapseCallbackReceiver) axisOp.getMessageReceiver();
                 callbackReceiver.addCallback(mc.getMessageID(), callback);
                 EndpointReference replyToFromTransport = mc.getConfigurationContext().getListenerManager().
                         getEPRforService(sc.getAxisService().getName(), axisOp.getName().getLocalPart(), mc
-                                .getTransportIn().getName()
+                                .getTransportOut().getName()
                                 .getLocalPart());
 
                 if (mc.getReplyTo() == null) {
@@ -247,17 +253,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                 // Options object reused so soapAction needs to be removed so
                 // that soapAction+wsa:Action on response don't conflict
                 options.setAction("");
-
             } else {
-
-                SynapseCallbackReceiver callbackReceiver = (SynapseCallbackReceiver) axisOp.getMessageReceiver();
-                callbackReceiver.addCallback(mc.getMessageID(), callback);
-                AxisEngine engine = new AxisEngine(cc);
-                mc.getConfigurationContext().registerOperationContext(mc.getMessageID(), oc);
-                engine.send(mc);
-
-            }
-            /*} else {
                 if (block) {
                     // Send the SOAP Message and receive a response
                     MessageContext response = send(mc);
@@ -277,7 +273,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                     sc.getConfigurationContext().getThreadPool().execute(
                             new NonBlockingInvocationWorker(callback, mc));
                 }
-            }*/
+            }
         }
 
         private void addReferenceParameters(MessageContext msgctx) {

@@ -110,7 +110,9 @@ public class ProxyService {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                     }
 
-                    assert wsdlToAxisServiceBuilder != null;
+                    if (wsdlToAxisServiceBuilder == null) {
+                        throw new SynapseException("Could not get the WSDL to Axis Service Builder");
+                    }
                     proxyService = wsdlToAxisServiceBuilder.populateService();
                     proxyService.setWsdlFound(true);
 
@@ -136,7 +138,9 @@ public class ProxyService {
 
         // Set the name and description. Currently Axis2 uses the name as the
         // default Service destination
-        assert proxyService != null;
+        if (proxyService == null) {
+            throw new SynapseException("Could not create a proxy service");
+        }
         proxyService.setName(name);
         if (description != null) {
             proxyService.setServiceDescription(description);

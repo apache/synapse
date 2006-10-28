@@ -58,7 +58,8 @@ public class ProxyService {
     /** The proxy service description */
     private String description;
     /** The transport/s over which this service should be exposed */
-    private String transports;
+    //private String transports;
+    private ArrayList transports;
     /** The target endpoint, if assigned */
     private String targetEndpoint = null;
     /** The target sequence, if assigned */
@@ -148,15 +149,10 @@ public class ProxyService {
         // process transports and expose over requested transports. If none
         // is specified, default to all transports using service name as
         // destination
-        if (transports == null || ALL_TRANSPORTS.equals(transports)) {
+        if (transports == null || transports.size() == 0) {
             // default to all transports using service name as destination
         } else {
-            StringTokenizer st = new StringTokenizer(transports, " ");
-            ArrayList transportList = new ArrayList();
-            for (int i=0; i<st.countTokens(); i++) {
-                transportList.add(st.nextToken());
-            }
-            proxyService.setExposedTransports(transportList);
+            proxyService.setExposedTransports(transports);
         }
 
         // process parameters
@@ -255,8 +251,8 @@ public class ProxyService {
         this.description = description;
     }
 
-    public String getTransports() {
-        return transports != null ? transports : ALL_TRANSPORTS;
+    public ArrayList getTransports() {
+        return transports;
     }
 
     public void addProperty(String name, String value) {
@@ -267,7 +263,7 @@ public class ProxyService {
         return this.properties;
     }
 
-    public void setTransports(String transports) {
+    public void setTransports(ArrayList transports) {
         this.transports = transports;
     }
 

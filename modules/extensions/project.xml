@@ -73,6 +73,15 @@
             </properties>
         </dependency>
 
+        <dependency>
+           <groupId>bsf</groupId>
+           <artifactId>bsf</artifactId>
+           <version>${bsf.version}</version>
+           <properties>
+              <module>true</module>
+           </properties>
+        </dependency>
+
     </dependencies>
 
     <build>

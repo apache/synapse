@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.synapse</groupId>
+    <artifactId>Apache-Synapse-Incubating</artifactId>
+    <version>SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>synapse-extensions</artifactId>
+  <name>Apache Synapse - Extensions</name>
+  <description>Apache Synapse - Extensions</description>
+  <packaging>jar</packaging>  
+  
+  <build>
+  	<sourceDirectory>src</sourceDirectory>
+  	<testSourceDirectory>test</testSourceDirectory>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.synapse</groupId>
+      <artifactId>synapse-core</artifactId>
+    </dependency>
+  </dependencies>
+</project>

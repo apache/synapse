@@ -15,26 +15,28 @@
 */
 package org.apache.synapse.mediators;
 
+import java.io.ByteArrayInputStream;
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Property;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.registry.url.SimpleURLRegistry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.Map;
 
 public class TestUtils {
 
@@ -74,7 +76,7 @@ public class TestUtils {
     }
 
     public static MessageContext createLightweightSynapseMessageContext(
-            String paylod) throws Exception {
+            String payload) throws Exception {
         org.apache.axis2.context.MessageContext mc =
                 new org.apache.axis2.context.MessageContext();
         SynapseConfiguration config = new SynapseConfiguration();
@@ -86,14 +88,23 @@ public class TestUtils {
                 OMAbstractFactory.getSOAP11Factory().createOMDocument();
         omDoc.addChild(envelope);
 
-        XMLStreamReader parser = XMLInputFactory.newInstance().
-                createXMLStreamReader(new StringReader(paylod));
-        StAXOMBuilder builder = new StAXOMBuilder(parser);
-
-        // set a dummy static message
-        envelope.getBody().addChild(builder.getDocumentElement());
+        envelope.getBody().addChild(createOMElement(payload));
 
         synMc.setEnvelope(envelope);
         return synMc;
     }
+
+    public static OMElement createOMElement(String xml) {
+        try {
+
+            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
+            StAXOMBuilder builder = new StAXOMBuilder(reader);
+            OMElement omElement = builder.getDocumentElement();
+            return omElement;
+
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

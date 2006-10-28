@@ -5,8 +5,8 @@
     <extend>../../project.xml</extend>
 
 
-    <name>Apache Synapse - Core</name>
-    <id>synapse-core</id>
+    <name>Apache Synapse - niohttp</name>
+    <id>synapse-niohttp</id>
     <groupId>synapse</groupId>
 
     <!-- ============ -->
@@ -14,31 +14,12 @@
     <!-- ============ -->
 
     <dependencies>
-        <dependency>
-            <groupId>axis2</groupId>
-            <artifactId>addressing</artifactId>
-            <version>${addressing.version}</version>
-            <type>mar</type>
-        </dependency>
-    </dependencies>
-    
-    <dependencies>
-        <dependency>
-            <groupId>synapse</groupId>
-            <artifactId>synapse-nhttp</artifactId>
-            <version>${synapse.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>synapse</groupId>
-            <artifactId>synapse-niohttp</artifactId>
-            <version>${synapse.version}</version>
-        </dependency>        
     </dependencies>
     
     <build>
         <nagEmailAddress>synapse-dev@ws.apache.org</nagEmailAddress>
         <sourceDirectory>src</sourceDirectory>
-        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <!--<unitTestSourceDirectory>test</unitTestSourceDirectory>
         <unitTest>
             <includes>
                 <include>**/*Test.java</include>
@@ -57,7 +38,7 @@
 					<include>**/*.properties</include>
 				</includes>
 			</resource>
-        </resources>
+        </resources>-->
     </build>
 </project>
 

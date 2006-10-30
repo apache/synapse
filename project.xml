@@ -88,6 +88,9 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <includes>
                 <include>**/*Test.java</include>
             </includes>
+            <excludes>
+				<exclude>**/CloseSequenceTest.java</exclude>
+            </excludes>
             <resources>
                 <resource>
                     <directory>test-resources</directory>

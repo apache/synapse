@@ -33,18 +33,8 @@ import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
-import org.apache.axiom.soap.impl.dom.SOAPTextImpl;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.ServiceGroupContext;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.util.Utils;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.FaultData;
@@ -97,7 +87,6 @@ public class FaultManager {
 		if (createSequence == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts));
 
-		ConfigurationContext context = createSequenceMessage.getConfigurationContext();
 		if (storageManager == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotGetStorageManager));
 
@@ -146,7 +135,6 @@ public class FaultManager {
 		long messageNumber = sequence.getMessageNumber().getMessageNumber();
 		String sequenceID = sequence.getIdentifier().getIdentifier();
 
-		ConfigurationContext configCtx = applicationRMMessage.getMessageContext().getConfigurationContext();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		boolean lastMessageNumberExceeded = false;
@@ -214,7 +202,6 @@ public class FaultManager {
 		MessageContext messageContext = rmMessageContext.getMessageContext();
 
 		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-		int type = rmMessageContext.getMessageType();
 
 		boolean validSequence = false;
 
@@ -367,7 +354,6 @@ public class FaultManager {
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
-		ConfigurationContext configCtx = referenceMessage.getConfigurationContext();
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 

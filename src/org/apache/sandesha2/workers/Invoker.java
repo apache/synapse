@@ -211,12 +211,13 @@ public class Invoker extends Thread {
 				ArrayList allSequencesList = SandeshaUtil
 						.getArrayListFromString(allSequencesBean.getValue());
 				int size = allSequencesList.size();
+				log.debug("Choosing one from " + size + " sequences");
 				if(nextIndex >= size) {
 					nextIndex = 0;
 					if (size == 0) continue;
 				}
 				String sequenceId = (String) allSequencesList.get(nextIndex++);
-				
+				log.debug("Chose sequence " + sequenceId);
 
 				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 				if (nextMsgBean == null) {

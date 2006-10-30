@@ -202,7 +202,9 @@ public interface Sandesha2Constants {
 		
 		int MAKE_CONNECTION_MSG = 11;
 		
-		int MAX_MESSAGE_TYPE = 11;
+		int LAST_MESSAGE = 12;
+		
+		int MAX_MESSAGE_TYPE = 12;
 	}
 
 	public interface MessageParts {

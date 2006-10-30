@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -35,9 +34,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -68,11 +65,11 @@ public class AckRequestedProcessor {
 
 	private static final Log log = LogFactory.getLog(AckRequestedProcessor.class);
 
-	public boolean processAckRequestedHeaders(MessageContext message) throws AxisFault {
+	public boolean processAckRequestedHeaders(RMMsgContext message) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestHeaders");
 
-		SOAPEnvelope envelope = message.getEnvelope();
+		SOAPEnvelope envelope = message.getMessageContext().getEnvelope();
 		SOAPHeader header = envelope.getHeader();
 		boolean msgCtxPaused = false;
 		if(header!=null)
@@ -107,18 +104,13 @@ public class AckRequestedProcessor {
 	 * @return true if the msg context was paused
 	 * @throws AxisFault
 	 */
-	public boolean processAckRequestedHeader(MessageContext msgContext, OMElement soapHeader, AckRequested ackRequested) throws AxisFault {
+	public boolean processAckRequestedHeader(RMMsgContext rmMsgCtx, OMElement soapHeader, AckRequested ackRequested) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader " + soapHeader);
 
-		// TODO: Note that this RMMessageContext is not really any use - but we need to create it
-		// so that it can be passed to the fault handling chain. It's really no more than a
-		// container for the correct addressing and RM spec levels, so we'd be better off passing
-		// them in directly. Unfortunately that change ripples through the codebase...
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgContext);
-
 		String sequenceId = ackRequested.getIdentifier().getIdentifier();
 
+		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
@@ -142,6 +134,8 @@ public class AckRequestedProcessor {
 		// Setting the ack depending on AcksTo.
 		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
+		SequencePropertyBean versionBean = seqPropMgr.retrieve(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 
 		EndpointReference acksTo = new EndpointReference(acksToBean.getValue());
 		String acksToStr = acksTo.getAddress();
@@ -149,24 +143,10 @@ public class AckRequestedProcessor {
 		if (acksToStr == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
 
-		AxisOperation ackOperation = null;
-
-		try {
-			ackOperation = AxisOperationFactory.getOperationDescription(WSDL20_2004Constants.MEP_URI_IN_ONLY);
-		} catch (AxisFault e) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisOperationError, e
-					.toString()));
-		}
-
-		AxisOperation rmMsgOperation = rmMsgCtx.getMessageContext().getAxisOperation();
-		if (rmMsgOperation != null) {
-			ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
-			if (outFlow != null) {
-				ackOperation.setPhasesOutFlow(outFlow);
-				ackOperation.setPhasesOutFaultFlow(outFlow);
-			}
-		}
-
+		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.ACK,
+				versionBean.getValue(),
+				msgContext.getAxisService());
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(rmMsgCtx, ackOperation);
 
 		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
@@ -210,14 +190,8 @@ public class AckRequestedProcessor {
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
 				// operation context will be null when doing in a GLOBAL
 				// handler.
-				try {
-					AxisOperation op = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_IN_OUT);
-					OperationContext opCtx = new OperationContext(op);
-					rmMsgCtx.getMessageContext().setAxisOperation(op);
-					rmMsgCtx.getMessageContext().setOperationContext(opCtx);
-				} catch (AxisFault e2) {
-					throw new SandeshaException(e2.getMessage());
-				}
+				OperationContext opCtx = new OperationContext(ackOperation);
+				rmMsgCtx.getMessageContext().setOperationContext(opCtx);
 			}
 
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,

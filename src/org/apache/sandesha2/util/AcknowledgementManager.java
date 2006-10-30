@@ -29,15 +29,12 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisOperationFactory;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.description.AxisService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -50,7 +47,6 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
@@ -224,7 +220,6 @@ public class AcknowledgementManager {
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 
-		ConfigurationContext configurationContext = referenceRMMessage.getMessageContext().getConfigurationContext();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		// Setting the ack depending on AcksTo.
@@ -237,28 +232,12 @@ public class AcknowledgementManager {
 		if (acksToStr == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
 
-		AxisOperation ackOperation = null;
-
-		ackOperation = AxisOperationFactory.getOperationDescription(WSDL20_2004Constants.MEP_URI_IN_ONLY);
-
-		AxisOperation rmMsgOperation = referenceRMMessage.getMessageContext().getAxisOperation();
-		if (rmMsgOperation != null) {
-			ArrayList outFlow = rmMsgOperation.getPhasesOutFlow();
-			if (outFlow != null) {
-				ackOperation.setPhasesOutFlow(outFlow);
-				ackOperation.setPhasesOutFaultFlow(outFlow);
-			}
-		}
+		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.ACK,
+				referenceRMMessage.getRMSpecVersion(),
+				referenceMsg.getAxisService());
 
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage, ackOperation);
-		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, referenceMsg
-				.getProperty(AddressingConstants.WS_ADDRESSING_VERSION)); // TODO
-																			// do
-																			// this
-																			// in
-																			// the
-																			// RMMsgCreator
-
 		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
@@ -278,8 +257,6 @@ public class AcknowledgementManager {
 
 		// adding the SequenceAcknowledgement part.
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequencePropertyKey ,sequenceId, storageManager);
-
-		ackMsgCtx.setProperty(MessageContext.TRANSPORT_IN, null);
 
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);

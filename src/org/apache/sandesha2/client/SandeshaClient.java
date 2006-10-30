@@ -46,6 +46,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -1093,6 +1094,7 @@ public class SandeshaClient {
 				anonOutOnlyOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 				anonOutOnlyOperation.setName(ServiceClient.ANON_OUT_ONLY_OP);
 				anonOutOnlyOperation.setParent(service);
+				anonOutOnlyOperation.setMessageReceiver(new RMMessageReceiver());
 				service.addChild(anonOutOnlyOperation);
 				
 				Iterator iter = service.getOperations();

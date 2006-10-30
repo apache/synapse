@@ -34,6 +34,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 	}
 	
 	public void run() {
+		if(log.isDebugEnabled()) log.debug("Entry: InvokerWorker::run");
 		
 		Transaction transaction = null;
 		MessageContext msgToInvoke = null;
@@ -170,6 +171,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				lock.removeWork(workId);
 			}
 		}
+		
+		if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run");
 	}
 
 	private void makeMessageReadyForReinjection(MessageContext messageContext) {

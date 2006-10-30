@@ -40,6 +40,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
+import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -275,8 +276,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 							seqPropMgr.update(receivedMsgsBean);
 
-							ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
-							ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
+							SequenceProcessor processor = new SequenceProcessor();
+							processor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
 							
 							
 							drop = true;
@@ -343,10 +344,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
 			String receivedMsgStr = receivedMsgsBean.getValue();
 
-			ApplicationMsgProcessor ackProcessor = new ApplicationMsgProcessor();
 			// Even though the duplicate message is dropped, hv to send the ack
 			// if needed.
-			ackProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
+			SequenceProcessor processor = new SequenceProcessor();
+			processor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
 
 		}
 		if (log.isDebugEnabled())

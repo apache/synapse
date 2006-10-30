@@ -32,8 +32,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
 import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
-import org.apache.sandesha2.msgprocessors.MsgProcessor;
-import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
+import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -100,18 +99,6 @@ public class SandeshaInHandler extends AbstractHandler {
 
 		try {
 
-			// Process Ack headers in the message
-			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
-			if(ackProcessor.processAckHeaders(msgCtx)){
-				returnValue = InvocationResponse.SUSPEND;
-			}
-
-			// Process Ack Request headers in the message
-			AckRequestedProcessor reqProcessor = new AckRequestedProcessor();
-			if(reqProcessor.processAckRequestedHeaders(msgCtx)){
-				returnValue = InvocationResponse.SUSPEND;
-			}
-
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.axisServiceIsNull);
@@ -128,26 +115,25 @@ public class SandeshaInHandler extends AbstractHandler {
 				throw new AxisFault(message, ex);
 			}
 
-			//Ack messages will be paused
-			if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK) {
-				rmMsgCtx.pause();
-				returnValue = InvocationResponse.SUSPEND;
-			}
-			
 			// validating the message
 			MessageValidator.validateMessage(rmMsgCtx, storageManager);
 
-			MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
+			// Process Ack headers in the message
+			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
+			ackProcessor.processAckHeaders(rmMsgCtx);
 
-			if (msgProcessor != null){
-				if(msgProcessor.processInMessage(rmMsgCtx)){
-					//this paused the msg
-					returnValue = InvocationResponse.SUSPEND;
-				}
+			// Process Ack Request headers in the message
+			AckRequestedProcessor reqProcessor = new AckRequestedProcessor();
+			if(reqProcessor.processAckRequestedHeaders(rmMsgCtx)){
+				returnValue = InvocationResponse.SUSPEND;
 			}
-				
 
-			
+			// Process the Sequence header, if there is one
+			SequenceProcessor seqProcessor = new SequenceProcessor();
+			if(seqProcessor.processSequenceHeader(rmMsgCtx)) {
+				returnValue = InvocationResponse.SUSPEND;
+			}
+
 		} catch (AxisFault e) {
 			// message should not be sent in a exception situation.
 			msgCtx.pause();

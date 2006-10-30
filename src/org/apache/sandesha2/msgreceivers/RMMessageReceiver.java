@@ -19,11 +19,19 @@ package org.apache.sandesha2.msgreceivers;
 
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.MsgProcessor;
+import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -38,11 +46,65 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 	private static final Log log = LogFactory.getLog(RMMessageReceiver.class.getName());
 	
-	public final void receive(MessageContext messgeCtx) throws AxisFault {
-		log.debug("RM MESSSAGE RECEIVER WAS CALLED");
+	public final void receive(MessageContext msgCtx) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: RMMessageReceiver::receive");
 		
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(messgeCtx);
-		log.debug("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));	
-	}
+		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+		if(log.isDebugEnabled()) log.debug("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));	
+
+		// Note that some messages (such as stand-alone acks) will be routed here, but
+		// the headers will already have been processed. Therefore we should not assume
+		// that we will have a MsgProcessor every time.
+		MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
+		if(msgProcessor != null) {
+			boolean withinTransaction = false;
+			String withinTransactionStr = (String) msgCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
+			if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr)) {
+				withinTransaction = true;
+			}
+
+			Transaction transaction = null;
+			if (!withinTransaction) {
+				ConfigurationContext context = msgCtx.getConfigurationContext();
+				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());				transaction = storageManager.getTransaction();
+				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+			}
+			
+			boolean rolledBack = false;
+			
+			try {
+
+				msgProcessor.processInMessage(rmMsgCtx);
+
+			} catch (AxisFault e) {
+				// message should not be sent in a exception situation.
+				msgCtx.pause();
 	
+				if (!withinTransaction) {
+					try {
+						transaction.rollback();
+						msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
+						rolledBack = true;
+					} catch (Exception e1) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
+						log.debug(message, e);
+					}
+				}
+	
+				throw e;
+			} finally {
+				if (!withinTransaction && !rolledBack) {
+					try {
+						transaction.commit();
+						msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
+					} catch (Exception e) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
+						log.debug(message, e);
+					}
+				}
+			}
+		}	
+
+		if(log.isDebugEnabled()) log.debug("Exit: RMMessageReceiver::receive");
+	}
 }

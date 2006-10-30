@@ -18,10 +18,7 @@
 package org.apache.sandesha2.util;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringBufferInputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +29,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axiom.om.OMElement;
@@ -55,7 +51,6 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
@@ -449,7 +444,7 @@ public class SandeshaUtil {
 	}
 
 	public static int getSOAPVersion(SOAPEnvelope envelope) throws SandeshaException {
-		String namespaceName = envelope.getNamespace().getName();
+		String namespaceName = envelope.getNamespace().getNamespaceURI();
 		if (namespaceName.equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI))
 			return Sandesha2Constants.SOAPVersion.v1_1;
 		else if (namespaceName.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))
@@ -569,30 +564,9 @@ public class SandeshaUtil {
 					ServiceContext serviceContext = new ServiceContext (referenceMessage.getAxisService(),newMessageContext.getServiceGroupContext());
 					newMessageContext.setServiceContext(serviceContext);
 				}
-			} else {
-				AxisService axisService = new AxisService("AnonymousRMService"); 
-				
-				AxisServiceGroup serviceGroup = newMessageContext.getAxisServiceGroup();
-				axisService.setParent(serviceGroup);
-				serviceGroup.addChild(axisService);
-				
-				ServiceContext serviceContext = new ServiceContext(axisService, newMessageContext.getServiceGroupContext());
-
-				newMessageContext.setAxisService(axisService);
-				newMessageContext.setServiceContext(serviceContext);
 			}
 
 			newMessageContext.setAxisOperation(operation);
-
-			// setting parent child relationships
-			AxisService service = newMessageContext.getAxisService();
-
-			if (service != null && operation != null) {
-//				Adding this operation to the service is tricky.  
-//				service.addChild(operation);
-				
-				operation.setParent(service);
-			}
 
 			OperationContext operationContext = new OperationContext(operation);
 			newMessageContext.setOperationContext(operationContext);
@@ -1082,9 +1056,6 @@ public class SandeshaUtil {
 		MessageContext msgContext = rmMsgContext.getMessageContext();
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 		
-		rmMsgContext.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
-
-
 		// message will be stored in the Sandesha2TransportSender
 		msgContext.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
 
@@ -1104,7 +1075,6 @@ public class SandeshaUtil {
 			engine.resumeSend(msgContext);
 		else
 			engine.send(msgContext);
-
 
 	}
 	

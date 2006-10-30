@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -35,13 +33,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -70,7 +64,6 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
-import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
  * Used to create new RM messages.
@@ -220,8 +213,10 @@ public class RMMsgCreator {
 		try {
 			// creating by copying common contents. (this will not set contexts
 			// except for configCtx).
-			AxisOperation createSequenceOperation = AxisOperationFactory
-					.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
+			AxisOperation createSequenceOperation = SpecSpecificConstants.getWSRMOperation(
+					Sandesha2Constants.MessageTypes.CREATE_SEQ,
+					SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager),
+					applicationMsgContext.getAxisService());
 
 			createSeqmsgContext = SandeshaUtil
 					.createNewRelatedMessageContext(applicationRMMsg, createSequenceOperation);
@@ -237,35 +232,8 @@ public class RMMsgCreator {
 			throw new SandeshaException(e.getMessage());
 		}
 
-		AxisOperation appMsgOperationDesc = applicationMsgContext.getAxisOperation();
-
-		AxisOperation createSeqOperation = createSeqmsgContext.getAxisOperation();
-
-		createSeqOperation.setName(new QName("CreateSequenceOperation"));
-		if (appMsgOperationDesc != null) {
-			createSeqOperation.setPhasesOutFlow(appMsgOperationDesc.getPhasesOutFlow());
-			createSeqOperation.setPhasesOutFaultFlow(appMsgOperationDesc.getPhasesOutFaultFlow());
-			createSeqOperation.setPhasesInFaultFlow(appMsgOperationDesc.getPhasesInFaultFlow());
-			createSeqOperation.setRemainingPhasesInFlow(appMsgOperationDesc.getRemainingPhasesInFlow());
-		}
-
-		createSeqmsgContext.setAxisOperation(createSeqOperation);
-
 		createSeqmsgContext.setTo(applicationRMMsg.getTo());
-		
-//		createSeqmsgContext.setReplyTo(applicationRMMsg.getReplyTo());
-		//generating a new replyTo address for the CreateSequenceMessage.
-		//Otherwise there will be errors when the app msg is InOnly.
-		
-		QName axisOperationName = createSeqmsgContext.getAxisOperation().getName();
-		TransportInDescription transportIn = createSeqmsgContext.getTransportIn();
-		QName transportInName = null;
-		if (transportIn!=null)
-			transportInName = transportIn.getName();
-		
-		EndpointReference referenceTo = applicationMsgContext.getTo();
 		EndpointReference referenceReplyTo = applicationMsgContext.getReplyTo();
-		
 		
 		if (referenceReplyTo!=null) {
 			EndpointReference createSeqReplyTo = new EndpointReference (referenceReplyTo.getAddress());
@@ -396,16 +364,10 @@ public class RMMsgCreator {
 		if (referenceMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
 
-		AxisOperation terminateOperation = null;
-
-		try {
-			terminateOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1.getMessage());
-		}
-
-		if (terminateOperation == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateOpperationIsNull));
+		AxisOperation terminateOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.TERMINATE_SEQ,
+				SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager),
+				referenceMessage.getAxisService());
 
 		ConfigurationContext configCtx = referenceMessage.getConfigurationContext();
 		if (configCtx == null)
@@ -422,18 +384,6 @@ public class RMMsgCreator {
 																								// response
 																								// messages
 																								// correctly.
-
-		//using the Sandesha2 RMOutInOperation as the reference operation.
-		AxisOperation referenceOperation = referenceMessage.getAxisService()
-					.getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
-		
-		AxisOperation terminateMsgOperation = terminateMessage.getAxisOperation();
-		if (referenceOperation != null) {
-			terminateMsgOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());
-			terminateMsgOperation.setPhasesOutFaultFlow(referenceOperation.getPhasesOutFaultFlow());
-			terminateMsgOperation.setPhasesInFaultFlow(referenceOperation.getPhasesInFaultFlow());
-			terminateMsgOperation.setRemainingPhasesInFlow(referenceOperation.getRemainingPhasesInFlow());
-		}
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
@@ -507,8 +457,6 @@ public class RMMsgCreator {
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(createSeqMessage
 				.getSOAPEnvelope()));
-
-		ConfigurationContext configurationContext = createSeqMessage.getMessageContext().getConfigurationContext();
 
 		IOMRMElement messagePart = createSeqMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		CreateSequence cs = (CreateSequence) messagePart;
@@ -612,7 +560,7 @@ public class RMMsgCreator {
 
 		finalizeCreation(terminateSeqRMMsg.getMessageContext(), outMessage);
 
-//		terminateSeqResponseRMMsg.getMessageContext().setServerSide(true);
+		terminateSeqResponseRMMsg.getMessageContext().setServerSide(true);
 		return terminateSeqResponseRMMsg;
 	}
 
@@ -620,7 +568,6 @@ public class RMMsgCreator {
 			StorageManager storageManager) throws AxisFault {
 
 		RMMsgContext closeSeqResponseRMMsg = new RMMsgContext(outMessage);
-		ConfigurationContext configurationContext = closeSeqRMMsg.getMessageContext().getConfigurationContext();
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(closeSeqRMMsg
 				.getSOAPEnvelope()));
@@ -671,8 +618,6 @@ public class RMMsgCreator {
 		factory = (SOAPFactory) envelope.getOMFactory();
 		
 		envelope = applicationMsg.getSOAPEnvelope();
-
-		ConfigurationContext ctx = applicationMsg.getMessageContext().getConfigurationContext();
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
@@ -733,9 +678,11 @@ public class RMMsgCreator {
 		String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
 		String rmVersion = referenceRMMessage.getRMSpecVersion();
 		
-		AxisOperation makeConnectionOperation = AxisOperationFactory.getAxisOperation(
-				WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
-		
+		AxisOperation makeConnectionOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG,
+				rmVersion,
+				referenceMessage.getAxisService());
+
 		MessageContext makeConnectionMessageCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,makeConnectionOperation);
 		RMMsgContext makeConnectionRMMessageCtx = MsgInitializer.initializeMessage(makeConnectionMessageCtx);
 		

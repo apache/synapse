@@ -44,6 +44,7 @@ public class SandeshaMessageKeys {
 	public static final String storedKeyNotPresent="storedKeyNotPresent";
 	public static final String invalidQName="invalidQName";
 	public static final String couldNotFindPropertyKey="couldNotFindPropertyKey";
+	public static final String couldNotFindOperation="couldNotFindOperation";
 
 	public static final String dummyCallback="dummyCallback";
 	public static final String cannotFindSequenceID="cannotFindSequenceID";
@@ -226,7 +227,6 @@ public class SandeshaMessageKeys {
 	public static final String storageMapNotPresent="storageMapNotPresent";
 	public static final String entryNotPresentForUpdating="entryNotPresentForUpdating";
 	public static final String appMsgIsNull="appMsgIsNull";
-	public static final String terminateOpperationIsNull="terminateOpperationIsNull";
 	public static final String invalidMsgNumberList="invalidMsgNumberList";
 	public static final String cannotFindReqMsgFromOpContext="cannotFindReqMsgFromOpContext";
 

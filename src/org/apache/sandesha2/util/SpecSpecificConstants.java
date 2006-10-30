@@ -17,9 +17,11 @@
 
 package org.apache.sandesha2.util;
 
-import java.net.UnknownServiceException;
+import javax.xml.namespace.QName;
 
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -321,6 +323,52 @@ public class SpecSpecificConstants {
 			return AddressingConstants.Submission.WSA_FAULT_ACTION;
 		
 		return null;
+	}
+	
+	public static AxisOperation getWSRMOperation(int messageType, String rmSpecLevel, AxisService service)
+	throws SandeshaException
+	{
+		// This table needs to be kept in sync with the operations defined in the
+		// sandesha module.xml. The module.xml defintions are used to identify
+		// messages as they come into the server, and this table us used to pick
+		// the correct operation as we make invocations. Because of this, the
+		// tables are opposites of one another.
+		AxisOperation result = null;
+		if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) {
+			switch(messageType) {
+			case Sandesha2Constants.MessageTypes.CREATE_SEQ:
+				result = service.getOperation(new QName("RMOutInOperation"));
+				break;
+			case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
+			case Sandesha2Constants.MessageTypes.ACK:
+			case Sandesha2Constants.MessageTypes.ACK_REQUEST:
+			case Sandesha2Constants.MessageTypes.LAST_MESSAGE:
+				result = service.getOperation(new QName("RMOutOnlyOperation"));
+				break;
+			}
+		} else if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
+			switch(messageType) {
+			case Sandesha2Constants.MessageTypes.CREATE_SEQ:
+			case Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE:
+			case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
+				result = service.getOperation(new QName("RMOutInOperation"));
+				break;
+			case Sandesha2Constants.MessageTypes.ACK:
+			case Sandesha2Constants.MessageTypes.ACK_REQUEST:
+			case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
+				result = service.getOperation(new QName("RMOutOnlyOperation"));
+				break;
+			}
+		}
+		
+		if(result == null) {
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.couldNotFindOperation,
+					Integer.toString(messageType), rmSpecLevel);
+			throw new SandeshaException(message);
+		}
+		
+		return result;
 	}
 
 }

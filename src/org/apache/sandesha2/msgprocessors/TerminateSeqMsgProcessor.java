@@ -19,8 +19,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -31,7 +29,6 @@ import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
@@ -358,38 +355,18 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		String terminated = SandeshaUtil.getSequenceProperty(outSequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED, storageManager);
 
-		// registring an InOutOperationContext for this.
-		// since the serviceContext.fireAndForget only sets a inOnly One
-		// this does not work when there is a terminateSequnceResponse
-		// TODO do processing of terminateMessagesCorrectly., create a new
-		// message instead of sendign the one given by the serviceClient
-		// TODO important
-
-		AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
-
-		AxisOperation referenceInOutOperation = msgContext.getAxisService()
-				.getOperation(
-						new QName(Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
-		if (referenceInOutOperation == null) {
-			String messge = "Cant find the recerence RM InOut operation";
-			throw new SandeshaException(messge);
-		}
-
-		outInAxisOp.setParent(msgContext.getAxisService());
-		// setting flows
-		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
-		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
-				.getRemainingPhasesInFlow());
-
+		AxisOperation terminateOp = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.TERMINATE_SEQ,
+				rmMsgCtx.getRMSpecVersion(),
+				msgContext.getAxisService());
 		OperationContext opcontext = OperationContextFactory
 				.createOperationContext(
-						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);
+						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, terminateOp);
 		opcontext.setParent(msgContext.getServiceContext());
-		configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),
-				opcontext);
+		configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),	opcontext);
 
 		msgContext.setOperationContext(opcontext);
-		msgContext.setAxisOperation(outInAxisOp);
+		msgContext.setAxisOperation(terminateOp);
 		
 		if (terminated != null && "true".equals(terminated)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);

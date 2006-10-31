@@ -157,7 +157,11 @@ public class Property {
     }
 
     public boolean isExpired() {
-        return System.currentTimeMillis() > expiryTime;
+        if(getType() == DYNAMIC_TYPE) {
+            return System.currentTimeMillis() > expiryTime;
+        } else {
+            return false;
+        }
     }
 
     public boolean isCached() {

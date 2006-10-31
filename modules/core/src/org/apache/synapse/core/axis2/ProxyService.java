@@ -235,6 +235,24 @@ public class ProxyService {
         return proxyService;
     }
 
+    public void start(SynapseConfiguration synCfg) {
+        AxisConfiguration axisConfig = synCfg.getConfigurationContext().getAxisConfiguration();
+        try {
+            axisConfig.addService(this.buildAxisService(synCfg, axisConfig));
+        } catch (AxisFault axisFault) {
+            handleException(axisFault.getMessage());
+        }
+    }
+
+    public void stop(SynapseConfiguration synCfg) {
+        AxisConfiguration axisConfig = synCfg.getConfigurationContext().getAxisConfiguration();
+        try {
+            axisConfig.getService(this.getName()).setActive(false);
+        } catch (AxisFault axisFault) {
+            handleException(axisFault.getMessage());
+        }
+    }
+
     public String getName() {
         return name;
     }

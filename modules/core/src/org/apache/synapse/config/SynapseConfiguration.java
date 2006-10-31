@@ -21,10 +21,18 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
-
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.AxisFault;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+ 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.net.URLConnection;
+import java.io.IOException;
 
 /**
  * The SynapseConfiguration holds the global configuration for a Synapse
@@ -57,6 +65,9 @@ public class SynapseConfiguration {
      * It could/would hold a Mediator object or a Property (if loaded from a registry)
      */
     private Object mainMediator = null;
+
+    /** Hold reference to the Axis2 ConfigurationContext */
+    private ConfigurationContext configContext = null;
 
     /**
      * Add a named mediator into this configuration
@@ -148,7 +159,18 @@ public class SynapseConfiguration {
             if(globalProps.containsKey(name)) {
                 log.warn("Overiding the global property with name : " + name);
             } else {
-                globalProps.put(name, value);
+                if(value.getType() == Property.SRC_TYPE) {
+                    try {
+                        URLConnection urlc = value.getSrc().openConnection();
+                        XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(urlc.getInputStream());
+                        StAXOMBuilder builder = new StAXOMBuilder(parser);
+                        value.setValue(builder.getDocumentElement());
+                    } catch (IOException e) {
+                        handleException("Can not read from the source : " + value.getSrc());
+                    } catch (XMLStreamException e) {
+                        handleException("Can not load the source property : " + value.getName());
+                    }
+                }
             }
         } else {
             log.error("Name and the value of the property cannot be null");
@@ -303,7 +325,13 @@ public class SynapseConfiguration {
         if(o == null) {
             handleException("Invalid proxyService for name : " + name + " from registry");
         } else {
-            proxyServices.remove(name);
+            try {
+                getConfigurationContext().getAxisConfiguration().getService(name).setActive(false);
+                getConfigurationContext().getAxisConfiguration().removeService(name);
+                proxyServices.remove(name);
+            } catch (AxisFault axisFault) {
+                handleException(axisFault.getMessage());
+            }
         }
     }
 
@@ -380,6 +408,22 @@ public class SynapseConfiguration {
      */
     public Map getRegistries() {
         return registryMap;
+    }
+
+    /**
+     * Set the Axis2 ConfigurationContext to the SynapseConfiguration
+     * @param configContext
+     */
+    public void setConfigurationContext(ConfigurationContext configContext) {
+        this.configContext = configContext;
+    }
+
+    /**
+     * Get the Axis2 ConfigurationContext for the SynapseConfiguration
+     * @return ConfigurationContext of the Axis2
+     */
+    public ConfigurationContext getConfigurationContext() {
+        return configContext;
     }
 
     private void handleException(String msg) {

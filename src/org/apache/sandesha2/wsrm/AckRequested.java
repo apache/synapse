@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.wsrm;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -79,6 +81,21 @@ public class AckRequested implements IOMRMPart {
 		OMFactory factory = header.getOMFactory();
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 
+		Iterator iter = header.getChildrenWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
+		while (iter.hasNext()) {
+			OMElement ackRequestedElement = (OMElement) iter.next();
+			
+			OMElement identifierElement = ackRequestedElement.getFirstChildWithName(new QName (namespaceValue,
+					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+			String identifierVal = null;
+			if (identifierElement!=null)
+				identifierVal = identifierElement.getText();
+			
+			if (identifierVal!=null && identifierVal.equals(identifier.getIdentifier()))
+				ackRequestedElement.detach();
+			
+		}
+		
 		SOAPHeader SOAPHdr = (SOAPHeader) header;
 		SOAPHeaderBlock ackReqHdrBlock = SOAPHdr.addHeaderBlock(Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED, rmNamespace);
 		ackReqHdrBlock.setMustUnderstand(isMustUnderstand());

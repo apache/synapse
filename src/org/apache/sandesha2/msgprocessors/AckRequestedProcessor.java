@@ -30,16 +30,22 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
@@ -285,6 +291,160 @@ public class AckRequestedProcessor {
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * This is used to capture AckRequest messages send by the SandeshaClient.
+	 * This will send that message using the Sandesha2 Sender.
+	 * 
+	 * @param rmMsgContext
+	 */
+	public boolean processOutgoingAckRequestMessage (RMMsgContext ackRequestRMMsg) throws AxisFault {
+
+		if (log.isDebugEnabled())
+			log.debug("Enter: AckRequestedProcessor::processOutgoingAckRequestMessage");
+
+		MessageContext msgContext = ackRequestRMMsg.getMessageContext();
+		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
+		Options options = msgContext.getOptions();
+
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
+				configurationContext.getAxisConfiguration());
+
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+
+		String toAddress = ackRequestRMMsg.getTo().getAddress();
+		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		String internalSeqenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
+
+		String outSequenceID = SandeshaUtil.getSequenceProperty(internalSeqenceID,
+				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
+		if (outSequenceID == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.couldNotSendAckRequestSeqNotFound, internalSeqenceID));
+
+
+		// registring an InOutOperationContext for this.
+		// since the serviceContext.fireAndForget only sets a inOnly One
+		// this does not work when there is a terminateSequnceResponse
+		// TODO do processing of terminateMessagesCorrectly., create a new
+		// message instead of sendign the one given by the serviceClient
+		// TODO important
+
+		AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
+
+		AxisOperation referenceInOutOperation = msgContext.getAxisService()
+				.getOperation(
+						new QName(Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
+		if (referenceInOutOperation == null) {
+			String messge = "Cant find the recerence RM InOut operation";
+			throw new SandeshaException(messge);
+		}
+
+		outInAxisOp.setParent(msgContext.getAxisService());
+		// setting flows
+		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
+		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
+				.getRemainingPhasesInFlow());
+
+		OperationContext opcontext = OperationContextFactory
+				.createOperationContext(
+						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);
+		opcontext.setParent(msgContext.getServiceContext());
+		configurationContext.registerOperationContext(ackRequestRMMsg.getMessageId(),
+				opcontext);
+
+		msgContext.setOperationContext(opcontext);
+		msgContext.setAxisOperation(outInAxisOp);
+		
+		Iterator iterator = ackRequestRMMsg.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+		
+		AckRequested ackRequested = null;
+		while (iterator.hasNext()) {
+			ackRequested = (AckRequested) iterator.next(); 
+		}
+		
+		if (iterator.hasNext()) {
+			String message = "Passed message has more than one AckRequest. You can have only one";
+			throw new SandeshaException (message);
+		}
+		
+		if (ackRequested==null) {
+			String message = "No AckRequested part was present in the message";
+			throw new SandeshaException (message);
+		}
+		
+		ackRequested.getIdentifier().setIndentifer(outSequenceID);
+		
+		ackRequestRMMsg.setFlow(MessageContext.OUT_FLOW);
+		msgContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
+
+		ackRequestRMMsg.setTo(new EndpointReference(toAddress));
+
+		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID, storageManager);
+		if (rmVersion == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
+
+		ackRequestRMMsg.setWSAAction(SpecSpecificConstants.getAckRequestAction (rmVersion));
+		ackRequestRMMsg.setSOAPAction(SpecSpecificConstants.getAckRequestSOAPAction (rmVersion));
+
+		String transportTo = SandeshaUtil.getSequenceProperty(internalSeqenceID,
+				Sandesha2Constants.SequenceProperties.TRANSPORT_TO, storageManager);
+		if (transportTo != null) {
+			ackRequestRMMsg.setProperty(MessageContextConstants.TRANSPORT_URL, transportTo);
+		}
+		
+		
+		//setting msg context properties
+		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, outSequenceID);
+		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSeqenceID);
+		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY , sequenceKey);
+
+		try {
+			ackRequestRMMsg.addSOAPEnvelope();
+		} catch (AxisFault e) {
+			throw new SandeshaException(e.getMessage(),e);
+		}
+
+		String key = SandeshaUtil.getUUID();
+
+		SenderBean ackRequestBean = new SenderBean();
+		ackRequestBean.setMessageContextRefKey(key);
+
+		storageManager.storeMessageContext(key, msgContext);
+
+		// Set a retransmitter lastSentTime so that terminate will be send with
+		// some delay.
+		// Otherwise this get send before return of the current request (ack).
+		// TODO: refine the terminate delay.
+		ackRequestBean.setTimeToSend(System.currentTimeMillis());
+
+		ackRequestBean.setMessageID(msgContext.getMessageID());
+		
+		EndpointReference to = msgContext.getTo();
+		if (to!=null)
+			ackRequestBean.setToAddress(to.getAddress());
+		
+		// this will be set to true at the sender.
+		ackRequestBean.setSend(true);
+
+		msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
+
+		ackRequestBean.setReSend(false);
+
+		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+
+		retramsmitterMgr.insert(ackRequestBean);
+
+		ackRequestRMMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
+
+		SandeshaUtil.executeAndStore(ackRequestRMMsg, key);
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: AckRequestedProcessor::processOutgoingAckRequestMessage " + Boolean.FALSE);
+		
+		return true;
+
 	}
 
 }

@@ -29,6 +29,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -40,13 +41,14 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2006Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
+import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -59,7 +61,9 @@ import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.AckRequested;
+import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CloseSequence;
+import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -308,9 +312,17 @@ public class SandeshaClient {
 		return sandeshaReport;
 	}
 
-	public static void createSequence(ServiceClient serviceClient, boolean offer) throws SandeshaException {
+	/**
+	 * Clients can use this to create a sequence sequence.
+	 * 
+	 * @param serviceClient - A configured ServiceClient to be used to invoke RM messages. This need to have Sandesha2 engaged.
+	 * @param offer - Weather a sequence should be offered for obtaining response messages.
+	 * @return The sequenceKey of the newly generated sequence.
+	 * @throws SandeshaException
+	 */
+	public static String createSequence(ServiceClient serviceClient, boolean offer) throws SandeshaException {
 		
-		setUpServiceClientAnonymousOperation(serviceClient);
+		setUpServiceClientAnonymousOperations (serviceClient);
 		
 		Options options = serviceClient.getOptions();
 		if (options == null)
@@ -327,6 +339,8 @@ public class SandeshaClient {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.toEPRNotValid, null));
 
+		ConfigurationContext configurationContext = serviceClient.getServiceContext().getConfigurationContext();
+		
 		if (offer) {
 			String offeredSequenceID = SandeshaUtil.getUUID();
 			options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSequenceID);
@@ -339,16 +353,35 @@ public class SandeshaClient {
 			options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 		}
 
+		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+
+		if (rmSpecVersion == null)
+			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
+
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
+		
+		//When the message is marked as Dummy the application processor will not actually try to send it. 
+		//But still the create Sequence will be added.
+
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_TRUE);
 
-		try {
-			serviceClient.fireAndForget(null);
+		String oldAction = options.getAction();
+		options.setAction(SpecSpecificConstants.getCreateSequenceAction(rmSpecVersion));
+		
+		try {			
+			//just to inform the sender.
+			serviceClient.fireAndForget (null);
 		} catch (AxisFault e) {
 			throw new SandeshaException(e);
 		}
 
+		options.setAction(oldAction);
+		
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
-
+		
+		//the generated sequenceKey will be returned. Client can use this to work with this newly generated sequence.
+		
+		return sequenceKey;
 	}
 
 	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)
@@ -385,7 +418,7 @@ public class SandeshaClient {
 	 */
 	public static void terminateSequence(ServiceClient serviceClient) throws SandeshaException {
 		
-		setUpServiceClientAnonymousOperation(serviceClient);
+		setUpServiceClientAnonymousOperations (serviceClient);
 		
 		ServiceContext serviceContext = serviceClient.getServiceContext();
 		if (serviceContext == null)
@@ -412,7 +445,8 @@ public class SandeshaClient {
 		options.setAction(SpecSpecificConstants.getTerminateSequenceAction(rmSpecVersion));
 
 		try {
-			serviceClient.fireAndForget(terminateBody);
+			//to inform the Sandesha2 out handler.
+			serviceClient.fireAndForget (terminateBody);				
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.couldNotSendTerminate,
@@ -444,7 +478,7 @@ public class SandeshaClient {
 	 */
 	public static void closeSequence(ServiceClient serviceClient) throws SandeshaException {
 		
-		setUpServiceClientAnonymousOperation(serviceClient);
+		setUpServiceClientAnonymousOperations (serviceClient);
 		
 		ServiceContext serviceContext = serviceClient.getServiceContext();
 		if (serviceContext == null)
@@ -470,7 +504,8 @@ public class SandeshaClient {
 		String oldAction = options.getAction();
 		options.setAction(SpecSpecificConstants.getCloseSequenceAction(rmSpecVersion));
 		try {
-			serviceClient.fireAndForget(closeSequenceBody);
+			//to inform the sandesha2 out handler
+			serviceClient.fireAndForget (closeSequenceBody);
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.couldNotSendClose,
@@ -482,7 +517,6 @@ public class SandeshaClient {
 	}
 
 	public static void closeSequence(ServiceClient serviceClient, String sequenceKey) throws SandeshaException {
-		// TODO test
 
 		Options options = serviceClient.getOptions();
 		if (options == null)
@@ -629,7 +663,7 @@ public class SandeshaClient {
 
 	public static void sendAckRequest(ServiceClient serviceClient) throws SandeshaException {
 
-		setUpServiceClientAnonymousOperation(serviceClient);
+		setUpServiceClientAnonymousOperations (serviceClient);
 		
 		Options options = serviceClient.getOptions();
 		if (options == null)
@@ -703,7 +737,8 @@ public class SandeshaClient {
 		serviceClient.addHeader(ackRequestedHeaderBlock);
 
 		try {
-			serviceClient.fireAndForget(null);
+			//to inform the sandesha2 out handler
+			serviceClient.fireAndForget (null);
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotSendAckRequestException, e.toString());
@@ -1085,28 +1120,107 @@ public class SandeshaClient {
 		return dummyEnvelope;
 	}
 	
-	private static void setUpServiceClientAnonymousOperation (ServiceClient serviceClient) throws SandeshaException {
+	
+//	private static SOAPEnvelope configureCreateSequence(Options options,
+//			ConfigurationContext configurationContext) throws AxisFault {
+//
+//		if (options == null)
+//			throw new SandeshaException(SandeshaMessageHelper
+//					.getMessage(SandeshaMessageKeys.optionsObjectNotSet));
+//
+//		EndpointReference epr = options.getTo();
+//		if (epr == null)
+//			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+//					SandeshaMessageKeys.toEPRNotValid, null));
+//
+//
+//		String rmSpecVersion = (String) options
+//				.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+//		if (rmSpecVersion == null)
+//			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
+//
+//		options.setAction(SpecSpecificConstants
+//				.getCreateSequenceAction (rmSpecVersion));
+//
+//		SOAPEnvelope dummyEnvelope = null;
+//		SOAPFactory factory = null;
+//		String soapNamespaceURI = options.getSoapVersionURI();
+//		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI
+//				.equals(soapNamespaceURI)) {
+//			factory = new SOAP12Factory();
+//			dummyEnvelope = factory.getDefaultEnvelope();
+//		} else {
+//			factory = new SOAP11Factory();
+//			dummyEnvelope = factory.getDefaultEnvelope();
+//		}
+//
+//		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
+//
+//		String addressingNamespaceValue = (String) options.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+//		if (addressingNamespaceValue==null)
+//			addressingNamespaceValue = SpecSpecificConstants.getDefaultAddressingNamespace ();
+//		
+//
+//		CreateSequence createSequence = new CreateSequence (rmNamespaceValue,addressingNamespaceValue);
+//		AcksTo acksTo = new AcksTo (rmNamespaceValue,addressingNamespaceValue);
+//		createSequence.setAcksTo(acksTo);
+//		EndpointReference endpointReference = new EndpointReference (null);
+//		acksTo.setAddress(endpointReference);
+//		
+//		createSequence.toSOAPEnvelope(dummyEnvelope);
+//
+//		return dummyEnvelope;
+//	}
+	
+	
+	/**
+	 * Sandesha uses default 'fireAndForget' and 'sendReceive' methods to send control messages.
+	 * But these can only be called when Anonymous operations are present within the passed ServiceClient.
+	 * But these could be situations where these Anonymous operations are not present. In such cases Sandesha2
+	 * will try to add them into the serviceClient. 
+	 */
+	private static void setUpServiceClientAnonymousOperations (ServiceClient serviceClient) throws SandeshaException {
 		try {
+			
 			AxisService service = serviceClient.getAxisService();
+
 			AxisOperation anonOutOnlyOperation = service.getOperation(ServiceClient.ANON_OUT_ONLY_OP);
 			
 			if (anonOutOnlyOperation==null) {
 				anonOutOnlyOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
 				anonOutOnlyOperation.setName(ServiceClient.ANON_OUT_ONLY_OP);
-				anonOutOnlyOperation.setParent(service);
-				anonOutOnlyOperation.setMessageReceiver(new RMMessageReceiver());
-				service.addChild(anonOutOnlyOperation);
 				
-				Iterator iter = service.getOperations();
-				AxisOperation referenceOperation = null;
-				if (iter.hasNext())
-					referenceOperation = (AxisOperation) iter.next();
+				AxisOperation referenceOperation = service.getOperation(new QName (Sandesha2Constants.RM_IN_ONLY_OPERATION));
 				
 				if (referenceOperation!=null) {
 					anonOutOnlyOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());
 					anonOutOnlyOperation.setPhasesOutFaultFlow(referenceOperation.getPhasesOutFaultFlow());
 					anonOutOnlyOperation.setPhasesInFaultFlow(referenceOperation.getPhasesInFaultFlow());
 					anonOutOnlyOperation.setPhasesInFaultFlow(referenceOperation.getRemainingPhasesInFlow());
+
+					service.addOperation(anonOutOnlyOperation);
+				} else {
+					String message = "Cant find RM Operations. Please engage the Sandesha2 module before doing the invocation.";
+					throw new SandeshaException (message);
+				}
+			}
+
+			AxisOperation anonOutInOperation = service.getOperation(ServiceClient.ANON_OUT_IN_OP);
+			
+			if (anonOutInOperation==null) {
+				anonOutInOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
+				anonOutInOperation.setName(ServiceClient.ANON_OUT_IN_OP);
+				
+				AxisOperation referenceOperation = service.getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
+				
+				if (referenceOperation!=null) {
+					anonOutInOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());
+					anonOutInOperation.setPhasesOutFaultFlow(referenceOperation.getPhasesOutFaultFlow());
+					anonOutInOperation.setPhasesInFaultFlow(referenceOperation.getPhasesInFaultFlow());
+					anonOutInOperation.setPhasesInFaultFlow(referenceOperation.getRemainingPhasesInFlow());
+					
+					//operation will be added to the service only if a valid referenceOperation was found.
+					service.addOperation(anonOutInOperation);
 				}
 			}
 		} catch (AxisFault e) {

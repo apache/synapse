@@ -171,6 +171,7 @@ public class SynapseConfiguration {
                         handleException("Can not load the source property : " + value.getName());
                     }
                 }
+		globalProps.put(name, value);
             }
         } else {
             log.error("Name and the value of the property cannot be null");

@@ -57,6 +57,8 @@ public class EndpointSerializer {
     public static OMElement serializeEndpoint(Endpoint endpt, OMElement parent) {
 
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
+        endpoint.addAttribute(fac.createOMAttribute(
+                "name", nullNS, endpt.getName()));
         if (endpt.getAddress() != null) {
             endpoint.addAttribute(fac.createOMAttribute(
                 "address", nullNS, endpt.getAddress()));

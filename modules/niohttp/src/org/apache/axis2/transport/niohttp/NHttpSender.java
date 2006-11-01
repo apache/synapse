@@ -166,7 +166,8 @@ public class NHttpSender extends AbstractHandler implements TransportSender {
 
         message.addHeader(org.apache.axis2.transport.niohttp.impl.Constants.CONTENT_TYPE,
             contentType + "; charset=" + format.getCharSetEncoding());
-
+        message.addHeader(org.apache.axis2.transport.niohttp.impl.Constants.TRANSFER_ENCODING,
+            org.apache.axis2.transport.niohttp.impl.Constants.CHUNKED);
         OutputStream out = message.getOutputStream();
         format.setDoOptimize(msgContext.isDoingMTOM());
         try {

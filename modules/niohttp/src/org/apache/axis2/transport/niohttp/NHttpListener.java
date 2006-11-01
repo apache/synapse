@@ -154,7 +154,8 @@ public class NHttpListener implements TransportListener, HttpService {
                 SessionContext sessionContext = sessionManager.getSessionContext(sessionKey);
                 msgContext.setSessionContext(sessionContext);
             }*/
-            workerPool.execute(new Worker(cfgCtx, msgContext, request));
+            //workerPool.execute(new Worker(cfgCtx, msgContext, request));
+            new Worker(cfgCtx, msgContext, request).run();
 
         } catch (AxisFault e) {
             HttpResponse response = request.createResponse();

@@ -206,9 +206,9 @@ public class ReactorTester extends TestCase {
         });
     }
 
-    public void runGenericSynapseUseCase() throws IOException {
+    public void testGenericSynapseUseCase() throws IOException {
 
-        synapseReactor = Reactor.createReactor(null, 9002, false,
+        synapseReactor = Reactor.createReactor(null, 8080, false,
 
             new HttpService() {
 
@@ -243,12 +243,12 @@ public class ReactorTester extends TestCase {
         Thread t = new Thread(synapseReactor);
         t.start();
 
-        /*// wait till the reactor is done
+        // wait till the reactor is done
         try {
             t.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
 

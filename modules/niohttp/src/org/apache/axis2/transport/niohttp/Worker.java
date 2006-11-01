@@ -61,7 +61,10 @@ public class Worker implements Runnable {
             processGet(response);
 
         } else if (Constants.POST.equals(request.getMethod())) {
+            response.addHeader(Constants.TRANSFER_ENCODING, Constants.CHUNKED);
+            response.addHeader(Constants.CONTENT_TYPE, "text/xml; charset=utf-8");
             processPost(response);
+            response.commit();
 
         } else {
             handleException("Unsupported method : " + request.getMethod(), null, response);

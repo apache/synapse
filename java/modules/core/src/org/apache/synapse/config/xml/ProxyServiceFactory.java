@@ -107,15 +107,11 @@ public class ProxyServiceFactory {
             Object o = policies.next();
             if (o instanceof OMElement) {
                 OMElement policy = (OMElement) o;
-                OMAttribute url = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-                if (url != null) {
-                    try {
-                        proxy.addServiceLevelPoliciy(new URL(url.getAttributeValue()));
-                    } catch (MalformedURLException e) {
-                        handleException("Invalid policy URL : " + url.getAttributeValue());
-                    }
+                OMAttribute key = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+                if (key != null) {
+                    proxy.addServiceLevelPoliciy(key.getAttributeValue());
                 } else {
-                    handleException("Policy element does not specify the policy URL");
+                    handleException("Policy element does not specify the policy key");
                 }
             } else {
                 handleException("Invalid 'policy' element found under element 'policies'");

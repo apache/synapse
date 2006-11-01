@@ -19,8 +19,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -31,12 +29,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.Utils;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -45,7 +40,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -62,7 +56,6 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
-import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * Responsible for processing an incoming Close Sequence message. (As introduced
@@ -176,10 +169,8 @@ public class CloseSequenceProcessor implements MsgProcessor {
 	}
 
 	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
-		
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: CloseSequenceProcessor::processOutMessage");
-			log.debug("Exit: CloseSequenceProcessor::processOutMessage " + Boolean.FALSE);
 		}
 		
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
@@ -188,8 +179,6 @@ public class CloseSequenceProcessor implements MsgProcessor {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
 				configurationContext.getAxisConfiguration());
-
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		String toAddress = rmMsgCtx.getTo().getAddress();
 		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
@@ -202,40 +191,16 @@ public class CloseSequenceProcessor implements MsgProcessor {
 					SandeshaMessageKeys.couldNotSendCloseSeqNotFound, internalSeqenceID));
 
 
-		// registring an InOutOperationContext for this.
-		// since the serviceContext.fireAndForget only sets a inOnly One
-		// this does not work when there is a closeSequnceResponse
-		// TODO do processing of closeMessagesCorrectly., create a new
-		// message instead of sendign the one given by the serviceClient
-		// TODO important
+		AxisOperation closeOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE,
+				rmMsgCtx.getRMSpecVersion(),
+				rmMsgCtx.getMessageContext().getAxisService());
+		msgContext.setAxisOperation(closeOperation);
 
-		AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
-
-		AxisOperation referenceInOutOperation = msgContext.getAxisService()
-				.getOperation(
-						new QName(Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
-		if (referenceInOutOperation == null) {
-			String messge = "Cant find the recerence RM InOut operation";
-			throw new SandeshaException(messge);
-		}
-
-		outInAxisOp.setParent(msgContext.getAxisService());
-		// setting flows
-		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
-		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
-				.getRemainingPhasesInFlow());
-
-		outInAxisOp.setMessageReceiver(new RMMessageReceiver ());
-		
-		OperationContext opcontext = OperationContextFactory
-				.createOperationContext(
-						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);
+		OperationContext opcontext = new OperationContext(closeOperation);
 		opcontext.setParent(msgContext.getServiceContext());
-		configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),
-				opcontext);
-
+		configurationContext.registerOperationContext(rmMsgCtx.getMessageId(),opcontext);
 		msgContext.setOperationContext(opcontext);
-		msgContext.setAxisOperation(outInAxisOp);
 		
 		CloseSequence closeSequencePart = (CloseSequence) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
@@ -247,10 +212,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		
 		identifier.setIndentifer(outSequenceID);
 
-		rmMsgCtx.setFlow(MessageContext.OUT_FLOW);
 		msgContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
-
-		rmMsgCtx.setTo(new EndpointReference(toAddress));
 
 		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID, storageManager);
 		if (rmVersion == null)
@@ -270,11 +232,7 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSeqenceID);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY , sequenceKey);
 
-		try {
-			rmMsgCtx.addSOAPEnvelope();
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage(),e);
-		}
+		rmMsgCtx.addSOAPEnvelope();
 
 		String key = SandeshaUtil.getUUID();
 

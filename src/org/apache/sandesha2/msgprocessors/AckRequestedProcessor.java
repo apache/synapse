@@ -35,11 +35,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -311,8 +308,6 @@ public class AckRequestedProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
 				configurationContext.getAxisConfiguration());
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		String toAddress = ackRequestRMMsg.getTo().getAddress();
 		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 		String internalSeqenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
@@ -323,39 +318,20 @@ public class AckRequestedProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.couldNotSendAckRequestSeqNotFound, internalSeqenceID));
 
+		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID, storageManager);
+		if (rmVersion == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
-		// registring an InOutOperationContext for this.
-		// since the serviceContext.fireAndForget only sets a inOnly One
-		// this does not work when there is a terminateSequnceResponse
-		// TODO do processing of terminateMessagesCorrectly., create a new
-		// message instead of sendign the one given by the serviceClient
-		// TODO important
+		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.ACK,
+				rmVersion,
+				msgContext.getAxisService());
+		msgContext.setAxisOperation(ackOperation);
 
-		AxisOperation outInAxisOp = new OutInAxisOperation(new QName("temp"));
-
-		AxisOperation referenceInOutOperation = msgContext.getAxisService()
-				.getOperation(
-						new QName(Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
-		if (referenceInOutOperation == null) {
-			String messge = "Cant find the recerence RM InOut operation";
-			throw new SandeshaException(messge);
-		}
-
-		outInAxisOp.setParent(msgContext.getAxisService());
-		// setting flows
-		// outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation.getRemainingPhasesInFlow());
-		outInAxisOp.setRemainingPhasesInFlow(referenceInOutOperation
-				.getRemainingPhasesInFlow());
-
-		OperationContext opcontext = OperationContextFactory
-				.createOperationContext(
-						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, outInAxisOp);
+		OperationContext opcontext = new OperationContext(ackOperation);
 		opcontext.setParent(msgContext.getServiceContext());
-		configurationContext.registerOperationContext(ackRequestRMMsg.getMessageId(),
-				opcontext);
-
+		configurationContext.registerOperationContext(ackRequestRMMsg.getMessageId(), opcontext);
 		msgContext.setOperationContext(opcontext);
-		msgContext.setAxisOperation(outInAxisOp);
 		
 		Iterator iterator = ackRequestRMMsg.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
 		
@@ -376,14 +352,8 @@ public class AckRequestedProcessor {
 		
 		ackRequested.getIdentifier().setIndentifer(outSequenceID);
 		
-		ackRequestRMMsg.setFlow(MessageContext.OUT_FLOW);
 		msgContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-		ackRequestRMMsg.setTo(new EndpointReference(toAddress));
-
-		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
 		ackRequestRMMsg.setWSAAction(SpecSpecificConstants.getAckRequestAction (rmVersion));
 		ackRequestRMMsg.setSOAPAction(SpecSpecificConstants.getAckRequestSOAPAction (rmVersion));
@@ -394,17 +364,12 @@ public class AckRequestedProcessor {
 			ackRequestRMMsg.setProperty(MessageContextConstants.TRANSPORT_URL, transportTo);
 		}
 		
-		
 		//setting msg context properties
 		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, outSequenceID);
 		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSeqenceID);
 		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY , sequenceKey);
 
-		try {
-			ackRequestRMMsg.addSOAPEnvelope();
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage(),e);
-		}
+		ackRequestRMMsg.addSOAPEnvelope();
 
 		String key = SandeshaUtil.getUUID();
 

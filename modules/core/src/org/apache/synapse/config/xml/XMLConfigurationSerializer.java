@@ -104,20 +104,20 @@ public class XMLConfigurationSerializer {
             String endpointName = (String) iter.next();
             Object endpt = synCfg.getNamedEndpoint(endpointName);
 
-            OMElement endpoint = fac.createOMElement("endpoint", synNS);
             if (endpt instanceof Property) {
+                OMElement endpoint = fac.createOMElement("endpoint", synNS);
                 Property dp = (Property) endpt;
                 endpoint.addAttribute(fac.createOMAttribute(
                         "name", nullNS, endpointName));
                 endpoint.addAttribute(fac.createOMAttribute(
                         "key", nullNS, dp.getKey()));
+                definitions.addChild(endpoint);
 
             } else if (endpt instanceof Endpoint) {
                 EndpointSerializer.serializeEndpoint((Endpoint) endpt, definitions);
             } else {
                 handleException("Invalid endpoint. Type : " + endpt.getClass());
             }
-            definitions.addChild(endpoint);
         }
     }
 

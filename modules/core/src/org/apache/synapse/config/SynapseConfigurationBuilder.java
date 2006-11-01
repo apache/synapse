@@ -25,6 +25,7 @@ import org.apache.synapse.mediators.builtin.SendMediator;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.File;
 
 /**
  * Builds a Synapse Configuration model with a given input (e.g. XML, programmatic creation, default etc)
@@ -58,6 +59,7 @@ public class SynapseConfigurationBuilder implements Constants {
         try {
             SynapseConfiguration synCfg = XMLConfigurationBuilder.getConfiguration(new FileInputStream(configFile));
             log.info("Loaded Synapse configuration from : " + configFile);
+            synCfg.setPathToConfigFile(new File(configFile).getAbsolutePath());
             return synCfg;
 
         } catch (FileNotFoundException fnf) {

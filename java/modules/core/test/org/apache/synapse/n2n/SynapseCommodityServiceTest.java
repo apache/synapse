@@ -27,7 +27,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
-import org.apache.axis2.transport.nhttp.AsyncHTTPListener;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.synapse.Constants;
 import org.apache.synapse.utils.Services;
 
@@ -36,8 +36,8 @@ import javax.xml.namespace.QName;
 
 public class SynapseCommodityServiceTest extends TestCase {
 
-    private AsyncHTTPListener synapseServer = null;
-    private AsyncHTTPListener businessServer = null;
+    private SimpleHTTPServer synapseServer = null;
+    private SimpleHTTPServer businessServer = null;
 
     protected void setUp() throws java.lang.Exception {
         // Initializing Synapse repository
@@ -64,8 +64,8 @@ public class SynapseCommodityServiceTest extends TestCase {
                                           "http://business.org", "http://business.org");
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
-        synapseServer = new AsyncHTTPListener(synapseConfigCtx, 10000);
-        businessServer = new AsyncHTTPListener(businessConfigCtx, 10001);
+        synapseServer = new SimpleHTTPServer(synapseConfigCtx, 10000);
+        businessServer = new SimpleHTTPServer(businessConfigCtx, 10001);
 
         //starting servers
         synapseServer.start();

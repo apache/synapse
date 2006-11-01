@@ -69,6 +69,25 @@ public class SynapseConfiguration {
     /** Hold reference to the Axis2 ConfigurationContext */
     private ConfigurationContext configContext = null;
 
+    /** Save the path to the configuration file loaded, to save it later */
+    private String pathToConfigFile = null;
+
+    /**
+     * The path to the currently loaded configuration file
+     * @return file path to synapse.xml
+     */
+    public String getPathToConfigFile() {
+        return pathToConfigFile;
+    }
+
+    /**
+     * Set the path to the loaded synapse.xml
+     * @param pathToConfigFile path to the synapse.xml loaded
+     */
+    public void setPathToConfigFile(String pathToConfigFile) {
+        this.pathToConfigFile = pathToConfigFile;
+    }
+
     /**
      * Add a named mediator into this configuration
      * @param name the name for the sequence

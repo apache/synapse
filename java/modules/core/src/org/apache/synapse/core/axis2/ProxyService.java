@@ -28,9 +28,8 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Util;
-import org.apache.ws.policy.Policy;
-import org.apache.ws.policy.util.PolicyFactory;
-import org.apache.ws.policy.util.PolicyReader;
+import org.apache.neethi.PolicyEngine;
+import org.apache.neethi.Policy;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -174,28 +173,26 @@ public class ProxyService {
         }
 
         // if service level policies are specified, apply them
-        /*if (!serviceLevelPolicies.isEmpty()) {
-            PolicyReader reader = PolicyFactory.getPolicyReader(PolicyFactory.OM_POLICY_READER);
+        if (!serviceLevelPolicies.isEmpty()) {
+
             Policy svcEffectivePolicy = null;
 
-            String policyKey;
             iter = serviceLevelPolicies.iterator();
             while (iter.hasNext()) {
-                policyKey = (String) iter.next();
+                String policyKey = (String) iter.next();
                 if (svcEffectivePolicy == null) {
-                    svcEffectivePolicy = reader.readPolicy(
+                    svcEffectivePolicy = PolicyEngine.getPolicy(
                         Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream());
                 } else {
-                    svcEffectivePolicy.merge(reader.readPolicy(
-                        Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream()));
+                    svcEffectivePolicy = (Policy) svcEffectivePolicy.merge(
+                        PolicyEngine.getPolicy(
+                            Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream()));
                 }
             }
 
-            PolicyInclude policyInclude = new PolicyInclude();
-            policyInclude.addPolicyElement(PolicyInclude.SERVICE_POLICY, svcEffectivePolicy);
-            proxyService.setPolicyInclude(policyInclude);
+            proxyService.getPolicyInclude().setPolicy(svcEffectivePolicy);
         }
-*/
+
         // create a custom message receiver for this proxy service to use a given named
         // endpoint or sequence for forwarding/message mediation
         ProxyServiceMessageReceiver msgRcvr = new ProxyServiceMessageReceiver();
@@ -321,7 +318,7 @@ public class ProxyService {
         return serviceLevelPolicies;
     }
 
-    public void addServiceLevelPoliciy(URL serviceLevelPolicy) {
+    public void addServiceLevelPoliciy(String serviceLevelPolicy) {
         this.serviceLevelPolicies.add(serviceLevelPolicy);
     }
 

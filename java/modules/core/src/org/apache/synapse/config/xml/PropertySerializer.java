@@ -43,11 +43,11 @@ public class PropertySerializer {
      */
     public static OMElement serializeProperty(Property property, OMElement parent) {
 
-        OMElement propertyElement = fac.createOMElement("property", synNS);
+        OMElement propertyElement = fac.createOMElement("set-property", synNS);
         propertyElement.addAttribute(fac.createOMAttribute(
                 "name", nullNS, property.getName()));
-	propertyElement.addAttribute(fac.createOMAttribute(
-                "type", nullNS, "" + property.getType()));
+//	    propertyElement.addAttribute(fac.createOMAttribute(
+//                "type", nullNS, "" + property.getType()));
 
         if (property.getType() == Property.DYNAMIC_TYPE) {
             propertyElement.addAttribute(fac.createOMAttribute(

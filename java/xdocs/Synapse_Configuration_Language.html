@@ -99,8 +99,9 @@ to give a logical name to an endpoint address. If the address is not just a
 simple URL, then extensibility elements may be used to indicate the address
 (i.e. to compute the address at runtime).</p>
 <pre> &lt;endpoint name="string" [address="url"] [key="string"]&gt;
-   &lt;enableRM [policy="key"]/&gt;?
-   &lt;enableSec/&gt;?
+   &lt;enableRM/&gt;?
+   &lt;enableSec [policy="key"]/&gt;?
+   &lt;enableAddressing/&gt;?
    .. extensibility ..
  &lt;/endpoint&gt;</pre>
 
@@ -140,7 +141,6 @@ define a Synapse Proxy service.</p>
    &lt;wsdl key="string"&gt;?
    &lt;enableRM/&gt;?
    &lt;enableSec/&gt;?
-   &lt;enableAddressing/&gt;?
    &lt;policy key="string"&gt;*                       // optional service level policies
                                                 // (e.g. WS-Security and/or WS-RM policies)
    &lt;property name="string" value="string"/&gt;*    // optional service parameters 

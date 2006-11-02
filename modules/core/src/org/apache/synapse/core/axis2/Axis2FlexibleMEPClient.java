@@ -102,9 +102,6 @@ public class Axis2FlexibleMEPClient {
         axisOutMsgCtx.setConfigurationContext(serviceCtx.getConfigurationContext());
         axisOutMsgCtx.setServerSide(false); // this will become a client
 
-        // set SOAP envelope on the message context, removing WS-A headers
-        axisOutMsgCtx.setEnvelope(removeAddressingHeaders(axisOutMsgCtx));
-
         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
         AxisOperation axisAnonymousOperation = anoymousService.getOperation(
             new QName(AnonymousServiceFactory.DYNAMIC_OPERATION));

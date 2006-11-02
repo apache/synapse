@@ -66,7 +66,27 @@ public class EndpointSerializer {
             handleException("Invalid Endpoint. Address is required");
         }
 
-        // TODO handle advanced options
+        if (endpt.isAddressingOn()) {
+            endpoint.addChild(fac.createOMElement("enableAddressing", synNS));
+        }
+
+        if (endpt.isReliableMessagingOn()) {
+            OMElement rm = fac.createOMElement("enableRM", synNS);
+            if (endpt.getWsRMPolicyKey() != null) {
+                rm.addAttribute(fac.createOMAttribute(
+                    "policy", nullNS, endpt.getWsRMPolicyKey()));
+            }
+            endpoint.addChild(rm);
+        }
+
+        if (endpt.isSecurityOn()) {
+            OMElement sec = fac.createOMElement("enableSec", synNS);
+            if (endpt.getWsSecPolicyKey() != null) {
+                sec.addAttribute(fac.createOMAttribute(
+                    "policy", nullNS, endpt.getWsSecPolicyKey()));
+            }
+            endpoint.addChild(sec);
+        }
 
         if (parent != null) {
             parent.addChild(endpoint);

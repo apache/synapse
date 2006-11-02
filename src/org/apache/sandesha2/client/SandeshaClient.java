@@ -29,7 +29,6 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -41,14 +40,12 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2006Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
@@ -61,9 +58,7 @@ import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.AckRequested;
-import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.CloseSequence;
-import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -86,19 +81,6 @@ public class SandeshaClient {
 	 */
 	public static SequenceReport getOutgoingSequenceReport(ServiceClient serviceClient) throws SandeshaException {
 
-		Options options = serviceClient.getOptions();
-		if (options == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.optionsObjectNotSet));
-
-		EndpointReference toEPR = options.getTo();
-		if (toEPR == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.toEPRNotValid, null));
-
-		String to = toEPR.getAddress();
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-
 		ServiceContext serviceContext = serviceClient.getServiceContext();
 		if (serviceContext == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
@@ -106,7 +88,7 @@ public class SandeshaClient {
 
 		ConfigurationContext configurationContext = serviceContext.getConfigurationContext();
 
-		String internalSequenceID = getInternalSequenceID(to, sequenceKey);
+		String internalSequenceID = getInternalSequenceIdFromServiceClient(serviceClient);
 
 		return getOutgoingSequenceReport(internalSequenceID, configurationContext);
 	}
@@ -338,8 +320,6 @@ public class SandeshaClient {
 		if (to == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.toEPRNotValid, null));
-
-		ConfigurationContext configurationContext = serviceClient.getServiceContext().getConfigurationContext();
 		
 		if (offer) {
 			String offeredSequenceID = SandeshaUtil.getUUID();
@@ -357,8 +337,6 @@ public class SandeshaClient {
 
 		if (rmSpecVersion == null)
 			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
 		
 		//When the message is marked as Dummy the application processor will not actually try to send it. 
 		//But still the create Sequence will be added.
@@ -615,18 +593,7 @@ public class SandeshaClient {
 	// SandeshaException
 	public static String getSequenceID(ServiceClient serviceClient) throws SandeshaException {
 
-		Options options = serviceClient.getOptions();
-		if (options == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.optionsObjectNotSet));
-
-		EndpointReference toEPR = options.getTo();
-		if (toEPR == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.toEPRNotValid, null));
-
-		String to = toEPR.getAddress();
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		String internalSequenceID = getInternalSequenceIdFromServiceClient(serviceClient); 
 
 		ServiceContext serviceContext = serviceClient.getServiceContext();
 		if (serviceContext == null)
@@ -634,8 +601,6 @@ public class SandeshaClient {
 					SandeshaMessageKeys.serviceContextNotSet));
 
 		ConfigurationContext configurationContext = serviceContext.getConfigurationContext();
-
-		String internalSequenceID = generateInternalSequenceIDForTheClientSide(to, sequenceKey);
 
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		if (sequenceReport == null)
@@ -677,15 +642,6 @@ public class SandeshaClient {
 
 		ConfigurationContext configContext = serviceContext.getConfigurationContext();
 
-		EndpointReference toEPR = options.getTo();
-		if (toEPR == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.toEPRNotValid, null));
-
-		String to = toEPR.getAddress();
-
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 		if (rmSpecVersion == null)
 			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.v1_0;
@@ -695,7 +651,7 @@ public class SandeshaClient {
 					SandeshaMessageKeys.emptyAckRequestSpecLevel, rmSpecVersion));
 		}
 
-		String internalSequenceID = getInternalSequenceID(to, sequenceKey);
+		String internalSequenceID = getInternalSequenceIdFromServiceClient(serviceClient);
 
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configContext);
 		if (sequenceReport == null)
@@ -993,10 +949,6 @@ public class SandeshaClient {
 
 	}
 
-	private static String generateInternalSequenceIDForTheClientSide(String toEPR, String sequenceKey) {
-		return SandeshaUtil.getInternalSequenceID(toEPR, sequenceKey);
-	}
-
 	public static SequenceReport getIncomingSequenceReport(String sequenceID, ConfigurationContext configCtx)
 			throws SandeshaException {
 
@@ -1228,4 +1180,133 @@ public class SandeshaClient {
 		}
 	}
 
+	/**
+	 * Gets the last error that occured on a send to an endpoint.
+	 * 
+	 * The method will return null if no exception has been encountered.
+	 * Errors may be transient and maybe out of date.  To check the validity of the
+	 * error, check the timestamp from which the error was encountered 
+	 * @see getLastSendTimestamp .
+	 * 
+	 * @param serviceClient
+	 * @return
+	 * @throws SandeshaException
+	 */
+	public static String getLastSendError(ServiceClient serviceClient) 
+	
+	throws SandeshaException
+	{
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaClient::getLastSendError");
+
+		// Get the internal sequence id for this client
+		String internalSequenceId = getInternalSequenceIdFromServiceClient(serviceClient);
+		
+		if (log.isTraceEnabled())
+			log.trace("Looking up sequence with identifier " + internalSequenceId);
+		
+		ServiceContext serviceContext = serviceClient.getServiceContext();
+		if (serviceContext == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.serviceContextNotSet));
+
+		ConfigurationContext configurationContext = serviceContext.getConfigurationContext();
+
+		// Get the in use storage manager and the sequence property bean manager
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+		
+		// Lookup the last failed to send error
+		SequencePropertyBean errorBean = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR);
+	
+		String resultString = null;
+		
+		// Get the value from the 
+		if (errorBean != null)
+			resultString = errorBean.getValue();
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaClient::getLastSendError, " + resultString);
+		
+		return resultString;
+	}
+	
+	/**
+	 * Gets the timestamp from which the last error that occured on a send to an endpoint.
+	 * 
+	 * The method will return -1 if no errors have been encountered.
+	 * 
+	 * @param serviceClient
+	 * @return
+	 * @throws SandeshaException
+	 */
+	public static long getLastSendErrorTimestamp(ServiceClient serviceClient)
+	
+	throws SandeshaException
+	{
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaClient::getLastSendErrorTimestamp");
+
+		// Get the internal sequence id for this client
+		String internalSequenceId = getInternalSequenceIdFromServiceClient(serviceClient);
+		
+		if (log.isTraceEnabled())
+			log.trace("Looking up sequence with identifier " + internalSequenceId);
+		
+		ServiceContext serviceContext = serviceClient.getServiceContext();
+		if (serviceContext == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.serviceContextNotSet));
+
+		ConfigurationContext configurationContext = serviceContext.getConfigurationContext();
+
+		// Get the in use storage manager and the sequence property bean manager
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
+		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+		
+		// Lookup the last failed to send error
+		SequencePropertyBean errorTSBean = 
+			seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP);
+	
+		long resultTime = -1;
+		
+		// Get the value from the 
+		if (errorTSBean != null)
+			resultTime = Long.valueOf(errorTSBean.getValue()).longValue();
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaClient::getLastSendErrorTimestamp, " + resultTime);
+		
+		return resultTime;
+
+	}
+
+	/**
+	 * Gets the internal sequence id from the service client instance.
+	 * 
+	 * @param serviceClient
+	 * @return
+	 * @throws SandeshaException
+	 */
+	private static String getInternalSequenceIdFromServiceClient(ServiceClient serviceClient) 
+	
+	throws SandeshaException
+	{
+		Options options = serviceClient.getOptions();
+		if (options == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.optionsObjectNotSet));
+
+		EndpointReference toEPR = options.getTo();
+		if (toEPR == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.toEPRNotValid, null));
+
+		String to = toEPR.getAddress();
+		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+
+		String internalSequenceID = getInternalSequenceID(to, sequenceKey);
+
+		return internalSequenceID;
+	}
 }

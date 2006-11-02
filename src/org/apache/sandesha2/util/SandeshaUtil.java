@@ -18,7 +18,9 @@
 package org.apache.sandesha2.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -220,14 +222,6 @@ public class SandeshaUtil {
 			sender.runSenderForTheSequence(context, sequenceID);
 		}
 	}
-
-	private static void stopSenderForTheSequence(String sequenceID, ConfigurationContext context) {
-		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
-		
-		if (sender!=null) {
-			sender.stopSenderForTheSequence(sequenceID);
-		}
-	}
 	
 	public static void stopSender(ConfigurationContext context) {
 		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
@@ -266,12 +260,6 @@ public class SandeshaUtil {
 				Sandesha2Constants.POLLING_MANAGER);
 		if (pollingManager!=null) 
 			pollingManager.stopPolling ();
-	}
-
-	private static void stopInvokerForTheSequence(String sequenceID, ConfigurationContext context) {
-		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
-		if (invoker!=null)
-			invoker.stopInvokerForTheSequence(sequenceID);
 	}
 	
 	public static void stopInvoker(ConfigurationContext context) {
@@ -1148,5 +1136,22 @@ public class SandeshaUtil {
 		return newMsg;
 		
 	}
+
+	/**
+	 * Returns an Exception as a String
+	 * 
+	 * @param exc
+	 * @return
+	 */
+  public static String getStackTrace(Throwable exc)
+  {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintWriter pw = new PrintWriter(baos);
+    exc.printStackTrace(pw);
+    pw.flush();
+    String stackTrace = baos.toString();
+    return stackTrace;
+  }
+
 	
 }

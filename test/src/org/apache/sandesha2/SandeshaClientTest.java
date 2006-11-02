@@ -18,14 +18,19 @@ package org.apache.sandesha2;
 
 import java.io.File;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.Constants.Configuration;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,18 +45,17 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	private Log log = LogFactory.getLog(getClass());
 	int serverPort = DEFAULT_SERVER_TEST_PORT;
 	
+	private static final String applicationNamespaceName = "http://tempuri.org/"; 
+	private static final String ping = "ping";
+	private static final String Text = "Text";
+
+	
 	public SandeshaClientTest () {
 		super ("SandeshaClientTest");
 	}
 	
-	public void setUp () throws AxisFault {
+	public void setUp () {
 		
-		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-
-
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
 		String serverPortStr = getTestProperty("test.server.port");
 		if (serverPortStr!=null) {
 		
@@ -62,6 +66,15 @@ public class SandeshaClientTest extends SandeshaTestCase {
 			}
 		}
 		
+	}
+	
+	private void startServer() throws AxisFault {
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
+
+
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 		httpServer = new SimpleHTTPServer (configContext,serverPort);
 		httpServer.start();
 		try {
@@ -69,6 +82,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		} catch (InterruptedException e) {
 			throw new SandeshaException ("sleep interupted");
 		}
+
 	}
 	
 	public void tearDown () throws SandeshaException {
@@ -84,6 +98,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	
 	public void testCreateSequenceWithOffer () throws AxisFault,InterruptedException {
 		
+		startServer();
+		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
@@ -95,7 +111,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		Options clientOptions = new Options ();
 
 		clientOptions.setTo(new EndpointReference (to));
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
@@ -156,5 +172,75 @@ public class SandeshaClientTest extends SandeshaTestCase {
 //		
 //	}
 	
+	/**
+	 * Tests that the last error and timestamp are set for the simple case of the target service not being available
+	 */
+	public void testLastErrorAndTimestamp() throws Exception
+	{
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		Options clientOptions = new Options ();
+		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		
+		clientOptions.setTo(new EndpointReference (to));
+		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportTo);
+		
+		String sequenceKey = "sequence1";
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		
+		serviceClient.setOptions(clientOptions);
+		
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		
+		//starting the server after a wait
+		Thread.sleep(10000);
+				
+		// Check that the last error and last error time stamp have been set
+		String lastSendError = SandeshaClient.getLastSendError(serviceClient);
+		long lastSendErrorTime = SandeshaClient.getLastSendErrorTimestamp(serviceClient);
+		
+		// Check the values are valid
+		assertNotNull(lastSendError);
+		assertTrue(lastSendErrorTime > -1);
+		
+		startServer();
+
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
+		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		
+		
+		Thread.sleep(10000);
+	
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
+		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
+		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+	
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
+	}
+	
+	private OMElement getPingOMBlock(String text) {
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement pingElem = fac.createOMElement(ping, namespace);
+		OMElement textElem = fac.createOMElement(Text, namespace);
+		
+		textElem.setText(text);
+		pingElem.addChild(textElem);
+
+		return pingElem;
+	}
+
 	
 }

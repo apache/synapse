@@ -11,7 +11,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
@@ -25,11 +24,12 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
-import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.TerminateSequence;
@@ -52,6 +52,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	
 	public void run () {
 		
+		if (log.isDebugEnabled())
+			log.debug("Enter: SenderWorker::run");
+
 		Transaction transaction = null;
 		
 		try {
@@ -76,6 +79,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(rmMsgCtx, senderBean, configurationContext,
 					storageManager);
 			if (!continueSending) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SenderWorker::run, !continueSending");
 				return;
 			}
 
@@ -88,6 +93,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			String qualifiedForSending = (String) msgCtx.getProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING);
 			if (qualifiedForSending != null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SenderWorker::run, !qualified for sending");
 				return;
 			}
 
@@ -101,6 +108,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			ArrayList msgsNotToSend = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation()).getMsgTypesToDrop();
 
 			if (msgsNotToSend != null && msgsNotToSend.contains(new Integer(rmMsgCtx.getMessageType()))) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SenderWorker::run, message type to be dropped " + rmMsgCtx.getMessageType());
 				return;	
 			}
 
@@ -171,7 +180,55 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			} catch (Exception e) {
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.sendMsgError, e.toString());
-				log.error(message, e);
+				
+				if (log.isErrorEnabled())
+				  log.error(message, e);
+				// Store the Exception as a sequence property to enable the client to lookup the last 
+				// exception time and timestamp.
+				
+				// Create a new Transaction
+				transaction = storageManager.getTransaction();
+			
+				try
+				{
+					
+					// Get the internal sequence id from the context
+					String internalSequenceId = (String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
+					
+					// Get the sequence property bean manager
+					SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+					
+					// Add the new sequence property beans.
+					String exceptionStr = SandeshaUtil.getStackTrace(e);
+					SequencePropertyBean eBean = 
+						new SequencePropertyBean(internalSequenceId, 
+																	   Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR, 
+																	   exceptionStr);
+					
+					SequencePropertyBean etsBean = 
+						new SequencePropertyBean(internalSequenceId, 
+																	   Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP, 
+																	   String.valueOf(System.currentTimeMillis()));
+					
+					
+					// Insert the exception bean
+					seqPropMgr.insert(eBean);
+					
+					// Insert the timestamp bean
+					seqPropMgr.insert(etsBean);
+					
+					// Commit the properties
+					transaction.commit();
+				}
+				catch (Exception e1)
+				{
+					if (log.isErrorEnabled())
+						log.error(e1);
+					
+					if (transaction != null && transaction.isActive())
+						transaction.rollback();
+				}
+				
 			} finally {
 				transaction = storageManager.getTransaction();
 				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
@@ -224,16 +281,30 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 		} catch (SandeshaStorageException e) { 
+			if (log.isDebugEnabled())
+				log.debug(e);
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} catch (SandeshaException e) {
-			e.printStackTrace();
+			if (log.isDebugEnabled())
+				log.debug(e);
+			if (transaction!=null && transaction.isActive())
+				transaction.rollback();
 		} catch (MissingResourceException e) {
-			e.printStackTrace();
+			if (log.isFatalEnabled())
+			  log.fatal("Unable to load message bundle", e);
+			if (transaction!=null && transaction.isActive())
+				transaction.rollback();
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			if (log.isDebugEnabled())
+				log.debug(e);
+			if (transaction!=null && transaction.isActive())
+				transaction.rollback();
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (log.isDebugEnabled())
+				log.debug(e);
+			if (transaction!=null && transaction.isActive())
+				transaction.rollback();
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();
@@ -242,6 +313,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				lock.removeWork(workId);
 			}
 		}
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SenderWorker::run");
 	}
 	
 	private void updateMessage(MessageContext msgCtx1) throws SandeshaException {
@@ -347,7 +421,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			log.debug("Exit: Sender::checkForSyncResponses");
 	}
 	
-	private boolean isFaultEnvelope(SOAPEnvelope envelope) throws SandeshaException {
+	private boolean isFaultEnvelope(SOAPEnvelope envelope) {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::isFaultEnvelope, " + envelope.getBody().getFault());
 		SOAPFault fault = envelope.getBody().getFault();

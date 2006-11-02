@@ -66,7 +66,10 @@ public class SynapseModule implements Module {
         Iterator iter = synCfg.getProxyServices().iterator();
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
-            axisCfg.addService(proxy.buildAxisService(synCfg, axisCfg));
+            proxy.buildAxisService(synCfg, axisCfg);
+            if(!proxy.isStartOnLoad()) {
+                proxy.stop(synCfg);
+            }
         }
 
         log.info("Synapse initialized successfully...!");

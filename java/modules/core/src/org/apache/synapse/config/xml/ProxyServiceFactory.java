@@ -75,6 +75,13 @@ public class ProxyServiceFactory {
             }
         }
 
+        OMAttribute startOnLoad = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "startOnLoad"));
+        if(startOnLoad != null) {
+            proxy.setStartOnLoad(Boolean.parseBoolean(startOnLoad.getAttributeValue()));
+        } else {
+            proxy.setStartOnLoad(true);
+        }
+
         // read definition of the target of this proxy service. The target could be an 'endpoint'
         // or a named sequence. If none of these are specified, the messages would be mediated
         // by the Synapse main mediator

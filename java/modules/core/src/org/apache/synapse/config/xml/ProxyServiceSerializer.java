@@ -70,6 +70,14 @@ public class ProxyServiceSerializer {
             proxy.addAttribute(fac.createOMAttribute("transports", nullNS, transportStr));
         }
 
+        if (service.isStartOnLoad()) {
+            proxy.addAttribute(fac.createOMAttribute(
+                "startOnLoad", nullNS, "true"));
+        } else {
+            proxy.addAttribute(fac.createOMAttribute(
+                "startOnLoad", nullNS, "false"));
+        }
+
         if (service.getTargetEndpoint() != null) {
             OMElement target = fac.createOMElement("target", synNS);
             target.addAttribute(fac.createOMAttribute(

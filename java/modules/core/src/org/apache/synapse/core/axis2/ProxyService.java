@@ -78,6 +78,10 @@ public class ProxyService {
     private boolean wsRMEnabled = false;
     /** Should WS Sec (default configuration) be engaged on this service */
     private boolean wsSecEnabled = false;
+    /** This will say weather need to start the service at the load or not */
+    private boolean startOnLoad = true;
+    /** This will hold the status of the proxy weather it is running or not */
+    private boolean running = false;
 
     public static final String ALL_TRANSPORTS = "all";
 
@@ -209,11 +213,17 @@ public class ProxyService {
             op.setMessageReceiver(msgRcvr);
         }
 
+try {
+            axisCfg.addService(proxyService);
+            this.setRunning(true);
+        } catch (AxisFault axisFault) {
+            handleException("Unable to start the Proxy Service");
+        }
+
         // should RM be engaged on this service?
         if (wsRMEnabled) {
             try {
-                proxyService.engageModule(
-                    axisCfg.getModule(Constants.SANDESHA2_MODULE_NAME), axisCfg);
+                proxyService.engageModule(axisCfg.getModule(Constants.SANDESHA2_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS RM module on proxy service : " + name, axisFault);
             }
@@ -222,29 +232,25 @@ public class ProxyService {
         // should Security be engaged on this service?
         if (wsSecEnabled) {
             try {
-                proxyService.engageModule(
-                    axisCfg.getModule(Constants.RAMPART_MODULE_NAME), axisCfg);
+                proxyService.engageModule(axisCfg.getModule(Constants.RAMPART_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS Sec module on proxy service : " + name, axisFault);
             }
         }
-
         return proxyService;
     }
 
     public void start(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getConfigurationContext().getAxisConfiguration();
-        try {
-            axisConfig.addService(this.buildAxisService(synCfg, axisConfig));
-        } catch (AxisFault axisFault) {
-            handleException(axisFault.getMessage());
-        }
+        axisConfig.getServiceForActivation(this.getName()).setActive(true);
+        this.setRunning(true);
     }
 
     public void stop(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getConfigurationContext().getAxisConfiguration();
         try {
             axisConfig.getService(this.getName()).setActive(false);
+            this.setRunning(false);
         } catch (AxisFault axisFault) {
             handleException(axisFault.getMessage());
         }
@@ -336,6 +342,22 @@ public class ProxyService {
 
     public void setWsSecEnabled(boolean wsSecEnabled) {
         this.wsSecEnabled = wsSecEnabled;
+    }
+
+    public boolean isStartOnLoad() {
+        return startOnLoad;
+    }
+
+    public void setStartOnLoad(boolean startOnLoad) {
+        this.startOnLoad = startOnLoad;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 
     private static void handleException(String msg) {

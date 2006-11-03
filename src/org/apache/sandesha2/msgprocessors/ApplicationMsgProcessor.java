@@ -58,7 +58,6 @@ import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
-import org.apache.sandesha2.wsrm.UsesSequenceSTR;
 
 /**
  * Responsible for processing an incoming Application message.
@@ -560,13 +559,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if(token != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			createSeqBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
-			
-			// If we are using token based security, and the 1.1 spec level, then we
-			// should introduce a UsesSequenceSTR header into the message.
-			if(createSequencePart.getNamespaceValue().equals(Sandesha2Constants.SPEC_2006_08.NS_URI)) {
-				UsesSequenceSTR header = new UsesSequenceSTR(null, Sandesha2Constants.SPEC_2006_08.NS_URI);
-				header.toSOAPEnvelope(createSeqMsg.getEnvelope());
-			}
 		}
 		
 		createSeqMgr.insert(createSeqBean);

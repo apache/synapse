@@ -310,4 +310,10 @@ public class RampartBasedSecurityManager extends SecurityManager {
     private OMElement convertOMElement(OMFactory fac, OMElement elem) {
         return new StAXOMBuilder(fac, elem.getXMLStreamReader()).getDocumentElement();
     }
+
+	public void applySecurityToken(SecurityToken token, MessageContext outboundMessage) throws SandeshaException {
+		// TODO If there are any properties that should be put onto the outbound message
+		// to ensure that the correct token is used to secure it, then they should be
+		// added now.
+	}
 }

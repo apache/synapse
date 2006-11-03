@@ -33,6 +33,8 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
@@ -49,7 +51,7 @@ public class SequenceManager {
 
 	private static Log log = LogFactory.getLog(SequenceManager.class);
 
-	public static String setupNewSequence(RMMsgContext createSequenceMsg, StorageManager storageManager)
+	public static String setupNewSequence(RMMsgContext createSequenceMsg, StorageManager storageManager, SecurityManager securityManager, SecurityToken token)
 			throws AxisFault {
 
 		String sequenceId = SandeshaUtil.getUUID();
@@ -107,13 +109,21 @@ public class SequenceManager {
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, to.getAddress());
 		SequencePropertyBean acksToBean = new SequencePropertyBean(sequenceId,
 				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo.getAddress());
-
+		
 		seqPropMgr.insert(receivedMsgBean);
 		seqPropMgr.insert(replyToBean);
 		seqPropMgr.insert(acksToBean);
 
 		if (toBean != null)
 			seqPropMgr.insert(toBean);
+
+		// Store the security token alongside the sequence
+		if(token != null) {
+			String tokenData = securityManager.getTokenRecoveryData(token);
+			SequencePropertyBean tokenBean = new SequencePropertyBean(sequenceId,
+					Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
+			seqPropMgr.insert(tokenBean);
+		}		
 
 		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 		nextMsgMgr.insert(new NextMsgBean(sequenceId, 1)); // 1 will be the

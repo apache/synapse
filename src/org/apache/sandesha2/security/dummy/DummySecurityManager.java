@@ -78,5 +78,10 @@ public class DummySecurityManager extends SecurityManager {
 		throw new SandeshaException(msg);
 	}
 
+	public void applySecurityToken(SecurityToken token, MessageContext outboundMessage) throws SandeshaException {
+		String msg = SandeshaMessageHelper.getMessage("secureDummyNoSTR");
+		throw new SandeshaException(msg);
+	}
+
 
 }

@@ -234,6 +234,16 @@ public class CloseSequenceProcessor implements MsgProcessor {
 
 		rmMsgCtx.addSOAPEnvelope();
 
+		// Ensure the outbound message us secured using the correct token
+		String tokenData = SandeshaUtil.getSequenceProperty(internalSeqenceID,
+				Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
+				storageManager);
+		if(tokenData != null) {
+			SecurityManager secMgr = SandeshaUtil.getSecurityManager(configurationContext);
+			SecurityToken token = secMgr.recoverSecurityToken(tokenData);
+			secMgr.applySecurityToken(token, msgContext);
+		}
+
 		String key = SandeshaUtil.getUUID();
 
 		SenderBean closeBean = new SenderBean();

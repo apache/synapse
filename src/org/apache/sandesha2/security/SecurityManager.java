@@ -98,4 +98,12 @@ public abstract class SecurityManager {
 	public abstract SecurityToken recoverSecurityToken(String tokenData)
 	throws SandeshaException;
 
+	/**
+	 * Ensure that the given token will be associated with an outbound message.
+	 * This gives the SecurityManager implementation an opportunity to decorate
+	 * the message context with properties that will then be used by the security
+	 * handlers.
+	 */
+	public abstract void applySecurityToken(SecurityToken token, MessageContext outboundMessage)
+	throws SandeshaException;
 }

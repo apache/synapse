@@ -91,10 +91,10 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		// If the inbound CreateSequence includes a SecurityTokenReference then
 		// ask the security manager to resolve that to a token for us. We also
 		// check that the Create was secured using the token.
+		SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 		OMElement theSTR = createSeqPart.getSecurityTokenReference();
 		SecurityToken token = null;
 		if(theSTR != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 			MessageContext msgcontext = createSeqRMMsg.getMessageContext();
 			token = secManager.getSecurityToken(theSTR, msgcontext);
 			
@@ -116,12 +116,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		try {
-			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager); // newly
-																										// created
-																										// sequnceID.
-
-			
-			
+			// Create the new sequence id, as well as establishing the beans that handle the
+			// sequence state.
+			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
 			
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
 					newSequenceId, storageManager); // converting the blank out
@@ -205,6 +202,16 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						offeredEndpointBean.setValue(endpoint.getEPR().getAddress());  
 						offeredEndpointBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
 						seqPropMgr.insert(offeredEndpointBean);
+					}
+					
+					// Store the inbound token (if any) with the new sequence
+					if(token != null) {
+						String tokenData = secManager.getTokenRecoveryData(token);
+						SequencePropertyBean tokenBean = new SequencePropertyBean(
+								offeredSequenceID,
+								Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
+								tokenData);
+						seqPropMgr.insert(tokenBean);
 					}
 				} else {
 					// removing the accept part.

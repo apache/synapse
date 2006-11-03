@@ -19,21 +19,17 @@ package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -64,6 +60,7 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
+import org.apache.sandesha2.wsrm.UsesSequenceSTR;
 
 /**
  * Used to create new RM messages.
@@ -73,124 +70,8 @@ public class RMMsgCreator {
 
 	private static Log log = LogFactory.getLog(RMMsgCreator.class);
 
-	private static void initializeCreation(MessageContext relatedMessage, MessageContext newMessage)
-			throws SandeshaException {
-
-		if (relatedMessage.getAxisService() != null && newMessage.getAxisService() != null
-				&& newMessage.getAxisService() != relatedMessage.getAxisService()) {
-
-			Parameter referencePolicyParam = relatedMessage.getAxisService().getParameter(
-					Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
-			if (referencePolicyParam != null) {
-				Parameter newPolicyParam = new Parameter();
-				newPolicyParam.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
-				newPolicyParam.setValue(newPolicyParam.getValue());
-			}
-		}
-
-		if (relatedMessage.getAxisOperation() != null && newMessage.getAxisOperation() != null
-				&& newMessage.getAxisOperation() != relatedMessage.getAxisOperation()) {
-
-			Parameter referencePolicyParam = relatedMessage.getAxisOperation().getParameter(
-					Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
-			if (referencePolicyParam != null) {
-				Parameter newPolicyParam = new Parameter();
-				newPolicyParam.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
-				newPolicyParam.setValue(newPolicyParam.getValue());
-			}
-		}
-	}
-
-	private static void finalizeCreation(MessageContext relatedMessage, MessageContext newMessage)
-			throws SandeshaException {
-
-		newMessage.setServerSide(relatedMessage.isServerSide());
-
-		// adding all parameters from old message to the new one.
-		try {
-			// axisOperation parameters
-			AxisOperation oldAxisOperation = relatedMessage.getAxisOperation();
-			if (oldAxisOperation != null) {
-				ArrayList axisOpParams = oldAxisOperation.getParameters();
-				if (axisOpParams != null) {
-					AxisOperation newAxisOperation = newMessage.getAxisOperation();
-					Iterator iter = axisOpParams.iterator();
-					while (iter.hasNext()) {
-						Parameter nextParam = (Parameter) iter.next();
-						Parameter newParam = new Parameter();
-
-						newParam.setName(nextParam.getName());
-						newParam.setValue(nextParam.getValue());
-
-						newAxisOperation.addParameter(newParam);
-					}
-				}
-			}
-
-		} catch (AxisFault e) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotCopyParameters, e.getLocalizedMessage());
-			log.error(message, e);
-			throw new SandeshaException(message, e);
-		}
-
-		// TODO optimize by cloning the Map rather than copying one by one.
-
-		// operationContext properties
-		OperationContext oldOpContext = relatedMessage.getOperationContext();
-		if (oldOpContext != null) {
-			Map oldOpContextProperties = oldOpContext.getProperties();
-			if (oldOpContextProperties != null) {
-				OperationContext newOpContext = newMessage.getOperationContext();
-				Iterator keyIter = oldOpContextProperties.keySet().iterator();
-				while (keyIter.hasNext()) {
-					String key = (String) keyIter.next();
-					newOpContext.setProperty(key, oldOpContextProperties.get(key));
-				}
-			}
-		}
-
-		// MessageContext properties
-		if (relatedMessage != null && newMessage != null) {
-			Map oldMsgContextProperties = relatedMessage.getProperties();
-			if (oldMsgContextProperties != null) {
-				Iterator keyIter = oldMsgContextProperties.keySet().iterator();
-				while (keyIter.hasNext()) {
-					String key = (String) keyIter.next();
-					newMessage.setProperty(key, oldMsgContextProperties.get(key));
-				}
-			}
-		}
-
-		// setting an options with properties copied from the old one.
-		Options relatesMessageOptions = relatedMessage.getOptions();
-		if (relatesMessageOptions != null) {
-			Options newMessageOptions = newMessage.getOptions();
-			if (newMessageOptions == null) {
-				newMessageOptions = new Options();
-				newMessage.setOptions(newMessageOptions);
-			}
-
-			Map relatedMessageProperties = relatesMessageOptions.getProperties();
-			Iterator keys = relatedMessageProperties.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = (String) keys.next();
-				newMessageOptions.setProperty(key, relatedMessageProperties.get(key));
-			}
-
-			Options relatedMessageParentOptions = relatesMessageOptions.getParent();
-			if (relatedMessageParentOptions != null) {
-				Map relatedMessageParentProperties = relatedMessageParentOptions.getProperties();
-				keys = relatedMessageParentProperties.keySet().iterator();
-				while (keys.hasNext()) {
-					String key = (String) keys.next();
-					newMessageOptions.setProperty(key, relatedMessageParentProperties.get(key));
-				}
-			}
-		}
-	}
-
 	/**
-	 * Create a new CreateSeqnence message.
+	 * Create a new CreateSequence message.
 	 * 
 	 * @param applicationRMMsg
 	 * @param internalSequenceId
@@ -221,8 +102,6 @@ public class RMMsgCreator {
 			createSeqmsgContext = SandeshaUtil
 					.createNewRelatedMessageContext(applicationRMMsg, createSequenceOperation);
 			
-			initializeCreation(applicationMsgContext, createSeqmsgContext);
-
 			OperationContext createSeqOpCtx = createSeqmsgContext.getOperationContext();
 			String createSeqMsgId = SandeshaUtil.getUUID();
 			createSeqmsgContext.setMessageID(createSeqMsgId);
@@ -316,6 +195,8 @@ public class RMMsgCreator {
 		AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue,addressingNamespaceValue);
 		createSequencePart.setAcksTo(acksTo);
 		
+		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, createSequencePart);
+
 		// Find the token that should be used to secure this new sequence. If there is a token, then we
 		// save it in the properties so that the caller can store the token within the create sequence
 		// bean.
@@ -326,18 +207,16 @@ public class RMMsgCreator {
 			createSequencePart.setSecurityTokenReference(str);
 			createSeqRMMsg.setProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, token);
 			
-			//adding the UseSequenceSTR header
-			SOAPFactory createSeqFactory = (SOAPFactory) createSeqRMMsg.getSOAPEnvelope().getOMFactory();
-			OMNamespace namespace = createSeqFactory.createOMNamespace(Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM, createSeqRMMsg.getRMNamespaceValue());
-			createSeqFactory.createSOAPHeaderBlock(Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR, namespace);
-		}
+			// If we are using token based security, and the 1.1 spec level, then we
+			// should introduce a UsesSequenceSTR header into the message.
+			if(createSequencePart.getNamespaceValue().equals(Sandesha2Constants.SPEC_2006_08.NS_URI)) {
+				UsesSequenceSTR header = new UsesSequenceSTR(null, Sandesha2Constants.SPEC_2006_08.NS_URI);
+				header.toSOAPEnvelope(createSeqmsgContext.getEnvelope());
+			}
 
-		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, createSequencePart);
-
-		try {
-			createSeqRMMsg.addSOAPEnvelope();
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1.getMessage());
+			// Ensure that the correct token will be used to secure the outbound create sequence message.
+			// We cannot use the normal helper method as we have not stored the token into the sequence bean yet.
+			secMgr.applySecurityToken(token, createSeqRMMsg.getMessageContext());
 		}
 
 		createSeqRMMsg.setAction(SpecSpecificConstants.getCreateSequenceAction(SandeshaUtil.getRMVersion(
@@ -345,8 +224,8 @@ public class RMMsgCreator {
 		createSeqRMMsg.setSOAPAction(SpecSpecificConstants.getCreateSequenceSOAPAction(SandeshaUtil.getRMVersion(
 				sequencePropertyKey, storageManager)));
 
-		finalizeCreation(applicationMsgContext, createSeqmsgContext);
-
+		createSeqRMMsg.addSOAPEnvelope();
+		
 		return createSeqRMMsg;
 	}
 
@@ -391,8 +270,6 @@ public class RMMsgCreator {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
-		initializeCreation(referenceMessage, terminateMessage);
-
 		if (!SpecSpecificConstants.isTerminateSequenceResponseRequired(rmVersion)) {
 			terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null);
 		}
@@ -418,16 +295,11 @@ public class RMMsgCreator {
 			}
 		}
 
-		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		terminateRMMessage.setSOAPEnvelop(envelope);
-
 		TerminateSequence terminateSequencePart = new TerminateSequence(rmNamespaceValue);
 		Identifier identifier = new Identifier(rmNamespaceValue);
 		identifier.setIndentifer(sequenceId);
 		terminateSequencePart.setIdentifier(identifier);
 		terminateRMMessage.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ, terminateSequencePart);
-
-		finalizeCreation(referenceMessage, terminateMessage);
 
 		terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null); // no
 																			// need
@@ -440,6 +312,9 @@ public class RMMsgCreator {
 																			// terminate
 		// message. If this is put, sender will look for an response.
 
+		// Ensure the correct token is used to secure the terminate sequence
+		secureOutboundMessage(sequencePropertyKey, terminateMessage);
+		
 		return terminateRMMessage;
 	}
 
@@ -507,8 +382,6 @@ public class RMMsgCreator {
 
 		outMessage.setEnvelope(envelope);
 
-		initializeCreation(createSeqMessage.getMessageContext(), outMessage);
-
 		RMMsgContext createSeqResponse = null;
 		try {
 			createSeqResponse = MsgInitializer.initializeMessage(outMessage);
@@ -518,9 +391,11 @@ public class RMMsgCreator {
 
 		createSeqResponse.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE, response);
 
-		finalizeCreation(createSeqMessage.getMessageContext(), outMessage);
-
 		createSeqMessage.getMessageContext().setServerSide(true);
+
+		// Ensure the correct token is used to secure the create sequence response
+		secureOutboundMessage(newSequenceID, outMessage);
+		
 		return createSeqResponse;
 	}
 
@@ -554,13 +429,13 @@ public class RMMsgCreator {
 		outMessage.setSoapAction(SpecSpecificConstants.getTerminateSequenceResponseAction(SandeshaUtil.getRMVersion(
 				sequenceID, storageManager)));
 
-		initializeCreation(terminateSeqRMMsg.getMessageContext(), outMessage);
-
 		terminateSeqResponseRMMsg.addSOAPEnvelope();
 
-		finalizeCreation(terminateSeqRMMsg.getMessageContext(), outMessage);
-
 		terminateSeqResponseRMMsg.getMessageContext().setServerSide(true);
+		
+		// Ensure the correct token is used to secure the terminate sequence response
+		secureOutboundMessage(sequenceID, outMessage);
+		
 		return terminateSeqResponseRMMsg;
 	}
 
@@ -594,12 +469,12 @@ public class RMMsgCreator {
 		outMessage.setSoapAction(SpecSpecificConstants.getCloseSequenceResponseAction(SandeshaUtil.getRMVersion(
 				sequenceID, storageManager)));
 
-		initializeCreation(closeSeqRMMsg.getMessageContext(), outMessage);
-
 		closeSeqResponseRMMsg.addSOAPEnvelope();
-
-		finalizeCreation(closeSeqRMMsg.getMessageContext(), outMessage);
 		closeSeqResponseRMMsg.getMessageContext().setServerSide(true);
+
+		// Ensure the correct token is used to secure the close sequence response
+		secureOutboundMessage(sequenceID, outMessage);
+		
 		return closeSeqResponseRMMsg;
 	}
 
@@ -669,6 +544,9 @@ public class RMMsgCreator {
 		
 		//generating the SOAP envelope.
 		applicationMsg.addSOAPEnvelope();
+		
+		// Ensure the message also contains the token that needs to be used
+		secureOutboundMessage(sequencePropertyKey, applicationMsg.getMessageContext());
 	}
 	
 	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,  String makeConnectionSeqId,
@@ -710,7 +588,30 @@ public class RMMsgCreator {
 		//generating the SOAP Envelope.
 		makeConnectionRMMessageCtx.addSOAPEnvelope();
 		
+		// TODO work out how to find the correct sequence property key to look up the token
+		// that we should include in the makeConnection (assuming we need one)
+		
 		return makeConnectionRMMessageCtx;
+	}
+
+	private static void secureOutboundMessage(String sequenceKey, MessageContext message)
+	throws SandeshaException
+	{
+		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::secureOutboundMessage");
+
+		ConfigurationContext configCtx = message.getConfigurationContext();
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx.getAxisConfiguration());
+		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
+
+		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequenceKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		if(tokenBean != null) {
+			if(log.isDebugEnabled()) log.debug("Securing outbound message");
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
+			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			secManager.applySecurityToken(token, message);
+		}
+
+		if(log.isDebugEnabled()) log.debug("Exit: RMMsgCreator::secureOutboundMessage");
 	}
 
 }

@@ -177,21 +177,20 @@ public class SynapseConfiguration {
         if(name != null && value != null) {
             if(globalProps.containsKey(name)) {
                 log.warn("Overiding the global property with name : " + name);
-            } else {
-                if(value.getType() == Property.SRC_TYPE) {
-                    try {
-                        URLConnection urlc = value.getSrc().openConnection();
-                        XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(urlc.getInputStream());
-                        StAXOMBuilder builder = new StAXOMBuilder(parser);
-                        value.setValue(builder.getDocumentElement());
-                    } catch (IOException e) {
-                        handleException("Can not read from the source : " + value.getSrc());
-                    } catch (XMLStreamException e) {
-                        handleException("Can not load the source property : " + value.getName());
-                    }
-                }
-		globalProps.put(name, value);
             }
+            if(value.getType() == Property.SRC_TYPE) {
+                try {
+                    URLConnection urlc = value.getSrc().openConnection();
+                    XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(urlc.getInputStream());
+                    StAXOMBuilder builder = new StAXOMBuilder(parser);
+                    value.setValue(builder.getDocumentElement());
+                } catch (IOException e) {
+                    handleException("Can not read from the source : " + value.getSrc());
+                } catch (XMLStreamException e) {
+                    handleException("Can not load the source property : " + value.getName());
+                }
+            }
+            globalProps.put(name, value);
         } else {
             log.error("Name and the value of the property cannot be null");
         }

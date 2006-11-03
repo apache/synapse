@@ -57,35 +57,44 @@ public class EndpointSerializer {
     public static OMElement serializeEndpoint(Endpoint endpt, OMElement parent) {
 
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
-        endpoint.addAttribute(fac.createOMAttribute(
-                "name", nullNS, endpt.getName()));
-        if (endpt.getAddress() != null) {
+
+        // is this an endpoint ref or an actual endpoint
+        if (endpt.getName() == null && endpt.getRef() != null) {
             endpoint.addAttribute(fac.createOMAttribute(
-                "address", nullNS, endpt.getAddress()));
+                "ref", nullNS, endpt.getRef()));
+            
         } else {
-            handleException("Invalid Endpoint. Address is required");
-        }
 
-        if (endpt.isAddressingOn()) {
-            endpoint.addChild(fac.createOMElement("enableAddressing", synNS));
-        }
-
-        if (endpt.isReliableMessagingOn()) {
-            OMElement rm = fac.createOMElement("enableRM", synNS);
-            if (endpt.getWsRMPolicyKey() != null) {
-                rm.addAttribute(fac.createOMAttribute(
-                    "policy", nullNS, endpt.getWsRMPolicyKey()));
+            endpoint.addAttribute(fac.createOMAttribute(
+                    "name", nullNS, endpt.getName()));
+            if (endpt.getAddress() != null) {
+                endpoint.addAttribute(fac.createOMAttribute(
+                    "address", nullNS, endpt.getAddress()));
+            } else {
+                handleException("Invalid Endpoint. Address is required");
             }
-            endpoint.addChild(rm);
-        }
 
-        if (endpt.isSecurityOn()) {
-            OMElement sec = fac.createOMElement("enableSec", synNS);
-            if (endpt.getWsSecPolicyKey() != null) {
-                sec.addAttribute(fac.createOMAttribute(
-                    "policy", nullNS, endpt.getWsSecPolicyKey()));
+            if (endpt.isAddressingOn()) {
+                endpoint.addChild(fac.createOMElement("enableAddressing", synNS));
             }
-            endpoint.addChild(sec);
+
+            if (endpt.isReliableMessagingOn()) {
+                OMElement rm = fac.createOMElement("enableRM", synNS);
+                if (endpt.getWsRMPolicyKey() != null) {
+                    rm.addAttribute(fac.createOMAttribute(
+                        "policy", nullNS, endpt.getWsRMPolicyKey()));
+                }
+                endpoint.addChild(rm);
+            }
+
+            if (endpt.isSecurityOn()) {
+                OMElement sec = fac.createOMElement("enableSec", synNS);
+                if (endpt.getWsSecPolicyKey() != null) {
+                    sec.addAttribute(fac.createOMAttribute(
+                        "policy", nullNS, endpt.getWsSecPolicyKey()));
+                }
+                endpoint.addChild(sec);
+            }
         }
 
         if (parent != null) {

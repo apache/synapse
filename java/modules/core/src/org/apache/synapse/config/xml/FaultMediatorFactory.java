@@ -139,7 +139,7 @@ public class FaultMediatorFactory implements MediatorFactory {
                 throw new SynapseException(msg);
             }
 
-        }else {
+        } else {
             String msg = "The fault reason is a required attribute for the makefault mediator";
             log.error(msg);
             throw new SynapseException(msg);

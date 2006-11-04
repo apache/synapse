@@ -1040,6 +1040,8 @@ public class SandeshaUtil {
 	}
 	
 	public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaUtil::executeAndStore, " + storageKey);
 		
 		MessageContext msgContext = rmMsgContext.getMessageContext();
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
@@ -1064,6 +1066,8 @@ public class SandeshaUtil {
 		else
 			engine.send(msgContext);
 
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::executeAndStore");
 	}
 	
 	public static void modifyExecutionChainForStoring (MessageContext message) {

@@ -44,7 +44,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class RMMessageReceiver extends AbstractMessageReceiver {
 
-	private static final Log log = LogFactory.getLog(RMMessageReceiver.class.getName());
+	private static final Log log = LogFactory.getLog(RMMessageReceiver.class);
 	
 	public final void receive(MessageContext msgCtx) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: RMMessageReceiver::receive");
@@ -66,7 +66,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 			Transaction transaction = null;
 			if (!withinTransaction) {
 				ConfigurationContext context = msgCtx.getConfigurationContext();
-				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());				transaction = storageManager.getTransaction();
+				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());				
+				transaction = storageManager.getTransaction();
 				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
 			}
 			
@@ -76,7 +77,9 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 				msgProcessor.processInMessage(rmMsgCtx);
 
-			} catch (AxisFault e) {
+			} catch (Exception e) {
+				if (log.isDebugEnabled())
+					log.debug("Exception caught during processInMessage", e);
 				// message should not be sent in a exception situation.
 				msgCtx.pause();
 	
@@ -91,7 +94,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 					}
 				}
 	
-				throw e;
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
+				throw new AxisFault(message, e);
 			} finally {
 				if (!withinTransaction && !rolledBack) {
 					try {

@@ -521,8 +521,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
 		createSeqMsg.setRelationships(null); // create seq msg does not
 												// relateTo anything
-
-		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key taht will be used to store 
+		
+		// Set that the create sequence message is part of a transaction.
+		createSeqMsg.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+		
+		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key that will be used to store 
 																	   //the create sequence message.
 		
 		CreateSeqBean createSeqBean = new CreateSeqBean();
@@ -539,7 +542,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
 		
-//		//checking weather the sequence is in polling mode.
+//		//checking whether the sequence is in polling mode.
 //		boolean pollingMode = false;
 //		EndpointReference replyTo = applicationRMMsg.getReplyTo();
 //		if (replyTo!=null && SandeshaUtil.isWSRMAnonymousReplyTo(replyTo.getAddress()))
@@ -577,6 +580,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqEntry.setInternalSequenceID(sequencePropertyKey);
 		// this will be set to true in the sender
 		createSeqEntry.setSend(true);
+		// Indicate that this message is a create sequence
+		createSeqEntry.setMessageType(Sandesha2Constants.MessageTypes.CREATE_SEQ);
 		EndpointReference to = createSeqRMMessage.getTo();
 		if (to!=null)
 			createSeqEntry.setToAddress(to.getAddress());

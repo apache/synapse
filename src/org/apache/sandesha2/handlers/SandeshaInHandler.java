@@ -134,7 +134,9 @@ public class SandeshaInHandler extends AbstractHandler {
 				returnValue = InvocationResponse.SUSPEND;
 			}
 
-		} catch (AxisFault e) {
+		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("Exception caught during processInMessage", e);
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
 			returnValue = InvocationResponse.SUSPEND;
@@ -149,9 +151,11 @@ public class SandeshaInHandler extends AbstractHandler {
 					log.debug(message, e);
 				}
 			}
-
-			throw e;
-		} finally {
+			
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
+			throw new AxisFault(message, e);
+		} 
+		finally {
 			if (!withinTransaction && !rolebacked) {
 				try {
 					transaction.commit();

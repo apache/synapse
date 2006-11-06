@@ -113,8 +113,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportTo);
 		
-		String sequenceKey = SandeshaUtil.getUUID();
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+//		String sequenceKey = SandeshaUtil.getUUID();
+//		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
@@ -133,7 +133,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		
 		serviceClient.setOptions(clientOptions);
 		
-		SandeshaClient.createSequence(serviceClient,true);
+		String sequenceKey = SandeshaClient.createSequence(serviceClient,true);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 		
 		Thread.sleep(10000);
 		

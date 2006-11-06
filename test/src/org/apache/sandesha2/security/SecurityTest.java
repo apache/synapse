@@ -92,17 +92,21 @@ public class SecurityTest extends SandeshaTestCase {
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		String sequenceKey = SandeshaUtil.getUUID();
+		
+//		String sequenceKey = SandeshaUtil.getUUID();
 
 		Options clientOptions = new Options ();
 
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,to);
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+
+//		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, spec);
 		serviceClient.setOptions(clientOptions);
 		
-		SandeshaClient.createSequence(serviceClient,false);
+		String sequenceKey = SandeshaClient.createSequence(serviceClient,false);
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 		
 		SequenceReport sequenceReport = null;
 		for(int i = 0; i < 15; i++) {

@@ -39,8 +39,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -179,6 +181,19 @@ public class AcknowledgementProcessor {
 			long msgNo = nack.getNackNumber();
 
 			// TODO - Process Nack
+		}
+		
+		//adding a MakeConnection for the response sequence if needed.
+		String offeredSequenceId = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
+				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
+		if (offeredSequenceId!=null) {
+
+			NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
+			NextMsgBean nextMsgBean = nextMsgBeanMgr.retrieve(outSequenceId);
+			
+			if (nextMsgBean!=null && nextMsgBean.isPollingMode())
+				SandeshaUtil.shedulePollingRequest(offeredSequenceId, configCtx);
+			
 		}
 
 		// setting acked message date.

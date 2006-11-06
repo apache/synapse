@@ -18,6 +18,7 @@
 package org.apache.sandesha2.polling;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -55,21 +56,16 @@ public class PollingManager extends Thread {
 	/**
 	 * By adding an entry to this, the PollingManager will be asked to do a polling request on this sequence.
 	 */
-	private ArrayList sheduledPollingRequests = null;
+	private HashMap sheduledPollingRequests = null;
 	
-	private final int POLLING_MANAGER_WAIT_TIME = 5000;
+	private final int POLLING_MANAGER_WAIT_TIME = 3000;
 	
 	public void run() {
+		
 		
 		while (isPoll()) {
 			
 			try {
-				
-				try {
-					Thread.sleep(POLLING_MANAGER_WAIT_TIME);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 				
 				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 				
@@ -77,15 +73,12 @@ public class PollingManager extends Thread {
 				//if shedule contains any requests, do the earliest one.
 				//else pick one randomly.
 				
-				String sequenceId = null;
-				if (sheduledPollingRequests.size()>0) {
-					sequenceId = (String )sheduledPollingRequests.get(0);
-					sheduledPollingRequests.remove(0);
-				}
+				String sequenceId = getNextSheduleEntry ();
 
 				NextMsgBean nextMsgBean = null;
 				
 				if (sequenceId==null) {
+					
 					NextMsgBean findBean = new NextMsgBean ();
 					findBean.setPollingMode(true);
 					
@@ -96,6 +89,8 @@ public class PollingManager extends Thread {
 						int item = random.nextInt(size);
 						nextMsgBean = (NextMsgBean) results.get(item);
 					}
+					
+					
 					
 				} else {
 					NextMsgBean findBean = new NextMsgBean ();
@@ -173,6 +168,22 @@ public class PollingManager extends Thread {
 		}
 	}
 	
+	private synchronized String getNextSheduleEntry () {
+		String sequenceId = null;
+		
+		if (sheduledPollingRequests.size()>0) {
+			sequenceId = (String) sheduledPollingRequests.keySet().iterator().next();
+			Integer sequencEntryCount = (Integer) sheduledPollingRequests.get(sequenceId);
+			
+			Integer leftCount = new Integer (sequencEntryCount.intValue() -1 );
+			if (leftCount.intValue()==0) 
+				sheduledPollingRequests.remove(sequenceId);
+			
+		}
+		
+		return sequenceId;
+	}
+	
 	/**
 	 * Starts the PollingManager.
 	 * 
@@ -181,7 +192,7 @@ public class PollingManager extends Thread {
 	 */
 	public synchronized void start (ConfigurationContext configurationContext) throws SandeshaException {
 		this.configurationContext = configurationContext;
-		this.sheduledPollingRequests = new ArrayList ();
+		this.sheduledPollingRequests = new HashMap ();
 		this.storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		setPoll(true);
 		super.start();
@@ -213,9 +224,19 @@ public class PollingManager extends Thread {
 	 * 
 	 * @param sequenceId
 	 */
-	public synchronized void shedulePollingRequest (String internalSequenceId) {
-		if (!sheduledPollingRequests.contains(internalSequenceId))
-			sheduledPollingRequests.add(internalSequenceId);
+	public synchronized void shedulePollingRequest (String sequenceId) {
+		
+		System.out.println("Polling request sheduled for sequence:" + sequenceId);
+		
+		if (sheduledPollingRequests.containsKey (sequenceId)) {
+			Integer sequenceEntryCount = (Integer) sheduledPollingRequests.get(sequenceId);
+			Integer newCount = new Integer (sequenceEntryCount.intValue()+1);
+			sheduledPollingRequests.put(sequenceId,newCount);
+		} else {
+			Integer sequenceEntryCount = new Integer (1);
+			sheduledPollingRequests.put(sequenceId, sequenceEntryCount);
+		}
+		
 	}
 
 	

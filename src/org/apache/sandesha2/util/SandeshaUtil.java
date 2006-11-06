@@ -1156,6 +1156,18 @@ public class SandeshaUtil {
     String stackTrace = baos.toString();
     return stackTrace;
   }
+  
+	public static PollingManager getPollingManager (ConfigurationContext configurationContext) {
+		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
+				Sandesha2Constants.POLLING_MANAGER);
+		
+		return pollingManager;
+	}
+	
+	public static void shedulePollingRequest (String sequenceId, ConfigurationContext configurationContext) throws SandeshaException { 
+		PollingManager pollingManager = getPollingManager(configurationContext);
+		pollingManager.shedulePollingRequest(sequenceId);
+	}
 
 	
 }

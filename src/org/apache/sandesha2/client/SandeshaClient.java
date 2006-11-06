@@ -327,11 +327,10 @@ public class SandeshaClient {
 		}
 
 		// setting a new squenceKey if not already set.
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		if (sequenceKey == null) {
-			sequenceKey = SandeshaUtil.getUUID();
-			options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
-		}
+		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+
+		String	newSequenceKey = SandeshaUtil.getUUID();
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, newSequenceKey);
 
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 
@@ -356,10 +355,11 @@ public class SandeshaClient {
 		options.setAction(oldAction);
 		
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
-		
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
+				
 		//the generated sequenceKey will be returned. Client can use this to work with this newly generated sequence.
 		
-		return sequenceKey;
+		return newSequenceKey;
 	}
 
 	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)

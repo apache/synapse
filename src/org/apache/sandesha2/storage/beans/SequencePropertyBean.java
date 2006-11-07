@@ -23,6 +23,8 @@ package org.apache.sandesha2.storage.beans;
 
 public class SequencePropertyBean extends RMBean {
 
+	private static final long serialVersionUID = 8266532177909565832L;
+
 	/**
 	 * Comment for <code>sequencePropertyKey</code>
 	 * The key used to store properties of this sequence.

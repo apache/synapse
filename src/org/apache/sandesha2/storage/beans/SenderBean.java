@@ -24,6 +24,8 @@ package org.apache.sandesha2.storage.beans;
 
 public class SenderBean extends RMBean {
 
+	private static final long serialVersionUID = 5776347847725156786L;
+
 	/**
 	 * Comment for <code>messageID</code>
 	 * The message id of the representing message.

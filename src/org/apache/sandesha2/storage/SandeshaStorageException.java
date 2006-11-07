@@ -24,6 +24,9 @@ import org.apache.sandesha2.SandeshaException;
  */
 
 public class SandeshaStorageException extends SandeshaException {
+	
+	private static final long serialVersionUID = -8620608387173070005L;
+
 	public SandeshaStorageException (String message) {
 		super (message);
 	}

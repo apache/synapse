@@ -24,6 +24,8 @@ package org.apache.sandesha2.storage.beans;
 
 public class InvokerBean extends RMBean {
 
+	private static final long serialVersionUID = -7839397509697276257L;
+
 	/**
 	 * Comment for <code>messageContextRefKey</code>
 	 * 

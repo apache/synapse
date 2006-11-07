@@ -24,6 +24,8 @@ package org.apache.sandesha2.storage.beans;
 
 public class CreateSeqBean extends RMBean {
 	
+	private static final long serialVersionUID = 7051201094510208784L;
+
 	/**
 	 * Comment for <code>internalSequenceID</code>
 	 * This property is a unique identifier that can be used to identify the messages of a certain sequence.

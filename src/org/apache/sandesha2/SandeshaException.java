@@ -17,9 +17,6 @@
 
 package org.apache.sandesha2;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 
 /**
@@ -27,6 +24,8 @@ import org.apache.axis2.AxisFault;
  */
 
 public class SandeshaException extends AxisFault  {
+
+	private static final long serialVersionUID = 730653663339985226L;
 
 	public SandeshaException (String message) {
 		super (message);

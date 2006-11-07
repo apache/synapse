@@ -24,6 +24,8 @@ package org.apache.sandesha2.storage.beans;
 
 public class NextMsgBean extends RMBean {
 	
+	private static final long serialVersionUID = -2976123838615087562L;
+
 	/**
 	 * Comment for <code>sequenceID</code>
 	 * The sequenceID of the representing sequence.

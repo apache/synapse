@@ -16,12 +16,12 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 /**
@@ -34,10 +34,13 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private ConfigurationContext cfgCtx = null;
     private ThreadFactory threadFactory = null;
 
+    private SynapseConfiguration synapseConfig;
+
     public Axis2SynapseEnvironment() {}
 
-    public Axis2SynapseEnvironment(ConfigurationContext cfgCtx) {
+    public Axis2SynapseEnvironment(ConfigurationContext cfgCtx, SynapseConfiguration synapseConfig) {
         this.cfgCtx = cfgCtx;
+        this.synapseConfig = synapseConfig;
         threadFactory = cfgCtx.getThreadPool();
     }
 
@@ -56,6 +59,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             Axis2Sender.sendBack(synCtx);
         else
             Axis2Sender.sendOn(synCtx);
+    }
+
+    public MessageContext createMessageContext() {
+        org.apache.axis2.context.MessageContext axis2MC = new org.apache.axis2.context.MessageContext();
+        MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
+        return mc;
     }
 
 }

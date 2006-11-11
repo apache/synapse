@@ -36,4 +36,10 @@ public interface SynapseEnvironment {
      * This will send request messages on (forward), and send the response messages back to the client
      */
     public void send(MessageContext smc);
+    
+    /**
+     * Creates a new Synapse <code>MessageContext</code> instance.
+     * @return a MessageContext
+     */
+    public MessageContext createMessageContext();
 }

@@ -137,7 +137,7 @@ public class SynapseModule implements Module {
                 handleException("Error instantiating Synapse environment with : " + clazz, e);
             }
         } else {
-            synapseEnvParam.setValue(new Axis2SynapseEnvironment(cfgCtx));
+            synapseEnvParam.setValue(new Axis2SynapseEnvironment(cfgCtx, synapseConfiguration));
         }
 
         try {

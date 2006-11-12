@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
@@ -43,6 +44,7 @@ import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -1169,5 +1171,26 @@ public class SandeshaUtil {
 		pollingManager.shedulePollingRequest(sequenceId);
 	}
 
+	public static EndpointReference cloneEPR (EndpointReference epr) {
+		EndpointReference newEPR = new EndpointReference (epr.getAddress());
+		Map referenceParams = epr.getAllReferenceParameters();
+		
+		if (referenceParams != null) {
+			for (Iterator keys = referenceParams.keySet().iterator(); keys
+					.hasNext();) {
+				Object key = keys.next();
+				Object referenceParam = referenceParams.get(key);
+
+				if (referenceParam instanceof OMElement) {
+					OMElement clonedElement = ((OMElement) referenceParam)
+							.cloneOMElement();
+					clonedElement.setText("false");
+					newEPR.addReferenceParameter(clonedElement);
+				}
+			}
+		}
+		
+		return newEPR;
+	}
 	
 }

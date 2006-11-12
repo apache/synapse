@@ -236,6 +236,9 @@ public class SandeshaMessageKeys {
 	
 	public static final String cannotFindTransportInDesc = "cannotFindTransportInDesc";
 	public static final String toEPRNotSet = "toEPRNotSet";
+	public static final String toBeanNotSet = "toBeanNotSet";
+	public static final String replyToBeanNotSet = "replyToBeanNotSet";
+	    
     
     public final static String errorRetrievingSecurityToken = "errorRetrievingSecurityToken";
 	public final static String proofOfPossessionNotVerified = "proofOfPossessionNotVerified";

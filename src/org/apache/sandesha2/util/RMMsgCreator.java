@@ -89,7 +89,6 @@ public class RMMsgCreator {
 		if (context == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet));
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		MessageContext createSeqmsgContext;
 		try {
 			// creating by copying common contents. (this will not set contexts
@@ -109,14 +108,6 @@ public class RMMsgCreator {
 
 		} catch (AxisFault e) {
 			throw new SandeshaException(e.getMessage());
-		}
-
-		createSeqmsgContext.setTo(applicationRMMsg.getTo());
-		EndpointReference referenceReplyTo = applicationMsgContext.getReplyTo();
-		
-		if (referenceReplyTo!=null) {
-			EndpointReference createSeqReplyTo = new EndpointReference (referenceReplyTo.getAddress());
-        	createSeqmsgContext.setReplyTo(createSeqReplyTo);
 		}
         
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
@@ -140,9 +131,12 @@ public class RMMsgCreator {
 			EndpointReference offeredEndpoint = (EndpointReference) applicationMsgContext
 					.getProperty(SandeshaClientConstants.OFFERED_ENDPOINT);
 			
-			if (offeredEndpoint==null)
-				offeredEndpoint = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
+			if (offeredEndpoint==null) {
+				EndpointReference replyTo = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
 			
+				if (replyTo!=null)
+					offeredEndpoint = SandeshaUtil.cloneEPR(replyTo);
+			}
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);
 				Identifier identifier = new Identifier(rmNamespaceValue);
@@ -163,33 +157,42 @@ public class RMMsgCreator {
 				}
 			}
 		}
+		
+		String to = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.TO_EPR, storageManager);
+		String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,
+				storageManager);
 
-		//TODO remove setting addressing values following two beans.
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
-		SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
+		if (replyTo == null) {
+			// using wsa:Anonymous as ReplyTo
 
-		if (toBean == null || toBean.getValue() == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null));
+			String addressingNamespace = applicationRMMsg
+					.getAddressingNamespaceValue();
+			if (AddressingConstants.Submission.WSA_NAMESPACE
+					.equals(addressingNamespace))
+				replyTo = AddressingConstants.Submission.WSA_ANONYMOUS_URL;
+			else
+				replyTo = AddressingConstants.Final.WSA_ANONYMOUS_URL;
+		}
 
-		EndpointReference toEPR = new EndpointReference(toBean.getValue());
-		EndpointReference replyToEPR = null;
+		if (to == null) {
+			String message = SandeshaMessageHelper
+					.getMessage(SandeshaMessageKeys.toBeanNotSet);
+			throw new SandeshaException(message);
+		}
+
+		// TODO store and retrieve a full EPR instead of just the address.
+		EndpointReference toEPR = new EndpointReference(to);
+		EndpointReference replyToEPR = new EndpointReference(replyTo);
+
+		createSeqRMMsg.setTo(toEPR);
+		createSeqRMMsg.setReplyTo(replyToEPR);
 
 		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
 
 		if (acksToEPR==null || acksToEPR.getAddress() == null || "".equals(acksToEPR.getAddress()))
 			acksToEPR = new EndpointReference(anonymousURI);
-
-		if (replyToBean != null && replyToBean.getValue() != null)
-			replyToEPR = new EndpointReference(replyToBean.getValue());
-
-		if (createSeqRMMsg.getTo() == null)
-			createSeqRMMsg.setTo(toEPR);
-
-		// ReplyTo will be set only if not null.
-		if (replyToEPR != null)
-			createSeqRMMsg.setReplyTo(replyToEPR);
 
 
 		AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue,addressingNamespaceValue);
@@ -359,7 +362,7 @@ public class RMMsgCreator {
 			if (outSequenceId != null && !"".equals(outSequenceId)) {
 
 				Accept accept = new Accept(rmNamespaceValue, addressingNamespaceValue);
-				EndpointReference acksToEPR = createSeqMessage.getTo();
+				EndpointReference acksToEPR = SandeshaUtil.cloneEPR (createSeqMessage.getTo());
 				
 				//putting the To EPR as the AcksTo for the response sequence.
 				AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue, addressingNamespaceValue);

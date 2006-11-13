@@ -1,5 +1,5 @@
 ======================================================
-Apache Synapse M2 build  (May, 2006)
+Apache Synapse 0.90 build  (November, 2006)
 
 http://incubator.apache.org/synapse/
 ------------------------------------------------------

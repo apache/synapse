@@ -4,11 +4,11 @@
 
 <beans>
 
-   <bean id="springtest" class="org.apache.synapse.spring.SpringTestBean" singleton="false">
+   <bean id="springtest" class="org.apache.synapse.mediators.spring.SpringTestBean" singleton="false">
 	   <property name="testProperty"><value>100</value></property>
 	   <property name="handler"><ref bean="handler"/></property>
    </bean>
    
-   <bean id="handler" class="org.apache.synapse.spring.TestMediateHandlerImpl" singleton="true"/>
+   <bean id="handler" class="org.apache.synapse.mediators.spring.TestMediateHandlerImpl" singleton="true"/>
 
 </beans>

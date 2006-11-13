@@ -34,7 +34,7 @@ public class SpringMediatorTest extends TestCase {
 
         MessageContext msgCtx = TestUtils.getTestContext("<dummy/>");
         msgCtx.setConfiguration(
-            SynapseConfigurationBuilder.getConfiguration("./../../repository/conf/sample/synapse_spring_unittest.xml"));
+            SynapseConfigurationBuilder.getConfiguration("./../../repository/conf/sample/resources/spring/synapse_spring_unittest.xml"));
         msgCtx.getConfiguration().getMainMediator().mediate(msgCtx);
 
         assertEquals(TestMediateHandlerImpl.invokeCount, 202);

@@ -1,4 +1,4 @@
-package org.apache.synapse.json;
+package org.apache.synapse.mediators.json;
 
 import junit.framework.TestCase;
 import org.apache.synapse.MessageContext;

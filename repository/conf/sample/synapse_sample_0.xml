@@ -1,38 +1,11 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
   
-  <definitions>
-    
-    <sequence name="stockquote">
-    	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    
-    	<!-- check if the symbol is MSFT -->
-      <filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://services.samples/xsd">
-      	<!-- if it is throw a fault -->
-      	<makefault>
-      		<code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-      		<reason value="Isn't there a Windows API for that?"/>
-      	</makefault>
-      </filter>
-    </sequence>
-
-  </definitions>
-
+  <!-- The most simple Synapse configuration -->
   <rules>
-  	<!-- now log the message using log4j -->
+  	<!-- Log all messages passing through -->
   	<log level="full"/>
   	
-  	<!-- Check if the URL matches the stockquote gateway/dumb case -->
-  	<filter source="get-property('To')" regex=".*/StockQuote.*">
-  		<sequence ref="stockquote"/>
-  	</filter>
-  	
-  	<!-- check if the URL matches the virtual url - either the proxy or ws-add case -->
-		<filter source="get-property('To')" regex="http://.*stockquotes.*">
-  		<sequence ref="stockquote"/>
-  	</filter>
-  	
-  	<!-- send the message on -->
+  	<!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
   	<send/>
   </rules>
 

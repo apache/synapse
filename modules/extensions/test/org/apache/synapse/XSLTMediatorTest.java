@@ -60,7 +60,7 @@ public class XSLTMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/transform.xslt");
+        prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
         props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
@@ -100,7 +100,7 @@ public class XSLTMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/transform.xslt");
+        prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
         props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
@@ -141,7 +141,7 @@ public class XSLTMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/transform.xslt");
+        prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
         props.put("xslt-key", prop);
         
         // invoke transformation, with static enveope

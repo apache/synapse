@@ -151,7 +151,7 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key", prop);
 
         // test validate mediator, with static enveope
@@ -181,11 +181,11 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
         Property prop2 = new Property();
         prop2.setType(Property.DYNAMIC_TYPE);
-        prop2.setKey("file:../core/test-resources/misc/validate2.xsd");
+        prop2.setKey("file:./../../repository/conf/sample/resources/validate/validate2.xsd");
         props.put("xsd-key-2", prop2);
 
         // test validate mediator, with static enveope
@@ -215,11 +215,11 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
         Property prop2 = new Property();
         prop2.setType(Property.DYNAMIC_TYPE);
-        prop2.setKey("file:../core/test-resources/misc/validate2.xsd");
+        prop2.setKey("file:./../../repository/conf/sample/resources/validate/validate2.xsd");
         props.put("xsd-key-2", prop2);
 
         // test validate mediator, with static enveope
@@ -248,7 +248,7 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
@@ -277,7 +277,7 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
@@ -306,7 +306,7 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
@@ -360,7 +360,7 @@ public class ValidateMediatorTest extends TestCase {
         Map props = new HashMap();
         Property prop = new Property();
         prop.setType(Property.DYNAMIC_TYPE);
-        prop.setKey("file:../core/test-resources/misc/validate.xsd");
+        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
 

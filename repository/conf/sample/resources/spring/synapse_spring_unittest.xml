@@ -6,8 +6,8 @@
 	</registry>
   
   <definitions>
-		<set-property name="springconfig1" key="conf/sample/springsample.xml"/>
-		<set-property name="springconfig2" src="file:./../../repository/conf/sample/springsample.xml"/>
+		<set-property name="springconfig1" key="conf/sample/resources/spring/springsample.xml"/>
+		<set-property name="springconfig2" src="file:./../../repository/conf/sample/resources/spring/springsample.xml"/>
   </definitions>
 
   <rules>

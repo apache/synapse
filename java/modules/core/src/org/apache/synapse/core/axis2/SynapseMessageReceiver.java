@@ -38,7 +38,9 @@ public class SynapseMessageReceiver implements MessageReceiver {
             mc.getTo().getAddress() : "null"));
         log.debug("SOAPAction: " + (mc.getWSAAction() != null ?
             mc.getWSAAction() : "null"));
-        log.debug("Body : \n" + mc.getEnvelope());
+        if (log.isDebugEnabled()) {
+            log.debug("Body : \n" + mc.getEnvelope());
+        }
 
         MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
         synCtx.getEnvironment().injectMessage(synCtx);

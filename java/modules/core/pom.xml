@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>Apache-Synapse-Incubating</artifactId>
+        <version>SNAPSHOT</version>
+    </parent>
+
+    <artifactId>synapse-core</artifactId>
+    <name>Apache Synapse - Core</name>
+    <description>Apache Synapse - Core</description>
+    <packaging>jar</packaging>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test</testSourceDirectory>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.0-alpha-1-20061114.043217-3</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>axis2</groupId>
+                                    <artifactId>addressing</artifactId>
+                                    <version>${addressing.version}</version>
+                                    <type>mar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>target/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>create_repo</id>
+                        <phase>generate-test-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <echo message="*** Creating a testing repository ***"/>
+
+                                <mkdir dir="target/test_repos"/>
+                                <mkdir dir="target/test_repos/synapse/modules"/>
+                                <mkdir dir="target/test_repos/synapse/services"/>
+                                <mkdir dir="target/test_repos/client/modules"/>
+
+                                <echo message="*** Creating synapse.mar ***"/>
+                                <mkdir dir="target/modules/synapse/META-INF"/>
+                                <copy file="conf/module.xml" tofile="target/modules/synapse/META-INF/module.xml"/>
+                                <jar jarfile="target/synapse-${version}.mar">
+                                    <fileset dir="target/modules/synapse">
+                                         <include name="**"/>
+                                    </fileset>
+                                    <fileset dir="target/classes">
+                                        <include name="**"/>
+                                    </fileset>                        
+                                </jar>
+
+                                <copy file="target/synapse-${version}.mar"
+                                    tofile="target/test_repos/synapse/modules/synapse-${version}.mar"/>
+
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>populate_repo</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <echo message="*** Populating the testing repository ***"/>
+
+                                <!--<copy todir="target/test_repos/client/modules">-->
+                                    <!--<fileset dir="target/lib">-->
+                                        <!--<include name="**/addressing*.mar"/>-->
+                                    <!--</fileset>-->
+                                <!--</copy>-->
+
+                                <copy todir="target/test_repos/synapse/modules">
+                                    <fileset dir="target/lib">
+                                        <include name="**/*.mar"/>
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-nhttp</artifactId>
+        </dependency>
+    </dependencies>
+</project>

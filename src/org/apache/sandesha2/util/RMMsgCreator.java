@@ -490,6 +490,8 @@ public class RMMsgCreator {
 	 */
 	public static void addAckMessage(RMMsgContext applicationMsg, String sequencePropertyKey ,String sequenceId, StorageManager storageManager)
 			throws AxisFault {
+		if(log.isDebugEnabled())
+			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
 		
 		SOAPFactory factory = null;
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
@@ -550,6 +552,9 @@ public class RMMsgCreator {
 		
 		// Ensure the message also contains the token that needs to be used
 		secureOutboundMessage(sequencePropertyKey, applicationMsg.getMessageContext());
+		
+		if(log.isDebugEnabled()) 
+			log.debug("Exit: RMMsgCreator::addAckMessage");
 	}
 	
 	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,  String makeConnectionSeqId,

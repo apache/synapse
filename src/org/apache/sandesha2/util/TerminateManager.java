@@ -27,8 +27,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -47,7 +45,6 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 
 /**
  * Contains logic to remove all the storad data of a sequence. Methods of this
@@ -145,7 +142,6 @@ public class TerminateManager {
 	 */
 	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
 		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
 
 		// removing nextMsgMgr entries
@@ -185,16 +181,6 @@ public class TerminateManager {
 			allSequenceBean.setValue(allSequenceList.toString());
 			sequencePropertyBeanMgr.update(allSequenceBean);
 		}
-	}
-
-	private static boolean isRequiredForResponseSide(String name) {
-		if (name == null && name.equals(Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO))
-			return false;
-
-		if (name.equals(Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO))
-			return false;
-
-		return false;
 	}
 
 	/**
@@ -362,9 +348,8 @@ public class TerminateManager {
 
 	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String outSequenceId,
 			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
-
-		// / Transaction addTerminateSeqTransaction =
-		// storageManager.getTransaction();
+		if(log.isDebugEnabled())
+			log.debug("Enter: TerminateManager::addTerminateSequenceMessage " + outSequenceId);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
@@ -372,8 +357,8 @@ public class TerminateManager {
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 
 		if (terminated != null && terminated.getValue() != null && "true".equals(terminated.getValue())) {
-			String message = "Terminate was added previously.";
-			log.debug(message);
+			if(log.isDebugEnabled())
+				log.debug("Exit: TerminateManager::addTerminateSequenceMessage - terminate was added previously.");
 			return;
 		}
 
@@ -418,11 +403,6 @@ public class TerminateManager {
 			terminateRMMessage.setReplyTo(new EndpointReference (replyToBean.getValue()));
 		}
 		
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
@@ -482,6 +462,9 @@ public class TerminateManager {
 		
 		// / addTerminateSeqTransaction.commit();
 		SandeshaUtil.executeAndStore(terminateRMMessage, key);
+
+		if(log.isDebugEnabled())
+			log.debug("Exit: TerminateManager::addTerminateSequenceMessage");
 	}
 
 }

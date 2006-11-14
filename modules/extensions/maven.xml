@@ -37,12 +37,12 @@
     <goal name="synapse_extensions">
         <j:set var="class_test.dir" value="target/test-classes"/>
 
-        <mkdir dir="target/synapse-repository"/>
+        <!--<mkdir dir="target/synapse-repository"/>
         <ant:copy todir="target/synapse-repository">
             <ant:fileset dir="../core/target/synapse-repository">
                 <ant:include name="**/**"/>
             </ant:fileset>
-        </ant:copy>
+        </ant:copy>-->
         <ant:path id="classes_test.dir" location="${class_test.dir}"/>
         <maven:addPath id="maven.dependency.classpath" refid="classes_test.dir"/>
     </goal>

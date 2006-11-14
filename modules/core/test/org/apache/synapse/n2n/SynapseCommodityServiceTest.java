@@ -42,20 +42,20 @@ public class SynapseCommodityServiceTest extends TestCase {
     protected void setUp() throws java.lang.Exception {
         // Initializing Synapse repository
         System.setProperty(Constants.SYNAPSE_XML,
-                           "target/testing_repository/conf/synapse.xml");
+                           "./../../repository/conf/sample/resources/misc/synapse.xml");
         System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
-                           "target/testing_repository/conf/axis2.xml");
+                           "./../../repository/conf/axis2.xml");
 
         ConfigurationContext synapseConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
-                        "target/testing_repository",
-                        "target/testing_repository/conf/axis2.xml");
+                        "./target/test_repos/synapse",
+                        "./../../repository/conf/axis2.xml");
 
         // Initializing Bussiness Endpoint
         ConfigurationContext businessConfigCtx = ConfigurationContextFactory
                 .createConfigurationContextFromFileSystem(
-                        "target/testing_repository",
-                        "target/testing_repository/conf/axis2.xml");
+                        "./target/test_repos/synapse",
+                        "./../../repository/conf/axis2.xml");
 
         AxisService businessService =
                 AxisService.createService(Services.class.getName(),

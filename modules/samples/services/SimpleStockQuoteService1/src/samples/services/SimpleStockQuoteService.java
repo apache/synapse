@@ -20,13 +20,13 @@ public class SimpleStockQuoteService {
 
     // in-out
     public GetQuoteResponse getQuote(GetQuote request) {
-        System.out.println(new Date() + " SimpleStockQuoteService :: Generating quote for : " + request.getSymbol());
+        System.out.println(new Date() + " SimpleStockQuoteService1 :: Generating quote for : " + request.getSymbol());
         return new GetQuoteResponse(request.getSymbol());
     }
 
     // in only
     public void placeOrder(PlaceOrder order) {
-        System.out.println(new Date() + " SimpleStockQuoteService :: Accepted order for : " +
+        System.out.println(new Date() + " SimpleStockQuoteService1 :: Accepted order for : " +
             order.getQuantity() + " stocks of " + order.getSymbol() +
             " at $ " + order.getPrice());
     }

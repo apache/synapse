@@ -14,20 +14,22 @@
 * limitations under the License.
 */
 package samples.services;
-import java.util.Date;
 
-public class SimpleStockQuoteService {
+public class GetQuote {
+    String symbol;
 
-    // in-out
-    public GetQuoteResponse getQuote(GetQuote request) {
-        System.out.println(new Date() + " SimpleStockQuoteService :: Generating quote for : " + request.getSymbol());
-        return new GetQuoteResponse(request.getSymbol());
+    public GetQuote() {
     }
 
-    // in only
-    public void placeOrder(PlaceOrder order) {
-        System.out.println(new Date() + " SimpleStockQuoteService :: Accepted order for : " +
-            order.getQuantity() + " stocks of " + order.getSymbol() +
-            " at $ " + order.getPrice());
+    public GetQuote(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 }

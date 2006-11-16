@@ -15,8 +15,6 @@
  */
 package org.apache.synapse.mediators.bsf.convertors;
 
-import java.io.ByteArrayInputStream;
-
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
@@ -48,7 +46,7 @@ public class JSOMElementConvertor extends DefaultOMElementConvertor {
     public Object toScript(OMElement o) {
         XmlObject xml;
         try {
-            xml = XmlObject.Factory.parse(new ByteArrayInputStream(o.toString().getBytes()));
+            xml = XmlObject.Factory.parse(o.getXMLStreamReader());
         } catch (Exception e) {
             throw new SynapseException("exception getting message XML: " + e);
         }
@@ -71,15 +69,11 @@ public class JSOMElementConvertor extends DefaultOMElementConvertor {
             return super.fromScript(o);
         }
 
-        // TODO: E4X Bug? Shouldn't need this copy, but without it the outer element gets lost???
-        Scriptable jsXML = (Scriptable) ScriptableObject.callMethod((Scriptable) o, "copy", new Object[0]);
-        Wrapper wrapper = (Wrapper) ScriptableObject.callMethod(jsXML, "getXmlObject", new Object[0]);
-        Object response = wrapper.unwrap();
-
+        Wrapper wrapper = (Wrapper) ScriptableObject.callMethod((XMLObject)o, "getXmlObject", new Object[0]);
+        XmlObject xmlObject = (XmlObject)wrapper.unwrap();
         try {
 
-            byte[] xmlBytes = response.toString().getBytes();
-            StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xmlBytes));
+            StAXOMBuilder builder = new StAXOMBuilder(xmlObject.newInputStream());
             OMElement omElement = builder.getDocumentElement();
 
             return omElement;

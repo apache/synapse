@@ -282,12 +282,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 		} catch (SandeshaStorageException e) { 
 			if (log.isDebugEnabled())
-				log.debug(e);
+				log.debug("Caught exception", e);
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} catch (SandeshaException e) {
 			if (log.isDebugEnabled())
-				log.debug(e);
+				log.debug("Caught exception", e);
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} catch (MissingResourceException e) {
@@ -297,12 +297,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				transaction.rollback();
 		} catch (AxisFault e) {
 			if (log.isDebugEnabled())
-				log.debug(e);
+				log.debug("Caught exception", e);
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
-				log.debug(e);
+				log.debug("Caught exception", e);
 			if (transaction!=null && transaction.isActive())
 				transaction.rollback();
 		} finally {
@@ -389,7 +389,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				if (log.isDebugEnabled()) {
 					log.debug(SandeshaMessageHelper
 							.getMessage(SandeshaMessageKeys.soapEnvNotSet));
-					log.debug(e);
+					log.debug("Caught exception", e);
 				}
 				
 				return;

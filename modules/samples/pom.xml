@@ -3,26 +3,31 @@
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>Apache-Synapse-Incubating</artifactId>
+        <version>${synapse.version}</version>
+    </parent>
+
     <groupId>org.apache.synapse</groupId>
-    <artifactId>Apache-Synapse-Incubating</artifactId>
-    <version>SNAPSHOT</version>
-  </parent>
-  
-  <artifactId>synapse-samples</artifactId>
-  <name>Apache Synapse - Samples</name>
-  <description>Apache Synapse - Samples</description>
-  <packaging>jar</packaging>  
-  
-  <build>
-  	<sourceDirectory>src</sourceDirectory>
-  </build>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.synapse</groupId>
-      <artifactId>synapse-core</artifactId>
-    </dependency>
-  </dependencies>
+    <artifactId>synapse-samples</artifactId>
+
+    <name>Apache Synapse - Samples</name>
+    <description>Apache Synapse - Samples</description>
+    <packaging>jar</packaging>
+
+    <build>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <synapse.version>0.90-SNAPSHOT</synapse.version>
+    </properties>
 </project>

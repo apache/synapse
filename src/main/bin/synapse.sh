@@ -85,10 +85,10 @@ fi
 SYNAPSE_ENDORSED=$JAVA_HOME/lib/endorsed
 
 # synapse.xml
-SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/synapse_repository/conf/synapse.xml
+SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/synapse.xml
 
 if [ "$1" == "-sample" ]; then
-SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/synapse_repository/conf/sample/synapse_sample_$2.xml
+SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
 fi
 
 # ----- Execute The Requested Command -----------------------------------------
@@ -99,4 +99,4 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/synapse_repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseHTTPServer $SYNAPSE_HOME/synapse_repository -p8080
+$JAVA_HOME/bin/java $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseHTTPServer $SYNAPSE_HOME/repository

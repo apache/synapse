@@ -49,7 +49,14 @@
         </fileSet>
         <fileSet>
             <directory>repository/conf</directory>
-            <outputDirectory>synapse-${synapse.version}/samples/client_repo/conf</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/conf</outputDirectory>
+            <includes>
+                <include>axis2.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>repository/conf/sample/resources/misc</directory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/conf</outputDirectory>
             <includes>
                 <include>axis2.xml</include>
             </includes>
@@ -69,16 +76,34 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>modules/samples/services</directory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>modules/samples/src/main/java</directory>
-            <outputDirectory>synapse-${synapse.version}/samples</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/src</outputDirectory>
             <excludes>
                 <exclude>**/target</exclude>
                 <exclude>**/target/**/*</exclude>
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/src/main/scripts/userguide</directory>
-            <outputDirectory>synapse-${synapse.version}/samples</outputDirectory>
+            <directory>modules/samples/src/main/scripts</directory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Client</outputDirectory>
+            <excludes>
+                <exclude>custom.sh</exclude>
+                <exclude>custom.bat</exclude>
+                <exclude>axis2server.sh</exclude>
+                <exclude>axis2server.bat</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>modules/samples/src/main/scripts</directory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
+            <includes>
+                <include>axis2server.sh</include>
+                <include>axis2server.bat</include>
+            </includes>
         </fileSet>
 
         <!--<fileSet>-->
@@ -143,12 +168,21 @@
             </includes>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>synapse-${synapse.version}/samples/client_repo/modules</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules</outputDirectory>
             <includes>
                 <include>axis2:addressing:mar</include>
                 <!--<include>axis2:rampart:mar</include>-->
                 <!--<include>sandesha2:sandesha2:mar</include>-->
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules</outputDirectory>
+            <includes>
+                <include>axis2:addressing:mar</include>
+                <include>axis2:rampart:mar</include>
+                <include>sandesha2:sandesha2:mar</include>
+            </includes>
+        </dependencySet>
+
     </dependencySets>
 </assembly>

@@ -21,7 +21,7 @@
     <id>bin</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
-        <!--<format>tar.gz</format>-->
+        <format>tar.gz</format>
         <format>zip</format>
     </formats>
 
@@ -84,16 +84,16 @@
             <!--</includes>-->
         <!--</fileSet>-->
     </fileSets>
-    <!--<dependencySets>-->
-        <!--<dependencySet>-->
-            <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <!--<unpack>false</unpack>-->
             <!--<excludes>-->
                 <!--<exclude>org.apache.synapse</exclude>-->
             <!--</excludes>-->
             <!--<scope>runtime</scope>-->
-        <!--</dependencySet>-->
-    <!--</dependencySets>-->
+        </dependencySet>
+    </dependencySets>
     <!--<dependencySets>-->
         <!--<dependencySet>-->
             <!--<outputDirectory>/lib</outputDirectory>-->

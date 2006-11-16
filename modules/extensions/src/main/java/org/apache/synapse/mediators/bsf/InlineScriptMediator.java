@@ -15,11 +15,13 @@
  */
 package org.apache.synapse.mediators.bsf;
 
+import java.util.Arrays;
+import java.util.Vector;
+
 import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-
 
 /**
  * An inline script mediator has the script source embedded in the config XML:
@@ -34,9 +36,12 @@ import org.apache.synapse.SynapseException;
  */
 public class InlineScriptMediator extends ScriptMediator {
 
-    private String scriptName;
+    protected String scriptName;
 
-    private String scriptSrc;
+    protected String scriptSrc;
+    
+    protected static final String MC_VAR_NAME = "mc";
+    protected static final Vector PARAM_NAMES = new Vector(Arrays.asList(new String[]{ MC_VAR_NAME }));
 
     public InlineScriptMediator(String scriptName, String scriptSrc) {
         super(null, null);
@@ -47,9 +52,19 @@ public class InlineScriptMediator extends ScriptMediator {
     public boolean mediate(MessageContext synCtx) {
         try {
 
-            ThreadLocalMessageContext.setMC(new ScriptMessageContext(synCtx, convertor));
+            // This is a bit of a hack to deal with inconsistencies in the varrious BSF script engines.
+            // The JavaScript engine does not support BSFEngine.apply properly as it doesn't pass the
+            // param names and values to the script (actually this looks like a bug in BSFEngineImpl
+            // not the JavaScript engine). To circumvent this problem the ThreadLocalMessageContext is
+            // added as a declared bean. Some other engines (eg JRuby) seem to have a bug where they don't
+            // pick up declared beans so ScriptMessageContext is passed in as a param on the apply call.
+            
+            ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
+            ThreadLocalMessageContext.setMC(scriptMC);
+            Vector paramValues = new Vector();
+            paramValues.add(scriptMC);
 
-            Object response = bsfEngine.eval(scriptName, 0, 0, scriptSrc);
+            Object response = bsfEngine.apply(scriptName, 0, 0, scriptSrc, PARAM_NAMES, paramValues);
 
             if (response instanceof Boolean) {
                 return ((Boolean) response).booleanValue();
@@ -64,11 +79,13 @@ public class InlineScriptMediator extends ScriptMediator {
 
     public void init() {
         try {
-            this.bsfManager.declareBean("mc", new ThreadLocalMessageContext(), ThreadLocalMessageContext.class);
+
+            this.bsfManager.declareBean(MC_VAR_NAME, new ThreadLocalMessageContext(), ThreadLocalMessageContext.class);
             String scriptLanguage = BSFManager.getLangFromFilename(scriptName);
             this.bsfEngine = bsfManager.loadScriptingEngine(scriptLanguage);
             this.convertor = createOMElementConvertor(scriptName);
             convertor.setEngine(bsfEngine);
+
         } catch (BSFException e) {
             throw new SynapseException(e);
         }

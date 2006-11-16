@@ -34,7 +34,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>axis2</groupId>
+                                    <groupId>org.apache.axis2</groupId>
                                     <artifactId>addressing</artifactId>
                                     <version>${addressing.version}</version>
                                     <type>mar</type>
@@ -64,7 +64,7 @@
 
                                 <echo message="*** Creating synapse.mar ***"/>
                                 <mkdir dir="target/modules/synapse/META-INF"/>
-                                <copy file="conf/module.xml" tofile="target/modules/synapse/META-INF/module.xml"/>
+                                <copy file="src/main/resources/module.xml" tofile="target/modules/synapse/META-INF/module.xml"/>
                                 <jar jarfile="target/synapse-${version}.mar">
                                     <fileset dir="target/modules/synapse">
                                          <include name="**"/>

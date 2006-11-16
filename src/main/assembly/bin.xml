@@ -48,6 +48,20 @@
             <outputDirectory>synapse-${synapse.version}/repository</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>repository/conf</directory>
+            <outputDirectory>synapse-${synapse.version}/samples/client_repo/conf</outputDirectory>
+            <includes>
+                <include>axis2.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>modules/core/target</directory>
+            <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
+            <includes>
+                <include>synapse-${synapse.version}.mar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/release/docs</directory>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <includes>
@@ -55,13 +69,18 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/samples</directory>
+            <directory>modules/samples/src/main/java</directory>
             <outputDirectory>synapse-${synapse.version}/samples</outputDirectory>
             <excludes>
                 <exclude>**/target</exclude>
                 <exclude>**/target/**/*</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>modules/samples/src/main/scripts/userguide</directory>
+            <outputDirectory>synapse-${synapse.version}/samples</outputDirectory>
+        </fileSet>
+
         <!--<fileSet>-->
             <!--<directory>target/javadoc</directory>-->
             <!--<outputDirectory>synapse-${synapse.version}/docs/api</outputDirectory>-->
@@ -83,20 +102,53 @@
                 <!--<include>synapse-incubator.jar</include>-->
             <!--</includes>-->
         <!--</fileSet>-->
+
+        <fileSet>
+            <directory>modules/core/target</directory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <includes>
+                <include>synapse-core-${synapse.version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>modules/extensions/target</directory>
+            <outputDirectory>synapse-${synapse.version}/lib/extensions</outputDirectory>
+            <includes>
+                <include>synapse-extensions-${synapse.version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/release/docs</directory>
+            <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
+            <includes>
+                <include>endorsed_libs.txt</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
-            <!--<unpack>false</unpack>-->
-            <!--<excludes>-->
-                <!--<exclude>org.apache.synapse</exclude>-->
-            <!--</excludes>-->
-            <!--<scope>runtime</scope>-->
+            <excludes>
+                <exclude>axis2:addressing:mar</exclude>
+                <exclude>axis2:rampart:mar</exclude>
+                <exclude>sandesha2:sandesha2:mar</exclude>                
+            </excludes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
+            <includes>
+                <include>axis2:addressing:mar</include>
+                <include>axis2:rampart:mar</include>
+                <!--<include>sandesha2:sandesha2:mar</include>-->
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>synapse-${synapse.version}/samples/client_repo/modules</outputDirectory>
+            <includes>
+                <include>axis2:addressing:mar</include>
+                <!--<include>axis2:rampart:mar</include>-->
+                <!--<include>sandesha2:sandesha2:mar</include>-->
+            </includes>
         </dependencySet>
     </dependencySets>
-    <!--<dependencySets>-->
-        <!--<dependencySet>-->
-            <!--<outputDirectory>/lib</outputDirectory>-->
-        <!--</dependencySet>-->
-    <!--</dependencySets>-->
 </assembly>

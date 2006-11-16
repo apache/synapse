@@ -31,31 +31,22 @@ import java.util.Iterator;
 public class SynapseHTTPServer {
 
     public static void printUsage() {
-        System.out.println("Usage: SynapseHTTPServer [options] <repository>");
+        System.out.println("Usage: SynapseHTTPServer <repository>");
         System.out.println(" Opts: -? this message");
-        System.out.println();
-        System.out.println("       -p port to listen on (default is 8080)");
         System.exit(1);
     }
 
     public static void main(String[] args) throws Exception {
 
-        int port = 8080;
         OptionsParser optionsParser = new OptionsParser(args);
         args = optionsParser.getRemainingArgs();
 
         // first check if we should print usage
         if ((optionsParser.isFlagSet('?') > 0) || (optionsParser.isFlagSet('h') > 0) ||
-                args == null || args.length == 0 || args.length > 2) {
+                args == null || args.length == 0 || args.length > 1) {
             printUsage();
         }
-        String paramPort = optionsParser.isValueSet('p');
-        if (paramPort != null) {
-            port = Integer.parseInt(paramPort);
-        }
-        args = optionsParser.getRemainingArgs();
 
-        System.out.println("[SynapseHTTPServer] Starting on port " + port + "...");
         System.out.println("[SynapseHTTPServer] Using the Axis2 Repository "
                 + new File(args[0]).getAbsolutePath());
 

@@ -6,10 +6,11 @@
         <href>incubator.apache.org/synapse/</href>
     </bannerLeft>
 
-    <!--<skin>-->
-        <!--<groupId>org.apache.maven.skins</groupId>-->
-        <!--<artifactId>maven-default-skin</artifactId>-->
-    <!--</skin>-->
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-default-skin</artifactId>
+        <version>1.0</version>
+    </skin>
 
     <publishDate format="dd MMM yyyy"/>
 

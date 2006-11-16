@@ -29,7 +29,7 @@
     <fileSets>
         <fileSet>
             <directory>src/main/release</directory>
-            <outputDirectory>synapse-${synapse.version}</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}-src</outputDirectory>
             <includes>
                 <include>DISCLAIMER.txt</include>
                 <include>LICENSE.txt</include>
@@ -40,10 +40,10 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>..</directory>
+            <directory>.</directory>
             <outputDirectory>synapse-${synapse.version}-src</outputDirectory>
             <includes>
-                <include>**/*</include>
+                <include>modules/**/*</include>
             </includes>
             <excludes>
                 <exclude>build.xml</exclude>
@@ -64,6 +64,7 @@
                 <exclude>bin/*</exclude>
                 <exclude>**/var/journal</exclude>
                 <exclude>**/build.out*</exclude>
+                <exclude>**/*.iml</exclude>
             </excludes>
         </fileSet>
     </fileSets>

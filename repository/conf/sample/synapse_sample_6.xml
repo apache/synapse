@@ -1,0 +1,30 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+	<!-- illustration of various mediators : header, in and out mediators -->  
+  <definitions>
+  
+  <rules>
+  	<!-- the in mediator applies only to 'incoming' messages (requests) into synapse -->
+		<in>
+			<filter source="//m0:CheckPriceRequest/m0:Code" regex="IBM" xmlns:m0="http://www.apache-synapse.org/test">
+				<!-- set the message header for the 'To' EPR to the supplied value -->
+				<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService1"/>
+				<send/>
+			</filter>
+			
+			<!-- drop (i.e. abort processing of) any other messages -->
+			<drop/>			
+		</in>
+		
+		<!-- the out mediator applies only to 'outgoing' messages (responses) from synapse -->
+		<out>
+			<!-- display a log message at the time a response passes through synapse -->
+			<log level="custom">
+				<property name="message" value="sending back the response"/>
+			</log>
+			
+			<send/>
+		</out>
+  </rules>
+
+</synapse> 

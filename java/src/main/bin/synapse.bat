@@ -52,7 +52,7 @@ rem and for NT handling to skip to.
 
 :synapseSample
 shift
-set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\synapse_repository\conf\sample\synapse_sample_%1.xml"
+set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\sample\synapse_sample_%1.xml"
 shift
 goto setupArgs
 
@@ -76,7 +76,7 @@ if  "%SYNAPSE_CMD_LINE_ARGS%" == "" goto defaultParams
 goto runSynapse
 
 :defaultParams
-set SYNAPSE_CMD_LINE_ARGS=-p8080 "%SYNAPSE_HOME%\synapse_repository"
+set SYNAPSE_CMD_LINE_ARGS="%SYNAPSE_HOME%\repository"
 goto runSynapse
 
 :noJavaHome
@@ -90,13 +90,13 @@ FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS
 set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\conf";%SYNAPSE_CLASS_PATH%
 
 rem if a sample configuration is not specified, use default
-if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\synapse_repository\conf\synapse.xml"
+if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\synapse.xml"
 
 set SYNAPSE_ENDORSED="%SYNAPSE_HOME%\lib\endorsed";"%JAVA_ENDORSED_DIRS%";"%JAVA_HOME%\lib\endorsed"
 
 @echo on
 cd %SYNAPSE_HOME%
-"%_JAVACMD%" %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\synapse_repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseHTTPServer %SYNAPSE_CMD_LINE_ARGS%
+"%_JAVACMD%" %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseHTTPServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 
 :end

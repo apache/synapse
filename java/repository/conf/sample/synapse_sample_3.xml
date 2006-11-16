@@ -1,65 +1,60 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
-  
+
+	<!-- illustration of simple properties, and reusable endpoints and sequences -->  
   <definitions>
-  	<sequence name="stockquote">
-    	<log level="custom">
-    		<property name="sequence" value="*** Custom 'stockquote'Sequence ***"/>
-    	</log>
-			<in>
-	    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
-    	</in>
-    	<!-- set correlation field to custom label -->
-    	<set-property name="correlate/label" value="stockquote"/>
-      <send/>
-    </sequence>
-    
-    <endpoint name="invesbot" address="http://ws.invesbot.com/stockquotes.asmx"/>
-  </definitions>
   
-  <proxies>
-  	<!--
-  	<proxy name="InvesbotSequenceProxy" type="wsdl" description="This uses the stockquote named sequence for mediation">
-	    <endpoint protocol="http" uri="/MyfirstProxy"/>
-	    <target sequence="stockquote"/>
-	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
-	    <policy url="file:synapse_repository/conf/sample/sample_policy_1.xml"/>
-	  </proxy>
-	  
-	  <proxy name="InvesbotForwardProxy" type="wsdl" description="This simply forwards all messages to the investbot endpoint">
-	    <endpoint protocol="http" uri="/MyfirstProxy"/>
-	    <target endpoint="invesbot"/>
-	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
-	  </proxy>  	
-	  
-	  <proxy name="InvesbotDefaultProxy" type="wsdl" description="This simply forwards all messages to the investbot endpoint">
-	    <endpoint protocol="http" uri="/MyfirstProxy"/>
-	    <wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
-	  </proxy>
--->
-	  <proxy name="JMSInvesbotSequenceProxy" transports="jms" description="This uses the stockquote named sequence for mediation">
-	    <target sequence="stockquote"/>
-	    <!--<wsdl url="file:synapse_repository/conf/sample/sample_proxy_1.wsdl"/>
-	    <policy url="file:synapse_repository/conf/sample/sample_policy_1.xml"/>-->
-	    <parameter name="transport.jms.ConnectionFactory" locked="true">myTopicConnectionFactory</parameter>
-    	<parameter name="transport.jms.Destination" locked="true">dynamicTopics/something.TestTopic</parameter>
-	  </proxy>
+  	<!-- define a string literal property -->
+  	<set-property name="version" value="0.1"/>
+  	
+  	<!-- define a reuseable endpoint definition -->
+  	<endpoint name="simple" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
 
-  </proxies>
-
+		<!-- define a reusable sequence -->
+    <sequence name="stockquote">
+    	
+    	<!-- log the message using the custom log level. illustrates custom properties for log messages -->
+    	<log level="custom">
+    		<property name="Text" value="Sending quote request"/>
+    		<property name="version" expression="get-property('version')"/>
+    		<property name="symbol" expression="get-property('symbol')"/>
+    	</log>
+    	
+    	<!-- send message to real endpoint referenced by name "stockquote" endpoint definition -->
+    	<send>
+    		<endpoint ref="simple"/>
+    	</send>
+    </sequence>
+  
   <rules>
-    <out>
-  		<filter source="get-property('correlate/label')" regex="stockquote">
-	  		<sequence ref="stockquote"/>
-	  	</filter>
-	  </out>
-	  	
-		<log level="custom">
-			<property name="sequence" value="*** Default Main mediator Sequence ***"/>
-		</log>
-		<in>
-    	<header name="To" value="http://ws.invesbot.com/stockquotes.asmx"/>
-    </in>
-    <send/>
+  
+  	<!-- match the 'To' EPR to the given regex -->
+  	<filter source="get-property('To')" regex=".*/SimpleStockQuoteService.*">
+
+			<!-- set a custom local message property based on the stock code requested -->
+  		<switch source="//m0:CheckPriceRequest/m0:Code" xmlns:m0="http://www.apache-synapse.org/test">
+		    <case regex="IBM">
+		    	<set-property name="symbol" value="Great stock - IBM"/>
+		    </case>
+		    <case regex="MSFT">
+		      <set-property name="symbol" value="Are you sure? - MSFT"/>
+		    </case>
+		    <default>
+		    	<!-- it is possible to assign the result of an XPath expression as the value of a local message property -->
+		      <set-property name="symbol" expression="fn:concat('Normal Stock - ', //m0:CheckPriceRequest/m0:Code)" 
+		      	xmlns:m0="http://www.apache-synapse.org/test"/>
+		    </default>
+		  </switch>
+		  
+		  <!-- invoke an already defined [reusable] sequence at this point -->
+			<sequence ref="stockquote"/>
+	  </filter>
+	  
+  	<!-- Log all messages passing through -->
+  	<log level="full"/>
+  	
+  	<!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
+  	<send/>
+  	
   </rules>
 
 </synapse> 

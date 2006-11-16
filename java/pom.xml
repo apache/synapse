@@ -7,7 +7,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse-Incubating</artifactId>
-    <version>0.90-RC1-SNAPSHOT</version>
+    <version>${synapse.version}</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -18,7 +18,7 @@
     <issueManagement>
         <url>http://issues.apache.org/jira/browse/SYNAPSE</url>
     </issueManagement>
-        
+
     <mailingLists>
         <mailingList>
             <name>Apache Synapse Developer List</name>
@@ -62,18 +62,26 @@
     <profiles>
         <profile>
             <id>release</id>
-            <activation>
-                <property>
-                    <name>release</name>
-                    <value></value>
-                </property>
-            </activation>
             <build>
+
                 <plugins>
                     <plugin>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <inherited>false</inherited>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/bin.xml</descriptor>
+                                <descriptor>src/main/assembly/src.xml</descriptor>
+                            </descriptors>
+                            <finalName>synapse-${synapse.version}</finalName>
+                        </configuration>
                     </plugin>
+
+                    <!--<plugin>-->
+                        <!--<artifactId>maven-site-plugin</artifactId>-->
+                        <!--<inherited>false</inherited>-->
+                    <!--</plugin>-->
+                    <!---->
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
@@ -89,6 +97,11 @@
                     </plugin>
                 </plugins>
             </build>
+            <activation>
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
         </profile>
     </profiles>
 
@@ -104,50 +117,6 @@
                 </configuration>
             </plugin>
 
-            <!--<plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-SNAPSHOT</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>bin.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>directory-inline</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
-
-            <!--
-            <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-              <configuration>
-                <descriptors>
-                  <descriptor>src/main/assembly/bin.xml</descriptor>
-                  <descriptor>src/main/assembly/src.xml</descriptor>
-                </descriptors>
-                <tarLongFileMode>gnu</tarLongFileMode>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-source-plugin</artifactId>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>jar</goal>
-                  </goals>
-                </execution>
-              </executions>
-              <configuration>
-                <attach>true</attach>
-              </configuration>
-            </plugin>
-            -->
         </plugins>
     </build>
 
@@ -180,11 +149,11 @@
         <dependencies>
 
             <!-- Synapse modules -->
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-nhttp</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+            <!--<dependency>-->
+            <!--<groupId>org.apache.synapse</groupId>-->
+            <!--<artifactId>synapse-nhttp</artifactId>-->
+            <!--<version>${project.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
@@ -205,11 +174,34 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- core Axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
+            <artifactId>axis2-kernel</artifactId>
             <version>${axis2.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-adb</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-adb-codegen</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-codegen</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-java2wsdl</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        
+        <!-- core Axiom -->
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
@@ -229,7 +221,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-rahas</artifactId>
-            <version>${axis2.version}</version>
+            <version>${axis2.security.version}</version>
         </dependency>
 
         <dependency>
@@ -239,7 +231,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.ws.commons.neethi</groupId>
+            <groupId>org.apache.neethi</groupId>
             <artifactId>neethi</artifactId>
             <version>${neethi.version}</version>
         </dependency>
@@ -253,13 +245,13 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-secpolicy</artifactId>
-            <version>${axis2.version}</version>
+            <version>${axis2.security.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-security</artifactId>
-            <version>${axis2.version}</version>
+            <version>${axis2.security.version}</version>
         </dependency>
 
         <dependency>
@@ -276,7 +268,7 @@
 
         <!-- external MARs -->
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
             <version>${addressing.version}</version>
             <type>mar</type>
@@ -290,9 +282,9 @@
         </dependency>
 
         <dependency>
-            <groupId>axis2</groupId>
+            <groupId>org.apache.axis2</groupId>
             <artifactId>rampart</artifactId>
-            <version>${rampart.version}</version>
+            <version>${axis2.security.version}</version>
             <type>mar</type>
         </dependency>
 
@@ -344,11 +336,6 @@
             <version>${wsdl4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis-wsdl4j</artifactId>
-            <version>${axis.wsdl4j.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>${commons.fileupload.version}</version>
@@ -390,83 +377,48 @@
             <version>${jakarta.httpcore.version}</version>
         </dependency>
 
-        <!-- For nhttp -->
-        <dependency>
-            <groupId>directory-network</groupId>
-            <artifactId>mina</artifactId>
-            <version>${mina.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>concurrent</groupId>
-            <artifactId>concurrent</artifactId>
-            <version>1.3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asyncweb</groupId>
-            <artifactId>asyncWeb</artifactId>
-            <version>${asyncWeb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asyncweb</groupId>
-            <artifactId>asyncWeb_API</artifactId>
-            <version>${asyncWeb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>asyncweb</groupId>
-            <artifactId>asyncWeb_CommonCodecs</artifactId>
-            <version>${asyncWeb.version}</version>
-        </dependency>
-
     </dependencies>
 
-    <!--
     <reporting>
-      <plugins>
-        <plugin>
-          <inherited>false</inherited>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <aggregate>true</aggregate>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-changes-plugin</artifactId>
-          <reportSets>
-            <reportSet>
-              <reports>
-                <report>changes-report</report>
-              </reports>
-            </reportSet>
-          </reportSets>
-        </plugin>
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>jdepend-maven-plugin</artifactId>
-          <version>2.0-beta-1-SNAPSHOT</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>jxr-maven-plugin</artifactId>
-          <version>2.0-beta-2-SNAPSHOT</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <inherited>false</inherited>
-        </plugin>
-      </plugins>
+        <plugins>
+            <plugin>
+                <inherited>false</inherited>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+            </plugin>
+            <!--<plugin>-->
+                <!--<artifactId>maven-changes-plugin</artifactId>-->
+                <!--<reportSets>-->
+                    <!--<reportSet>-->
+                        <!--<reports>-->
+                            <!--<report>changes-report</report>-->
+                        <!--</reports>-->
+                    <!--</reportSet>-->
+                <!--</reportSets>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<artifactId>maven-project-info-reports-plugin</artifactId>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>jdepend-maven-plugin</artifactId>-->
+                <!--<version>2.0-beta-1-SNAPSHOT</version>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+            <!--<groupId>org.codehaus.mojo</groupId>-->
+            <!--<artifactId>jxr-maven-plugin</artifactId>-->
+            <!--<version>2.0-beta-2-SNAPSHOT</version>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<artifactId>maven-site-plugin</artifactId>-->
+                <!--<inherited>false</inherited>-->
+            <!--</plugin>-->
+        </plugins>
     </reporting>
-    -->
 
     <distributionManagement>
-
         <!--
             <repository>
               <id>apache-repo</id>
@@ -486,11 +438,48 @@
     </distributionManagement>
 
     <repositories>
+        <!--<repository>-->
+            <!--<id>m1-local-repo</id>-->
+            <!--<url>file://${user.home}/.maven/repository</url>-->
+            <!--<layout>legacy</layout>-->
+            <!--<snapshots>-->
+                <!--<enabled>true</enabled>-->
+            <!--</snapshots>-->
+            <!--<releases>-->
+                <!--<enabled>true</enabled>-->
+            <!--</releases>-->
+        <!--</repository>-->
         <repository>
-            <id>ibiblio</id>
-            <name>Ibiblio Maven Repo</name>
-            <layout>legacy</layout>
+            <id>ibiblio-m2</id>
+            <name>Ibiblio Maven 2 Repo</name>
             <url>http://www.ibiblio.org/maven2</url>
+            <releases>
+                <updatePolicy>interval:1440</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>ibiblio-m1</id>
+            <name>Ibiblio Maven 1 Repo</name>
+            <layout>legacy</layout>
+            <url>http://www.ibiblio.org/maven</url>
+            <releases>
+                <updatePolicy>interval:1440</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>Apache Repo1</id>
+            <name>Apache Repo1</name>
+            <layout>legacy</layout>
+            <url>http://repo1.maven.org/maven/</url>
+            <releases>
+                <updatePolicy>interval:1440</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>Apache Zones</id>
+            <name>Apache Zones</name>
+            <layout>legacy</layout>
+            <url>http://ws.zones.apache.org/repository/</url>
             <releases>
                 <updatePolicy>interval:1440</updatePolicy>
             </releases>
@@ -505,105 +494,71 @@
             </releases>
         </repository>
         <repository>
-            <id>Apache Dist</id>
-            <name>Apache Dist Repo</name>
+            <id>Apache People Ibiblio RSync</id>
+            <name>Apache People Ibiblio RSync</name>
             <layout>legacy</layout>
-            <url>http://www.apache.org/dist/java-repository</url>
+            <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/</url>
             <releases>
                 <updatePolicy>interval:1440</updatePolicy>
             </releases>
         </repository>
         <repository>
-            <id>openejb</id>
-            <name>Openejb Repo</name>
+            <id>Jibx</id>
+            <name>Jibx</name>
             <layout>legacy</layout>
-            <url>http://www.openejb.org/maven</url>
-            <releases>
-                <updatePolicy>interval:1440</updatePolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>codehaus</id>
-            <name>Codehaus Repo</name>
-            <layout>legacy</layout>
-            <url>http://dist.codehaus.org</url>
-            <releases>
-                <updatePolicy>interval:1440</updatePolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>sunsite</id>
-            <name>Sunsite Repo</name>
-            <layout>legacy</layout>
-            <url>http://mirrors.sunsite.dk/maven</url>
-            <releases>
-                <updatePolicy>interval:1440</updatePolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>sourceforge</id>
-            <name>Sourceforge Repo</name>
-            <layout>legacy</layout>
-            <url>http://jibx.sourceforge.net/maven</url>
+            <url>http://jibx.sourceforge.net/maven/</url>
             <releases>
                 <updatePolicy>interval:1440</updatePolicy>
             </releases>
         </repository>
         <repository>
             <id>asankha</id>
-            <name>Asankha Repo</name>
+            <name>asankha</name>
             <layout>legacy</layout>
-            <url>http://people.apache.org/~asankha/maven</url>
+            <url>http://people.apache.org/~asankha/maven/</url>
             <releases>
                 <updatePolicy>interval:1440</updatePolicy>
             </releases>
         </repository>
-        <repository>
-            <id>maven-snaps</id>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
+        
+
     </repositories>
 
     <modules>
-        <module>modules/nhttp</module>
+        <!--<module>modules/nhttp</module>-->
         <module>modules/core</module>
         <module>modules/extensions</module>
         <module>modules/samples</module>
     </modules>
 
     <properties>
-        <axis2.version>1.1-SNAPSHOT</axis2.version>
-        <axiom.version>SNAPSHOT</axiom.version>
-        <xml_schema.version>SNAPSHOT</xml_schema.version>
-        <neethi.version>SNAPSHOT</neethi.version>
+        <synapse.version>0.90-SNAPSHOT</synapse.version>
+        <axis2.version>1.1</axis2.version>
+        <axis2.security.version>1.1-SNAPSHOT</axis2.security.version>
+        <axiom.version>1.2</axiom.version>
+        <xml_schema.version>1.2</xml_schema.version>
+        <neethi.version>2.0</neethi.version>
         <wss4j.version>SNAPSHOT</wss4j.version>
         <xmlsec.version>1.3.0</xmlsec.version>
-        <woden.version>SNAPSHOT</woden.version>
+        <woden.version>1.0.0M6</woden.version>
 
-        <addressing.version>SNAPSHOT</addressing.version>
+        <addressing.version>1.1</addressing.version>
         <sandesha2.version>SNAPSHOT</sandesha2.version>
-        <rampart.version>SNAPSHOT</rampart.version>
+        <rampart.version>1.1</rampart.version>
 
-        <commons.logging.version>1.0.4</commons.logging.version>
-        <commons.httpclient.version>3.0</commons.httpclient.version>
+        <commons.logging.version>1.1</commons.logging.version>
+        <commons.httpclient.version>3.0.1</commons.httpclient.version>
         <commons.codec.version>1.3</commons.codec.version>
-        <commons.fileupload.version>1.0</commons.fileupload.version>
+        <commons.fileupload.version>1.1.1</commons.fileupload.version>
         <jakarta.httpcore.version>4.0-alpha2</jakarta.httpcore.version>
 
         <log4j.version>1.2.13</log4j.version>
-        <junit.version>3.8.1</junit.version>
-        <jaxen.version>1.1-beta-8</jaxen.version>
+        <junit.version>3.8.2</junit.version>
+        <jaxen.version>1.1-beta-10</jaxen.version>
         <servletapi.version>2.3</servletapi.version>
-        <wsdl4j.version>1.5.2</wsdl4j.version>
-        <axis.wsdl4j.version>1.2</axis.wsdl4j.version>
+        <wsdl4j.version>1.6.1</wsdl4j.version>
         <annogen.version>0.1.0</annogen.version>
-        <backport_util_concurrent.version>2.1</backport_util_concurrent.version>
+        <backport_util_concurrent.version>2.2</backport_util_concurrent.version>
 
         <geronimo.spec.javamail.version>1.3.1-rc5</geronimo.spec.javamail.version>
         <geronimo.spec.activation.version>1.0.2-rc4</geronimo.spec.activation.version>
@@ -611,11 +566,7 @@
 
         <stax.impl.groupid>woodstox</stax.impl.groupid>
         <stax.impl.artifactid>wstx</stax.impl.artifactid>
-        <stax.impl.version>asl-3.0rc1</stax.impl.version>
+        <stax.impl.version>asl-3.0.1</stax.impl.version>
         <stax.api.version>1.0.1</stax.api.version>
-
-        <mina.version>0.8.0</mina.version>
-        <slf4j.version>1.0</slf4j.version>
-        <asyncWeb.version>0.8.2</asyncWeb.version>
     </properties>
 </project>

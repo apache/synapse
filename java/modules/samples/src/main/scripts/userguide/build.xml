@@ -184,7 +184,7 @@
     </target>
 
     <target name="compile" depends="init" description="Compile all Java">
-        <javac srcdir="src" destdir="${class.dir}">
+        <javac srcdir="." destdir="${class.dir}">
             <classpath refid="javac.classpath"/>
         </javac>
     </target>

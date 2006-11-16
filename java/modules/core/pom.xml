@@ -7,24 +7,23 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse-Incubating</artifactId>
-        <version>SNAPSHOT</version>
+        <version>${synapse.version}</version>
     </parent>
 
+    <groupId>org.apache.synapse</groupId>
     <artifactId>synapse-core</artifactId>
+
     <name>Apache Synapse - Core</name>
     <description>Apache Synapse - Core</description>
     <packaging>jar</packaging>
 
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        <testSourceDirectory>test</testSourceDirectory>
-
         <plugins>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.0-alpha-1-20061114.043217-3</version>
+                <version>2.0-alpha-1-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -35,7 +34,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>axis2</groupId>
+                                    <groupId>org.apache.axis2</groupId>
                                     <artifactId>addressing</artifactId>
                                     <version>${addressing.version}</version>
                                     <type>mar</type>
@@ -65,7 +64,7 @@
 
                                 <echo message="*** Creating synapse.mar ***"/>
                                 <mkdir dir="target/modules/synapse/META-INF"/>
-                                <copy file="conf/module.xml" tofile="target/modules/synapse/META-INF/module.xml"/>
+                                <copy file="src/main/resources/module.xml" tofile="target/modules/synapse/META-INF/module.xml"/>
                                 <jar jarfile="target/synapse-${version}.mar">
                                     <fileset dir="target/modules/synapse">
                                          <include name="**"/>
@@ -113,13 +112,14 @@
             </plugin>
 
         </plugins>
-
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-nhttp</artifactId>
-        </dependency>
-    </dependencies>
+    <!--<dependencies>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.synapse</groupId>-->
+            <!--<artifactId>synapse-nhttp</artifactId>-->
+        <!--</dependency>-->
+    <!--</dependencies>-->
+    <properties>
+        <synapse.version>0.90-SNAPSHOT</synapse.version>
+    </properties>
 </project>

@@ -1,0 +1,58 @@
+<synapse xmlns="http://ws.apache.org/ns/synapse">
+
+	<-- introduction of static inline XML properties and the validation mediator -->
+  <definitions>
+  
+  	<!-- define a static property for an XSD schema resource as an inline XML fragment -->
+  	<set-property name="validate_schema">
+			<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.apache-synapse.org/test" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://www.apache-synapse.org/test">
+				<xs:element name="CheckPriceRequest">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Code" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:schema>
+  	</set-property>
+  	
+  	<endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+
+    <sequence name="customrequest">
+    	<!-- is this a valid custom request ? -->
+    	<validate>
+    		<schema key="validate_schema"/>
+		    <on-fail>
+		    	<!-- if the request does not validate againt schema throw a fault -->
+	      	<makefault>
+	      		<code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+	      		<reason value="Invalid custom quote request"/>
+	      	</makefault>
+	      	
+	      	<!-- send the fault and stop processing -->
+	      	<send/>
+		    </on-fail>
+		  </validate>
+
+    	<!-- send message to real endpoint referenced by name "stockquote" and stop -->
+    	<send>
+    		<endpoint ref="stockquote"/>
+    	</send>
+    </sequence>
+
+  </definitions>
+
+  <rules>
+  	<in>
+	  	<!-- is this a custom stock quote message? -->
+	  	<filter xpath="//m0:CheckPriceRequest" xmlns:m0="http://www.apache-synapse.org/test">
+	  		<sequence ref="customrequest"/>
+	  	</filter>
+		</in>
+		
+		<!-- just let the message flow through -->
+	  <send/>
+
+  </rules>
+
+</synapse> 

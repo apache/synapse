@@ -1,122 +1,20 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse">
-
-	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
-		<property name="root" value=""/>
-		<property name="cachableDuration" value="15000"/>
-	</registry>
   
-  <definitions>
-  
-  	<!-- define the local property keys for the XSLTs -->
-  	<!--<set-property name="xslt-key-req" src="file:synapse_repository/conf/sample/transform.xslt"/>-->
-  	<set-property name="xslt-key-req">
-			<xsl:stylesheet version="2.0" 
-				xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-				xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-				xmlns:m0="http://www.apache-synapse.org/test"
-				exclude-result-prefixes="m0 fn">
-			<xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
-			
-			<xsl:template match="/">
-			  <xsl:apply-templates select="//m0:CheckPriceRequest" /> 
-			</xsl:template>
-			  
-			<xsl:template match="m0:CheckPriceRequest">
-			
-			<m:getQuote xmlns:m="http://services.samples/xsd">
-				<m:request>
-					<m:symbol><xsl:value-of select="m0:Code"/></m:symbol>
-				</m:request>
-			</m:getQuote>
-
-					
-			</xsl:template>
-			</xsl:stylesheet>
-		</set-property>
-		
-  	<set-property name="xslt-key-resp" key="file:synapse_repository/conf/sample/transform_back.xslt"/>
-
-    <sequence name="customrequest">
-    	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    	
-    	<!-- set correlation field to custom label -->
-    	<set-property name="correlate/label" value="customquote"/>
-    	
-    	<!-- transform the custom quote into a standard quote requst -->
-    	<xslt key="xslt-key-req"/>
-    	
-    	<!-- send message to real endpoint and stop -->
-    	<send/>
-    </sequence>
-
-		<sequence name="customresponse">
-    	<!-- transform the custom quote into a standard quote requst -->
-    	<xslt key="xslt-key-resp"/>
-    	
-    	<!-- now send the custom response back to the client and stop -->
-    	<send/>    	
-    </sequence>
-    
-    <sequence name="stockquote">
-    	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    
-    	<!-- check if the symbol is MSFT -->
-      <filter xpath="//*[wsx:symbol='MSFT']" xmlns:wsx="http://www.webserviceX.NET/">
-      	<!-- if it is throw a fault -->
-      	<makefault>
-      		<code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-      		<reason value="Isn't there a Windows API for that?"/>
-      	</makefault>
-      </filter>
-      
-      <send/>
-    </sequence>
-    
-    <sequence name="standardrequest">
-	  	<!-- now log the message using log4j -->
-	  	<log level="full"/>
-	  	
-	  	<!-- Check if the URL matches the stockquote gateway/dumb case -->
-	  	<filter source="get-property('To')" regex=".*/StockQuote.*">
-	  		<sequence ref="stockquote"/>
-	  	</filter>
-	  	
-	  	<!-- check if the URL matches the virtual url - either the proxy or ws-add case -->
-			<filter source="get-property('To')" regex="http://stockquote.*">
-	  		<sequence ref="stockquote"/>
-	  	</filter>
-	  		  	
-	  	<!-- send the message on -->
-	  	<send/>
-    </sequence>
-
-  </definitions>
-
+  <!-- simple content based routing of messages -->
   <rules>
-  	<in>
-	  	<!-- is this a custom stock quote message? -->
-	  	<filter xpath="//m0:CheckPriceRequest" xmlns:m0="http://www.apache-synapse.org/test">
-	  		<sequence ref="customrequest"/>
-	  	</filter>
-	  	
-	  	<!-- else, proceed as usual with the standard processing rules -->
-	  	<sequence ref="standardrequest"/>
-		</in>
-		
-		<out>
-			<log>
-				<property name="Correlate label : " expression="get-property('correlate/label')"/>
-			</log>
-  		<!-- is this a custom stock quote reply? -->
-	  	<filter source="get-property('correlate/label')" regex="customquote">
-	  		<sequence ref="customresponse"/>
-	  	</filter>
-
-			<!-- just let the message flow through -->
-		  <send/>
-		</out>		
+	
+		<!-- simple filtering of messages with XPath and regex matches -->
+		<filter source="//m0:CheckPriceRequest/m0:Code" regex="IBM" xmlns:m0="http://www.apache-synapse.org/test">
+		  	
+	  	<!-- route the message to the SimpleStockQuoteService1 service EPR -->
+  		<send>
+  			<endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService1"/>
+  		<send>
+  	</filter>
+  	
+  	<!-- send any other messages without change -->
+  	<send/>  	
+  	
   </rules>
 
 </synapse> 

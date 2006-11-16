@@ -1,0 +1,11 @@
+<serviceGroup>
+<service name="SimpleStockQuoteService2">
+	<messageReceivers>
+		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only" 
+				class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />
+		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out" 
+				class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
+		</messageReceivers>
+		<parameter locked="false" name="ServiceClass">samples.services.SimpleStockQuoteService</parameter>
+</service>
+</serviceGroup>

@@ -1,11 +1,11 @@
 <project default="build-service">
 
-    <property name="synapse.home" value="../../../"/>
+    <property name="synapse.home" value="../../../.."/>
     <property name="lib" value="${synapse.home}/lib"/>
     <property name="temp.dir" value="temp"/>
     <property name="classes" value="${temp.dir}/classes"/>
     <property name="src" value="src"/>
-    <property name="services" value="services"/>
+    <property name="services" value="../../repository/services"/>
 
     <path id="synapse.class.path">
         <pathelement path="${java.class.path}"/>

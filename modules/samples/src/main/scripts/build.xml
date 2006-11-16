@@ -99,7 +99,7 @@
     <property name="class.dir" value="target/classes"/>
 
     <path id="axis.classpath">
-        <fileset dir="../lib">
+        <fileset dir="../../lib">
             <include name="*.jar"/>
         </fileset>
     </path>
@@ -177,14 +177,14 @@
         <mkdir dir="${class.dir}"/>
         <path id="javac.classpath">
             <pathelement path="${class.dir}"/>
-            <fileset dir="../lib">
+            <fileset dir="../../lib">
                 <include name="**/*.jar"/>
             </fileset>
         </path>
     </target>
 
     <target name="compile" depends="init" description="Compile all Java">
-        <javac srcdir="." destdir="${class.dir}">
+        <javac srcdir="src" destdir="${class.dir}">
             <classpath refid="javac.classpath"/>
         </javac>
     </target>

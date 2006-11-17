@@ -42,7 +42,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
+            <artifactId>synapse-incubating-core</artifactId>
         </dependency>
     </dependencies>
 

@@ -71,7 +71,8 @@ public class Axis2Sender {
                     // The Axis2 Message context of the Synapse MC
                     synapseInMessageContext);
 
-            if (axisOutMsgContext != null) {
+          
+            if (axisOutMsgContext != null && axisOutMsgContext.getEnvelope()!=null) { // if there is no response env will be null
                 //set the response Envelop as a property in Original axisMsgCtx
                 synapseInMessageContext.setProperty(
                     org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,

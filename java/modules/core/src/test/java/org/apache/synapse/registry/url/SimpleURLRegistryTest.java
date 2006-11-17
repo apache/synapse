@@ -29,7 +29,7 @@ import java.io.FileWriter;
 
 public class SimpleURLRegistryTest extends TestCase {
 
-    private static final String FILE = "target/unittest/text.xml";
+    private static final String FILE = "target/text.xml";
     private static final String TEXT_1 = "<text1 />";
     private static final String TEXT_2 = "<text2 />";
 

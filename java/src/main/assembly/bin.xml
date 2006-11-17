@@ -65,7 +65,7 @@
             <directory>modules/core/target</directory>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
-                <include>synapse-${synapse.version}.mar</include>
+                <include>synapse-incubating-${synapse.version}.mar</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -154,32 +154,32 @@
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
-                <exclude>axis2:addressing:mar</exclude>
-                <exclude>axis2:rampart:mar</exclude>
+                <exclude>org.apache.axis2:addressing:mar</exclude>
+                <exclude>org.apache.axis2:rampart:mar</exclude>
                 <exclude>sandesha2:sandesha2:mar</exclude>                
             </excludes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
-                <include>axis2:addressing:mar</include>
-                <include>axis2:rampart:mar</include>
-                <!--<include>sandesha2:sandesha2:mar</include>-->
+                <include>org.apache.axis2:addressing:mar</include>
+                <include>org.apache.axis2:rampart:mar</include>
+                <include>sandesha2:sandesha2:mar</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules</outputDirectory>
             <includes>
-                <include>axis2:addressing:mar</include>
-                <!--<include>axis2:rampart:mar</include>-->
-                <!--<include>sandesha2:sandesha2:mar</include>-->
+                <include>org.apache.axis2:addressing:mar</include>
+                <include>org.apache.axis2:rampart:mar</include>
+                <include>sandesha2:sandesha2:mar</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules</outputDirectory>
             <includes>
-                <include>axis2:addressing:mar</include>
-                <include>axis2:rampart:mar</include>
+                <include>org.apache.axis2:addressing:mar</include>
+                <include>org.apache.axis2:rampart:mar</include>
                 <include>sandesha2:sandesha2:mar</include>
             </includes>
         </dependencySet>

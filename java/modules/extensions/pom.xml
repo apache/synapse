@@ -30,7 +30,7 @@
     </parent>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse-extensions</artifactId>
+    <artifactId>synapse-incubating-extensions</artifactId>
     
     <name>Apache Synapse - Extensions</name>
     <description>Apache Synapse - Extensions</description>

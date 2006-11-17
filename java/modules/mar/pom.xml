@@ -30,7 +30,7 @@
     </parent>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse</artifactId>
+    <artifactId>synapse-incubating</artifactId>
 
     <name>Apache Synapse - Module</name>
     <description>Apache Synapse - Module</description>
@@ -48,7 +48,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <copy file="../core/target/synapse-${synapse.version}.mar" tofile="target/synapse-${synapse.version}.mar"/>
+                                <copy file="../core/target/synapse-incubating-${synapse.version}.mar" tofile="target/synapse-incubating-${synapse.version}.mar"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -71,7 +71,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>target/synapse-${synapse.version}.mar</file>
+                                    <file>target/synapse-incubating-${synapse.version}.mar</file>
                                     <type>mar</type>
                                 </artifact>
                             </artifacts>

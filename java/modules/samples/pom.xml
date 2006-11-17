@@ -30,7 +30,7 @@
     </parent>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse-samples</artifactId>
+    <artifactId>synapse-incubating-samples</artifactId>
 
     <name>Apache Synapse - Samples</name>
     <description>Apache Synapse - Samples</description>

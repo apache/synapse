@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="Proficio">
+<project name="Apache Synapse">
 
     <bannerLeft>
         <name>Apache Synapse</name>
@@ -17,11 +17,12 @@
     <body>
         <links>
             <item name="Apache" href="http://www.apache.org/"/>
+            <item name="Incubator" href="http://incubator.apache.org/"/>
             <item name="WebServices" href="http://ws.apache.org/"/>
         </links>
 
         <menu name="Apache Synapse">
-            <item name="About" href="index.xml"/>
+            <item name="About" href="index.html"/>
             <item name="Downloads">
                 <item name="Releases" href="download.cgi"/>
                 <item name="Source Code" href="source-repository.html"/>
@@ -29,16 +30,18 @@
             <item name="Documentation">
                 <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
                 <item name="User guide" href="userguide.html"/>
-                <item name="Javadocs" href="/apidocs/index.html"/>
-                <!--<item name="View Source"-->
-                      <!--href="http://svn.apache.org/viewvc/webservices/commons/trunk/modules/axiom/?root=Apache-SVN"/>-->
+                <item name="Extending Synapse" href="extending_synapse.html"/>
+                <item name="Javadocs" href="apidocs/index.html"/>
             </item>
             <item name="Project Information">
-                <item name="Mailing Lists" href="/mail-lists.html"/>
-                <item name="Project Team" href="/team-list.html"/>
+                <item name="Project Information" href="project-info.html"/>
+                <item name="Mailing Lists" href="mail-lists.html"/>
                 <item name="Issue Tracking" href="issue-tracking.html"/>
+                <item name="Dependencies" href="dependencies.html"/>
+                <item name="Dependency Convergence" href="dependency-convergence.html"/>
+                <item name="Project Team" href="team-list.html"/>
+                <item name="Project Summary" href="project-summary.html"/>
             </item>
-            <item name="License" href="/license.html"/>
         </menu>
 
     </body>

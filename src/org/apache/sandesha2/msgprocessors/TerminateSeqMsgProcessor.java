@@ -355,6 +355,14 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		String terminated = SandeshaUtil.getSequenceProperty(outSequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED, storageManager);
 
+		if (terminated != null && "true".equals(terminated)) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);
+			log.debug(message);
+			if (log.isDebugEnabled())
+				log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage, sequence previously terminated");
+			return true;
+		}
+
 		AxisOperation terminateOp = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.TERMINATE_SEQ,
 				rmMsgCtx.getRMSpecVersion(),
@@ -367,12 +375,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		msgContext.setOperationContext(opcontext);
 		msgContext.setAxisOperation(terminateOp);
-		
-		if (terminated != null && "true".equals(terminated)) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);
-			log.debug(message);
-			return false;
-		}
 
 		TerminateSequence terminateSequencePart = (TerminateSequence) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
@@ -423,6 +425,10 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		terminateBean.setMessageID(msgContext.getMessageID());
 		
+		// Set the internal sequence id and outgoing sequence id for the terminate message
+		terminateBean.setInternalSequenceID(internalSeqenceID);
+		terminateBean.setSequenceID(outSequenceID);
+		
 		EndpointReference to = msgContext.getTo();
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
@@ -444,14 +450,15 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);
-
-		rmMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-
+		
 		SandeshaUtil.executeAndStore(rmMsgCtx, key);
+		
+		// Pause the message context
+		rmMsgCtx.pause();
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage " + Boolean.FALSE);
-		return false;
+			log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage " + Boolean.TRUE);
+		return true;
 	}
 
 }

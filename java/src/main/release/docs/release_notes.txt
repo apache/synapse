@@ -5,10 +5,9 @@ Apache Synapse XX Release Notes
 3. Building the Samples
 4. Known Problems
 5. Reporting Problems
-6. Specific issues, features, and improvements fixed in the 
-Synapse XX release:
+6. Specific issues, features, and improvements fixed in the Synapse 0.90 release
 
-Release Notes - Synapse - Version XX
+Release Notes - Synapse - Version 0.90
 
 6.1 Bugs
 

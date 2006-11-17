@@ -7,7 +7,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse-Incubating</artifactId>
-    <version>${synapse.version}</version>
+    <version>0.90-SNAPSHOT</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>

@@ -44,12 +44,11 @@
             <outputDirectory>synapse-${synapse.version}-src</outputDirectory>
             <includes>
                 <include>modules/**/*</include>
+                <include>**/pom.xml</include>
+                <include>repository/**/*</include>
+                <include>src/**/*</include>
             </includes>
             <excludes>
-                <exclude>build.xml</exclude>
-                <exclude>distribution/build.xml</exclude>
-                <exclude>benchmark</exclude>
-                <exclude>benchmark/**/*</exclude>
                 <exclude>**/target</exclude>
                 <exclude>**/target/**/*</exclude>
                 <exclude>**/build</exclude>
@@ -58,12 +57,6 @@
                 <exclude>**/.classpath</exclude>
                 <exclude>**/.project</exclude>
                 <exclude>**/.wtpmodules</exclude>
-                <exclude>**/surefire*</exclude>
-                <exclude>**/cobertura.ser</exclude>
-                <exclude>bin</exclude>
-                <exclude>bin/*</exclude>
-                <exclude>**/var/journal</exclude>
-                <exclude>**/build.out*</exclude>
                 <exclude>**/*.iml</exclude>
             </excludes>
         </fileSet>

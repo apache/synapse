@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
   ~  Licensed to the Apache Software Foundation (ASF) under one
   ~  or more contributor license agreements.  See the NOTICE file
@@ -16,8 +17,6 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="2.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:fn="http://www.w3.org/2005/02/xpath-functions"

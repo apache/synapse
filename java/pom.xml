@@ -73,7 +73,7 @@
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
                                 <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
-                            <finalName>synapse-${synapse.version}</finalName>
+                            <finalName>synapse-${synapse.version}-incubating</finalName>
                         </configuration>
                     </plugin>
 
@@ -117,30 +117,46 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
+
         </plugins>
     </build>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>snapshot</id>
+            <id>codehaus-snapshot</id>
             <name>Snapshot repository</name>
             <url>http://snapshots.maven.codehaus.org/maven2/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
         </pluginRepository>
         <pluginRepository>
-            <id>snapshot-apache</id>
+            <id>apache-snapshot</id>
             <name>Apache Snapshot repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+            <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
             <releases>
                 <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>Codehaus Snapshots</id>
+            <url>http://snapshots.repository.codehaus.org/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
             </releases>
         </pluginRepository>
     </pluginRepositories>
@@ -411,10 +427,10 @@
             <!--<artifactId>jxr-maven-plugin</artifactId>-->
             <!--<version>2.0-beta-2-SNAPSHOT</version>-->
             <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<artifactId>maven-site-plugin</artifactId>-->
-                <!--<inherited>false</inherited>-->
-            <!--</plugin>-->
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <inherited>false</inherited>
+            </plugin>
         </plugins>
     </reporting>
 
@@ -529,6 +545,7 @@
         <module>modules/core</module>
         <module>modules/extensions</module>
         <module>modules/samples</module>
+        <module>modules/mar</module>
     </modules>
 
     <properties>
@@ -569,4 +586,100 @@
         <stax.impl.version>asl-3.0.1</stax.impl.version>
         <stax.api.version>1.0.1</stax.api.version>
     </properties>
+
+    <developers>
+        <!-- If you are a committer and your name is not listed here, please include -->
+        <developer>
+            <name>Saminda Abeyruwan</name>
+            <id>saminda</id>
+            <email>saminda AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Paul Fremantle</name>
+            <email>paul AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Eran Chinthaka</name>
+            <id>chinthaka</id>
+            <email>chinthaka AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~chinthaka</url>
+        </developer>
+        <developer>
+            <name>Ant Elder</name>
+            <email>ant.elder AT gmail.com</email>
+            <organization>IBM</organization>
+        </developer>
+        <developer>
+            <name>Glen Daniels</name>
+            <id>gdaniels</id>
+            <email>gdaniels AT apache.org</email>
+            <organization>Sonic Software</organization>
+        </developer>
+        <developer>
+            <name>Deepal Jayasinghe</name>
+            <id>deepal</id>
+            <email>deepal AT wso2.com</email>
+            <organization>WSO2</organization>
+            <url>http://www.apache.org/~deepal</url>
+        </developer>
+        <developer>
+            <name>Davanum Srinivas</name>
+            <id>dims</id>
+            <email>dims AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Sanjiva Weerawarana</name>
+            <id>sanjiva</id>
+            <email>sanjiva AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Ruwan Linton</name>
+            <id>ruwan</id>
+            <email>ruwan AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Jaliya Ekanayake</name>
+            <email>jnekanayake AT gmail.com</email>
+        </developer>
+        <developer>
+            <name>Asankha Perera</name>
+            <id>asankha</id>
+            <email>asankha AT wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Hadrian Zbarcea</name>
+        </contributor>
+        <contributor>
+            <name>Indika Kumara</name>
+            <email>indika@wso2.com</email>
+            <organization>WSO2</organization>
+        </contributor>
+        <contributor>
+            <name>Chathura Ekanayake</name>
+            <email>chathura@wso2.com</email>
+            <organization>WSO2</organization>
+        </contributor>
+        <contributor>
+            <name>Tijs Rademakers</name>
+        </contributor>
+        <contributor>
+            <name>Sanjesh Pathak</name>
+        </contributor>
+        <contributor>
+            <name>Oleg Kalnichevski</name>
+        </contributor>
+        <contributor>
+            <name>Dave Irving</name>
+        </contributor>
+    </contributors>
 </project>

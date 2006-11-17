@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>Apache-Synapse-Incubating</artifactId>
+        <version>0.90-SNAPSHOT</version>
+    </parent>
+
+    <groupId>org.apache.synapse</groupId>
+    <artifactId>synapse</artifactId>
+
+    <name>Apache Synapse - Module</name>
+    <description>Apache Synapse - Module</description>
+    <packaging>pom</packaging>
+
+    <build>
+
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>mar</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <copy file="../core/target/synapse-${synapse.version}.mar" tofile="target/synapse-${synapse.version}.mar"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>mar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/synapse-${synapse.version}.mar</file>
+                                    <type>mar</type>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

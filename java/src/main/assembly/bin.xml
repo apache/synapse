@@ -132,7 +132,7 @@
             <directory>modules/core/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>synapse-core-${synapse.version}.jar</include>
+                <include>synapse-incubating-core-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>

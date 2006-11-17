@@ -201,26 +201,19 @@
 
     <dependencyManagement>
         <dependencies>
-
-            <!-- Synapse modules -->
-            <!--<dependency>-->
-            <!--<groupId>org.apache.synapse</groupId>-->
-            <!--<artifactId>synapse-nhttp</artifactId>-->
-            <!--<version>${project.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-core</artifactId>
+                <artifactId>synapse-incubating-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-extensions</artifactId>
+                <artifactId>synapse-incubating-extensions</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-samples</artifactId>
+                <artifactId>synapse-incubating-samples</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -174,6 +174,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				msgCtx.setPaused(false);
 			
 				AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
+				if (log.isDebugEnabled())
+					log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
 				engine.resumeSend(msgCtx);
 				
 				successfullySent = true;

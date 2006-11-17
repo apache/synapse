@@ -213,6 +213,8 @@ public class SandeshaUtil {
 	}
 
 	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaUtil::startSenderForTheSequence , context " + context + ", sequenceID " + sequenceID);
 		
 		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
 		
@@ -223,6 +225,9 @@ public class SandeshaUtil {
 			context.setProperty(Sandesha2Constants.SENDER,sender);
 			sender.runSenderForTheSequence(context, sequenceID);
 		}
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::startSenderForTheSequence");
 	}
 	
 	public static void stopSender(ConfigurationContext context) {
@@ -428,7 +433,8 @@ public class SandeshaUtil {
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotGetStorageManager);
-			log.error(message);
+			if (log.isErrorEnabled())
+			  log.error(message, e);
 			throw new SandeshaException(message,e);
 		}
 	}
@@ -1055,7 +1061,6 @@ public class SandeshaUtil {
 
 		msgContext.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
 		msgContext.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-		msgContext.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
 
 		Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
 		msgContext.setTransportOut(sandesha2TransportOutDesc);

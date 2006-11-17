@@ -107,7 +107,7 @@ public class RMMsgCreator {
 			context.registerOperationContext(createSeqMsgId, createSeqOpCtx);
 
 		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage());
+			throw new SandeshaException(e.getMessage(), e);
 		}
         
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
@@ -514,7 +514,7 @@ public class RMMsgCreator {
 
 		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-		String msgNoList = (String) seqBean.getValue();
+		String msgNoList = seqBean.getValue();
 
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(msgNoList, factory, rmNamespaceValue);
 		Iterator iterator = ackRangeArrayList.iterator();

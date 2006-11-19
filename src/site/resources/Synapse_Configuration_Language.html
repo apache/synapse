@@ -436,6 +436,57 @@ managed by Spring. This Spring bean must implement the Mediator interface for
 it to act as a Mediator. The key will reference the Spring
 ApplicationContext/Configuration used for the bean</p>
 
+<h4>Script Language Mediators</h4>
+
+<p>
+Synapse supports Mediators implemented in a variety of scripting languages such as JavaScript, Python or Ruby.
+
+<p>There are two ways of defining script mediators, either with the script program statements stored in a separate file which is referenced via a Synapse property, or with the script program statements embedded in-line within the Synapse configuration.</p>
+<p>
+A script mediator using a registry property is defined as follows:
+<p>
+<pre>
+ &lt;script key=&quot;property-key&quot; [function=&quot;script-function-name&quot;]/&gt;
+</pre>
+<p>
+The property-key is a Synapse registry property containing a URL to the script source. The function is an
+optional attribute defining the name of the script function to call, if not specified it
+defaults to a function named 'mediate'. The function is passed a single parameter which is the
+Synapse MessageContext. The function may return a boolean, if it does not then true is assumed.
+The language the script is written in is determined from the file name suffix of the property key value.
+<p>
+An inline script mediator has the script source embedded in the config XML:
+<pre>
+ &lt;script.LL&gt;...script source code...&lt;script.LL/&gt;
+</pre>
+<p>
+where LL is the script language name extension. For example, script.js indicates a JavaScript program, script.rb a Ruby program, or script.py a Python program.
+The environment of the script has the Synapse MessageContext predefined in a script variable named 'mc'.
+<p>
+An example of an inline mediator using JavaScript/E4X which returns false if the SOAP message
+body contains an element named 'symbol' which has a value of 'IBM' would be:
+<p>
+<pre>
+ &lt;script.js&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script.js/&gt;
+</pre>
+<p>
+The boolean response from the inlined mediator is either the response from the evaluation of the
+script statements or if that result is not a boolean then a response of true is assumed.
+<p>
+Synapse uses the Apache <a href="http://jakarta.apache.org/bsf/">Bean Scripting Framework</a> for the script language
+support, any script language supported by BSF may be used to implement a Synapse Mediator.
+<p>
+Implementing a Mediator with a script language can have advantages over using the built in Synapse Mediator types or implementing a custom Java class Mediator.
+Script Mediators have all the flexibility of a class Mediator with access to the Synapse MessageContext and SynapseEnvironment APIs, and  
+the ease of use and dynamic nature of scripting languages allows rapid development and prototyping of custom mediators. An additional
+benefit of some scripting languages is that they have very simple and elegant XML manipulation capabilities, for example JavaScript E4X or Ruby REXML,
+so this makes them well suited for use in the Synapse mediation environment.   
+<p>
+For both types of script mediator definition the MessageContext passed in to the script
+has additional methods over the standard Synapse MessageContext to enable working with the XML
+in a way natural to the scripting language. For example when using JavaScript get/setPayloadXML
+use E4X XML objects, when using Ruby they use REXML documents.
+
 <p></p>
 
 <h2>Examples</h2>

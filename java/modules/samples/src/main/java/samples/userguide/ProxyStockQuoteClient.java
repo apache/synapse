@@ -45,7 +45,7 @@ public class ProxyStockQuoteClient {
 
         String symbol = "IBM";
         String xurl   = "http://localhost:9000/axis2/services/SimpleStockQuoteService";
-        String purl   = "http://localhost:8081";
+        String purl   = "http://localhost:8080";
         String sAction= "urn:getQuote";
 
         if (args.length > 0) symbol = args[0];

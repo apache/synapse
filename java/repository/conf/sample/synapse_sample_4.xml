@@ -19,61 +19,67 @@
 
 <synapse xmlns="http://ws.apache.org/ns/synapse">
 
-	<!-- illustration of various mediators : try-catch-finally and makefault mediators -->  
-  <definitions>
-  
-  	<!-- define an endpoint for the stock quote service -->
-  	<endpoint name="simple" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-  	
-  	<!-- define a non-existent endpoint to test error handling -->
-  	<endpoint name="bogus" address="http://localhost:9000/axis2/services/NonExistentStockQuoteService"/>
+    <!-- illustration of various mediators : try-catch-finally and makefault mediators -->
+    <definitions>
 
-		<!-- define a sequence to be used for error handling -->
-    <sequence name="errorHandler">
-    	
-    	<!-- Log the error -->
-    	<log level="custom">
-    		<property name="text" value="An unexpected error occured"/>
-    		<property name="message" expression="get-property('ERROR_MESSAGE')"/>
-    		<property name="detail" expression="get-property('ERROR_DETAIL')"/>
-    	</log>
-    	
-    	<!-- create a custom fault message -->
-    	<makefault>
-    		<code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-    		<reason value="get-property('ERROR_MESSAGE')"/>
-    	</makefault>
-    	
-    	<send/>
-    </sequence>
-  
-  <rules>
-  
-  	<try>
-  		<sequence>
-				<switch source="//m0:CheckPriceRequest/m0:Code" xmlns:m0="http://www.apache-synapse.org/test">
-			    <case regex="IBM">
-						<send>
-							<endpoint ref="simple"/>
-						</send>
-			    </case>
-			    <case regex="MSFT">
-			      <send>
-							<endpoint ref="bogus"/>
-						</send>
-			    </case>
-			  </switch>
-			</sequence>
-			<onError>
-				<sequence ref="errorHandler"/>
-			</onError>
-			<finally>
-				<log level="custom">
-					<property name="message" value="Processed request"/>
-				</log>
-			</finally>
-		</try>
-  	
-  </rules>
+        <!-- define an endpoint for the stock quote service -->
+        <endpoint name="simple"
+                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+
+        <!-- define a non-existent endpoint to test error handling -->
+        <endpoint name="bogus"
+                  address="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/>
+
+        <!-- define a sequence to be used for error handling -->
+        <sequence name="errorHandler">
+
+            <!-- Log the error -->
+            <log level="custom">
+                <property name="text" value="An unexpected error occured"/>
+                <property name="message" expression="get-property('ERROR_MESSAGE')"/>
+                <property name="detail" expression="get-property('ERROR_DETAIL')"/>
+            </log>
+
+            <!-- create a custom fault message -->
+            <makefault>
+                <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+                <reason expression="get-property('ERROR_MESSAGE')"/>
+            </makefault>
+
+            <send/>
+        </sequence>
+    </definitions>
+
+    <rules>
+
+        <try>
+            <sequence>
+                <switch source="//m0:getQuote/m0:request/m0:symbol"
+                        xmlns:m0="http://services.samples/xsd">
+                    <case regex="IBM">
+                        <send>
+                            <endpoint ref="simple"/>
+                        </send>
+                    </case>
+                    <case regex="MSFT">
+                        <send>
+                            <endpoint ref="bogus"/>
+                        </send>
+                    </case>
+                </switch>
+            </sequence>
+            <onError>
+                <sequence ref="errorHandler"/>
+            </onError>
+            <finally>
+                <log level="custom">
+                    <property name="message" value="Processed request"/>
+                </log>
+            </finally>
+        </try>
+
+        <send/>
+
+    </rules>
 
 </synapse> 

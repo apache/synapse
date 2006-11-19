@@ -61,7 +61,7 @@ public class SpringMediator implements Mediator {
         Property dp = synCtx.getConfiguration().getPropertyObject(configKey);
 
         // if the configKey refers to a dynamic property
-        if (dp != null && dp.getType() == Property.DYNAMIC_TYPE) {
+        if (dp != null && dp.isDynamic()) {
             if (!dp.isCached() || dp.isExpired()) {
                 buildAppContext(synCtx);
             }

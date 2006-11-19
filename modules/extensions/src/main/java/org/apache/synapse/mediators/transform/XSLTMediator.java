@@ -135,7 +135,7 @@ public class XSLTMediator extends AbstractMediator {
         Property dp = msgCtx.getConfiguration().getPropertyObject(xsltKey);
 
         // if the xsltKey refers to a dynamic property
-        if (dp != null) {
+        if (dp != null && dp.isDynamic()) {
             if (!dp.isCached() || dp.isExpired()) {
                 synchronized(transformerLock) {
                     try {

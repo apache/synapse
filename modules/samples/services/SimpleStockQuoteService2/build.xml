@@ -63,7 +63,7 @@
             </fileset>
         </copy>
 
-        <jar destfile="${services}/SimpleStockQuoteService.aar">
+        <jar destfile="${services}/SimpleStockQuoteService2.aar">
             <fileset dir="${SSQ.dir}"/>
         </jar>
     </target>

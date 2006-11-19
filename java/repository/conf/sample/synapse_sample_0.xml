@@ -18,21 +18,21 @@
   -->
 
 <synapse xmlns="http://ws.apache.org/ns/synapse">
-  
-  <!-- simple Synapse configuration -->
-  <rules>
-  	<!-- log all attributes of messages passing through -->
-  	<log level="full"/>
-  	
-  	<!-- Send the messages where they are destined to (i.e. the 'To' EPR of the message) -->
-  	<send/>
-  	
-  	<!-- a send or drop mediator [currently] terminates further processing of the current message -->
-  	<!-- hence the following mediatior will not be invoked on any message -->
-  	<log level="custom">
-  		<!-- the log mediator allows custom attributes/properties for a log message. -->
-  		<property name="message" value="You should not see this"/>
-  	</log>
-  </rules>
+
+    <!-- simple Synapse configuration -->
+    <rules>
+        <!-- log all attributes of messages passing through -->
+        <log level="full"/>
+
+        <!-- Send the messages where they are destined to (i.e. the 'To' EPR of the message) -->
+        <send/>
+
+        <!-- a send or drop mediator [currently] terminates further processing of the current message -->
+        <!-- hence the following mediatior will not be invoked on any message -->
+        <log level="custom">
+            <!-- the log mediator allows custom attributes/properties for a log message. -->
+            <property name="message" value="You should not see this"/>
+        </log>
+    </rules>
 
 </synapse> 

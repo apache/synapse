@@ -19,71 +19,51 @@
 
 <synapse xmlns="http://ws.apache.org/ns/synapse">
 
-	<!-- introduction to URL source properties, registry based properties and the XSLT mediator -->
-	
-	<!-- the SimpleURLRegistry allows access to a URL based resource store such as the -->
-	<!-- file system (file://) or a web server (http://) -->
-	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
-		<!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
-		<property name="root" value="file:repository/conf/sample/resources/"/>
-		<!-- all resources loaded from the URL registry would be cached for this number of secs -->
-		<property name="cachableDuration" value="15000"/>
-	</registry>
-  
-  <definitions>
-  
-  	<!-- define a static property for the first XSLT resource as an URL source (could be any URL src) -->
-  	<set-property name="xslt-key-req" src="file:repository/conf/sample/resources/transform/transform.xslt"/>
-  	
-  	<!-- define a dynamic property for the second XSLT resource as a key reference to the registry -->
-  	<!-- the key is just a unique identifier for a resource on the registry. It is treated as a string literal --> 
-  	<set-property name="xslt-key-resp" key="transform/transform_back.xslt"/>
-  
-  	<!-- define a reuseable endpoint definition and use it within config -->
-  	<endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    <!-- introduction to URL source properties, registry based properties and the XSLT mediator -->
 
-    <sequence name="customrequest">
+    <!-- the SimpleURLRegistry allows access to a URL based resource store such as the -->
+    <!-- file system (file://) or a web server (http://) -->
+    <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
+        <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
+        <property name="root" value="file:repository/conf/sample/resources/"/>
+        <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
+        <property name="cachableDuration" value="15000"/>
+    </registry>
 
-    	<!-- set correlation field to custom label -->
-    	<set-property name="correlate/label" value="customquote"/>
-    	
-    	<!-- transform the custom quote into a standard quote requst -->
-    	<xslt key="xslt-key-req"/>
-    	
-    	<!-- send message to real endpoint referenced by name "stockquote" and stop -->
-    	<send>
-    		<endpoint ref="stockquote"/>
-    	</send>
-    </sequence>
+    <definitions>
 
-		<sequence name="customresponse">
-    	<!-- transform the custom quote into a standard quote requst -->
-    	<xslt key="xslt-key-resp"/>
-    	
-    	<!-- now send the custom response back to the client and stop -->
-    	<send/>    	
-    </sequence>
+        <!-- define a static property for the first XSLT resource as an URL source (could be any URL src) -->
+        <set-property name="xslt-key-req"
+                      src="file:repository/conf/sample/resources/transform/transform.xslt"/>
 
-  </definitions>
+        <!-- define a dynamic property for the second XSLT resource as a key reference to the registry -->
+        <!-- the key is just a unique identifier for a resource on the registry. It is treated as a string literal -->
+        <set-property name="xslt-key-resp" key="transform/transform_back.xslt"/>
 
-  <rules>
-  	<in>
-	  	<!-- is this a custom stock quote message? if so transform to a standard request -->
-	  	<filter xpath="//m0:CheckPriceRequest" xmlns:m0="http://www.apache-synapse.org/test">
-	  		<sequence ref="customrequest"/>
-	  	</filter>
-		</in>
-		
-		<out>
-  		<!-- is this a standard stock quote reply? if so transform this back to the custom format -->
-	  	<filter source="get-property('correlate/label')" regex="customquote">
-	  		<sequence ref="customresponse"/>
-	  	</filter>
-		</out>		
+        <!-- define a reuseable endpoint definition and use it within config -->
+        <endpoint name="stockquote"
+                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
 
-		<!-- just let the message flow through -->
-	  <send/>
+    </definitions>
 
-  </rules>
+    <rules>
+        <in>
+            <!-- transform the custom quote request into a standard quote requst expected by the service -->
+            <xslt key="xslt-key-req"/>
+
+            <!-- send message to real endpoint referenced by name "stockquote" and stop -->
+            <send>
+                <endpoint ref="stockquote"/>
+            </send>
+        </in>
+
+        <out>
+            <!-- transform the standard response back into the custom format the client expects -->
+            <xslt key="xslt-key-resp"/>
+
+            <!-- now send the custom response back to the client and stop -->
+            <send/>
+        </out>
+    </rules>
 
 </synapse> 

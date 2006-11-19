@@ -1,22 +1,21 @@
 <!--
-  ~  Licensed to the Apache Software Foundation (ASF) under one
-  ~  or more contributor license agreements.  See the NOTICE file
-  ~  distributed with this work for additional information
-  ~  regarding copyright ownership.  The ASF licenses this file
-  ~  to you under the Apache License, Version 2.0 (the
-  ~  "License"); you may not use this file except in compliance
-  ~  with the License.  You may obtain a copy of the License at
-  ~
-  ~   http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~  Unless required by applicable law or agreed to in writing,
-  ~  software distributed under the License is distributed on an
-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  ~  KIND, either express or implied.  See the License for the
-  ~  specific language governing permissions and limitations
-  ~  under the License.
-  -->
-
+~  Licensed to the Apache Software Foundation (ASF) under one
+~  or more contributor license agreements.  See the NOTICE file
+~  distributed with this work for additional information
+~  regarding copyright ownership.  The ASF licenses this file
+~  to you under the Apache License, Version 2.0 (the
+~  "License"); you may not use this file except in compliance
+~  with the License.  You may obtain a copy of the License at
+~
+~   http://www.apache.org/licenses/LICENSE-2.0
+~
+~  Unless required by applicable law or agreed to in writing,
+~  software distributed under the License is distributed on an
+~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~  KIND, either express or implied.  See the License for the
+~  specific language governing permissions and limitations
+~  under the License.
+-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -347,7 +346,8 @@ expressions. If the specified cases does not match and a default case exists,
 it will be executed.</p>
 
 <h4>Validation</h4>
-<pre> &lt;validate key="string" [source="xpath"]&gt;
+<pre> &lt;validate [source="xpath"]&gt;
+   &lt;schema key="string"/&gt;+
    &lt;on-fail&gt;
      mediator+
    &lt;/on-fail&gt;
@@ -355,13 +355,13 @@ it will be executed.</p>
 
 <p>The &lt;validate&gt; mediator validates the result of the evaluation of
 the source xpath expression, against the schema specified. If the source
-attribute is not specified, the validation is performed against the soap body
-content of the current message. If the validation fails, the on-fail sequence
-of mediators is executed.</p>
+attribute is not specified, the validation is performed against the first
+child of the SOAP body of the current message. If the validation fails, the
+on-fail sequence of mediators is executed.</p>
 
-<p>Note: As the validation mediator is strongly dependent on the Xerces 2.8.0
-parser, it is bundled with the Synapse extensions, so that the Synapse core
-will remain simple and lightweight.</p>
+<p>Note: As the validation mediator is strongly dependent on the Xerces2-J
+2.8.0 parser, it is bundled with the Synapse extensions, so that the Synapse
+core will remain simple and lightweight.</p>
 
 <h4>Properties</h4>
 <pre> &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;</pre>
@@ -371,6 +371,25 @@ mediator that has no direct impact on the message but rather on the message
 context flowing through Synapse. The properties thus set on the message
 context applies only to the current message and can be later retrieved
 through the synapse:get-property(prop-name) extension function.</p>
+
+<h4>Try</h4>
+<pre> &lt;try&gt;
+   &lt;sequence&gt;
+     mediator+
+   &lt;/sequence&gt;
+   &lt;onError&gt;
+     mediator+
+   &lt;/onError&gt;
+   &lt;finally&gt;
+     mediator+
+   &lt;/finally&gt;
+  &lt;/try&gt;</pre>
+
+<p>The try token refers to a &lt;try&gt; element which is a mediator that has
+a set of child mediators. If an exception is encountered during the execution
+of these child mediators, the list of mediators specified as the 'onError'
+sequence is executed. The 'finally' list of mediators is then executed
+irrespective of whether an exception was encountered or not.</p>
 
 <h4>Class Mediators</h4>
 <pre> &lt;class name="class-name"&gt;

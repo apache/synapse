@@ -18,22 +18,22 @@
   -->
 
 <synapse xmlns="http://ws.apache.org/ns/synapse">
-  
-  <!-- simple content based routing of messages -->
-  <rules>
-	
-		<!-- simple filtering of messages with XPath and regex matches -->
-		<filter source="//m0:CheckPriceRequest/m0:Code" regex="IBM" xmlns:m0="http://www.apache-synapse.org/test">
-		  	
-	  	<!-- route the message to the SimpleStockQuoteService1 service EPR -->
-  		<send>
-  			<endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService1"/>
-  		<send>
-  	</filter>
-  	
-  	<!-- send any other messages without change -->
-  	<send/>  	
-  	
-  </rules>
+
+    <!-- simple content based routing of messages -->
+    <rules>
+
+        <!-- simple filtering of messages with XPath and regex matches -->
+        <filter source="get-property('To')" regex="/StockQuote">
+
+            <!-- route the message to the SimpleStockQuoteService1 service EPR -->
+            <send>
+                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+            </send>
+        </filter>
+
+        <!-- send any other messages without change -->
+        <send/>
+
+    </rules>
 
 </synapse> 

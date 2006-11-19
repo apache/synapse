@@ -338,3 +338,76 @@ INFO  SimpleURLRegistry - ==> Repository fetch of resource with key : transform/
 
 Thus the SimpleURLRegistry allows resource to be cached, and updates detected so that changes
 could be reloaded without restarting the Synapse instance.
+
+Proxy services
+Sample 100:
+Objective: Introduction to Synapse proxy services
+
+Pre-Requisites:
+Start the Synapse configuration numbered 100: i.e. synapse -sample 100
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+
+Once Synapse starts, you could go to http://localhost:8080/axis2/services/StockQuoteProxy?wsdl and
+view the WSDL for the proxy service defined in the configuration. This WSDL is based on the source
+WSDL supplied in the proxy service definition, and is updated to reflect the proxy service EPR. If
+a proxy service definition does not specify a target for its messages, the Synapse mediation rules
+are applied to route messages.
+
+Execute the stock quote client by requesting for a stock quote on the proxy service as follows:
+  ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy
+
+You will now notice that the Synapse mediation rules were applied and the request was routed to the
+SimpleStockQuoteService service on the local Axis2 instance. The response message is mediated using
+the same rules, as an outgoing sequence is not specified in this example either. The client should
+receive a stock quote reply from the proxy service. Also the client could get the WSDL for the proxy
+service by requesting for http://localhost:8080/axis2/services/StockQuoteProxy?wsdl
+
+Sample 101:
+Objective: Using custom sequences and endpoints for message mediation with proxy services
+
+Pre-Requisites:
+Start the Synapse configuration numbered 101: i.e. synapse -sample 101
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+
+This configuration creates two proxy services with different behaviour. The first proxy service
+'StockQuoteProxy1' uses the sequence named 'proxy_1' as its main mediation sequence for messages
+it receives. The second proxy service 'StockQuoteProxy2' is set to directly forward messages that
+are received to the endpoint named 'proxy_2_endpoint' without any mediation.
+
+You could send a stock quote request to each of these proxy services and receive the reply generated
+by the actual service hosted on the Axis2 instance. Use the -Durl=<EPR> property when executing the
+client as per example 100, to request on the two proxy services.
+
+Sample 102:
+Objective: Attaching service level WS-Security policies to proxy services
+
+Pre-Requisites:
+Start the Synapse configuration numbered 102: i.e. synapse -sample 102
+Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the modules directories of both
+the sample Axis2 client and server: samples/axis2Client/client_repo/modules and samples/axis2Server/
+repository/modules. The Rampart module could be found at repository\modules and is not duplicated
+in the distributions due to its large file size.
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+
+To execute the sample use the stock quote client with the 'secpolicy' system property passed in as
+follows: e.g. ant stockquote -Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml
+
+The sample security policy policy_1.xml uses timestamps and username token tuhentication on the
+stock quote request. Following the debug logs on the Synapse server you could notice the presence
+of WS-Security headers on the incoming message. By requesting the WSDL of the proxy service you
+could also see that the supplied policy file has been attached to the specified WSDL as well.
+e.g. http://localhost:8080/axis2/services/StockQuoteProxy?wsdl
+
+A proxy service with an attached policy - such as a WS-Security policy - ensures that messages which
+goes through mediation have satisfied the constraints as specified by the supplied policy. i.e. for
+example, if any WS-Security validations fail, the message will not reach Synapse mediation, but
+the client would get an appropriate error message from the Apache Rampart module directly.
+
+The mediation shows the header mediator used to strip out the wsse:Security header from the current
+message before being forwarded to the SimpleStockQuoteService. Hence the message sent to the stock
+quote service EPR is without any WS-Security headers as can be seen from the log messages.
+
+Note: In this example, Apache Rampart was engaged on the proxy service through the policy specified.
+However, if you wish to engage the default WS-Security policy of Rampart on a proxy service, you
+could use the <enableSec/> option on a proxy service instead. This will be similar in function to
+'engaging' Rampart on an Axis2 service.

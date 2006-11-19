@@ -27,8 +27,6 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import javax.xml.namespace.QName;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
@@ -120,7 +118,7 @@ public class ProxyServiceFactory {
                 OMElement policy = (OMElement) o;
                 OMAttribute key = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
                 if (key != null) {
-                    proxy.addServiceLevelPoliciy(key.getAttributeValue());
+                    proxy.addServiceLevelPolicy(key.getAttributeValue());
                 } else {
                     handleException("Policy element does not specify the policy key");
                 }

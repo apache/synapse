@@ -43,8 +43,9 @@
   	  ant stockquote [-Dsymbol=IBM] 
   	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
   	  	[-Dsynapseurl=http://localhost:8080] [-Drepository=client_repo]
-  	
-  	ant proxystockquote
+        [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
+
+      ant proxystockquote
 	    Use the http proxy client - Synapse in "transparent mode" as an HTTP proxy
 	    Use default sample configuration (i.e. start with -sample 0)
     
@@ -72,48 +73,15 @@
 	    ant customquote [-Dsymbol=IBM] 
 	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
 	    	[-Dsynapseurl=http://localhost:8080]
-
-    ant advancedquote 
-      Validate custom quote requests against a schema before sending out
-      Use sample configuration #2 (i.e. start with -sample 2)
-  
-  		examples:
-	  	ant advancedquote 
-	    ant advancedquote 
-	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-	    	[-Dsynapseurl=http://localhost:8080]
-
-    ant simplequote 
-      Use a simple quote using addressing to demonstrate the custom server 
-      configuration created programmatically
-      Use sample configuration created programmatically (i.e. start using custom.bat/sh)
-  
-  		examples:
-	  	ant simplequote 
-	    ant simplequote [-Dsymbol=IBM] 
-	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-	    	[-Dsynapseurl=http://localhost:8080] [-Drepository=client_repo]
-
-  	ant proxyquote
-	    Use Proxy services to query stock prices. (Must be used with the sample configuration # 3)
-    
-  	 	examples:
-  	  ant proxyquote
-  	  ant proxyquote -Dsymbol=IBM 
-  	  	-DfwdProxy=http://localhost:8080/axis2/services/StockQuoteForwardProxy 
-  	  	-DdefProxy=http://localhost:8080/axis2/services/StockQuoteDefaultProxy 
-  	  	-DseqProxy=http://localhost:8080/axis2/services/StockQuoteSequenceProxy"
         </echo>
     </target>
 
-		<property name="symbol" value="IBM"/>
+    <property name="symbol" value="IBM"/>
     <property name="url" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
     <property name="synapseurl" value="http://localhost:8080"/>
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="client_repo"/>
-    <property name="fwdProxy" value="http://localhost:8080/axis2/services/StockQuoteForwardProxy"/>
-    <property name="defProxy" value="http://localhost:8080/axis2/services/StockQuoteDefaultProxy"/>
-    <property name="seqProxy" value="http://localhost:8080/axis2/services/StockQuoteSequenceProxy"/>
+    <property name="secpolicy" value=""/>
 
     <property name="class.dir" value="target/classes"/>
 
@@ -135,6 +103,7 @@
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
             <arg value="${repository}"/>
+            <arg value="${secpolicy}"/>
         </java>
     </target>
 
@@ -161,34 +130,6 @@
            	<arg value="${symbol}"/>
             <arg value="${url}"/>
             <arg value="${synapseurl}"/>
-        </java>
-    </target>
-
-    <target name="advancedquote" depends="compile">
-        <java classname="samples.mediation.AdvancedQuoteClient"
-              classpathref="javac.classpath" fork="true">
-            <arg value="${url}"/>
-            <arg value="${synapseurl}"/>
-        </java>
-    </target>
-
-    <target name="simplequote" depends="compile">        
-        <java classname="samples.userguide.StockQuoteClient"
-              classpathref="javac.classpath" fork="true">
-           	<arg value="${symbol}"/>
-            <arg value="${url}"/>
-            <arg value="${synapseurl}"/>
-            <arg value="${repository}"/>
-        </java>
-    </target>
-    
-    <target name="proxyquote" depends="compile">        
-        <java classname="samples.mediation.ProxyStockQuoteClient"
-              classpathref="javac.classpath" fork="true">
-           	<arg value="${symbol}"/>
-            <arg value="${fwdProxy}"/>
-            <arg value="${defProxy}"/>
-            <arg value="${seqProxy}"/>
         </java>
     </target>
 

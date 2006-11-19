@@ -125,7 +125,7 @@
     </target>
 
     <target name="customquote" depends="compile">        
-        <java classname="samples.mediation.CustomStockQuoteClient"
+        <java classname="samples.userguide.CustomStockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${url}"/>

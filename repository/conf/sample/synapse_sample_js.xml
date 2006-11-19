@@ -18,10 +18,10 @@
   -->
 
 <synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:js="http://ws.apache.org/ns/synapse/js">
-  <rules>
+    <rules>
 
-    <in>
-       <js:javascript><![CDATA[
+        <in>
+            <js:javascript><![CDATA[
           function mediate(msg) {
              msg.setPayloadXML(
                 <ns1:getQuote xmlns:ns1="urn:xmethods-delayed-quotes" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
@@ -30,12 +30,12 @@
           }
        ]]></js:javascript>
 
-       <header name="To" value="http://64.124.140.30:9090/soap"/>
+            <header name="To" value="http://64.124.140.30:9090/soap"/>
 
-    </in>
+        </in>
 
-    <out>
-       <js:javascript><![CDATA[
+        <out>
+            <js:javascript><![CDATA[
           function mediate(msg) {
              msg.setPayloadXML(
                 <ns:getQuoteResponse xmlns:ns="http://services.samples/xsd">
@@ -45,10 +45,10 @@
                 </ns:getQuoteResponse>);
           }
        ]]></js:javascript>
-    </out>
+        </out>
 
-    <send/>
+        <send/>
 
-  </rules>
+    </rules>
 </synapse> 
 

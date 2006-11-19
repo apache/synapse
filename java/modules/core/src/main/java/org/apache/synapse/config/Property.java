@@ -171,6 +171,10 @@ public class Property {
         return value != null;
     }
 
+    public boolean isDynamic() {
+        return type == DYNAMIC_TYPE;
+    }
+
     private void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);

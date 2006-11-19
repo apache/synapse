@@ -143,6 +143,7 @@ public class ValidateMediator extends AbstractListMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
+        log.debug("ValidateMediator - Validate mediator mediate()");
         ByteArrayInputStream baisFromSource = null;
 
         try {
@@ -190,6 +191,8 @@ public class ValidateMediator extends AbstractListMediator {
             handleException("Error validating " + source + " element" + e.getMessage(), e);
         }
 
+        log.debug("validation of element returned by the XPath expression : " + source +
+            " succeeded against the given schemas and the current message");
         return true;
     }
 
@@ -206,7 +209,7 @@ public class ValidateMediator extends AbstractListMediator {
         while (iter.hasNext()) {
             String propKey = (String) iter.next();
             Property dp = msgCtx.getConfiguration().getPropertyObject(propKey);
-            if (dp != null) {
+            if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
                     reCreate = true;       // request re-initialization of Validator
                 }
@@ -214,7 +217,7 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         // do not re-initialize Validator unless required
-        if (!reCreate) {
+        if (!reCreate && validator != null) {
             return;
         }
 

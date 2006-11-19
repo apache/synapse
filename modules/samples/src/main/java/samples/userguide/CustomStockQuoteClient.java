@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package samples.mediation;
+package samples.userguide;
 
 import samples.common.Util;
 

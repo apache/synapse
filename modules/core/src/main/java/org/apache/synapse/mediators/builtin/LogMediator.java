@@ -81,7 +81,7 @@ public class LogMediator extends AbstractMediator {
     private String getCustomLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
         setCustomProperties(sb, synCtx);
-        return sb.toString();
+        return trimLeadingSeparator(sb);
     }
 
     private String getSimpleLogMessage(MessageContext synCtx) {
@@ -101,7 +101,7 @@ public class LogMediator extends AbstractMediator {
         if (synCtx.getMessageID() != null)
             sb.append(separator + "MessageID: " + synCtx.getMessageID());
         setCustomProperties(sb, synCtx);
-        return sb.toString();
+        return trimLeadingSeparator(sb);
     }
 
     private String getHeadersLogMessage(MessageContext synCtx) {

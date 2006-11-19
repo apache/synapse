@@ -137,9 +137,9 @@
         </fileSet>
         <fileSet>
             <directory>modules/extensions/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib/extensions</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>synapse-extensions-${synapse.version}.jar</include>
+                <include>synapse-incubating-extensions-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -171,16 +171,16 @@
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
-                <include>org.apache.axis2:rampart:mar</include>
-                <include>sandesha2:sandesha2:mar</include>
+                <!--<include>org.apache.axis2:rampart:mar</include>-->
+                <!--<include>sandesha2:sandesha2:mar</include>-->
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
-                <include>org.apache.axis2:rampart:mar</include>
-                <include>sandesha2:sandesha2:mar</include>
+                <!--<include>org.apache.axis2:rampart:mar</include>-->
+                <!--<include>sandesha2:sandesha2:mar</include>-->
             </includes>
         </dependencySet>
 

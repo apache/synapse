@@ -26,6 +26,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 
+import javax.xml.namespace.QName;
+
 /**
  * Set header
  *   <pre>
@@ -50,9 +52,16 @@ public class HeaderMediatorSerializer extends BaseMediatorSerializer
         HeaderMediator mediator = (HeaderMediator) m;
         OMElement header = fac.createOMElement("header", synNS);
 
-        if (mediator.getName() != null) {
-            header.addAttribute(fac.createOMAttribute(
-                "name", nullNS, mediator.getName()));
+        QName qName = mediator.getQName();
+        if (qName != null) {
+            if (qName.getNamespaceURI() != null) {
+                header.addAttribute(fac.createOMAttribute(
+                    "name", nullNS, qName.getPrefix() + ":" + qName.getLocalPart()));
+                header.declareNamespace(qName.getPrefix(), qName.getNamespaceURI());
+            } else {
+                header.addAttribute(fac.createOMAttribute(
+                    "name", nullNS, qName.getLocalPart()));
+            }
         }
 
         if (mediator.getAction() == HeaderMediator.ACTION_REMOVE) {

@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +31,7 @@ import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 /**
  * This builds a Header Mediator parsing the XML configuration supplied
@@ -63,7 +65,23 @@ public class HeaderMediatorFactory implements MediatorFactory {
             log.error(msg);
             throw new SynapseException(msg);
         } else {
-            headerMediator.setName(name.getAttributeValue());
+            String nameAtt = name.getAttributeValue();
+            int colonPos = nameAtt.indexOf(":");
+            if (colonPos != -1) {
+                // has a NS prefix.. find it and the NS it maps into
+                String prefix = nameAtt.substring(0, colonPos);
+                Iterator it = elem.getAllDeclaredNamespaces();
+                while (it.hasNext()) {
+                    OMNamespace n = (OMNamespace) it.next();
+                    if (prefix.equals(n.getPrefix())) {
+                        headerMediator.setQName(
+                            new QName(n.getNamespaceURI(), nameAtt.substring(colonPos+1)));
+                    }
+                }
+            } else {
+                // no prefix
+                headerMediator.setQName(new QName(nameAtt));
+            }
         }
 
         // The action attribute is optional, if provided and equals to 'remove' the
@@ -72,8 +90,9 @@ public class HeaderMediatorFactory implements MediatorFactory {
             headerMediator.setAction(HeaderMediator.ACTION_REMOVE);
         }
 
-        if (value == null && exprn == null) {
-            String msg = "A 'value' or 'expression' attribute is required for a header mediator";
+        if (headerMediator.getAction() == HeaderMediator.ACTION_SET &&
+            value == null && exprn == null) {
+            String msg = "A 'value' or 'expression' attribute is required for a [set] header mediator";
             log.error(msg);
             throw new SynapseException(msg);
         }
@@ -91,11 +110,6 @@ public class HeaderMediatorFactory implements MediatorFactory {
                 log.error(msg);
                 throw new SynapseException(msg, je);
             }
-            
-        } else {
-            String msg = "Invalid attribute value for the attribute 'expression' or 'value'";
-            log.error(msg);
-            throw new SynapseException(msg);
         }
 
         return headerMediator;

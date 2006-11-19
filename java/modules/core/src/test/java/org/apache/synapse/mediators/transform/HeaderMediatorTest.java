@@ -25,6 +25,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.TestUtils;
 
+import javax.xml.namespace.QName;
+
 public class HeaderMediatorTest extends TestCase {
 
     private static final String TEST_HEADER = "http://server/path";
@@ -32,7 +34,7 @@ public class HeaderMediatorTest extends TestCase {
     public void testSimpleHeaderSetAndRemove() throws Exception {
 
         HeaderMediator headerMediator = new HeaderMediator();
-        headerMediator.setName(Constants.HEADER_TO);
+        headerMediator.setQName(new QName(Constants.HEADER_TO));
         headerMediator.setValue(TEST_HEADER);
 
         // invoke transformation, with static enveope
@@ -51,7 +53,7 @@ public class HeaderMediatorTest extends TestCase {
     public void testSimpleHeaderXPathSetAndRemove() throws Exception {
 
         HeaderMediator headerMediator = new HeaderMediator();
-        headerMediator.setName(Constants.HEADER_TO);
+        headerMediator.setQName(new QName(Constants.HEADER_TO));
         headerMediator.setExpression(new AXIOMXPath("concat('http://','server','/path')"));
 
         // invoke transformation, with static enveope

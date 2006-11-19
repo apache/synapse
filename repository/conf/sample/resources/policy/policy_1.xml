@@ -49,19 +49,19 @@
 	<ramp:RampartConfig xmlns:ramp="http://ws.apache.org/rampart/policy"> 
 		<ramp:user>alice</ramp:user>
 		<ramp:encryptionUser>bob</ramp:encryptionUser>
-		<ramp:passwordCallbackClass>org.apache.rampart.PWCallback</ramp:passwordCallbackClass>
+		<ramp:passwordCallbackClass>samples.userguide.PWCallback</ramp:passwordCallbackClass>
 		
 		<ramp:signatureCrypto>
 			<ramp:crypto provider="org.apache.ws.security.components.crypto.Merlin">
 				<ramp:property name="org.apache.ws.security.crypto.merlin.keystore.type">JKS</ramp:property>
-				<ramp:property name="org.apache.ws.security.crypto.merlin.file">synapse_repository/conf/sample/store.jks</ramp:property>
+				<ramp:property name="org.apache.ws.security.crypto.merlin.file">../../repository/conf/sample/resources/security/store.jks</ramp:property>
 				<ramp:property name="org.apache.ws.security.crypto.merlin.keystore.password">password</ramp:property>
 			</ramp:crypto>
 		</ramp:signatureCrypto>
 		<ramp:encryptionCypto>
 			<ramp:crypto provider="org.apache.ws.security.components.crypto.Merlin">
 				<ramp:property name="org.apache.ws.security.crypto.merlin.keystore.type">JKS</ramp:property>
-				<ramp:property name="org.apache.ws.security.crypto.merlin.file">synapse_repository/conf/sample/store.jks</ramp:property>
+				<ramp:property name="org.apache.ws.security.crypto.merlin.file">../../repository/conf/sample/resources/security/store.jks</ramp:property>
 				<ramp:property name="org.apache.ws.security.crypto.merlin.keystore.password">password</ramp:property>
 			</ramp:crypto>
 		</ramp:encryptionCypto>

@@ -197,8 +197,8 @@ public class ProxyService {
                             Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream()));
                 }
             }
-
-            proxyService.getPolicyInclude().setPolicy(svcEffectivePolicy);
+            PolicyInclude pi = proxyService.getPolicyInclude();
+            pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
         }
 
         // create a custom message receiver for this proxy service to use a given named
@@ -217,7 +217,7 @@ public class ProxyService {
             op.setMessageReceiver(msgRcvr);
         }
 
-try {
+        try {
             axisCfg.addService(proxyService);
             this.setRunning(true);
         } catch (AxisFault axisFault) {
@@ -328,7 +328,7 @@ try {
         return serviceLevelPolicies;
     }
 
-    public void addServiceLevelPoliciy(String serviceLevelPolicy) {
+    public void addServiceLevelPolicy(String serviceLevelPolicy) {
         this.serviceLevelPolicies.add(serviceLevelPolicy);
     }
 

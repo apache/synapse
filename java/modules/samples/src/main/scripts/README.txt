@@ -414,6 +414,35 @@ However, if you wish to engage the default WS-Security policy of Rampart on a pr
 could use the <enableSec/> option on a proxy service instead. This will be similar in function to
 'engaging' Rampart on an Axis2 service.
 
+Sample 103:
+Objective: Using WS-Security signing and encryption with proxy services through WS-Policy 
+
+Pre-Requisites:
+Download and copy the BouncyCastle JAR file into your Synapse lib directory. (Note: the exact JAR
+you need to install depends on your JDK - for JDK 1.4 I have used bcprov-jdk13-132.jar)
+Start the Synapse configuration numbered 103: i.e. synapse -sample 103
+Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the modules directory of
+the sample Axis2 client samples/axis2Client/client_repo/modules. The Rampart module could be found
+at repository\modules and is not duplicated within the distributions due to its large file size.
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+
+To execute the sample use the dumb stock quote client with the 'secpolicy' and 'gatewayurl' system
+properties passed in as follows:
+e.g.
+    ant dumbstockquote -Dsecpolicy=..\..\repository\conf\sample\resources\policy\client_policy_3.xml
+    -Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy
+
+The sample security policy client_policy_3.xml ensures signed and encrypted messages which request
+for the stock quotes. Following the debug logs on the Synapse server you could notice the presence
+of WS-Security headers on the incoming message. By requesting the WSDL of the proxy service you
+could also see that the supplied policy file has been attached to the specified WSDL as well.
+e.g. http://localhost:8080/axis2/services/StockQuoteProxy?wsdl
+
+By following through the Synapse log messages you could see that the proxy service received and
+decrypted the secured SOAP envelope. (If you sent the client request to Synapse through a TCP
+monitor you would be able to see the raw encrypted message in transit) and forwarded this to the
+simple stockquote service.
+
 Sample 110:
 Objective: Introduction to switching transports with proxy services
 

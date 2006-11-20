@@ -60,9 +60,10 @@
       url which is interpreted by Synapse
       Use default sample configuration (i.e. start with -sample 0)
   
-  		examples:
+  	  examples:
 	  	ant dumbstockquote 
 	    ant dumbstockquote [-Dsymbol=IBM] [-Dgatewayurl=http://localhost:8080/StockQuote]
+        [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
 
     ant customquote 
       Use a custom stock quote request and response format, and transform (XSLT) between
@@ -121,6 +122,8 @@
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${gatewayurl}"/>
+            <arg value="${repository}"/>
+            <arg value="${secpolicy}"/>
         </java>
     </target>
 

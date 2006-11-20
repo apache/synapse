@@ -76,6 +76,22 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>src/site/resources</directory>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <includes>
+                <include>Synapse_Configuration_Language.html</include>
+                <include>userguide.html</include>
+                <include>extending_synapse.html</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>modules/samples/src/main/scripts</directory>
+            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+            <includes>
+                <include>README.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>modules/samples/services</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
         </fileSet>
@@ -133,6 +149,13 @@
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-incubating-core-${synapse.version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>modules/samples/target</directory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <includes>
+                <include>synapse-incubating-samples-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>

@@ -389,8 +389,10 @@ repository/modules. The Rampart module could be found at repository\modules and 
 in the distributions due to its large file size.
 Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
 
-To execute the sample use the stock quote client with the 'secpolicy' system property passed in as
-follows: e.g. ant stockquote -Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml
+To execute the sample use the stock quote client with the 'secpolicy' and 'url' system properties
+passed in as follows:
+e.g. ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy
+        -Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml
 
 The sample security policy policy_1.xml uses timestamps and username token tuhentication on the
 stock quote request. Following the debug logs on the Synapse server you could notice the presence
@@ -411,3 +413,74 @@ Note: In this example, Apache Rampart was engaged on the proxy service through t
 However, if you wish to engage the default WS-Security policy of Rampart on a proxy service, you
 could use the <enableSec/> option on a proxy service instead. This will be similar in function to
 'engaging' Rampart on an Axis2 service.
+
+Sample 110:
+Objective: Introduction to switching transports with proxy services
+
+Pre-Requisites:
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+Download, install and start a JMS server, and configure Synapse to listen on JMS (refer notes below)
+Start the Synapse configuration numbered 110: i.e. synapse -sample 110
+
+For this example we would use ActiveMQ as the JMS provider. Once ActiveMQ is installed and started
+you should get a message as follows:
+  INFO  BrokerService                  - ActiveMQ JMS Message Broker (localhost) started
+
+You will now need to configure the Axis2 instance used by Synapse (not the sample Axis2 server) to
+enable JMS support using the above provider. Refer to the Axis2 documentation on setting up JMS for
+more details (http://ws.apache.org/axis2/1_1/jms-transport.html). You will also need to copy the
+ActiveMQ client jar files activeio-core-3.0-beta1.jar, activemq-core-4.0-RC2.jar and
+geronimo-j2ee-management_1.0_spec-1.0.jar into the lib directory to allow Synapse to connect to the
+JMS provider.
+
+For a default ActiveMQ v4.0 installation, you may uncomment the Axis2 transport listener
+configuration found at repository/conf/axis2.xml as
+<transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"> ...
+
+Once you start the Synapse configuration and request for the WSDL of the proxy service you will
+notice that its exposed only on the JMS transport. This is because the configuration specified this
+requirement in the proxy service definition.
+
+Now lets send a stock quote request on JMS, using the dumb stock quote client as follows: (note: you
+need type the command in one single line without breaks)
+
+ant dumbstockquote -Dgatewayurl="jms:/StockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=
+    QueueConnectionFactory&java.naming.factory.initial=org.apache.activemq.jndi.
+    ActiveMQInitialContextFactory&java.naming.provider.url=tcp://localhost:61616"
+
+On the Synapse debug log you will notice that the JMS listener received the request message as:
+    [JMSWorker-1] DEBUG ProxyServiceMessageReceiver -
+        Proxy Service StockQuoteProxy received a new message...
+
+Synapse forwarded this message to the HTTP EPR of the simple stock quote service hosted on the
+sample Axis2 server, and returned the reply back to the client through a JMS temporary queue.
+
+Note: It is possible to instruct a JMS proxy service to listen to an already existing destination
+without creating a new one. To do this, use the property elements on the proxy service definition
+to specify the destination and connection factory etc. 
+    e.g. <property name="transport.jms.Destination" value="dynamicTopics/something.TestTopic"/>
+
+Sample 111:
+Objective: Demonstrate switching from HTTP to JMS
+
+Pre-Requisites:
+Download, install and start a JMS server, and configure Synapse to listen on JMS (refer notes below)
+Configure sample Axis2 server for JMS (refer notes above)
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps above)
+Configure JMS transport for Synapse (refer notes above - sample 110)
+Start the Synapse configuration numbered 111: i.e. synapse -sample 111
+
+To switch from HTTP to JMS, edit the samples/axis2Server/repository/conf/axis2.xml for the sample
+Axis2 server and enable JMS (refer notes above), and restart the server. You should now see that
+the simple stock quote service is available over JMS as well at an address as the one shown below,
+by looking at the WSDL of the service.
+
+jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&
+    java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&
+    java.naming.provider.url=tcp://localhost:61616
+
+This Synapse configuration creates a proxy service over HTTP and forwards received messages to the
+above EPR using JMS, and sends back the response to the client over HTTP once the simple stock quote
+service responds with the stock quote reply over JMS to the Synapse server.
+
+

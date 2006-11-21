@@ -59,7 +59,7 @@ public class SendMediator extends AbstractMediator {
         // TODO this may be really strange but true.. unless you call the below, sometimes it
         // results in an unbound URI exception for no credible reason - needs more investigation
         // seems like a woodstox issue. Use hack for now
-        synCtx.getEnvelope().build();
+        // synCtx.getEnvelope().build();
 
         // if no endpoints are defined, send where implicitly stated
         if (endpoints.isEmpty()) {
@@ -82,6 +82,16 @@ public class SendMediator extends AbstractMediator {
                 eprAddress = singleEndpoint.getAddress().toString();
             }
 
+            if (singleEndpoint.isForceREST()) {
+            	synCtx.setDoingREST(true);
+            } else if (singleEndpoint.isForceSOAP()) {
+            	synCtx.setDoingREST(false);
+            }
+            if (singleEndpoint.isUseSeparateListener()) 
+            {
+            	synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
+            }
+            
             log.debug("Sending message to endpoint :: name = " +
                 singleEndpoint.getName() + " resolved address = " + eprAddress);
 

@@ -68,6 +68,11 @@ public class EndpointSerializer {
                 "ref", nullNS, endpt.getRef()));
             
         } else {
+        	if (endpt.isForceREST()) {
+        		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "rest"));
+        	} else if (endpt.isForceSOAP()) {
+        		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "soap"));
+        	}
 
             endpoint.addAttribute(fac.createOMAttribute(
                     "name", nullNS, endpt.getName()));
@@ -79,7 +84,12 @@ public class EndpointSerializer {
             }
 
             if (endpt.isAddressingOn()) {
-                endpoint.addChild(fac.createOMElement("enableAddressing", synNS));
+            	OMElement addressing = fac.createOMElement("enableAddressing", synNS);
+            	if (endpt.isUseSeparateListener()) {
+            		addressing.addAttribute(fac.createOMAttribute(
+                            "separateListener", nullNS, "true"));
+            	}
+                endpoint.addChild(addressing);
             }
 
             if (endpt.isReliableMessagingOn()) {

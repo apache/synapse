@@ -59,26 +59,29 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         SequenceMediator seqMediator = new SequenceMediator();
 
         OMAttribute n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute e = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "onError"));
         if (n != null) {
             seqMediator.setName(n.getAttributeValue());
+            if (e != null) {
+                seqMediator.setErrorHandler(e.getAttributeValue());
+            }
             super.addChildren(elem, seqMediator);
 
         } else {
             n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "ref"));
             if (n != null) {
                 seqMediator.setRef(n.getAttributeValue());
-                
+                if (e != null) {
+                    String msg = "A sequence mediator swhich a reference to another sequence can not have 'ErrorHandler'";
+                    log.error(msg);
+                    throw new SynapseException(msg);
+                }
             } else {
                 String msg = "A sequence mediator should be a named sequence or a reference to another sequence " +
                     "(i.e. a name attribute or ref attribute is required.";
                 log.error(msg);
                 throw new SynapseException(msg);
             }
-        }
-
-        OMAttribute e = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "onError"));
-        if (e != null) {
-            seqMediator.setErrorHandler(e.getAttributeValue());
         }
 
         return seqMediator;

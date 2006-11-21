@@ -75,6 +75,10 @@ public class FaultMediatorFactory implements MediatorFactory {
                 faultMediator.setSoapVersion(FaultMediator.SOAP11);
             } else if (SOAP12.equals(version.getAttributeValue())) {
                 faultMediator.setSoapVersion(FaultMediator.SOAP12);
+            }else {
+                String msg = "Invalid SOAP version";
+                log.error(msg);
+                throw new SynapseException(msg);
             }
         }
 

@@ -214,7 +214,7 @@ public class XMLConfigurationBuilder {
             dp.setMapper(EndpointFactory.getInstance());
             config.addNamedEndpoint(name.getAttributeValue(), dp);
         } else {
-            Endpoint endpoint = EndpointFactory.createEndpoint(ele);
+            Endpoint endpoint = EndpointFactory.createEndpoint(ele, false);
             // add this endpoint to the configuration
             config.addNamedEndpoint(endpoint.getName(), endpoint);
         }

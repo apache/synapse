@@ -46,11 +46,17 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
      */
     private String targetEndpoint = null;
     /**
-     * A target sequence name specifies to Synapse to use the given named sequence for
-     * message mediation. If a target endpoint or sequence is not specified, the default
-     * main mediator would be used for mediation.
+     * A target inSequence name specifies to Synapse to use the given named sequence for
+     * message mediation for incoming messages. If a target endpoint or inSequence is not
+     * specified, the default main mediator would be used for incoming message mediation.
      */
-    private String targetSequence = null;
+    private String targetInSequence = null;
+    /**
+     * A target outSequence name specifies to Synapse to use the given named sequence for
+     * message mediation for outgoing messages. If a target endpoint or outSequence is not
+     * specified, the default main mediator would be used for outgoing message mediation.
+     */
+    private String targetOutSequence = null;
 
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
@@ -68,7 +74,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             Endpoint endpoint = synCtx.getConfiguration().getNamedEndpoint(targetEndpoint);
             if (endpoint == null) {
                 // what else can/should we do instead of just logging the message as an error?
-                log.error("The endpoint named '" + targetEndpoint + "' is not defined. Dropping current message");
+                log.error("The endpoint named '" + targetEndpoint
+                        + "' is not defined. Dropping current message");
             } else {
                 synCtx.setTo(new EndpointReference(endpoint.getAddress()));
                 log.debug("Forwarding message directly to the endpoint named : " + targetEndpoint);
@@ -85,45 +92,61 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                 axisOutMsgContext.setServerSide(true);
                 axisOutMsgContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT,
-                    axisInMsgContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT));
+                    axisInMsgContext.getProperty(
+                            org.apache.axis2.context.MessageContext.TRANSPORT_OUT));
 
                 axisOutMsgContext.setTransportIn(axisInMsgContext.getTransportIn());
 
-                // TODO this may be really strange but true.. unless you call the below, sometimes it
-                // results in an unbound URI exception for no credible reason - needs more investigation
-                // seems like a woodstox issue. Use hack for now
+                // TODO this may be really strange but true.. unless you call the below, sometimes
+                // it results in an unbound URI exception for no credible reason - needs more
+                // investigation seems like a woodstox issue. Use hack for now
                 axisOutMsgContext.getEnvelope().build();
                 
                 log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
 
                 AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
                 try {
-                    axisOutMsgContext.setProperty(org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-                    mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+                    axisOutMsgContext.setProperty(
+                            org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+                    mc.getOperationContext().setProperty(
+                            Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
                     // check for addressing is alredy engaged for this message.
                     // if engage we should use the address enable Configuraion context.
                     ae.send(axisOutMsgContext);
 
                 } catch (AxisFault e) {
-                    log.error("Axis fault encountered while forwarding message to endpoint : " + targetEndpoint, e);
+                    log.error("Axis fault encountered while forwarding message to endpoint : "
+                            + targetEndpoint, e);
                 }
             }
 
-        // if a named sequence is specified, use it for message mediation
-        } else if (targetSequence != null) {
-            Mediator mediator = synCtx.getConfiguration().getNamedSequence(targetSequence);
-            if (mediator == null) {
-                // what else can/should we do instead of just logging the message as an error?
-                log.error("The mediator named '" + targetSequence + "' is not defined. Dropping current message");
-            } else {
-                log.debug("Using sequence named : " + targetSequence + " for message mediation");
-                mediator.mediate(synCtx);
+        } else {
+            
+            // if a named outSequence os specified set it as a property to the MessageContext
+            if (targetOutSequence != null) {
+                log.debug("OutSequence " + targetOutSequence
+                        + " for the proxy set to the MessageContext");
+                synCtx.setProperty(org.apache.synapse.Constants.OUT_SEQUENCE, targetOutSequence);
             }
 
-        // else default to the Synapse main mediator
-        } else {
-            log.debug("Using default 'main' mediator for message mediation");
-            synCtx.getEnvironment().injectMessage(synCtx);
+            // if a named inSequence is specified, use it for message mediation
+            if (targetInSequence != null) {
+                Mediator mediator = synCtx.getConfiguration().getNamedSequence(targetInSequence);
+                if (mediator == null) {
+                    // what else can/should we do instead of just logging the message as an error?
+                    log.error("The mediator named '" + targetInSequence
+                            + "' is not defined. Dropping current message");
+                } else {
+                    log.debug("Using sequence named : " + targetInSequence
+                            + " for message mediation");
+                    mediator.mediate(synCtx);
+                }
+
+            // else default to the Synapse main mediator
+            } else {
+                log.debug("Using default 'main' mediator for message mediation");
+                synCtx.getEnvironment().injectMessage(synCtx);
+            }
         }
 
         // Response handling mechanism for 200/202 and 5XX
@@ -149,11 +172,19 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
     }
 
     /**
-     * Specify a named target sequence to be used for message mediation
-     * @param targetSequence the name of the target sequence to be used
+     * Specify a named target sequence to be used for message mediation for incoming messages
+     * @param targetInSequence the name of the target sequence to be used for incoming messages
      */
-    public void setTargetSequence(String targetSequence) {
-        this.targetSequence = targetSequence;
+    public void setTargetInSequence(String targetInSequence) {
+        this.targetInSequence = targetInSequence;
+    }
+
+    /**
+     * Specify a named target sequence to be used for message mediation for outgoing messages
+     * @param targetOutSequence the name of the target sequence to be used for outgoing messages
+     */
+    public void setTargetOutSequence(String targetOutSequence) {
+        this.targetOutSequence = targetOutSequence;
     }
 
     /**

@@ -29,6 +29,8 @@ public interface Constants {
     /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
 
+	
+
     // -- keys related to Axis2 configuration and Synapse initialization --
     /** The key name used to store the Synapse configuration into the Axis2 config */
     String SYNAPSE_CONFIG = "synapse.config";
@@ -72,6 +74,9 @@ public interface Constants {
     /** The message context property name which holds the Security 'Policy' object for outgoing messages */
     String OUTFLOW_SEC_POLICY = "OUTFLOW_SEC_POLICY";
 
+    /** If message context property contains Boolean.TRUE then Axis2 will send this with a separate listener engaged **/
+    public static final String OUTFLOW_USE_SEPARATE_LISTENER = "OUTFLOW_USE_SEPARATE_LISTENER";
+    
     /** The message context property name which holds the error code for the last encountered exception */
     String ERROR_CODE = "ERROR_CODE";
 

@@ -72,8 +72,11 @@ public class Axis2FlexibleMEPClient {
         String wsSecPolicyKey,
         boolean wsRMEnabled,
         String wsRMPolicyKey,
+        boolean separateListener,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
 
+    	log.debug("sending [add = "+wsAddressingEnabled+"] [sec = "+wsSecurityEnabled + "] [ rm = "+wsRMEnabled+"] [ to "+synapseOutMessageContext.getTo()+"]");
+    	
         MessageContext axisOutMsgCtx =
             ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
 
@@ -110,7 +113,7 @@ public class Axis2FlexibleMEPClient {
             new QName(AnonymousServiceFactory.DYNAMIC_OPERATION));
 
         Options clientOptions = new Options();
-
+        clientOptions.setUseSeparateListener(separateListener);
         // if RM is requested,
         if (wsRMEnabled) {
             // if a WS-RM policy is specified, use it
@@ -119,10 +122,10 @@ public class Axis2FlexibleMEPClient {
                     org.apache.synapse.config.xml.Constants.SANDESHA_POLICY,
                     getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
-            clientOptions.setUseSeparateListener(true);
+
 
             // always send each and every message in a new sequence and terminate sequence
-            clientOptions.setProperty("Sandesha2LastMessage", "true");
+            //clientOptions.setProperty("Sandesha2LastMessage", "true");
         }
 
         // if security is enabled,

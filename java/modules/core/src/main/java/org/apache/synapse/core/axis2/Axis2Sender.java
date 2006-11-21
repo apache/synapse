@@ -48,6 +48,8 @@ public class Axis2Sender {
                 Constants.OUTFLOW_RM_ON);
             Boolean wsSecOn = (Boolean) synapseInMessageContext.getProperty(
                 Constants.OUTFLOW_SECURITY_ON);
+            Boolean separateListener = (Boolean) synapseInMessageContext.getProperty(
+                    Constants.OUTFLOW_USE_SEPARATE_LISTENER);
 
             MessageContext axisOutMsgContext =
                 Axis2FlexibleMEPClient.send(
@@ -68,6 +70,9 @@ public class Axis2Sender {
                     (String) synapseInMessageContext.getProperty(
                         Constants.OUTFLOW_RM_POLICY),
 
+                    // use a separate listener
+                    (separateListener != null && separateListener.booleanValue()),
+                    
                     // The Axis2 Message context of the Synapse MC
                     synapseInMessageContext);
 

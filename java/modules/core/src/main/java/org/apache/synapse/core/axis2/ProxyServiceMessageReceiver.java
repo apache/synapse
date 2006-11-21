@@ -88,6 +88,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         endpoint.getWsSecPolicyKey(),
                         endpoint.isReliableMessagingOn(),
                         endpoint.getWsRMPolicyKey(),
+                        endpoint.isUseSeparateListener(),
                         synCtx);
 
                 axisOutMsgContext.setServerSide(true);

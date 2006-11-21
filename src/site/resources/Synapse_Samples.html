@@ -625,7 +625,11 @@ by the actual service hosted on the Axis2 instance. Use the -Durl=&lt;EPR&gt; pr
 executing the client as per example 100, to request on this proxy service.</p>
 
 <p>You can observe the synapse log to see the response message mediation using the specified
-outSequence, unlike using MainMediator in the sample 100 case.</p>
+outSequence, unlike using MainMediator in the sample 100 case. The log should be as follows
+<pre>DEBUG SequenceMediator - Sequence mediator &lt;proxy_out&gt; :: mediate()
+DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
+DEBUG LogMediator - Log mediator :: mediate()
+INFO  LogMediator - message = Executing inside the out sequence</pre></p>
 
 <h2>Sample 110:</h2>
 

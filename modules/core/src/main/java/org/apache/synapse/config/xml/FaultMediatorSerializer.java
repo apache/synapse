@@ -42,6 +42,10 @@ public class FaultMediatorSerializer extends BaseMediatorSerializer
 
     private static final Log log = LogFactory.getLog(FaultMediatorSerializer.class);
 
+    private static final String SOAP11 = "soap11";
+
+    private static final String SOAP12 = "soap12";
+
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
         if (!(m instanceof FaultMediator)) {
@@ -51,10 +55,18 @@ public class FaultMediatorSerializer extends BaseMediatorSerializer
         FaultMediator mediator = (FaultMediator) m;
         OMElement fault = fac.createOMElement("makefault", synNS);
 
+        if(mediator.getSoapVersion()==FaultMediator.SOAP11) {
+           fault.addAttribute(fac.createOMAttribute(
+                "version", nullNS, SOAP11));
+        }else if(mediator.getSoapVersion()==FaultMediator.SOAP12) {
+           fault.addAttribute(fac.createOMAttribute(
+                "version", nullNS, SOAP12));
+        }
+
         OMElement code = fac.createOMElement("code", synNS, fault);
         if (mediator.getFaultCodeValue() != null) {
             code.addAttribute(fac.createOMAttribute(
-                "code", nullNS, mediator.getFaultCodeValue().toString()));
+                "value", nullNS, mediator.getFaultCodeValue().toString()));
 
         } else if (mediator.getFaultCodeExpr() != null) {
             code.addAttribute(fac.createOMAttribute(
@@ -68,7 +80,7 @@ public class FaultMediatorSerializer extends BaseMediatorSerializer
         OMElement reason = fac.createOMElement("reason", synNS, fault);
         if (mediator.getFaultReasonValue() != null) {
             reason.addAttribute(fac.createOMAttribute(
-                "code", nullNS, mediator.getFaultReasonValue()));
+                "value", nullNS, mediator.getFaultReasonValue()));
 
         } else if (mediator.getFaultReasonExpr() != null) {
             reason.addAttribute(fac.createOMAttribute(

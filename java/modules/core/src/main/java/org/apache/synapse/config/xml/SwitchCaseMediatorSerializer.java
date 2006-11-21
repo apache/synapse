@@ -45,7 +45,7 @@ public class SwitchCaseMediatorSerializer extends BaseListMediatorSerializer
             caseElem = fac.createOMElement("case", synNS);
         }
 
-        if (mediator.isDefaultCase()) {
+        if (!mediator.isDefaultCase()) {
             if (mediator.getRegex() != null) {
                 caseElem.addAttribute(fac.createOMAttribute(
                     "regex", nullNS, mediator.getRegex().pattern()));

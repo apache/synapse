@@ -30,6 +30,9 @@
         </sequence>
 
         <sequence name="proxy_out">
+            <log level="custom">
+                <property name="message" value="Executing inside the out sequence"/>
+            </log>
             <send/>
         </sequence>
 

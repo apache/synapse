@@ -46,6 +46,14 @@ public class Endpoint {
     private String wsRMPolicyKey = null;
     /** The "key" for any Rampart Security Policy to be used */
     private String wsSecPolicyKey = null;
+    /** use a separate listener - implies addressing is on **/
+	private boolean useSeparateListener = false;
+	/** force REST on **/
+	private boolean forceREST = false;
+	/** force SOAP on **/
+	private boolean forceSOAP = false;
+	
+	
 
     /**
      * Return the name of the endpoint
@@ -174,4 +182,27 @@ public class Endpoint {
     public void setWsRMPolicyKey(String wsRMPolicyKey) {
         this.wsRMPolicyKey = wsRMPolicyKey;
     }
+
+	public void setUseSeparateListener(boolean b) {
+		this.useSeparateListener = b;	
+	}
+	public boolean isUseSeparateListener() {
+		return useSeparateListener;
+	}
+
+	public void setForceREST(boolean forceREST) {
+		this.forceREST = forceREST;
+	}
+
+	public boolean isForceREST() {
+		return forceREST;
+	}
+
+	public void setForceSOAP(boolean forceSOAP) {
+		this.forceSOAP = forceSOAP;
+	}
+
+	public boolean isForceSOAP() {
+		return forceSOAP;
+	}
 }

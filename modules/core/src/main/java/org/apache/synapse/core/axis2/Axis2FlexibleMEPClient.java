@@ -27,10 +27,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.ServiceGroupContext;
+import org.apache.axis2.context.*;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.util.UUIDGenerator;
@@ -110,7 +107,6 @@ public class Axis2FlexibleMEPClient {
             new QName(AnonymousServiceFactory.DYNAMIC_OPERATION));
 
         Options clientOptions = new Options();
-        clientOptions.setTransportInProtocol(org.apache.axis2.Constants.TRANSPORT_HTTP);
 
         // if RM is requested,
         if (wsRMEnabled) {
@@ -135,7 +131,8 @@ public class Axis2FlexibleMEPClient {
                     getPolicy(synapseOutMessageContext, wsSecPolicyKey));
             }
         }
-
+        OperationContext originalOpCtx = axisOutMsgCtx.getOperationContext();
+        
         OperationClient mepClient = axisAnonymousOperation.createClient(
             serviceCtx, clientOptions);
         mepClient.addMessageContext(axisOutMsgCtx);
@@ -153,6 +150,10 @@ public class Axis2FlexibleMEPClient {
 
             MessageContext response = mepClient.getMessageContext(
                 WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+            response.setOperationContext(originalOpCtx);
+            response.setAxisMessage(
+                originalOpCtx.getAxisOperation().getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
 
             // set properties on response
             response.setServerSide(true);

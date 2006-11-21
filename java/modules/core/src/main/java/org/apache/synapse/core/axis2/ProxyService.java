@@ -24,7 +24,6 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.transport.jms.JMSConstants;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +38,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -65,8 +63,10 @@ public class ProxyService {
     private ArrayList transports;
     /** The target endpoint, if assigned */
     private String targetEndpoint = null;
-    /** The target sequence, if assigned */
-    private String targetSequence = null;
+    /** The target inSequence, if assigned */
+    private String targetInSequence = null;
+    /** The target outSequence, if assigned */
+    private String targetOutSequence = null;
     // if a target endpoint or sequence is not specified,
     // the default Synapse main mediator will be used
     /** A list properties */
@@ -98,7 +98,8 @@ public class ProxyService {
             try {
                 InputStream wsdlInputStream = Util.getInputStream(synCfg.getProperty(wsdlKey));
                 // detect version of the WSDL 1.1 or 2.0
-                OMNamespace documentElementNS = new StAXOMBuilder(wsdlInputStream).getDocumentElement().getNamespace();
+                OMNamespace documentElementNS = new StAXOMBuilder(
+                        wsdlInputStream).getDocumentElement().getNamespace();
 
                 wsdlInputStream = Util.getInputStream(synCfg.getProperty(wsdlKey));
 
@@ -118,7 +119,8 @@ public class ProxyService {
                     }
 
                     if (wsdlToAxisServiceBuilder == null) {
-                        throw new SynapseException("Could not get the WSDL to Axis Service Builder");
+                        throw new SynapseException(
+                                "Could not get the WSDL to Axis Service Builder");
                     }
                     proxyService = wsdlToAxisServiceBuilder.populateService();
                     proxyService.setWsdlFound(true);
@@ -130,9 +132,11 @@ public class ProxyService {
             } catch (XMLStreamException e) {
                 handleException("Error reading WSDL defined by registry key : " + wsdlKey, e);
             } catch (AxisFault af) {
-                handleException("Error building service from WSDL defined by registry key : " + wsdlKey, af);
+                handleException("Error building service from WSDL defined by registry key : "
+                        + wsdlKey, af);
             } catch (IOException ioe) {
-                handleException("Error reading WSDL from WSDL defined by registry key : " + wsdlKey, ioe);
+                handleException("Error reading WSDL from WSDL defined by registry key : "
+                        + wsdlKey, ioe);
             }
         } else {
             // this is for POX... create a dummy service and an operation for which
@@ -207,8 +211,13 @@ public class ProxyService {
         msgRcvr.setName(name);
         if (targetEndpoint != null) {
             msgRcvr.setTargetEndpoint(targetEndpoint);
-        } else if (targetSequence != null) {
-            msgRcvr.setTargetSequence(targetSequence);
+        } else {
+            if (targetInSequence != null) {
+                msgRcvr.setTargetInSequence(targetInSequence);
+            }
+            if (targetOutSequence != null) {
+                msgRcvr.setTargetOutSequence(targetOutSequence);
+            }
         }
 
         iter = proxyService.getOperations();
@@ -227,7 +236,8 @@ public class ProxyService {
         // should RM be engaged on this service?
         if (wsRMEnabled) {
             try {
-                proxyService.engageModule(axisCfg.getModule(Constants.SANDESHA2_MODULE_NAME), axisCfg);
+                proxyService.engageModule(axisCfg.getModule(
+                        Constants.SANDESHA2_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS RM module on proxy service : " + name, axisFault);
             }
@@ -236,22 +246,24 @@ public class ProxyService {
         // should Security be engaged on this service?
         if (wsSecEnabled) {
             try {
-                proxyService.engageModule(axisCfg.getModule(Constants.RAMPART_MODULE_NAME), axisCfg);
+                proxyService.engageModule(axisCfg.getModule(
+                        Constants.RAMPART_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
-                handleException("Error loading WS Sec module on proxy service : " + name, axisFault);
+                handleException("Error loading WS Sec module on proxy service : "
+                        + name, axisFault);
             }
         }
         return proxyService;
     }
 
     public void start(SynapseConfiguration synCfg) {
-        AxisConfiguration axisConfig = synCfg.getConfigurationContext().getAxisConfiguration();
+        AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         axisConfig.getServiceForActivation(this.getName()).setActive(true);
         this.setRunning(true);
     }
 
     public void stop(SynapseConfiguration synCfg) {
-        AxisConfiguration axisConfig = synCfg.getConfigurationContext().getAxisConfiguration();
+        AxisConfiguration axisConfig = synCfg.getAxisConfiguration().getAxisConfiguration();
         try {
             axisConfig.getService(this.getName()).setActive(false);
             this.setRunning(false);
@@ -300,12 +312,20 @@ public class ProxyService {
         this.targetEndpoint = targetEndpoint;
     }
 
-    public String getTargetSequence() {
-        return targetSequence;
+    public String getTargetInSequence() {
+        return targetInSequence;
     }
 
-    public void setTargetSequence(String targetSequence) {
-        this.targetSequence = targetSequence;
+    public void setTargetInSequence(String targetInSequence) {
+        this.targetInSequence = targetInSequence;
+    }
+
+    public String getTargetOutSequence() {
+        return targetOutSequence;
+    }
+
+    public void setTargetOutSequence(String targetOutSequence) {
+        this.targetOutSequence = targetOutSequence;
     }
 
     public String getWSDLKey() {

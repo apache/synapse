@@ -103,6 +103,12 @@ public class Axis2Sender {
                     }
                 }
 
+                // sets the out sequence if present to the out MC to mediate the response
+                if(synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE) != null) {
+                    synapseOutMessageContext.setProperty(Constants.OUT_SEQUENCE,
+                            synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE));
+                }
+
                 // send the response message through the synapse mediation flow
                 synapseInMessageContext.getEnvironment().
                     injectMessage(synapseOutMessageContext);

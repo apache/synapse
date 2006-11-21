@@ -36,7 +36,7 @@
     <proxies>
         <proxy name="StockQuoteProxy1">
             <wsdl key="proxy_wsdl"/>
-            <target sequence="proxy_1"/>
+            <target inSequence="proxy_1"/>
         </proxy>
 
         <proxy name="StockQuoteProxy2">

@@ -85,10 +85,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/samples/src/main/scripts</directory>
+            <directory>src/site/resources</directory>
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <includes>
-                <include>README.txt</include>
+                <include>Synapse_Samples.html</include>
+                <include>sample_*.txt</include>
             </includes>
         </fileSet>
         <fileSet>

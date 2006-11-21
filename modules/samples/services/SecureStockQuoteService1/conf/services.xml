@@ -60,7 +60,7 @@
 		
 		<ramp:RampartConfig xmlns:ramp="http://ws.apache.org/rampart/policy"> 
 			<ramp:user>alice</ramp:user>
-			<ramp:passwordCallbackClass>org.apache.rampart.PWCallback</ramp:passwordCallbackClass>
+			<ramp:passwordCallbackClass>samples.userguide.PWCallback</ramp:passwordCallbackClass>
 		</ramp:RampartConfig>
 		
 	  </wsp:All>

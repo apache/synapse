@@ -24,6 +24,8 @@ import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Constants;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
@@ -41,7 +43,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     public Axis2SynapseEnvironment() {}
 
-    public Axis2SynapseEnvironment(ConfigurationContext cfgCtx, SynapseConfiguration synapseConfig) {
+    public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
+                                   SynapseConfiguration synapseConfig) {
         this.cfgCtx = cfgCtx;
         this.synapseConfig = synapseConfig;
         threadFactory = cfgCtx.getThreadPool();
@@ -54,7 +57,24 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 synCtx.getConfiguration().getMainMediator().mediate(synCtx);
             }
         });*/
-        synCtx.getConfiguration().getMainMediator().mediate(synCtx);
+
+        // if the outSequence property is present use that for the message mediation
+        // if not use the main mediator to mediate the outgoing message
+        if (synCtx.getProperty(Constants.OUT_SEQUENCE) != null) {
+            Mediator mediator = synCtx.getConfiguration().getNamedSequence(
+                    (String)synCtx.getProperty(Constants.OUT_SEQUENCE));
+            // check weather the sequence specified with the property outSequence is availabel
+            if(mediator != null) {
+                log.debug("Using the outSequence " + synCtx.getProperty(Constants.OUT_SEQUENCE)
+                        + " for the out message mediation");
+                mediator.mediate(synCtx);
+            } else {
+                log.error("Sequence named " + synCtx.getProperty(Constants.OUT_SEQUENCE)
+                        + " doesn't exists in synapse");
+            }
+        } else {
+            synCtx.getConfiguration().getMainMediator().mediate(synCtx);
+        }
     }
 
     public void send(MessageContext synCtx) {
@@ -65,7 +85,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     public MessageContext createMessageContext() {
-        org.apache.axis2.context.MessageContext axis2MC = new org.apache.axis2.context.MessageContext();
+        org.apache.axis2.context.MessageContext axis2MC
+                = new org.apache.axis2.context.MessageContext();
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
         return mc;
     }

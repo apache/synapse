@@ -25,8 +25,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
  
 import javax.xml.stream.XMLStreamReader;
@@ -71,7 +71,7 @@ public class SynapseConfiguration {
     private Object mainMediator = null;
 
     /** Hold reference to the Axis2 ConfigurationContext */
-    private ConfigurationContext configContext = null;
+    private AxisConfiguration axisConfig = null;
 
     /** Save the path to the configuration file loaded, to save it later */
     private String pathToConfigFile = null;
@@ -349,8 +349,8 @@ public class SynapseConfiguration {
             handleException("Invalid proxyService for name : " + name + " from registry");
         } else {
             try {
-                getConfigurationContext().getAxisConfiguration().getService(name).setActive(false);
-                getConfigurationContext().getAxisConfiguration().removeService(name);
+                getAxisConfiguration().getAxisConfiguration().getService(name).setActive(false);
+                getAxisConfiguration().getAxisConfiguration().removeService(name);
                 proxyServices.remove(name);
             } catch (AxisFault axisFault) {
                 handleException(axisFault.getMessage());
@@ -434,19 +434,19 @@ public class SynapseConfiguration {
     }
 
     /**
-     * Set the Axis2 ConfigurationContext to the SynapseConfiguration
-     * @param configContext
+     * Set the Axis2 AxisConfiguration to the SynapseConfiguration
+     * @param axisConfig
      */
-    public void setConfigurationContext(ConfigurationContext configContext) {
-        this.configContext = configContext;
+    public void setAxisConfiguration(AxisConfiguration axisConfig) {
+        this.axisConfig = axisConfig;
     }
 
     /**
-     * Get the Axis2 ConfigurationContext for the SynapseConfiguration
-     * @return ConfigurationContext of the Axis2
+     * Get the Axis2 AxisConfiguration for the SynapseConfiguration
+     * @return AxisConfiguration of the Axis2
      */
-    public ConfigurationContext getConfigurationContext() {
-        return configContext;
+    public AxisConfiguration getAxisConfiguration() {
+        return axisConfig;
     }
 
     private void handleException(String msg) {

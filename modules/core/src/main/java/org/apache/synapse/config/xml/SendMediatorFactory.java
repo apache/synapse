@@ -83,9 +83,6 @@ public class SendMediatorFactory implements MediatorFactory {
 
     private static final QName SEND_Q = new QName(Constants.SYNAPSE_NAMESPACE, "send");
 
-    private static final QName ATT_REF_Q = new QName(Constants.NULL_NAMESPACE, "ref");
-    private static final QName ATT_ADDRESS_Q = new QName(Constants.NULL_NAMESPACE, "address");
-
     public Mediator createMediator(OMElement elem) {
 
         SendMediator sm =  new SendMediator();
@@ -94,23 +91,7 @@ public class SendMediatorFactory implements MediatorFactory {
         while (iter.hasNext()) {
 
             OMElement endptElem = (OMElement) iter.next();
-            OMAttribute ref = endptElem.getAttribute(ATT_REF_Q);
-            OMAttribute address = endptElem.getAttribute(ATT_ADDRESS_Q);
-
-            Endpoint endpt = new Endpoint();
-            if (ref != null) {
-                endpt.setRef(ref.getAttributeValue());
-            } else if (address != null) {
-                
-                    endpt.setAddress(address.getAttributeValue());
-                
-            } else {
-                String msg = "An endpoint used within a send mediator definition must contain a " +
-                    "'ref' (reference) or 'address' (absolute URL) attribute";
-                log.error(msg);
-                throw new SynapseException(msg);
-            }
-
+            Endpoint endpt = EndpointFactory.createEndpoint(endptElem, true);
             sm.addEndpoint(endpt);
         }
 

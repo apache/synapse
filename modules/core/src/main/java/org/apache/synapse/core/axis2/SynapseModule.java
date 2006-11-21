@@ -114,7 +114,7 @@ public class SynapseModule implements Module {
         }
 
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
-        synapseConfiguration.setConfigurationContext(cfgCtx);
+        synapseConfiguration.setAxisConfiguration(cfgCtx.getAxisConfiguration());
 
         // set the Synapse configuration and environment into the Axis2 configuration
         Parameter synapseCtxParam = new Parameter(Constants.SYNAPSE_CONFIG, null);

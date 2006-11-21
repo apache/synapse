@@ -53,21 +53,34 @@ public class EndpointFactory implements XMLToObjectMapper {
 
     private EndpointFactory() {}
 
-    public static Endpoint createEndpoint(OMElement elem) {
+    public static Endpoint createEndpoint(OMElement elem, boolean anonymousEndpoint) {
+
 
         OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        if (name == null) {
-            handleException("The 'name' attribute is required for a named endpoint definition");
-        } else {
+        OMAttribute address = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "address"));
             Endpoint endpoint = new Endpoint();
-            endpoint.setName(name.getAttributeValue());
-
-            OMAttribute address = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "address"));
-            if (address != null) {
+            if(!anonymousEndpoint) {
+                if (name == null) {
+                    handleException("The 'name' attribute is required for a named endpoint definition");
+                } else {
+                    endpoint.setName(name.getAttributeValue());
+                }
+                if (address != null) {
                 endpoint.setAddress(address.getAttributeValue());
+                } else {
+                    // right now an address is *required*
+                    handleException("The 'address' attribute is required for an endpoint");
+                }
             } else {
-                // right now an address is *required*
-                handleException("The 'address' attribute is required for an endpoint");
+                OMAttribute reference = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "ref"));
+                if(reference != null) {
+                    endpoint.setRef(reference.getAttributeValue());
+                } else if (address != null) {
+                    endpoint.setAddress(address.getAttributeValue());
+                } else {
+                    handleException("One of the 'address' or 'ref' attributes are required in an " +
+                            "anonymous endpoint");
+                }
             }
 
             OMElement wsAddr = elem.getFirstChildWithName(
@@ -97,8 +110,7 @@ public class EndpointFactory implements XMLToObjectMapper {
             }
 
             return endpoint;
-        }
-        return null;
+//        }
     }
 
     private static void handleException(String msg) {
@@ -113,7 +125,7 @@ public class EndpointFactory implements XMLToObjectMapper {
 
     public Object getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om);
+            return createEndpoint((OMElement) om, false);
         } else {
             handleException("Invalid XML configuration for an Endpoint. OMElement expected");
         }

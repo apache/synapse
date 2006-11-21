@@ -77,7 +77,8 @@ public class ProxyServiceFactory {
             }
         }
 
-        OMAttribute startOnLoad = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "startOnLoad"));
+        OMAttribute startOnLoad = elem.getAttribute(
+                new QName(Constants.NULL_NAMESPACE, "startOnLoad"));
         if(startOnLoad != null) {
             proxy.setStartOnLoad(Boolean.valueOf(startOnLoad.getAttributeValue()).booleanValue());
         } else {
@@ -87,13 +88,21 @@ public class ProxyServiceFactory {
         // read definition of the target of this proxy service. The target could be an 'endpoint'
         // or a named sequence. If none of these are specified, the messages would be mediated
         // by the Synapse main mediator
-        OMElement target  = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "target"));
+        OMElement target  = elem.getFirstChildWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "target"));
         if (target != null) {
-            OMAttribute sequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "sequence"));
-            if (sequence != null) {
-                proxy.setTargetSequence(sequence.getAttributeValue());
+            OMAttribute inSequence = target.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, "inSequence"));
+            if (inSequence != null) {
+                proxy.setTargetInSequence(inSequence.getAttributeValue());
             }
-            OMAttribute tgtEndpt = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "endpoint"));
+            OMAttribute outSequence = target.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, "outSequence"));
+            if (outSequence != null) {
+                proxy.setTargetOutSequence(outSequence.getAttributeValue());
+            }
+            OMAttribute tgtEndpt = target.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, "endpoint"));
             if (tgtEndpt != null) {
                 proxy.setTargetEndpoint(tgtEndpt.getAttributeValue());
             }
@@ -110,8 +119,10 @@ public class ProxyServiceFactory {
             }
         }
 
-        //OMElement schema = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "schema"));
-        Iterator policies = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "policy"));
+//        OMElement schema = elem.getFirstChildWithName(
+//                new QName(Constants.SYNAPSE_NAMESPACE, "schema"));
+        Iterator policies = elem.getChildrenWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "policy"));
         while (policies.hasNext()) {
             Object o = policies.next();
             if (o instanceof OMElement) {
@@ -127,7 +138,8 @@ public class ProxyServiceFactory {
             }
         }
 
-        Iterator props = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "property"));
+        Iterator props = elem.getChildrenWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "property"));
         while (props.hasNext()) {
             Object o = props.next();
             if (o instanceof OMElement) {
@@ -144,14 +156,15 @@ public class ProxyServiceFactory {
             }
         }
 
-        if (elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
+        if (elem.getFirstChildWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
             proxy.setWsRMEnabled(true);
         }
 
-        if (elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
+        if (elem.getFirstChildWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
             proxy.setWsSecEnabled(true);
         }
-
 
         return proxy;
     }

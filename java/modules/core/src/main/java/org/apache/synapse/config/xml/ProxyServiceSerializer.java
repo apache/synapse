@@ -87,10 +87,14 @@ public class ProxyServiceSerializer {
             target.addAttribute(fac.createOMAttribute(
                 "endpoint", nullNS, service.getTargetEndpoint()));
             proxy.addChild(target);
-        } else if (service.getTargetSequence() != null) {
+        } else if (service.getTargetInSequence() != null || service.getTargetOutSequence() != null) {
             OMElement target = fac.createOMElement("target", synNS);
-            target.addAttribute(fac.createOMAttribute(
-                "sequence", nullNS, service.getTargetSequence()));
+            if (service.getTargetInSequence() != null) {
+                target.addAttribute(fac.createOMAttribute("inSequence", nullNS, service.getTargetInSequence()));
+            }
+            if (service.getTargetOutSequence() != null) {
+                target.addAttribute(fac.createOMAttribute("outSequence", nullNS, service.getTargetOutSequence()));
+            }
             proxy.addChild(target);
         }
 

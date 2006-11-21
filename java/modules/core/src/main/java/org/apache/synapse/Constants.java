@@ -51,6 +51,9 @@ public interface Constants {
      */
     String CORRELATE = "correlate/";
 
+    /** An string name which holds the out sequence property in the MessageContext */
+    String OUT_SEQUENCE = "outSequence";
+
     /** A key with this name on the message context set to Boolean.TRUE, indicates that this is a response */
     String ISRESPONSE_PROPERTY = "synapse.isresponse";
 

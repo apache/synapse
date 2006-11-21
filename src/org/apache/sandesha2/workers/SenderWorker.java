@@ -326,26 +326,28 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	
 	private boolean isAckPiggybackableMsgType(int messageType) {
 		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::isAckPiggybackableMsgType, " + messageType);
+			log.debug("Enter: SenderWorker::isAckPiggybackableMsgType, " + messageType);
 		boolean piggybackable = true;
 
 		if (messageType == Sandesha2Constants.MessageTypes.ACK)
 			piggybackable = false;
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::isAckPiggybackableMsgType, " + piggybackable);
+			log.debug("Exit: SenderWorker::isAckPiggybackableMsgType, " + piggybackable);
 		return piggybackable;
 	}
 	
 	private void checkForSyncResponses(MessageContext msgCtx) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::checkForSyncResponses, " + msgCtx.getEnvelope().getHeader());
+			log.debug("Enter: SenderWorker::checkForSyncResponses, " + msgCtx.getEnvelope().getHeader());
 
 		try {
 
 			boolean responsePresent = (msgCtx.getProperty(MessageContext.TRANSPORT_IN) != null);
-			if (!responsePresent)
+			if (!responsePresent) {
+				if(log.isDebugEnabled()) log.debug("Exit: SenderWorker::checkForSyncResponses, no response present");
 				return;
+			}
 
 			// create the responseMessageContext
 
@@ -420,21 +422,21 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			throw new SandeshaException(message, e);
 		}
 		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::checkForSyncResponses");
+			log.debug("Exit: SenderWorker::checkForSyncResponses");
 	}
 	
 	private boolean isFaultEnvelope(SOAPEnvelope envelope) {
 		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::isFaultEnvelope, " + envelope.getBody().getFault());
+			log.debug("Enter: SenderWorker::isFaultEnvelope, " + envelope.getBody().getFault());
 		SOAPFault fault = envelope.getBody().getFault();
 		if (fault != null) {
 			if (log.isDebugEnabled())
-				log.debug("Exit: Sender::isFaultEnvelope, TRUE");
+				log.debug("Exit: SenderWorker::isFaultEnvelope, TRUE");
 			return true;
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::isFaultEnvelope, FALSE");
+			log.debug("Exit: SenderWorker::isFaultEnvelope, FALSE");
 		return false;
 	}
 

@@ -258,6 +258,11 @@ public interface Sandesha2Constants {
 		String CLIENT_COMPLETED_MESSAGES = "ClientCompletedMessages";
 		String SERVER_COMPLETED_MESSAGES = "ServerCompletedMessages";
 		
+		//For IN_ORDER sequences, we can have finite ranges of messages that can be
+		//delivered out of order. These are maintained as a String that is consistent
+		//with the form described in  org.apache.sandesha2.util.RangeString
+		String OUT_OF_ORDER_RANGES = "OutOfOrderRanges";
+		
 		String TO_EPR = "ToEPR";
 
 		String ACKS_TO_EPR = "acksToEPR";

@@ -57,6 +57,7 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
+import org.apache.sandesha2.workers.Invoker;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.Identifier;
@@ -718,6 +719,30 @@ public class SandeshaClient {
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
 	}
 
+	/**
+	 * Forces any inbound messages currently on the specified inOrder inbound sequence to be dispatched out of order.
+	 * @param configContext
+	 * @param sequenceID
+	 * @param allowLaterDeliveryOfMissingMessages if true, messages skipped over during this
+	 * action will be invoked if they arrive on the system at a later time. 
+	 * Otherwise messages skipped over will be ignored
+	 * @throws SandeshaException
+	 */
+	public static void forceDispatchOfInboundMessages(ConfigurationContext configContext, 
+			String sequenceID,
+			boolean allowLaterDeliveryOfMissingMessages)throws SandeshaException{
+		//only do this if we are running inOrder
+		if(SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration()).isInOrder()){
+			Invoker invoker = (Invoker) configContext.getProperty(Sandesha2Constants.INVOKER);
+			if (invoker==null){
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.invokerNotFound, sequenceID));
+			}
+			
+			invoker.forceInvokeOfAllMessagesCurrentlyOnSequence(configContext, sequenceID, allowLaterDeliveryOfMissingMessages);			
+		}
+	}
+	
 	private static String getInternalSequenceID(String to, String sequenceKey) {
 		return SandeshaUtil.getInternalSequenceID(to, sequenceKey);
 	}

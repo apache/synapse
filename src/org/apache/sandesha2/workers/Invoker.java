@@ -19,6 +19,7 @@ package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.axis2.addressing.AddressingConstants;
@@ -43,6 +44,8 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -59,7 +62,10 @@ public class Invoker extends Thread {
 	private ArrayList workingSequences = new ArrayList();
 	private ConfigurationContext context = null;
 	private static final Log log = LogFactory.getLog(Invoker.class);
-	private boolean hasStopped = false;
+	
+	private boolean hasStoppedInvoking = false;
+	private boolean hasPausedInvoking = false;
+	private boolean pauseRequired = false;
 	
 	private transient ThreadFactory threadPool;
 	public int INVOKER_THREADPOOL_SIZE = 5;
@@ -85,11 +91,167 @@ public class Invoker extends Thread {
 		if (log.isDebugEnabled())
 			log.debug("Exit: InOrderInvoker::stopInvokerForTheSequence");
 	}
+	
+	
+	/**
+	 * Waits for the invoking thread to pause
+	 */
+	public synchronized void blockForPause(){
+		while(pauseRequired){
+			//someone else is requesting a pause - wait for them to finish
+			try{
+				wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
+			}catch(InterruptedException e){
+				//ignore
+			}
+		}
+		
+	  //we can now request a pause - the next pause will be ours
+	  pauseRequired = true;
+				
+		if(hasStoppedInvoking() || !isInvokerStarted()){
+			throw new IllegalStateException("Cannot pause a non-running invoker thread"); //TODO NLS
+		}
+		while(!hasPausedInvoking){
+			//wait for our pause to come around
+			try{
+				wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
+			}catch(InterruptedException e){
+				//ignore
+			}
+			
+		}
+		//the invoker thread is now paused
+	}
+	
+	private synchronized void finishPause(){
+		//indicate that the current pause is no longer required.
+		pauseRequired = false;
+		notifyAll();
+	}
+	
+	/**
+	 * Forces dispatch of queued messages to the application.
+	 * NOTE: may break ordering
+	 * @param ctx
+	 * @param sequenceID
+	 * @param allowLaterDeliveryOfMissingMessages if true, messages skipped over during this
+	 * action will be invoked if they arrive on the system at a later time. 
+	 * Otherwise messages skipped over will be ignored
+	 * @throws SandeshaException
+	 */
+	public synchronized void forceInvokeOfAllMessagesCurrentlyOnSequence(ConfigurationContext ctx, 
+			String sequenceID,
+			boolean allowLaterDeliveryOfMissingMessages)throws SandeshaException{
+		//first we block while we wait for the invoking thread to pause
+		blockForPause();
+		try{
+			//get all invoker beans for the sequence
+			StorageManager storageManager = 
+				SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+	
+			InvokerBeanMgr storageMapMgr = storageManager
+					.getStorageMapBeanMgr();
+			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceID);
+			
+			if (nextMsgBean != null) {
+				
+				//The outOfOrder window is the set of known sequence messages (including those
+				//that are missing) at the time the button is pressed.
+				long firstMessageInOutOfOrderWindow = nextMsgBean.getNextMsgNoToProcess();
+			
+				Iterator stMapIt = 
+					storageMapMgr.find(new InvokerBean(null, 0, sequenceID)).iterator();
+				
+				long highestMsgNumberInvoked = 0;
+				Transaction transaction = null;
+				
+				//invoke each bean in turn. 
+				//NOTE: here we are breaking ordering
+				while(stMapIt.hasNext()){
+					transaction = storageManager.getTransaction();
+					InvokerBean invoker = (InvokerBean)stMapIt.next();
+					
+					//invoke the app
+					try{
+						// start a new worker thread and let it do the invocation.
+						String workId = sequenceID + "::" + invoker.getMsgNo(); //creating a workId to uniquely identify the
+					   //piece of work that will be assigned to the Worker.
+						
+						String messageContextKey = invoker.getMessageContextRefKey();
+						InvokerWorker worker = new InvokerWorker(context,
+								messageContextKey, 
+								true); //want to ignore the enxt msg number
+						
+						worker.setLock(lock);
+						worker.setWorkId(workId);
+						
+						//before we execute we need to set the 
+						
+						threadPool.execute(worker);
+					
+						//adding the workId to the lock after assigning it to a thread makes sure 
+						//that all the workIds in the Lock are handled by threads.
+						lock.addWork(workId);
+
+						long msgNumber = invoker.getMsgNo();
+						//if necessary, update the "next message number" bean under this transaction
+						if(msgNumber>highestMsgNumberInvoked){
+							highestMsgNumberInvoked = invoker.getMsgNo();
+							nextMsgBean.setNextMsgNoToProcess(highestMsgNumberInvoked+1);
+							nextMsgMgr.update(nextMsgBean);
+							
+							if(allowLaterDeliveryOfMissingMessages){
+								//we also need to update the sequence OUT_OF_ORDER_RANGES property
+								//so as to include our latest view of this outOfOrder range.
+								//We do that here (rather than once at the end) so that we reamin
+								//transactionally consistent
+								Range r = new Range(firstMessageInOutOfOrderWindow,highestMsgNumberInvoked);
+										
+								RangeString rangeString = null;
+								SequencePropertyBeanMgr seqPropertyManager = storageManager.getSequencePropertyBeanMgr();
+								SequencePropertyBean outOfOrderRanges = 
+									seqPropertyManager.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES);
+								if(outOfOrderRanges==null){
+									//insert a new blank one one
+									outOfOrderRanges = new SequencePropertyBean(sequenceID,
+											Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES,
+											"");
+
+									seqPropertyManager.insert(outOfOrderRanges);
+									rangeString = new RangeString("");
+								}
+								else{
+									rangeString = new RangeString(outOfOrderRanges.getValue());
+								}
+								//update the range String with the new value
+								rangeString.addRange(r);
+								outOfOrderRanges.setValue(rangeString.toString());
+								seqPropertyManager.update(outOfOrderRanges);
+							}
+						}
+						
+						transaction.commit();
+					}
+					catch(Exception e){
+						transaction.rollback();
+					}
+		
+				}//end while
+			}
+		}
+		finally{
+			//restart the invoker
+			finishPause();
+		}
+	}
 
 	public synchronized void stopInvoking() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::stopInvoking");
-
+		//NOTE: we do not take acount of pausing when stopping.
+		//The call to stop will wait until the invoker has exited the loop
 		if (isInvokerStarted()) {
 			// the invoker is started so stop it
 			runInvoker = false;
@@ -137,9 +299,9 @@ public class Invoker extends Thread {
 			log.debug("Enter: InOrderInvoker::hasStoppedInvoking");
 			log
 					.debug("Exit: InOrderInvoker::hasStoppedInvoking, "
-							+ hasStopped);
+							+ hasStoppedInvoking);
 		}
-		return hasStopped;
+		return hasStoppedInvoking;
 	}
 
 	public void run() {
@@ -152,7 +314,7 @@ public class Invoker extends Thread {
 			// flag that we have exited the run loop and notify any waiting
 			// threads
 			synchronized (this) {
-				hasStopped = true;
+				hasStoppedInvoking = true;
 				notify();
 			}
 		}
@@ -161,6 +323,42 @@ public class Invoker extends Thread {
 			log.debug("Exit: InOrderInvoker::run");
 	}
 
+	private void addOutOfOrderInvokerBeansToList(String sequenceID, 
+			StorageManager strMgr, List list)throws SandeshaException{
+		if (log.isDebugEnabled())
+			log.debug("Enter: InOrderInvoker::addOutOfOrderInvokerBeansToList");
+		
+		SequencePropertyBeanMgr seqPropertyManager = strMgr.getSequencePropertyBeanMgr();
+		
+		SequencePropertyBean outOfOrderRanges = 
+			seqPropertyManager.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES);		
+		if(outOfOrderRanges!=null){
+			String sequenceRanges = outOfOrderRanges.getValue();
+			RangeString rangeString = new RangeString(sequenceRanges);
+			//we now have the set of ranges that can be delivered out of order.
+			//Look for any invokable message that lies in one of those ranges
+			Iterator invokerBeansIterator = 
+				strMgr.getStorageMapBeanMgr().find(
+						new InvokerBean(null, 
+														0,  //finds all invoker beans
+														sequenceID)).iterator();
+			
+			while(invokerBeansIterator.hasNext()){
+				InvokerBean invokerBean = (InvokerBean)invokerBeansIterator.next();
+				
+				if(rangeString.isMessageNumberInRanges(invokerBean.getMsgNo())){
+					//an invoker bean that has not been deleted and lies in an out
+					//or order range - we can add this to the list
+					list.add(invokerBean);
+				}
+			}
+			
+		}
+			
+		if (log.isDebugEnabled())
+			log.debug("Exit: InOrderInvoker::addOutOfOrderInvokerBeansToList");
+	}
+	
 	private void internalRun() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::internalRun");
@@ -176,6 +374,26 @@ public class Invoker extends Thread {
 			} catch (InterruptedException ex) {
 				log.debug("Invoker was Inturrepted....");
 				log.debug(ex.getMessage());
+			}
+					
+			//see if we need to pause
+			synchronized(this){
+				
+				while(pauseRequired){
+					if(!hasPausedInvoking){
+						//let the requester of this pause know we are now pausing
+					  hasPausedInvoking = true;
+					  notifyAll();						
+					}
+					//now we pause
+				  try{
+				  	wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
+				  }catch(InterruptedException e){
+				  	//ignore
+				  }
+				}//end while
+				//the request to pause has finished so we are no longer pausing
+				hasPausedInvoking = false;
 			}
 
 			Transaction transaction = null;
@@ -242,32 +460,43 @@ public class Invoker extends Thread {
 					throw new SandeshaException(message);
 				}
 
-				Iterator stMapIt = storageMapMgr.find(
-						new InvokerBean(null, nextMsgno, sequenceId))
-						.iterator();
-
+				List invokerBeans = storageMapMgr.find(
+						new InvokerBean(null, nextMsgno, sequenceId));
+				
+				//add any msgs that belong to out of order windows
+				addOutOfOrderInvokerBeansToList(sequenceId, 
+						storageManager, invokerBeans);
+				
+				Iterator stMapIt = invokerBeans.iterator();
 				
 				//TODO correct the locking mechanism to have one lock per sequence.
 				
-				if (stMapIt.hasNext()) { //the next Msg entry is present.
+				if (stMapIt.hasNext()) { //some invokation work is present
 
-					String workId = sequenceId + "::" + nextMsgno; //creating a workId to uniquely identify the
+					InvokerBean bean = (InvokerBean) stMapIt.next();
+					//see if this is an out of order msg
+					boolean beanIsOutOfOrderMsg = bean.getMsgNo()!=nextMsgno;
+					
+					String workId = sequenceId + "::" + bean.getMsgNo(); 
+																		//creating a workId to uniquely identify the
 																   //piece of work that will be assigned to the Worker.
 										
-					//check weather the bean is already assigned to a worker.
+					//check whether the bean is already assigned to a worker.
 					if (lock.isWorkPresent(workId)) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
 						log.debug(message);
 						continue;
 					}
-					
-					InvokerBean bean = (InvokerBean) stMapIt.next();
+
 					String messageContextKey = bean.getMessageContextRefKey();
 					
 					transaction.commit();
 
 					// start a new worker thread and let it do the invocation.
-					InvokerWorker worker = new InvokerWorker(context,messageContextKey);
+					InvokerWorker worker = new InvokerWorker(context,
+							messageContextKey, 
+							beanIsOutOfOrderMsg); //only ignore nextMsgNumber if the bean is an
+																		//out of order message
 					
 					worker.setLock(lock);
 					worker.setWorkId(workId);

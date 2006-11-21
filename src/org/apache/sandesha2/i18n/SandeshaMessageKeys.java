@@ -68,6 +68,7 @@ public class SandeshaMessageKeys {
 	public static final String cannotInnitMessage="cannotInnitMessage";
 	public static final String propertyInvalidValue="propertyInvalidValue";
 	public static final String couldNotCopyParameters="couldNotCopyParameters";
+	public static final String invalidRange="invalidRange";
 	public static final String senderBeanNotFound="senderBeanNotFound";
 	public static final String workAlreadyAssigned="workAlreadyAssigned";
 	public static final String workNotPresent="workNotPresent";
@@ -250,6 +251,7 @@ public class SandeshaMessageKeys {
     public final static String addressingNamespaceNotSet = "addressingNamespaceNotSet";
     public final static String invalidOfferNoResponseEndpoint = "invalidOfferNoResponseEndpoint";
     public final static String invalidElementFoundWithinElement = "invalidElementFoundWithinElement";
+    public final static String invokerNotFound="invokerNotFound";
     
     public final static String couldNotSendAckRequestSeqNotFound="couldNotSendAckRequestSeqNotFound";
     public final static String couldNotSendCloseResponse="couldNotSendCloseResponse";

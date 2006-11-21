@@ -25,12 +25,14 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 	ConfigurationContext configurationContext = null;
 	String messageContextKey;
+	boolean ignoreNextMsg = false;
 	
 	Log log = LogFactory.getLog(InvokerWorker.class);
 	
-	public InvokerWorker (ConfigurationContext configurationContext, String messageContextKey) {
+	public InvokerWorker (ConfigurationContext configurationContext, String messageContextKey, boolean ignoreNextMsg) {
 		this.configurationContext = configurationContext;
 		this.messageContextKey = messageContextKey;
+		this.ignoreNextMsg = ignoreNextMsg;
 	}
 	
 	public void run() {
@@ -122,12 +124,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			if (msgCtx != null) {
 				storageManager.removeMessageContext(messageContextKey);
 			}
-
-			// updating the next msg to invoke
-
-			String s = invokerBean.getSequenceID();
-			NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
-
 			
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
@@ -143,26 +139,30 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				}
 			}
 			
-			long nextMsgNo = nextMsgBean.getNextMsgNoToProcess();
-			
-			if (!(messageNo==nextMsgNo)) {
-				String message = "Operated message number is different from the Next Message Number to invoke";
-				throw new SandeshaException (message);
-			}
-			
-			if (invoked) {
-				nextMsgNo++;
-				nextMsgBean.setNextMsgNoToProcess(nextMsgNo);
-				nextMsgMgr.update(nextMsgBean);
+			if(!ignoreNextMsg){
+				// updating the next msg to invoke
+
+				String s = invokerBean.getSequenceID();
+				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
+				long nextMsgNo = nextMsgBean.getNextMsgNoToProcess();
+				
+				if (!(messageNo==nextMsgNo)) {
+					String message = "Operated message number is different from the Next Message Number to invoke";
+					throw new SandeshaException (message);
+				}
+				
+				if (invoked) {
+					nextMsgNo++;
+					nextMsgBean.setNextMsgNoToProcess(nextMsgNo);
+					nextMsgMgr.update(nextMsgBean);
+				}				
 			}
 		} catch (SandeshaStorageException e) {
 			transaction.rollback();
 		} catch (SandeshaException e) {
-			e.printStackTrace(); //TODO remove
-			log.error(e);
+			log.error(e.toString(), e);
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.error(e);
+			log.error(e.toString(), e);
 		} finally {
 			if (transaction!=null && transaction.isActive())
 				transaction.commit();

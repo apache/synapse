@@ -30,14 +30,10 @@
   
 <xsl:template match="m0:return">
 
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-<soap:Body>
 <m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test">
 	<m:Code><xsl:value-of select="m0:symbol"/></m:Code>
 	<m:Price><xsl:value-of select="m0:last"/></m:Price>
 </m:CheckPriceResponse>
-</soap:Body>
-</soap:Envelope>
 
 </xsl:template>
 </xsl:stylesheet>

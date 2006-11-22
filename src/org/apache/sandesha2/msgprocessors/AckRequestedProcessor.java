@@ -409,14 +409,16 @@ public class AckRequestedProcessor {
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
 
+		// Set the sequence id and internal sequence id in the SenderBean
+		ackRequestBean.setInternalSequenceID(internalSeqenceID);
+		ackRequestBean.setSequenceID(outSequenceID);
+		
 		retramsmitterMgr.insert(ackRequestBean);
-
-		ackRequestRMMsg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 
 		SandeshaUtil.executeAndStore(ackRequestRMMsg, key);
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AckRequestedProcessor::processOutgoingAckRequestMessage " + Boolean.FALSE);
+			log.debug("Exit: AckRequestedProcessor::processOutgoingAckRequestMessage " + Boolean.TRUE);
 		
 		return true;
 

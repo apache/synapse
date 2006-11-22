@@ -267,11 +267,12 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		closeBean.setReSend(false);
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		
+		// Add the sequence id and internal sequenceid to the closeBean
+		closeBean.setSequenceID(outSequenceID);
+		closeBean.setInternalSequenceID(internalSeqenceID);
 
 		retramsmitterMgr.insert(closeBean);
-
-
-		rmMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 
 		SandeshaUtil.executeAndStore(rmMsgCtx, key);
 

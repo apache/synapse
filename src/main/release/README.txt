@@ -33,41 +33,29 @@ Documentation
 ===================
  
 Documentation can be found in the 'docs' directory included with the 
-binary distribution and in the 'xdocs' directory in the source 
-distribution. Documentation on samples are available in the samples directory.
+binary distribution and in the 'src/site/resources' directory in the source 
+distribution. 
 
-For examples on Apache Synapse message mediation please see the User Guide
-(http://wiki.apache.org/ws/Synapse/UserGuide). 
+For examples on Apache Synapse message mediation please see the Synapse_Samples.html
 
 For more information on the Synapse Configuration language syntax and useage refer to
-the wiki page at http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage
+Synapse_Configuration_Language.html
 
 -------------------
 Getting Started
 ===================
 
-Synapse is typically configured using a synapse.xml file in the repository directory. 
-In the binary distribution this is the <SYNAPSE>\synapse_repository directory, where
-<SYNAPSE> is the directory you installed Apache Synapse into. 
+Refer to the Synapse_Samples.html document for examples of Synapse usage and configuration.
 
-You can start the sample Apache Synapse configuration using the bin\synapse command (bat or sh)
-This will pick up the Synapse configuration at <SYNAPSE>\synapse_repository\conf\synapse.xml
-and the Axis2 configuration from <SYNAPSE>\synapse_repository\conf\axis2.xml
+The actual sample Synapse configurations could be found at <SYNAPSE>/respository/conf/sample.
+The resources sub-directory contains the sample XSLT transformations, XSD schemas, WS policies
+and all other resources required to demonstrate various aspects of Synapse.
 
-More sample Synapse configurations could be found at <SYNAPSE>\synapse_respository\conf\sample.
-This directory contains sample XSLT transformations, XSD schemas for validation and resources
-required to demonstrate support for Spring beans, and programatic creation of a Synapse
-configuration in addition to sample Synapse configuration XML files. 
-
-The Synapse configuration language is specified at the Wiki page given below.
-http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage
-
-See the README.txt in the samples directory for more information about the samples.
 
 Support
 ===================
  
-Any problem with this release can be reported to Apache Synapse mailing list 
+Any issues with this release can be reported to Apache Synapse mailing list 
 or in the JIRA issue tracker.
 
 Mailing list subscription:

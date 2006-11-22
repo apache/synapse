@@ -73,7 +73,9 @@ public class JSOMElementConvertor extends DefaultOMElementConvertor {
             return super.fromScript(o);
         }
 
-        Wrapper wrapper = (Wrapper) ScriptableObject.callMethod((XMLObject)o, "getXmlObject", new Object[0]);
+        // TODO: E4X Bug? Shouldn't need this copy, but without it the outer element gets lost???
+        Scriptable jsXML = (Scriptable) ScriptableObject.callMethod((Scriptable) o, "copy", new Object[0]);
+        Wrapper wrapper = (Wrapper) ScriptableObject.callMethod((XMLObject)jsXML, "getXmlObject", new Object[0]);
         XmlObject xmlObject = (XmlObject)wrapper.unwrap();
         try {
 

@@ -31,6 +31,7 @@ import org.apache.axis2.context.*;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,18 +76,18 @@ public class Axis2FlexibleMEPClient {
         boolean separateListener,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
 
-    	log.debug("sending [add = "+wsAddressingEnabled+"] [sec = "+wsSecurityEnabled + "] [ rm = "+wsRMEnabled+"] [ to "+synapseOutMessageContext.getTo()+"]");
-    	
-        MessageContext axisOutMsgCtx =
-            ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
+        log.debug("sending [add = "+wsAddressingEnabled+"] [sec = "+wsSecurityEnabled + "] [ rm = "+wsRMEnabled+"] [ to "+synapseOutMessageContext.getTo()+"]");
 
-        Object addDisabled = axisOutMsgCtx.getProperty(
-            AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
-        if (wsAddressingEnabled && addDisabled != null && Boolean.TRUE.equals(addDisabled)) {
+        // save the original message context wihout altering it, so we can tie the response
+        MessageContext originalInMsgCtx = ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
+
+        // create a new MessageContext to be sent out as this should not corrupt the original
+        // we need to create the response to the original message later on
+        MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx);
+
+        if (wsAddressingEnabled) {
             axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
         }
-
-        TransportOutDescription savedTransportOut = axisOutMsgCtx.getTransportOut();
 
         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();
         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
@@ -97,16 +98,6 @@ public class Axis2FlexibleMEPClient {
         ServiceGroupContext sgc = new ServiceGroupContext(
             axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
-
-        if (axisOutMsgCtx.getMessageID() != null) {
-            axisOutMsgCtx.setMessageID(String.valueOf("uuid:" + UUIDGenerator.getUUID()));
-        }
-
-        axisOutMsgCtx.setConfigurationContext(serviceCtx.getConfigurationContext());
-        axisOutMsgCtx.setServerSide(false); // this will become a client
-
-        // set SOAP envelope on the message context, removing WS-A headers
-        axisOutMsgCtx.setEnvelope(removeAddressingHeaders(axisOutMsgCtx));
 
         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
         AxisOperation axisAnonymousOperation = anoymousService.getOperation(
@@ -137,8 +128,6 @@ public class Axis2FlexibleMEPClient {
                     getPolicy(synapseOutMessageContext, wsSecPolicyKey));
             }
         }
-        OperationContext originalOpCtx = axisOutMsgCtx.getOperationContext();
-        
         OperationClient mepClient = axisAnonymousOperation.createClient(
             serviceCtx, clientOptions);
         mepClient.addMessageContext(axisOutMsgCtx);
@@ -154,34 +143,39 @@ public class Axis2FlexibleMEPClient {
 
             mepClient.execute(true);
 
-            MessageContext response = mepClient.getMessageContext(
-                WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            MessageContext responseReceived =
+                mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
-            response.setOperationContext(originalOpCtx);
-            response.setAxisMessage(
-                originalOpCtx.getAxisOperation().getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
+            MessageContext response = Utils.createOutMessageContext(originalInMsgCtx);
+            response.setEnvelope(removeAddressingHeaders(responseReceived));
 
-            // set properties on response
             response.setServerSide(true);
             response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-            response.setProperty(MessageContext.TRANSPORT_OUT,
-                axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
-            response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-                axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-            response.setProperty(
-                    org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
-                    axisOutMsgCtx.getProperty(
-                            org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND));
-            response.setTransportIn(axisOutMsgCtx.getTransportIn());
-            response.setTransportOut(savedTransportOut);
-
-            // If request is REST assume that the response is REST too
-            response.setDoingREST(axisOutMsgCtx.isDoingREST());
 
             return response;
         }
     }
 
+    private static MessageContext cloneForSend(MessageContext ori) throws AxisFault {
+        MessageContext newMC = new MessageContext();
+
+        // do not copy options from the original
+        newMC.setConfigurationContext(ori.getConfigurationContext());
+        newMC.setMessageID("uuid:" + UUIDGenerator.getUUID());
+        newMC.setTo(ori.getTo());
+
+        newMC.setProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING,
+                ori.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING));
+        
+        newMC.setDoingREST(ori.isDoingREST());
+        newMC.setDoingMTOM(ori.isDoingMTOM());
+        newMC.setServerSide(false);
+
+        // set SOAP envelope on the message context, removing WS-A headers
+        newMC.setEnvelope(removeAddressingHeaders(ori));
+        return newMC;
+    }
+    
     /**
      * Get the Policy object for the given name from the Synapse configuration at runtime
      * @param synCtx the current synapse configuration to get to the synapse configuration

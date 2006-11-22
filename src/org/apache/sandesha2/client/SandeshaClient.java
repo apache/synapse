@@ -305,6 +305,30 @@ public class SandeshaClient {
 	 */
 	public static String createSequence(ServiceClient serviceClient, boolean offer) throws SandeshaException {
 		
+		// Generate a new sequence key to be used for creating the sequence
+		String	newSequenceKey = SandeshaUtil.getUUID();
+		
+		// Create the sequence
+		createSequence(serviceClient, offer, newSequenceKey);
+		
+		// Return the new sequence key
+		return newSequenceKey;
+	}
+
+	/**
+	 * Creates a sequence with the specified sequenceKey.
+	 * 
+	 * @param serviceClient
+	 * @param offer
+	 * @param sequenceKey
+	 * @throws SandeshaException
+	 */
+	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)
+			throws SandeshaException {
+		
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaClient::createSequence " + offer + ", " + sequenceKey);
+		
 		setUpServiceClientAnonymousOperations (serviceClient);
 		
 		Options options = serviceClient.getOptions();
@@ -330,8 +354,7 @@ public class SandeshaClient {
 		// setting a new squenceKey if not already set.
 		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 
-		String	newSequenceKey = SandeshaUtil.getUUID();
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, newSequenceKey);
+		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 
@@ -357,26 +380,9 @@ public class SandeshaClient {
 		
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
-				
-		//the generated sequenceKey will be returned. Client can use this to work with this newly generated sequence.
 		
-		return newSequenceKey;
-	}
-
-	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)
-			throws SandeshaException {
-
-		Options options = serviceClient.getOptions();
-		if (options == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.optionsObjectNotSet));
-
-		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
-
-		createSequence(serviceClient, offer);
-
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaClient::createSequence");
 	}
 	
 	/**
@@ -617,8 +623,21 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		// Get a transaction to retrieve the properties
+		Transaction transaction = storageManager.getTransaction();
+		SequencePropertyBean sequenceIDBean = null;
+		
+		try
+		{			
+			sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
+					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);		
+		}
+		finally
+		{
+			// Commit the transaction as it was only a retrieve
+			transaction.commit();
+		}
+		
 		if (sequenceIDBean == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.sequenceIdBeanNotSet));
@@ -774,13 +793,26 @@ public class SandeshaClient {
 					SandeshaMessageKeys.cannotCloseSequenceNotActive, internalSequenceID));
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		if (sequenceIDBean == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.sequenceIdBeanNotSet));
+		
+		// Get a transaction for getting the sequence properties
+		Transaction transaction = storageManager.getTransaction();
 
+		SequencePropertyBean sequenceIDBean = null;
+		
+		try
+		{
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+			sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
+					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+			if (sequenceIDBean == null)
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.sequenceIdBeanNotSet));
+		}
+		finally
+		{
+			transaction.commit();
+		}
+		
 		String sequenceID = sequenceIDBean.getValue();
 
 		if (sequenceID == null)
@@ -1056,17 +1088,32 @@ public class SandeshaClient {
 		if (sequenceReport.getSequenceStatus() != SequenceReport.SEQUENCE_STATUS_ESTABLISHED)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noSequenceEstablished, internalSequenceID));
-
+		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-		if (sequenceIDBean == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.sequenceIdBeanNotSet));
 
+		// Get a transaction to obtain sequence information
+		Transaction transaction = storageManager.getTransaction();
+		
+		SequencePropertyBean sequenceIDBean = null;
+		
+		try
+		{
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+			sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
+					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+			if (sequenceIDBean == null)
+				throw new SandeshaException(SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.sequenceIdBeanNotSet));
+
+		}
+		finally
+		{
+			transaction.commit();
+		}
+		
 		String sequenceID = sequenceIDBean.getValue();
 
+		
 		if (sequenceID == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cannotFindSequenceID, sequenceIDBean.toString()));
@@ -1241,14 +1288,24 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
-		// Lookup the last failed to send error
-		SequencePropertyBean errorBean = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR);
-	
+		Transaction transaction = storageManager.getTransaction();
+
 		String resultString = null;
+    
+		try 
+		{		
+			// Lookup the last failed to send error
+			SequencePropertyBean errorBean = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR);
 		
-		// Get the value from the 
-		if (errorBean != null)
-			resultString = errorBean.getValue();
+			
+			// Get the value from the 
+			if (errorBean != null)
+				resultString = errorBean.getValue();
+		}
+		finally
+		{
+			transaction.commit();
+		}
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaClient::getLastSendError, " + resultString);
@@ -1289,15 +1346,26 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
-		// Lookup the last failed to send error
-		SequencePropertyBean errorTSBean = 
-			seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP);
+		// Create a transaction for the retrieve operation
+		Transaction transaction = storageManager.getTransaction();
 	
 		long resultTime = -1;
-		
-		// Get the value from the 
-		if (errorTSBean != null)
-			resultTime = Long.valueOf(errorTSBean.getValue()).longValue();
+
+		try
+		{		
+			// Lookup the last failed to send error
+			SequencePropertyBean errorTSBean = 
+				seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP);
+				
+			// Get the value from the 
+			if (errorTSBean != null)
+				resultTime = Long.valueOf(errorTSBean.getValue()).longValue();
+		}
+		finally
+		{
+			// commit the transaction as it was only a retrieve
+			transaction.commit();
+		}
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaClient::getLastSendErrorTimestamp, " + resultTime);

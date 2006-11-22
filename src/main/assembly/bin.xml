@@ -34,8 +34,6 @@
                 <include>LICENSE</include>
                 <include>NOTICE</include>
                 <include>README.txt</include>
-                <include>BUILDING.txt</include>
-                <include>licenses/*.*</include>
             </includes>
         </fileSet>
         <fileSet>

@@ -87,6 +87,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.1</version>
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
@@ -103,6 +104,7 @@
                     <!---->
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.1</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -145,6 +147,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.1</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -224,30 +227,10 @@
         <!-- core Axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-kernel</artifactId>
+            <artifactId>axis2</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-adb</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-adb-codegen</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-codegen</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-java2wsdl</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        
+                
         <!-- core Axiom -->
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
@@ -370,6 +353,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -383,29 +367,28 @@
             <version>${wsdl4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>${commons.fileupload.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>${servletapi.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>
             <version>${geronimo.spec.javamail.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-activation</artifactId>
             <version>${geronimo.spec.activation.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jms</artifactId>
             <version>${geronimo.spec.jms.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>annogen</groupId>
@@ -431,6 +414,7 @@
             <plugin>
                 <inherited>false</inherited>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.1</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
@@ -460,6 +444,7 @@
             <!--</plugin>-->
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
+                <version>2.0-beta-5</version>
                 <inherited>false</inherited>
             </plugin>
         </plugins>

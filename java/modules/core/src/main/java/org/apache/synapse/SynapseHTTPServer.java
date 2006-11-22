@@ -42,12 +42,8 @@ public class SynapseHTTPServer {
 
     public static void main(String[] args) throws Exception {
 
-        OptionsParser optionsParser = new OptionsParser(args);
-        args = optionsParser.getRemainingArgs();
-
         // first check if we should print usage
-        if ((optionsParser.isFlagSet('?') > 0) || (optionsParser.isFlagSet('h') > 0) ||
-                args == null || args.length == 0 || args.length > 1) {
+        if (args.length != 1 || !new File(args[0]).exists()) {
             printUsage();
         }
 
@@ -71,8 +67,12 @@ public class SynapseHTTPServer {
                 TransportInDescription trsIn = (TransportInDescription)
                     configctx.getAxisConfiguration().getTransportsIn().get(trp);
                 listenerManager.addListener(trsIn, false);
+                if (new QName("http").equals(trsIn.getName())) {
+                    System.out.println("[SynapseHTTPServer] Started HTTP on port : " +
+                        trsIn.getParameter("port").getValue());
+                }
             }
-            System.out.println("[SynapseHTTPServer] Started");
+            System.out.println("[SynapseHTTPServer] Ready");
 
         } catch (Throwable t) {
             t.printStackTrace();

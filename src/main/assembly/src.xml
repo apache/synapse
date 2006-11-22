@@ -36,7 +36,6 @@
                 <include>NOTICE</include>
                 <include>README.txt</include>
                 <include>BUILDING.txt</include>
-                <include>licenses/*.*</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -58,6 +57,8 @@
                 <exclude>**/.project</exclude>
                 <exclude>**/.wtpmodules</exclude>
                 <exclude>**/*.iml</exclude>
+                <exclude>**/.settings</exclude>
+                <exclude>**/.settings/**/*</exclude>
             </excludes>
         </fileSet>
     </fileSets>

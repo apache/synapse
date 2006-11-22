@@ -91,7 +91,7 @@ public class Util {
             serviceClient.engageModule(new QName("addressing"));
             serviceClient.setOptions(options);
 
-            OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
+            OMElement result = serviceClient.sendReceive(getQuote);
             System.out.println("Custom :: Stock price = $" +
                 StockQuoteHandler.parseCustomResponsePayload(result));
 
@@ -126,7 +126,7 @@ public class Util {
 
             OMElement result = serviceClient.sendReceive(getQuote);
             System.out.println("Custom :: Stock price = $" +
-                StockQuoteHandler.parseCustomResponsePayload(result.getFirstElement()));
+                StockQuoteHandler.parseCustomResponsePayload(result));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,7 +159,7 @@ public class Util {
 
             OMElement result = serviceClient.sendReceive(getQuote);
             System.out.println("Error :: Stock price = $" +
-                StockQuoteHandler.parseCustomResponsePayload(result.getFirstElement()));
+                StockQuoteHandler.parseCustomResponsePayload(result));
 
         } catch (Exception e) {
             if (e instanceof AxisFault) {

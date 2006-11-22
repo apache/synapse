@@ -19,10 +19,14 @@
 
 package org.apache.synapse.mediators.bsf.convertors;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.mediators.bsf.InlineScriptMediator;
 
 public class JSOMElementConvertorTest extends TestCase {
     
@@ -35,4 +39,13 @@ public class JSOMElementConvertorTest extends TestCase {
         assertEquals(XML, om.toString());
     }
 
+    public void testFromScript() throws Exception {
+        InlineScriptMediator mediator = new InlineScriptMediator("xml.js", "mc.setPayloadXML(<a><b>petra</b></a>);");
+        mediator.init();
+        TestMessageContext mc = TestUtils.getTestContext("<foo/>");
+        mediator.mediate(mc);
+        Iterator iterator = mc.getEnvelope().getChildElements();
+        iterator.next();
+        assertEquals(XML, ((OMElement) iterator.next()).getFirstElement().toString());
+    }
 }

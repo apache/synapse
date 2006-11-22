@@ -122,21 +122,16 @@ public class StockQuoteHandler {
      * @return
      * @throws javax.xml.stream.XMLStreamException
      *
-     *  <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-     *  <soap:Body>
      *      <CheckPriceResponse xmlns="http://ws.invesbot.com/" >
      *          <Code>IBM</Code>
      *          <Price>82.90</Price>
      *      </CheckPriceResponse>
-     *  </soap:Body>
-     *  </soap:Envelope>
      */
     public static String parseCustomResponsePayload(OMElement result) throws Exception {
 
-        OMElement chkPResp = result.getFirstChildWithName(
-            new QName("http://www.apache-synapse.org/test", "CheckPriceResponse"));
-        if (chkPResp != null) {
-            OMElement price = chkPResp.getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "Price"));
+        OMElement price = result.getFirstChildWithName(
+            new QName("http://www.apache-synapse.org/test", "Price"));
+        if (price != null) {
             return price.getText();
         } else {
             throw new Exception("Unexpected response : " + result);

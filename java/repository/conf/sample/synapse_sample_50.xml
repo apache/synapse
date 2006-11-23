@@ -19,7 +19,7 @@
 
 <synapse xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- illustration of simple properties, and reusable endpoints and sequences -->
+    <!-- Connecting to endpoints with WS-Security for outgoing messages -->
     <definitions>
     		<set-property name="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
     		

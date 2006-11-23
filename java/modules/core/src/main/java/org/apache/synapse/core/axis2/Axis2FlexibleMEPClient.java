@@ -146,13 +146,16 @@ public class Axis2FlexibleMEPClient {
             MessageContext responseReceived =
                 mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
-            MessageContext response = Utils.createOutMessageContext(originalInMsgCtx);
-            response.setEnvelope(removeAddressingHeaders(responseReceived));
+            if (responseReceived != null && responseReceived.getEnvelope() != null) {
+                MessageContext response = Utils.createOutMessageContext(originalInMsgCtx);
+                response.setEnvelope(removeAddressingHeaders(responseReceived));
+                response.setServerSide(true);
+                response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+                return response;
 
-            response.setServerSide(true);
-            response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-
-            return response;
+            } else {
+                return null;
+            }
         }
     }
 

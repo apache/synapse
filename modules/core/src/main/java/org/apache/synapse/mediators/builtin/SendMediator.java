@@ -83,9 +83,9 @@ public class SendMediator extends AbstractMediator {
             }
             
             if (singleEndpoint.isForcePOX()) {
-            	synCtx.setDoingREST(true);
+            	synCtx.setDoingPOX(true);
             } else if (singleEndpoint.isForceSOAP()) {
-            	synCtx.setDoingREST(false);
+            	synCtx.setDoingPOX(false);
             }
             if (singleEndpoint.isUseSeparateListener()) 
             {

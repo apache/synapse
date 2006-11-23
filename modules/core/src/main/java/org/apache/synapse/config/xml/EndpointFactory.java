@@ -33,11 +33,12 @@ import javax.xml.namespace.QName;
 /**
  * Creates an Endpoint instance using the XML fragment specification
  * 
- * <endpoint name="string" address="url">
+ * <endpoint name="string" address="url" force="soap|pox">
  *  .. extensibility ..
  * 
  * <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
  * separateListener="true|false"/>+
+ * 
  * 
  * </endpoint>
  */
@@ -90,8 +91,8 @@ public class EndpointFactory implements XMLToObjectMapper {
 		if (force!=null) 
 		{
 			String forceValue = force.getAttributeValue().trim().toLowerCase();
-			if (forceValue.equals("rest")) {
-				endpoint.setForceREST(true);
+			if (forceValue.equals("pox")) {
+				endpoint.setForcePOX(true);
 			} else if (forceValue.equals("soap")) {
 				endpoint.setForceSOAP(true);
 			} else {

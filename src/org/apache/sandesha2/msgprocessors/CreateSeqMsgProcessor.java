@@ -17,14 +17,11 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -226,6 +223,27 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				log.debug(message);
 				throw new AxisFault(message);
 			}
+			
+			// Add this sequence to the list of inbound sequences
+			SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
+					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
+					Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+
+			if (incomingSequenceListBean == null) {
+				incomingSequenceListBean = new SequencePropertyBean();
+				incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
+				incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+				incomingSequenceListBean.setValue(null);
+
+				// this get inserted before
+				seqPropMgr.insert(incomingSequenceListBean);
+			}
+
+			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
+			incomingSequenceList.add(newSequenceId);
+			incomingSequenceListBean.setValue(incomingSequenceList.toString());
+			seqPropMgr.update(incomingSequenceListBean);
+
 			
 			//TODO add createSequenceResponse message as the referenceMessage to the NextMsgBean.
 			

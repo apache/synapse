@@ -261,32 +261,6 @@ public class SequenceProcessor {
 		
 		if (inOrderInvocation && !msgNoPresentInList) {
 
-			SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
-					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-					Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-
-			if (incomingSequenceListBean == null) {
-				ArrayList incomingSequenceList = new ArrayList();
-				incomingSequenceListBean = new SequencePropertyBean();
-				incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
-				incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-				incomingSequenceListBean.setValue(incomingSequenceList.toString());
-
-				// this get inserted before
-				seqPropMgr.insert(incomingSequenceListBean);
-			}
-
-			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
-
-			// Adding current sequence to the incoming sequence List.
-			if (!incomingSequenceList.contains(sequenceId)) {
-				incomingSequenceList.add(sequenceId);
-
-				// saving the property.
-				incomingSequenceListBean.setValue(incomingSequenceList.toString());
-				seqPropMgr.update(incomingSequenceListBean);
-			}
-
 			// saving the message.
 			try {
 				storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());

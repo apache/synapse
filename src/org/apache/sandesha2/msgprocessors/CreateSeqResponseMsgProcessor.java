@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.msgprocessors;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
@@ -168,7 +169,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 
 			String offeredSequenceId = (String) offeredSequenceBean.getValue();
-
+			
 			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
 			SequencePropertyBean acksToBean = new SequencePropertyBean();
 			acksToBean.setName(Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
@@ -245,6 +246,26 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 						Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
 				sequencePropMgr.insert(newToken);
 			}
+			
+			// Add the offered sequence into the inbound sequences list
+			SequencePropertyBean incomingSequenceListBean = sequencePropMgr.retrieve(
+					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
+					Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+
+			if (incomingSequenceListBean == null) {
+				incomingSequenceListBean = new SequencePropertyBean();
+				incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
+				incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+				incomingSequenceListBean.setValue(null);
+
+				// this get inserted before
+				sequencePropMgr.insert(incomingSequenceListBean);
+			}
+
+			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
+			incomingSequenceList.add(offeredSequenceId);
+			incomingSequenceListBean.setValue(incomingSequenceList.toString());
+			sequencePropMgr.update(incomingSequenceListBean);
 		}
 
 		SenderBean target = new SenderBean();

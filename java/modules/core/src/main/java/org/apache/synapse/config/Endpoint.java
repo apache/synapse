@@ -49,7 +49,7 @@ public class Endpoint {
     /** use a separate listener - implies addressing is on **/
 	private boolean useSeparateListener = false;
 	/** force REST on **/
-	private boolean forceREST = false;
+	private boolean forcePOX = false;
 	/** force SOAP on **/
 	private boolean forceSOAP = false;
 	
@@ -190,12 +190,12 @@ public class Endpoint {
 		return useSeparateListener;
 	}
 
-	public void setForceREST(boolean forceREST) {
-		this.forceREST = forceREST;
+	public void setForcePOX(boolean forcePOX) {
+		this.forcePOX = forcePOX;
 	}
 
-	public boolean isForceREST() {
-		return forceREST;
+	public boolean isForcePOX() {
+		return forcePOX;
 	}
 
 	public void setForceSOAP(boolean forceSOAP) {

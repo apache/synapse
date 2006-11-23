@@ -68,8 +68,8 @@ public class EndpointSerializer {
                 "ref", nullNS, endpt.getRef()));
             
         } else {
-        	if (endpt.isForceREST()) {
-        		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "rest"));
+        	if (endpt.isForcePOX()) {
+        		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "pox"));
         	} else if (endpt.isForceSOAP()) {
         		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "soap"));
         	}

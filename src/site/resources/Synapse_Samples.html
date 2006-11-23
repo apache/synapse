@@ -488,7 +488,7 @@ Synapse from the following log messages:</p>
 <p>The cache timeout could be tuned appropriately by configuring the URL
 registry to suite the environment and the needs.</p>
 
-<h2>Sample 9:</h2>
+<h2>Sample 10:</h2>
 
 <p><strong>Objective: Introduction to dynamic endpoints with a
 Registry</strong></p>
@@ -513,6 +513,28 @@ cached value expires, the Registry loads the new definition of the endpoint,
 and then the messages can be seen being routed to the
 SimpleStockQuoteService1.</p>
 <pre>SimpleStockQuoteService 1 :: Generating quote for : IBM</pre>
+
+<p></p>
+
+<h2>Sample 11:</h2>
+
+<p><strong>Objective: A full registry based configuration</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 11: i.e. synapse -sample 11<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This example shows a full registry based Synapse configuration. The
+Synapse configuration held on a node hosting Synapse simply points to the
+registry and looks up the actual configuration by requesting the key
+''synapse.xml'. This could be used to host a configuration on a file system
+or http server based registry, and allow a cluster of Synapse instances to
+load the configuration from this registry.</p>
+
+<p>Using 'ant stockquote' you would notice that the 'synapse.xml'
+configuration has been loaded from the root of the Simple URL based
+registry.</p>
 
 <p></p>
 

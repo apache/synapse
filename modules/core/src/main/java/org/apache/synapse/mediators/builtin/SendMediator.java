@@ -82,7 +82,7 @@ public class SendMediator extends AbstractMediator {
                 eprAddress = singleEndpoint.getAddress().toString();
             }
 
-            if (singleEndpoint.isForceREST()) {
+            if (singleEndpoint.isForcePOX()) {
             	synCtx.setDoingREST(true);
             } else if (singleEndpoint.isForceSOAP()) {
             	synCtx.setDoingREST(false);

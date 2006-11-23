@@ -488,6 +488,32 @@ Synapse from the following log messages:</p>
 <p>The cache timeout could be tuned appropriately by configuring the URL
 registry to suite the environment and the needs.</p>
 
+<h2>Sample 9:</h2>
+
+<p><strong>Objective: Introduction to dynamic endpoints with a
+Registry</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 10: i.e. synapse -sample 10<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService and the
+SimpleStockQuoteervice1 (Refer steps above)</p>
+
+<p>This example introduces dynamic endpoints, where the definition of an
+endpoint is stored in a Registry. To follow this example execute the stock
+quote client as 'ant stockquote' and see that the message is routed to the
+SimpleStockQuoteService on the Axis2 instance. Repeat the above example and
+notice that the endpoint is cached and reused by Synapse - similarly to
+example # 8. </p>
+<pre>SimpleStockQuoteService :: Generating quote for : IBM</pre>
+
+<p>Now edit the repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml
+definition and update the address to
+"http://localhost:9000/axis2/services/SimpleStockQuoteService1". After the
+cached value expires, the Registry loads the new definition of the endpoint,
+and then the messages can be seen being routed to the
+SimpleStockQuoteService1.</p>
+<pre>SimpleStockQuoteService 1 :: Generating quote for : IBM</pre>
+
 <p></p>
 
 <h2>Sample 50:</h2>

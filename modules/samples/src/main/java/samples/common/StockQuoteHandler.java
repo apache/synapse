@@ -91,6 +91,39 @@ public class StockQuoteHandler {
     }
 
     /**
+     * Create a new order for a quantiry of a stock at a given price
+     * <m:placeOrder xmlns:m="http://services.samples/xsd">
+     *	  <m:order>
+     *	      <m:price>3.141593E0</m:price>
+     *	      <m:quantity>4</m:quantity>
+     *	      <m:symbol>IBM</m:symbol>
+     *    </m:order>
+     * 	</m:placeOrder>
+     *
+     * @param purchPrice the purchase price
+     * @param qty the quantiry
+     * @param symbol the stock
+     * @return an OMElement payload for the order
+     */
+    public static OMElement createPlaceOrderPayload(double purchPrice, int qty, String symbol) {
+        OMFactory factory   = OMAbstractFactory.getOMFactory();
+        OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
+        OMElement placeOrder= factory.createOMElement("placeOrder", ns);
+        OMElement order     = factory.createOMElement("order", ns);
+        OMElement price     = factory.createOMElement("price", ns);
+        OMElement quantity  = factory.createOMElement("quantity", ns);
+        OMElement symb      = factory.createOMElement("symbol", ns);
+        price.setText(Double.toString(purchPrice));
+        quantity.setText(Integer.toString(qty));
+        symb.setText(symbol);
+        order.addChild(price);
+        order.addChild(quantity);
+        order.addChild(symb);
+        placeOrder.addChild(order);        
+        return placeOrder;
+    }
+
+    /**
      * Digests the standard StockQuote response and extracts the last trade price
      * @param result
      * @return

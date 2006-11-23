@@ -449,6 +449,47 @@ instance.</p>
 
 <p></p>
 
+<h2>Sample 9:</h2>
+
+<p><strong>Objective: Introduction to dynamic sequences with a
+Registry</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 9: i.e. synapse -sample 9<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
+above)</p>
+
+<p>This example introduces the dynamic behaviour of Synapse through the use
+of a Registry. Synapse supports dynamic definitions for sequences, the main
+rules, endpoints and as seen before resources and properties. In this example
+we define a Synapse configuration which references a sequence definition
+specified as a registry key. The registry key resolves to the actual content
+of the sequence which would be loaded dynamically by Synapse at runtime, and
+cached accordingly as per its registry definition. Once the cache expires,
+Synapse would recheck the meta information for the definition and re-load the
+sequence definition if necessary and re-cache it again.</p>
+
+<p>Once Synapse is started, execute the stock quote client as 'ant
+stockquote'. You will notice that that Synapse fetches the definition of the
+sequence from the registry and executes its rules as follows:</p>
+<pre>DEBUG SequenceMediator - Sequence mediator &lt;anonymous&gt; :: mediate()<br>INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml<br>.....<br>INFO LogMediator - message = *** Test Message 1 ***<br>...</pre>
+
+<p>Now if you execute the client immidiately (i.e. within 15 seconds of the
+last execution) you will notice that the sequence was not reloaded. If you
+now edit the repository/conf/sample/resources/sequence/dynamic_seq_1.xml and
+edit the log message to read as "*** Test Message 2 ***" and execute the
+client again, you will notice that the new message is not yet visible (i.e.
+if you execute this within 15 seconds of loading the resource for the first
+time) However, after 15 seconds have elapsed since the original caching of
+the sequence, you will notice that the new sequence is loaded and executed by
+Synapse from the following log messages:</p>
+<pre>DEBUG SequenceMediator - Sequence mediator &lt;anonymous&gt; :: mediate()<br>DEBUG AbstractRegistry - Cached object has expired for key : sequence/dynamic_seq_1.xml<br>DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : sequence/dynamic_seq_1.xml<br>INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml<br>...<br>INFO LogMediator - message = *** Test Message 2 ***<br>...</pre>
+
+<p>The cache timeout could be tuned appropriately by configuring the URL
+registry to suite the environment and the needs.</p>
+
+<p></p>
+
 <h2>Sample 50:</h2>
 
 <p><strong>Objective: Connecting to endpoints with WS-Security for outgoing

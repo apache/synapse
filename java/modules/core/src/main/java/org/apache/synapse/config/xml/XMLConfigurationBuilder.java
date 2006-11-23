@@ -19,10 +19,7 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMContainer;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Util;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
@@ -100,10 +98,30 @@ public class XMLConfigurationBuilder {
             }
         }
 
+        Iterator regs = root.getChildrenWithName(Constants.REGISTRY_ELT);
+        if (regs != null) {
+            while (regs.hasNext()) {
+                Object o = regs.next();
+                if (o instanceof OMElement) {
+                    Registry reg = RegistryFactory.createRegistry((OMElement) o);
+                    config.addRegistry(reg.getRegistryName(), reg);
+                } else {
+                    handleException("Invalid registry declaration in configuration");
+                }
+            }
+        }
+
         OMElement rules = root.getFirstChildWithName(Constants.RULES_ELT);
 
         if (rules == null) {
-            handleException("A valid Synapse configuration MUST specify the main mediator using the <rules> element");
+            if (regs == null) {
+                handleException("A valid Synapse configuration MUST specify the main mediator using the <rules> element");
+            } else {
+                // this is a fully dynamic configuration. look for synapse.xml at thr registry root
+                OMNode cfg = config.getRegistry(null).lookup("synapse.xml");
+                return getConfiguration(Util.getStreamSource(cfg).getInputStream());
+            }
+
         } else {
             OMAttribute key = rules.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
             if (key != null) {
@@ -120,19 +138,6 @@ public class XMLConfigurationBuilder {
                     handleException("Invalid configuration, the main mediator specified by the <rules> element is empty");
                 } else {
                     config.setMainMediator(sm);
-                }
-            }
-        }
-
-        Iterator regs = root.getChildrenWithName(Constants.REGISTRY_ELT);
-        if (regs != null) {
-            while (regs.hasNext()) {
-                Object o = regs.next();
-                if (o instanceof OMElement) {
-                    Registry reg = RegistryFactory.createRegistry((OMElement) o);
-                    config.addRegistry(reg.getRegistryName(), reg);
-                } else {
-                    handleException("Invalid registry declaration in configuration");
                 }
             }
         }

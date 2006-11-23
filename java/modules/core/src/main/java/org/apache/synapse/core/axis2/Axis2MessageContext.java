@@ -187,11 +187,11 @@ public class Axis2MessageContext implements MessageContext {
         axis2MessageContext.setDoingMTOM(b);
     }
 
-    public boolean isDoingREST() {
+    public boolean isDoingPOX() {
         return axis2MessageContext.isDoingREST();
     }
 
-    public void setDoingREST(boolean b) {
+    public void setDoingPOX(boolean b) {
         axis2MessageContext.setDoingREST(b);
     }
 

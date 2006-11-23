@@ -101,7 +101,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 // TODO this may be really strange but true.. unless you call the below, sometimes
                 // it results in an unbound URI exception for no credible reason - needs more
                 // investigation seems like a woodstox issue. Use hack for now
-                axisOutMsgContext.getEnvelope().build();
+                //axisOutMsgContext.getEnvelope().build();
                 
                 log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
 

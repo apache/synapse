@@ -28,6 +28,8 @@ import org.apache.axis2.description.TransportInDescription;
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.util.Iterator;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * Starts all transports as specified on the axis2.xml
@@ -60,6 +62,9 @@ public class SynapseHTTPServer {
                 listenerManager.init(configctx);
             }
 
+            // decide on HTTP port to execute
+            selectPort(configctx);
+
             Iterator iter = configctx.getAxisConfiguration().
                 getTransportsIn().keySet().iterator();
             while (iter.hasNext()) {
@@ -77,6 +82,38 @@ public class SynapseHTTPServer {
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("[SynapseHTTPServer] Startup failed...");
+        }
+    }
+
+    private static void selectPort(ConfigurationContext configCtx) {
+        // check if configured port is available
+        TransportInDescription trsIn = (TransportInDescription)
+            configCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+
+        if (trsIn != null) {
+
+            int port = Integer.parseInt(trsIn.getParameter("port").getValue().toString());
+
+            while (true) {
+                ServerSocket sock = null;
+                try {
+                    sock = new ServerSocket(port);
+                    trsIn.getParameter("port").setValue(Integer.toString(port));
+                    break;
+                } catch (Exception e) {
+                    if (port == 8080) {
+                        port = 8008;
+                    } else {
+                        port++;
+                    }
+                } finally {
+                    if (sock != null) {
+                        try {
+                            sock.close();
+                        } catch (Exception e) {}
+                    }
+                }
+            }
         }
     }
 

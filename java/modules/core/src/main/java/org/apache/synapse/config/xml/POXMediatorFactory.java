@@ -22,7 +22,8 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.builtin.RestMediator;
+import org.apache.synapse.mediators.builtin.POXMediator;
+
 
 import javax.xml.namespace.QName;
 
@@ -33,12 +34,12 @@ import javax.xml.namespace.QName;
  * &lt;rest value="true|false"/&gt;
  * </pre>
  */
-public class RestMediatorFactory implements MediatorFactory {
+public class POXMediatorFactory implements MediatorFactory {
 
-    private static final QName REST_Q = new QName(Constants.SYNAPSE_NAMESPACE, "rest");
+    private static final QName POX_Q = new QName(Constants.SYNAPSE_NAMESPACE, "pox");
 
     public Mediator createMediator(OMElement el) {
-		RestMediator restMediator = new RestMediator();
+		POXMediator restMediator = new POXMediator();
 		OMAttribute value = el.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
 		if (value != null) {
 			String valueString = value.getAttributeValue();
@@ -52,6 +53,6 @@ public class RestMediatorFactory implements MediatorFactory {
     }
 
     public QName getTagQName() {
-        return REST_Q;
+        return POX_Q;
     }
 }

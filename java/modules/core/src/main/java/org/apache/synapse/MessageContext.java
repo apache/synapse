@@ -191,16 +191,16 @@ public interface MessageContext {
     public void setDoingMTOM(boolean b);
 
     /**
-     * Is this message over REST?
-     * @return true if over REST
+     * Is this message over POX?
+     * @return true if over POX
      */
-    public boolean isDoingREST();
+    public boolean isDoingPOX();
 
     /**
      * Marks this message as over REST
      * @param b true to mark as REST
      */
-    public void setDoingREST(boolean b);
+    public void setDoingPOX(boolean b);
 
     /**
      * Is this message a SOAP 1.1 message?

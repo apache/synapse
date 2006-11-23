@@ -73,6 +73,7 @@ public class SynapseHTTPServer {
                     configctx.getAxisConfiguration().getTransportsIn().get(trp);
                 listenerManager.addListener(trsIn, false);
                 if (new QName("http").equals(trsIn.getName())) {
+                	
                     System.out.println("[SynapseHTTPServer] Started HTTP on port : " +
                         trsIn.getParameter("port").getValue());
                 }
@@ -101,6 +102,7 @@ public class SynapseHTTPServer {
                     trsIn.getParameter("port").setValue(Integer.toString(port));
                     break;
                 } catch (Exception e) {
+                	System.out.println("[SynapseHTTPServer] Port "+port+" already in use. Trying alternate");
                     if (port == 8080) {
                         port = 8008;
                     } else {

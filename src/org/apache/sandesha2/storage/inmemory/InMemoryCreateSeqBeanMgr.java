@@ -18,10 +18,6 @@
 package org.apache.sandesha2.storage.inmemory;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
@@ -33,96 +29,61 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMBean;
 
-public class InMemoryCreateSeqBeanMgr implements CreateSeqBeanMgr {
+public class InMemoryCreateSeqBeanMgr extends InMemoryBeanMgr implements CreateSeqBeanMgr {
 
 	private static final Log log = LogFactory.getLog(InMemoryCreateSeqBeanMgr.class);
-	private Hashtable table = null;
-	
 
-	public InMemoryCreateSeqBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
-		if (obj != null) {
-			table = (Hashtable) obj;
-		} else {
-			table = new Hashtable();
-			context.setProperty(Sandesha2Constants.BeanMAPs.CREATE_SEQUECE, table);
-		}
+	public InMemoryCreateSeqBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
+		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
 	}
 
-	public synchronized boolean insert(CreateSeqBean bean) {
-		table.put(bean.getCreateSeqMsgID(), bean);
-		return true;
+	public boolean insert(CreateSeqBean bean) {
+		return super.insert(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public synchronized boolean delete(String msgId) {
-		return table.remove(msgId) != null;
+	public boolean delete(String msgId) {
+		return super.delete(msgId);
 	}
 
-	public synchronized CreateSeqBean retrieve(String msgId) {
-		return (CreateSeqBean) table.get(msgId);
+	public CreateSeqBean retrieve(String msgId) {
+		return (CreateSeqBean) super.retrieve(msgId);
 	}
 
-	public synchronized boolean update(CreateSeqBean bean) {
-		if (table.get(bean.getCreateSeqMsgID())==null)
-			return false;
-
-		return table.put(bean.getCreateSeqMsgID(), bean) != null;
+	public boolean update(CreateSeqBean bean) {
+		return super.update(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public synchronized List find(CreateSeqBean bean) {
-		ArrayList beans = new ArrayList();
-		if (bean == null)
-			return beans;
-
-		Iterator iterator = table.values().iterator();
-
-		CreateSeqBean temp;
-		while (iterator.hasNext()) {
-			temp = (CreateSeqBean) iterator.next();
-
-			boolean equal = true;
-
-			if (bean.getCreateSeqMsgID() != null
-					&& !bean.getCreateSeqMsgID().equals(
-							temp.getCreateSeqMsgID()))
-				equal = false;
-
-			if (bean.getSequenceID() != null
-					&& !bean.getSequenceID().equals(temp.getSequenceID()))
-				equal = false;
-
-			if (bean.getInternalSequenceID() != null
-					&& !bean.getInternalSequenceID().equals(
-							temp.getInternalSequenceID()))
-				equal = false;
-
-			if (equal)
-				beans.add(temp);
-
-		}
-		return beans;
-	}
-
-	public synchronized ResultSet find(String query) {
-		throw new UnsupportedOperationException(SandeshaMessageHelper.getMessage(
-				SandeshaMessageKeys.selectRSNotSupported));
+	public List find(CreateSeqBean bean) {
+		return super.find(bean);
 	}
 	
-	public synchronized CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
-		Collection coll = find(bean);
-		if (coll.size()>1) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.nonUniqueResult);
-			log.error(message);
-			throw new SandeshaException (message);
-		}
+	protected boolean match(RMBean matchInfo, RMBean candidate) {
+		boolean equal = true;
 		
-		Iterator iter = coll.iterator();
-		if (iter.hasNext())
-			return (CreateSeqBean) iter.next();
-		else 
-			return null;
+		CreateSeqBean bean = (CreateSeqBean) matchInfo;
+		CreateSeqBean temp = (CreateSeqBean) candidate;
+
+		if (bean.getCreateSeqMsgID() != null
+				&& !bean.getCreateSeqMsgID().equals(
+						temp.getCreateSeqMsgID()))
+			equal = false;
+
+		if (bean.getSequenceID() != null
+				&& !bean.getSequenceID().equals(temp.getSequenceID()))
+			equal = false;
+
+		if (bean.getInternalSequenceID() != null
+				&& !bean.getInternalSequenceID().equals(
+						temp.getInternalSequenceID()))
+			equal = false;
+
+		return equal;
+	}
+
+	public CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
+		return (CreateSeqBean) super.findUnique(bean);
 	}
 
 }

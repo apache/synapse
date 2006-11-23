@@ -19,6 +19,8 @@ package org.apache.sandesha2.storage.beans;
 
 import java.io.Serializable;
 
+import org.apache.sandesha2.storage.Transaction;
+
 /**
  * Defines a data bean used and managed by Sandesha2.
  */
@@ -26,7 +28,7 @@ import java.io.Serializable;
 public abstract class RMBean implements Serializable {
 		
 		private long id;
-		
+		private volatile Transaction transaction;
 		
 		public long getId() {
 			return id;
@@ -34,5 +36,12 @@ public abstract class RMBean implements Serializable {
 		
 		protected void setId(long id) {
 			this.id = id;
+		}
+		public Transaction getTransaction() {
+			return transaction;
+		}
+
+		public void setTransaction(Transaction transaction) {
+			this.transaction = transaction;
 		}
 }

@@ -17,9 +17,6 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,218 +28,144 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beans.RMBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.util.SandeshaUtil;
 
-public class InMemorySenderBeanMgr implements SenderBeanMgr {
+public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBeanMgr {
 	
 	private static final Log log = LogFactory.getLog(InMemorySenderBeanMgr.class);
-	private Hashtable table = null;
 
-	public InMemorySenderBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.RETRANSMITTER);
-		if (obj != null) {
-			table = (Hashtable) obj;
-		} else {
-			table = new Hashtable();
-			context.setProperty(Sandesha2Constants.BeanMAPs.RETRANSMITTER, table);
-		}
+	public InMemorySenderBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
+		super(mgr, context, Sandesha2Constants.BeanMAPs.RETRANSMITTER);
 	}
 
-	public synchronized boolean delete(String MessageId) {
-		return table.remove(MessageId) != null;
+	public boolean delete(String MessageId) {
+		return super.delete(MessageId);
 	}
 
-	public synchronized SenderBean retrieve(String MessageId) {
-		return (SenderBean) table.get(MessageId);
+	public SenderBean retrieve(String MessageId) {
+		return (SenderBean) super.retrieve(MessageId);
 	}
 
-	public synchronized boolean insert(SenderBean bean) throws SandeshaStorageException {
+	public boolean insert(SenderBean bean) throws SandeshaStorageException {
 		if (bean.getMessageID() == null)
 			throw new SandeshaStorageException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.nullMsgId));
-		table.put(bean.getMessageID(), bean);
-		return true;
+		return super.insert(bean.getMessageID(), bean);
 	}
 
-	public synchronized List find(String internalSequenceID) {
-		
-		ArrayList arrayList = new ArrayList ();
-		if (internalSequenceID==null || "".equals(internalSequenceID))
-			return arrayList;
-		
-		Iterator iterator = table.keySet().iterator();
-		
-		while (iterator.hasNext()) {
-			SenderBean senderBean = (SenderBean) table.get(iterator.next());
-			if (internalSequenceID.equals(senderBean.getInternalSequenceID())) 
-					arrayList.add(senderBean);
-		}
-		
-		return arrayList;
-	}
-
-	public synchronized List find(SenderBean bean) {
-		ArrayList beans = new ArrayList();
-		Iterator iterator = ((Hashtable) table).values().iterator();
-
-		SenderBean temp;
-		while (iterator.hasNext()) {
-
-			temp = (SenderBean) iterator.next();
-
-			
-			boolean add = true;
-
-			if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
-				add = false;
-
-			if (bean.getTimeToSend() > 0
-					&& bean.getTimeToSend() != temp.getTimeToSend())
-				add = false;
-
-			if (bean.getMessageID() != null
-					&& !bean.getMessageID().equals(temp.getMessageID()))
-				add = false;
-
-			if (bean.getInternalSequenceID() != null
-					&& !bean.getInternalSequenceID().equals(
-							temp.getInternalSequenceID()))
-				add = false;
-
-			if (bean.getMessageNumber() > 0
-					&& bean.getMessageNumber() != temp.getMessageNumber())
-				add = false;
-
-			if (bean.getMessageType() != Sandesha2Constants.MessageTypes.UNKNOWN
-					&& bean.getMessageType() != temp.getMessageType())
-				add = false;
-			
-			if (bean.isSend() != temp.isSend())
-				add = false;
-
-			if (bean.isReSend() != temp.isReSend())
-				add = false;
-			
-			if (add)
-				beans.add(temp);
-		}
-
-		return beans;
-	}
-
-	public synchronized SenderBean getNextMsgToSend() {
-		
-		Iterator iterator = table.keySet().iterator();
-
-		//TODO
-		//pick a random sequence out of the sequences to be sent.
-		
-		
-		long lowestAppMsgNo = 0;
-		while (iterator.hasNext()) {
-			Object key = iterator.next();
-			SenderBean temp = (SenderBean) table.get(key);
-			if (temp.isSend()) {
-				long timeToSend = temp.getTimeToSend();
-				long timeNow = System.currentTimeMillis();
-				if ((timeNow >= timeToSend)) {
-					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
-						long msgNo = temp.getMessageNumber();
-						if (lowestAppMsgNo==0) {
-							lowestAppMsgNo=msgNo;
-						}else {
-							if (msgNo<lowestAppMsgNo)
-								lowestAppMsgNo = msgNo;
-						}
-					}
-				}
-			}
-		}
-		
-		iterator = table.keySet().iterator();	
-		while (iterator.hasNext()) {
-			Object key = iterator.next();
-			SenderBean temp = (SenderBean) table.get(key);
-
-			if (temp.isSend()) {
-
-				long timeToSend = temp.getTimeToSend();
-				long timeNow = System.currentTimeMillis();
-				if ((timeNow >= timeToSend)) {
-					boolean valid = false;
-					if (temp.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
-						if (temp.getMessageNumber()==lowestAppMsgNo)
-							valid = true;
-					}else {
-						valid = true;
-					}
-					
-					if (valid) {
-					    updateNextSendingTime (temp);
-					    return temp;
-					}
-				}
-			}
-		}
-		
-		return null;
-	}
-
-	private void updateNextSendingTime (SenderBean bean) {
-		
+	public List find(String internalSequenceID) {
+		SenderBean temp = new SenderBean();
+		temp.setInternalSequenceID(internalSequenceID);
+		return super.find(temp);
 	}
 	
-	private synchronized ArrayList findBeansWithMsgNo(ArrayList list, long msgNo) {
-		ArrayList beans = new ArrayList();
+	protected boolean match(RMBean matchInfo, RMBean candidate) {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemorySenderBeanMgr::match");
+		SenderBean bean = (SenderBean)matchInfo;
+		SenderBean temp = (SenderBean) candidate;
+		
+		boolean add = true;
 
-		Iterator it = list.iterator();
-		while (it.hasNext()) {
-			SenderBean bean = (SenderBean) it.next();
-			if (bean.getMessageNumber() == msgNo)
-				beans.add(bean);
+		if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey())) {
+			log.debug("MessageContextRefKey didn't match");
+			add = false;
 		}
-
-		return beans;
-	}
-
-	public synchronized boolean update(SenderBean bean) {
-		if (table.get(bean.getMessageID())==null)
-			return false;
-
-		return true; //No need to update. Being a reference does the job.
-	}
-	
-	public synchronized SenderBean findUnique(SenderBean bean) throws SandeshaException {
-		Collection coll = find(bean);
-		if (coll.size()>1) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.nonUniqueResult);
-			log.error(message);
-			throw new SandeshaException (message);
+		// Time is a bit special - we match all the beans that should be sent
+		// before the moment in time that the match criteria give us.
+		if (bean.getTimeToSend() > 0
+				&& bean.getTimeToSend() < temp.getTimeToSend()) {
+			log.debug("MessageContextRefKey didn't match");
+			add = false;
 		}
 		
-		Iterator iter = coll.iterator();
-		if (iter.hasNext())
-			return (SenderBean) iter.next();
-		else 
-			return null;
+		if (bean.getMessageID() != null
+				&& !bean.getMessageID().equals(temp.getMessageID())) {
+			log.debug("MessageID didn't match");
+			add = false;
+		}
+		
+		if (bean.getInternalSequenceID() != null
+				&& !bean.getInternalSequenceID().equals("")
+				&& !bean.getInternalSequenceID().equals(
+						temp.getInternalSequenceID())) {
+			log.debug("InternalSequenceID didn't match");
+			add = false;
+		}
+		
+		if (bean.getMessageNumber() > 0
+				&& bean.getMessageNumber() != temp.getMessageNumber()) {
+			log.debug("MessageNumber didn't match");
+			add = false;
+		}
+		
+		if (bean.getMessageType() != Sandesha2Constants.MessageTypes.UNKNOWN
+				&& bean.getMessageType() != temp.getMessageType()) {
+			log.debug("MessageType didn't match");
+			add = false;
+		}
+
+		if (bean.isSend() != temp.isSend()) {
+			log.debug("isSend didn't match");
+			add = false;
+		}
+
+		// Do not use the isReSend flag to match messages, as it can stop us from
+		// detecting RM messages during 'getNextMsgToSend'
+		//if (bean.isReSend() != temp.isReSend()) {
+		//	log.debug("isReSend didn't match");
+		//	add = false;
+		//}
+
+		if(log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanMgr::match, " + add);
+		return add;
 	}
 
-	public synchronized SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {
+	public List find(SenderBean bean) {
+		return super.find(bean);
+	}
+
+	public SenderBean getNextMsgToSend() {
+		// Set up match criteria
+		SenderBean matcher = new SenderBean();
+		matcher.setSend(true);
+		matcher.setTimeToSend(System.currentTimeMillis());
 		
-		Iterator iter = table.keySet().iterator();
-		while (iter.hasNext()) {
-			Object key = iter.next();
-			SenderBean bean = (SenderBean) table.get(key);
-			if (bean.getMessageContextRefKey().equals(messageContextRefKey)) {
-				return bean;
+		List matches = super.find(matcher);
+		
+		// We either return an application message or an RM message. If we find
+		// an application message first then we carry on through the list to be
+		// sure that we send the lowest app message avaliable. If we hit a RM
+		// message first then we are done.
+		SenderBean result = null;
+		Iterator i = matches.iterator();
+		while(i.hasNext()) {
+			SenderBean bean = (SenderBean) i.next();
+			if(bean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+				long number = bean.getMessageNumber();
+				if(result == null || result.getMessageNumber() > number) {
+					result = bean;
+				}
+			} else if(result == null) {
+				result = bean;
+				break;
 			}
 		}
 		
-		return null;
+		return result;
+	}
+	
+	public boolean update(SenderBean bean) {
+		return super.update(bean.getMessageID(), bean);
+	}
+	
+	public SenderBean findUnique(SenderBean bean) throws SandeshaException {
+		return (SenderBean) super.findUnique(bean);
+	}
+
+	public SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {
+		throw new UnsupportedOperationException("Deprecated method");
 	}
 	
 	

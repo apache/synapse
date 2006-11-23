@@ -17,12 +17,15 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -33,9 +36,12 @@ import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 
 public class InMemoryStorageManager extends StorageManager {
+
+	private static Log log = LogFactory.getLog(InMemoryStorageManager.class);
 
 	private static InMemoryStorageManager instance = null;
     private final String MESSAGE_MAP_KEY = "Sandesha2MessageMap";
@@ -44,21 +50,44 @@ public class InMemoryStorageManager extends StorageManager {
     private SequencePropertyBeanMgr sequencePropertyBeanMgr = null;
     private SenderBeanMgr senderBeanMgr = null;
     private InvokerBeanMgr invokerBeanMgr = null;
+    private HashMap transactions = new HashMap();
     
 	public InMemoryStorageManager(ConfigurationContext context) {
 		super(context);
 		
-		this.createSeqBeanMgr = new InMemoryCreateSeqBeanMgr (context);
-		this.nextMsgBeanMgr = new InMemoryNextMsgBeanMgr (context);
-		this.senderBeanMgr = new InMemorySenderBeanMgr (context);
-		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (context);
-		this.sequencePropertyBeanMgr = new InMemorySequencePropertyBeanMgr (context);
+		this.createSeqBeanMgr = new InMemoryCreateSeqBeanMgr (this, context);
+		this.nextMsgBeanMgr = new InMemoryNextMsgBeanMgr (this, context);
+		this.senderBeanMgr = new InMemorySenderBeanMgr (this, context);
+		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (this, context);
+		this.sequencePropertyBeanMgr = new InMemorySequencePropertyBeanMgr (this, context);
 	}
 
 	public Transaction getTransaction() {
-		return new InMemoryTransaction();
+		Transaction result = null;
+		synchronized (transactions) {
+			Long key = new Long(Thread.currentThread().getId());
+			String name = Thread.currentThread().getName();
+			result = (Transaction) transactions.get(key);
+			if(result == null) {
+				result = new InMemoryTransaction(this, key, name);
+				transactions.put(key, result);
+			}
+		}
+		return result;
 	}
-
+	
+	void removeTransaction(Transaction t) {
+		synchronized (transactions) {
+			Collection entries = transactions.values();
+			entries.remove(t);
+		}
+	}
+	
+	void enlistBean(RMBean bean) {
+		InMemoryTransaction t = (InMemoryTransaction) getTransaction();
+		t.enlist(bean);
+	}
+	
 	public CreateSeqBeanMgr getCreateSeqBeanMgr() {
 		return createSeqBeanMgr;
 	}

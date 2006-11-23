@@ -17,25 +17,107 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beans.RMBean;
 
 /**
- * This class does nothing special. Just to be consistent with the transaction
- * based behavious of other 'Persistant' StorageManager implementations.
+ * This class does not really implement transactions, but it is a good
+ * place to implement locking for the in memory storage manager.
  */
 
 public class InMemoryTransaction implements Transaction {
 
-	public void commit() {
+	private static final Log log = LogFactory.getLog(InMemoryTransaction.class);
 
+	private InMemoryStorageManager manager;
+	private Long key;
+	private String threadName;
+	private ArrayList enlistedBeans = new ArrayList();
+	
+	InMemoryTransaction(InMemoryStorageManager manager, Long key, String threadName) {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
+		this.manager = manager;
+		this.key = key;
+		this.threadName = threadName;
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
+	}
+	
+	public void commit() {
+		releaseLocks();
 	}
 
 	public void rollback() {
-
+		releaseLocks();
 	}
 	
 	public boolean isActive () {
-		return false;
+		return !enlistedBeans.isEmpty();
 	}
 
+	public void enlist(RMBean bean) {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
+		if(bean != null) {
+			synchronized (bean) {
+				Transaction other = bean.getTransaction();
+				while(other != null && other != this) {
+
+					if(!enlistedBeans.isEmpty()) {
+						Exception e = new Exception("Possible deadlock");
+						if(log.isDebugEnabled()) {
+							log.debug("Possible deadlock", e);
+							log.debug(this + ", " + bean);
+						}
+					}
+
+					try {
+						if(log.isDebugEnabled()) log.debug("This " + this + " waiting for " + other);
+						bean.wait();
+					} catch(InterruptedException e) {
+						// Do nothing
+					}
+					other = bean.getTransaction();
+				}
+				if(other == null) {
+					if(log.isDebugEnabled()) log.debug(this + " locking bean");
+					bean.setTransaction(this);
+					enlistedBeans.add(bean);
+				}
+			}
+		}
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::enlist");
+	}
+	
+	private void releaseLocks() {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::releaseLocks, " + this);
+		manager.removeTransaction(this);
+
+		Iterator beans = enlistedBeans.iterator();
+		while(beans.hasNext()) {
+			RMBean bean = (RMBean) beans.next();
+			synchronized (bean) {
+				bean.setTransaction(null);
+				bean.notify();
+			}
+		}
+		enlistedBeans.clear();
+		
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::releaseLocks");
+	}
+	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		result.append("[InMemoryTransaction #");
+		result.append(key);
+		result.append(", name: ");
+		result.append(threadName);
+		result.append(", locks: ");
+		result.append(enlistedBeans.size());
+		result.append("]");
+		return result.toString();
+	}
 }

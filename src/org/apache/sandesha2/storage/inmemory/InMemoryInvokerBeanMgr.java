@@ -33,89 +33,60 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
+import org.apache.sandesha2.storage.beans.RMBean;
 
-public class InMemoryInvokerBeanMgr implements InvokerBeanMgr {
+public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBeanMgr {
 	
 	private static final Log log = LogFactory.getLog(InMemoryInvokerBeanMgr.class);
-	private Hashtable table = null;
 
-	public InMemoryInvokerBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.STORAGE_MAP);
-		if (obj != null) {
-			table = (Hashtable) obj;
-		} else {
-			table = new Hashtable();
-			context.setProperty(Sandesha2Constants.BeanMAPs.STORAGE_MAP, table);
-		}
+	public InMemoryInvokerBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
+		super(mgr, context, Sandesha2Constants.BeanMAPs.STORAGE_MAP);
 	}
 
-	public synchronized boolean insert(InvokerBean bean) {
-		table.put(bean.getMessageContextRefKey(), bean);
-		return true;
+	public boolean insert(InvokerBean bean) {
+		return super.insert(bean.getMessageContextRefKey(), bean);
 	}
 
-	public synchronized boolean delete(String key) {
-		return table.remove(key) != null;
+	public boolean delete(String key) {
+		return super.delete(key);
 	}
 
-	public synchronized InvokerBean retrieve(String key) {
-		return (InvokerBean) table.get(key);
+	public InvokerBean retrieve(String key) {
+		return (InvokerBean) super.retrieve(key);
 	}
 
-	public synchronized ResultSet find(String query) {
-		throw new UnsupportedOperationException(SandeshaMessageHelper.getMessage(
-				SandeshaMessageKeys.selectRSNotSupported));
-	}
-
-	public synchronized List find(InvokerBean bean) {
-		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
-
-		InvokerBean temp = new InvokerBean();
-		while (iterator.hasNext()) {
-			temp = (InvokerBean) iterator.next();
-			boolean select = true;
-
-			if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
-				select = false;
-
-			if (bean.getMsgNo() != 0 && bean.getMsgNo() != temp.getMsgNo())
-				select = false;
-
-			if (bean.getSequenceID() != null
-					&& !bean.getSequenceID().equals(temp.getSequenceID()))
-				select = false;
-			
-			if (bean.isInvoked()!=temp.isInvoked())
-				select = false;
-
-			if (select)
-				beans.add(temp);
-		}
-		return beans;
-	}
-
-	public synchronized boolean update(InvokerBean bean) {
-		if (table.get(bean.getMessageContextRefKey())==null)
-			return false;
-
-		return table.put(bean.getMessageContextRefKey(), bean) != null;
+	public List find(InvokerBean bean) {
+		return super.find(bean);
 	}
 	
-	public synchronized InvokerBean findUnique (InvokerBean bean) throws SandeshaException {
-		Collection coll = find(bean);
-		if (coll.size()>1) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.nonUniqueResult);
-			log.error(message);
-			throw new SandeshaException (message);
-		}
+	protected boolean match(RMBean matchInfo, RMBean candidate) {
+		InvokerBean bean = (InvokerBean) matchInfo;
+		InvokerBean temp = (InvokerBean) candidate;
+
+		boolean select = true;
+
+		if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
+			select = false;
+
+		if (bean.getMsgNo() != 0 && bean.getMsgNo() != temp.getMsgNo())
+			select = false;
+
+		if (bean.getSequenceID() != null
+				&& !bean.getSequenceID().equals(temp.getSequenceID()))
+			select = false;
 		
-		Iterator iter = coll.iterator();
-		if (iter.hasNext())
-			return (InvokerBean) iter.next();
-		else 
-			return null;
+		if (bean.isInvoked()!=temp.isInvoked())
+			select = false;
+		
+		return select;
+	}
+
+	public boolean update(InvokerBean bean) {
+		return super.update(bean.getMessageContextRefKey(), bean);
+	}
+	
+	public InvokerBean findUnique(InvokerBean bean) throws SandeshaException {
+		return (InvokerBean) super.findUnique(bean);
 	}
 
 }

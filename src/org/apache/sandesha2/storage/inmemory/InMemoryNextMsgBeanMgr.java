@@ -33,94 +33,59 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMBean;
 
-public class InMemoryNextMsgBeanMgr implements NextMsgBeanMgr {
+public class InMemoryNextMsgBeanMgr extends InMemoryBeanMgr implements NextMsgBeanMgr {
 
 	private static final Log log = LogFactory.getLog(InMemoryNextMsgBeanMgr.class);
-	private Hashtable table = null;
 
-	public InMemoryNextMsgBeanMgr(AbstractContext context) {
-		Object obj = context.getProperty(Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);
-
-		if (obj != null) {
-			table = (Hashtable) obj;
-		} else {
-			table = new Hashtable();
-			context.setProperty(Sandesha2Constants.BeanMAPs.NEXT_MESSAGE, table);
-		}
+	public InMemoryNextMsgBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
+		super(mgr, context, Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);
 	}
 
-	public synchronized boolean delete(String sequenceId) {
-		return table.remove(sequenceId) != null;
+	public boolean delete(String sequenceId) {
+		return super.delete(sequenceId);
 	}
 
-	public synchronized NextMsgBean retrieve(String sequenceId) {
-		return (NextMsgBean) table.get(sequenceId);
+	public NextMsgBean retrieve(String sequenceId) {
+		return (NextMsgBean) super.retrieve(sequenceId);
 	}
 
-	public synchronized boolean insert(NextMsgBean bean) {
-		table.put(bean.getSequenceID(), bean);
-		return true;
+	public boolean insert(NextMsgBean bean) {
+		return super.insert(bean.getSequenceID(), bean);
 	}
 
-	public synchronized ResultSet find(String query) {
-		throw new UnsupportedOperationException(SandeshaMessageHelper.getMessage(
-				SandeshaMessageKeys.selectRSNotSupported));
-	}
-
-	public synchronized List find(NextMsgBean bean) {
-		ArrayList beans = new ArrayList();
-		Iterator iterator = table.values().iterator();
-
-		if (bean == null)
-			return beans;
-
-		NextMsgBean temp;
-		while (iterator.hasNext()) {
-			temp = (NextMsgBean) iterator.next();
-
-			boolean equal = true;
-
-			if (bean.getNextMsgNoToProcess() > 0
-					&& bean.getNextMsgNoToProcess() != temp
-							.getNextMsgNoToProcess())
-				equal = false;
-
-			if (bean.getSequenceID() != null
-					&& !bean.getSequenceID().equals(temp.getSequenceID()))
-				equal = false;
-
-			if (equal)
-				beans.add(temp);
-
-		}
-		return beans;
-	}
-
-	public synchronized boolean update(NextMsgBean bean) {
-		if (table.get(bean.getSequenceID())==null)
-			return false;
-
-		return table.put(bean.getSequenceID(), bean) != null;
-	}
-
-	public synchronized Collection retrieveAll() {
-		return table.values();
+	public List find(NextMsgBean bean) {
+		return super.find(bean);
 	}
 	
-	public synchronized NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
-		Collection coll = find(bean);
-		if (coll.size()>1) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.nonUniqueResult);
-			log.error(message);
-			throw new SandeshaException (message);
-		}
-		
-		Iterator iter = coll.iterator();
-		if (iter.hasNext())
-			return (NextMsgBean) iter.next();
-		else 
-			return null;
+	protected boolean match(RMBean matchInfo, RMBean candidate) {
+		NextMsgBean bean = (NextMsgBean) matchInfo;
+		NextMsgBean temp = (NextMsgBean) candidate;
+
+		boolean equal = true;
+
+		if (bean.getNextMsgNoToProcess() > 0
+				&& bean.getNextMsgNoToProcess() != temp
+						.getNextMsgNoToProcess())
+			equal = false;
+
+		if (bean.getSequenceID() != null
+				&& !bean.getSequenceID().equals(temp.getSequenceID()))
+			equal = false;
+
+		return equal;
+	}
+
+	public boolean update(NextMsgBean bean) {
+		return super.update(bean.getSequenceID(), bean);
+	}
+
+	public Collection retrieveAll() {
+		return super.find(null);
+	}
+	
+	public NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
+		return (NextMsgBean) super.findUnique(bean);
 	}
 }

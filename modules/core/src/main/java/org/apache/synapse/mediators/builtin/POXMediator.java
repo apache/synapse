@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 /**
  * Halts further processing/mediation of the current message. i.e. returns false
  */
-public class RestMediator extends AbstractMediator {
+public class POXMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(LogMediator.class);
     private boolean value=false;
@@ -39,7 +39,7 @@ public class RestMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Rest mediator :: mediate()");
-        synCtx.setDoingREST(value);
+        synCtx.setDoingPOX(value);
         return true;
     }
     

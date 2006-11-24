@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -288,7 +287,7 @@ public class SequenceProcessor {
 		sendAckIfNeeded(rmMsgCtx, messagesStr, storageManager);
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: SequenceProcessor::processInMessage " + msgCtxPaused);
+			log.debug("Exit: SequenceProcessor::processReliableMessage " + msgCtxPaused);
 		return msgCtxPaused;
 	}
 

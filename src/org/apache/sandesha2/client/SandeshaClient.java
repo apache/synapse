@@ -288,11 +288,13 @@ public class SandeshaClient {
 		} catch (Exception e) {
 			if (!withinTransaction && reportTransaction!=null) {
 				reportTransaction.rollback();
+				configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				rolebacked = true;
 			}
 		} finally {
 			if (!withinTransaction && !rolebacked && reportTransaction!=null) {
 				reportTransaction.commit();
+				configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 			}
 		}
 

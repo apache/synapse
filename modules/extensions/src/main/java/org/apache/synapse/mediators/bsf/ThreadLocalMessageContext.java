@@ -141,8 +141,8 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().isDoingMTOM();
     }
 
-    public boolean isDoingREST() {
-        return getMC().isDoingREST();
+    public boolean isDoingPOX() {
+        return getMC().isDoingPOX();
     }
 
     public boolean isFaultResponse() {
@@ -165,8 +165,8 @@ public class ThreadLocalMessageContext implements MessageContext {
         getMC().setDoingMTOM(b);
     }
 
-    public void setDoingREST(boolean b) {
-        getMC().setDoingREST(b);
+    public void setDoingPOX(boolean b) {
+        getMC().setDoingPOX(b);
     }
 
     public void setEnvelope(SOAPEnvelope envelope) throws AxisFault {

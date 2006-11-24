@@ -206,12 +206,12 @@ public class ScriptMessageContext implements MessageContext {
         mc.setDoingMTOM(b);
     }
 
-    public boolean isDoingREST() {
-        return mc.isDoingREST();
+    public boolean isDoingPOX() {
+        return mc.isDoingPOX();
     }
 
-    public void setDoingREST(boolean b) {
-        mc.setDoingREST(b);
+    public void setDoingPOX(boolean b) {
+        mc.setDoingPOX(b);
     }
 
     public boolean isSOAP11() {

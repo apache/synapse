@@ -159,11 +159,11 @@ public class TestMessageContext implements MessageContext {
     public void setDoingMTOM(boolean b) {
     }
 
-    public boolean isDoingREST() {
+    public boolean isDoingPOX() {
         return false;
     }
 
-    public void setDoingREST(boolean b) {
+    public void setDoingPOX(boolean b) {
     }
 
     public boolean isSOAP11() {

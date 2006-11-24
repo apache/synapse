@@ -148,12 +148,11 @@ public class AcknowledgementProcessor {
 			throw fault;
 		}
 
-		// updating the last activated time of the sequence.
-		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
-
 		SenderBean input = new SenderBean();
 		input.setSend(true);
 		input.setReSend(true);
+		input.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+		input.setInternalSequenceID(internalSequenceId);
 		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
 
 		ArrayList ackedMessagesList = new ArrayList();
@@ -175,6 +174,9 @@ public class AcknowledgementProcessor {
 				ackedMessagesList.add(new Long(messageNo));
 			}
 		}
+
+		// updating the last activated time of the sequence.
+		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		while (nackIterator.hasNext()) {
 			Nack nack = (Nack) nackIterator.next();

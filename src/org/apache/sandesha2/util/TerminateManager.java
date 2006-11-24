@@ -142,17 +142,6 @@ public class TerminateManager {
 	 */
 	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
-
-		// removing nextMsgMgr entries
-		NextMsgBean findNextMsgBean = new NextMsgBean();
-		findNextMsgBean.setSequenceID(sequenceId);
-		Collection collection = nextMsgBeanMgr.find(findNextMsgBean);
-		Iterator iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			NextMsgBean nextMsgBean = (NextMsgBean) iterator.next();
-			 nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
-		}
 
 		// removing the HighestInMessage entry.
 		String highestInMessageKey = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
@@ -162,6 +151,18 @@ public class TerminateManager {
 		}
 
 		removeReceivingSideProperties(configContext, sequencePropertyKey, sequenceId, storageManager);
+		
+		// removing nextMsgMgr entries
+		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
+		NextMsgBean findNextMsgBean = new NextMsgBean();
+		findNextMsgBean.setSequenceID(sequenceId);
+		Collection collection = nextMsgBeanMgr.find(findNextMsgBean);
+		Iterator iterator = collection.iterator();
+		while (iterator.hasNext()) {
+			NextMsgBean nextMsgBean = (NextMsgBean) iterator.next();
+			 nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
+		}
+
 	}
 
 	private static void removeReceivingSideProperties(ConfigurationContext configContext, String sequencePropertyKey, 

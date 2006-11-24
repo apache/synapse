@@ -120,10 +120,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			invokerBeanMgr.delete(messageContextKey);
 
 			// removing the corresponding message context as well.
-			MessageContext msgCtx = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
-			if (msgCtx != null) {
-				storageManager.removeMessageContext(messageContextKey);
-			}
+			storageManager.removeMessageContext(messageContextKey);
 			
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
@@ -134,7 +131,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequencePropertyKey, sequenceId, storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
-					
+					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");					
 					return;
 				}
 			}

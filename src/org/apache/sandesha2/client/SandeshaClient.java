@@ -117,8 +117,10 @@ public class SandeshaClient {
 			withinTransaction = true;
 
 		Transaction reportTransaction = null;
-		if (!withinTransaction)
+		if (!withinTransaction) {
 			reportTransaction = storageManager.getTransaction();
+			configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+		}
 
 		boolean rolebacked = false;
 
@@ -242,8 +244,10 @@ public class SandeshaClient {
 			withinTransaction = true;
 
 		Transaction reportTransaction = null;
-		if (!withinTransaction)
+		if (!withinTransaction) {
 			reportTransaction = storageManager.getTransaction();
+			configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+		}
 
 		boolean rolebacked = false;
 
@@ -1018,9 +1022,11 @@ public class SandeshaClient {
 			withinTransaction = true;
 
 		Transaction reportTransaction = null;
-		if (!withinTransaction)
+		if (!withinTransaction) {
 			reportTransaction = storageManager.getTransaction();
-
+			configCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+		}
+		
 		boolean rolebacked = false;
 
 		try {

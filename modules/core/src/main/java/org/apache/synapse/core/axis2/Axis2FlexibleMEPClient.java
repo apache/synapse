@@ -166,6 +166,7 @@ public class Axis2FlexibleMEPClient {
         newMC.setConfigurationContext(ori.getConfigurationContext());
         newMC.setMessageID("uuid:" + UUIDGenerator.getUUID());
         newMC.setTo(ori.getTo());
+        newMC.setSoapAction(ori.getSoapAction());
 
         newMC.setProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING,
                 ori.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING));

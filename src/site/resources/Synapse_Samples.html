@@ -25,6 +25,53 @@
 <body>
 <h1>Running the Synapse Samples</h1>
 
+<h2><a name="TOC">Contents</a></h2>
+<div class="section-content">
+  <ul>
+    <li><a href="#Overview">Overview</a>
+    </li>
+    <li><a href="#Axis2Server">Starting the Axis2 Server</a>
+    </li>
+    <li><a href="#MediationSamples">Message mediation samples</a>
+      <ul>
+        <li><a href="#Sample0">Sample 0: Introduction to Synapse - log a message</a></li>
+        <li><a href="#Sample1">Sample 1: Content based routing</a></li>
+        <li><a href="#Sample2">Sample 2: Switch-case mediator and writing and reading of message properties</a></li>
+        <li><a href="#Sample3">Sample 3: Simple properties, and reusable endpoints and sequences</a></li>
+        <li><a href="#Sample4">Sample 4: Error handling with the try and makefault mediators</a></li>
+        <li><a href="#Sample5">Sample 5: Error handling within a sequence using the 'onError' sequence</a></li>
+        <li><a href="#Sample6">Sample 6: Header, in and out mediators</a></li>
+        <li><a href="#Sample7">Sample 7: Extension mediators, static XML properties and the validate mediator</a></li>
+        <li><a href="#Sample8">Sample 8: URL source properties, registry based properties and the XSLT mediator</a></li>
+        <li><a href="#Sample9">Sample 9: Dynamic sequences with a Registry</a></li>
+        <li><a href="#Sample10">Sample 10: Dynamic endpoints with a Registry</a></li>
+        <li><a href="#Sample11">Sample 11: A full registry based configuration</a></li>
+      </ul>
+    </li>
+    <li><a href="#WSSecurity">WS-Security</a>
+      <ul>
+        <li><a href="#Sample50">Sample 50: Connecting to endpoints with WS-Security</a></li>
+      </ul>
+    </li>
+    <li><a href="#ProxyServices">Synapse Proxy service samples</a>
+      <ul>
+        <li><a href="#Sample100">Sample 100: Introduction to Synapse proxy services</a></li>
+        <li><a href="#Sample101">Sample 101: Custom sequences and endpoints for message mediation with proxy services</a></li>
+        <li><a href="#Sample102">Sample 102: Attaching service level WS-Security policies to proxy services</a></li>
+        <li><a href="#Sample103">Sample 103: Using WS-Security signing and encryption with proxy services through WS-Policy</a></li>
+        <li><a href="#Sample104">Sample 104: Explicit out sequence in proxy service level to mediate proxy response</a></li>
+      </ul>
+    </li>
+    <li><a href="#ProxyServices">Transport samples</a>
+      <ul>
+        <li><a href="#Sample110">Sample 110: Introduction to switching transports with proxy services</a></li>
+        <li><a href="#Sample111">Sample 111: Demonstrate switching from HTTP to JMS</a></li>
+        <li><a href="#Sample112">Sample 112: Demonstrate one way messaging / fireAndForget</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
 <h2><a name="Overview">Overview</a></h2>
 
 <p>To run the samples bundled with the Synapse distribution you will need Ant
@@ -538,6 +585,8 @@ registry.</p>
 
 <p></p>
 
+<h1><a name="WSSecurity">WS-Security</a></h1>
+
 <h2><a name="Sample50">Sample 50:</a></h2>
 
 <p><strong>Objective: Connecting to endpoints with WS-Security for outgoing
@@ -572,7 +621,7 @@ and the response is delivered back to the client as it expects.</p>
 
 <p></p>
 
-<h1>Proxy services</h1>
+<h1><a name="ProxyServices">Proxy services</a></h1>
 
 <h2><a name="Sample100">Sample 100:</a></h2>
 
@@ -757,6 +806,8 @@ case. The log should be as follows</p>
 DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
 DEBUG LogMediator - Log mediator :: mediate()
 INFO  LogMediator - message = Executing inside the out sequence</pre>
+
+<h1><a name="Transports">Transports</a></h1>
 
 <h2><a name="Sample110">Sample 110:</a></h2>
 

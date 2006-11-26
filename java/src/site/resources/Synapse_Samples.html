@@ -25,7 +25,7 @@
 <body>
 <h1>Running the Synapse Samples</h1>
 
-<h2>Overview</h2>
+<h2><a name="Overview">Overview</a></h2>
 
 <p>To run the samples bundled with the Synapse distribution you will need Ant
 1.5 or later. Ant can be downloaded from http://ant.apache.org. The samples
@@ -33,7 +33,7 @@ now come with a built in Axis2 server to host the service endpoints used in
 the samples, along with simple ant scripts to build and deploy the services
 into this Axis2 instance.</p>
 
-<h2>Starting Axis2</h2>
+<h2><a name="Axis2Server">Starting the Axis2 Server</a></h2>
 
 <p>To start the bundled Axis2 server, go to the samples/axis2Server directory
 and execute the axis2server.sh or axis2server.bat script. This starts the
@@ -45,8 +45,7 @@ directory. To deploy these services go the the selected directory and run
 Axis2 server. (i.e. copy it to the
 samples/axis2Server/repository\services)</p>
 
-<p>e.g.<br>
-To deploy the SimpleStockQuoteService service go to the
+<p>For example, to deploy the SimpleStockQuoteService service go to the
 samples/axis2Server/src/SimpleStockQuoteService and execute 'ant' without any
 arguments as follows:</p>
 <pre>C:\Java\synapse-0.90-SNAPSHOT\samples\axis2Server\src\SimpleStockQuoteService&gt;ant<br>Buildfile: build.xml
@@ -54,7 +53,7 @@ arguments as follows:</p>
 [jar] Building jar: C:\Java\synapse-0.90-SNAPSHOT\samples\axis2Server\repository\services\SimpleStockQuoteService.aar
 BUILD SUCCESSFUL</pre>
 
-<h2>Descriptions of sample Services</h2>
+<h2><a name="SampleServices">Descriptions of sample Services</a></h2>
 <ol>
   <li>SimpleStockQuoteService - This service has two operations, getQuote
     (in/out) and placeOrder (in-only). It will generate a sample stock quote
@@ -68,22 +67,23 @@ BUILD SUCCESSFUL</pre>
     signatures and encryption</li>
 </ol>
 
-<h2>Starting Synapse</h2>
+<h2><a name="StartingSynapse">Starting Synapse</a></h2>
 
 <p>To start Synapse with the default configuration execute the synapse.bat or
 synapse.sh script in the bin directory. This starts up an instance of Synapse
 using the Synapse and Axis2 configuration files located at repository/conf</p>
 
 <p>To start specific sample configurations of Synapse, use the -sample
-&lt;number&gt; switch as follows:<br>
-e.g.<br>
-bin\synapse.bat -sample &lt;number&gt;</p>
+&lt;number&gt; switch as follows:
+<br>
+<pre>bin\synapse.bat -sample &lt;number&gt;</pre>
+</p>
 
 <p>The above on a Windows system will use the sample synapse.xml
 configuration file located at
 repository\conf\sample\synapse_sample_&lt;number&gt;.xml</p>
 
-<h2>Invoking the sample clients</h2>
+<h2><a name="SampleClients">Invoking the sample clients</a></h2>
 
 <p>The clients are located in the samples/axis2Client directory, and should
 be executed with the ant script supplied. (e.g. ant stockquote) The ant
@@ -93,9 +93,9 @@ along with the necessary modules and dependencies to make available
 WS-Addressing, WS-Security (Rampart) and WS-Reliable Messaging (Sandesha2) on
 the client side.</p>
 
-<h1>Message Mediation Samples</h1>
+<h1><a name="MediationSamples">Message Mediation Samples</a></h1>
 
-<h2>Sample 0:</h2>
+<h2><a name="Sample0">Sample 0:</a></h2>
 
 <p><strong>Objective: Introduction to Synapse. Shows how a message could be
 made to pass through Synapse </strong><strong>and logged before it is
@@ -173,7 +173,7 @@ run this scenario. However this time the difference is at the client and
 would be noticable only if one looks at the source code of the example class
 samples.userguide.ProxyStockQuoteClient</p>
 
-<h2>Sample 1:</h2>
+<h2><a name="Sample1">Sample 1:</a></h2>
 
 <p><strong>Objective: Introduction to simple content based routing. Shows how
 a message could be made to pass through Synapse using the Dumb Client mode,
@@ -197,7 +197,7 @@ request matched the XPath expression of the filter mediator, the filter
 mediators' child mediators executes, and thereby semding the message to a
 different endpoint as specified by the [reusable] endpoint definition.</p>
 
-<h2>Sample 2:</h2>
+<h2><a name="Sample2">Sample 2:</a></h2>
 
 <p><strong>Objective: Introduce switch-case mediator and writing and reading
 of local properties on a message</strong></p>
@@ -214,7 +214,7 @@ stock - IBM'. Subsequently this local property value is looked up by the log
 mediator and logged. The message flowes through to Axis2 and then the reply
 back to the client.</p>
 
-<h2>Sample 3:</h2>
+<h2><a name="Sample3">Sample 3:</a></h2>
 
 <p><strong>Objective: Illustrates simple properties, and reusable endpoints
 and sequences</strong></p>
@@ -241,7 +241,7 @@ function supports the special cases 'To', 'From', 'Action', 'FaultTo' and
 'ReplyTo', which fetches the appropriate values from the current message
 context.</p>
 
-<h2>Sample 4:</h2>
+<h2><a name="Sample4">Sample 4:</a></h2>
 
 <p><strong>Objective: Introduction to error handling with the try and
 makefault mediators</strong></p>
@@ -272,7 +272,7 @@ property named 'ERROR_MESSAGE' which is set on the current message by the try
 mediator on encountering an exception. At the client end, you would see the
 custom SOAP fault message instead of a stock quote.</p>
 
-<h2>Sample 5:</h2>
+<h2><a name="Sample5">Sample 5:</a></h2>
 
 <p><strong>Objective: Introduction to error handling within a sequence using
 the 'onError' sequence</strong></p>
@@ -288,7 +288,7 @@ calls on the named sequence specified when an exception is encountered during
 the processing. You could request for IBM and MSFT quotes using the same
 client and experience the same behaviour from Synapse.</p>
 
-<h2>Sample 6:</h2>
+<h2><a name="Sample6">Sample 6:</a></h2>
 
 <p><strong>Objective: Introduction to header, in and out
 mediators</strong></p>
@@ -316,7 +316,7 @@ the message and hence the client will not receive any response. The drop
 mediator aborts further processing of a message and may be used to discard
 and reject unwanted messages.</p>
 
-<h2>Sample 7:</h2>
+<h2><a name="Sample7">Sample 7:</a></h2>
 
 <p><strong>Objective: Introduction to the extension mediators, static XML
 properties and the validate mediator</strong></p>
@@ -360,7 +360,7 @@ expects a slightly different message than what is created by the stock quote
 client. (i.e. expects a 'stocksymbol' element instead of 'symbol' to specify
 thestock symbol)</p>
 
-<h2>Sample 8:</h2>
+<h2><a name="Sample8">Sample 8:</a></h2>
 
 <p><strong>Objective: Introduction to URL source properties, registry based
 properties and the XSLT mediator</strong></p>
@@ -449,7 +449,7 @@ instance.</p>
 
 <p></p>
 
-<h2>Sample 9:</h2>
+<h2><a name="Sample9">Sample 9:</a></h2>
 
 <p><strong>Objective: Introduction to dynamic sequences with a
 Registry</strong></p>
@@ -488,7 +488,7 @@ Synapse from the following log messages:</p>
 <p>The cache timeout could be tuned appropriately by configuring the URL
 registry to suite the environment and the needs.</p>
 
-<h2>Sample 10:</h2>
+<h2><a name="Sample10">Sample 10:</a></h2>
 
 <p><strong>Objective: Introduction to dynamic endpoints with a
 Registry</strong></p>
@@ -516,7 +516,7 @@ SimpleStockQuoteService1.</p>
 
 <p></p>
 
-<h2>Sample 11:</h2>
+<h2><a name="Sample11">Sample 11:</a></h2>
 
 <p><strong>Objective: A full registry based configuration</strong></p>
 
@@ -538,7 +538,7 @@ registry.</p>
 
 <p></p>
 
-<h2>Sample 50:</h2>
+<h2><a name="Sample50">Sample 50:</a></h2>
 
 <p><strong>Objective: Connecting to endpoints with WS-Security for outgoing
 messages</strong></p>
@@ -574,7 +574,7 @@ and the response is delivered back to the client as it expects.</p>
 
 <h1>Proxy services</h1>
 
-<h2>Sample 100:</h2>
+<h2><a name="Sample100">Sample 100:</a></h2>
 
 <p><strong>Objective: Introduction to Synapse proxy services</strong></p>
 
@@ -603,7 +603,7 @@ receive a stock quote reply from the proxy service. Also the client could get
 the WSDL for the proxy service by requesting for
 http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
 
-<h2>Sample 101:</h2>
+<h2><a name="Sample101">Sample 101:</a></h2>
 
 <p><strong>Objective: Using custom sequences and endpoints for message
 mediation with proxy services</strong></p>
@@ -624,7 +624,7 @@ receive the reply generated by the actual service hosted on the Axis2
 instance. Use the -Durl=&lt;EPR&gt; property when executing the client as per
 example 100, to request on the two proxy services.</p>
 
-<h2>Sample 102:</h2>
+<h2><a name="Sample102">Sample 102:</a></h2>
 
 <p><strong>Objective: Attaching service level WS-Security policies to proxy
 services</strong></p>
@@ -676,7 +676,7 @@ proxy service, you could use the &lt;enableSec/&gt; option on a proxy service
 alone. This will be similar in function to 'engaging' Rampart on an Axis2
 service.</p>
 
-<h2>Sample 103:</h2>
+<h2><a name="Sample103">Sample 103:</a></h2>
 
 <p><strong>Objective: Using WS-Security signing and encryption with proxy
 services through WS-Policy</strong></p>
@@ -727,7 +727,7 @@ back to the client as follows: <a
 href="sample_103_2.txt">sample_103_2.txt</a></p>
 <pre></pre>
 
-<h2>Sample 104:</h2>
+<h2><a name="Sample104">Sample 104:</a></h2>
 
 <p><strong>Objective: Using an explicit out sequence in proxy service level
 to mediate proxy response</strong></p>
@@ -758,7 +758,7 @@ DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: media
 DEBUG LogMediator - Log mediator :: mediate()
 INFO  LogMediator - message = Executing inside the out sequence</pre>
 
-<h2>Sample 110:</h2>
+<h2><a name="Sample110">Sample 110:</a></h2>
 
 <p><strong>Objective: Introduction to switching transports with proxy
 services</strong></p>
@@ -814,7 +814,7 @@ and connection factory etc.</p>
 <p>e.g.</p>
 <pre>&lt;property name="transport.jms.Destination" value="dynamicTopics/something.TestTopic"/&gt;</pre>
 
-<h2>Sample 111:</h2>
+<h2><a name="Sample111">Sample 111:</a></h2>
 
 <p><strong>Objective: Demonstrate switching from HTTP to JMS</strong></p>
 
@@ -843,7 +843,7 @@ stock quote reply over JMS to the Synapse server.</p>
 
 <p></p>
 
-<h2>Sample 112:</h2>
+<h2><a name="Sample112">Sample 112:</a></h2>
 
 <p><strong>Objective: Demonstrate one way messaging /
 fireAndForget()</strong></p>

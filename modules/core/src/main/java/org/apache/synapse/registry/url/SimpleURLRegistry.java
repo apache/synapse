@@ -31,8 +31,9 @@ import org.apache.synapse.registry.RegistryEntry;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
  * A Simple HTTP GET based registry which will work with a Web Server / WebDAV
@@ -43,6 +44,8 @@ import java.net.*;
 public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
     private static final Log log = LogFactory.getLog(SimpleURLRegistry.class);
+
+    private static final int MAX_KEYS = 200;
 
     public OMNode lookup(String key) {
 
@@ -98,6 +101,27 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         return null;
     }
 
+    public void addConfigProperty(String name, String value) {
+
+        if(name.equals("root")) {
+
+            // if the root is folder, it should always end with '/'
+            // therefore, property keys do not have to begin with '/', which could be misleading
+            try {
+                URL url = new URL(value);
+                if(url.getProtocol().equals("file")) {
+                    if(!value.endsWith("/")) {
+                        value = value + "/";
+                    }
+                }
+            } catch (MalformedURLException e) {
+                // don't do any thing if this is not a valid URL
+            }
+        }
+
+        super.addConfigProperty(name, value);
+    }
+
     public String getRoot() {
         String root = (String) properties.get("root");
         if (root == null) {
@@ -110,6 +134,99 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     public long getCachableDuration() {
         String cachableDuration = (String) properties.get("cachableDuration");
         return cachableDuration == null ? 1500 : Long.parseLong(cachableDuration);
+    }
+
+    public RegistryEntry[] getChildren(RegistryEntry entry) {
+
+        try {
+            URL url;
+            if(entry == null) {
+                URLRegistryEntry urlEntry = new URLRegistryEntry();
+                urlEntry.setKey("");
+                entry = urlEntry;
+            }
+
+            url = new URL(getRoot() + entry.getKey());
+
+            if(url.getProtocol().equals("file")) {
+
+                File file = new File(url.getFile());
+                if(file.isDirectory() == false) {
+                    return null;
+                }
+
+                InputStream inStream = null;
+                try {
+                    inStream = (InputStream) url.getContent();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+                    ArrayList entryList = new ArrayList();
+                    String key = "";
+                    while((key=reader.readLine()) != null) {
+                        URLRegistryEntry registryEntry = new URLRegistryEntry();
+                        registryEntry.setKey(entry.getKey() + "/" + key);
+                        entryList.add(registryEntry);
+                    }
+
+                    RegistryEntry[] entries = new RegistryEntry[entryList.size()];
+                    for(int i=0; i<entryList.size(); i++) {
+                        entries[i] = (RegistryEntry) entryList.get(i);
+                    }
+                    return entries;
+
+                } catch(Exception e) {
+                    throw new SynapseException("Error in reading the URL.");
+                }
+
+            } else {
+                throw new SynapseException("Invalid protocol.");
+            }
+
+        } catch (MalformedURLException e) {
+            handleException("Invalid URL reference " + getRoot() + entry.getKey(), e);
+        }
+
+        return null;
+    }
+
+    public RegistryEntry[] getDescendants(RegistryEntry entry) {
+
+        ArrayList list = new ArrayList();
+        RegistryEntry[] entries = getChildren(entry);
+        if(entries != null) {
+            for(int i=0; i<entries.length; i++) {
+
+                if(list.size() > MAX_KEYS) {
+                    break;
+                }
+
+                fillDescendants(entries[i], list);
+            }
+        }
+
+        RegistryEntry[] descendants = new RegistryEntry[list.size()];
+        for(int i=0; i<list.size(); i++) {
+            descendants[i] = (RegistryEntry) list.get(i);
+        }
+
+        return descendants;
+    }
+
+    private void fillDescendants(RegistryEntry parent, ArrayList list) {
+
+        RegistryEntry[] entries = getChildren(parent);
+        if(entries != null) {
+            for(int i=0; i<entries.length; i++) {
+
+                if(list.size() > MAX_KEYS) {
+                    break;
+                }
+
+                fillDescendants(entries[i], list);
+            }
+        } else {
+            list.add(parent);
+        }
     }
 
     private void handleException(String msg, Exception e) {

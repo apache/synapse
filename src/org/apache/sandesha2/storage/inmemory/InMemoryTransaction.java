@@ -35,14 +35,12 @@ public class InMemoryTransaction implements Transaction {
 	private static final Log log = LogFactory.getLog(InMemoryTransaction.class);
 
 	private InMemoryStorageManager manager;
-	private Long key;
 	private String threadName;
 	private ArrayList enlistedBeans = new ArrayList();
 	
-	InMemoryTransaction(InMemoryStorageManager manager, Long key, String threadName) {
+	InMemoryTransaction(InMemoryStorageManager manager, String threadName) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
 		this.manager = manager;
-		this.key = key;
 		this.threadName = threadName;
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
@@ -111,9 +109,7 @@ public class InMemoryTransaction implements Transaction {
 	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
-		result.append("[InMemoryTransaction #");
-		result.append(key);
-		result.append(", name: ");
+		result.append("[InMemoryTransaction, name: ");
 		result.append(threadName);
 		result.append(", locks: ");
 		result.append(enlistedBeans.size());

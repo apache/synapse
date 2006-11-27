@@ -65,11 +65,11 @@ public class InMemoryStorageManager extends StorageManager {
 	public Transaction getTransaction() {
 		Transaction result = null;
 		synchronized (transactions) {
-			Long key = new Long(Thread.currentThread().getId());
-			String name = Thread.currentThread().getName();
+			Thread key = Thread.currentThread();
+			String name = key.getName();
 			result = (Transaction) transactions.get(key);
 			if(result == null) {
-				result = new InMemoryTransaction(this, key, name);
+				result = new InMemoryTransaction(this, name);
 				transactions.put(key, result);
 			}
 		}

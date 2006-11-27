@@ -20,17 +20,12 @@ package org.apache.sandesha2.workers;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -43,12 +38,9 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.util.TerminateManager;
-import org.apache.sandesha2.wsrm.Sequence;
 
 /**
  * This is used when InOrder invocation is required. This is a seperated Thread
@@ -442,7 +434,7 @@ public class Invoker extends Thread {
 					String message = "Next message not set correctly. Removing invalid entry.";
 					log.debug(message);
 	
-					allSequencesList.remove(size);
+					allSequencesList.remove(nextIndex - 1);
 					
 					// cleaning the invalid data of the all sequences.
 					allSequencesBean.setValue(allSequencesList.toString());

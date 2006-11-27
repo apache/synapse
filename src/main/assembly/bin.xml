@@ -53,6 +53,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>modules/core/src/main/resources</directory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <includes>
+                <include>log4j.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>repository/conf/sample/resources/misc</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/conf</outputDirectory>
             <includes>

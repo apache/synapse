@@ -155,7 +155,7 @@ semantics, such as WS-Security, WS-RM and Transport switching etc.</p>
 <p>A proxyservice token represents a &lt;proxy&gt; element which is used to
 define a Synapse Proxy service.</p>
 <pre> &lt;proxy name="string" [description="string"] [transports="(http |https |jms )+|all"]&gt;
-   &lt;target sequence="name" | endpoint="name"/&gt;? // defaults to the synapse main sequence
+   &lt;target (inSequence="name" outSequence="name") | endpoint="name"/&gt;? // defaults to the synapse main sequence
    &lt;wsdl key="string"&gt;?
    &lt;enableRM/&gt;?
    &lt;enableSec/&gt;?

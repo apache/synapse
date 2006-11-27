@@ -23,13 +23,13 @@
   This script requires Ant 1.5 or higher
 
   usage:
-    ant -help 
+    ant -help
   		display ant help screen
-    ant help 
+    ant help
   		display this message
-    ant clean 
+    ant clean
   		delete the build directory
-    ant compile 
+    ant compile
   		build the samples
 
   	These client samples are able to send stock quote and order placement messages
@@ -41,14 +41,14 @@
 
       examples:
   	  ant stockquote
-  	  ant stockquote [-Dsymbol=IBM] 
+  	  ant stockquote [-Dsymbol=IBM]
   	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
   	  	[-Dsynapseurl=http://localhost:8080] [-Drepository=client_repo]
         [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
 
     ant proxystockquote
       A client that could set Synapse as its HTTP proxy when sending requests
-    
+
   	  examples:
   	  ant proxystockquote
   	  ant proxystockquote [-Dsymbol=IBM]
@@ -58,21 +58,21 @@
     ant dumbstockquote
       A client that could directly invoke the service on a given endpoint. Could be
       used to test Synapse as a 'gateway'
-  
+
   	  examples:
 	  ant dumbstockquote
 	  ant dumbstockquote [-Dsymbol=IBM]
         [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
         [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
 
-    ant customquote 
+    ant customquote
       A client which could send out a stock quote request in a custom format. Synapse is
       expected to transform this message to a standard request, and the response back as
       a custom response as expected by this client
-  
+
   	  examples:
-	  	ant customquote 
-	    ant customquote [-Dsymbol=IBM] 
+	  	ant customquote
+	    ant customquote [-Dsymbol=IBM]
 	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
 	    	[-Dsynapseurl=http://localhost:8080]
 
@@ -82,8 +82,16 @@
 
       examples:
 	  	ant placeorder
-	    ant placeorder 
+	    ant placeorder
         [-Dsymbol=IBM] [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
+
+    ant jmsclient
+      A client which could post a JMS text or binary message to a given destination.
+
+      examples
+        ant jmsclient
+        [-Ddest=dynamicQueues/JMSTextProxy] [-Dtype=text|binary]
+        [-Dpayload="24.34 100 IBM" | "repository\conf\sample\resources\mtom\asf-logo.gif"]
         </echo>
     </target>
 
@@ -93,6 +101,9 @@
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="client_repo"/>
     <property name="secpolicy" value=""/>
+    <property name="dest" value="dynamicQueues/JMSTextProxy"/>
+    <property name="type" value="text"/> <!-- or "binary" -->
+    <property name="payload" value=""/>
 
     <property name="class.dir" value="target/classes"/>
 
@@ -107,7 +118,7 @@
         <delete dir="${class.dir}" quiet="true"/>
     </target>
 
-    <target name="stockquote" depends="compile">    		
+    <target name="stockquote" depends="compile">
         <java classname="samples.userguide.StockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
@@ -118,7 +129,7 @@
         </java>
     </target>
 
-    <target name="proxystockquote" depends="compile">    		
+    <target name="proxystockquote" depends="compile">
         <java classname="samples.userguide.ProxyStockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
@@ -127,7 +138,7 @@
         </java>
     </target>
 
-    <target name="dumbstockquote" depends="compile">        
+    <target name="dumbstockquote" depends="compile">
         <java classname="samples.userguide.DumbStockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
@@ -137,7 +148,7 @@
         </java>
     </target>
 
-    <target name="customquote" depends="compile">        
+    <target name="customquote" depends="compile">
         <java classname="samples.userguide.CustomStockQuoteClient"
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
@@ -151,6 +162,15 @@
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${gatewayurl}"/>
+        </java>
+    </target>
+
+    <target name="jmsclient" depends="compile">
+        <java classname="samples.userguide.GenericJMSClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${dest}"/>
+            <arg value="${type}"/>
+            <arg value="${payload}"/>
         </java>
     </target>
 

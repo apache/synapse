@@ -84,7 +84,7 @@ if $os400; then
 fi
 
 # update classpath
-SYNAPSE_CLASSPATH=""
+SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib":
 for f in $SYNAPSE_HOME/lib/*.jar
 do
   SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f

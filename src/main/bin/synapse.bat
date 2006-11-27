@@ -98,7 +98,7 @@ rem set the classes by looping through the libs
 setlocal EnableDelayedExpansion
 set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%"
 FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\conf";%SYNAPSE_CLASS_PATH%
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
 
 rem if a sample configuration is not specified, use default
 if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\synapse.xml"

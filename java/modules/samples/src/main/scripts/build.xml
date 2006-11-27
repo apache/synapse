@@ -90,8 +90,8 @@
 
       examples
         ant jmsclient
-        [-Ddest=dynamicQueues/JMSTextProxy] [-Dtype=text|binary]
-        [-Dpayload="24.34 100 IBM" | "repository\conf\sample\resources\mtom\asf-logo.gif"]
+        [-Ddest=dynamicQueues/JMSTextProxy] [-Dtype=text|binary|xml]
+        [-Dpayload="24.34 100 IBM | MSFT" | "repository\conf\sample\resources\mtom\asf-logo.gif"]
         </echo>
     </target>
 

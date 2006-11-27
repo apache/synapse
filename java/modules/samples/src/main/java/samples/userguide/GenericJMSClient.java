@@ -45,6 +45,15 @@ public class GenericJMSClient {
             app.sendTextMessage(dest, param);
         } else if ("binary".equalsIgnoreCase(type)) {
             app.sendBytesMessage(dest, getBytesFromFile(param));
+        } else if ("xml".equalsIgnoreCase(type)) {
+            app.sendTextMessage(dest, 
+                "<m:placeOrder xmlns:m=\"http://services.samples/xsd\">\n" +
+                "    <m:order>\n" +
+                "        <m:price>" + getRandom(100, 0.9, true) + "</m:price>\n" +
+                "        <m:quantity>" + (int) getRandom(10000, 1.0, true) + "</m:quantity>\n" +
+                "        <m:symbol>" + param + "</m:symbol>\n" +
+                "    </m:order>\n" +
+                "</m:placeOrder>");
         } else {
             System.out.println("Unknown JMS message type");
         }

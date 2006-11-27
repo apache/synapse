@@ -45,6 +45,13 @@
                 <endpoint address="http://localhost:9000/axis2/services/MTOMSampleService" optimize="mtom"/>
             </send>
         </sequence>
+
+        <sequence name="pox_proxy">
+            <header name="Action" value="urn:placeOrder"/>
+            <send>
+                <endpoint address="http://localhost:9001/axis2/services/SimpleStockQuoteService" force="soap"/>
+            </send>
+        </sequence>
     </definitions>
 
     <proxies>
@@ -56,9 +63,13 @@
             <target inSequence="text_proxy"/>
             <property name="transport.jms.Wrapper" value="{http://services.samples/xsd}text"/>
         </proxy>
+        <proxy name="JMSPoxProxy" transports="jms">
+            <target inSequence="pox_proxy"/>
+        </proxy>
     </proxies>
 
     <rules>
+    	<log level="full"/>
     	<drop/>
     </rules>
 

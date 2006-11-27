@@ -60,6 +60,20 @@ public interface Registry {
     public void addConfigProperty(String name, String value);
 
     /**
+     * Returns the child elements of a given registry entry
+     * @param entry - parent registry entry
+     * @return Array of child registry entries of the given parent registry entry
+     */
+    public RegistryEntry[] getChildren(RegistryEntry entry);
+
+    /**
+     * Returns all decendant entries of the given registry entry
+     * @param entry - parent registry entry
+     * @return Array of decendant registry entries of the given registry entry
+     */
+    public RegistryEntry[] getDescendants(RegistryEntry entry);
+
+    /**
      * Get the name of this registry
      * @return name of the registry
      */

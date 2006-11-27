@@ -185,10 +185,22 @@ public interface MessageContext {
     public boolean isDoingMTOM();
 
     /**
+     * If this message using SWA?
+     * @return true if using SWA
+     */
+    public boolean isDoingSWA();
+
+    /**
      * Marks as using MTOM
      * @param b true to mark as using MTOM
      */
     public void setDoingMTOM(boolean b);
+
+    /**
+     * Marks as using SWA
+     * @param b true to mark as using SWA
+     */
+    public void setDoingSWA(boolean b);
 
     /**
      * Is this message over POX?

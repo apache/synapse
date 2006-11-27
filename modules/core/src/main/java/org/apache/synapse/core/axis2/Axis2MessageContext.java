@@ -183,8 +183,16 @@ public class Axis2MessageContext implements MessageContext {
         return axis2MessageContext.isDoingMTOM();
     }
 
+    public boolean isDoingSWA() {
+        return axis2MessageContext.isDoingSwA();
+    }
+
     public void setDoingMTOM(boolean b) {
         axis2MessageContext.setDoingMTOM(b);
+    }
+
+    public void setDoingSWA(boolean b) {
+        axis2MessageContext.setDoingSwA(b);
     }
 
     public boolean isDoingPOX() {

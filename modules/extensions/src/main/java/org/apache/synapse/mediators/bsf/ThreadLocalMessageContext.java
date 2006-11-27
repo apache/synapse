@@ -141,6 +141,10 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().isDoingMTOM();
     }
 
+    public boolean isDoingSWA() {
+        return getMC().isDoingSWA();
+    }
+
     public boolean isDoingPOX() {
         return getMC().isDoingPOX();
     }
@@ -163,6 +167,10 @@ public class ThreadLocalMessageContext implements MessageContext {
 
     public void setDoingMTOM(boolean b) {
         getMC().setDoingMTOM(b);
+    }
+
+    public void setDoingSWA(boolean b) {
+        getMC().setDoingSWA(b);
     }
 
     public void setDoingPOX(boolean b) {

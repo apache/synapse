@@ -87,7 +87,14 @@ public class SendMediator extends AbstractMediator {
             } else if (singleEndpoint.isForceSOAP()) {
             	synCtx.setDoingPOX(false);
             }
-            if (singleEndpoint.isUseSeparateListener()) 
+
+            if (singleEndpoint.isUseMTOM()) {
+                synCtx.setDoingMTOM(true);
+            } else if (singleEndpoint.isUseSwa()) {
+                synCtx.setDoingSWA(true);
+            }
+
+            if (singleEndpoint.isUseSeparateListener())
             {
             	synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
             }

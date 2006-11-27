@@ -156,7 +156,14 @@ public class TestMessageContext implements MessageContext {
         return false;
     }
 
+    public boolean isDoingSWA() {
+        return false;
+    }
+
     public void setDoingMTOM(boolean b) {
+    }
+
+    public void setDoingSWA(boolean b) {
     }
 
     public boolean isDoingPOX() {

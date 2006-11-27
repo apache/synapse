@@ -25,6 +25,7 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.CallbackReceiver;
+import org.apache.axis2.util.TargetResolver;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
@@ -206,10 +207,12 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 			mc.setOptions(options);
 
 			// do Target Resolution
-			cc.getAxisConfiguration().getTargetResolverChain()
-					.resolveTarget(mc);
+			TargetResolver tr = cc.getAxisConfiguration().getTargetResolverChain();
+            if (tr != null) {
+                tr.resolveTarget(mc);
+            }
 
-			// if the transport to use for sending is not specified, try to find
+            // if the transport to use for sending is not specified, try to find
 			// it
 			// from the URL
 			TransportOutDescription transportOut = options.getTransportOut();

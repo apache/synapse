@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 /**
  * Creates an Endpoint instance using the XML fragment specification
  * 
- * <endpoint name="string" address="url" force="soap|pox">
+ * <endpoint name="string" address="url" [force="soap|pox"] [optimize="mtom|swa"]>
  *  .. extensibility ..
  * 
  * <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
@@ -58,10 +58,12 @@ public class EndpointFactory implements XMLToObjectMapper {
 				Constants.NULL_NAMESPACE, "name"));
 		OMAttribute address = elem.getAttribute(new QName(
 				Constants.NULL_NAMESPACE, "address"));
-		 OMAttribute force = elem.getAttribute(new QName(
+		OMAttribute force = elem.getAttribute(new QName(
 					Constants.NULL_NAMESPACE, "force"));
-		
-		Endpoint endpoint = new Endpoint();
+        OMAttribute optimize = elem.getAttribute(new QName(
+					Constants.NULL_NAMESPACE, "optimize"));
+
+        Endpoint endpoint = new Endpoint();
 		if (!anonymousEndpoint) {
 			if (name == null) {
 				handleException("The 'name' attribute is required for a named endpoint definition");
@@ -88,7 +90,7 @@ public class EndpointFactory implements XMLToObjectMapper {
 		}
 		
 		
-		if (force!=null) 
+		if (force != null)
 		{
 			String forceValue = force.getAttributeValue().trim().toLowerCase();
 			if (forceValue.equals("pox")) {
@@ -100,7 +102,16 @@ public class EndpointFactory implements XMLToObjectMapper {
 			}
 		}
 
-		OMElement wsAddr = elem.getFirstChildWithName(new QName(
+        if (optimize != null && optimize.getAttributeValue().length() > 0) {
+            String method = optimize.getAttributeValue().trim();
+            if ("mtom".equalsIgnoreCase(method)) {
+                endpoint.setUseMTOM(true);
+            } else if ("swa".equalsIgnoreCase(method)) {
+                endpoint.setUseSwa(true);
+            }            
+        }
+
+        OMElement wsAddr = elem.getFirstChildWithName(new QName(
 				Constants.SYNAPSE_NAMESPACE, "enableAddressing"));
 		if (wsAddr != null) {
 			endpoint.setAddressingOn(true);

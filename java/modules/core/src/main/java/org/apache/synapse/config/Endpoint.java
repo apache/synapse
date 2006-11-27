@@ -52,6 +52,10 @@ public class Endpoint {
 	private boolean forcePOX = false;
 	/** force SOAP on **/
 	private boolean forceSOAP = false;
+    /** use MTOM **/
+    private boolean useMTOM = false;
+    /** use SWA **/
+    private boolean useSwa = false;
 	
 	
 
@@ -205,4 +209,20 @@ public class Endpoint {
 	public boolean isForceSOAP() {
 		return forceSOAP;
 	}
+
+    public boolean isUseMTOM() {
+        return useMTOM;
+    }
+
+    public void setUseMTOM(boolean useMTOM) {
+        this.useMTOM = useMTOM;
+    }
+
+    public boolean isUseSwa() {
+        return useSwa;
+    }
+
+    public void setUseSwa(boolean useSwa) {
+        this.useSwa = useSwa;
+    }
 }

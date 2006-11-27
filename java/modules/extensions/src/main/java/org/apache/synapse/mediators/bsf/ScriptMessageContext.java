@@ -202,8 +202,16 @@ public class ScriptMessageContext implements MessageContext {
         return mc.isDoingMTOM();
     }
 
+    public boolean isDoingSWA() {
+        return mc.isDoingSWA();
+    }
+
     public void setDoingMTOM(boolean b) {
         mc.setDoingMTOM(b);
+    }
+
+    public void setDoingSWA(boolean b) {
+        mc.setDoingSWA(b);
     }
 
     public boolean isDoingPOX() {

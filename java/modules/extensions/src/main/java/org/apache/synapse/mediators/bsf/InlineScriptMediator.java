@@ -26,6 +26,8 @@ import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * An inline script mediator has the script source embedded in the config XML:
@@ -39,6 +41,8 @@ import org.apache.synapse.SynapseException;
  * has the Synapse MessageContext predefined in a script variable named 'mc'.
  */
 public class InlineScriptMediator extends ScriptMediator {
+
+    private static final Log log = LogFactory.getLog(InlineScriptMediator.class);
 
     protected String scriptName;
 
@@ -55,6 +59,7 @@ public class InlineScriptMediator extends ScriptMediator {
 
     public boolean mediate(MessageContext synCtx) {
         try {
+            log.debug("Script mediator mediate()");
 
             // This is a bit of a hack to deal with inconsistencies in the varrious BSF script engines.
             // The JavaScript engine does not support BSFEngine.apply properly as it doesn't pass the
@@ -77,6 +82,7 @@ public class InlineScriptMediator extends ScriptMediator {
             return true; // default to returning true
 
         } catch (BSFException e) {
+            log.error("Error executing inline script", e);
             throw new SynapseException(e);
         }
     }

@@ -62,7 +62,7 @@
   	  examples:
 	  ant dumbstockquote
 	  ant dumbstockquote [-Dsymbol=IBM]
-        [-Dhttp://localhost:8080/axis2/services/StockQuoteProxy]
+        [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
         [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
 
     ant customquote 

@@ -577,12 +577,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			createSeqEntry.setToAddress(to.getAddress());
 
 		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-		storageManager.storeMessageContext(createSequenceMessageStoreKey, createSeqMsg); // storing the message
 		
+		SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey);
+
 		retransmitterMgr.insert(createSeqEntry);
 
-		SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey);
-		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage");
 	}
@@ -752,16 +751,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			appMsgEntry.setToAddress(to.getAddress());
 		
 		appMsgEntry.setInternalSequenceID(internalSequenceId);
-		storageManager.storeMessageContext(storageKey, msg);
 
 		msg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-		retransmitterMgr.insert(appMsgEntry);
 
 		// increasing the current handler index, so that the message will not be
 		// going throught the SandeshaOutHandler again.
 		msg.setCurrentHandlerIndex(msg.getCurrentHandlerIndex() + 1);
 
 		SandeshaUtil.executeAndStore(rmMsg, storageKey);
+
+		retransmitterMgr.insert(appMsgEntry);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processResponseMessage");

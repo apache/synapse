@@ -127,8 +127,6 @@ public class PollingManager extends Thread {
 				makeConnectionRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY,
 						sequencePropertyKey);
 				
-				storageManager.storeMessageContext(makeConnectionMsgStoreKey,makeConnectionRMMessage.getMessageContext());
-				
 				//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
 				SenderBean makeConnectionSenderBean = new SenderBean ();
 //				makeConnectionSenderBean.setInternalSequenceID(internalSequenceId);
@@ -147,9 +145,9 @@ public class PollingManager extends Thread {
 				//this message should not be sent until it is qualified. I.e. till it is sent through the Sandesha2TransportSender.
 				makeConnectionRMMessage.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 				
-				senderBeanMgr.insert(makeConnectionSenderBean);
-				
 				SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey);
+				
+				senderBeanMgr.insert(makeConnectionSenderBean);				
 			} catch (SandeshaStorageException e) {
 				e.printStackTrace();
 			} catch (SandeshaException e) {

@@ -249,8 +249,6 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		SenderBean closeBean = new SenderBean();
 		closeBean.setMessageContextRefKey(key);
 
-		storageManager.storeMessageContext(key, msgContext);
-
 		closeBean.setTimeToSend(System.currentTimeMillis());
 
 		closeBean.setMessageID(msgContext.getMessageID());
@@ -272,9 +270,9 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		closeBean.setSequenceID(outSequenceID);
 		closeBean.setInternalSequenceID(internalSeqenceID);
 
-		retramsmitterMgr.insert(closeBean);
-
 		SandeshaUtil.executeAndStore(rmMsgCtx, key);
+
+		retramsmitterMgr.insert(closeBean);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: CloseSeqMsgProcessor::processOutMessage " + Boolean.TRUE);

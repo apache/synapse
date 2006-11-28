@@ -394,12 +394,9 @@ public class SequenceProcessor {
 			}
 
 			ackBean.setTimeToSend(timeToSend);
-			storageManager.storeMessageContext(key, ackMsgCtx);
 
 			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
-			// inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
 			// / asyncAckTransaction.commit();
 
 			// passing the message through sandesha2sender
@@ -407,6 +404,9 @@ public class SequenceProcessor {
 			ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
 			
 			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
+
+			// inserting the new ack.
+			retransmitterBeanMgr.insert(ackBean);
 
 			SandeshaUtil.startSenderForTheSequence(ackRMMsgCtx.getConfigurationContext(), sequenceId);
 		}

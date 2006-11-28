@@ -393,8 +393,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		SenderBean terminateBean = new SenderBean();
 		terminateBean.setMessageContextRefKey(key);
 
-		storageManager.storeMessageContext(key, msgContext);
-
 		// Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
 		// Otherwise this get send before return of the current request (ack).
@@ -420,8 +418,6 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
 
-		retramsmitterMgr.insert(terminateBean);
-
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 		terminateAdded.setSequencePropertyKey(outSequenceID);
@@ -430,7 +426,9 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		seqPropMgr.insert(terminateAdded);
 		
 		SandeshaUtil.executeAndStore(rmMsgCtx, key);
-		
+	
+		retramsmitterMgr.insert(terminateBean);
+
 		// Pause the message context
 		rmMsgCtx.pause();
 

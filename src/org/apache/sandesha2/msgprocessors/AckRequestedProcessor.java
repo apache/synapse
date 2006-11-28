@@ -269,15 +269,14 @@ public class AckRequestedProcessor {
 
 			ackBean.setTimeToSend(timeToSend);
 
-			storageManager.storeMessageContext(key, ackMsgCtx);
 			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
-			// inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
-
 			// passing the message through sandesha2sender
 
 			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
+
+			// inserting the new ack.
+			retransmitterBeanMgr.insert(ackBean);
 
 			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
 
@@ -386,8 +385,6 @@ public class AckRequestedProcessor {
 		SenderBean ackRequestBean = new SenderBean();
 		ackRequestBean.setMessageContextRefKey(key);
 
-		storageManager.storeMessageContext(key, msgContext);
-
 		// Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
 		// Otherwise this get send before return of the current request (ack).
@@ -413,9 +410,9 @@ public class AckRequestedProcessor {
 		ackRequestBean.setInternalSequenceID(internalSeqenceID);
 		ackRequestBean.setSequenceID(outSequenceID);
 		
-		retramsmitterMgr.insert(ackRequestBean);
-
 		SandeshaUtil.executeAndStore(ackRequestRMMsg, key);
+
+		retramsmitterMgr.insert(ackRequestBean);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AckRequestedProcessor::processOutgoingAckRequestMessage " + Boolean.TRUE);

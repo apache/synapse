@@ -416,8 +416,6 @@ public class TerminateManager {
 		SenderBean terminateBean = new SenderBean();
 		terminateBean.setMessageContextRefKey(key);
 
-		storageManager.storeMessageContext(key, terminateRMMessage.getMessageContext());
-
 		// Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
 		// Otherwise this get send before return of the current request (ack).
@@ -438,10 +436,6 @@ public class TerminateManager {
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
 
-		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
-
-		retramsmitterMgr.insert(terminateBean);
-
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 		terminateAdded.setSequencePropertyKey(outSequenceId);
@@ -456,6 +450,9 @@ public class TerminateManager {
 		
 		// / addTerminateSeqTransaction.commit();
 		SandeshaUtil.executeAndStore(terminateRMMessage, key);
+		
+		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		retramsmitterMgr.insert(terminateBean);
 
 		if(log.isDebugEnabled())
 			log.debug("Exit: TerminateManager::addTerminateSequenceMessage");

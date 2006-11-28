@@ -49,7 +49,7 @@
         <sequence name="pox_proxy">
             <header name="Action" value="urn:placeOrder"/>
             <send>
-                <endpoint address="http://localhost:9001/axis2/services/SimpleStockQuoteService" force="soap"/>
+                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/>
             </send>
         </sequence>
     </definitions>

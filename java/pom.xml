@@ -277,6 +277,12 @@
             <artifactId>axis2-secpolicy</artifactId>
             <version>${axis2.security.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>sandesha2</groupId>
+            <artifactId>sandesha2-policy</artifactId>
+            <version>${sandesha2.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.axis2</groupId>

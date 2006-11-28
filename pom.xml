@@ -392,7 +392,6 @@
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jms</artifactId>
             <version>${geronimo.spec.jms.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>annogen</groupId>

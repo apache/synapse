@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.neethi.Policy;
+import org.apache.axiom.soap.SOAPFault;
 
 import java.util.Iterator;
 
@@ -107,6 +108,18 @@ public class Axis2Sender {
                         );
                     }
                 }
+
+                // if we have a SOAP Fault, log it - irrespective of the mediation logic
+                // http://issues.apache.org/jira/browse/SYNAPSE-42
+                if (synapseOutMessageContext.getEnvelope().getBody().hasFault()) {
+                    SOAPFault fault = synapseOutMessageContext.getEnvelope().getBody().getFault();
+                    log.warn("Synapse received a SOAP fault from : " + synapseInMessageContext.getTo() + 
+                        (fault.getNode() != null ? " Node : " + fault.getNode().getNodeValue() : "") +
+                        (fault.getReason() != null ? " Reason : " + fault.getReason().getFirstSOAPText() : "") +
+                        (fault.getCode() != null ? " Code : " + fault.getCode().getValue() : ""));
+                }
+
+                log.debug("Processing incoming message");
 
                 // sets the out sequence if present to the out MC to mediate the response
                 if(synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE) != null) {

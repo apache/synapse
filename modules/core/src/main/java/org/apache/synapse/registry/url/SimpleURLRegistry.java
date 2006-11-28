@@ -164,7 +164,16 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
                     String key = "";
                     while((key=reader.readLine()) != null) {
                         URLRegistryEntry registryEntry = new URLRegistryEntry();
-                        registryEntry.setKey(entry.getKey() + "/" + key);
+                        if(entry.getKey().equals("")) {
+                            registryEntry.setKey(key);
+                        } else {
+                            if(entry.getKey().endsWith("/")) {
+                                  registryEntry.setKey(entry.getKey() + key);
+                            } else {
+                                  registryEntry.setKey(entry.getKey() + "/" + key);
+                            }
+                        }
+
                         entryList.add(registryEntry);
                     }
 

@@ -23,7 +23,7 @@
     <definitions>
     		<set-property name="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
     		
-        <endpoint name="secure" address="http://localhost:9001/axis2/services/SecureStockQuoteService3">
+        <endpoint name="secure" address="http://localhost:9000/axis2/services/SecureStockQuoteService3">
         	<enableSec policy="sec_policy"/>
         	<enableAddressing/>
         </endpoint>

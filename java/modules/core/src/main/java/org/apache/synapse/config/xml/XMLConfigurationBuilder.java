@@ -62,6 +62,19 @@ public class XMLConfigurationBuilder {
         }
         root.build();
 
+        Iterator regs = root.getChildrenWithName(Constants.REGISTRY_ELT);
+        if (regs != null) {
+            while (regs.hasNext()) {
+                Object o = regs.next();
+                if (o instanceof OMElement) {
+                    Registry reg = RegistryFactory.createRegistry((OMElement) o);
+                    config.addRegistry(reg.getRegistryName(), reg);
+                } else {
+                    handleException("Invalid registry declaration in configuration");
+                }
+            }
+        }
+
         OMContainer definitions = root.getFirstChildWithName(Constants.DEFINITIONS_ELT);
         if (definitions != null) {
 
@@ -94,19 +107,6 @@ public class XMLConfigurationBuilder {
                         ProxyService proxy = ProxyServiceFactory.createProxy(elt);
                         config.addProxyService(proxy.getName(), proxy);
                     }
-                }
-            }
-        }
-
-        Iterator regs = root.getChildrenWithName(Constants.REGISTRY_ELT);
-        if (regs != null) {
-            while (regs.hasNext()) {
-                Object o = regs.next();
-                if (o instanceof OMElement) {
-                    Registry reg = RegistryFactory.createRegistry((OMElement) o);
-                    config.addRegistry(reg.getRegistryName(), reg);
-                } else {
-                    handleException("Invalid registry declaration in configuration");
                 }
             }
         }

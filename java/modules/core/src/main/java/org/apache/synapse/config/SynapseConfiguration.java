@@ -28,7 +28,8 @@ import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
- 
+import org.apache.axiom.om.OMNode;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -194,6 +195,26 @@ public class SynapseConfiguration {
                     handleException("Can not load the source property : " + value.getName());
                 }
             }
+
+            if (value.getType() == Property.DYNAMIC_TYPE) {
+
+                Registry registry = getRegistry(value.getRegistryName());
+
+                if (registry == null) {
+                    handleException("Registry not available.");
+                }
+
+                OMNode node = null;
+                try {
+                    node = registry.lookup(value.getKey());
+                    if (node == null) {
+                        handleException("Registry key should map to a XML resource.");
+                    }
+                } catch (Exception e) {
+                    handleException("Registry key should map to a XML resource.");
+                }
+            }
+
             globalProps.put(name, value);
         } else {
             log.error("Name and the value of the property cannot be null");

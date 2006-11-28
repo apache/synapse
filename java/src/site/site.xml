@@ -48,9 +48,9 @@
             </item>
             <item name="Documentation">
                 <item name="Configuration Language" href="Synapse_Configuration_Language.html"/>
-                <item name="User guide" href="userguide.html"/>
+                <item name="User guide" href="Synapse_Userguide.html"/>
                 <item name="Samples" href="Synapse_Samples.html"/>
-                <item name="Extending Synapse" href="extending_synapse.html"/>
+                <item name="Extending Synapse" href="Synapse_Extending.html"/>
                 <item name="Javadocs" href="apidocs/index.html"/>
             </item>
             <item name="Project Information">

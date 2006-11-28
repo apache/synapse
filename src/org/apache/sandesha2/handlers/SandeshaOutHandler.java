@@ -132,6 +132,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 
 			MsgProcessor msgProcessor = null;
 			int messageType = rmMsgCtx.getMessageType();
+			if(log.isDebugEnabled()) log.debug("Message Type: " + messageType);
 			if (messageType == Sandesha2Constants.MessageTypes.UNKNOWN) {
 				MessageContext requestMsgCtx = msgCtx.getOperationContext().getMessageContext(
 						OperationContextFactory.MESSAGE_LABEL_IN_VALUE);

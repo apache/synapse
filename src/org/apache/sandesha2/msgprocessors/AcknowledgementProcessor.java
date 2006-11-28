@@ -121,6 +121,7 @@ public class AcknowledgementProcessor {
 		
 		String internalSequenceId = SandeshaUtil.getSequenceProperty(outSequenceId,
 				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+		if(log.isDebugEnabled()) log.debug("Got ack for RM Sequence: " + outSequenceId + ", internal id: " + internalSequenceId);
 
 		//here we cannot get the property key using the usual SandeshaUtil.getSequencePropertyKey function,
 		//because this can be a applicationMessage, which piggybacks the acknowledgement.
@@ -160,6 +161,7 @@ public class AcknowledgementProcessor {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator.next();
 			long lower = ackRange.getLowerValue();
 			long upper = ackRange.getUpperValue();
+			if(log.isDebugEnabled()) log.debug("Ack Range: " + lower + " - " + upper);
 
 			for (long messageNo = lower; messageNo <= upper; messageNo++) {
 				SenderBean retransmitterBean = getRetransmitterEntry(retransmitterEntriesOfSequence, messageNo);

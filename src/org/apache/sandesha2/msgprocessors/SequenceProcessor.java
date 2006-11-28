@@ -294,7 +294,7 @@ public class SequenceProcessor {
 		return false;
 	}
 
-	public void sendAckIfNeeded(RMMsgContext rmMsgCtx, String messagesStr, StorageManager storageManager)
+	public static void sendAckIfNeeded(RMMsgContext rmMsgCtx, String messagesStr, StorageManager storageManager)
 			throws AxisFault {
 
 		if (log.isDebugEnabled())

@@ -39,7 +39,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.msgprocessors.ApplicationMsgProcessor;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -276,9 +275,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 							seqPropMgr.update(receivedMsgsBean);
 
-							SequenceProcessor processor = new SequenceProcessor();
-							processor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
-							
+							SequenceProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);							
 							
 							drop = true;
 
@@ -346,8 +343,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 			// Even though the duplicate message is dropped, hv to send the ack
 			// if needed.
-			SequenceProcessor processor = new SequenceProcessor();
-			processor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
+			SequenceProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
 
 		}
 		if (log.isDebugEnabled())

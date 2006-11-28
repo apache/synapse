@@ -143,13 +143,6 @@ public class TerminateManager {
 	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 
-		// removing the HighestInMessage entry.
-		String highestInMessageKey = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, storageManager);
-		if (highestInMessageKey != null) {
-			storageManager.removeMessageContext(highestInMessageKey);
-		}
-
 		removeReceivingSideProperties(configContext, sequencePropertyKey, sequenceId, storageManager);
 		
 		// removing nextMsgMgr entries

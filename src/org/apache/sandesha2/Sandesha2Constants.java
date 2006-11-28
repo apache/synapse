@@ -307,17 +307,24 @@ public interface Sandesha2Constants {
 
 		String REQUEST_SIDE_SEQUENCE_ID = "RequestSideSequenceID"; 		//used only at the server side
 		
+		// A pair of properties to keep track of the highest received message
+		// for an inbound sequence.
 		String HIGHEST_IN_MSG_NUMBER = "HighestInMsgNumber";
+		String HIGHEST_IN_MSG_ID = "HighestInMsgId";
 		
-		String HIGHEST_IN_MSG_KEY = "HighestInMsgKey";
+		// Once an inbound sequence is closed, or we receive a message with the
+		// 'LastMessage' marker, we record the message id of the highest message
+		// in the sequence.
+		String LAST_IN_MSG_ID = "LastInMessageId";
 		
+		// A pair pf properties to keep track of the highest transmitted message
+		// for an outbound sequence.
 		String HIGHEST_OUT_MSG_NUMBER = "HighestOutMsgNumber";
-		
-		String HIGHEST_OUT_MSG_KEY = "HighestOutMsgKey";
-		
+		String HIGHEST_OUT_RELATES_TO = "HighestOutRelatesTo";
+
+		// Once the last message for any outbound sequence has been acknowledged,
+		// we can safely close the sequence.
 		String LAST_OUT_MESSAGE_NO = "LastOutMessage";
-		
-		String LAST_IN_MESSAGE_NO = "LastInMessage";
 		
 		String SECURITY_TOKEN = "SecurityToken";
 		

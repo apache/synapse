@@ -188,14 +188,14 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		String highestImMsgNumberStr = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, storageManager);
-		String highestImMsgKey = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, storageManager);
+		String highestImMsgId = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_ID, storageManager);
 
 		long highestInMsgNo = 0;
 		if (highestImMsgNumberStr != null) {
-			if (highestImMsgKey == null)
+			if (highestImMsgId == null)
 				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.highestMsgKeyNotStored, sequenceId));
+						SandeshaMessageKeys.highestMsgIdNotStored, sequenceId));
 
 			highestInMsgNo = Long.parseLong(highestImMsgNumberStr);
 		}
@@ -213,44 +213,22 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 			if (highestInMsgNo == 0) {
 				addResponseSideTerminate = false;
 			} else {
-
-				// setting the last in message property
+				// Mark up the highest inbound message as if it had the last message flag on it.
+				// 
+				String inMsgId = highestImMsgId;
 				SequencePropertyBean lastInMsgBean = new SequencePropertyBean(requestSidesequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.LAST_IN_MESSAGE_NO, highestImMsgNumberStr);
+						Sandesha2Constants.SequenceProperties.LAST_IN_MSG_ID, highestImMsgId);
 				seqPropMgr.insert(lastInMsgBean);
-
-				MessageContext highestInMsg = storageManager.retrieveMessageContext(highestImMsgKey, configCtx);
-
-				// TODO get the out message in a storage friendly manner.
-				MessageContext highestOutMessage = highestInMsg.getOperationContext().getMessageContext(
-						OperationContextFactory.MESSAGE_LABEL_FAULT_VALUE);
-
-				if (highestOutMessage == null || highestOutMessage.getEnvelope() == null)
-					highestOutMessage = highestInMsg.getOperationContext().getMessageContext(
-							OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
-
-				if (highestOutMessage != null) {
-					if (highestOutMessage.getEnvelope() == null)
-						throw new SandeshaException(SandeshaMessageHelper
-								.getMessage(SandeshaMessageKeys.outMsgHasNoEnvelope));
-
-					RMMsgContext highestOutRMMsg = MsgInitializer.initializeMessage(highestOutMessage);
-					Sequence seqPartOfOutMsg = (Sequence) highestOutRMMsg
-							.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-
-					if (seqPartOfOutMsg != null) {
-
-						// response message of the last in message can be
-						// considered as the last out message.
-						highestOutMsgNo = seqPartOfOutMsg.getMessageNumber().getMessageNumber();
-						SequencePropertyBean highestOutMsgBean = new SequencePropertyBean(
-								responseSideSequencePropertyKey ,
-								Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, new Long(highestOutMsgNo)
-										.toString());
-
-						seqPropMgr.insert(highestOutMsgBean);
-						addResponseSideTerminate = true;
-					}
+				
+				// If an outbound message has already gone out with that relatesTo, then we can terminate
+				// right away.
+				String highestOutRelatesTo = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
+						Sandesha2Constants.SequenceProperties.HIGHEST_OUT_RELATES_TO, storageManager);
+				if(highestOutRelatesTo != null && highestOutRelatesTo.equals(inMsgId)) {
+					String highOutMessageNumberString = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
+							Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_NUMBER, storageManager);
+					highestOutMsgNo = Long.parseLong(highOutMessageNumberString);
+					addResponseSideTerminate = true;
 				}
 			}
 

@@ -175,10 +175,6 @@ public class SequenceProcessor {
 		// message number retrieved from this sequence.
 		String highetsInMsgNoStr = SandeshaUtil.getSequenceProperty(propertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, storageManager);
-		String highetsInMsgKey = SandeshaUtil.getSequenceProperty(propertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, storageManager);
-		if (highetsInMsgKey == null)
-			highetsInMsgKey = SandeshaUtil.getUUID();
 
 		long highestInMsgNo = 0;
 		if (highetsInMsgNoStr != null) {
@@ -186,24 +182,17 @@ public class SequenceProcessor {
 		}
 
 		if (msgNo > highestInMsgNo) {
-			highestInMsgNo = msgNo;
-
-			String str = new Long(msgNo).toString();
 			SequencePropertyBean highestMsgNoBean = new SequencePropertyBean(propertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, str);
-			SequencePropertyBean highestMsgKeyBean = new SequencePropertyBean(propertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_KEY, highetsInMsgKey);
-
-			// storing the new message as the highest in message.
-			storageManager.removeMessageContext(highetsInMsgKey);
-			storageManager.storeMessageContext(highetsInMsgKey, msgCtx);
+					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, Long.toString(msgNo));
+			SequencePropertyBean highestMsgIdBean = new SequencePropertyBean(propertyKey,
+					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_ID, msgCtx.getMessageID());
 
 			if (highetsInMsgNoStr != null) {
 				seqPropMgr.update(highestMsgNoBean);
-				seqPropMgr.update(highestMsgKeyBean);
+				seqPropMgr.update(highestMsgIdBean);
 			} else {
 				seqPropMgr.insert(highestMsgNoBean);
-				seqPropMgr.insert(highestMsgKeyBean);
+				seqPropMgr.insert(highestMsgIdBean);
 			}
 		}
 

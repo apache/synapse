@@ -21,6 +21,7 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -67,6 +68,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(ApplicationMsgProcessor.class);
 
+	private String inboundSequence = null;
+	
+	public ApplicationMsgProcessor() {
+		// Nothing to do
+	}
+	
+	public ApplicationMsgProcessor(String inboundSequenceId) {
+		this.inboundSequence = inboundSequenceId;
+	}
 	
 	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled()) {
@@ -75,7 +85,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 		return false;
 	}
-
+	
 	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processOutMessage");
@@ -119,43 +129,22 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		boolean lastMessage = false;
 		if (serverSide) {
-			// getting the request message and rmMessage.
-			MessageContext reqMsgCtx;
-			try {
-				reqMsgCtx = msgContext.getOperationContext().getMessageContext(
-						OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
-			} catch (AxisFault e) {
-				throw new SandeshaException(e);
-			}
-
-			RMMsgContext requestRMMsgCtx = MsgInitializer.initializeMessage(reqMsgCtx);
-
-			Sequence reqSequence = (Sequence) requestRMMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if (reqSequence == null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
+			if (inboundSequence == null || "".equals(inboundSequence)) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.incomingSequenceNotValidID, inboundSequence);
 				log.debug(message);
 				throw new SandeshaException(message);
 			}
 
-			String incomingSeqId = reqSequence.getIdentifier().getIdentifier();
-			if (incomingSeqId == null || "".equals(incomingSeqId)) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.incomingSequenceNotValidID, "''"
-						+ incomingSeqId + "''");
-				log.debug(message);
-				throw new SandeshaException(message);
-			}
+			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(inboundSequence);
 
-			long requestMsgNo = reqSequence.getMessageNumber().getMessageNumber();
-
-			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(incomingSeqId);
-
-			// deciding weather the last message.
-			String requestLastMsgNoStr = SandeshaUtil.getSequenceProperty(incomingSeqId,
-					Sandesha2Constants.SequenceProperties.LAST_IN_MESSAGE_NO, storageManager);
-			if (requestLastMsgNoStr != null) {
-				long requestLastMsgNo = Long.parseLong(requestLastMsgNoStr);
-				if (requestLastMsgNo == requestMsgNo)
-					lastMessage = true;
+			// Deciding weather this is the last message. We assume it is if it relates to
+			// a message which arrived with the LastMessage flag on it.
+			String lastRequestId = SandeshaUtil.getSequenceProperty(inboundSequence,
+					Sandesha2Constants.SequenceProperties.LAST_IN_MSG_ID, storageManager);
+			RelatesTo relatesTo = msgContext.getRelatesTo();
+			if(relatesTo != null && lastRequestId != null &&
+					lastRequestId.equals(relatesTo.getValue())) {
+				lastMessage = true;
 			}
 
 		} else {
@@ -239,16 +228,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBean responseHighestMsgBean = new SequencePropertyBean(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_NUMBER, new Long(messageNumber).toString());
 		seqPropMgr.insert(responseHighestMsgBean);
+		RelatesTo relatesTo = msgContext.getRelatesTo();
+		if(relatesTo != null) {
+			SequencePropertyBean responseRelatesToBean = new SequencePropertyBean(sequencePropertyKey,
+					Sandesha2Constants.SequenceProperties.HIGHEST_OUT_RELATES_TO, relatesTo.getValue());
+			seqPropMgr.insert(responseRelatesToBean);
+		}
 
 		if (lastMessage) {
-
-			SequencePropertyBean responseHighestMsgKeyBean = new SequencePropertyBean(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_KEY, storageKey);
-
 			SequencePropertyBean responseLastMsgKeyBean = new SequencePropertyBean(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, new Long(messageNumber).toString());
 
-			seqPropMgr.insert(responseHighestMsgKeyBean);
 			seqPropMgr.insert(responseLastMsgKeyBean);
 		}
 

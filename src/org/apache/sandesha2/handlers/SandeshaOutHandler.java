@@ -140,8 +140,10 @@ public class SandeshaOutHandler extends AbstractHandler {
                     RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsgCtx);
                     Sequence sequencePart = (Sequence) reqRMMsgCtx
                                     .getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-                    if (sequencePart != null)
-                            msgProcessor = new ApplicationMsgProcessor();// a rm intended message
+                    if (sequencePart != null) {
+            			String incomingSeqId = sequencePart.getIdentifier().getIdentifier();
+            			msgProcessor = new ApplicationMsgProcessor(incomingSeqId);// a rm intended message
+                    }
                 } else // if client side.
                     msgProcessor = new ApplicationMsgProcessor();
                 

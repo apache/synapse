@@ -80,7 +80,7 @@
         <ant:jar jarfile="${maven.build.dir}/${mar.name}" basedir="${build.temp.dir}/module" /> 
         
         <copy file="${maven.build.dir}/${mar.name}" 
-            tofile="${maven.repo.local}/${pom.artifactId}/mars/${mar.name}"/>
+            tofile="${maven.repo.local}/${pom.groupId}/mars/${mar.name}"/>
         
         <delete dir="${build.temp.dir}" />
     </goal>
@@ -99,7 +99,7 @@
         <ant:jar jarfile="${maven.build.dir}/${jar.name}" basedir="${jar.temp.path}" /> 
         
         <copy file="${maven.build.dir}/${jar.name}" 
-            toDir="${maven.repo.local}/${pom.artifactId}/jars"/>
+            toDir="${maven.repo.local}/${pom.groupId}/jars"/>
         
         <delete dir="${build.temp.dir}" />
     </goal>
@@ -126,7 +126,7 @@
         <ant:jar jarfile="${maven.build.dir}/${policy.jar.name}" basedir="${policy.jar.temp.path}" /> 
         
         <copy file="${maven.build.dir}/${policy.jar.name}" 
-            toDir="${maven.repo.local}/${pom.artifactId}/jars"/>
+            toDir="${maven.repo.local}/${pom.groupId}/jars"/>
 		
         <delete dir="${build.temp.dir}" />
 	</goal>
@@ -147,7 +147,7 @@
         <ant:jar jarfile="${maven.build.dir}/${client.jar.name}" basedir="${build.temp.dir}/client" /> 
         
         <copy file="${maven.build.dir}/${client.jar.name}" 
-            tofile="${maven.repo.local}/${pom.artifactId}/jars/${client.jar.name}"/>
+            tofile="${maven.repo.local}/${pom.groupId}/jars/${client.jar.name}"/>
             
         <delete dir="${build.temp.dir}" />
         

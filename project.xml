@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project>
     <pomVersion>3</pomVersion>
-    <groupId>sandesha2</groupId>
+    <groupId>org.apache.sandesha2</groupId>
     <id>sandesha2</id>
     <name>Apache Sandesha2</name>
     <currentVersion>${sandesha2.version}</currentVersion>

@@ -41,6 +41,26 @@ public class SandeshaUtilTest extends TestCase {
 		assertTrue(UUID2.startsWith("urn:uuid:"));
 	}
 	
+	public void testInternalSequenceIDToSequenceKeyConversion()throws SandeshaException{
+		String toEPR = "http://127.0.0.1:1111/some_random_uri";
+		String sequenceKey = "1234abcd";
+		
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(toEPR, sequenceKey);
+		
+		//check that we can parse out the sequence key
+		assertEquals(sequenceKey, SandeshaUtil.getSequenceKeyFromInternalSequenceID(internalSequenceID, toEPR));
+		
+		//try an internal sequenceID without a sequenceKey - should get null
+		internalSequenceID = SandeshaUtil.getSequenceKeyFromInternalSequenceID(toEPR, null);
+		assertNull(SandeshaUtil.getSequenceKeyFromInternalSequenceID(internalSequenceID, toEPR));
+		
+		//for badly formed sequences, or for server-side response sequences, check 
+		//we just get null
+		String outgoingSequenceID = SandeshaUtil.getOutgoingSideInternalSequenceID(SandeshaUtil.getUUID());
+		assertNull(SandeshaUtil.getSequenceKeyFromInternalSequenceID(outgoingSequenceID, toEPR));
+		
+	}
+	
 	public void testGetAckRangeArrayList () throws SandeshaException {
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
 		String msgNumberStr = "3,6,1,5,8,2";

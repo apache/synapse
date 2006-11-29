@@ -784,10 +784,16 @@ public class SandeshaClient {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.toEPRNotValid, null));
 
-		String to = epr.getAddress();
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-
-		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		//first see if the cliet has told us which sequence to close
+		String internalSequenceID = 
+			(String)options.getProperty(SandeshaClientConstants.INTERNAL_SEQUENCE_ID);
+		
+		if(internalSequenceID==null){
+			//lookup the internal seq id based on to EPR and sequenceKey
+			String to = epr.getAddress();
+			String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+			internalSequenceID = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		}
 
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,
 				configurationContext);
@@ -1085,9 +1091,17 @@ public class SandeshaClient {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.toEPRNotValid, null));
 
-		String to = epr.getAddress();
-		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		String internalSequenceID = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		//first see if the cliet has told us which sequence to terminate
+		String internalSequenceID = 
+			(String)options.getProperty(SandeshaClientConstants.INTERNAL_SEQUENCE_ID);
+		
+		if(internalSequenceID==null){
+			//lookup the internal seq id based on to EPR and sequenceKey
+			String to = epr.getAddress();
+			String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+			internalSequenceID = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		}
+		
 		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,
 				configurationContext);
 		if (sequenceReport == null)

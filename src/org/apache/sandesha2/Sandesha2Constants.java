@@ -299,6 +299,8 @@ public interface Sandesha2Constants {
 		
 		String SEQUENCE_CLOSED = "SequenceClosed";
 		
+		String SEQUENCE_CLOSED_CLIENT = "SequenceClosedClient"; //indicates the client has sent a close sequence
+		
 		String SEQUENCE_TERMINATED = "SequenceTerminated";
 		
 		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";

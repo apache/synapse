@@ -23,6 +23,7 @@ public class SandeshaClientConstants {
 	public static String AcksTo = "Sandesha2AcksTo";
 	public static String LAST_MESSAGE = "Sandesha2LastMessage";
 	public static String OFFERED_SEQUENCE_ID = "Sandesha2OfferedSequenceId";
+	public static String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
 	public static String SANDESHA_DEBUG_MODE = "Sandesha2DebugMode";
 	public static String SEQUENCE_KEY = "Sandesha2SequenceKey";
 	public static String MESSAGE_NUMBER = "Sandesha2MessageNumber";

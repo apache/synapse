@@ -20,6 +20,7 @@ public class SandeshaMessageKeys {
 	public static final String invokeMsgError="invokeMsgError";
 	public static final String msgError="msgError";
 	public static final String sendMsgError="sendMsgError";
+	public static final String cannotSendMsgAsSequenceClosed="cannotSendMsgAsSequenceClosed";
 	public static final String noValidSyncResponse="noValidSyncResponse";
 	public static final String generalError="generalError";
 	public static final String classLoaderNotFound="classLoaderNotFound";

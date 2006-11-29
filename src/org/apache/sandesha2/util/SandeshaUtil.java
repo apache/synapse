@@ -930,6 +930,28 @@ public class SandeshaUtil {
 
 		return sequenceID;
 	}
+	
+	public static String getSequenceKeyFromInternalSequenceID(String internalSequenceID, String to){
+		if(to==null){
+			//sequenceKey is just the internalSequenceID
+			return internalSequenceID;
+		}
+		else{
+			//remove the prefix
+			int postPrefixStringIndex = internalSequenceID.indexOf(Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX);
+			if(postPrefixStringIndex>=0){
+				String postPrefixString = internalSequenceID.substring(postPrefixStringIndex + Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX.length());
+				//strip of the to epr and trailing and trailing ":"
+				String toEPRString = ":" + to + ":";
+				int indexOfToEPR = postPrefixString.indexOf(toEPRString);
+				if(indexOfToEPR>=0){
+					return postPrefixString.substring(indexOfToEPR + toEPRString.length());
+				}
+			}
+		}
+		return null; //could not find the sequenceKey
+	}
+	
 
 	public static SecurityManager getSecurityManager(ConfigurationContext context) throws SandeshaException {
 		SecurityManager util = (SecurityManager) context.getProperty(Sandesha2Constants.SECURITY_MANAGER);

@@ -97,12 +97,11 @@ public class CloseSequenceProcessor implements MsgProcessor {
 		if (fault != null) {
 			throw fault;
 		}
-
+		
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
 		sequenceClosedBean.setSequencePropertyKey(sequencePropertyKey);
 		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
 		sequenceClosedBean.setValue(Sandesha2Constants.VALUE_TRUE);
-
 		sequencePropMgr.insert(sequenceClosedBean);
 
 		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
@@ -162,6 +161,8 @@ public class CloseSequenceProcessor implements MsgProcessor {
 					sequenceId, e.toString());
 			throw new SandeshaException(message, e);
 		}
+		
+
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: CloseSequenceProcessor::processInMessage " + Boolean.FALSE);
@@ -190,6 +191,12 @@ public class CloseSequenceProcessor implements MsgProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.couldNotSendCloseSeqNotFound, internalSeqenceID));
 
+		//write into the sequence proeprties that the client is now closed
+		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
+		sequenceClosedBean.setSequencePropertyKey(internalSeqenceID);
+		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED_CLIENT);
+		sequenceClosedBean.setValue(Sandesha2Constants.VALUE_TRUE);
+		storageManager.getSequencePropertyBeanMgr().insert(sequenceClosedBean);
 
 		AxisOperation closeOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE,

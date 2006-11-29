@@ -32,6 +32,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,8 +103,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	
 	public void testCreateSequenceWithOffer () throws AxisFault,InterruptedException {
 		
-		startServer();
-		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
@@ -111,9 +110,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
 		Options clientOptions = new Options ();
-
+		
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportTo);
 		
@@ -122,34 +120,111 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
-		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
-		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-		
-		String offeredSequenceID = SandeshaUtil.getUUID();
-		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
-		
-		serviceClient.setOptions(clientOptions);
-		//serviceClient.
-		
-		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-		clientOptions.setUseSeparateListener(true);
-		
-		serviceClient.setOptions(clientOptions);
-		
-		String sequenceKey = SandeshaClient.createSequence(serviceClient,true);
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
-		
-		Thread.sleep(10000);
-		
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-		
-		assertNotNull(sequenceReport.getSequenceID());
-		assertFalse(sequenceReport.isSecureSequence());
-		
-		configContext.getListenerManager().stop();
-		serviceClient.cleanup();
+		startServer();
+		try
+		{
+			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+			clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+			
+			String offeredSequenceID = SandeshaUtil.getUUID();
+			clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+			
+			serviceClient.setOptions(clientOptions);
+			//serviceClient.
+			
+			clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+			clientOptions.setUseSeparateListener(true);
+			
+			serviceClient.setOptions(clientOptions);
+			
+			String sequenceKey = SandeshaClient.createSequence(serviceClient,true);
+			clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
+			
+			Thread.sleep(10000);
+			
+			SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			
+			assertNotNull(sequenceReport.getSequenceID());
+			assertFalse(sequenceReport.isSecureSequence());
+		}
+		finally
+		{
+			configContext.getListenerManager().stop();
+			serviceClient.cleanup();			
+		}
+
 	}
+	
+	public void testSequenceCloseTerminate()throws Exception{
+			startServer();
+			String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+			String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+			
+			String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+			String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+			
+			ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+			
+			Options clientOptions = new Options ();
+			clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
+		       Sandesha2Constants.SPEC_VERSIONS.v1_1);
+			clientOptions.setTo(new EndpointReference (to));
+			clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
+			
+			String sequenceKey = "some_sequence_key";
+			clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+			
+			ServiceClient serviceClient = new ServiceClient (configContext,null);
+			
+			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+			clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+				//serviceClient.
+			serviceClient.setOptions(clientOptions);
+				
+			try{
+				
+				serviceClient.fireAndForget(getPingOMBlock("ping1"));
+				
+				Thread.sleep(10000);
+				
+				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+				assertNotNull(sequenceReport.getSequenceID());
+				
+				//now close the sequence
+				SandeshaClient.closeSequence(serviceClient);
+				
+				//try and send another msg - this should fail
+				try{
+					serviceClient.fireAndForget(getPingOMBlock("ping2"));
+					fail(); //this should have failed
+				}
+				catch(Exception e){
+					//good
+				}
+			
+				//finally terminate the sequence
+				terminateAndCheck(serviceClient);
+			}
+			finally{
+				configContext.getListenerManager().stop();
+				serviceClient.cleanup();			
+			}
+			
+		}
+		
+		private void terminateAndCheck(ServiceClient srvcClient)throws Exception{
+			SandeshaClient.terminateSequence(srvcClient);
+			//wait
+			Thread.sleep(1000);
+			//now check the sequence is terminated
+			SequenceReport report = SandeshaClient.getOutgoingSequenceReport(srvcClient);
+			assertNotNull(report);
+			assertEquals(report.getSequenceStatus(), SequenceReport.SEQUENCE_STATUS_TERMINATED);
+			
+		}
 	
 //	public void testCreateSequenceWithoutOffer () {
 ////		SandeshaClient.createSequence(serviceClient,true);

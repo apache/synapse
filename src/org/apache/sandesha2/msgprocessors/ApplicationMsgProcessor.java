@@ -220,6 +220,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (dummyMessageString != null && Sandesha2Constants.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 
+		//see if the sequence is closed
+		SequencePropertyBean sequenceClosed = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED_CLIENT);
+		if(sequenceClosed!=null){
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
+		}
+		
 		// saving the used message number
 		if (!dummyMessage)
 			setNextMsgNo(configContext, sequencePropertyKey, messageNumber, storageManager);

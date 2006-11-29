@@ -35,29 +35,28 @@
   	These client samples are able to send stock quote and order placement messages
 
   	ant stockquote
-  	  This could be used to act as a 'smart client' for Synapse, by specifying an
+  	  This client could be used to act as a 'smart client', by specifying a
       WS-Addressing EPR directed to the real endpoint, and the transport endpoint
-      set to Synapse
+      set differently
 
       examples:
   	  ant stockquote
   	  ant stockquote [-Dsymbol=IBM]
   	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-  	  	[-Dsynapseurl=http://localhost:8080] [-Drepository=client_repo]
+  	  	[-Dtransporturl=http://localhost:8080] [-Drepository=client_repo]
         [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
 
     ant proxystockquote
-      A client that could set Synapse as its HTTP proxy when sending requests
+      A client that could act as a HTTP proxy client
 
   	  examples:
   	  ant proxystockquote
   	  ant proxystockquote [-Dsymbol=IBM]
   	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-  	  	[-Dsynapseurl=http://localhost:8080]
+  	  	[-Dtransporturl=http://localhost:8080]
 
     ant dumbstockquote
-      A client that could directly invoke the service on a given endpoint. Could be
-      used to test Synapse as a 'gateway'
+      A client that could directly invoke the service on a given endpoint. i.e. as a 'gateway'
 
   	  examples:
 	  ant dumbstockquote
@@ -66,7 +65,7 @@
         [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
 
     ant customquote
-      A client which could send out a stock quote request in a custom format. Synapse is
+      A client which could send out a stock quote request in a custom format. It is
       expected to transform this message to a standard request, and the response back as
       a custom response as expected by this client
 
@@ -74,7 +73,7 @@
 	  	ant customquote
 	    ant customquote [-Dsymbol=IBM]
 	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-	    	[-Dsynapseurl=http://localhost:8080]
+	    	[-Dtransporturl=http://localhost:8080]
 
     ant placeorder
       A client which could send out a one way message using the Axis2 ServiceClient's
@@ -97,7 +96,7 @@
 
     <property name="symbol" value="IBM"/>
     <property name="url" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    <property name="synapseurl" value="http://localhost:8080"/>
+    <property name="transporturl" value="http://localhost:8080"/>
     <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="client_repo"/>
     <property name="secpolicy" value=""/>
@@ -123,7 +122,7 @@
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${url}"/>
-            <arg value="${synapseurl}"/>
+            <arg value="${transporturl}"/>
             <arg value="${repository}"/>
             <arg value="${secpolicy}"/>
         </java>
@@ -134,7 +133,7 @@
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${url}"/>
-            <arg value="${synapseurl}"/>
+            <arg value="${transporturl}"/>
         </java>
     </target>
 
@@ -153,7 +152,7 @@
               classpathref="javac.classpath" fork="true">
            	<arg value="${symbol}"/>
             <arg value="${url}"/>
-            <arg value="${synapseurl}"/>
+            <arg value="${transporturl}"/>
         </java>
     </target>
 

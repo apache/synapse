@@ -24,15 +24,11 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
-import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * Low-level testcases for the Security handling. This test mostly checks that the code can
@@ -41,9 +37,6 @@ import org.apache.sandesha2.util.SandeshaUtil;
  */
 public class SecurityTest extends SandeshaTestCase {
 
-	private int serverPort = DEFAULT_SERVER_TEST_PORT;
-	private SimpleHTTPServer httpServer;
-	
 	public SecurityTest(String name) {
 		super(name);
 	}
@@ -54,25 +47,7 @@ public class SecurityTest extends SandeshaTestCase {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "secure-server";
 		String axis2_xml = repoPath + File.separator + "server_axis2.xml";
 
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
-		String serverPortStr = getTestProperty("test.server.port");
-		if(serverPortStr != null) serverPort = Integer.parseInt(serverPortStr);
-		
-		httpServer = new SimpleHTTPServer (configContext,serverPort);
-		httpServer.start();
-		Thread.sleep(300);
-		
-	}
-	
-	public void tearDown () throws Exception {
-		if (httpServer!=null) {
-			httpServer.stop();
-			httpServer = null;
-		}
-		
-		Thread.sleep(300);
-		super.tearDown();
+		startServer(repoPath, axis2_xml);
 	}
 	
 	// Test the create sequence flow for the 2 spec versions
@@ -98,7 +73,6 @@ public class SecurityTest extends SandeshaTestCase {
 		Options clientOptions = new Options ();
 
 		clientOptions.setTo(new EndpointReference (to));
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,to);
 
 //		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		
@@ -108,14 +82,25 @@ public class SecurityTest extends SandeshaTestCase {
 		String sequenceKey = SandeshaClient.createSequence(serviceClient,false);
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 		
-		SequenceReport sequenceReport = null;
-		for(int i = 0; i < 15; i++) {
-			Thread.sleep(1000);
-			sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			if(sequenceReport.getSequenceID() != null) break;
+		long limit = System.currentTimeMillis() + waitTime;
+		Error lastError = null;
+		while(System.currentTimeMillis() < limit) {
+			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
+			
+			try {
+				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+				assertNotNull(sequenceReport);
+				assertTrue(sequenceReport.isSecureSequence());
+
+				lastError = null;
+				break;
+			} catch(Error e) {
+				lastError = e;
+			}
 		}
-		assertTrue(sequenceReport.isSecureSequence());
-		
+
+		if(lastError != null) throw lastError;
+
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}

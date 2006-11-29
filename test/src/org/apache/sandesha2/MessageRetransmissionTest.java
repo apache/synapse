@@ -18,75 +18,29 @@ package org.apache.sandesha2;
 
 import java.io.File;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
 public class MessageRetransmissionTest extends SandeshaTestCase {
 
-	SimpleHTTPServer httpServer = null;
-	private final String applicationNamespaceName = "http://tempuri.org/"; 
-	private final String ping = "ping";
-	private final String Text = "Text";
-	
-	private Log log = LogFactory.getLog(getClass());
-	
-	int serverPort = DEFAULT_SERVER_TEST_PORT;
+	private static final String server_repoPath = "target" + File.separator + "repos" + File.separator + "server";
+	private static final String server_axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 	
 	public MessageRetransmissionTest () {
 		super ("MessageRetransmissionTest");
 	}
 	
-	public void setUp () throws AxisFault {
-		String serverPortStr = getTestProperty("test.server.port");
-		if (serverPortStr!=null) {
-		
-			try {
-				serverPort = Integer.parseInt(serverPortStr);
-			} catch (NumberFormatException e) {
-				log.error(e);
-			}
-		}
-	}
-	
-	private void startServer () throws AxisFault {
-		
-		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-
-
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
-		
-		httpServer = new SimpleHTTPServer (configContext,serverPort);
-		httpServer.start();
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			throw new SandeshaException ("sleep interupted");
-		}
-	}
-	
-	public void testMessageRetransmission () throws AxisFault,InterruptedException  {
+	public void testMessageRetransmission () throws Exception  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		
+	
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
 
@@ -97,7 +51,6 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence1";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
@@ -112,46 +65,33 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 		
 		//starting the server after a wait
 		Thread.sleep(10000);
-		
-		startServer();
+		startServer(server_repoPath, server_axis2_xml);
 
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
-		
-		Thread.sleep(10000);
-	
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-		assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-		assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
-	
+		long limit = System.currentTimeMillis() + waitTime;
+		Error lastError = null;
+		while(System.currentTimeMillis() < limit) {
+			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
+			
+			try {
+				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
+				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
+				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+
+				lastError = null;
+				break;
+			} catch(Error e) {
+				lastError = e;
+			}
+		}
+		if(lastError != null) throw lastError;
+
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
-	}
-	
-	private OMElement getPingOMBlock(String text) {
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(ping, namespace);
-		OMElement textElem = fac.createOMElement(Text, namespace);
-		
-		textElem.setText(text);
-		pingElem.addChild(textElem);
-
-		return pingElem;
-	}
-	
-	public void tearDown () throws SandeshaException {
-		if (httpServer!=null)
-			httpServer.stop();
-		
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			throw new SandeshaException ("sleep interupted");
-		}
 	}
 	
 }

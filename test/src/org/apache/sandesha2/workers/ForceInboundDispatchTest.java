@@ -2,10 +2,6 @@ package org.apache.sandesha2.workers;
 
 import java.io.File;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -13,12 +9,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.context.MessageContextConstants;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -27,64 +18,25 @@ import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.workers.Invoker;
 
 public class ForceInboundDispatchTest extends SandeshaTestCase  {
 
-	SimpleHTTPServer httpServer = null;
-	private final String applicationNamespaceName = "http://tempuri.org/"; 
-	private final String ping = "ping";
-	private final String Text = "Text";
-
-	private Log log = LogFactory.getLog(getClass());
-	int serverPort = DEFAULT_SERVER_TEST_PORT;
-	
 	ConfigurationContext serverConfigCtx = null;
 	
 	public ForceInboundDispatchTest () {
         super ("ForceDispatchTest");
 	}
 	
-	public void setUp () throws AxisFault {
-		
+	public void setUp () throws Exception {
+		super.setUp();
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-
-		serverConfigCtx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
-		String serverPortStr = getTestProperty("test.server.port");
-		if (serverPortStr!=null) {
-			try {
-				serverPort = Integer.parseInt(serverPortStr);
-			} catch (NumberFormatException e) {
-				log.error(e);
-			}
-		}
-		
-		httpServer = new SimpleHTTPServer (serverConfigCtx,serverPort);
-		httpServer.start();
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			throw new SandeshaException ("sleep interupted");
-		}
-	}
-	
-	public void tearDown () throws SandeshaException {
-		if (httpServer!=null)
-			httpServer.stop();
-		
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			throw new SandeshaException ("sleep interupted");
-		}
+		serverConfigCtx = startServer(repoPath, axis2_xml);
 	}
 	
 	public void testForceInvoke () throws AxisFault,InterruptedException  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
@@ -95,7 +47,6 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence1";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
@@ -156,7 +107,6 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 	public void testForceInvokeWithDiscardGaps () throws AxisFault,InterruptedException  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
@@ -167,7 +117,6 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));
-		clientOptions.setProperty(MessageContextConstants.TRANSPORT_URL,transportTo);
 		
 		String sequenceKey = "sequence1";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
@@ -202,16 +151,4 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 
 	}
 	
-	private OMElement getPingOMBlock(String text) {
-		OMFactory fac = OMAbstractFactory.getOMFactory();
-		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
-		OMElement pingElem = fac.createOMElement(ping, namespace);
-		OMElement textElem = fac.createOMElement(Text, namespace);
-		
-		textElem.setText(text);
-		pingElem.addChild(textElem);
-
-		return pingElem;
-	}
-
 }

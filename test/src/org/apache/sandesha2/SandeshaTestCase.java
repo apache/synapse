@@ -32,16 +32,22 @@ import javax.xml.stream.XMLStreamReader;
 import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.async.AsyncResult;
+import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,6 +61,19 @@ public class SandeshaTestCase extends TestCase {
     private final String RMServiceName = "RMSampleService";
 	private Log log = LogFactory.getLog(getClass());
     
+	private final static String applicationNamespaceName = "http://tempuri.org/"; 
+	private final static String echoString = "echoString";
+	private final static String ping = "ping";
+	private final static String Text = "Text";
+	private final static String Sequence = "Sequence";
+	private final static String echoStringResponse = "echoStringResponse";
+	private final static String EchoStringReturn = "EchoStringReturn";
+
+	protected SimpleHTTPServer httpServer = null;
+	protected int serverPort = DEFAULT_SERVER_TEST_PORT;
+	protected int waitTime = 30000; // Each test will wait up to 30 seconds, unless we override it here
+	protected int tickTime = 1000;  // Each wait will check the test assertions each second
+	
     public SandeshaTestCase(String name) {
         super(name);
         File baseDir = new File("");
@@ -74,7 +93,39 @@ public class SandeshaTestCase extends TestCase {
 		}
     }
     
-    protected InputStreamReader getResource(String relativePath, String resourceName) {
+    public void setUp () throws Exception {
+		super.setUp();
+    	
+		String serverPortStr = getTestProperty("test.server.port");
+		if (serverPortStr!=null) {
+			try {
+				serverPort = Integer.parseInt(serverPortStr);
+			} catch (NumberFormatException e) {
+				log.error(e);
+			}
+		}
+    }
+    
+	public ConfigurationContext startServer(String repoPath, String axis2_xml)
+	throws Exception {
+
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+
+		httpServer = new SimpleHTTPServer (configContext,serverPort);
+		httpServer.start();
+		Thread.sleep(300);
+		
+		return configContext;
+	}
+
+	public void tearDown () throws Exception {
+		if (httpServer!=null)
+			httpServer.stop();
+		
+		Thread.sleep(300);
+	}
+
+	protected InputStreamReader getResource(String relativePath, String resourceName) {
         String resourceFile = resourceDir + relativePath + File.separator + resourceName;
         try {
             FileReader reader = new FileReader(resourceFile);
@@ -104,7 +155,45 @@ public class SandeshaTestCase extends TestCase {
     protected SOAPEnvelope getEmptySOAPEnvelope() {
         return OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
     }
+
+    protected static OMElement getEchoOMBlock(String text, String sequenceKey) {
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMNamespace applicationNamespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement echoStringElement = fac.createOMElement(echoString, applicationNamespace);
+		OMElement textElem = fac.createOMElement(Text,applicationNamespace);
+		OMElement sequenceElem = fac.createOMElement(Sequence,applicationNamespace);
+		
+		textElem.setText(text);
+		sequenceElem.setText(sequenceKey);
+		echoStringElement.addChild(textElem);
+		echoStringElement.addChild(sequenceElem);
+		
+		return echoStringElement;
+	}
     
+	protected OMElement getPingOMBlock(String text) {
+		OMFactory fac = OMAbstractFactory.getOMFactory();
+		OMNamespace namespace = fac.createOMNamespace(applicationNamespaceName,"ns1");
+		OMElement pingElem = fac.createOMElement(ping, namespace);
+		OMElement textElem = fac.createOMElement(Text, namespace);
+		
+		textElem.setText(text);
+		pingElem.addChild(textElem);
+
+		return pingElem;
+	}
+
+	protected String checkEchoOMBlock(OMElement response) {
+		assertEquals("Response namespace", applicationNamespaceName, response.getNamespace().getNamespaceURI());
+		assertEquals("Response local name", echoStringResponse, response.getLocalName());
+		
+		OMElement echoStringReturnElem = response.getFirstChildWithName(new QName (applicationNamespaceName,EchoStringReturn));
+		assertNotNull("Echo String Return", echoStringReturnElem);
+		
+		String resultStr = echoStringReturnElem.getText();
+		return resultStr;
+	}
+
     public String getTestProperty (String key) {
     	if (properties!=null)
     		return properties.getProperty(key);
@@ -130,5 +219,41 @@ public class SandeshaTestCase extends TestCase {
     	
     	operation.setMessageReceiver(messageReceiver);
     }
+
+	protected class TestCallback extends Callback {
+
+		String name = null;
+		boolean completed = false;
+		boolean errorRported = false;
+		String resultStr;
+		
+		public boolean isCompleted() {
+			return completed;
+		}
+
+		public boolean isErrorRported() {
+			return errorRported;
+		}
+
+		public String getResult () {
+			return resultStr;
+		}
+		
+		public TestCallback (String name) {
+			this.name = name;
+		}
+		
+		public void onComplete(AsyncResult result) {
+			SOAPBody body = result.getResponseEnvelope().getBody();
+			OMElement contents = body.getFirstElement();
+			this.resultStr = checkEchoOMBlock(contents);
+			completed = true;
+		}
+
+		public void onError (Exception e) {
+			e.printStackTrace();
+			errorRported = true;
+		}
+	}
 
 }

@@ -250,6 +250,7 @@ public class SandeshaMessageKeys {
     
     public final static String elementMustForSpec = "elementMustForSpec";
     public final static String addressingNamespaceNotSet = "addressingNamespaceNotSet";
+    public final static String couldNotSendCreateSeqResponse = "couldNotSendCreateSeqResponse";
     public final static String invalidOfferNoResponseEndpoint = "invalidOfferNoResponseEndpoint";
     public final static String invalidElementFoundWithinElement = "invalidElementFoundWithinElement";
     public final static String invokerNotFound="invokerNotFound";

@@ -260,7 +260,14 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			SequenceManager.updateLastActivatedTime(newSequenceId, storageManager);
 
 			AxisEngine engine = new AxisEngine(context);
-			engine.send(outMessage);
+			try{
+				engine.send(outMessage);				
+			}
+			catch(AxisFault e){
+				throw new SandeshaException(
+						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCreateSeqResponse, e.toString()), 
+						e);
+			}
 
 			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,
 					Sandesha2Constants.SequenceProperties.TO_EPR);

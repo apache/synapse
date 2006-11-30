@@ -23,6 +23,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.OperationClient;
@@ -236,10 +237,22 @@ public class Axis2FlexibleMEPClient {
      * @param headerInformation headers to be removed
      */
     private static void detachAddressingInformation(ArrayList headerInformation) {
-        Iterator iterator = headerInformation.iterator();
-        while (iterator.hasNext()) {
-            SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) iterator.next();
-            headerBlock.detach();
-        }
-    }
+       Iterator iterator = headerInformation.iterator();
+       while (iterator.hasNext()) {
+           Object o = iterator.next();
+           if (o instanceof SOAPHeaderBlock) {
+               SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
+               headerBlock.detach();
+           } else if (o instanceof OMElement) {
+               // work around for a known addressing bug which sends non SOAPHeaderBlock objects
+               OMElement om = (OMElement) o;
+               OMNamespace ns = om.getNamespace();
+               if (ns != null &&
+                       (AddressingConstants.Submission.WSA_NAMESPACE.equals(ns.getNamespaceURI())
+                       || AddressingConstants.Final.WSA_NAMESPACE.equals(ns.getNamespaceURI()))) {
+                   om.detach();
+               }
+           }
+       }
+   } 
 }

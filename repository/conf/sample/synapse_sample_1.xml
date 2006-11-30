@@ -23,7 +23,7 @@
     <rules>
 
         <!-- simple filtering of messages with XPath and regex matches -->
-        <filter source="get-property('To')" regex="/StockQuote">
+        <filter source="get-property('To')" regex=".*/StockQuote.*">
 
             <!-- route the message to the SimpleStockQuoteService1 service EPR -->
             <send>

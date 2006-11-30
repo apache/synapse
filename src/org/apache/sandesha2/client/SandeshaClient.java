@@ -175,7 +175,7 @@ public class SandeshaClient {
 			}
 
 			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
-			fillOutgoingSequenceInfo(sequenceReport, outSequenceID, seqPropMgr);
+			fillOutgoingSequenceInfo(sequenceReport, internalSequenceID, outSequenceID, seqPropMgr);
 
 		} catch (Exception e) {
 			if (!withinTransaction && reportTransaction!=null) {
@@ -932,7 +932,7 @@ public class SandeshaClient {
 		report.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_TERMINATED);
 
 		String outSequenceID = internalSequenceBean.getSequencePropertyKey();
-		fillOutgoingSequenceInfo(report, outSequenceID, seqPropMgr);
+		fillOutgoingSequenceInfo(report, internalSequenceID, outSequenceID, seqPropMgr);
 	}
 
 	private static void fillTimedoutOutgoingSequenceInfo(SequenceReport report, String internalSequenceID,
@@ -952,14 +952,14 @@ public class SandeshaClient {
 
 		report.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_TIMED_OUT);
 		String outSequenceID = internalSequenceBean.getSequencePropertyKey();
-		fillOutgoingSequenceInfo(report, outSequenceID, seqPropMgr);
+		fillOutgoingSequenceInfo(report, internalSequenceID, outSequenceID, seqPropMgr);
 	}
 
-	private static void fillOutgoingSequenceInfo(SequenceReport report, String outSequenceID,
+	private static void fillOutgoingSequenceInfo(SequenceReport report, String internalSequenceID, String outSequenceID,
 			SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
 		report.setSequenceID(outSequenceID);
 
-		ArrayList completedMessageList = AcknowledgementManager.getClientCompletedMessagesList(outSequenceID,
+		ArrayList completedMessageList = AcknowledgementManager.getClientCompletedMessagesList(internalSequenceID, outSequenceID,
 				seqPropMgr);
 
 		Iterator iter = completedMessageList.iterator();

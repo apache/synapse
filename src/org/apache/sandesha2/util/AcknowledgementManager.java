@@ -34,7 +34,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -152,18 +151,11 @@ public class AcknowledgementManager {
 	 * @param outGoingMessage
 	 * @return
 	 */
-	public static ArrayList getClientCompletedMessagesList(String sequenceID, SequencePropertyBeanMgr seqPropMgr)
+	public static ArrayList getClientCompletedMessagesList(String internalSequenceID, String sequenceID, SequencePropertyBeanMgr seqPropMgr)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::getClientCompletedMessagesList");
-
-		// first trying to get it from the internal sequence id.
-		SequencePropertyBean internalSequenceBean = seqPropMgr.retrieve(sequenceID,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		String internalSequenceID = null;
-		if (internalSequenceBean != null)
-			internalSequenceID = internalSequenceBean.getValue();
-
+			log.debug("Enter: AcknowledgementManager::getClientCompletedMessagesList " + internalSequenceID + ", " + sequenceID);
+    
 		SequencePropertyBean completedMessagesBean = null;
 		if (internalSequenceID != null)
 			completedMessagesBean = seqPropMgr.retrieve(internalSequenceID,

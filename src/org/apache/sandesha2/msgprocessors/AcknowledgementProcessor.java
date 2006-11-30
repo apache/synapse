@@ -118,14 +118,6 @@ public class AcknowledgementProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
-		
-		String internalSequenceId = SandeshaUtil.getSequenceProperty(outSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
-		if(log.isDebugEnabled()) log.debug("Got ack for RM Sequence: " + outSequenceId + ", internal id: " + internalSequenceId);
-
-		//here we cannot get the property key using the usual SandeshaUtil.getSequencePropertyKey function,
-		//because this can be a applicationMessage, which piggybacks the acknowledgement.
-		String sequencePropertyKey = internalSequenceId;
 
 		// Check that the sender of this Ack holds the correct token
 		SequencePropertyBean tokenBean = seqPropMgr.retrieve(outSequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
@@ -148,6 +140,14 @@ public class AcknowledgementProcessor {
 		if (fault != null) {
 			throw fault;
 		}
+		
+		String internalSequenceId = SandeshaUtil.getSequenceProperty(outSequenceId,
+				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+		if(log.isDebugEnabled()) log.debug("Got ack for RM Sequence: " + outSequenceId + ", internal id: " + internalSequenceId);
+
+		//here we cannot get the property key using the usual SandeshaUtil.getSequencePropertyKey function,
+		//because this can be a applicationMessage, which piggybacks the acknowledgement.
+		String sequencePropertyKey = internalSequenceId;
 
 		SenderBean input = new SenderBean();
 		input.setSend(true);

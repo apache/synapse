@@ -256,7 +256,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			if (successfullySent) {
 				if (!msgCtx.isServerSide())
+        {
+          // Commit the transaction to release the SenderBean
+          transaction.commit();
+          transaction = storageManager.getTransaction();
 					checkForSyncResponses(msgCtx);
+        }
 			}
 
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)

@@ -36,14 +36,15 @@ import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class SenderWorker extends SandeshaWorker implements Runnable {
 
+  private static final Log log = LogFactory.getLog(SenderWorker.class);
+
 	private ConfigurationContext configurationContext = null;
-	private String messageId = null;
-	private static final Log log = LogFactory.getLog(SenderWorker.class);
+	private SenderBean senderBean = null;
 	private TransportOutDescription transportOut = null;
 	
-	public SenderWorker (ConfigurationContext configurationContext, String messageId) {
+	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean) {
 		this.configurationContext = configurationContext;
-		this.messageId = messageId;
+		this.senderBean = senderBean;
 	}
 	
 	public void setTransportOut (TransportOutDescription transportOut) {
@@ -63,15 +64,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			transaction = storageManager.getTransaction();
 
-			SenderBean senderBean = senderBeanMgr.retrieve(messageId);
-			if (senderBean==null) {
-				//the work is not present. May be invalid now. So should return.
-				if (log.isDebugEnabled())
-					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workNotPresent,workId));
-				return;
-			}
 			String key = senderBean.getMessageContextRefKey();
 			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
+      
+      if (msgCtx == null) {
+        // This sender bean has already been processed
+        return;
+      }
+      
 			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
 
 			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);

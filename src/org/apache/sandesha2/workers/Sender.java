@@ -179,9 +179,7 @@ public class Sender extends Thread {
 					continue;
 				}
 
-				String messageId = senderBean.getMessageID();
-
-				String toAddress = senderBean.getToAddress();
+        String toAddress = senderBean.getToAddress();
 				if (toAddress != null) {
 					boolean unsendableAddress = false;
 
@@ -209,7 +207,7 @@ public class Sender extends Thread {
 				// work Id is used to define the piece of work that will be
 				// assigned to the Worker thread,
 				// to handle this Sender bean.
-				String workId = messageId;
+				String workId = senderBean.getMessageID();
 
 				// check weather the bean is already assigned to a worker.
 				if (lock.isWorkPresent(workId)) {
@@ -226,9 +224,9 @@ public class Sender extends Thread {
 				transaction.commit();
 
 				// start a worker which will work on this messages.
-				SenderWorker worker = new SenderWorker(context, messageId);
+				SenderWorker worker = new SenderWorker(context, senderBean);
 				worker.setLock(lock);
-				worker.setWorkId(messageId);
+				worker.setWorkId(workId);
 				threadPool.execute(worker);
 
 				// adding the workId to the lock after assigning it to a thread

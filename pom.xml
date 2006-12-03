@@ -279,7 +279,7 @@
         </dependency>
         
         <dependency>
-            <groupId>sandesha2</groupId>
+            <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-policy</artifactId>
             <version>${sandesha2.version}</version>
         </dependency>
@@ -311,7 +311,7 @@
         </dependency>
 
         <dependency>
-            <groupId>sandesha2</groupId>
+            <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2</artifactId>
             <version>${sandesha2.version}</version>
             <type>mar</type>
@@ -569,7 +569,7 @@
 
     <properties>
         <synapse.version>0.90-SNAPSHOT</synapse.version>
-        <axis2.version>1.1.1-SNAPSHOT</axis2.version>
+        <axis2.version>1.1</axis2.version>
         <axis2.security.version>1.1-SNAPSHOT</axis2.security.version>
         <axiom.version>1.2.1-SNAPSHOT</axiom.version>
         <xml_schema.version>1.2</xml_schema.version>
@@ -600,9 +600,9 @@
         <activation.version>1.1</activation.version>
         <geronimo.spec.jms.version>1.1-rc4</geronimo.spec.jms.version>
 
-        <stax.impl.groupid>woodstox</stax.impl.groupid>
-        <stax.impl.artifactid>wstx</stax.impl.artifactid>
-        <stax.impl.version>asl-3.1.0</stax.impl.version>
+        <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>
+        <stax.impl.artifactid>wstx-asl</stax.impl.artifactid>
+        <stax.impl.version>3.1.0</stax.impl.version>
         <stax.api.version>1.0.1</stax.api.version>
     </properties>
 

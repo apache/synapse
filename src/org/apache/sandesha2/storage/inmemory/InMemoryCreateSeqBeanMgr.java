@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
-import java.sql.ResultSet;
 import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
@@ -25,8 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.RMBean;
@@ -39,23 +37,23 @@ public class InMemoryCreateSeqBeanMgr extends InMemoryBeanMgr implements CreateS
 		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
 	}
 
-	public boolean insert(CreateSeqBean bean) {
+	public boolean insert(CreateSeqBean bean) throws SandeshaStorageException {
 		return super.insert(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public boolean delete(String msgId) {
+	public boolean delete(String msgId) throws SandeshaStorageException {
 		return super.delete(msgId);
 	}
 
-	public CreateSeqBean retrieve(String msgId) {
+	public CreateSeqBean retrieve(String msgId) throws SandeshaStorageException {
 		return (CreateSeqBean) super.retrieve(msgId);
 	}
 
-	public boolean update(CreateSeqBean bean) {
+	public boolean update(CreateSeqBean bean) throws SandeshaStorageException {
 		return super.update(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public List find(CreateSeqBean bean) {
+	public List find(CreateSeqBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	

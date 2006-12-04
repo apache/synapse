@@ -756,15 +756,44 @@ public class SandeshaClient {
 	public static void forceDispatchOfInboundMessages(ConfigurationContext configContext, 
 			String sequenceID,
 			boolean allowLaterDeliveryOfMissingMessages)throws SandeshaException{
-		//only do this if we are running inOrder
-		if(SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration()).isInOrder()){
-			Invoker invoker = (Invoker) configContext.getProperty(Sandesha2Constants.INVOKER);
-			if (invoker==null){
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.invokerNotFound, sequenceID));
+		String withinTransactionStr = (String) configContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
+		boolean withinTransaction = false;
+		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr))
+			withinTransaction = true;
+
+		Transaction reportTransaction = null;
+		if (!withinTransaction) {
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
+			reportTransaction = storageManager.getTransaction();
+			configContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+		}
+
+		boolean rolledback = false;
+
+		try {
+
+			//only do this if we are running inOrder
+			if(SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration()).isInOrder()){
+				Invoker invoker = (Invoker) configContext.getProperty(Sandesha2Constants.INVOKER);
+				if (invoker==null){
+					throw new SandeshaException(SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.invokerNotFound, sequenceID));
+				}
+				
+				invoker.forceInvokeOfAllMessagesCurrentlyOnSequence(configContext, sequenceID, allowLaterDeliveryOfMissingMessages);			
 			}
 			
-			invoker.forceInvokeOfAllMessagesCurrentlyOnSequence(configContext, sequenceID, allowLaterDeliveryOfMissingMessages);			
+		} catch (Exception e) {
+			if (!withinTransaction && reportTransaction!=null) {
+				reportTransaction.rollback();
+				configContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
+				rolledback = true;
+			}
+		} finally {
+			if (!withinTransaction && !rolledback && reportTransaction!=null) {
+				reportTransaction.commit();
+				configContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
+			}
 		}
 	}
 	

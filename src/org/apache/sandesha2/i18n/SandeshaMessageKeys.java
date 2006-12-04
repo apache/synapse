@@ -15,6 +15,8 @@ public class SandeshaMessageKeys {
 
 	public static final String commitError="commitError";
 	public static final String rollbackError="rollbackError";
+	public static final String deadlock="deadlock";
+	public static final String noTransaction="noTransaction";
 	public static final String inMsgError="inMsgError";
 	public static final String outMsgError="outMsgError";
 	public static final String invokeMsgError="invokeMsgError";

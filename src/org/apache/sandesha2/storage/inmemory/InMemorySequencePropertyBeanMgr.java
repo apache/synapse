@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -37,19 +38,19 @@ public class InMemorySequencePropertyBeanMgr extends InMemoryBeanMgr implements 
 		super(mgr, context, Sandesha2Constants.BeanMAPs.SEQUENCE_PROPERTY);
 	}
 
-	public boolean delete(String sequenceId, String name) {
+	public boolean delete(String sequenceId, String name) throws SandeshaStorageException {
 		return super.delete(getId(sequenceId, name));
 	}
 
-	public SequencePropertyBean retrieve(String sequenceId, String name) {
+	public SequencePropertyBean retrieve(String sequenceId, String name) throws SandeshaStorageException {
 		return (SequencePropertyBean) super.retrieve(getId(sequenceId, name));
 	}
 
-	public boolean insert(SequencePropertyBean bean) {
+	public boolean insert(SequencePropertyBean bean) throws SandeshaStorageException {
 		return super.insert(getId(bean), bean);
 	}
 
-	public List find(SequencePropertyBean bean) {
+	public List find(SequencePropertyBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	
@@ -74,7 +75,7 @@ public class InMemorySequencePropertyBeanMgr extends InMemoryBeanMgr implements 
 		return equal;
 	}
 
-	public boolean update(SequencePropertyBean bean) {	
+	public boolean update(SequencePropertyBean bean) throws SandeshaStorageException {	
 		return super.update(getId(bean), bean);
 	}
 	
@@ -93,7 +94,7 @@ public class InMemorySequencePropertyBeanMgr extends InMemoryBeanMgr implements 
 		return (SequencePropertyBean) super.findUnique(bean);
 	}
 
-	public Collection retrieveAll() {
+	public Collection retrieveAll() throws SandeshaStorageException {
 		return super.find(null);
 	}
 	

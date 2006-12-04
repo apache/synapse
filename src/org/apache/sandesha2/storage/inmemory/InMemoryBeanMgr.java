@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beans.RMBean;
 
 abstract class InMemoryBeanMgr {
@@ -30,7 +31,7 @@ abstract class InMemoryBeanMgr {
 		}
 	}
 	
-	protected boolean insert(Object key, RMBean bean) {
+	protected boolean insert(Object key, RMBean bean) throws SandeshaStorageException {
 		mgr.enlistBean(bean);
 		synchronized (table) {
 			table.put(key, bean);
@@ -38,7 +39,7 @@ abstract class InMemoryBeanMgr {
 		return true;
 	}
 
-	protected boolean delete(Object key) {
+	protected boolean delete(Object key) throws SandeshaStorageException {
 		RMBean bean = null;
 		synchronized (table) {
 			bean = (RMBean) table.get(key);
@@ -52,7 +53,7 @@ abstract class InMemoryBeanMgr {
 		return bean != null;
 	}
 
-	protected RMBean retrieve(Object key) {
+	protected RMBean retrieve(Object key) throws SandeshaStorageException {
 		RMBean bean = null;
 		synchronized (table) {
 			bean = (RMBean) table.get(key);
@@ -66,7 +67,7 @@ abstract class InMemoryBeanMgr {
 		return bean;
 	}
 
-	protected boolean update(Object key, RMBean bean) {
+	protected boolean update(Object key, RMBean bean) throws SandeshaStorageException {
 		mgr.enlistBean(bean);
 		RMBean oldBean = null;
 		synchronized (table) {
@@ -79,7 +80,7 @@ abstract class InMemoryBeanMgr {
 		return true;
 	}
 
-	protected List find(RMBean matchInfo) {
+	protected List find(RMBean matchInfo) throws SandeshaStorageException {
 		ArrayList beans = new ArrayList();
 		synchronized (table) {
 			if(matchInfo == null) {

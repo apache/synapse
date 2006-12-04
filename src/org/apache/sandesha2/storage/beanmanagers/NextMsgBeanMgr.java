@@ -42,5 +42,5 @@ public interface NextMsgBeanMgr extends RMBeanManager {
 	
 	public NextMsgBean findUnique (NextMsgBean bean) throws SandeshaException;
 
-	public Collection retrieveAll();
+	public Collection retrieveAll() throws SandeshaStorageException;
 }

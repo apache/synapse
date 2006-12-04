@@ -17,11 +17,6 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
@@ -29,8 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMBean;
@@ -43,19 +37,19 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		super(mgr, context, Sandesha2Constants.BeanMAPs.STORAGE_MAP);
 	}
 
-	public boolean insert(InvokerBean bean) {
+	public boolean insert(InvokerBean bean) throws SandeshaStorageException {
 		return super.insert(bean.getMessageContextRefKey(), bean);
 	}
 
-	public boolean delete(String key) {
+	public boolean delete(String key) throws SandeshaStorageException {
 		return super.delete(key);
 	}
 
-	public InvokerBean retrieve(String key) {
+	public InvokerBean retrieve(String key) throws SandeshaStorageException {
 		return (InvokerBean) super.retrieve(key);
 	}
 
-	public List find(InvokerBean bean) {
+	public List find(InvokerBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	
@@ -81,7 +75,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		return select;
 	}
 
-	public boolean update(InvokerBean bean) {
+	public boolean update(InvokerBean bean) throws SandeshaStorageException {
 		return super.update(bean.getMessageContextRefKey(), bean);
 	}
 	

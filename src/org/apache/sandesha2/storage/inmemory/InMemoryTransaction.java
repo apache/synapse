@@ -18,10 +18,14 @@
 package org.apache.sandesha2.storage.inmemory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMBean;
 
@@ -36,12 +40,15 @@ public class InMemoryTransaction implements Transaction {
 
 	private InMemoryStorageManager manager;
 	private String threadName;
+	private int    threadId;
 	private ArrayList enlistedBeans = new ArrayList();
+	private InMemoryTransaction waitingForTran = null;
 	
-	InMemoryTransaction(InMemoryStorageManager manager, String threadName) {
+	InMemoryTransaction(InMemoryStorageManager manager, String threadName, int id) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
 		this.manager = manager;
 		this.threadName = threadName;
+		this.threadId = id;
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::<init>, " + this);
 	}
 	
@@ -57,18 +64,32 @@ public class InMemoryTransaction implements Transaction {
 		return !enlistedBeans.isEmpty();
 	}
 
-	public void enlist(RMBean bean) {
+	public void enlist(RMBean bean) throws SandeshaStorageException {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::enlist, " + bean);
 		if(bean != null) {
 			synchronized (bean) {
-				Transaction other = bean.getTransaction();
+				InMemoryTransaction other = (InMemoryTransaction) bean.getTransaction();
 				while(other != null && other != this) {
+					// Put ourselves into the list of waiters
+					waitingForTran = other;
 
+					// Look to see if there is a loop in the chain of waiters
 					if(!enlistedBeans.isEmpty()) {
-						Exception e = new Exception("Possible deadlock");
-						if(log.isDebugEnabled()) {
-							log.debug("Possible deadlock", e);
-							log.debug(this + ", " + bean);
+						HashSet set = new HashSet();
+						set.add(this);
+						while(other != null) {
+							if(set.contains(other)) {
+								// Do our best to get out of the way of the other work in the system
+								waitingForTran = null;
+								releaseLocks();
+
+								String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.deadlock, this.toString(), bean.toString());
+								SandeshaStorageException e = new SandeshaStorageException(message);
+								if(log.isDebugEnabled()) log.debug(message, e);
+								throw e;
+							}
+							set.add(other);
+							other = other.waitingForTran;
 						}
 					}
 
@@ -78,8 +99,10 @@ public class InMemoryTransaction implements Transaction {
 					} catch(InterruptedException e) {
 						// Do nothing
 					}
-					other = bean.getTransaction();
+					other = (InMemoryTransaction) bean.getTransaction();
 				}
+				
+				waitingForTran = null;
 				if(other == null) {
 					if(log.isDebugEnabled()) log.debug(this + " locking bean");
 					bean.setTransaction(this);
@@ -109,7 +132,9 @@ public class InMemoryTransaction implements Transaction {
 	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
-		result.append("[InMemoryTransaction, name: ");
+		result.append("[InMemoryTransaction, id:");
+		result.append(threadId);
+		result.append(", name: ");
 		result.append(threadName);
 		result.append(", locks: ");
 		result.append(enlistedBeans.size());
@@ -117,3 +142,4 @@ public class InMemoryTransaction implements Transaction {
 		return result.toString();
 	}
 }
+

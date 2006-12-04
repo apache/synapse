@@ -51,5 +51,5 @@ public interface SequencePropertyBeanMgr extends RMBeanManager {
 	 */
 	public boolean updateOrInsert(SequencePropertyBean bean) throws SandeshaStorageException;
 
-	public Collection retrieveAll ();
+	public Collection retrieveAll () throws SandeshaStorageException;
 }

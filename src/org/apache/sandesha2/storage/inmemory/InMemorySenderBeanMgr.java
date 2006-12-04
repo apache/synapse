@@ -40,11 +40,11 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		super(mgr, context, Sandesha2Constants.BeanMAPs.RETRANSMITTER);
 	}
 
-	public boolean delete(String MessageId) {
+	public boolean delete(String MessageId) throws SandeshaStorageException {
 		return super.delete(MessageId);
 	}
 
-	public SenderBean retrieve(String MessageId) {
+	public SenderBean retrieve(String MessageId) throws SandeshaStorageException {
 		return (SenderBean) super.retrieve(MessageId);
 	}
 
@@ -55,7 +55,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return super.insert(bean.getMessageID(), bean);
 	}
 
-	public List find(String internalSequenceID) {
+	public List find(String internalSequenceID) throws SandeshaStorageException {
 		SenderBean temp = new SenderBean();
 		temp.setInternalSequenceID(internalSequenceID);
 		return super.find(temp);
@@ -122,11 +122,11 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return add;
 	}
 
-	public List find(SenderBean bean) {
+	public List find(SenderBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 
-	public SenderBean getNextMsgToSend() {
+	public SenderBean getNextMsgToSend() throws SandeshaStorageException {
 		// Set up match criteria
 		SenderBean matcher = new SenderBean();
 		matcher.setSend(true);
@@ -156,7 +156,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return result;
 	}
 	
-	public boolean update(SenderBean bean) {
+	public boolean update(SenderBean bean) throws SandeshaStorageException {
 		return super.update(bean.getMessageID(), bean);
 	}
 	

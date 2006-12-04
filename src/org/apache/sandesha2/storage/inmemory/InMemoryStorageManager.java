@@ -63,14 +63,22 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	public Transaction getTransaction() {
+		// Calling getTransaction is the only way to set up a new transaction. If you
+		// do some work that requires a tran without there being a transaction in scope
+		// then the enlist method will throw an exception.
 		Transaction result = null;
 		synchronized (transactions) {
 			Thread key = Thread.currentThread();
 			String name = key.getName();
+			int    id = System.identityHashCode(key);
 			result = (Transaction) transactions.get(key);
 			if(result == null) {
-				result = new InMemoryTransaction(this, name);
+				result = new InMemoryTransaction(this, name, id);
 				transactions.put(key, result);
+			} else {
+				// We just returned an existing transaction. That might be ok, but it
+				// might be an indication of a real problem.
+				if(log.isDebugEnabled()) log.debug("Possible re-used transaction: " + result);
 			}
 		}
 		return result;
@@ -83,8 +91,19 @@ public class InMemoryStorageManager extends StorageManager {
 		}
 	}
 	
-	void enlistBean(RMBean bean) {
-		InMemoryTransaction t = (InMemoryTransaction) getTransaction();
+	void enlistBean(RMBean bean) throws SandeshaStorageException {
+		InMemoryTransaction t = null;
+		synchronized (transactions) {
+			Thread key = Thread.currentThread();
+			t = (InMemoryTransaction) transactions.get(key);
+			if(t == null) {
+				// We attempted to do some work without a transaction in scope
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noTransaction);
+				SandeshaStorageException e = new SandeshaStorageException(message);
+				if(log.isDebugEnabled()) log.debug(message, e);
+				throw e;
+			}
+		}
 		t.enlist(bean);
 	}
 	
@@ -185,3 +204,4 @@ public class InMemoryStorageManager extends StorageManager {
 	
 	
 }
+

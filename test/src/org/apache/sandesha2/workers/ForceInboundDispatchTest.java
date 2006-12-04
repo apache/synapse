@@ -14,6 +14,7 @@ import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.NextMsgBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RangeString;
@@ -61,9 +62,11 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			serviceClient.fireAndForget(getPingOMBlock("ping3"));
 	
 			Thread.sleep(5000);
-			
+			StorageManager mgr = SandeshaUtil.getInMemoryStorageManager(configContext);
+			Transaction t = mgr.getTransaction();
 			String inboundSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(SandeshaUtil.getInternalSequenceID(to, sequenceKey),
-					SandeshaUtil.getInMemoryStorageManager(configContext));
+					mgr);
+			t.commit();
 			
 			SandeshaClient.forceDispatchOfInboundMessages(serverConfigCtx, 
 					inboundSequenceID, 
@@ -71,6 +74,7 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			
 			//check that the server is now expecting msg 4
 			StorageManager serverStore = SandeshaUtil.getInMemoryStorageManager(serverConfigCtx);
+			t = serverStore.getTransaction();
 			NextMsgBean nextMsgBean = 
 				serverStore.getNextMsgBeanMgr().retrieve(inboundSequenceID);
 			assertNotNull(nextMsgBean);
@@ -85,14 +89,17 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			assertNotNull(outOfOrderRanges);
 			RangeString rangeString = new RangeString(outOfOrderRanges.getValue());
 			assertTrue(rangeString.isMessageNumberInRanges(2));
+			t.commit();
 			
 			//we deliver msg 2
 			//set highest out msg number to 1
+			t = mgr.getTransaction();
 			SequencePropertyBean nextMsgNoBean = 
-					SandeshaUtil.getInMemoryStorageManager(configContext).getSequencePropertyBeanMgr().
+					mgr.getSequencePropertyBeanMgr().
 					retrieve(SandeshaUtil.getInternalSequenceID(to, sequenceKey),
 					Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
 			nextMsgNoBean.setValue("1");
+			t.commit();
 			
 			clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(2));
 			serviceClient.fireAndForget(getPingOMBlock("ping2"));
@@ -132,17 +139,21 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 	
 			Thread.sleep(5000);
 			
+			StorageManager mgr = SandeshaUtil.getInMemoryStorageManager(configContext);
+			Transaction t = mgr.getTransaction();
 			String inboundSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(SandeshaUtil.getInternalSequenceID(to, sequenceKey),
-					SandeshaUtil.getInMemoryStorageManager(configContext));
+					mgr);
+			t.commit();
 			
 			SandeshaClient.forceDispatchOfInboundMessages(serverConfigCtx, inboundSequenceID, false);
 			
 			//check that the server is now expecting msg 4
-			NextMsgBean nextMsgBean = 
-				SandeshaUtil.getInMemoryStorageManager(serverConfigCtx).getNextMsgBeanMgr().
-					retrieve(inboundSequenceID);
+			StorageManager serverMgr = SandeshaUtil.getInMemoryStorageManager(serverConfigCtx);
+			t = serverMgr.getTransaction();
+			NextMsgBean nextMsgBean = serverMgr.getNextMsgBeanMgr().retrieve(inboundSequenceID);
 			assertNotNull(nextMsgBean);
 			assertEquals(nextMsgBean.getNextMsgNoToProcess(), 4);
+			t.commit();
 	  }
 		finally{
 			configContext.getListenerManager().stop();

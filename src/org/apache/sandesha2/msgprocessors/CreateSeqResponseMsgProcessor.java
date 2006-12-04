@@ -50,6 +50,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
+import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -311,6 +312,20 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 				
 				TerminateSequence sequencePart = (TerminateSequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+				if (sequencePart == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
+	
+				Identifier identifier = new Identifier(assumedRMNamespace);
+				identifier.setIndentifer(newOutSequenceId);
+	
+				sequencePart.setIdentifier(identifier);
+
+			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
+			
+				CloseSequence sequencePart = (CloseSequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
 				if (sequencePart == null) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
 					log.debug(message);

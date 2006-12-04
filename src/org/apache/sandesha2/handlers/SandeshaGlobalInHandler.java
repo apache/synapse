@@ -58,7 +58,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 	private static final long serialVersionUID = -7187928423123306156L;
 
-	private static final Log log = LogFactory.getLog(SandeshaGlobalInHandler.class.getName());
+	private static final Log log = LogFactory.getLog(SandeshaGlobalInHandler.class);
 	
 	public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
@@ -80,31 +80,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			return returnValue; // Reinjected messages are not processed by Sandesha2 inflow
 													// handlers
 
-		StorageManager storageManager = null;
-		try {
-			storageManager = SandeshaUtil
-					.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
-			if (storageManager == null) {
-				log.debug("Sandesha2 cannot proceed. The StorageManager is not available " + returnValue);
-				return returnValue;
-			}
-		} catch (SandeshaException e1) {
-			// TODO make this a log
-			log.debug("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager", e1);
-			return returnValue;
-		}
-
 		boolean withinTransaction = false;
-		String withinTransactionStr = (String) msgContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr)) {
-			withinTransaction = true;
-		}
-
 		Transaction transaction = null;
-		if (!withinTransaction) {
-			transaction = storageManager.getTransaction();
-			msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		}
 		boolean rolebacked = false;
 
 		try {
@@ -151,6 +128,30 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				return returnValue;
 			}
 
+			String withinTransactionStr = (String) msgContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
+			if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr)) {
+				withinTransaction = true;
+			}
+
+			StorageManager storageManager = null;
+			try {
+				storageManager = SandeshaUtil
+						.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
+				if (storageManager == null) {
+					log.debug("Sandesha2 cannot proceed. The StorageManager is not available " + returnValue);
+					return returnValue;
+				}
+			} catch (SandeshaException e1) {
+				// TODO make this a log
+				log.debug("Sandesha2 cannot proceed. Exception thrown when looking for the StorageManager", e1);
+				return returnValue;
+			}
+
+			if (!withinTransaction) {
+				transaction = storageManager.getTransaction();
+				msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
+			}
+
 			RMMsgContext rmMessageContext = MsgInitializer.initializeMessage(msgContext);
 
 			// Dropping duplicates
@@ -180,7 +181,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			msgContext.pause();
 			returnValue = InvocationResponse.SUSPEND;
 
-			if (!withinTransaction) {
+			if (!withinTransaction && transaction != null) {
 				try {
 					transaction.rollback();
 					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
@@ -196,7 +197,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				log.debug("Exit: SandeshaGlobalInHandler::invoke ", e);
 			throw new AxisFault(message, e);
 		} finally {
-			if (!withinTransaction && !rolebacked) {
+			if (!withinTransaction && !rolebacked && transaction != null) {
 				try {
 					transaction.commit();
 					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);

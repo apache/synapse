@@ -33,7 +33,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
@@ -51,6 +50,7 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -309,15 +309,36 @@ public class AckRequestedProcessor {
 
 		String toAddress = ackRequestRMMsg.getTo().getAddress();
 		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		String internalSeqenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
 
-		String outSequenceID = SandeshaUtil.getSequenceProperty(internalSeqenceID,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
-		if (outSequenceID == null)
+		// Does the sequence exist ?
+		boolean sequenceExists = false;
+		String outSequenceID = null;
+		
+		// Get the Create sequence bean with the matching internal sequenceid 
+		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		createSeqFindBean.setInternalSequenceID(internalSequenceID);
+
+		CreateSeqBean createSeqBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		
+		if (createSeqBean == null)
+		{
+			if (log.isDebugEnabled())
+				log.debug("Exit: AckRequestedProcessor::processOutMessage Sequence doesn't exist");
+			
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.couldNotSendAckRequestSeqNotFound, internalSeqenceID));
+					SandeshaMessageKeys.couldNotSendCloseSeqNotFound, internalSequenceID));			
+		}
+		
+		if (createSeqBean.getSequenceID() != null)
+		{
+			sequenceExists = true;		
+			outSequenceID = createSeqBean.getSequenceID();
+		}
+		else
+			outSequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;			
 
-		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID, storageManager);
+		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceID, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
@@ -340,38 +361,35 @@ public class AckRequestedProcessor {
 		}
 		
 		if (iterator.hasNext()) {
-			String message = "Passed message has more than one AckRequest. You can have only one";
-			throw new SandeshaException (message);
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
 		}
 		
 		if (ackRequested==null) {
-			String message = "No AckRequested part was present in the message";
-			throw new SandeshaException (message);
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAckRequestPartFound));
 		}
 		
 		ackRequested.getIdentifier().setIndentifer(outSequenceID);
 		
 		msgContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-
 		ackRequestRMMsg.setWSAAction(SpecSpecificConstants.getAckRequestAction (rmVersion));
 		ackRequestRMMsg.setSOAPAction(SpecSpecificConstants.getAckRequestSOAPAction (rmVersion));
 
-		String transportTo = SandeshaUtil.getSequenceProperty(internalSeqenceID,
+		String transportTo = SandeshaUtil.getSequenceProperty(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.TRANSPORT_TO, storageManager);
 		if (transportTo != null) {
-			ackRequestRMMsg.setProperty(MessageContextConstants.TRANSPORT_URL, transportTo);
+			ackRequestRMMsg.setProperty(Constants.Configuration.TRANSPORT_URL, transportTo);
 		}
 		
 		//setting msg context properties
 		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, outSequenceID);
-		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSeqenceID);
+		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceID);
 		ackRequestRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY , sequenceKey);
 
 		ackRequestRMMsg.addSOAPEnvelope();
 		
 		// Ensure the outbound message us secured using the correct token
-		String tokenData = SandeshaUtil.getSequenceProperty(internalSeqenceID,
+		String tokenData = SandeshaUtil.getSequenceProperty(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
 				storageManager);
 		if(tokenData != null) {
@@ -383,12 +401,9 @@ public class AckRequestedProcessor {
 		String key = SandeshaUtil.getUUID();
 
 		SenderBean ackRequestBean = new SenderBean();
+		ackRequestBean.setMessageType(Sandesha2Constants.MessageTypes.ACK_REQUEST);
 		ackRequestBean.setMessageContextRefKey(key);
 
-		// Set a retransmitter lastSentTime so that terminate will be send with
-		// some delay.
-		// Otherwise this get send before return of the current request (ack).
-		// TODO: refine the terminate delay.
 		ackRequestBean.setTimeToSend(System.currentTimeMillis());
 
 		ackRequestBean.setMessageID(msgContext.getMessageID());
@@ -398,7 +413,10 @@ public class AckRequestedProcessor {
 			ackRequestBean.setToAddress(to.getAddress());
 		
 		// this will be set to true at the sender.
-		ackRequestBean.setSend(true);
+		if (sequenceExists)
+		  ackRequestBean.setSend(true);
+		else
+			ackRequestBean.setSend(false);
 
 		msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 
@@ -407,8 +425,9 @@ public class AckRequestedProcessor {
 		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
 
 		// Set the sequence id and internal sequence id in the SenderBean
-		ackRequestBean.setInternalSequenceID(internalSeqenceID);
-		ackRequestBean.setSequenceID(outSequenceID);
+		ackRequestBean.setInternalSequenceID(internalSequenceID);
+		if (sequenceExists)
+			ackRequestBean.setSequenceID(outSequenceID);
 		
 		SandeshaUtil.executeAndStore(ackRequestRMMsg, key);
 

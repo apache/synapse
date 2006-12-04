@@ -102,6 +102,8 @@ public class SandeshaMessageKeys {
 	public static final String couldNotSendFault="couldNotSendFault";
 	public static final String cannotSendAckRequestNotActive="cannotSendAckRequestNotActive";
 	public static final String cannotSendAckRequestException="cannotSendAckRequestException";
+	public static final String ackRequestMultipleParts="ackRequestMultipleParts";
+	public static final String noAckRequestPartFound="noAckRequestPartFound";
 	public static final String cannotCloseSequenceNotActive="cannotCloseSequenceNotActive";
 	public static final String noSequenceEstablished="noSequenceEstablished";
 	public static final String invalidInternalSequenceID="invalidInternalSequenceID";
@@ -245,21 +247,21 @@ public class SandeshaMessageKeys {
 	public static final String replyToBeanNotSet = "replyToBeanNotSet";
 	    
     
-    public final static String errorRetrievingSecurityToken = "errorRetrievingSecurityToken";
+	public final static String errorRetrievingSecurityToken = "errorRetrievingSecurityToken";
 	public final static String proofOfPossessionNotVerified = "proofOfPossessionNotVerified";
-    public final static String noSecurityResults = "noSecurityResults";
-    public final static String noSecConvTokenInPolicy = "noSecConvTokenInPolicy";
-    public final static String noServicePolicy = "noServicePolicy";
-    
-    public final static String elementMustForSpec = "elementMustForSpec";
-    public final static String addressingNamespaceNotSet = "addressingNamespaceNotSet";
-    public final static String couldNotSendCreateSeqResponse = "couldNotSendCreateSeqResponse";
-    public final static String invalidOfferNoResponseEndpoint = "invalidOfferNoResponseEndpoint";
-    public final static String invalidElementFoundWithinElement = "invalidElementFoundWithinElement";
-    public final static String invokerNotFound="invokerNotFound";
-    
-    public final static String couldNotSendAckRequestSeqNotFound="couldNotSendAckRequestSeqNotFound";
-    public final static String couldNotSendCloseResponse="couldNotSendCloseResponse";
-    public final static String couldNotSendCloseSeqNotFound="couldNotSendCloseSeqNotFound";
+	public final static String noSecurityResults = "noSecurityResults";
+	public final static String noSecConvTokenInPolicy = "noSecConvTokenInPolicy";
+	public final static String noServicePolicy = "noServicePolicy";
+	    
+	public final static String elementMustForSpec = "elementMustForSpec";
+	public final static String addressingNamespaceNotSet = "addressingNamespaceNotSet";
+	public final static String couldNotSendCreateSeqResponse = "couldNotSendCreateSeqResponse";
+	public final static String invalidOfferNoResponseEndpoint = "invalidOfferNoResponseEndpoint";
+	public final static String invalidElementFoundWithinElement = "invalidElementFoundWithinElement";
+	public final static String invokerNotFound="invokerNotFound";
+	    
+	public final static String couldNotSendAckRequestSeqNotFound="couldNotSendAckRequestSeqNotFound";
+	public final static String couldNotSendCloseResponse="couldNotSendCloseResponse";
+	public final static String couldNotSendCloseSeqNotFound="couldNotSendCloseSeqNotFound";
     
 }

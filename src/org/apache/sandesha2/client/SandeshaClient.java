@@ -19,6 +19,7 @@ package org.apache.sandesha2.client;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.MissingResourceException;
 
 import javax.xml.namespace.QName;
 
@@ -659,6 +660,83 @@ public class SandeshaClient {
 		String sequenceID = sequenceIDBean.getValue();
 		return sequenceID;
 	}
+	
+	private static SOAPEnvelope configureAckRequest(Options options, ConfigurationContext configurationContext) 
+	
+	throws SandeshaException, MissingResourceException {
+		if (options == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.optionsObjectNotSet));
+
+		EndpointReference epr = options.getTo();
+		if (epr == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.toEPRNotValid, null));
+
+		//first see if the cliet has told us which sequence to terminate
+		String internalSequenceID = 
+			(String)options.getProperty(SandeshaClientConstants.INTERNAL_SEQUENCE_ID);
+		
+		if(internalSequenceID==null){
+			//lookup the internal seq id based on to EPR and sequenceKey
+			String to = epr.getAddress();
+			String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+			internalSequenceID = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		}
+		
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
+
+		// Get a transaction to obtain sequence information
+		Transaction transaction = storageManager.getTransaction();
+		
+		SequencePropertyBean sequenceIDBean = null;
+		
+		try
+		{
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+			sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
+					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		}
+		finally
+		{
+			transaction.commit();
+		}
+		
+		String sequenceID = null;
+		
+		if (sequenceIDBean != null)
+			sequenceID = sequenceIDBean.getValue();
+		else
+			sequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;	
+		
+		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+		if (rmSpecVersion == null)
+			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
+
+		options.setAction(SpecSpecificConstants.getAckRequestAction(rmSpecVersion));
+		
+		String soapNamespaceURI = options.getSoapVersionURI();
+		SOAPFactory factory = null;
+		SOAPEnvelope dummyEnvelope = null;
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
+			factory = new SOAP12Factory();
+			dummyEnvelope = factory.getDefaultEnvelope();
+		} else {
+			factory = new SOAP11Factory();
+			dummyEnvelope = factory.getDefaultEnvelope();
+		}
+
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
+
+		AckRequested ackRequested = new AckRequested(rmNamespaceValue);
+		Identifier identifier = new Identifier(rmNamespaceValue);
+		identifier.setIndentifer(sequenceID);
+		ackRequested.setIdentifier(identifier);
+
+		ackRequested.toSOAPEnvelope(dummyEnvelope);
+
+		return dummyEnvelope;
+	}
 
 	public static void sendAckRequest(ServiceClient serviceClient) throws SandeshaException {
 
@@ -684,45 +762,15 @@ public class SandeshaClient {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.emptyAckRequestSpecLevel, rmSpecVersion));
 		}
-
-		String internalSequenceID = getInternalSequenceIdFromServiceClient(serviceClient);
-
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configContext);
-		if (sequenceReport == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotGenerateReport, internalSequenceID));
-		if (sequenceReport.getSequenceStatus() != SequenceReport.SEQUENCE_STATUS_ESTABLISHED)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotSendAckRequestNotActive, internalSequenceID));
-
-		String outSequenceID = getSequenceID(serviceClient);
-
-		String soapNamespaceURI = options.getSoapVersionURI();
-		SOAPFactory factory = null;
-		SOAPEnvelope dummyEnvelope = null;
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
-			factory = new SOAP12Factory();
-			dummyEnvelope = factory.getDefaultEnvelope();
-		} else {
-			factory = new SOAP11Factory();
-			dummyEnvelope = factory.getDefaultEnvelope();
-		}
-
+		
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
 
-		AckRequested ackRequested = new AckRequested(rmNamespaceValue);
-		Identifier identifier = new Identifier(rmNamespaceValue);
-		identifier.setIndentifer(outSequenceID);
-		ackRequested.setIdentifier(identifier);
-
-		ackRequested.toSOAPEnvelope(dummyEnvelope);
-
+		SOAPEnvelope dummyEnvelope = configureAckRequest(options, configContext);
+		
 		OMElement ackRequestedHeaderBlock = dummyEnvelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
 
 		String oldAction = options.getAction();
-
-		options.setAction(SpecSpecificConstants.getAckRequestAction(rmSpecVersion));
 
 		serviceClient.addHeader(ackRequestedHeaderBlock);
 

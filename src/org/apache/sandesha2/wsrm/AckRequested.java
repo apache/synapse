@@ -91,7 +91,8 @@ public class AckRequested implements IOMRMPart {
 			if (identifierElement!=null)
 				identifierVal = identifierElement.getText();
 			
-			if (identifierVal!=null && identifierVal.equals(identifier.getIdentifier()))
+			if (identifierVal!=null && 
+					(identifierVal.equals(identifier.getIdentifier()) || identifierVal.equals(Sandesha2Constants.TEMP_SEQUENCE_ID)))
 				ackRequestedElement.detach();
 			
 		}

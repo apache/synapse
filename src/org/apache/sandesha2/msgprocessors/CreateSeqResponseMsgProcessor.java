@@ -50,6 +50,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
+import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
@@ -336,6 +337,28 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				identifier.setIndentifer(newOutSequenceId);
 	
 				sequencePart.setIdentifier(identifier);
+				
+			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
+
+				Iterator headerIterator = applicaionRMMsg.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+								
+				AckRequested sequencePart = null;
+				while (headerIterator.hasNext()) {
+					sequencePart = (AckRequested) headerIterator.next(); 
+				}
+				
+				if (headerIterator.hasNext()) {
+					throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
+				}
+				
+				if (sequencePart == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
+				
+				sequencePart.getIdentifier().setIndentifer(newOutSequenceId);
+					
 			}
 
 			try {

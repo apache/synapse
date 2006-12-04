@@ -213,6 +213,88 @@ public class SandeshaClientTest extends SandeshaTestCase {
 //		
 //	}
 //
+
+    /**
+		 * Checks the following scenario
+		 * 
+		 * Don't start the server
+		 * 1) send an application message (will generate the create sequence)
+		 * 2) Send ACK Request (should not be rejected)
+		 * 3) start the server
+		 * 4) wait a bit then terminate sequence
+		 * 5) Issue wait until sequence completed (with a wait time)
+		 * 6) Ensure that the sequence was terminated
+		 * 
+		 */
+		public void testAckRequestWithWait () throws Exception {
+			String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+			
+			String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+			String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+			
+			ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+			
+			Options clientOptions = new Options ();
+			clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
+		       Sandesha2Constants.SPEC_VERSIONS.v1_1);
+			clientOptions.setTo(new EndpointReference (to));
+			
+			ServiceClient serviceClient = new ServiceClient (configContext,null);
+			
+			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+			clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+				//serviceClient.
+			serviceClient.setOptions(clientOptions);
+				
+			try{
+				// 1) Send the application message
+				serviceClient.fireAndForget(getPingOMBlock("ping1"));
+				
+				// 2) Send Ack request for the sequence
+				SandeshaClient.sendAckRequest(serviceClient);
+								
+				// 3) Start the server			
+				startServer(server_repoPath, server_axis2_xml);
+
+				// 4) Wait a bit then terminate
+				long limit = System.currentTimeMillis() + waitTime;
+				Error lastError = null;
+				while(System.currentTimeMillis() < limit) {
+					Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
+					
+					try {
+						//now check the sequence is running
+						SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+						assertEquals(report.getSequenceStatus(), SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
+
+						lastError = null;
+						break;
+					} catch(Error e) {
+						lastError = e;
+					}
+				}
+				if(lastError != null) throw lastError;
+				
+				SandeshaClient.terminateSequence(serviceClient);
+				
+				// 5) wait for the sequence completion (30 second wait)
+				SandeshaClient.waitUntilSequenceCompleted(serviceClient, 30000);
+				
+				// 6) Check that the sequence has terminated
+				SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+				assertNotNull(report);
+				assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, report.getSequenceStatus());
+
+			}
+			finally {
+				configContext.getListenerManager().stop();
+				serviceClient.cleanup();			
+			}
+			
+		}
+
 		/**
 		 * Checks the following scenario
 		 * 
@@ -268,7 +350,23 @@ public class SandeshaClientTest extends SandeshaTestCase {
 				startServer(server_repoPath, server_axis2_xml);
 
 				// 5) Wait a bit then terminate
-				Thread.sleep(10000);
+				long limit = System.currentTimeMillis() + waitTime;
+				Error lastError = null;
+				while(System.currentTimeMillis() < limit) {
+					Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
+					
+					try {
+						//now check the sequence is running
+						SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+						assertEquals(report.getSequenceStatus(), SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
+
+						lastError = null;
+						break;
+					} catch(Error e) {
+						lastError = e;
+					}
+				}
+				if(lastError != null) throw lastError;
 				SandeshaClient.terminateSequence(serviceClient);
 				
 				// 6) wait for the sequence completion (30 second wait)
@@ -287,7 +385,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 			
 		}
 
-	/**
+  /**
 	 * Checks the following scenario
 	 * 
 	 * Don't start the server

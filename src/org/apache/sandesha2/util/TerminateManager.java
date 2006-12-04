@@ -340,14 +340,14 @@ public class TerminateManager {
 		}
 	}
 
-	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String outSequenceId,
+	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String internalSequenceID, String outSequenceId,
 			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
 		if(log.isDebugEnabled())
-			log.debug("Enter: TerminateManager::addTerminateSequenceMessage " + outSequenceId);
+			log.debug("Enter: TerminateManager::addTerminateSequenceMessage " + outSequenceId + ", " + internalSequenceID);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean terminated = seqPropMgr.retrieve(outSequenceId,
+		SequencePropertyBean terminated = seqPropMgr.retrieve(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 
 		if (terminated != null && terminated.getValue() != null && "true".equals(terminated.getValue())) {
@@ -438,7 +438,7 @@ public class TerminateManager {
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequencePropertyKey(outSequenceId);
+		terminateAdded.setSequencePropertyKey(internalSequenceID);
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);

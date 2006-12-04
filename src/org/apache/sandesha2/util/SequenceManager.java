@@ -522,28 +522,7 @@ public class SequenceManager {
 		// / Transaction transaction = storageManager.getTransaction();
 		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean findSeqIDBean = new SequencePropertyBean();
-		findSeqIDBean.setValue(internalSequenceID);
-		findSeqIDBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-		Collection seqIDBeans = seqPropBeanMgr.find(findSeqIDBean);
-
-		if (seqIDBeans.size() == 0) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSequenceEstablished);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		if (seqIDBeans.size() > 1) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotGenerateReportNonUniqueSequence, internalSequenceID);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		SequencePropertyBean seqIDBean = (SequencePropertyBean) seqIDBeans.iterator().next();
-		String sequenceID = seqIDBean.getSequencePropertyKey();
-
-		SequencePropertyBean terminateAddedBean = seqPropBeanMgr.retrieve(sequenceID,
+		SequencePropertyBean terminateAddedBean = seqPropBeanMgr.retrieve(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
 		if (terminateAddedBean == null)
 			return false;
@@ -551,7 +530,6 @@ public class SequenceManager {
 		if ("true".equals(terminateAddedBean.getValue()))
 			return true;
 
-		// / transaction.commit();
 		return false;
 	}
 

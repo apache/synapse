@@ -428,12 +428,11 @@ public class SandeshaClient {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmSpecVersion);
 
+		String oldAction = options.getAction();
+
 		SOAPEnvelope terminateEnvelope = configureTerminateSequence(options, serviceContext.getConfigurationContext());
 		OMElement terminateBody = terminateEnvelope.getBody().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
-
-		String oldAction = options.getAction();
-		options.setAction(SpecSpecificConstants.getTerminateSequenceAction(rmSpecVersion));
 
 		try {
 			//to inform the Sandesha2 out handler.
@@ -584,6 +583,15 @@ public class SandeshaClient {
 				long timeNow = System.currentTimeMillis();
 				if (timeNow > (startTime + maxWaitingTime))
 					done = true;
+				else
+				{
+					// Wait for half a second to stop 100 CPU
+					try {
+	          Thread.sleep(500);
+          } catch (InterruptedException e) {
+          	// Ignore the exception
+          }
+				}
 			}
 		}
 	}
@@ -1131,15 +1139,6 @@ public class SandeshaClient {
 			internalSequenceID = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
 		}
 		
-		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(internalSequenceID,
-				configurationContext);
-		if (sequenceReport == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotGenerateReport, internalSequenceID));
-		if (sequenceReport.getSequenceStatus() != SequenceReport.SEQUENCE_STATUS_ESTABLISHED)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.noSequenceEstablished, internalSequenceID));
-		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 
 		// Get a transaction to obtain sequence information
@@ -1152,23 +1151,18 @@ public class SandeshaClient {
 			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 			sequenceIDBean = seqPropMgr.retrieve(internalSequenceID,
 					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-			if (sequenceIDBean == null)
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.sequenceIdBeanNotSet));
-
 		}
 		finally
 		{
 			transaction.commit();
 		}
 		
-		String sequenceID = sequenceIDBean.getValue();
-
+		String sequenceID = null;
+		if (sequenceIDBean != null)
+		  sequenceID = sequenceIDBean.getValue();
+		else
+			sequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;
 		
-		if (sequenceID == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotFindSequenceID, sequenceIDBean.toString()));
-
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 		if (rmSpecVersion == null)
 			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();

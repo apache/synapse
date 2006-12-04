@@ -53,6 +53,7 @@ import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.Sequence;
+import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * Responsible for processing an incoming Create Sequence Response message.
@@ -168,7 +169,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				throw new SandeshaException(message);
 			}
 
-			String offeredSequenceId = (String) offeredSequenceBean.getValue();
+			String offeredSequenceId = offeredSequenceBean.getValue();
 			
 			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
 			SequencePropertyBean acksToBean = new SequencePropertyBean();
@@ -271,7 +272,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		SenderBean target = new SenderBean();
 		target.setInternalSequenceID(internalSequenceId);
 		target.setSend(false);
-		target.setReSend(true);
 
 		Iterator iterator = retransmitterMgr.find(target).iterator();
 		while (iterator.hasNext()) {
@@ -294,17 +294,34 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			RMMsgContext applicaionRMMsg = MsgInitializer.initializeMessage(applicationMsg);
 
-			Sequence sequencePart = (Sequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if (sequencePart == null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
-				log.debug(message);
-				throw new SandeshaException(message);
+			if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+				
+				Sequence sequencePart = (Sequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+				if (sequencePart == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
+	
+				Identifier identifier = new Identifier(assumedRMNamespace);
+				identifier.setIndentifer(newOutSequenceId);
+	
+				sequencePart.setIdentifier(identifier);
+				
+			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+				
+				TerminateSequence sequencePart = (TerminateSequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+				if (sequencePart == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
+	
+				Identifier identifier = new Identifier(assumedRMNamespace);
+				identifier.setIndentifer(newOutSequenceId);
+	
+				sequencePart.setIdentifier(identifier);
 			}
-
-			Identifier identifier = new Identifier(assumedRMNamespace);
-			identifier.setIndentifer(newOutSequenceId);
-
-			sequencePart.setIdentifier(identifier);
 
 			try {
 				applicaionRMMsg.addSOAPEnvelope();
@@ -314,6 +331,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			// asking to send the application msssage
 			tempBean.setSend(true);
+			tempBean.setSequenceID(newOutSequenceId);
 			retransmitterMgr.update(tempBean);
 
 			// updating the message. this will correct the SOAP envelope string.

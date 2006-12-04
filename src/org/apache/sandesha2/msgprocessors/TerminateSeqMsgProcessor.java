@@ -21,11 +21,11 @@ import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
@@ -45,17 +45,16 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
-import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
-import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
@@ -234,16 +233,21 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 			// If all the out message have been acked, add the outgoing
 			// terminate seq msg.
-			String outgoingSqunceID = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
+			String outgoingSequnceID = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
 			if (addResponseSideTerminate && highestOutMsgNo > 0 && responseSideSequencePropertyKey != null
-					&& outgoingSqunceID != null) {
+					&& outgoingSequnceID != null) {
 				boolean allAcked = SandeshaUtil.isAllMsgsAckedUpto(highestOutMsgNo, responseSideSequencePropertyKey,
 						storageManager);
 
 				if (allAcked)
-					TerminateManager.addTerminateSequenceMessage(terminateRMMsg, outgoingSqunceID,
+				{
+					String internalSequenceID = SandeshaUtil.getSequenceProperty(outgoingSequnceID,
+							Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+
+					TerminateManager.addTerminateSequenceMessage(terminateRMMsg, internalSequenceID, outgoingSequnceID,
 							responseSideSequencePropertyKey, storageManager);
+				}
 			}
 		} catch (AxisFault e) {
 			throw new SandeshaException(e);
@@ -319,18 +323,37 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		String toAddress = rmMsgCtx.getTo().getAddress();
 		String sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		String internalSeqenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
+		String internalSequenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
 
-		String outSequenceID = SandeshaUtil.getSequenceProperty(internalSeqenceID,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
-		if (outSequenceID == null)
+		// Does the sequence exist ?
+		boolean sequenceExists = false;
+		String outSequenceID = null;
+		
+		// Get the Create sequence bean with the matching internal sequenceid 
+		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		createSeqFindBean.setInternalSequenceID(internalSequenceID);
+
+		CreateSeqBean createSeqBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		
+		if (createSeqBean == null)
+		{
+			if (log.isDebugEnabled())
+				log.debug("Exit: TerminateSeqMsgProcessor::processOutMessage Sequence doesn't exist");
+			
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.couldNotSendTerminateSeqNotFound, internalSeqenceID));
-
-		// / Transaction addTerminateSeqTransaction =
-		// storageManager.getTransaction();
-
-		String terminated = SandeshaUtil.getSequenceProperty(outSequenceID,
+					SandeshaMessageKeys.couldNotSendTerminateSeqNotFound, internalSequenceID));			
+		}
+		
+		if (createSeqBean.getSequenceID() != null)
+		{
+			sequenceExists = true;		
+			outSequenceID = createSeqBean.getSequenceID();
+		}
+		else
+			outSequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;			
+		
+		// Check if the sequence is already terminated (stored on the internal sequenceid)
+		String terminated = SandeshaUtil.getSequenceProperty(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED, storageManager);
 
 		if (terminated != null && "true".equals(terminated)) {
@@ -363,23 +386,22 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		rmMsgCtx.setTo(new EndpointReference(toAddress));
 
-		String rmVersion = SandeshaUtil.getRMVersion(internalSeqenceID, storageManager);
+		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceID, storageManager);
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 
 		rmMsgCtx.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
 		rmMsgCtx.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
 
-		String transportTo = SandeshaUtil.getSequenceProperty(internalSeqenceID,
+		String transportTo = SandeshaUtil.getSequenceProperty(internalSequenceID,
 				Sandesha2Constants.SequenceProperties.TRANSPORT_TO, storageManager);
 		if (transportTo != null) {
-			rmMsgCtx.setProperty(MessageContextConstants.TRANSPORT_URL, transportTo);
-		}
-		
+			rmMsgCtx.setProperty(Constants.Configuration.TRANSPORT_URL, transportTo);
+		}		
 		
 		//setting msg context properties
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, outSequenceID);
-		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSeqenceID);
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID, internalSequenceID);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY , sequenceKey);
 
 		try {
@@ -391,6 +413,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		String key = SandeshaUtil.getUUID();
 
 		SenderBean terminateBean = new SenderBean();
+		terminateBean.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
 		terminateBean.setMessageContextRefKey(key);
 
 		// Set a retransmitter lastSentTime so that terminate will be send with
@@ -402,15 +425,19 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 		terminateBean.setMessageID(msgContext.getMessageID());
 		
 		// Set the internal sequence id and outgoing sequence id for the terminate message
-		terminateBean.setInternalSequenceID(internalSeqenceID);
-		terminateBean.setSequenceID(outSequenceID);
+		terminateBean.setInternalSequenceID(internalSequenceID);
+		if (sequenceExists)
+		  terminateBean.setSequenceID(outSequenceID);
 		
 		EndpointReference to = msgContext.getTo();
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
 		
 		// this will be set to true at the sender.
-		terminateBean.setSend(true);
+		if (sequenceExists)
+			terminateBean.setSend(true);
+		else
+			terminateBean.setSend(false);
 
 		msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 
@@ -420,7 +447,7 @@ public class TerminateSeqMsgProcessor implements MsgProcessor {
 
 		SequencePropertyBean terminateAdded = new SequencePropertyBean();
 		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequencePropertyKey(outSequenceID);
+		terminateAdded.setSequencePropertyKey(internalSequenceID);
 		terminateAdded.setValue("true");
 
 		seqPropMgr.insert(terminateAdded);

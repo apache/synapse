@@ -226,6 +226,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
 		}
 		
+		//see if the sequence is terminated
+		SequencePropertyBean sequenceTerminated = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
+		if(sequenceTerminated!=null){
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
+		}
+
 		// saving the used message number
 		if (!dummyMessage)
 			setNextMsgNo(configContext, sequencePropertyKey, messageNumber, storageManager);

@@ -256,7 +256,7 @@ public class AcknowledgementProcessor {
 //					CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 //					CreateSeqBean createSeqBean = createSeqBeanMgr.retrieve(msgId);
 //					
-					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, outSequenceId, sequencePropertyKey,
+					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, internalSequenceId, outSequenceId, sequencePropertyKey,
 							storageManager);
 				}
 			}

@@ -84,12 +84,12 @@ if $os400; then
 fi
 
 # update classpath
-SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib":
+SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib"
 for f in $SYNAPSE_HOME/lib/*.jar
 do
   SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f
 done
-SYNAPSE_CLASSPATH=$JAVA_HOME/lib/tools.jar$SYNAPSE_CLASSPATH:$CLASSPATH
+SYNAPSE_CLASSPATH=$JAVA_HOME/lib/tools.jar:$SYNAPSE_CLASSPATH:$CLASSPATH
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then

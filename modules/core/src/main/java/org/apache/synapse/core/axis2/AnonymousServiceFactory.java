@@ -80,6 +80,12 @@ public class AnonymousServiceFactory {
             if (service == null) {
                 synchronized (AnonymousServiceFactory.class) {
 
+                    // fix with double locking, issue found on performance test
+                    service = axisCfg.getService(servicekey);
+                    if (service != null) {
+                        return service;
+                    }
+
                     service = createAnonymousService(axisCfg, servicekey);
 
                     if (wsAddrOn) {

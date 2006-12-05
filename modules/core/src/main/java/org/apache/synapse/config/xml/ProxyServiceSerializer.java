@@ -65,6 +65,14 @@ public class ProxyServiceSerializer {
                 "description", nullNS, service.getDescription()));
         }
 
+        String wsdlKey = service.getWSDLKey();
+        if(wsdlKey != null) {
+            OMElement wsdl = fac.createOMElement("wsdl", synNS);
+            wsdl.addAttribute(fac.createOMAttribute(
+                "key", nullNS, wsdlKey));
+            proxy.addChild(wsdl);
+        }
+
         if (service.getTransports() != null && service.getTransports().size() != 0) {
             ArrayList transports = service.getTransports();
             String transportStr = "" + transports.get(0);

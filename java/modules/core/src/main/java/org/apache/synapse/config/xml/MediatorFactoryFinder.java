@@ -146,7 +146,12 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 	public Mediator getMediator(OMElement element) {
 
         String localName = element.getLocalName();
-		QName qName = new QName(element.getNamespace().getName(), localName);
+        QName qName = null;
+        if (element.getNamespace() != null) {
+            qName = new QName(element.getNamespace().getName(), localName);
+        } else {
+            qName = new QName(localName);
+        }
         log.debug("getMediator(" + qName + ")");
         Class cls = (Class) factoryMap.get(qName);
 

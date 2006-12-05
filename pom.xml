@@ -26,7 +26,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse-Incubating</artifactId>
-    <version>0.90-SNAPSHOT</version>
+    <version>0.90-RC1</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -251,7 +251,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-rahas</artifactId>
-            <version>${axis2.security.version}</version>
+            <version>${axis2.version}</version>
         </dependency>
 
         <dependency>
@@ -275,7 +275,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-secpolicy</artifactId>
-            <version>${axis2.security.version}</version>
+            <version>${axis2.version}</version>
         </dependency>
         
         <dependency>
@@ -287,7 +287,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-security</artifactId>
-            <version>${axis2.security.version}</version>
+            <version>${axis2.version}</version>
         </dependency>
 
         <dependency>
@@ -320,7 +320,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>rampart</artifactId>
-            <version>${axis2.security.version}</version>
+            <version>${rampart.version}</version>
             <type>mar</type>
         </dependency>
 
@@ -568,18 +568,18 @@
     </modules>
 
     <properties>
-        <synapse.version>0.90-SNAPSHOT</synapse.version>
+        <synapse.version>0.90-RC1</synapse.version>
         <axis2.version>1.1</axis2.version>
-        <axis2.security.version>1.1-SNAPSHOT</axis2.security.version>
-        <axiom.version>1.2.1-SNAPSHOT</axiom.version>
-        <xml_schema.version>1.2</xml_schema.version>
+        <rampart.version>1.1</rampart.version>
+        <axiom.version>1.2.1</axiom.version>
+        <xml_schema.version>SNAPSHOT</xml_schema.version>
         <neethi.version>2.0</neethi.version>
-        <wss4j.version>SNAPSHOT</wss4j.version>
+        <wss4j.version>1.5.1</wss4j.version>
         <xmlsec.version>1.3.0</xmlsec.version>
         <woden.version>1.0.0M6</woden.version>
 
         <addressing.version>1.1</addressing.version>
-        <sandesha2.version>1.1-SNAPSHOT</sandesha2.version>
+        <sandesha2.version>1.1</sandesha2.version>
         <rampart.version>1.1</rampart.version>
 
         <commons.logging.version>1.1</commons.logging.version>

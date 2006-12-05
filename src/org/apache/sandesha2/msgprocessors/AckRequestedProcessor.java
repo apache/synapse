@@ -53,6 +53,7 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -132,6 +133,20 @@ public class AckRequestedProcessor {
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
 			
 			secManager.checkProofOfPossession(token, soapHeader, msgContext);
+		}
+
+		// Check that the sequence requested exists
+		FaultManager faultManager = new FaultManager();
+		SandeshaException fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		if (fault != null) {
+			throw fault;
+		}
+
+		// Check that the sequence isn't closed
+		// throwing a fault if the sequence is closed.
+		fault = faultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
+		if (fault != null) {
+			throw fault;
 		}
 
 		// Setting the ack depending on AcksTo.

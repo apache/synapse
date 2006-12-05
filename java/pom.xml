@@ -600,7 +600,7 @@
         <activation.version>1.1</activation.version>
         <geronimo.spec.jms.version>1.1-rc4</geronimo.spec.jms.version>
 
-        <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>
+        <stax.impl.groupid>woodstox</stax.impl.groupid>
         <stax.impl.artifactid>wstx-asl</stax.impl.artifactid>
         <stax.impl.version>3.1.0</stax.impl.version>
         <stax.api.version>1.0.1</stax.api.version>

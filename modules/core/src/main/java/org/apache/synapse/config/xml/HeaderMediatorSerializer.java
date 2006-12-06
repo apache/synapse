@@ -56,8 +56,11 @@ public class HeaderMediatorSerializer extends BaseMediatorSerializer
         if (qName != null) {
             if (qName.getNamespaceURI() != null) {
                 header.addAttribute(fac.createOMAttribute(
-                    "name", nullNS, qName.getPrefix() + ":" + qName.getLocalPart()));
-                header.declareNamespace(qName.getPrefix(), qName.getNamespaceURI());
+                    "name", nullNS,
+                    (qName.getPrefix() != null || "".equals(qName.getPrefix())
+                        ? qName.getPrefix() + ":" : "") + 
+                    qName.getLocalPart()));
+                header.declareNamespace(qName.getNamespaceURI(), qName.getPrefix());
             } else {
                 header.addAttribute(fac.createOMAttribute(
                     "name", nullNS, qName.getLocalPart()));

@@ -11,11 +11,11 @@ mvn clean install
 Note: If you encounter any issues with Maven 2 complaining of invalid POMs refer to this ->
 http://www.nabble.com/forum/ViewPost.jtp?post=7437760&framed=y
 
-To build the Synapse assembly, use the following:
+To build the Synapse distribution, use the following:
 
 mvn assembly:assembly -Drelease
 
-This would build the source and binary distributions in the target folder.
+This will build the source and binary distributions in the target folder.
 
 To build the site, use:
 

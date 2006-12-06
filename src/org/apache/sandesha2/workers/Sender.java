@@ -17,12 +17,8 @@
 
 package org.apache.sandesha2.workers;
 
-import java.util.ArrayList;
-
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.util.threadpool.ThreadFactory;
-import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -41,92 +37,54 @@ import org.apache.sandesha2.util.SandeshaUtil;
  * Sender table to find out any entries that should be sent.
  */
 
-public class Sender extends Thread {
+public class Sender extends SandeshaThread {
 
-	private boolean runSender = false;
-	private ArrayList workingSequences = new ArrayList();
-	private ConfigurationContext context = null;
+
 	private static final Log log = LogFactory.getLog(Sender.class);
-	private boolean hasStopped = false;
 	
-    private transient ThreadFactory threadPool;
-    public int SENDER_THREADPOOL_SIZE = 5;
-    
-    private WorkerLock lock = null;
+
+  public static final int SENDER_THREADPOOL_SIZE = 5;
+  
+  private WorkerLock lock = null;
     
     public Sender () {
-    	threadPool = new ThreadPool (SENDER_THREADPOOL_SIZE,SENDER_THREADPOOL_SIZE);
+    	super(SENDER_THREADPOOL_SIZE, Sandesha2Constants.SENDER_SLEEP_TIME);
     	lock = new WorkerLock ();
     }
 
 	public synchronized void stopSenderForTheSequence(String sequenceID) {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::stopSenderForTheSequence, " + sequenceID);
-		workingSequences.remove(sequenceID);
-		if (workingSequences.size() == 0) {
-			runSender = false;
-		}
+		
+		super.stopThreadForSequence(sequenceID);
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: Sender::stopSenderForTheSequence");
 	}
+	
 
 	public synchronized void stopSending() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::stopSending");
 
-		if (isSenderStarted()) {
-			// the sender is started so stop it
-			runSender = false;
-			// wait for it to finish
-			while (!hasStoppedSending()) {
-				try {
-					wait(Sandesha2Constants.SENDER_SLEEP_TIME);
-				} catch (InterruptedException e1) {
-					log.debug(e1.getMessage());
-				}
-			}
-		}
+		super.stopRunning();
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: Sender::stopSending");
 	}
 
-	private synchronized boolean hasStoppedSending() {
-		if (log.isDebugEnabled()) {
-			log.debug("Enter: Sender::hasStoppedSending");
-			log.debug("Exit: Sender::hasStoppedSending, " + hasStopped);
-		}
-		return hasStopped;
-	}
-
 	public synchronized boolean isSenderStarted() {
-		if (log.isDebugEnabled()) {
-			log.debug("Enter: Sender::isSenderStarted");
-			log.debug("Exit: Sender::isSenderStarted, " + runSender);
+		boolean isThreadStarted = super.isThreadStarted();
+		if(!isThreadStarted){
+			//to avoid too much noise we should only trace if the sender is not started
+			if (log.isDebugEnabled())
+				log.debug("sender not started");	
 		}
-		return runSender;
+		return isThreadStarted;
 	}
 
-	public void run() {
-		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::run");
 
-		try {
-			internalRun();
-		} finally {
-			// flag that we have exited the run loop and notify any waiting
-			// threads
-			synchronized (this) {
-				hasStopped = true;
-				notify();
-			}
-		}
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::run");
-	}
-
-	private void internalRun() {
+	protected void internalRun() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::internalRun");
 
@@ -151,6 +109,9 @@ public class Sender extends Thread {
 				log.debug(e1.getMessage());
 				log.debug("End printing Interrupt...");
 			}
+			
+			//pause if we have to
+			doPauseIfNeeded();
 
 			Transaction transaction = null;
 			boolean rolebacked = false;
@@ -164,7 +125,7 @@ public class Sender extends Thread {
 					log.debug(message);
 					throw new SandeshaException(message);
 				}
-
+				
 				// TODO make sure this locks on reads.
 				transaction = storageManager.getTransaction();
 
@@ -277,14 +238,8 @@ public class Sender extends Thread {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::runSenderForTheSequence, " + sequenceID);
 
-		if (sequenceID != null && !workingSequences.contains(sequenceID))
-			workingSequences.add(sequenceID);
-
-		if (!isSenderStarted()) {
-			this.context = context;
-			runSender = true; // so that isSenderStarted()=true.
-			super.start();
-		}
+		runThreadForSequence(context, sequenceID);
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: Sender::runSenderForTheSequence");
 	}

@@ -22,8 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.util.threadpool.ThreadFactory;
-import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -48,25 +46,16 @@ import org.apache.sandesha2.util.SandeshaUtil;
  * to find weather there are any messages to me invoked.
  */
 
-public class Invoker extends Thread {
+public class Invoker extends SandeshaThread {
 
-	private boolean runInvoker = false;
-	private ArrayList workingSequences = new ArrayList();
-	private ConfigurationContext context = null;
 	private static final Log log = LogFactory.getLog(Invoker.class);
 	
-	private boolean hasStoppedInvoking = false;
-	private boolean hasPausedInvoking = false;
-	private boolean pauseRequired = false;
-	
-	private transient ThreadFactory threadPool;
-	public int INVOKER_THREADPOOL_SIZE = 5;
+	public static final int INVOKER_THREADPOOL_SIZE = 5;
 
 	private WorkerLock lock = null;
 	
 	public Invoker() {
-		threadPool = new ThreadPool(INVOKER_THREADPOOL_SIZE,
-				INVOKER_THREADPOOL_SIZE);
+		super(INVOKER_THREADPOOL_SIZE, Sandesha2Constants.INVOKER_SLEEP_TIME);
 		lock = new WorkerLock ();
 	}
 
@@ -75,51 +64,10 @@ public class Invoker extends Thread {
 			log.debug("Enter: InOrderInvoker::stopInvokerForTheSequence, "
 					+ sequenceID);
 
-		workingSequences.remove(sequenceID);
-		if (workingSequences.size() == 0) {
-			runInvoker = false;
-		}
+		super.stopThreadForSequence(sequenceID);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: InOrderInvoker::stopInvokerForTheSequence");
-	}
-	
-	
-	/**
-	 * Waits for the invoking thread to pause
-	 */
-	public synchronized void blockForPause(){
-		while(pauseRequired){
-			//someone else is requesting a pause - wait for them to finish
-			try{
-				wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
-			}catch(InterruptedException e){
-				//ignore
-			}
-		}
-		
-	  //we can now request a pause - the next pause will be ours
-	  pauseRequired = true;
-				
-		if(hasStoppedInvoking() || !isInvokerStarted()){
-			throw new IllegalStateException("Cannot pause a non-running invoker thread"); //TODO NLS
-		}
-		while(!hasPausedInvoking){
-			//wait for our pause to come around
-			try{
-				wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
-			}catch(InterruptedException e){
-				//ignore
-			}
-			
-		}
-		//the invoker thread is now paused
-	}
-	
-	private synchronized void finishPause(){
-		//indicate that the current pause is no longer required.
-		pauseRequired = false;
-		notifyAll();
 	}
 	
 	/**
@@ -242,31 +190,21 @@ public class Invoker extends Thread {
 	public synchronized void stopInvoking() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::stopInvoking");
-		//NOTE: we do not take acount of pausing when stopping.
-		//The call to stop will wait until the invoker has exited the loop
-		if (isInvokerStarted()) {
-			// the invoker is started so stop it
-			runInvoker = false;
-			// wait for it to finish
-			while (!hasStoppedInvoking()) {
-				try {
-					wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
-				} catch (InterruptedException e1) {
-					log.debug(e1.getMessage());
-				}
-			}
-		}
+
+		super.stopRunning();
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: InOrderInvoker::stopInvoking");
 	}
 
 	public synchronized boolean isInvokerStarted() {
-		if (log.isDebugEnabled()) {
-			log.debug("Enter: InOrderInvoker::isInvokerStarted");
-			log.debug("Exit: InOrderInvoker::isInvokerStarted, " + runInvoker);
+		boolean isThreadStarted = super.isThreadStarted();
+		if(!isThreadStarted){
+			//to avoid too much noise we should only trace if the invoker is not started
+			if (log.isDebugEnabled())
+				log.debug("invoker not started");	
 		}
-		return runInvoker;
+		return isThreadStarted;
 	}
 
 	public synchronized void runInvokerForTheSequence(
@@ -274,45 +212,10 @@ public class Invoker extends Thread {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::runInvokerForTheSequence");
 
-		if (!workingSequences.contains(sequenceID))
-			workingSequences.add(sequenceID);
-
-		if (!isInvokerStarted()) {
-			this.context = context;
-			runInvoker = true; // so that isSenderStarted()=true.
-			super.start();
-		}
+		super.runThreadForSequence(context, sequenceID);
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: InOrderInvoker::runInvokerForTheSequence");
-	}
-
-	private synchronized boolean hasStoppedInvoking() {
-		if (log.isDebugEnabled()) {
-			log.debug("Enter: InOrderInvoker::hasStoppedInvoking");
-			log
-					.debug("Exit: InOrderInvoker::hasStoppedInvoking, "
-							+ hasStoppedInvoking);
-		}
-		return hasStoppedInvoking;
-	}
-
-	public void run() {
-		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::run");
-
-		try {
-			internalRun();
-		} finally {
-			// flag that we have exited the run loop and notify any waiting
-			// threads
-			synchronized (this) {
-				hasStoppedInvoking = true;
-				notify();
-			}
-		}
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: InOrderInvoker::run");
 	}
 
 	private void addOutOfOrderInvokerBeansToList(String sequenceID, 
@@ -351,7 +254,7 @@ public class Invoker extends Thread {
 			log.debug("Exit: InOrderInvoker::addOutOfOrderInvokerBeansToList");
 	}
 	
-	private void internalRun() {
+	protected void internalRun() {
 		if (log.isDebugEnabled())
 			log.debug("Enter: InOrderInvoker::internalRun");
 		
@@ -368,25 +271,8 @@ public class Invoker extends Thread {
 				log.debug(ex.getMessage());
 			}
 					
-			//see if we need to pause
-			synchronized(this){
-				
-				while(pauseRequired){
-					if(!hasPausedInvoking){
-						//let the requester of this pause know we are now pausing
-					  hasPausedInvoking = true;
-					  notifyAll();						
-					}
-					//now we pause
-				  try{
-				  	wait(Sandesha2Constants.INVOKER_SLEEP_TIME);
-				  }catch(InterruptedException e){
-				  	//ignore
-				  }
-				}//end while
-				//the request to pause has finished so we are no longer pausing
-				hasPausedInvoking = false;
-			}
+			//pause if we have to
+			doPauseIfNeeded();
 
 			Transaction transaction = null;
 			boolean rolebacked = false;

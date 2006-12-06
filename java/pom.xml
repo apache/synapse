@@ -26,7 +26,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse-Incubating</artifactId>
-    <version>0.90-SNAPSHOT</version>
+    <version>0.90-RC1</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -422,29 +422,6 @@
                     <aggregate>true</aggregate>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<artifactId>maven-changes-plugin</artifactId>-->
-                <!--<reportSets>-->
-                    <!--<reportSet>-->
-                        <!--<reports>-->
-                            <!--<report>changes-report</report>-->
-                        <!--</reports>-->
-                    <!--</reportSet>-->
-                <!--</reportSets>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<artifactId>maven-project-info-reports-plugin</artifactId>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>jdepend-maven-plugin</artifactId>-->
-                <!--<version>2.0-beta-1-SNAPSHOT</version>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-            <!--<groupId>org.codehaus.mojo</groupId>-->
-            <!--<artifactId>jxr-maven-plugin</artifactId>-->
-            <!--<version>2.0-beta-2-SNAPSHOT</version>-->
-            <!--</plugin>-->
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>2.0-beta-5</version>
@@ -473,17 +450,22 @@
     </distributionManagement>
 
     <repositories>
-        <!--<repository>-->
-            <!--<id>m1-local-repo</id>-->
-            <!--<url>file://${user.home}/.maven/repository</url>-->
-            <!--<layout>legacy</layout>-->
-            <!--<snapshots>-->
-                <!--<enabled>true</enabled>-->
-            <!--</snapshots>-->
-            <!--<releases>-->
-                <!--<enabled>true</enabled>-->
-            <!--</releases>-->
-        <!--</repository>-->
+        <repository>
+            <id>asankha-m2</id>
+            <name>asankha-m2</name>
+            <url>http://people.apache.org/~asankha/maven2/</url>
+            <releases>
+                <updatePolicy>interval:1440</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>wso2</id>
+            <name>wso2</name>
+            <url>http://dist.wso2.org/maven/</url>
+            <releases>
+                <updatePolicy>interval:1440</updatePolicy>
+            </releases>
+        </repository>
         <repository>
             <id>ibiblio-m2</id>
             <name>Ibiblio Maven 2 Repo</name>
@@ -546,16 +528,6 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </releases>
         </repository>
-        <repository>
-            <id>asankha</id>
-            <name>asankha</name>
-            <layout>legacy</layout>
-            <url>http://people.apache.org/~asankha/maven/</url>
-            <releases>
-                <updatePolicy>interval:1440</updatePolicy>
-            </releases>
-        </repository>
-        
 
     </repositories>
 
@@ -568,19 +540,18 @@
     </modules>
 
     <properties>
-        <synapse.version>0.90-SNAPSHOT</synapse.version>
-        <axis2.version>1.1</axis2.version>
+        <synapse.version>0.90-RC1</synapse.version>
+        <axis2.version>1.1.051</axis2.version>
         <rampart.version>1.1</rampart.version>
         <axiom.version>1.2.1</axiom.version>
-        <xml_schema.version>SNAPSHOT</xml_schema.version>
+        <xml_schema.version>1.064</xml_schema.version>
         <neethi.version>2.0</neethi.version>
         <wss4j.version>1.5.1</wss4j.version>
         <xmlsec.version>1.3.0</xmlsec.version>
         <woden.version>1.0.0M6</woden.version>
 
-        <addressing.version>1.1</addressing.version>
+        <addressing.version>1.1.051</addressing.version>
         <sandesha2.version>1.1</sandesha2.version>
-        <rampart.version>1.1</rampart.version>
 
         <commons.logging.version>1.1</commons.logging.version>
         <commons.httpclient.version>3.0.1</commons.httpclient.version>

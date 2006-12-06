@@ -370,8 +370,10 @@ public class SynapseConfiguration {
             handleException("Invalid proxyService for name : " + name + " from registry");
         } else {
             try {
-                getAxisConfiguration().getAxisConfiguration().getService(name).setActive(false);
-                getAxisConfiguration().getAxisConfiguration().removeService(name);
+                if(getAxisConfiguration().getServiceForActivation(name).isActive()) {
+                    getAxisConfiguration().getService(name).setActive(false);
+                }
+                getAxisConfiguration().removeService(name);
                 proxyServices.remove(name);
             } catch (AxisFault axisFault) {
                 handleException(axisFault.getMessage());

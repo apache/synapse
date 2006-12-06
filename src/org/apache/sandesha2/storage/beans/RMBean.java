@@ -28,7 +28,7 @@ import org.apache.sandesha2.storage.Transaction;
 public abstract class RMBean implements Serializable {
 		
 		private long id;
-		private volatile Transaction transaction;
+		private transient Transaction transaction;
 		
 		public long getId() {
 			return id;

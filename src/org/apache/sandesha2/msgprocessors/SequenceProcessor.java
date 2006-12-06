@@ -361,7 +361,7 @@ public class SequenceProcessor {
 			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			long ackInterval = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation())
+			long ackInterval = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisService())
 					.getAcknowledgementInterval();
 
 			// Ack will be sent as stand alone, only after the retransmitter

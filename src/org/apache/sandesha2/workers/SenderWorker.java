@@ -374,6 +374,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// ctx.
 			OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
 			if (requestMsgOpCtx != null) {
+				responseMessageContext.setOperationContext(requestMsgOpCtx);
+				
 				if (responseMessageContext.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE) == null) {
 					responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE, requestMsgOpCtx
 							.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
@@ -392,7 +394,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			SOAPEnvelope resenvelope = null;
 			try {
-				resenvelope = TransportUtils.createSOAPMessage(msgCtx, msgCtx.getEnvelope().getNamespace().getNamespaceURI());
+				// MessageContext is modified in TransportUtils.createSOAPMessage(). It might be used by axis.engine or handler.
+				// To catch the modification and pass it to engine or handler, resenvelope is created by responseMessageContext. 
+				resenvelope = TransportUtils.createSOAPMessage(responseMessageContext, msgCtx.getEnvelope().getNamespace().getNamespaceURI());
 			} catch (AxisFault e) {
 				//Cannot find a valid SOAP envelope.
 				if (log.isDebugEnabled()) {

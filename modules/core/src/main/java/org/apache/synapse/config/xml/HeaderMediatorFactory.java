@@ -75,7 +75,7 @@ public class HeaderMediatorFactory implements MediatorFactory {
                     OMNamespace n = (OMNamespace) it.next();
                     if (prefix.equals(n.getPrefix())) {
                         headerMediator.setQName(
-                            new QName(n.getNamespaceURI(), nameAtt.substring(colonPos+1)));
+                            new QName(n.getNamespaceURI(), nameAtt.substring(colonPos+1), prefix));
                     }
                 }
             } else {

@@ -203,7 +203,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				} catch (Exception e) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
-					log.debug(message, e);
+					if (log.isDebugEnabled())
+						log.debug("Exit: SandeshaGlobalInHandler::invoke ", e);
+					throw new AxisFault(message, e);
 				}
 			}
 		}

@@ -120,7 +120,9 @@ public class AcknowledgementProcessor {
 		}
 
 		// Check that the sender of this Ack holds the correct token
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(outSequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		String sequencePropertyKey = SandeshaUtil.getSequenceProperty(outSequenceId,
+				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
@@ -141,19 +143,11 @@ public class AcknowledgementProcessor {
 			throw fault;
 		}
 		
-		String internalSequenceId = SandeshaUtil.getSequenceProperty(outSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
-		if(log.isDebugEnabled()) log.debug("Got ack for RM Sequence: " + outSequenceId + ", internal id: " + internalSequenceId);
-
-		//here we cannot get the property key using the usual SandeshaUtil.getSequencePropertyKey function,
-		//because this can be a applicationMessage, which piggybacks the acknowledgement.
-		String sequencePropertyKey = internalSequenceId;
-
 		SenderBean input = new SenderBean();
 		input.setSend(true);
 		input.setReSend(true);
 		input.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
-		input.setInternalSequenceID(internalSequenceId);
+		input.setInternalSequenceID(sequencePropertyKey);
 		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
 
 		ArrayList ackedMessagesList = new ArrayList();
@@ -256,7 +250,7 @@ public class AcknowledgementProcessor {
 //					CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 //					CreateSeqBean createSeqBean = createSeqBeanMgr.retrieve(msgId);
 //					
-					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, internalSequenceId, outSequenceId, sequencePropertyKey,
+					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, sequencePropertyKey, outSequenceId, sequencePropertyKey,
 							storageManager);
 				}
 			}

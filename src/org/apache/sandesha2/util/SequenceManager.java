@@ -51,6 +51,10 @@ public class SequenceManager {
 
 	private static Log log = LogFactory.getLog(SequenceManager.class);
 
+	/**
+	 * Set up a new outbound sequence, triggered by the arrival of a create sequence message. As this
+	 * is an inbound sequence, the sequencePropertyKey is the sequenceId.
+	 */
 	public static String setupNewSequence(RMMsgContext createSequenceMsg, StorageManager storageManager, SecurityManager securityManager, SecurityToken token)
 			throws AxisFault {
 

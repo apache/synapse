@@ -79,7 +79,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		// Check that the sender of this CloseSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequenceId, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
 			OMElement body = msgCtx.getEnvelope().getBody();

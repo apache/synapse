@@ -198,7 +198,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					if(token != null) {
 						String tokenData = secManager.getTokenRecoveryData(token);
 						SequencePropertyBean tokenBean = new SequencePropertyBean(
-								offeredSequenceID,
+								outgoingSideSequencePropertyKey,
 								Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
 								tokenData);
 						seqPropMgr.insert(tokenBean);

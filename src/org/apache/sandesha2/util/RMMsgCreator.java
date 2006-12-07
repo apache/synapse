@@ -204,7 +204,7 @@ public class RMMsgCreator {
 		// save it in the properties so that the caller can store the token within the create sequence
 		// bean.
 		SecurityManager secMgr = SandeshaUtil.getSecurityManager(context);
-		SecurityToken token = secMgr.getSecurityToken(createSeqmsgContext);
+		SecurityToken token = secMgr.getSecurityToken(applicationMsgContext);
 		if(token != null) {
 			OMElement str = secMgr.createSecurityTokenReference(token, createSeqmsgContext);
 			createSequencePart.setSecurityTokenReference(str);

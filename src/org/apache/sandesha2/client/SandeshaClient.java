@@ -1023,7 +1023,7 @@ public class SandeshaClient {
 			report.addCompletedMessage(lng);
 		}
 		
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(outSequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SequencePropertyBean tokenBean = seqPropMgr.retrieve(internalSequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) report.setSecureSequence(true);
 	}
 

@@ -149,7 +149,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		// Store the security token under the new sequence id
 		if(tokenData != null) {
-			SequencePropertyBean newToken = new SequencePropertyBean(newOutSequenceId,
+			SequencePropertyBean newToken = new SequencePropertyBean(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
 			sequencePropMgr.insert(newToken);
 		}

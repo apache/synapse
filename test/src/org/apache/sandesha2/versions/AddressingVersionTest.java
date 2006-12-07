@@ -56,6 +56,7 @@ public class AddressingVersionTest extends SandeshaTestCase {
 
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));
@@ -108,6 +109,7 @@ public class AddressingVersionTest extends SandeshaTestCase {
 
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));

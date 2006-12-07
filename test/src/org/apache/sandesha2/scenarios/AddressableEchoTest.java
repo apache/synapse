@@ -43,7 +43,7 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
 		Options clientOptions = new Options ();
-
+		clientOptions.setAction(echoAction);
 		clientOptions.setTo(new EndpointReference (to));
 		
 		String sequenceKey = SandeshaUtil.getUUID();
@@ -131,7 +131,7 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
 		Options clientOptions = new Options ();
-
+		clientOptions.setAction(echoAction);
 		clientOptions.setTo(new EndpointReference (to));
 		
 		String sequenceKey = SandeshaUtil.getUUID();

@@ -121,6 +121,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 			ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 			
 			Options clientOptions = new Options ();
+			clientOptions.setAction(pingAction);
 			clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
 		       Sandesha2Constants.SPEC_VERSIONS.v1_1);
@@ -241,6 +242,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 			clientOptions.setTo(new EndpointReference (to));
 			
 			ServiceClient serviceClient = new ServiceClient (configContext,null);
+			clientOptions.setAction(pingAction);
 			
 			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
 			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
@@ -317,6 +319,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 			ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 			
 			Options clientOptions = new Options ();
+			clientOptions.setAction(pingAction);
 			clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
 		       Sandesha2Constants.SPEC_VERSIONS.v1_1);
@@ -406,6 +409,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 		
 		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 	   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
 	       Sandesha2Constants.SPEC_VERSIONS.v1_1);
@@ -571,6 +575,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));

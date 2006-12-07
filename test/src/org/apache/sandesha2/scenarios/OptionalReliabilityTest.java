@@ -41,7 +41,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 
 		Options clientOptions = new Options ();
-		clientOptions.setAction("ping");
+		clientOptions.setAction(pingAction);
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE, "true");
 		serviceClient.setOptions(clientOptions);
@@ -70,7 +70,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 
 		Options clientOptions = new Options ();
-		clientOptions.setAction("echo");
+		clientOptions.setAction(echoAction);
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE,"true");
 		serviceClient.setOptions(clientOptions);
@@ -103,7 +103,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 
 		Options clientOptions = new Options ();
-		clientOptions.setAction("echo");
+		clientOptions.setAction(echoAction);
 		clientOptions.setTo(new EndpointReference (to));
 		clientOptions.setProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE,"true");
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);

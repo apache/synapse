@@ -11,6 +11,7 @@
        
     <operation name="ping" mep="http://www.w3.org/2004/08/wsdl/in-only">  
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+        <actionMapping>urn:wsrm:Ping</actionMapping>
     </operation>
     
     <operation name="MTOMPing" mep="http://www.w3.org/2004/08/wsdl/in-only">  
@@ -19,6 +20,8 @@
     
     <operation name="echoString">
         <messageReceiver class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+        <actionMapping>urn:wsrm:EchoString</actionMapping>
+        <outputActionMapping>urn:wsrm:EchoStringResponse</outputActionMapping>
     </operation>
        
 <!--    <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />-->
@@ -34,3 +37,4 @@
     
     
 </service>
+

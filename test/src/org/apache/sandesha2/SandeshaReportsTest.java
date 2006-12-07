@@ -58,7 +58,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
 		Options clientOptions = new Options ();
-
+		clientOptions.setAction(echoAction);
 		clientOptions.setTo(new EndpointReference (to));
 		
 		String sequenceKey = SandeshaUtil.getUUID();
@@ -134,6 +134,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 
 		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
 //		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 		
 		clientOptions.setTo(new EndpointReference (to));

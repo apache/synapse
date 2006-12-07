@@ -35,21 +35,21 @@
 
  	<p>For more information, see:</p>
   <ul>
-  <li>The wiki (we use this more than this main site): <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
-  <li>The original proposal: <a href="http://wiki.apache.org/incubator/SynapseProposal">http://wiki.apache.org/incubator/SynapseProposal</a></li>
-  <li>The Synapse Configuration Language: <a href="http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage">http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage</a></li>
-	<li>The Wiki User Guide: <a href="http://wiki.apache.org/incubator/Synapse/SynapseUserGuide">http://wiki.apache.org/incubator/Synapse/SynapseUserGuide</a></li>
-	<li>The Wiki Synapse extension guide: <a href="http://wiki.apache.org/incubator/Synapse/ExtendingSynapse">http://wiki.apache.org/incubator/Synapse/ExtendingSynapse</a></li>
-  <li>The M2 release download is available from <a href="download.cgi">here</a></li>
-  <li>The developer mailing list:  <a href="mailto:synapse-dev-subscribe@ws.apache.org">Subscribe</a></li>
-  <li>The users mailing list:  <a href="mailto:synapse-user-subscribe@ws.apache.org">Subscribe</a></li>
+  <li><a href="Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
+  <li><a href="Synapse_Samples.html">A Quick start with Synapse Samples</a></li>
+  <li><a href="Synapse_Extending.html">Extending Synapse</a></li>
+  <li><a href="Synapse_Userguide.html">The Synapse User Guide</a><a href="http://wiki.apache.org/incubator/Synapse/0.90/SynapseUserGuide">(In Progress)</a></li>
+  
+  <li>The WS Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
+  <li>The Incubator Wiki <a href="http://wiki.apache.org/incubator/Synapse">http://wiki.apache.org/incubator/Synapse</a></li>
+  <li>The Original proposal: <a href="http://wiki.apache.org/incubator/SynapseProposal">http://wiki.apache.org/incubator/SynapseProposal</a></li>
+  <li>The Developer mailing list:  <a href="mailto:synapse-dev-subscribe@ws.apache.org">Subscribe</a></li>
+  <li>The User mailing list:  <a href="mailto:synapse-user-subscribe@ws.apache.org">Subscribe</a></li>
   </ul>
 </section>
 
 <section name="Introduction">
 	<p>Synapse is a mediation framework for Web Services. Synapse allows messages flowing through, into, or out of an organization to be mediated.</p>
-	<!--<p>The user guide is available at <a  class="external" rel="nofollow" href="http://wiki.apache.org/ws/Synapse/UserGuide">http://wiki.apache.org/ws/Synapse/UserGuide</a> </p>-->
-	<p>The configuration language and its syntax is available at <a  class="external" rel="nofollow" href="http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage">http://wiki.apache.org/incubator/Synapse/SynapseConfigurationLanguage</a> </p>
 
 	<p>Synapse, incidentally, is pronounced "sine-apse", and not "sin-apse".  </p>
 </section>
@@ -63,18 +63,20 @@
 	stability of the code, it does indicate that the project has 
 	yet to be fully endorsed by the ASF.</p>
 	
-	<p>We have released the second Milestone M2. The release will support: </p>
+	<p>We are currently finalizing the 0.90 release of Synapse. Its ket features are </p>
 
 	<ul>
 	<li><p> A streamlined configuration model and a new XML syntax</p></li>
+	<li><p> Proxy Services (service mediation) and Message mediation</p></li>
 	<li><p> Concept of Endpoints </p></li>
-	<li><p> Global and message context based 'properties', and a new XPath extention function synapse:get-property() to read them</p></li>
-	<li><p> New mediators - Switch &amp; Validate </p></li>
-	<li><p> Enhanced and streamlined mediators - send, drop, log, makefault, transform, header, filter, class, set-property, sequence, in &amp; out </p></li>
-	<li><p> Message correlation support</p></li>
-	<li><p> Enhanced Spring support</p></li>
-	<li><p> Synapse initialization on Axis2 startup</p></li>
-	<li><p> Sample applications and configurations demonstrating most of the above features </p></li>
+	<li><p> Integration of a Registry and dynamic refresh of resources as well as rules used to mediate </p></li>
+	<li><p> Support for http and JMS transports</p></li>
+	<li><p> Support for WS-Reliable Messaging and WS-Security through WS-Policies</p></li>
+	<li><p> Script mediator supporting all BSF scripting languages </p></li>
+	<li><p> Support for error handling and recovery </p></li>
+	<li><p> Many built in mediators </p></li>
+	<li><p> Maven 2 based build process</p></li>
+	<li><p> Many samples and a built-in Axis2 server to try out and experiment with samples (Samples includes WS-Security, JMS POX/Text messages, Script mediation and many more samples which can be run out of the box) </p></li>
 	<li><p> Enhanced documentation </p></li>
 	</ul>
 </section>

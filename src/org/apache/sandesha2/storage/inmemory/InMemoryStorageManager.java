@@ -38,6 +38,9 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMBean;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.workers.Invoker;
+import org.apache.sandesha2.workers.SandeshaThread;
+import org.apache.sandesha2.workers.Sender;
 
 public class InMemoryStorageManager extends StorageManager {
 
@@ -50,6 +53,8 @@ public class InMemoryStorageManager extends StorageManager {
     private SequencePropertyBeanMgr sequencePropertyBeanMgr = null;
     private SenderBeanMgr senderBeanMgr = null;
     private InvokerBeanMgr invokerBeanMgr = null;
+    private Sender sender = null;
+    private Invoker invoker = null;
     private HashMap transactions = new HashMap();
     
 	public InMemoryStorageManager(ConfigurationContext context) {
@@ -60,6 +65,8 @@ public class InMemoryStorageManager extends StorageManager {
 		this.senderBeanMgr = new InMemorySenderBeanMgr (this, context);
 		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (this, context);
 		this.sequencePropertyBeanMgr = new InMemorySequencePropertyBeanMgr (this, context);
+		this.sender = new Sender();
+		this.invoker = new Invoker();
 	}
 
 	public Transaction getTransaction() {
@@ -91,6 +98,20 @@ public class InMemoryStorageManager extends StorageManager {
 		}
 	}
 	
+	/** 
+	 * Gets the Invoker for this Storage manager
+	 */
+	public SandeshaThread getInvoker() {
+	  return invoker;
+  }
+
+	/** 
+	 * Gets the Sender for this Storage manager
+	 */
+	public SandeshaThread getSender() {
+	  return sender;
+  }
+
 	void enlistBean(RMBean bean) throws SandeshaStorageException {
 		InMemoryTransaction t = null;
 		synchronized (transactions) {
@@ -201,7 +222,9 @@ public class InMemoryStorageManager extends StorageManager {
 	public void storeSOAPEnvelope(SOAPEnvelope envelope, String key) throws SandeshaStorageException {
 		// TODO no real value
 	}
+
 	
 	
 }
+
 

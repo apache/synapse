@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.axis2.util.threadpool.ThreadPool;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
@@ -28,6 +30,8 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
  * Aggregates pause and stop logic between sender and invoker threads.
  */
 public abstract class SandeshaThread extends Thread{
+
+	private static final Log log = LogFactory.getLog(SandeshaThread.class);
 
 	private boolean runThread = false;
 	private boolean hasStoppedRunning = false;
@@ -46,11 +50,16 @@ public abstract class SandeshaThread extends Thread{
 		this.sleepTime = sleepTime;
 	}
 	
-	protected void stopThreadForSequence(String sequenceID){
+	public synchronized void stopThreadForSequence(String sequenceID){
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaThread::stopThreadForSequence, " + sequenceID);
+		
 		workingSequences.remove(sequenceID);
-		if (workingSequences.size() == 0) {
-			runThread = false;
-		}
+		if (workingSequences.size() == 0) 
+			runThread = false;		
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaThread::stopThreadForSequence");		
 	}
 	
 	/**
@@ -91,6 +100,9 @@ public abstract class SandeshaThread extends Thread{
 	}
 	
 	public synchronized void stopRunning() {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaThread::stopRunning");
+
 		//NOTE: we do not take acount of pausing when stopping.
 		//The call to stop will wait until the invoker has exited the loop
 		if (isThreadStarted()) {
@@ -105,10 +117,16 @@ public abstract class SandeshaThread extends Thread{
 				}
 			}
 		}
-
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaThread::stopRunning");
 	}
 	
 	public synchronized boolean isThreadStarted() {
+
+		if (!runThread && log.isDebugEnabled())
+			log.debug("SandeshaThread not started");	
+
 		return runThread;
 	}
 	

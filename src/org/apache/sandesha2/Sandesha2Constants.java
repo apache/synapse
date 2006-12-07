@@ -538,10 +538,6 @@ public interface Sandesha2Constants {
 	
 	String DEFAULT_STORAGE_MANAGER = INMEMORY_STORAGE_MANAGER;
 	
-	String SENDER = "Sender";
-	
-	String INVOKER = "Invoker";
-	
 	String POLLING_MANAGER = "PollingManager";
 	
 	String WITHIN_TRANSACTION = "WithinTransaction";

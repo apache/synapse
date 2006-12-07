@@ -58,17 +58,6 @@ public class Invoker extends SandeshaThread {
 		super(INVOKER_THREADPOOL_SIZE, Sandesha2Constants.INVOKER_SLEEP_TIME);
 		lock = new WorkerLock ();
 	}
-
-	public synchronized void stopInvokerForTheSequence(String sequenceID) {
-		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::stopInvokerForTheSequence, "
-					+ sequenceID);
-
-		super.stopThreadForSequence(sequenceID);
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: InOrderInvoker::stopInvokerForTheSequence");
-	}
 	
 	/**
 	 * Forces dispatch of queued messages to the application.
@@ -187,37 +176,6 @@ public class Invoker extends SandeshaThread {
 		}
 	}
 
-	public synchronized void stopInvoking() {
-		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::stopInvoking");
-
-		super.stopRunning();
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: InOrderInvoker::stopInvoking");
-	}
-
-	public synchronized boolean isInvokerStarted() {
-		boolean isThreadStarted = super.isThreadStarted();
-		if(!isThreadStarted){
-			//to avoid too much noise we should only trace if the invoker is not started
-			if (log.isDebugEnabled())
-				log.debug("invoker not started");	
-		}
-		return isThreadStarted;
-	}
-
-	public synchronized void runInvokerForTheSequence(
-			ConfigurationContext context, String sequenceID) {
-		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::runInvokerForTheSequence");
-
-		super.runThreadForSequence(context, sequenceID);
-		
-		if (log.isDebugEnabled())
-			log.debug("Exit: InOrderInvoker::runInvokerForTheSequence");
-	}
-
 	private void addOutOfOrderInvokerBeansToList(String sequenceID, 
 			StorageManager strMgr, List list)throws SandeshaException{
 		if (log.isDebugEnabled())
@@ -262,7 +220,7 @@ public class Invoker extends SandeshaThread {
 		// try and give them all a chance to invoke messages.
 		int nextIndex = 0;
 
-		while (isInvokerStarted()) {
+		while (isThreadStarted()) {
 
 			try {
 				Thread.sleep(Sandesha2Constants.INVOKER_SLEEP_TIME);

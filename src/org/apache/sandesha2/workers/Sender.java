@@ -18,7 +18,6 @@
 package org.apache.sandesha2.workers;
 
 import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -47,42 +46,10 @@ public class Sender extends SandeshaThread {
   
   private WorkerLock lock = null;
     
-    public Sender () {
-    	super(SENDER_THREADPOOL_SIZE, Sandesha2Constants.SENDER_SLEEP_TIME);
-    	lock = new WorkerLock ();
-    }
-
-	public synchronized void stopSenderForTheSequence(String sequenceID) {
-		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::stopSenderForTheSequence, " + sequenceID);
-		
-		super.stopThreadForSequence(sequenceID);
-		
-		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::stopSenderForTheSequence");
-	}
-	
-
-	public synchronized void stopSending() {
-		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::stopSending");
-
-		super.stopRunning();
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::stopSending");
-	}
-
-	public synchronized boolean isSenderStarted() {
-		boolean isThreadStarted = super.isThreadStarted();
-		if(!isThreadStarted){
-			//to avoid too much noise we should only trace if the sender is not started
-			if (log.isDebugEnabled())
-				log.debug("sender not started");	
-		}
-		return isThreadStarted;
-	}
-
+  public Sender () {
+  	super(SENDER_THREADPOOL_SIZE, Sandesha2Constants.SENDER_SLEEP_TIME);
+  	lock = new WorkerLock ();
+  }	
 
 	protected void internalRun() {
 		if (log.isDebugEnabled())
@@ -99,7 +66,7 @@ public class Sender extends SandeshaThread {
 			return;
 		}
 
-		while (isSenderStarted()) {
+		while (isThreadStarted()) {
 
 			try {
 				Thread.sleep(Sandesha2Constants.SENDER_SLEEP_TIME);
@@ -232,16 +199,6 @@ public class Sender extends SandeshaThread {
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: Sender::internalRun");
-	}
-
-	public synchronized void runSenderForTheSequence(ConfigurationContext context, String sequenceID) {
-		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::runSenderForTheSequence, " + sequenceID);
-
-		runThreadForSequence(context, sequenceID);
-		
-		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::runSenderForTheSequence");
 	}
 
 }

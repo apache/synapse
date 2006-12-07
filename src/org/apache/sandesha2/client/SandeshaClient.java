@@ -821,7 +821,7 @@ public class SandeshaClient {
 
 			//only do this if we are running inOrder
 			if(SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration()).isInOrder()){
-				Invoker invoker = (Invoker) configContext.getProperty(Sandesha2Constants.INVOKER);
+				Invoker invoker = (Invoker)SandeshaUtil.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration()).getInvoker();
 				if (invoker==null){
 					throw new SandeshaException(SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.invokerNotFound, sequenceID));

@@ -25,6 +25,7 @@ import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.workers.SandeshaThread;
 
 /**
  * Storage managers should extend this.
@@ -51,6 +52,10 @@ public abstract class StorageManager {
 	public abstract void initStorage (AxisModule moduleDesc) throws SandeshaStorageException;
 
 	public abstract Transaction getTransaction();
+	
+	public abstract SandeshaThread getSender();
+	
+	public abstract SandeshaThread getInvoker();
 
 	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr();
 

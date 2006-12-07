@@ -78,8 +78,7 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
-import org.apache.sandesha2.workers.Invoker;
-import org.apache.sandesha2.workers.Sender;
+import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.CloseSequence;
@@ -213,44 +212,38 @@ public class SandeshaUtil {
 		return sortedList;
 	}
 
-	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) {
+	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::startSenderForTheSequence , context " + context + ", sequenceID " + sequenceID);
 		
-		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
-		
-		if (sender!=null)
-			sender.runSenderForTheSequence(context, sequenceID);
-		else {
-			sender = new Sender ();
-			context.setProperty(Sandesha2Constants.SENDER,sender);
-			sender.runSenderForTheSequence(context, sequenceID);
-		}
+		SandeshaThread sender = getSandeshaStorageManager(context, context.getAxisConfiguration()).getSender();		
+		sender.runThreadForSequence(context, sequenceID);
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::startSenderForTheSequence");
 	}
 	
-	public static void stopSender(ConfigurationContext context) {
-		Sender sender = (Sender) context.getProperty(Sandesha2Constants.SENDER);
-		
-		if (sender!=null) {
-			sender.stopSending ();
-		}
+	public static void stopSender(ConfigurationContext context) throws SandeshaException {
+		SandeshaThread sender = getSandeshaStorageManager(context, context.getAxisConfiguration()).getSender();
+		sender.stopRunning();		
 	}
 
-	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) {
+	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaUtil::startInvokerForTheSequence , context " + context + ", sequenceID " + sequenceID);
 		
-		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
-		if (invoker!=null)
-			invoker.runInvokerForTheSequence(context,sequenceID);
-		else {
-			invoker = new Invoker ();
-			context.setProperty(Sandesha2Constants.INVOKER,invoker);
-			invoker.runInvokerForTheSequence(context,sequenceID);
-		}
+		SandeshaThread invoker = getSandeshaStorageManager(context, context.getAxisConfiguration()).getInvoker();
+		invoker.runThreadForSequence(context,sequenceID);
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::startInvokerForTheSequence");			
 	}
-	
+
+	public static void stopInvoker(ConfigurationContext context) throws SandeshaException {
+		SandeshaThread invoker = getSandeshaStorageManager(context, context.getAxisConfiguration()).getInvoker();
+		invoker.stopRunning();
+	}
+
 	public static void startPollingManager (ConfigurationContext configurationContext) throws SandeshaException {
 		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
 				Sandesha2Constants.POLLING_MANAGER);
@@ -270,12 +263,6 @@ public class SandeshaUtil {
 			pollingManager.stopPolling ();
 	}
 	
-	public static void stopInvoker(ConfigurationContext context) {
-		Invoker invoker = (Invoker) context.getProperty(Sandesha2Constants.INVOKER);
-		if (invoker!=null)
-			invoker.stopInvoking();
-	}
-
 	public static String getMessageTypeString(int messageType) {
 		switch (messageType) {
 		case Sandesha2Constants.MessageTypes.CREATE_SEQ:

@@ -142,12 +142,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		// storing new out sequence id
 		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean outSequenceBean = new SequencePropertyBean(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, newOutSequenceId);
 		SequencePropertyBean internalSequenceBean = new SequencePropertyBean(newOutSequenceId,
 				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, sequencePropertyKey);
 
-		sequencePropMgr.insert(outSequenceBean);
 		sequencePropMgr.insert(internalSequenceBean);
 		
 		// Store the security token under the new sequence id

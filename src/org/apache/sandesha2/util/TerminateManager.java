@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -282,26 +282,6 @@ public class TerminateManager {
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
 		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 
-		String outSequenceID = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
-
-		if (!serverSide) {
-			boolean stopListnerForAsyncAcks = false;
-			SequencePropertyBean acksToBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
-
-			String addressingNamespace = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
-
-			if (acksToBean != null) {
-				String acksTo = acksToBean.getValue();
-				if (acksTo != null && !anonymousURI.equals(acksTo)) {
-					stopListnerForAsyncAcks = true;
-				}
-			}
-		}
-
 		// removing retransmitterMgr entries and corresponding message contexts.
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
 		Iterator iterator = collection.iterator();
@@ -314,15 +294,14 @@ public class TerminateManager {
 		}
 
 		// removing the createSeqMgrEntry
-		CreateSeqBean findCreateSequenceBean = new CreateSeqBean();
-		findCreateSequenceBean.setInternalSequenceID(internalSequenceId);
-		collection = createSeqBeanMgr.find(findCreateSequenceBean);
-		iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			CreateSeqBean createSeqBean = (CreateSeqBean) iterator.next();
-			createSeqBeanMgr.delete(createSeqBean.getCreateSeqMsgID());
-		}
+		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		createSeqFindBean.setInternalSequenceID(internalSequenceId);
 
+		CreateSeqBean createSeqBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		createSeqBeanMgr.delete(createSeqBean.getCreateSeqMsgID());
+
+		String outSequenceID = createSeqBean.getSequenceID();
+		
 		// removing sequence properties
 		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean();
 		findSequencePropertyBean1.setSequencePropertyKey(sequencePropertyKey);
@@ -406,7 +385,7 @@ public class TerminateManager {
 		SequencePropertyBean transportToBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
 		if (transportToBean != null) {
-			terminateRMMessage.setProperty(MessageContextConstants.TRANSPORT_URL, transportToBean.getValue());
+			terminateRMMessage.setProperty(Constants.Configuration.TRANSPORT_URL, transportToBean.getValue());
 		}
 
 		terminateRMMessage.addSOAPEnvelope();

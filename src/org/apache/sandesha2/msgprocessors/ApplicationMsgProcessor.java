@@ -25,9 +25,8 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.description.AxisOperationFactory;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -78,7 +77,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		this.inboundSequence = inboundSequenceId;
 	}
 	
-	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext rmMsgCtx) {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: ApplicationMsgProcessor::processInMessage");
 			log.debug("Exit: ApplicationMsgProcessor::processInMessage");
@@ -256,8 +255,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		boolean sendCreateSequence = false;
 
-		SequencePropertyBean outSeqBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		String outSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceId, storageManager);
 
 		// setting async ack endpoint for the server side. (if present)
 		if (serverSide) {
@@ -277,7 +275,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			MessageContext requestMessageContext;
 			try {
 				requestMessageContext = msgContext.getOperationContext().getMessageContext(
-						AxisOperationFactory.MESSAGE_LABEL_IN_VALUE);
+						WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 			} catch (AxisFault e) {
 				throw new SandeshaException(e);
 			}
@@ -315,7 +313,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 																			// v1_1.
 
 		if (messageNumber == 1) {
-			if (outSeqBean == null) { // out sequence will be set for the
+			if (outSequenceID == null) { // out sequence will be set for the
 										// server side, in the case of an offer.
 				sendCreateSequence = true; // message number being one and not
 											// having an out sequence, implies
@@ -355,7 +353,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					MessageContext requestMessage;
 					try {
 						requestMessage = operationContext
-								.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+								.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 					} catch (AxisFault e) {
 						throw new SandeshaException(e);
 					}
@@ -394,7 +392,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 //							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
 					
 					try {
-						MessageContext requestMsgContext = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+						MessageContext requestMsgContext = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 						RMMsgContext requestRMMsgContext = MsgInitializer.initializeMessage(requestMsgContext);
 						
 						String requestSideSequencePropertyKey = SandeshaUtil.getSequencePropertyKey(requestRMMsgContext);
@@ -446,7 +444,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			MessageContext reqMsgCtx = null;
 			try {
 				reqMsgCtx = msgContext.getOperationContext().getMessageContext(
-						OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+						WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 			} catch (AxisFault e) {
 				throw new SandeshaException(e);
 			}
@@ -475,7 +473,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// processing the response if not an dummy.
 		if (!dummyMessage)
-			processResponseMessage(rmMsgCtx, internalSequenceId, messageNumber, storageKey, storageManager);
+			processResponseMessage(rmMsgCtx, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager);
 
 		
 		//Users wont be able to get reliable response msgs in the back channel in the back channel of a 
@@ -598,10 +596,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage");
 	}
 
-	private void processResponseMessage(RMMsgContext rmMsg, String internalSequenceId, long messageNumber,
+	private void processResponseMessage(RMMsgContext rmMsg, String internalSequenceId, String outSequenceID, long messageNumber,
 			String storageKey, StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
-			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId);
+			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId + ", " + outSequenceID);
 
 		MessageContext msg = rmMsg.getMessageContext();
 
@@ -612,10 +610,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				Sandesha2Constants.SequenceProperties.TO_EPR);
 		SequencePropertyBean replyToBean = sequencePropertyMgr.retrieve(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
-
-		// again - looks weird in the client side - but consistent
-		SequencePropertyBean outSequenceBean = sequencePropertyMgr.retrieve(internalSequenceId,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
 
 		if (toBean == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
@@ -640,7 +634,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (msg.isServerSide()) {
 
 			MessageContext requestMsg = msg.getOperationContext().getMessageContext(
-					OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 			if (requestMsg != null) {
 				newToStr = requestMsg.getReplyTo().getAddress();
 			}
@@ -671,7 +665,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			MessageContext requestMsg = null;
 
 			requestMsg = msg.getOperationContext()
-					.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
 			RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsg);
 			Sequence requestSequence = (Sequence) reqRMMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -713,15 +707,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		// addAckRequested = true; //TODO decide the policy to add the
 		// ackRequested tag
 
-		// setting the Sequnece id.
+		// setting the Sequence id.
 		// Set send = true/false depending on the availability of the out
 		// sequence id.
 		String identifierStr = null;
-		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
+		if (outSequenceID == null) {
 			identifierStr = Sandesha2Constants.TEMP_SEQUENCE_ID;
 
 		} else {
-			identifierStr = outSequenceBean.getValue();
+			identifierStr = outSequenceID;
 		}
 
 		Identifier id1 = new Identifier(rmNamespaceValue);
@@ -750,7 +744,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		appMsgEntry.setMessageID(rmMsg.getMessageId());
 		appMsgEntry.setMessageNumber(messageNumber);
 		appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
-		if (outSequenceBean == null || outSequenceBean.getValue() == null) {
+		if (outSequenceID == null) {
 			appMsgEntry.setSend(false);
 		} else {
 			appMsgEntry.setSend(true);

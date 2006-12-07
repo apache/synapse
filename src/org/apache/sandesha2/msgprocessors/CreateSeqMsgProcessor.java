@@ -174,13 +174,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// Only will be used by the server side response path. Will
 					// be wasted properties for the client side.
 
-					// setting the out_sequence_id
-					SequencePropertyBean outSequenceBean = new SequencePropertyBean();
-					outSequenceBean.setName(Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
-					outSequenceBean.setValue(offeredSequenceID);
-					outSequenceBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
-					seqPropMgr.insert(outSequenceBean);
-
 					// setting the internal_sequence_id
 					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
 					internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);

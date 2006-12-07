@@ -228,8 +228,8 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 			// If all the out message have been acked, add the outgoing
 			// terminate seq msg.
-			String outgoingSequnceID = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID, storageManager);
+			String outgoingSequnceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(responseSideSequencePropertyKey, storageManager); 
+
 			if (addResponseSideTerminate && highestOutMsgNo > 0 && responseSideSequencePropertyKey != null
 					&& outgoingSequnceID != null) {
 				boolean allAcked = SandeshaUtil.isAllMsgsAckedUpto(highestOutMsgNo, responseSideSequencePropertyKey,

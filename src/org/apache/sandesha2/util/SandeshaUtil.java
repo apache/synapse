@@ -75,6 +75,7 @@ import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.CreateSeqBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.workers.Invoker;
@@ -716,14 +717,16 @@ public class SandeshaUtil {
 	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
 			StorageManager storageManager) throws SandeshaException {
 
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
+		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		createSeqFindBean.setInternalSequenceID(internalSequenceID);
 
-		SequencePropertyBean outSequenceBean = sequencePropertyBeanMgr.retrieve(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.OUT_SEQUENCE_ID);
+		CreateSeqBean createSeqBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
 
 		String sequeunceID = null;
-		if (outSequenceBean != null)
-			sequeunceID = outSequenceBean.getValue();
+		if (createSeqBean != null && 
+				createSeqBean.getSequenceID() != null &&
+				!createSeqBean.getSequenceID().equals(Sandesha2Constants.TEMP_SEQUENCE_ID))
+			sequeunceID = createSeqBean.getSequenceID();
 
 		return sequeunceID;
 	}

@@ -267,8 +267,6 @@ public interface Sandesha2Constants {
 
 		String ACKS_TO_EPR = "acksToEPR";
 
-		String OUT_SEQUENCE_ID = "OutSequenceId";
-
 		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
 
 		String REPLY_TO_EPR = "ReplyToEPR";

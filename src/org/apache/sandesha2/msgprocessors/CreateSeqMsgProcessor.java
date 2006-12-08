@@ -79,11 +79,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		ConfigurationContext context = createSeqMsg.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
-		FaultManager faultManager = new FaultManager();
-		SandeshaException fault = faultManager.checkForCreateSequenceRefused(createSeqMsg, storageManager);
-		if (fault != null) {
-			throw fault;
-		}
+		FaultManager.checkForCreateSequenceRefused(createSeqMsg, storageManager);
 		
 		// If the inbound CreateSequence includes a SecurityTokenReference then
 		// ask the security manager to resolve that to a token for us. We also

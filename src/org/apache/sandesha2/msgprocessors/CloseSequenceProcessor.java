@@ -87,11 +87,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 
-		FaultManager faultManager = new FaultManager();
-		SandeshaException fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
-		if (fault != null) {
-			throw fault;
-		}
+		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 		
 		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
 		sequenceClosedBean.setSequencePropertyKey(sequencePropertyKey);

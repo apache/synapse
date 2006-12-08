@@ -134,15 +134,8 @@ public class AcknowledgementProcessor {
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
 		Iterator nackIterator = sequenceAck.getNackList().iterator();
 
-		FaultManager faultManager = new FaultManager();
-		SandeshaException fault = faultManager
-				.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager);
-		if(fault == null) {
-			fault = faultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
-		}
-		if (fault != null) {
-			throw fault;
-		}
+		FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager);
+		FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
 		
 		SenderBean input = new SenderBean();
 		input.setSend(true);

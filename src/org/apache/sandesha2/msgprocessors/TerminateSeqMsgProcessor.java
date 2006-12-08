@@ -100,13 +100,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			secManager.checkProofOfPossession(token, body, terminateSeqRMMsg.getMessageContext());
 		}
 
-		FaultManager faultManager = new FaultManager();
-		SandeshaException fault = faultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId,
-				storageManager);
-		if (fault != null) {
-			throw fault;
-		}
-
+		FaultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId, storageManager);
 
 		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean();
 		terminateReceivedBean.setSequencePropertyKey(sequencePropertyKey);

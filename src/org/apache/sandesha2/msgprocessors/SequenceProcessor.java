@@ -134,26 +134,15 @@ public class SequenceProcessor {
 			throw new SandeshaException(message);
 		}
 
-		FaultManager faultManager = new FaultManager();
-		SandeshaException fault = faultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
-		if (fault != null) {
-			throw fault;
-		}
+		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 
 		// setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
 
 		// throwing a fault if the sequence is closed.
-		fault = faultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
-		if (fault != null) {
-			throw fault;
-		}
-
-		fault = faultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
-		if (fault != null) {
-			throw fault;
-		}
+		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
+		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 
 		// updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(propertyKey, storageManager);

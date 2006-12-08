@@ -63,9 +63,6 @@ public class FaultManager {
 
 	private static final Log log = LogFactory.getLog(FaultManager.class);
 
-	public FaultManager() {
-	}
-
 	/**
 	 * Check weather the CreateSequence should be refused and generate the fault
 	 * if it should.
@@ -74,7 +71,7 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public SandeshaException checkForCreateSequenceRefused(MessageContext createSequenceMessage,
+	public static void checkForCreateSequenceRefused(MessageContext createSequenceMessage,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
@@ -110,14 +107,12 @@ public class FaultManager {
 			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForCreateSequenceRefused, refused sequence");
-			return getFault(createSequenceRMMsg, data, createSequenceRMMsg.getAddressingNamespaceValue(),
+			getFault(createSequenceRMMsg, data, createSequenceRMMsg.getAddressingNamespaceValue(),
 					storageManager);
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForCreateSequenceRefused");
-		return null;
-
 	}
 
 	/**
@@ -127,7 +122,7 @@ public class FaultManager {
 	 * @param msgCtx
 	 * @return
 	 */
-	public SandeshaException checkForLastMsgNumberExceeded(RMMsgContext applicationRMMessage, StorageManager storageManager)
+	public static void checkForLastMsgNumberExceeded(RMMsgContext applicationRMMessage, StorageManager storageManager)
 			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForLastMsgNumberExceeded");
@@ -172,16 +167,15 @@ public class FaultManager {
 			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForLastMsgNumberExceeded, lastMessageNumberExceeded");
-			return getFault(applicationRMMessage, faultData, applicationRMMessage.getAddressingNamespaceValue(),
+			getFault(applicationRMMessage, faultData, applicationRMMessage.getAddressingNamespaceValue(),
 					storageManager);
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForLastMsgNumberExceeded");
-		return null;
 	}
 
-	public RMMsgContext checkForMessageNumberRoleover(MessageContext messageContext) {
+	public static RMMsgContext checkForMessageNumberRoleover(MessageContext messageContext) {
 		return null;
 	}
 
@@ -194,7 +188,7 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public SandeshaException checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
+	public static void checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
 			StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForUnknownSequence, " + sequenceID);
@@ -259,14 +253,12 @@ public class FaultManager {
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSequenceEstablished, sequenceID));
 
 			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::checkForUnknownSequence");
-
-			return getFault(rmMessageContext, data, rmMessageContext.getAddressingNamespaceValue(), storageManager);
+				log.debug("Exit: FaultManager::checkForUnknownSequence, Sequence unknown");
+			getFault(rmMessageContext, data, rmMessageContext.getAddressingNamespaceValue(), storageManager);
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForUnknownSequence");
-		return null;
 	}
 
 	/**
@@ -277,7 +269,7 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public SandeshaException checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, StorageManager storageManager)
+	public static void checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, StorageManager storageManager)
 			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForInvalidAcknowledgement");
@@ -289,7 +281,6 @@ public class FaultManager {
 		if (ackRMMessageContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, MessageType not an ACK");
-			return null;
 		}
 
 		boolean invalidAck = false;
@@ -336,7 +327,7 @@ public class FaultManager {
 
 				if (log.isDebugEnabled())
 					log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-				return getFault(ackRMMessageContext, data, ackRMMessageContext.getAddressingNamespaceValue(),
+				getFault(ackRMMessageContext, data, ackRMMessageContext.getAddressingNamespaceValue(),
 						storageManager);
 			}
 		
@@ -344,11 +335,9 @@ public class FaultManager {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement");
-		
-		return null;
 	}
 
-	public SandeshaException checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
+	public static void checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
 			StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
@@ -387,14 +376,11 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
-			return getFault(referenceRMMessage, data, referenceRMMessage.getAddressingNamespaceValue(), storageManager);
+			getFault(referenceRMMessage, data, referenceRMMessage.getAddressingNamespaceValue(), storageManager);
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForSequenceClosed");
-		
-		return null;
-
 	}
 	
 	/**
@@ -409,7 +395,7 @@ public class FaultManager {
 	 * 
 	 * @throws AxisFault
 	 */
-	public SandeshaException getFault (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
+	public static void getFault (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
 			StorageManager storageManager) throws AxisFault {
 		
 		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
@@ -448,7 +434,7 @@ public class FaultManager {
 		}
 		
 		SandeshaException fault = new SandeshaException("");
-		return fault;
+		throw fault;
 	}
 	
 	public static boolean isRMFault (String faultSubcodeValue) {

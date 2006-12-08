@@ -233,6 +233,7 @@ public class AcknowledgementManager {
 		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
+		ackRMMsgCtx.setFlow(MessageContext.OUT_FLOW);
 		ackRMMsgCtx.setRMNamespaceValue(referenceRMMessage.getRMNamespaceValue());
 
 		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());

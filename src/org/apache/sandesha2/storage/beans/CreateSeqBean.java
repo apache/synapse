@@ -124,4 +124,15 @@ public class CreateSeqBean extends RMBean {
 		this.referenceMessageStoreKey = referenceMessageStoreKey;
 	}
 	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getName());
+		result.append("\nSequence Id      : "); result.append(sequenceID);
+		result.append("\nInternal Seq Id  : "); result.append(internalSequenceID);
+		result.append("\nCreateSeq Msg Id : "); result.append(createSeqMsgID);
+		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
+		result.append("\nCreateSeq Msg Key: "); result.append(createSequenceMsgStoreKey);
+		result.append("\nReference Msg Key: "); result.append(referenceMessageStoreKey);
+		return result.toString();
+	}
 }

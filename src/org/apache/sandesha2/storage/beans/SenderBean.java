@@ -212,4 +212,19 @@ public class SenderBean extends RMBean {
 		this.toAddress = toAddress;
 	}
 	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		// There is a lot of data in this bean, so we don't trace it all.
+		result.append(this.getClass().getName());
+		result.append("\nSequence Id    : "); result.append(sequenceID);
+		result.append("\nInternal Seq Id: "); result.append(internalSequenceID);
+		result.append("\nMessage Number : "); result.append(messageNumber);
+		result.append("\nMessage Type   : "); result.append(messageType);
+		result.append("\nMessage Key    : "); result.append(messageContextRefKey);
+		result.append("\nSend           : "); result.append(send);
+		result.append("\nResend         : "); result.append(reSend);
+		result.append("\nSent count     : "); result.append(sentCount);
+		result.append("\nTime to send   : "); result.append(timeToSend);
+		return result.toString();
+	}
 }

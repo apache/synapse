@@ -114,4 +114,14 @@ public class InvokerBean extends RMBean {
 	public void setInvoked(boolean invoked) {
 		this.invoked = invoked;
 	}
+	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getName());
+		result.append("\nSequence Id: "); result.append(sequenceID);
+		result.append("\nMsg Number : "); result.append(msgNo);
+		result.append("\nInvoked    : "); result.append(invoked);
+		result.append("\nMessage Key: "); result.append(messageContextRefKey);
+		return result.toString();
+	}
 }

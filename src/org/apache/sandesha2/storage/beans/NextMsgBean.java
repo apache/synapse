@@ -106,4 +106,13 @@ public class NextMsgBean extends RMBean {
 		this.referenceMessageKey = referenceMessageKey;
 	}
 	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getName());
+		result.append("\nSequence Id: "); result.append(sequenceID);
+		result.append("\nNext Msg # : "); result.append(nextMsgNoToProcess);
+		result.append("\nPolling    : "); result.append(pollingMode);
+		result.append("\nRef Msg Key: "); result.append(referenceMessageKey);
+		return result.toString();
+	}
 }

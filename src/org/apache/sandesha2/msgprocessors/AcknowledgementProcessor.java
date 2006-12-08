@@ -130,6 +130,7 @@ public class AcknowledgementProcessor {
 			secManager.checkProofOfPossession(token, soapHeader, msgCtx);
 		}
 		
+		if(log.isDebugEnabled()) log.debug("Got Ack for RM Sequence: " + outSequenceId + ", propertyKey: " + sequencePropertyKey);
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
 		Iterator nackIterator = sequenceAck.getNackList().iterator();
 

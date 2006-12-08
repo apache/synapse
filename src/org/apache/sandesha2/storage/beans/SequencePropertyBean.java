@@ -80,4 +80,13 @@ public class SequencePropertyBean extends RMBean {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getName());
+		result.append("\nSeq Key :"); result.append(sequencePropertyKey);
+		result.append("\nName    :"); result.append(name);
+		result.append("\nValue   :"); result.append(value);
+		return result.toString();
+	}
 }

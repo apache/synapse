@@ -38,17 +38,10 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class Sender extends SandeshaThread {
 
-
 	private static final Log log = LogFactory.getLog(Sender.class);
-	
-
-  public static final int SENDER_THREADPOOL_SIZE = 5;
-  
-  private WorkerLock lock = null;
-    
+	    
   public Sender () {
-  	super(SENDER_THREADPOOL_SIZE, Sandesha2Constants.SENDER_SLEEP_TIME);
-  	lock = new WorkerLock ();
+  	super(Sandesha2Constants.SENDER_SLEEP_TIME);
   }	
 
 	protected void internalRun() {
@@ -138,7 +131,7 @@ public class Sender extends SandeshaThread {
 				String workId = senderBean.getMessageID();
 
 				// check weather the bean is already assigned to a worker.
-				if (lock.isWorkPresent(workId)) {
+				if (getWorkerLock().isWorkPresent(workId)) {
 					if (log.isDebugEnabled()) {
 						String message = SandeshaMessageHelper
 								.getMessage(
@@ -153,14 +146,14 @@ public class Sender extends SandeshaThread {
 
 				// start a worker which will work on this messages.
 				SenderWorker worker = new SenderWorker(context, senderBean);
-				worker.setLock(lock);
+				worker.setLock(getWorkerLock());
 				worker.setWorkId(workId);
 				threadPool.execute(worker);
 
 				// adding the workId to the lock after assigning it to a thread
 				// makes sure
 				// that all the workIds in the Lock are handled by threads.
-				lock.addWork(workId);
+				getWorkerLock().addWork(workId);
 
 			} catch (Exception e) {
 

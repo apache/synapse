@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.ThreadFactory;
-import org.apache.axis2.util.threadpool.ThreadPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -39,15 +38,20 @@ public abstract class SandeshaThread extends Thread{
 	private boolean pauseRequired = false;
 	
 	private int sleepTime;
-	
+  private WorkerLock lock = null;
+
 	private ArrayList workingSequences = new ArrayList();
 	
 	protected transient ThreadFactory threadPool;
 	protected ConfigurationContext context = null;
 	
-	protected SandeshaThread(int threadPoolSize, int sleepTime){
-		threadPool = new ThreadPool(threadPoolSize, threadPoolSize);
+	public SandeshaThread(int sleepTime) {
 		this.sleepTime = sleepTime;
+  	lock = new WorkerLock ();
+	}
+	
+	public final WorkerLock getWorkerLock() {
+		return lock;
 	}
 	
 	public synchronized void stopThreadForSequence(String sequenceID){
@@ -136,6 +140,9 @@ public abstract class SandeshaThread extends Thread{
 			workingSequences.add(sequenceID);
 		if (!isThreadStarted()) {
 			this.context = context;
+			// Get the axis2 thread pool
+			threadPool = context.getThreadPool();
+			
 			runThread = true; // so that isStarted()=true.
 			super.start();
 		}		

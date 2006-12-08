@@ -50,13 +50,8 @@ public class Invoker extends SandeshaThread {
 
 	private static final Log log = LogFactory.getLog(Invoker.class);
 	
-	public static final int INVOKER_THREADPOOL_SIZE = 5;
-
-	private WorkerLock lock = null;
-	
 	public Invoker() {
-		super(INVOKER_THREADPOOL_SIZE, Sandesha2Constants.INVOKER_SLEEP_TIME);
-		lock = new WorkerLock ();
+		super(Sandesha2Constants.INVOKER_SLEEP_TIME);
 	}
 	
 	/**
@@ -113,7 +108,7 @@ public class Invoker extends SandeshaThread {
 								messageContextKey, 
 								true); //want to ignore the enxt msg number
 						
-						worker.setLock(lock);
+						worker.setLock(getWorkerLock());
 						worker.setWorkId(workId);
 						
 						//before we execute we need to set the 
@@ -122,7 +117,7 @@ public class Invoker extends SandeshaThread {
 					
 						//adding the workId to the lock after assigning it to a thread makes sure 
 						//that all the workIds in the Lock are handled by threads.
-						lock.addWork(workId);
+						getWorkerLock().addWork(workId);
 
 						long msgNumber = invoker.getMsgNo();
 						//if necessary, update the "next message number" bean under this transaction
@@ -318,7 +313,7 @@ public class Invoker extends SandeshaThread {
 																   //piece of work that will be assigned to the Worker.
 										
 					//check whether the bean is already assigned to a worker.
-					if (lock.isWorkPresent(workId)) {
+					if (getWorkerLock().isWorkPresent(workId)) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
 						log.debug(message);
 						continue;
@@ -334,14 +329,14 @@ public class Invoker extends SandeshaThread {
 							beanIsOutOfOrderMsg); //only ignore nextMsgNumber if the bean is an
 																		//out of order message
 					
-					worker.setLock(lock);
+					worker.setLock(getWorkerLock());
 					worker.setWorkId(workId);
 					
 					threadPool.execute(worker);
 					
 					//adding the workId to the lock after assigning it to a thread makes sure 
 					//that all the workIds in the Lock are handled by threads.
-					lock.addWork(workId);
+					getWorkerLock().addWork(workId);
 				}
 
 			} catch (Exception e) {

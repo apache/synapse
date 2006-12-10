@@ -54,7 +54,7 @@ public class RMDBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getNextMsgBeanMgr();
+        mgr = storageManager.getRMDBeanMgr();
 
     }
     

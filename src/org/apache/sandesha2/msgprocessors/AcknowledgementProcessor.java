@@ -109,7 +109,7 @@ public class AcknowledgementProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
 
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
@@ -180,7 +180,7 @@ public class AcknowledgementProcessor {
 				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
 		if (offeredSequenceId!=null) {
 
-			RMDBeanMgr rMDBeanMgr = storageManager.getNextMsgBeanMgr();
+			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = rMDBeanMgr.retrieve(outSequenceId);
 			
 			if (rMDBean!=null && rMDBean.isPollingMode())

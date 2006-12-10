@@ -503,8 +503,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
+		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
@@ -604,7 +604,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext msg = rmMsg.getMessageContext();
 
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 
 		SequencePropertyBean toBean = sequencePropertyMgr.retrieve(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.TO_EPR);

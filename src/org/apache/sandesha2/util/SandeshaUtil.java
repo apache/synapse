@@ -54,6 +54,7 @@ import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisDescription;
+import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
@@ -96,6 +97,16 @@ public class SandeshaUtil {
 	// private static Hashtable storedMsgContexts = new Hashtable();
 
 	private static Log log = LogFactory.getLog(SandeshaUtil.class);
+	
+	private static AxisModule axisModule = null;
+
+	public static AxisModule getAxisModule() {
+		return axisModule;
+	}
+
+	public static void setAxisModule(AxisModule module) {
+		axisModule = module;
+	}
 
 	/**
 	 * Create a new UUID.
@@ -579,11 +590,50 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			
-			//TODO - move these to a property file.
-            newMessageContext.setProperty(RampartMessageData.KEY_RAMPART_POLICY, referenceMessage
-                    .getProperty(RampartMessageData.KEY_RAMPART_POLICY));
-            newMessageContext.setProperty(WSHandlerConstants.RECV_RESULTS, 
-                    referenceMessage.getProperty(WSHandlerConstants.RECV_RESULTS));
+
+			//copyint properties as configured in the module.xml properties. Module xml has several
+			//properties which gives comma seperated lists of property names that have to be copited
+			//from various places when creating related messages.
+			
+			AxisModule axisModule = SandeshaUtil.getAxisModule();
+
+			Parameter propertiesFromRefMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceMessage);
+			if (propertiesFromRefMsg!=null) {
+				String value = (String) propertiesFromRefMsg.getValue();
+				if (value!=null) {
+					value = value.trim();
+					String[] propertyNames = value.split(",");
+					for (int i=0;i<propertyNames.length;i++) {
+						String propertyName = propertyNames[i];
+						Object val = referenceMessage.getProperty(propertyName);
+						if (val!=null) {
+							newMessageContext.setProperty(propertyName,val);
+						}
+					}
+				}
+			}
+			
+			Parameter propertiesFromRefReqMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessage);
+			OperationContext referenceOpCtx = referenceMessage.getOperationContext();
+			MessageContext referenceRequestMessage = null;
+			if (referenceOpCtx!=null) 
+				referenceRequestMessage=referenceOpCtx.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+			
+			if (propertiesFromRefReqMsg!=null && referenceRequestMessage!=null) {
+				String value = (String) propertiesFromRefReqMsg.getValue();
+				if (value!=null) {
+					value = value.trim();
+					String[] propertyNames = value.split(",");
+					for (int i=0;i<propertyNames.length;i++) {
+						String propertyName = propertyNames[i];
+						Object val = referenceRequestMessage.getProperty(propertyName);
+						if (val!=null) {
+							newMessageContext.setProperty(propertyName,val);
+						}
+					}
+				}
+			}
+
             
 			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
 
@@ -707,7 +757,7 @@ public class SandeshaUtil {
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setInternalSequenceID(internalSequenceID);
 
-		RMSBean rMSBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(createSeqFindBean);
 
 		String sequeunceID = null;
 		if (rMSBean != null && 

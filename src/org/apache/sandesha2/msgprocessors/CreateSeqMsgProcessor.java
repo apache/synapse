@@ -163,7 +163,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					
 					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
-					RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+					RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 					createSeqMgr.insert(rMSBean);
 
 					// Setting sequence properties for the outgoing sequence.
@@ -300,7 +300,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			return false;
 		}
 
-		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setSequenceID(sequenceId);

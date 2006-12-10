@@ -44,8 +44,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		try {
 			
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-			InvokerBeanMgr invokerBeanMgr = storageManager.getStorageMapBeanMgr();
-			RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
+			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 			
 			//starting a transaction
 			transaction = storageManager.getTransaction();

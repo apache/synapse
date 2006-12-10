@@ -216,7 +216,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		} else {
 
-			SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+			SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
 			String key = SandeshaUtil.getUUID();
 

@@ -110,7 +110,7 @@ public class SandeshaClient {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 
 		String withinTransactionStr = (String) configurationContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
 		boolean withinTransaction = false;
@@ -303,38 +303,14 @@ public class SandeshaClient {
 	}
 
 	/**
-	 * Clients can use this to create a sequence sequence.
+	 * This could be used to create sequences with a given sequence key.
 	 * 
 	 * @param serviceClient - A configured ServiceClient to be used to invoke RM messages. This need to have Sandesha2 engaged.
 	 * @param offer - Weather a sequence should be offered for obtaining response messages.
-	 * @return The sequenceKey of the newly generated sequence.
+	 * @param sequenceKey The sequenceKey of the newly generated sequence.
 	 * @throws SandeshaException
 	 */
-	public static String createSequence(ServiceClient serviceClient, boolean offer) throws SandeshaException {
-		
-		// Generate a new sequence key to be used for creating the sequence
-		String	newSequenceKey = SandeshaUtil.getUUID();
-		
-		// Create the sequence
-		createSequence(serviceClient, offer, newSequenceKey);
-		
-		// Return the new sequence key
-		return newSequenceKey;
-	}
-
-	/**
-	 * Creates a sequence with the specified sequenceKey.
-	 * 
-	 * @param serviceClient
-	 * @param offer
-	 * @param sequenceKey
-	 * @throws SandeshaException
-	 */
-	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey)
-			throws SandeshaException {
-		
-		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaClient::createSequence " + offer + ", " + sequenceKey);
+	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey) throws SandeshaException {
 		
 		setUpServiceClientAnonymousOperations (serviceClient);
 		
@@ -352,7 +328,7 @@ public class SandeshaClient {
 		if (to == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.toEPRNotValid, null));
-		
+
 		if (offer) {
 			String offeredSequenceID = SandeshaUtil.getUUID();
 			options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSequenceID);
@@ -367,7 +343,7 @@ public class SandeshaClient {
 
 		if (rmSpecVersion == null)
 			rmSpecVersion = SpecSpecificConstants.getDefaultSpecVersion();
-		
+
 		//When the message is marked as Dummy the application processor will not actually try to send it. 
 		//But still the create Sequence will be added.
 
@@ -388,8 +364,29 @@ public class SandeshaClient {
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
 		
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaClient::createSequence");
+	}
+
+	/**
+	 * Clients can use this to create a sequence sequence.
+	 * 
+	 * @param serviceClient - A configured ServiceClient to be used to invoke RM messages. This need to have Sandesha2 engaged.
+	 * @param offer - Weather a sequence should be offered for obtaining response messages.
+	 * @return The sequenceKey of the newly generated sequence.
+	 * @throws SandeshaException
+	 */
+	public static String createSequence(ServiceClient serviceClient, boolean offer)
+			throws SandeshaException {
+
+		Options options = serviceClient.getOptions();
+		if (options == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.optionsObjectNotSet));
+
+		
+		String newSequenceKey = SandeshaUtil.getUUID();
+		createSequence(serviceClient, offer, newSequenceKey);
+		
+		return newSequenceKey;
 	}
 	
 	/**
@@ -1044,7 +1041,7 @@ public class SandeshaClient {
 			return SequenceReport.SEQUENCE_STATUS_TIMED_OUT;
 		}
 
-		RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 		RMDBean rMDBean = nextMsgMgr.retrieve(sequenceID);
 
 		if (rMDBean != null) {

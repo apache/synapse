@@ -66,7 +66,7 @@ public class PollingManager extends Thread {
 			
 			try {
 				
-				RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+				RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 				
 				//geting the sequences to be polled.
 				//if shedule contains any requests, do the earliest one.
@@ -140,7 +140,7 @@ public class PollingManager extends Thread {
 				if (to!=null)
 					makeConnectionSenderBean.setToAddress(to.getAddress());
 
-				SenderBeanMgr senderBeanMgr = storageManager.getRetransmitterBeanMgr();
+				SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 				
 				//this message should not be sent until it is qualified. I.e. till it is sent through the Sandesha2TransportSender.
 				makeConnectionRMMessage.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);

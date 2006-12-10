@@ -75,8 +75,8 @@ public class Invoker extends SandeshaThread {
 				SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 	
 			InvokerBeanMgr storageMapMgr = storageManager
-					.getStorageMapBeanMgr();
-			RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+					.getInvokerBeanMgr();
+			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = nextMsgMgr.retrieve(sequenceID);
 			
 			if (rMDBean != null) {
@@ -186,7 +186,7 @@ public class Invoker extends SandeshaThread {
 			//we now have the set of ranges that can be delivered out of order.
 			//Look for any invokable message that lies in one of those ranges
 			Iterator invokerBeansIterator = 
-				strMgr.getStorageMapBeanMgr().find(
+				strMgr.getInvokerBeanMgr().find(
 						new InvokerBean(null, 
 														0,  //finds all invoker beans
 														sequenceID)).iterator();
@@ -234,10 +234,10 @@ public class Invoker extends SandeshaThread {
 				StorageManager storageManager = SandeshaUtil
 						.getSandeshaStorageManager(context, context
 								.getAxisConfiguration());
-				RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+				RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 
 				InvokerBeanMgr storageMapMgr = storageManager
-						.getStorageMapBeanMgr();
+						.getInvokerBeanMgr();
 
 				SequencePropertyBeanMgr sequencePropMgr = storageManager
 						.getSequencePropertyBeanMgr();

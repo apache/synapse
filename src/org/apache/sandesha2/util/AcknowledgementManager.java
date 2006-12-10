@@ -71,7 +71,7 @@ public class AcknowledgementManager {
 
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 
-		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
 		SenderBean findBean = new SenderBean();
 

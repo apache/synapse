@@ -57,15 +57,15 @@ public abstract class StorageManager {
 	
 	public abstract SandeshaThread getInvoker();
 
-	public abstract RMSBeanMgr getCreateSeqBeanMgr();
+	public abstract RMSBeanMgr getRMSBeanMgr();
 
-	public abstract RMDBeanMgr getNextMsgBeanMgr();
+	public abstract RMDBeanMgr getRMDBeanMgr();
 
-	public abstract SenderBeanMgr getRetransmitterBeanMgr();
+	public abstract SenderBeanMgr getSenderBeanMgr();
 
 	public abstract SequencePropertyBeanMgr getSequencePropertyBeanMgr();
 
-	public abstract InvokerBeanMgr getStorageMapBeanMgr();
+	public abstract InvokerBeanMgr getInvokerBeanMgr();
 	
 	public abstract void storeMessageContext (String storageKey,MessageContext msgContext) throws SandeshaStorageException;
 	

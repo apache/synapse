@@ -80,7 +80,7 @@ public class WSRMMessageSender  {
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setInternalSequenceID(internalSequenceID);
 
-		RMSBean rMSBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(createSeqFindBean);
 		
 		if (rMSBean == null)
 		{
@@ -166,7 +166,7 @@ public class WSRMMessageSender  {
 
 		senderBean.setReSend(false);
 
-		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
 		
 		SandeshaUtil.executeAndStore(rmMsgCtx, key);
 	

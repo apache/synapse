@@ -100,8 +100,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		}
 		String createSeqMsgId = relatesTo.getValue();
 
-		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
-		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 
 		RMSBean createSeqBean = createSeqMgr.retrieve(createSeqMsgId);
 		if (createSeqBean == null) {
@@ -215,7 +215,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			if (pollingMode)
 				SandeshaUtil.startPollingManager(configCtx);
 			
-			RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 			nextMsgMgr.insert(rMDBean);
 
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();

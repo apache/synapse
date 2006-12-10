@@ -106,7 +106,7 @@ public class TerminateManager {
 	 */
 	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		InvokerBeanMgr storageMapBeanMgr = storageManager.getStorageMapBeanMgr();
+		InvokerBeanMgr storageMapBeanMgr = storageManager.getInvokerBeanMgr();
 
 		// removing storageMap entries
 		InvokerBean findStorageMapBean = new InvokerBean();
@@ -146,7 +146,7 @@ public class TerminateManager {
 		removeReceivingSideProperties(configContext, sequencePropertyKey, sequenceId, storageManager);
 		
 		// removing nextMsgMgr entries
-		RMDBeanMgr rMDBeanMgr = storageManager.getNextMsgBeanMgr();
+		RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 		RMDBean findNextMsgBean = new RMDBean();
 		findNextMsgBean.setSequenceID(sequenceId);
 		Collection collection = rMDBeanMgr.find(findNextMsgBean);
@@ -279,8 +279,8 @@ public class TerminateManager {
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
-		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-		RMSBeanMgr rMSBeanMgr = storageManager.getCreateSeqBeanMgr();
+		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
+		RMSBeanMgr rMSBeanMgr = storageManager.getRMSBeanMgr();
 
 		// removing retransmitterMgr entries and corresponding message contexts.
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
@@ -297,7 +297,7 @@ public class TerminateManager {
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setInternalSequenceID(internalSequenceId);
 
-		RMSBean rMSBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(createSeqFindBean);
 		rMSBeanMgr.delete(rMSBean.getCreateSeqMsgID());
 
 		String outSequenceID = rMSBean.getSequenceID();
@@ -430,7 +430,7 @@ public class TerminateManager {
 		// / addTerminateSeqTransaction.commit();
 		SandeshaUtil.executeAndStore(terminateRMMessage, key);
 		
-		SenderBeanMgr retramsmitterMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
 		retramsmitterMgr.insert(terminateBean);
 
 		if(log.isDebugEnabled())

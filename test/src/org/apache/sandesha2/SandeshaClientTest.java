@@ -527,7 +527,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 				String sequenceId = SandeshaClient.getSequenceID(serviceClient);
 				
 				// Get the SenderBeanManager
-				SenderBeanMgr senderManager = storageManager.getRetransmitterBeanMgr();
+				SenderBeanMgr senderManager = storageManager.getSenderBeanMgr();
 						
 				// Check that there are no sender beans inside the SenderBeanMgr.
 				SenderBean senderBean = new SenderBean();

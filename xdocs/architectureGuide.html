@@ -204,23 +204,23 @@ framework.</strong></p>
 <p>Storage framework defines several beans that extend the RMBean abstract
 class. They are given below:</p>
 <ol>
-  <li>CreateSequenceBean (fields - InternalSequenceID, CreateSequenceMsgID,
-    SequenceID)</li>
+  <li>RMSBean (fields - internalSequenceID, createSequenceMsgID,
+    sequenceID, createSequenceMsgStoreKey, referenceMsgStoreKey, securityTokenData)</li>
   <li>SenderBean (fields - messageContextRefKey, internalSequenceID,
     messageNumber, messageID, messageType, send, resent,
   sentCount,timeToSend)</li>
-  <li>NextMsgBean (fields - sequenceID, nextMsgToProcess)</li>
+  <li>RMDBean (fields - sequenceID, nextMsgToProcess, pollingMode, referenceMessageKey)</li>
   <li>InvokerBean (fields - invoked,messageContextRefKey, sequenceID,
   msgNo)</li>
-  <li>SequencePropertyBean (fields - sequenceID, name, value)</li>
+  <li>SequencePropertyBean (fields - sequencePropertyKey, name, value)</li>
 </ol>
 
 <p>There are five bean manager interfaces corresponding to each of above
 beans.They are as follows:</p>
 <ol>
-  <li>CreateSequenceBeanMgr</li>
+  <li>RMSBeanMgr</li>
   <li>InvokerBeanMgr</li>
-  <li>NextMsgBeanMgr</li>
+  <li>RMDBeanMgr</li>
   <li>SenderBeanMgr</li>
   <li>SequencePropertyBeanMgr</li>
 </ol>

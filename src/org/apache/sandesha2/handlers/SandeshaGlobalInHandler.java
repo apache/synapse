@@ -85,40 +85,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		boolean rolebacked = false;
 
 		try {
-			// processing faults.
-			// Had to do this before dispatching. A fault message comes with the
-			// relatesTo part. So this will
-			// fill the opContext of te req/res message. But RM keeps
-			// retransmitting. So RM has to report the
-			// error and stop this fault being dispatched as the response
-			// message.
-
-			SOAPFault faultPart = envelope.getBody().getFault();
-
-			if (faultPart != null) {
-
-				// constructing the fault
-				AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
-
-				//If this is a RM related fault. I.e. one that was defined in the WSRM spec. It will be 
-				//handled at this point.
-				SOAPFaultCode faultCode = axisFault.getFaultCodeElement();
-				SOAPFaultSubCode faultSubCode = faultCode!=null?faultCode.getSubCode():null;
-				SOAPFaultValue faultSubcodeValue = faultSubCode!=null?faultSubCode.getValue():null;
-				String subCodeText = faultSubcodeValue!=null?faultSubcodeValue.getText():null;
-				
-				if (subCodeText!=null && FaultManager.isRMFault(subCodeText)) {
-					//handling the fault here and pausing the message.
-					
-					FaultManager faultManager = new FaultManager ();
-					faultManager.manageIncomingRMFault (axisFault, msgContext);
-					
-					msgContext.pause();
-					returnValue = InvocationResponse.SUSPEND;
-				}
-				
-			}
-
+			
 			// Quitting the message with minimum processing if not intended for
 			// RM.
 			boolean isRMGlobalMessage = SandeshaUtil.isRMGlobalMessage(msgContext);
@@ -277,8 +244,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							// TODO correct the syntac into '[received msgs]'
 
 							seqPropMgr.update(receivedMsgsBean);
-
-							SequenceProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);							
 							
 							drop = true;
 

@@ -79,7 +79,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
 		
 		if (offeredSequenceId!=null) {
-			RMDBeanMgr rMDBeanMgr = storageManager.getNextMsgBeanMgr();
+			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = rMDBeanMgr.retrieve(sequenceId);
 			
 			if (rMDBean!=null && rMDBean.isPollingMode())

@@ -129,7 +129,7 @@ public class SequenceManager {
 			seqPropMgr.insert(tokenBean);
 		}		
 
-		RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 		nextMsgMgr.insert(new RMDBean(sequenceId, 1)); // 1 will be the
 															// next
 

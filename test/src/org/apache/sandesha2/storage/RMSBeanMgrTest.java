@@ -54,7 +54,7 @@ public class RMSBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getCreateSeqBeanMgr();
+        mgr = storageManager.getRMSBeanMgr();
     }
     
     public void tearDown() throws Exception {

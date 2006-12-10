@@ -55,7 +55,7 @@ public class SenderBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getRetransmitterBeanMgr();
+        mgr = storageManager.getSenderBeanMgr();
     }
     
     public void tearDown() throws Exception {

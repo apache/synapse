@@ -57,6 +57,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		//init the i18n messages
 		SandeshaMessageHelper.innit();
 		
+		//storing the module as a static variable
+		SandeshaUtil.setAxisModule(module);
+		
 		// continueUncompletedSequences (storageManager,configCtx);
 
 		SandeshaPolicyBean constantPropertyBean = PropertyManager.loadPropertiesFromDefaultValues();

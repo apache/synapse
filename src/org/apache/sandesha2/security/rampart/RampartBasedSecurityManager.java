@@ -137,7 +137,9 @@ public class RampartBasedSecurityManager extends SecurityManager {
                                     //Now check signature parts
                                     OMAttribute idattr = messagePart.getAttribute(new QName(WSConstants.WSU_NS, "Id"));
                                     verified = wser.getSignedElements().contains(idattr.getAttributeValue());
-                                    break;
+                                    if(verified) {
+                                    	    break;
+                                    }
                                 }
                             }
                         }

@@ -77,7 +77,7 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			StorageManager serverStore = SandeshaUtil.getInMemoryStorageManager(serverConfigCtx);
 			t = serverStore.getTransaction();
 			RMDBean rMDBean = 
-				serverStore.getNextMsgBeanMgr().retrieve(inboundSequenceID);
+				serverStore.getRMDBeanMgr().retrieve(inboundSequenceID);
 			assertNotNull(rMDBean);
 			assertEquals(rMDBean.getNextMsgNoToProcess(), 4);
 			
@@ -152,7 +152,7 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			//check that the server is now expecting msg 4
 			StorageManager serverMgr = SandeshaUtil.getInMemoryStorageManager(serverConfigCtx);
 			t = serverMgr.getTransaction();
-			RMDBean rMDBean = serverMgr.getNextMsgBeanMgr().retrieve(inboundSequenceID);
+			RMDBean rMDBean = serverMgr.getRMDBeanMgr().retrieve(inboundSequenceID);
 			assertNotNull(rMDBean);
 			assertEquals(rMDBean.getNextMsgNoToProcess(), 4);
 			t.commit();

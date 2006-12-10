@@ -35,6 +35,7 @@ import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -106,6 +107,10 @@ public class SandeshaInHandler extends AbstractHandler {
 				throw new AxisFault(message);
 			}
 
+			//processing any incoming faults.
+			//This is responsible for Sandesha2 specific 
+			FaultManager.processMessagesForFaults(msgCtx);
+			
 			RMMsgContext rmMsgCtx = null;
 			try {
 				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);

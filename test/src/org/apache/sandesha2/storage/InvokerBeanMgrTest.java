@@ -53,7 +53,7 @@ public class InvokerBeanMgrTest extends SandeshaTestCase {
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getStorageMapBeanMgr();
+        mgr = storageManager.getInvokerBeanMgr();
     }
     
     public void tearDown() throws Exception {

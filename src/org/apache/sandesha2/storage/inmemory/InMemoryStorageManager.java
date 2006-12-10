@@ -20,10 +20,14 @@ package org.apache.sandesha2.storage.inmemory;
 import java.util.Collection;
 import java.util.HashMap;
 
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -48,6 +52,7 @@ public class InMemoryStorageManager extends StorageManager {
 
 	private static InMemoryStorageManager instance = null;
     private final String MESSAGE_MAP_KEY = "Sandesha2MessageMap";
+    private final String ENVELOPE_MAP_KEY = "Sandesha2EnvelopeMap";
     private RMSBeanMgr  rMSBeanMgr = null;
     private RMDBeanMgr rMDBeanMgr = null;
     private SequencePropertyBeanMgr sequencePropertyBeanMgr = null;
@@ -128,15 +133,15 @@ public class InMemoryStorageManager extends StorageManager {
 		t.enlist(bean);
 	}
 	
-	public RMSBeanMgr getCreateSeqBeanMgr() {
+	public RMSBeanMgr getRMSBeanMgr() {
 		return rMSBeanMgr;
 	}
 
-	public RMDBeanMgr getNextMsgBeanMgr() {
+	public RMDBeanMgr getRMDBeanMgr() {
 		return rMDBeanMgr;
 	}
 
-	public SenderBeanMgr getRetransmitterBeanMgr() {
+	public SenderBeanMgr getSenderBeanMgr() {
 		return senderBeanMgr;
 	}
 
@@ -144,7 +149,7 @@ public class InMemoryStorageManager extends StorageManager {
 		return sequencePropertyBeanMgr;
 	}
 
-	public InvokerBeanMgr getStorageMapBeanMgr() {
+	public InvokerBeanMgr getInvokerBeanMgr() {
 		return invokerBeanMgr;
 	}
 
@@ -160,12 +165,34 @@ public class InMemoryStorageManager extends StorageManager {
 		return instance;
 	}
 	
-	public MessageContext retrieveMessageContext(String key,ConfigurationContext context) {
+	public MessageContext retrieveMessageContext(String key,ConfigurationContext context) throws SandeshaStorageException {
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		if (storageMap==null)
 			return null;
 		
-		return (MessageContext) storageMap.get(key);
+		MessageContext messageContext = (MessageContext) storageMap.get(key);
+		
+		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
+		if(envMap==null) {
+			return null;
+		}
+		
+		//Get hold of the original SOAP envelope
+		SOAPEnvelope envelope = (SOAPEnvelope)envMap.get(key);
+		
+		//Now clone the env and set it in the message context
+		if (envelope!=null) {
+			
+			XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
+			SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
+			try {
+				messageContext.setEnvelope(clonedEnvelope);
+			} catch (AxisFault e) {
+				throw new SandeshaStorageException (e);
+			}
+		}
+		
+		return messageContext; 
 	}
 
 	public void storeMessageContext(String key,MessageContext msgContext) {
@@ -180,6 +207,23 @@ public class InMemoryStorageManager extends StorageManager {
 		    key = SandeshaUtil.getUUID();
 		
 		storageMap.put(key,msgContext);
+		
+		//Now get hold of the SOAP envelope and store it in the env map
+		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
+		
+		if(envMap==null) {
+			envMap = new HashMap ();
+			getContext().setProperty(ENVELOPE_MAP_KEY, envMap);
+		}
+		
+		SOAPEnvelope envelope = msgContext.getEnvelope();
+		//storing a cloned version of the envelope in the Map.
+		if (envelope!=null) {			
+			XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
+			SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
+			envMap.put(key, clonedEnvelope);
+		}
+		
 	}
 
 	public void updateMessageContext(String key,MessageContext msgContext) throws SandeshaStorageException { 
@@ -195,19 +239,26 @@ public class InMemoryStorageManager extends StorageManager {
 			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.entryNotPresentForUpdating));
 		
+		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
+
+		storageMap.remove(key);
+		if (envMap!=null)
+			envMap.remove(key);
+		
 		storeMessageContext(key,msgContext);
 	}
 	
 	public void removeMessageContext(String key) throws SandeshaStorageException { 
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
+		HashMap envelopeMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
 		
-		if (storageMap==null) {
-			return;
-		}
-		
-		Object entry = storageMap.get(key);
-		if (entry!=null)
+
+		if (storageMap!=null)
 			storageMap.remove(key);
+		
+		if (envelopeMap!=null)
+			envelopeMap.remove(key);
+		
 	}
 	
 	public void  initStorage (AxisModule moduleDesc) {

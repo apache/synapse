@@ -560,6 +560,10 @@ public interface Sandesha2Constants {
 	
 	String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
 	
+	String propertiesToCopyFromReferenceMessage = "propertiesToCopyFromReferenceMessage";
+	
+	String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";
+	
 	String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI

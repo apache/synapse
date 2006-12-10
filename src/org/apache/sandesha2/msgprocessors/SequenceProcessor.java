@@ -217,7 +217,7 @@ public class SequenceProcessor {
 		}
 
 		// Pause the messages bean if not the right message to invoke.
-		RMDBeanMgr mgr = storageManager.getNextMsgBeanMgr();
+		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
 		RMDBean bean = mgr.retrieve(sequenceId);
 
 		if (bean == null) {
@@ -225,7 +225,7 @@ public class SequenceProcessor {
 					sequenceId));
 		}
 
-		InvokerBeanMgr storageMapMgr = storageManager.getStorageMapBeanMgr();
+		InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
 		// inorder invocation is still a global property
 		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
@@ -331,7 +331,7 @@ public class SequenceProcessor {
 			// / Transaction asyncAckTransaction =
 			// storageManager.getTransaction();
 
-			SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
+			SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
 			String key = SandeshaUtil.getUUID();
 

@@ -89,7 +89,7 @@ public class Sender extends SandeshaThread {
 				// TODO make sure this locks on reads.
 				transaction = storageManager.getTransaction();
 
-				SenderBeanMgr mgr = storageManager.getRetransmitterBeanMgr();
+				SenderBeanMgr mgr = storageManager.getSenderBeanMgr();
 				SenderBean senderBean = mgr.getNextMsgToSend();
 				if (senderBean == null) {
 					if (log.isDebugEnabled()) {

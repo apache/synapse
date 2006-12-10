@@ -47,7 +47,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		ConfigurationContext configurationContext = rmMsgCtx.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		
-		SenderBeanMgr senderBeanMgr = storageManager.getRetransmitterBeanMgr();
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 		
 		//selecting the set of SenderBeans that suit the given criteria.
 		SenderBean findSenderBean = new SenderBean ();

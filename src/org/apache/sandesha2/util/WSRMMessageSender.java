@@ -34,7 +34,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 public class WSRMMessageSender  {
@@ -77,12 +77,12 @@ public class WSRMMessageSender  {
 		outSequenceID = null;
 		
 		// Get the Create sequence bean with the matching internal sequenceid 
-		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setInternalSequenceID(internalSequenceID);
 
-		CreateSeqBean createSeqBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		RMSBean rMSBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
 		
-		if (createSeqBean == null)
+		if (rMSBean == null)
 		{
 			if (log.isDebugEnabled())
 				log.debug("Exit: WSRMParentProcessor::setupOutMessage Sequence doesn't exist");
@@ -91,10 +91,10 @@ public class WSRMMessageSender  {
 					SandeshaMessageKeys.couldNotSendTerminateSeqNotFound, internalSequenceID));			
 		}
 		
-		if (createSeqBean.getSequenceID() != null)
+		if (rMSBean.getSequenceID() != null)
 		{
 			sequenceExists = true;		
-			outSequenceID = createSeqBean.getSequenceID();
+			outSequenceID = rMSBean.getSequenceID();
 		}
 		else
 			outSequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;			

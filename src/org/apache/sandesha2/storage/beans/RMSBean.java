@@ -22,7 +22,7 @@ package org.apache.sandesha2.storage.beans;
  * There is on object of this for each sequence.
  */
 
-public class CreateSeqBean extends RMBean {
+public class RMSBean extends RMBean {
 	
 	private static final long serialVersionUID = 7051201094510208784L;
 
@@ -71,7 +71,7 @@ public class CreateSeqBean extends RMBean {
 	 */
 	private String referenceMessageStoreKey;
 	
-	public CreateSeqBean() {
+	public RMSBean() {
 	}
 
 

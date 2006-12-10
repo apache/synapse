@@ -17,30 +17,29 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 
 /**
- * Used to manage NextMsg beans.
+ * This is used to manage CreateSequence beans.
  */
 
-public interface NextMsgBeanMgr extends RMBeanManager {
 
-	public boolean delete(String sequenceId) throws SandeshaStorageException;
+public interface RMSBeanMgr extends RMBeanManager {
 
-	public NextMsgBean retrieve(String sequenceId) throws SandeshaStorageException;
+	public boolean insert(RMSBean bean) throws SandeshaStorageException;
 
-	public boolean insert(NextMsgBean bean) throws SandeshaStorageException;
+	public boolean delete(String msgId) throws SandeshaStorageException;
 
-	public List find(NextMsgBean bean) throws SandeshaStorageException;
+	public RMSBean retrieve(String msgId) throws SandeshaStorageException;
 
-	public boolean update(NextMsgBean bean) throws SandeshaStorageException;
+	public boolean update(RMSBean bean) throws SandeshaStorageException;
+
+	public List find(RMSBean bean) throws SandeshaStorageException;
 	
-	public NextMsgBean findUnique (NextMsgBean bean) throws SandeshaException;
+	public RMSBean findUnique (RMSBean bean) throws SandeshaException;
 
-	public Collection retrieveAll() throws SandeshaStorageException;
 }

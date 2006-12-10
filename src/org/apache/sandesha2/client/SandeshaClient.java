@@ -49,11 +49,11 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -110,7 +110,7 @@ public class SandeshaClient {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
 		String withinTransactionStr = (String) configurationContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
 		boolean withinTransaction = false;
@@ -129,14 +129,14 @@ public class SandeshaClient {
 
 			sequenceReport.setInternalSequenceID(internalSequenceID);
 
-			CreateSeqBean createSeqFindBean = new CreateSeqBean();
+			RMSBean createSeqFindBean = new RMSBean();
 			createSeqFindBean.setInternalSequenceID(internalSequenceID);
 
-			CreateSeqBean createSeqBean = createSeqMgr.findUnique(createSeqFindBean);
+			RMSBean rMSBean = createSeqMgr.findUnique(createSeqFindBean);
 
 			// if data not is available sequence has to be terminated or
 			// timedOut.
-			if (createSeqBean == null) {
+			if (rMSBean == null) {
 
 				// check weather this is an terminated sequence.
 				if (isSequenceTerminated(internalSequenceID, seqPropMgr)) {
@@ -165,12 +165,12 @@ public class SandeshaClient {
 				return sequenceReport;
 			}
 
-			String outSequenceID = createSeqBean.getSequenceID();
+			String outSequenceID = rMSBean.getSequenceID();
 			if (outSequenceID == null) {
 				sequenceReport.setInternalSequenceID(internalSequenceID);
 				sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_INITIAL);
 				sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
-				if(createSeqBean.getSecurityTokenData() != null) sequenceReport.setSecureSequence(true);
+				if(rMSBean.getSecurityTokenData() != null) sequenceReport.setSecureSequence(true);
 
 				return sequenceReport;
 			}
@@ -1044,10 +1044,10 @@ public class SandeshaClient {
 			return SequenceReport.SEQUENCE_STATUS_TIMED_OUT;
 		}
 
-		NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
-		NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceID);
+		RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+		RMDBean rMDBean = nextMsgMgr.retrieve(sequenceID);
 
-		if (nextMsgBean != null) {
+		if (rMDBean != null) {
 			return SequenceReport.SEQUENCE_STATUS_ESTABLISHED;
 		}
 

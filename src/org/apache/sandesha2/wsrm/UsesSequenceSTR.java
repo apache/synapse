@@ -93,6 +93,11 @@ public class UsesSequenceSTR implements IOMRMPart {
 	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
 		SOAPHeader header = envelope.getHeader();
 
+		if (header==null) {
+			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
+			header = factory.createSOAPHeader(envelope);
+		}
+		
 		//detach if already exist.
 		OMElement elem = header.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR));

@@ -15,7 +15,7 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -76,10 +76,10 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			//check that the server is now expecting msg 4
 			StorageManager serverStore = SandeshaUtil.getInMemoryStorageManager(serverConfigCtx);
 			t = serverStore.getTransaction();
-			NextMsgBean nextMsgBean = 
+			RMDBean rMDBean = 
 				serverStore.getNextMsgBeanMgr().retrieve(inboundSequenceID);
-			assertNotNull(nextMsgBean);
-			assertEquals(nextMsgBean.getNextMsgNoToProcess(), 4);
+			assertNotNull(rMDBean);
+			assertEquals(rMDBean.getNextMsgNoToProcess(), 4);
 			
 			//also check that the sequence has an out of order gap that contains msg 2
 			SequencePropertyBean outOfOrderRanges = 
@@ -152,9 +152,9 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			//check that the server is now expecting msg 4
 			StorageManager serverMgr = SandeshaUtil.getInMemoryStorageManager(serverConfigCtx);
 			t = serverMgr.getTransaction();
-			NextMsgBean nextMsgBean = serverMgr.getNextMsgBeanMgr().retrieve(inboundSequenceID);
-			assertNotNull(nextMsgBean);
-			assertEquals(nextMsgBean.getNextMsgNoToProcess(), 4);
+			RMDBean rMDBean = serverMgr.getNextMsgBeanMgr().retrieve(inboundSequenceID);
+			assertNotNull(rMDBean);
+			assertEquals(rMDBean.getNextMsgNoToProcess(), 4);
 			t.commit();
 	  }
 		finally{

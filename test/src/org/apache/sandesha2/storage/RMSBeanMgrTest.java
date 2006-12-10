@@ -17,8 +17,8 @@
 package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -30,12 +30,12 @@ import org.apache.axis2.context.ConfigurationContext;
 import java.util.Iterator;
 
 
-public class CreateSeqBeanMgrTest extends SandeshaTestCase {
-    private CreateSeqBeanMgr mgr;
+public class RMSBeanMgrTest extends SandeshaTestCase {
+    private RMSBeanMgr mgr;
     Transaction transaction;
     
-    public CreateSeqBeanMgrTest() {
-        super("CreateSeqBeanMgrTest");
+    public RMSBeanMgrTest() {
+        super("RMSBeanMgrTest");
     }
 
     public void setUp() throws Exception {
@@ -62,22 +62,22 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
     }
 
     public void testDelete() throws SandeshaStorageException {
-    	CreateSeqBean createSeqBean = new CreateSeqBean ();
-    	createSeqBean.setInternalSequenceID("TmpSeqId1");
-    	createSeqBean.setCreateSeqMsgID("CreateSeqMsgId1");
-    	createSeqBean.setSequenceID("SeqId1");
-        mgr.insert(createSeqBean);
+    	RMSBean rMSBean = new RMSBean ();
+    	rMSBean.setInternalSequenceID("TmpSeqId1");
+    	rMSBean.setCreateSeqMsgID("CreateSeqMsgId1");
+    	rMSBean.setSequenceID("SeqId1");
+        mgr.insert(rMSBean);
         mgr.delete("CreateSeqMsgId1");
         assertNull(mgr.retrieve("CreateSeqMsgId1"));
     }
 
     public void testFind() throws SandeshaStorageException {
-    	CreateSeqBean createSeqBean1 = new CreateSeqBean ();
+    	RMSBean createSeqBean1 = new RMSBean ();
     	createSeqBean1.setInternalSequenceID("TmpSeqId1");
     	createSeqBean1.setCreateSeqMsgID("CreateSeqMsgId1");
     	createSeqBean1.setSequenceID("SeqId1");
     	
-    	CreateSeqBean createSeqBean2 = new CreateSeqBean ();
+    	RMSBean createSeqBean2 = new RMSBean ();
     	createSeqBean2.setInternalSequenceID("TmpSeqId1");
     	createSeqBean2.setCreateSeqMsgID("CreateSeqMsgId2");
     	createSeqBean2.setSequenceID("SeqId2");
@@ -85,28 +85,28 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
         mgr.insert(createSeqBean1);
         mgr.insert(createSeqBean2);
 
-        CreateSeqBean target = new CreateSeqBean();
+        RMSBean target = new RMSBean();
         target.setInternalSequenceID("TmpSeqId1");
 
         Iterator iter = mgr.find(target).iterator();
-        CreateSeqBean tmp = (CreateSeqBean) iter.next();
+        RMSBean tmp = (RMSBean) iter.next();
         if (tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1")) {
-            tmp = (CreateSeqBean) iter.next();
+            tmp = (RMSBean) iter.next();
             assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId2"));
 
         }   else {
-            tmp = (CreateSeqBean) iter.next();
+            tmp = (RMSBean) iter.next();
             assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1"));
         }
     }
 
     public void testInsert() throws SandeshaStorageException{
-    	CreateSeqBean createSeqBean = new CreateSeqBean ();
-    	createSeqBean.setInternalSequenceID("TmpSeqId4");
-    	createSeqBean.setCreateSeqMsgID("CreateSeqMsgId4");
-    	createSeqBean.setSequenceID("SeqId4");
-        mgr.insert(createSeqBean);
-        CreateSeqBean tmpbean = mgr.retrieve("CreateSeqMsgId4");
+    	RMSBean rMSBean = new RMSBean ();
+    	rMSBean.setInternalSequenceID("TmpSeqId4");
+    	rMSBean.setCreateSeqMsgID("CreateSeqMsgId4");
+    	rMSBean.setSequenceID("SeqId4");
+        mgr.insert(rMSBean);
+        RMSBean tmpbean = mgr.retrieve("CreateSeqMsgId4");
         assertTrue(tmpbean.getCreateSeqMsgID().equals("CreateSeqMsgId4"));
         assertTrue(tmpbean.getSequenceID().equals("SeqId4"));
         assertTrue(tmpbean.getInternalSequenceID().equals("TmpSeqId4"));
@@ -116,25 +116,25 @@ public class CreateSeqBeanMgrTest extends SandeshaTestCase {
     public void testRetrieve() throws SandeshaStorageException{
         assertNull(mgr.retrieve("CreateSeqMsgId5"));
 
-    	CreateSeqBean createSeqBean = new CreateSeqBean ();
-    	createSeqBean.setInternalSequenceID("TmpSeqId5");
-    	createSeqBean.setCreateSeqMsgID("CreateSeqMsgId5");
-    	createSeqBean.setSequenceID("SeqId5");
-        mgr.insert(createSeqBean);
-        CreateSeqBean tmp = mgr.retrieve("CreateSeqMsgId5");
+    	RMSBean rMSBean = new RMSBean ();
+    	rMSBean.setInternalSequenceID("TmpSeqId5");
+    	rMSBean.setCreateSeqMsgID("CreateSeqMsgId5");
+    	rMSBean.setSequenceID("SeqId5");
+        mgr.insert(rMSBean);
+        RMSBean tmp = mgr.retrieve("CreateSeqMsgId5");
         assertTrue(tmp.getCreateSeqMsgID().equals("CreateSeqMsgId5"));
     }
 
     public void testUpdate() throws SandeshaStorageException {
-    	CreateSeqBean createSeqBean = new CreateSeqBean ();
-    	createSeqBean.setInternalSequenceID("TmpSeqId6");
-    	createSeqBean.setCreateSeqMsgID("CreateSeqMsgId6");
-    	createSeqBean.setSequenceID("SeqId6");
+    	RMSBean rMSBean = new RMSBean ();
+    	rMSBean.setInternalSequenceID("TmpSeqId6");
+    	rMSBean.setCreateSeqMsgID("CreateSeqMsgId6");
+    	rMSBean.setSequenceID("SeqId6");
         
-        mgr.insert(createSeqBean);
-        createSeqBean.setInternalSequenceID("TmpSeqId7");
-        mgr.update(createSeqBean);
-        CreateSeqBean tmp = mgr.retrieve("CreateSeqMsgId6");
+        mgr.insert(rMSBean);
+        rMSBean.setInternalSequenceID("TmpSeqId7");
+        mgr.update(rMSBean);
+        RMSBean tmp = mgr.retrieve("CreateSeqMsgId6");
         assertTrue(tmp.getInternalSequenceID().equals("TmpSeqId7"));
     }
 }

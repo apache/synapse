@@ -29,9 +29,9 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
@@ -79,10 +79,10 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
 		
 		if (offeredSequenceId!=null) {
-			NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
-			NextMsgBean nextMsgBean = nextMsgBeanMgr.retrieve(sequenceId);
+			RMDBeanMgr rMDBeanMgr = storageManager.getNextMsgBeanMgr();
+			RMDBean rMDBean = rMDBeanMgr.retrieve(sequenceId);
 			
-			if (nextMsgBean!=null && nextMsgBean.isPollingMode())
+			if (rMDBean!=null && rMDBean.isPollingMode())
 				SandeshaUtil.shedulePollingRequest(offeredSequenceId, configContext);
 		}
 

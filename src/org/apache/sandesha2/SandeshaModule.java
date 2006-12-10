@@ -63,11 +63,15 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		SandeshaPolicyBean propertyBean = PropertyManager.loadPropertiesFromModuleDescPolicy(module,constantPropertyBean);
 		
 		if (propertyBean==null) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotFindModulePolicies);
-			log.debug(message);
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotLoadModulePolicies);
+			log.error (message);
 			
 			propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+		} else {
+			if (log.isDebugEnabled()) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.modulePoliciesLoaded);
+				log.info (message);
+			}
 		}
 		
 		Parameter parameter = new Parameter ();

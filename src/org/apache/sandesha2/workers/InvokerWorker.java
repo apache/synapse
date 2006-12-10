@@ -13,9 +13,9 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
@@ -45,7 +45,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 			InvokerBeanMgr invokerBeanMgr = storageManager.getStorageMapBeanMgr();
-			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 			
 			//starting a transaction
 			transaction = storageManager.getTransaction();
@@ -140,8 +140,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				// updating the next msg to invoke
 
 				String s = invokerBean.getSequenceID();
-				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
-				long nextMsgNo = nextMsgBean.getNextMsgNoToProcess();
+				RMDBean rMDBean = nextMsgMgr.retrieve(sequenceId);
+				long nextMsgNo = rMDBean.getNextMsgNoToProcess();
 				
 				if (!(messageNo==nextMsgNo)) {
 					String message = "Operated message number is different from the Next Message Number to invoke";
@@ -150,8 +150,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				
 				if (invoked) {
 					nextMsgNo++;
-					nextMsgBean.setNextMsgNoToProcess(nextMsgNo);
-					nextMsgMgr.update(nextMsgBean);
+					rMDBean.setNextMsgNoToProcess(nextMsgNo);
+					nextMsgMgr.update(rMDBean);
 				}				
 			}
 		} catch (SandeshaStorageException e) {

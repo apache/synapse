@@ -22,7 +22,7 @@ package org.apache.sandesha2.storage.beans;
  * There is one entry for each sequence.
  */
 
-public class NextMsgBean extends RMBean {
+public class RMDBean extends RMBean {
 	
 	private static final long serialVersionUID = -2976123838615087562L;
 
@@ -51,11 +51,11 @@ public class NextMsgBean extends RMBean {
 	private String referenceMessageKey;
 	
 
-	public NextMsgBean() {
+	public RMDBean() {
 
 	}
 
-	public NextMsgBean(String sequenceID, long nextNsgNo) {
+	public RMDBean(String sequenceID, long nextNsgNo) {
 		this.sequenceID = sequenceID;
 		this.nextMsgNoToProcess = nextNsgNo;
 	}

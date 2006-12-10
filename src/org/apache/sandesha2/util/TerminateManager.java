@@ -35,14 +35,14 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
@@ -146,14 +146,14 @@ public class TerminateManager {
 		removeReceivingSideProperties(configContext, sequencePropertyKey, sequenceId, storageManager);
 		
 		// removing nextMsgMgr entries
-		NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
-		NextMsgBean findNextMsgBean = new NextMsgBean();
+		RMDBeanMgr rMDBeanMgr = storageManager.getNextMsgBeanMgr();
+		RMDBean findNextMsgBean = new RMDBean();
 		findNextMsgBean.setSequenceID(sequenceId);
-		Collection collection = nextMsgBeanMgr.find(findNextMsgBean);
+		Collection collection = rMDBeanMgr.find(findNextMsgBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			NextMsgBean nextMsgBean = (NextMsgBean) iterator.next();
-			 nextMsgBeanMgr.delete(nextMsgBean.getSequenceID());
+			RMDBean rMDBean = (RMDBean) iterator.next();
+			 rMDBeanMgr.delete(rMDBean.getSequenceID());
 		}
 
 	}
@@ -280,7 +280,7 @@ public class TerminateManager {
 
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getRetransmitterBeanMgr();
-		CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr rMSBeanMgr = storageManager.getCreateSeqBeanMgr();
 
 		// removing retransmitterMgr entries and corresponding message contexts.
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
@@ -294,13 +294,13 @@ public class TerminateManager {
 		}
 
 		// removing the createSeqMgrEntry
-		CreateSeqBean createSeqFindBean = new CreateSeqBean();
+		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setInternalSequenceID(internalSequenceId);
 
-		CreateSeqBean createSeqBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
-		createSeqBeanMgr.delete(createSeqBean.getCreateSeqMsgID());
+		RMSBean rMSBean = storageManager.getCreateSeqBeanMgr().findUnique(createSeqFindBean);
+		rMSBeanMgr.delete(rMSBean.getCreateSeqMsgID());
 
-		String outSequenceID = createSeqBean.getSequenceID();
+		String outSequenceID = rMSBean.getSequenceID();
 		
 		// removing sequence properties
 		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean();

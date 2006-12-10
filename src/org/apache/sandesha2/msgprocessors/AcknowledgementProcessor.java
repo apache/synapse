@@ -39,10 +39,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -180,10 +180,10 @@ public class AcknowledgementProcessor {
 				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
 		if (offeredSequenceId!=null) {
 
-			NextMsgBeanMgr nextMsgBeanMgr = storageManager.getNextMsgBeanMgr();
-			NextMsgBean nextMsgBean = nextMsgBeanMgr.retrieve(outSequenceId);
+			RMDBeanMgr rMDBeanMgr = storageManager.getNextMsgBeanMgr();
+			RMDBean rMDBean = rMDBeanMgr.retrieve(outSequenceId);
 			
-			if (nextMsgBean!=null && nextMsgBean.isPollingMode())
+			if (rMDBean!=null && rMDBean.isPollingMode())
 				SandeshaUtil.shedulePollingRequest(offeredSequenceId, configCtx);
 			
 		}
@@ -241,8 +241,8 @@ public class AcknowledgementProcessor {
 				if (complete) {
 					
 					//using create sequence message as the reference message.
-//					CreateSeqBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
-//					CreateSeqBean createSeqBean = createSeqBeanMgr.retrieve(msgId);
+//					RMSBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
+//					RMSBean createSeqBean = createSeqBeanMgr.retrieve(msgId);
 //					
 					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, sequencePropertyKey, outSequenceId, sequencePropertyKey,
 							storageManager);

@@ -37,12 +37,12 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -101,9 +101,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		String createSeqMsgId = relatesTo.getValue();
 
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 
-		CreateSeqBean createSeqBean = createSeqMgr.retrieve(createSeqMsgId);
+		RMSBean createSeqBean = createSeqMgr.retrieve(createSeqMsgId);
 		if (createSeqBean == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound);
 			log.debug(message);
@@ -178,9 +178,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			sequencePropMgr.insert(acksToBean);
 
-			NextMsgBean nextMsgBean = new NextMsgBean();
-			nextMsgBean.setSequenceID(offeredSequenceId);
-			nextMsgBean.setNextMsgNoToProcess(1);
+			RMDBean rMDBean = new RMDBean();
+			rMDBean.setSequenceID(offeredSequenceId);
+			rMDBean.setNextMsgNoToProcess(1);
 			
 
 			boolean pollingMode = false;
@@ -207,16 +207,16 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			String newMessageStoreKey = SandeshaUtil.getUUID();
 			storageManager.storeMessageContext(newMessageStoreKey,referenceMsg);
 			
-			nextMsgBean.setReferenceMessageKey(newMessageStoreKey);
+			rMDBean.setReferenceMessageKey(newMessageStoreKey);
 			
-			nextMsgBean.setPollingMode(pollingMode);
+			rMDBean.setPollingMode(pollingMode);
 			
 			//if PollingMode is true, starting the pollingmanager.
 			if (pollingMode)
 				SandeshaUtil.startPollingManager(configCtx);
 			
-			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
-			nextMsgMgr.insert(nextMsgBean);
+			RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			nextMsgMgr.insert(rMDBean);
 
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
 

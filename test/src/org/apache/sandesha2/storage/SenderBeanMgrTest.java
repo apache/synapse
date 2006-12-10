@@ -31,13 +31,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import java.util.Iterator;
 
 
-public class RetransmitterBeanMgrTest extends SandeshaTestCase {
+public class SenderBeanMgrTest extends SandeshaTestCase {
     
 	private SenderBeanMgr mgr;
 	Transaction transaction;
 	
-    public RetransmitterBeanMgrTest() {
-        super("RetransmitterBeanMgrTest");
+    public SenderBeanMgrTest() {
+        super("SenderBeanMgrTest");
     }
 
     public void setUp() throws Exception {

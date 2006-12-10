@@ -31,10 +31,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
@@ -76,14 +76,14 @@ public class Invoker extends SandeshaThread {
 	
 			InvokerBeanMgr storageMapMgr = storageManager
 					.getStorageMapBeanMgr();
-			NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
-			NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceID);
+			RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+			RMDBean rMDBean = nextMsgMgr.retrieve(sequenceID);
 			
-			if (nextMsgBean != null) {
+			if (rMDBean != null) {
 				
 				//The outOfOrder window is the set of known sequence messages (including those
 				//that are missing) at the time the button is pressed.
-				long firstMessageInOutOfOrderWindow = nextMsgBean.getNextMsgNoToProcess();
+				long firstMessageInOutOfOrderWindow = rMDBean.getNextMsgNoToProcess();
 			
 				Iterator stMapIt = 
 					storageMapMgr.find(new InvokerBean(null, 0, sequenceID)).iterator();
@@ -123,8 +123,8 @@ public class Invoker extends SandeshaThread {
 						//if necessary, update the "next message number" bean under this transaction
 						if(msgNumber>highestMsgNumberInvoked){
 							highestMsgNumberInvoked = invoker.getMsgNo();
-							nextMsgBean.setNextMsgNoToProcess(highestMsgNumberInvoked+1);
-							nextMsgMgr.update(nextMsgBean);
+							rMDBean.setNextMsgNoToProcess(highestMsgNumberInvoked+1);
+							nextMsgMgr.update(rMDBean);
 							
 							if(allowLaterDeliveryOfMissingMessages){
 								//we also need to update the sequence OUT_OF_ORDER_RANGES property
@@ -234,7 +234,7 @@ public class Invoker extends SandeshaThread {
 				StorageManager storageManager = SandeshaUtil
 						.getSandeshaStorageManager(context, context
 								.getAxisConfiguration());
-				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+				RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 
 				InvokerBeanMgr storageMapMgr = storageManager
 						.getStorageMapBeanMgr();
@@ -268,7 +268,7 @@ public class Invoker extends SandeshaThread {
 				String sequenceId = (String) allSequencesList.get(nextIndex++);
 				log.debug("Chose sequence " + sequenceId);
 
-				NextMsgBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
+				RMDBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
 				if (nextMsgBean == null) {
 					String message = "Next message not set correctly. Removing invalid entry.";
 					log.debug(message);

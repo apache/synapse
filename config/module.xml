@@ -74,43 +74,44 @@
 
 	<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
 			xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-			xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
-		<wsrm:RMAssertion>
+			xmlns:sandesha2="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+		<sandesha2:RMAssertion>
 			<wsp:Policy>
-				<wsrm:AcknowledgementInterval>3000</wsrm:AcknowledgementInterval>
+				<sandesha2:AcknowledgementInterval>3000</sandesha2:AcknowledgementInterval>
 	
-				<wsrm:RetransmissionInterval>6000</wsrm:RetransmissionInterval>
+				<sandesha2:RetransmissionInterval>6000</sandesha2:RetransmissionInterval>
 	      
 	      <!-- '-1' conveys that there is no limit to the max. number of retransmissions.-->
-				<wsrm:MaximumRetransmissionCount>10</wsrm:MaximumRetransmissionCount>
+				<sandesha2:MaximumRetransmissionCount>10</sandesha2:MaximumRetransmissionCount>
 	
-				<wsrm:ExponentialBackoff>false</wsrm:ExponentialBackoff>
+				<sandesha2:ExponentialBackoff>false</sandesha2:ExponentialBackoff>
 	
-				<wsrm:InactivityTimeout>60</wsrm:InactivityTimeout>
+				<sandesha2:InactivityTimeout>60</sandesha2:InactivityTimeout>
 	
-				<wsrm:InactivityTimeoutMeasure>seconds</wsrm:InactivityTimeoutMeasure>
+				<sandesha2:InactivityTimeoutMeasure>seconds</sandesha2:InactivityTimeoutMeasure>
 	
-				<wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
+				<sandesha2:InvokeInOrder>true</sandesha2:InvokeInOrder>
 	      
 	      <!-- These will not be overriden by service level policies -->
-				<wsrm:MessageTypesToDrop>none</wsrm:MessageTypesToDrop>  
+				<sandesha2:MessageTypesToDrop>none</sandesha2:MessageTypesToDrop>  
 	                              
 	      <!-- This will not be overriden by service level policies -->
-				<wsrm:StorageManagers>
+				<sandesha2:StorageManagers>
 	
-					<wsrm:InMemoryStorageManager>
+					<sandesha2:InMemoryStorageManager>
 					  org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
-					</wsrm:InMemoryStorageManager>
+					</sandesha2:InMemoryStorageManager>
 	
-					<wsrm:PermanentStorageManager>
+					<sandesha2:PermanentStorageManager>
 					  org.apache.sandesha2.storage.inmemory.InMemoryStorageManager
-					</wsrm:PermanentStorageManager>
+					</sandesha2:PermanentStorageManager>
 	
-				</wsrm:StorageManagers>
+				</sandesha2:StorageManagers>
 	      
 	      <!-- This will not be overriden by service level policies -->
-				<wsrm:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</wsrm:SecurityManager>
+				<sandesha2:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</sandesha2:SecurityManager>
 			</wsp:Policy>
-		</wsrm:RMAssertion>
+		</sandesha2:RMAssertion>
 	</wsp:Policy>
+	
 </module>

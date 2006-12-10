@@ -264,5 +264,7 @@ public class SandeshaMessageKeys {
 	public final static String couldNotSendAckRequestSeqNotFound="couldNotSendAckRequestSeqNotFound";
 	public final static String couldNotSendCloseResponse="couldNotSendCloseResponse";
 	public final static String couldNotSendCloseSeqNotFound="couldNotSendCloseSeqNotFound";
-    
+	
+    public final static String couldNotLoadModulePolicies = "couldNotLoadModulePolicies";
+    public final static String modulePoliciesLoaded = "modulePoliciesLoaded";
 }

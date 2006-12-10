@@ -26,15 +26,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMBean;
 
-public class InMemoryNextMsgBeanMgr extends InMemoryBeanMgr implements NextMsgBeanMgr {
+public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 
-	private static final Log log = LogFactory.getLog(InMemoryNextMsgBeanMgr.class);
+	private static final Log log = LogFactory.getLog(InMemoryRMDBeanMgr.class);
 
-	public InMemoryNextMsgBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
+	public InMemoryRMDBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);
 	}
 
@@ -42,21 +42,21 @@ public class InMemoryNextMsgBeanMgr extends InMemoryBeanMgr implements NextMsgBe
 		return super.delete(sequenceId);
 	}
 
-	public NextMsgBean retrieve(String sequenceId) throws SandeshaStorageException {
-		return (NextMsgBean) super.retrieve(sequenceId);
+	public RMDBean retrieve(String sequenceId) throws SandeshaStorageException {
+		return (RMDBean) super.retrieve(sequenceId);
 	}
 
-	public boolean insert(NextMsgBean bean) throws SandeshaStorageException {
+	public boolean insert(RMDBean bean) throws SandeshaStorageException {
 		return super.insert(bean.getSequenceID(), bean);
 	}
 
-	public List find(NextMsgBean bean) throws SandeshaStorageException {
+	public List find(RMDBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	
 	protected boolean match(RMBean matchInfo, RMBean candidate) {
-		NextMsgBean bean = (NextMsgBean) matchInfo;
-		NextMsgBean temp = (NextMsgBean) candidate;
+		RMDBean bean = (RMDBean) matchInfo;
+		RMDBean temp = (RMDBean) candidate;
 
 		boolean equal = true;
 
@@ -72,7 +72,7 @@ public class InMemoryNextMsgBeanMgr extends InMemoryBeanMgr implements NextMsgBe
 		return equal;
 	}
 
-	public boolean update(NextMsgBean bean) throws SandeshaStorageException {
+	public boolean update(RMDBean bean) throws SandeshaStorageException {
 		return super.update(bean.getSequenceID(), bean);
 	}
 
@@ -80,7 +80,7 @@ public class InMemoryNextMsgBeanMgr extends InMemoryBeanMgr implements NextMsgBe
 		return super.find(null);
 	}
 	
-	public NextMsgBean findUnique(NextMsgBean bean) throws SandeshaException {
-		return (NextMsgBean) super.findUnique(bean);
+	public RMDBean findUnique(RMDBean bean) throws SandeshaException {
+		return (RMDBean) super.findUnique(bean);
 	}
 }

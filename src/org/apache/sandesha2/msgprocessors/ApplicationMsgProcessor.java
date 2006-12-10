@@ -39,10 +39,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -503,7 +503,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		CreateSeqBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
+		RMSBeanMgr createSeqMgr = storageManager.getCreateSeqBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getRetransmitterBeanMgr();
 
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
@@ -528,16 +528,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key that will be used to store 
 																	   //the create sequence message.
 		
-		CreateSeqBean createSeqBean = new CreateSeqBean();
-		createSeqBean.setInternalSequenceID(internalSequenceId);
-		createSeqBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
-		createSeqBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
+		RMSBean rMSBean = new RMSBean();
+		rMSBean.setInternalSequenceID(internalSequenceId);
+		rMSBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
+		rMSBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
 		
 		//cloning the message and storing it as a reference.
 		MessageContext clonedMessage = SandeshaUtil.cloneMessageContext(createSeqMsg);
 		String clonedMsgStoreKey = SandeshaUtil.getUUID();
 		storageManager.storeMessageContext(clonedMsgStoreKey, clonedMessage);
-		createSeqBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
+		rMSBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
 		
 		
 		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
@@ -561,10 +561,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(token != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			createSeqBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
+			rMSBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
 		}
 		
-		createSeqMgr.insert(createSeqBean);
+		createSeqMgr.insert(rMSBean);
 
 		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);

@@ -17,8 +17,8 @@
 package org.apache.sandesha2.storage;
 
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -29,13 +29,13 @@ import org.apache.axis2.context.ConfigurationContext;
 
 import java.util.Iterator;
 
-public class NextMsgBeanMgrTest extends SandeshaTestCase {
+public class InvokerBeanMgrTest extends SandeshaTestCase {
+
+    InvokerBeanMgr mgr;
+    Transaction transaction;
     
-	private NextMsgBeanMgr mgr;
-	Transaction transaction;
-	
-    public NextMsgBeanMgrTest(String name) {
-        super(name);
+    public InvokerBeanMgrTest() {
+        super ("InvokerBeanMgrTest");
     }
 
     public void setUp() throws Exception {
@@ -51,65 +51,59 @@ public class NextMsgBeanMgrTest extends SandeshaTestCase {
         ClassLoader classLoader = getClass().getClassLoader();
         configCtx.setProperty(Sandesha2Constants.MODULE_CLASS_LOADER,classLoader);
         
-        
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();
-        mgr = storageManager.getNextMsgBeanMgr();
-
+        mgr = storageManager.getStorageMapBeanMgr();
     }
     
     public void tearDown() throws Exception {
     	transaction.commit();
     }
 
-    public void testDelete() throws SandeshaStorageException{
-        mgr.insert(new NextMsgBean("SeqId1", 1001));
-        mgr.delete("SeqId1");
-        assertNull(mgr.retrieve("SeqId1"));
+    public void testDelete() throws SandeshaStorageException {
+        mgr.insert(new InvokerBean("Key1", 1001, "SeqId1"));
+        mgr.delete("Key1");
+        assertNull(mgr.retrieve("Key1"));
     }
 
     public void testFind() throws SandeshaStorageException {
-        mgr.insert(new NextMsgBean("SeqId2", 1002));
-        mgr.insert(new NextMsgBean("SeqId3", 1002));
+        mgr.insert(new InvokerBean("Key2", 1002, "SeqId2"));
+        mgr.insert(new InvokerBean("Key3", 1003, "SeqId2"));
 
-        NextMsgBean target = new NextMsgBean();
-        target.setNextMsgNoToProcess(1002);
+        InvokerBean bean = new InvokerBean();
+        bean.setSequenceID("SeqId2");
 
-        Iterator iterator = mgr.find(target).iterator();
-        NextMsgBean tmp = (NextMsgBean) iterator.next();
+        Iterator iter = mgr.find(bean).iterator();
+        InvokerBean tmp = (InvokerBean) iter.next();
 
-        if (tmp.getSequenceID().equals("SeqId2")) {
-            tmp = (NextMsgBean) iterator.next();
-            tmp.getSequenceID().equals("SeqId3");
+        if (tmp.getMessageContextRefKey().equals("Key2")) {
+            tmp = (InvokerBean) iter.next();
+            assertTrue(tmp.getMessageContextRefKey().equals("Key3"));
         } else {
-            tmp = (NextMsgBean) iterator.next();
-            tmp.getSequenceID().equals("SeqId2");
-        }
+            tmp = (InvokerBean) iter.next();
+            assertTrue(tmp.getMessageContextRefKey().equals("Key2"));
 
+        }
     }
 
     public void testInsert() throws SandeshaStorageException {
-        NextMsgBean bean = new NextMsgBean("SeqId4", 1004);
-        mgr.insert(bean);
-        NextMsgBean tmp = mgr.retrieve("SeqId4");
-        assertTrue(tmp.getNextMsgNoToProcess() == 1004);
+        mgr.insert(new InvokerBean("Key4", 1004, "SeqId4"));
+        InvokerBean tmp = mgr.retrieve("Key4");
+        assertTrue(tmp.getMessageContextRefKey().equals("Key4"));
     }
 
     public void testRetrieve() throws SandeshaStorageException {
-        assertNull(mgr.retrieve("SeqId5"));
-        mgr.insert(new NextMsgBean("SeqId5", 1005));
-
-        NextMsgBean tmp = mgr.retrieve("SeqId5");
-        assertTrue(tmp.getNextMsgNoToProcess() == 1005);
+        assertNull(mgr.retrieve("Key5"));
+        mgr.insert(new InvokerBean("Key5", 1004, "SeqId5"));
+        assertNotNull(mgr.retrieve("Key5"));
     }
 
     public void testUpdate() throws SandeshaStorageException {
-        NextMsgBean bean = new NextMsgBean("SeqId6", 1006);
+        InvokerBean bean = new InvokerBean("Key6", 1006, "SeqId6");
         mgr.insert(bean);
-        bean.setNextMsgNoToProcess(1007);
+        bean.setMsgNo(1007);
         mgr.update(bean);
-        NextMsgBean tmp = mgr.retrieve("SeqId6");
-        assertTrue(tmp.getNextMsgNoToProcess() ==1007);
+        InvokerBean tmp = mgr.retrieve("Key6");
+        assertTrue(tmp.getMsgNo() == 1007);
     }
-
 }

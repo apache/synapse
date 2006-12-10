@@ -20,9 +20,9 @@ package org.apache.sandesha2.storage;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.workers.SandeshaThread;
@@ -57,9 +57,9 @@ public abstract class StorageManager {
 	
 	public abstract SandeshaThread getInvoker();
 
-	public abstract CreateSeqBeanMgr getCreateSeqBeanMgr();
+	public abstract RMSBeanMgr getCreateSeqBeanMgr();
 
-	public abstract NextMsgBeanMgr getNextMsgBeanMgr();
+	public abstract RMDBeanMgr getNextMsgBeanMgr();
 
 	public abstract SenderBeanMgr getRetransmitterBeanMgr();
 

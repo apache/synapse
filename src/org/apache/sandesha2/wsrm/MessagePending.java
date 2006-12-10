@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.Constants;
@@ -48,6 +49,11 @@ public class MessagePending implements IOMRMPart {
 	
 	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
 		SOAPHeader header = envelope.getHeader();
+		
+		if (header==null) {
+			SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
+			header = factory.createSOAPHeader(envelope);
+		}
 		
 		//detach if already exist.
 		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,

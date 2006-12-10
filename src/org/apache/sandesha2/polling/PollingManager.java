@@ -33,11 +33,11 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -66,7 +66,7 @@ public class PollingManager extends Thread {
 			
 			try {
 				
-				NextMsgBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
+				RMDBeanMgr nextMsgMgr = storageManager.getNextMsgBeanMgr();
 				
 				//geting the sequences to be polled.
 				//if shedule contains any requests, do the earliest one.
@@ -74,11 +74,11 @@ public class PollingManager extends Thread {
 				
 				String sequenceId = getNextSheduleEntry ();
 
-				NextMsgBean nextMsgBean = null;
+				RMDBean nextMsgBean = null;
 				
 				if (sequenceId==null) {
 					
-					NextMsgBean findBean = new NextMsgBean ();
+					RMDBean findBean = new RMDBean ();
 					findBean.setPollingMode(true);
 					
 					List results = nextMsgMgr.find(findBean);
@@ -86,13 +86,13 @@ public class PollingManager extends Thread {
 					if (size>0) {
 						Random random = new Random ();
 						int item = random.nextInt(size);
-						nextMsgBean = (NextMsgBean) results.get(item);
+						nextMsgBean = (RMDBean) results.get(item);
 					}
 					
 					
 					
 				} else {
-					NextMsgBean findBean = new NextMsgBean ();
+					RMDBean findBean = new RMDBean ();
 					findBean.setPollingMode(true);
 					findBean.setSequenceID(sequenceId);
 					

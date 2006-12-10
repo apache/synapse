@@ -43,11 +43,11 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.NextMsgBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.NextMsgBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -217,8 +217,8 @@ public class SequenceProcessor {
 		}
 
 		// Pause the messages bean if not the right message to invoke.
-		NextMsgBeanMgr mgr = storageManager.getNextMsgBeanMgr();
-		NextMsgBean bean = mgr.retrieve(sequenceId);
+		RMDBeanMgr mgr = storageManager.getNextMsgBeanMgr();
+		RMDBean bean = mgr.retrieve(sequenceId);
 
 		if (bean == null) {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,

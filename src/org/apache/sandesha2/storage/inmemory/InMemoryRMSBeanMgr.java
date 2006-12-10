@@ -25,19 +25,19 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.beanmanagers.CreateSeqBeanMgr;
-import org.apache.sandesha2.storage.beans.CreateSeqBean;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMBean;
 
-public class InMemoryCreateSeqBeanMgr extends InMemoryBeanMgr implements CreateSeqBeanMgr {
+public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 
-	private static final Log log = LogFactory.getLog(InMemoryCreateSeqBeanMgr.class);
+	private static final Log log = LogFactory.getLog(InMemoryRMSBeanMgr.class);
 
-	public InMemoryCreateSeqBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
+	public InMemoryRMSBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.CREATE_SEQUECE);
 	}
 
-	public boolean insert(CreateSeqBean bean) throws SandeshaStorageException {
+	public boolean insert(RMSBean bean) throws SandeshaStorageException {
 		return super.insert(bean.getCreateSeqMsgID(), bean);
 	}
 
@@ -45,23 +45,23 @@ public class InMemoryCreateSeqBeanMgr extends InMemoryBeanMgr implements CreateS
 		return super.delete(msgId);
 	}
 
-	public CreateSeqBean retrieve(String msgId) throws SandeshaStorageException {
-		return (CreateSeqBean) super.retrieve(msgId);
+	public RMSBean retrieve(String msgId) throws SandeshaStorageException {
+		return (RMSBean) super.retrieve(msgId);
 	}
 
-	public boolean update(CreateSeqBean bean) throws SandeshaStorageException {
+	public boolean update(RMSBean bean) throws SandeshaStorageException {
 		return super.update(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public List find(CreateSeqBean bean) throws SandeshaStorageException {
+	public List find(RMSBean bean) throws SandeshaStorageException {
 		return super.find(bean);
 	}
 	
 	protected boolean match(RMBean matchInfo, RMBean candidate) {
 		boolean equal = true;
 		
-		CreateSeqBean bean = (CreateSeqBean) matchInfo;
-		CreateSeqBean temp = (CreateSeqBean) candidate;
+		RMSBean bean = (RMSBean) matchInfo;
+		RMSBean temp = (RMSBean) candidate;
 
 		if (bean.getCreateSeqMsgID() != null
 				&& !bean.getCreateSeqMsgID().equals(
@@ -80,8 +80,8 @@ public class InMemoryCreateSeqBeanMgr extends InMemoryBeanMgr implements CreateS
 		return equal;
 	}
 
-	public CreateSeqBean findUnique (CreateSeqBean bean) throws SandeshaException {
-		return (CreateSeqBean) super.findUnique(bean);
+	public RMSBean findUnique (RMSBean bean) throws SandeshaException {
+		return (RMSBean) super.findUnique(bean);
 	}
 
 }

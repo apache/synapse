@@ -47,7 +47,7 @@ public class SenderBean extends RMBean {
 
 	/**
 	 * Comment for <code>internalSequenceID</code>
-	 * Please see the comment of CreateSeqBean.
+	 * Please see the comment of RMSBean.
 	 */
 	private String internalSequenceID;
 

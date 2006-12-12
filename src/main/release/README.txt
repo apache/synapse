@@ -33,6 +33,13 @@ The actual sample Synapse configurations could be found at <SYNAPSE>/respository
 The resources sub-directory contains the sample XSLT transformations, XSD schemas, WS policies
 and all other resources required to demonstrate various aspects of Synapse.
 
+Synapse uses Log4J for its logging, and the default log level on the code is set to INFO. If you
+are trying out the samples and is new to Synapse, you may enable DEBUG level logging on the 
+log4j.properties found in the lib sub directory as follows. This would help you see what actually
+takes place during Synapse mediation.
+
+	e.g. log4j.category.org.apache.synapse=DEBUG
+
 
 Support
 ===================

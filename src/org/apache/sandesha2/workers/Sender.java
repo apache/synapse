@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.workers;
 
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -98,31 +97,6 @@ public class Sender extends SandeshaThread {
 						log.debug(message);
 					}
 					continue;
-				}
-
-        String toAddress = senderBean.getToAddress();
-				if (toAddress != null) {
-					boolean unsendableAddress = false;
-
-					if (toAddress
-							.equals(AddressingConstants.Submission.WSA_ANONYMOUS_URL))
-						unsendableAddress = true;
-					else if (toAddress
-							.equals(AddressingConstants.Final.WSA_ANONYMOUS_URL))
-						unsendableAddress = true;
-					else if (toAddress
-							.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
-						unsendableAddress = true;
-
-					if (unsendableAddress) {
-						if (log.isDebugEnabled()) {
-							String message = SandeshaMessageHelper.getMessage(
-									SandeshaMessageKeys.cannotSendToTheAddress,
-									toAddress);
-							log.debug(message);
-						}
-						continue;
-					}
 				}
 
 				// work Id is used to define the piece of work that will be

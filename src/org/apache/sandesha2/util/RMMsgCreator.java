@@ -26,6 +26,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.EndpointReferenceHelper;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -134,8 +135,19 @@ public class RMMsgCreator {
 			if (offeredEndpoint==null) {
 				EndpointReference replyTo = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
 			
-				if (replyTo!=null)
+				if (replyTo!=null) {
 					offeredEndpoint = SandeshaUtil.cloneEPR(replyTo);
+				}
+			}
+			// Finally fall back to using an anonymous endpoint
+			if (offeredEndpoint==null) {
+				String anon = null;
+				if(AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNamespaceValue)) {
+					anon = AddressingConstants.Final.WSA_ANONYMOUS_URL;
+				} else {
+					anon = AddressingConstants.Submission.WSA_ANONYMOUS_URL;
+				}
+				offeredEndpoint = new EndpointReference(anon);
 			}
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);
@@ -145,15 +157,9 @@ public class RMMsgCreator {
 				createSequencePart.setSequenceOffer(offerPart);
 				
 				if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(rmNamespaceValue)) {
-					if (offeredEndpoint!=null) {
-						Endpoint endpoint = new Endpoint (rmNamespaceValue,addressingNamespaceValue);
-						endpoint.setEPR (offeredEndpoint);
-						offerPart.setEndpoint(endpoint);
-					} else {
-						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.invalidOfferNoResponseEndpoint);
-						throw new SandeshaException (message);
-					}
+					Endpoint endpoint = new Endpoint (rmNamespaceValue,addressingNamespaceValue);
+					endpoint.setEPR (offeredEndpoint);
+					offerPart.setEndpoint(endpoint);
 				}
 			}
 		}
@@ -489,7 +495,7 @@ public class RMMsgCreator {
 	 * @throws SandeshaException
 	 */
 	public static void addAckMessage(RMMsgContext applicationMsg, String sequencePropertyKey ,String sequenceId, StorageManager storageManager)
-			throws AxisFault {
+			throws SandeshaException {
 		if(log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
 		
@@ -548,7 +554,11 @@ public class RMMsgCreator {
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());
 		
 		//generating the SOAP envelope.
-		applicationMsg.addSOAPEnvelope();
+		try {
+			applicationMsg.addSOAPEnvelope();
+		} catch(AxisFault e) {
+			throw new SandeshaException(e);
+		}
 		
 		// Ensure the message also contains the token that needs to be used
 		secureOutboundMessage(sequencePropertyKey, applicationMsg.getMessageContext());

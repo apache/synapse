@@ -351,11 +351,11 @@ public class SpecSpecificConstants {
 			case Sandesha2Constants.MessageTypes.CREATE_SEQ:
 			case Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE:
 			case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
+			case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
 				result = service.getOperation(new QName("RMOutInOperation"));
 				break;
 			case Sandesha2Constants.MessageTypes.ACK:
 			case Sandesha2Constants.MessageTypes.ACK_REQUEST:
-			case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
 				result = service.getOperation(new QName("RMOutOnlyOperation"));
 				break;
 			}

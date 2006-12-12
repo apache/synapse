@@ -47,6 +47,7 @@ import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
+import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -68,21 +69,34 @@ public class AcknowledgementManager {
 			throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
-
+		
 		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
-
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
+		// If this message is going to an anonymous address then we add in an ack for the
+		// sequence that was used on the inbound side.
+		EndpointReference target = rmMessageContext.getTo();
+		if(target.hasAnonymousAddress()) {
+			Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			if(sequence != null) {
+				String outboundSequenceId = sequence.getIdentifier().getIdentifier();
+				String outboundInternalSeq = SandeshaUtil.getSequenceProperty(outboundSequenceId,
+						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+				String inboundSequenceId = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(outboundInternalSeq);
+				
+				if(log.isDebugEnabled()) log.debug("Piggybacking ack for " + inboundSequenceId);
+				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequenceId, inboundSequenceId, storageManager);
+			}
+			if(log.isDebugEnabled()) log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent, anon");
+			return;
+		}
+		
 		SenderBean findBean = new SenderBean();
-
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
-		findBean.setReSend(false);
-
-		String carrietTo = rmMessageContext.getTo().getAddress();
+		findBean.setToAddress(target.getAddress());
 
 		Collection collection = retransmitterBeanMgr.find(findBean);
-
 		Iterator it = collection.iterator();
 
 		piggybackLoop: while (it.hasNext()) {
@@ -95,12 +109,6 @@ public class AcknowledgementManager {
 
 				MessageContext ackMsgContext = storageManager.retrieveMessageContext(ackBean.getMessageContextRefKey(),
 						configurationContext);
-
-				// wsa:To has to match for piggybacking.
-				String to = ackMsgContext.getTo().getAddress();
-				if (!carrietTo.equals(to)) {
-					continue piggybackLoop;
-				}
 
 				if (log.isDebugEnabled()) log.debug("Adding ack headers");
 

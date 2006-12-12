@@ -6,11 +6,15 @@ import java.util.MissingResourceException;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.Handler.InvocationResponse;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
@@ -113,6 +117,23 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				return;	
 			}
 
+			// If we are sending to the anonymous URI then we _must_ have a transport waiting,
+			// or the message can't go anywhere. If there is nothing here then we leave the
+			// message in the sender queue, and a MakeConnection will hopefully pick it up
+			// soon.
+			EndpointReference toEPR = msgCtx.getTo();
+			if(toEPR.hasAnonymousAddress()) {
+				RequestResponseTransport t = null;
+				MessageContext inMsg = null;
+				OperationContext op = msgCtx.getOperationContext();
+				if(op != null) inMsg = op.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+				if(inMsg != null) t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+				if(t == null) {
+					if(log.isDebugEnabled()) log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
+					return;
+				}
+			}
+
 			updateMessage(msgCtx);
 
 			int messageType = senderBean.getMessageType();
@@ -142,7 +163,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			if (transportOut!=null)
 				msgCtx.setTransportOut(transportOut);
-			
 
 			boolean successfullySent = false;
 
@@ -176,7 +196,19 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
 				if (log.isDebugEnabled())
 					log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
-				engine.resumeSend(msgCtx);
+				InvocationResponse response = engine.resumeSend(msgCtx);
+				if(log.isDebugEnabled()) log.debug("Engine resume returned " + response);
+				if(response != InvocationResponse.SUSPEND) {
+					RequestResponseTransport t = null;
+					MessageContext inMsg = null;
+					OperationContext op = msgCtx.getOperationContext();
+					if(op != null) inMsg = op.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					if(inMsg != null) t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+					if(t != null) {
+						if(log.isDebugEnabled()) log.debug("Signalling transport in " + t);
+						if(t != null) t.signalResponseReady();
+					}
+				}
 				
 				successfullySent = true;
 			} catch (Exception e) {

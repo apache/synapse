@@ -124,7 +124,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			// Dropping duplicates
 			boolean dropped = dropIfDuplicate(rmMessageContext, storageManager);
 			if (dropped) {
-				returnValue = InvocationResponse.SUSPEND; //the msg has been paused
+				returnValue = InvocationResponse.ABORT; //the msg has been dropped
 				processDroppedMessage(rmMessageContext, storageManager);
 				if (log.isDebugEnabled())
 					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped " + returnValue);

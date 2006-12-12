@@ -119,13 +119,6 @@ public class SequenceProcessor {
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 		
-		//RM will not send sync responses. If sync acks are there this will be
-		// made true again later.
-		if (rmMsgCtx.getMessageContext().getOperationContext() != null) {
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(Constants.RESPONSE_WRITTEN,
-					Constants.VALUE_FALSE);
-		}
-		
 		// setting acked msg no range
 		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
 		if (configCtx == null) {
@@ -303,10 +296,18 @@ public class SequenceProcessor {
 		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 		
-		EndpointReference acksTo = ackRMMsgCtx.getTo();
-		
-		if (SandeshaUtil.isAnonymousURI (acksTo.getAddress())) {
+		boolean anonAck = ackRMMsgCtx.getTo().hasAnonymousAddress();
+		EndpointReference replyTo = rmMsgCtx.getReplyTo();
 
+		// Only use the backchannel for ack messages if we are sure that the application
+		// doesn't need it. A 1-way MEP should be complete by now.
+		boolean complete = ackMsgCtx.getOperationContext().isComplete();
+		if (anonAck && !complete && (replyTo == null || replyTo.hasAnonymousAddress())) {
+			if (log.isDebugEnabled()) log.debug("Exit: SequenceProcessor::sendAckIfNeeded, avoiding using backchannel");
+			return;
+		}
+			
+		if(anonAck) {
 			// setting CONTEXT_WRITTEN since acksto is anonymous
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
 				// operation context will be null when doing in a GLOBAL
@@ -326,7 +327,7 @@ public class SequenceProcessor {
 			AxisEngine engine = new AxisEngine(configCtx);
 			engine.send(ackRMMsgCtx.getMessageContext());
 
-		} else {
+		} else if(!anonAck) {
 
 			// / Transaction asyncAckTransaction =
 			// storageManager.getTransaction();

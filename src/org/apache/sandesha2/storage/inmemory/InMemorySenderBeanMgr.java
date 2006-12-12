@@ -110,6 +110,13 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 			log.debug("isSend didn't match");
 			add = false;
 		}
+		
+		if (bean.getToAddress() != null
+				&& !bean.getToAddress().equals("")
+				&& !bean.getToAddress().equals(temp.getToAddress())) {
+			log.debug("ToAddress didn't match");
+			add = false;
+		}
 
 		// Do not use the isReSend flag to match messages, as it can stop us from
 		// detecting RM messages during 'getNextMsgToSend'

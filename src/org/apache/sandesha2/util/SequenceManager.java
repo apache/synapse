@@ -279,13 +279,14 @@ public class SequenceManager {
 			}
 		} else {
 			
+			//setting replyTo, which defaults to anonymous
+			String replyTo = anonymousURI;
 			EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
-			//setting replyTo and acksTo beans.
-					
-			if (replyToEPR!=null)		
-				replyToBean = new SequencePropertyBean(sequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
-		
+			if (replyToEPR!=null) replyTo = replyToEPR.getAddress();
+			
+			replyToBean = new SequencePropertyBean(sequencePropertyKey,
+					Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyTo);
+
 			//TODO set AcksToBean.
 		}
 		

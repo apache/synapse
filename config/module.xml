@@ -48,7 +48,6 @@
         <!-- namespaces for the 2006-08 spec -->
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement</actionMapping>
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection</actionMapping>
      </operation>
  
      <operation name="RMInOutOperation" mep="http://www.w3.org/2004/08/wsdl/in-out">
@@ -61,6 +60,7 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence</actionMapping>
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence</actionMapping>
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection</actionMapping>
     </operation>
 
     <operation name="RMOutOnlyOperation" mep="http://www.w3.org/2004/08/wsdl/out-only">

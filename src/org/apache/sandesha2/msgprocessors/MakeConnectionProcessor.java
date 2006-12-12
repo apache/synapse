@@ -8,7 +8,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -33,13 +36,16 @@ import org.apache.sandesha2.wsrm.MessagePending;
  */
 public class MakeConnectionProcessor implements MsgProcessor {
 
+	private static final Log log = LogFactory.getLog(MakeConnectionProcessor.class);
+
 	/**
 	 * Prosesses incoming MakeConnection request messages.
 	 * A message is selected by the set of SenderBeans that are waiting to be sent.
 	 * This is processed using a SenderWorker. 
 	 */
 	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
-		
+		if(log.isDebugEnabled()) log.debug("Entry: MakeConnectionProcessor::processInMessage");
+
 		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION);
 		Address address = makeConnection.getAddress();
 		Identifier identifier = makeConnection.getIdentifier();
@@ -54,23 +60,15 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		findSenderBean.setSend(true);
 		
 		if (address!=null)
-			findSenderBean.setWsrmAnonURI(address.getAddress());
+			findSenderBean.setToAddress(address.getAddress());
 		
 		if (identifier!=null)
 			findSenderBean.setSequenceID(identifier.getIdentifier());
 		
 		//finding the beans that go with the criteria of the passed SenderBean
-		
-		//beans with reSend=true
-		findSenderBean.setReSend(true);
+		//The reSend flag is ignored for this selection, so there is no need to
+		//set it.
 		Collection collection = senderBeanMgr.find(findSenderBean);
-		
-		//beans with reSend=false
-		findSenderBean.setReSend (false);
-		Collection collection2 = senderBeanMgr.find(findSenderBean);
-		
-		//all possible beans
-		collection.addAll(collection2);
 		
 		//selecting a bean to send RANDOMLY. TODO- Should use a better mechanism.
 		int size = collection.size();
@@ -90,14 +88,15 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		SenderBean senderBean = null;
 		for (int item=0;item<size;item++) {
-			
 		    senderBean = (SenderBean) it.next();
 			if (item==itemToPick)
 				break;
 		}
 
-		if (senderBean==null) 
+		if (senderBean==null) {
+			if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
 			return false;
+		}
 			
 		TransportOutDescription transportOut = rmMsgCtx.getMessageContext().getTransportOut();
 		if (transportOut==null) {
@@ -110,15 +109,17 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,configurationContext);
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
 		
-		
-		addMessagePendingHeader (returnRMMsg,pending);
+		if(pending) addMessagePendingHeader (returnRMMsg,pending);
 		
 		setTransportProperties (returnMessage, rmMsgCtx);
 		
-		//setting that the response gets written written.
-		//This will be used by transports. For e.g. CommonsHTTPTransportSender will send 200 OK, instead of 202.
-		rmMsgCtx.getMessageContext().getOperationContext().setProperty(Constants.RESPONSE_WRITTEN , Constants.VALUE_TRUE);
+		// Link the response to the request
+		OperationContext context = rmMsgCtx.getMessageContext().getOperationContext();
+		context.addMessageContext(returnMessage);
+		returnMessage.setOperationContext(context);
 		
+		// Store the response again
+		storageManager.updateMessageContext(messageStorageKey, returnMessage);
 		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.

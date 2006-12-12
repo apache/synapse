@@ -437,23 +437,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsgCtx.setMessageId(messageId1);
 		}
 
-		if (serverSide) {
-			// let the request end with 202 if a ack has not been
-			// written in the incoming thread.
-
-			MessageContext reqMsgCtx = null;
-			try {
-				reqMsgCtx = msgContext.getOperationContext().getMessageContext(
-						WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-			} catch (AxisFault e) {
-				throw new SandeshaException(e);
-			}
-
-			if (reqMsgCtx.getProperty(Sandesha2Constants.ACK_WRITTEN) == null
-					|| !"true".equals(reqMsgCtx.getProperty(Sandesha2Constants.ACK_WRITTEN)))
-				reqMsgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-		}
-
 		EndpointReference toEPR = msgContext.getTo();
 		if (toEPR == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);

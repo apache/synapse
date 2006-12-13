@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse-Incubating</artifactId>
-        <version>0.90-RC1</version>
+        <version>SNAPSHOT</version>
     </parent>
 
     <groupId>org.apache.synapse</groupId>

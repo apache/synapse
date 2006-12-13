@@ -47,7 +47,7 @@ import java.util.Iterator;
  * &lt;/switch&gt;
  * </pre>
  */
-public class SwitchMediatorFactory implements MediatorFactory {
+public class SwitchMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(SwitchMediatorFactory.class);
 

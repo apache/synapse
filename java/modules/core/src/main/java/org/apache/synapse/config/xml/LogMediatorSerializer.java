@@ -33,8 +33,8 @@ import org.apache.synapse.mediators.builtin.LogMediator;
  * &lt;/log&gt;
  * </pre>
  */
-public class LogMediatorSerializer extends BaseMediatorSerializer
-    implements MediatorSerializer{
+public class LogMediatorSerializer extends AbstractMediatorSerializer
+    {
 
     private static final Log log = LogFactory.getLog(LogMediatorSerializer.class);
 

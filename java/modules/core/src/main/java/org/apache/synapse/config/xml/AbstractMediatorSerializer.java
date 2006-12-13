@@ -19,18 +19,25 @@
 
 package org.apache.synapse.config.xml;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.MediatorProperty;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-public class MediatorPropertySerializer extends BaseMediatorSerializer {
+public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(MediatorPropertySerializer.class);
+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
+    protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    private static final Log log = LogFactory.getLog(AbstractMediatorSerializer.class);
 
     public void serializeMediatorProperties(OMElement parent, Collection props) {
 
@@ -50,10 +57,25 @@ public class MediatorPropertySerializer extends BaseMediatorSerializer {
             } else if (mp.getExpression() != null) {
                 prop.addAttribute(fac.createOMAttribute("expression", nullNS,
                     mp.getExpression().toString()));
-                super.serializeNamespaces(prop, mp.getExpression());
+                serializeNamespaces(prop, mp.getExpression());
 
             } else {
                 handleException("Mediator property must have a literal value or be an expression");
+            }
+        }
+    }
+
+    public void serializeProperties(OMElement parent, Collection props) {
+        serializeMediatorProperties(parent, props);
+    }
+
+    public void serializeNamespaces(OMElement elem, AXIOMXPath xpath) {
+        Iterator iter = xpath.getNamespaces().keySet().iterator();
+        while (iter.hasNext()) {
+            String prefix = (String) iter.next();
+            String uri = xpath.getNamespaceContext().translateNamespacePrefixToUri(prefix);
+            if (!Constants.SYNAPSE_NAMESPACE.equals(uri)) {
+                elem.declareNamespace(uri, prefix);
             }
         }
     }

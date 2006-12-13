@@ -26,8 +26,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.filters.OutMediator;
 
-public class OutMediatorSerializer extends BaseListMediatorSerializer
-    implements MediatorSerializer {
+public class OutMediatorSerializer extends AbstractListMediatorSerializer
+     {
 
     private static final Log log = LogFactory.getLog(OutMediatorSerializer.class);
 

@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
  * &lt;rest value="true|false"/&gt;
  * </pre>
  */
-public class POXMediatorFactory implements MediatorFactory {
+public class POXMediatorFactory extends AbstractMediatorFactory  {
 
     private static final QName POX_Q = new QName(Constants.SYNAPSE_NAMESPACE, "pox");
 

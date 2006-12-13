@@ -41,8 +41,8 @@ import org.apache.synapse.mediators.base.TryMediator;
  * &lt;/try&gt;
  * </pre>
  */
-public class TryMediatorSerializer extends BaseListMediatorSerializer
-    implements MediatorSerializer {
+public class TryMediatorSerializer extends AbstractListMediatorSerializer
+     {
 
     private static final Log log = LogFactory.getLog(TryMediatorSerializer.class);
 

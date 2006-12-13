@@ -39,8 +39,8 @@ import javax.xml.namespace.QName;
  *      &lt;header name="qname" action="remove"/&gt;
  *   </pre>
  */
-public class HeaderMediatorSerializer extends BaseMediatorSerializer
-    implements MediatorSerializer {
+public class HeaderMediatorSerializer extends AbstractMediatorSerializer
+     {
     private static final Log log = LogFactory.getLog(FilterMediatorSerializer.class);
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {

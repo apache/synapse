@@ -311,6 +311,8 @@ public class SandeshaClient {
 	 * @throws SandeshaException
 	 */
 	public static void createSequence(ServiceClient serviceClient, boolean offer, String sequenceKey) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaClient::createSequence , " + offer + ", " + sequenceKey);
 		
 		setUpServiceClientAnonymousOperations (serviceClient);
 		
@@ -337,7 +339,8 @@ public class SandeshaClient {
 		// setting a new squenceKey if not already set.
 		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
+		if (sequenceKey != null)
+		  options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 
@@ -364,6 +367,8 @@ public class SandeshaClient {
 		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
 		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
 		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaClient::createSequence");
 	}
 
 	/**

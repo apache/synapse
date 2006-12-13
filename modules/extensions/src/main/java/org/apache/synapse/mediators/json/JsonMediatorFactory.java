@@ -27,6 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.AbstractMediatorFactory;
 
 import javax.xml.namespace.QName;
 
@@ -38,7 +39,7 @@ import javax.xml.namespace.QName;
  * JTX is Json to XML
  * XTJ is XML to Json
  */
-public class JsonMediatorFactory implements MediatorFactory {
+public class JsonMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(JsonMediatorFactory.class);
 

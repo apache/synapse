@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.BaseListMediatorSerializer;
+import org.apache.synapse.config.xml.AbstractListMediatorSerializer;
 
 import java.util.Iterator;
 
@@ -38,7 +38,7 @@ import java.util.Iterator;
  *   </on-fail>
  * </validate>
  */
-public class ValidateMediatorSerializer extends BaseListMediatorSerializer
+public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
     implements MediatorSerializer {
 
     private static final Log log = LogFactory.getLog(ValidateMediatorSerializer.class);

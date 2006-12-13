@@ -24,8 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.BaseMediatorSerializer;
+import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
 /**
  * <pre>
@@ -34,8 +33,7 @@ import org.apache.synapse.config.xml.BaseMediatorSerializer;
  * &lt;/transform&gt;
  * </pre>
  */
-public class XSLTMediatorSerializer extends BaseMediatorSerializer
-    implements MediatorSerializer {
+public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(XSLTMediatorSerializer.class);
 

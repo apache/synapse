@@ -27,6 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.AbstractMediatorFactory;
 
 import javax.xml.namespace.QName;
 
@@ -37,7 +38,7 @@ import javax.xml.namespace.QName;
  * <p/>
  * <spring bean="exampleBean1" key="string""/>
  */
-public class SpringMediatorFactory implements MediatorFactory {
+public class SpringMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(SpringMediatorFactory.class);
 

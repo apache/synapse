@@ -77,7 +77,7 @@ import java.util.Iterator;
  * &lt;/send&gt;
  * </pre>
  */
-public class SendMediatorFactory implements MediatorFactory {
+public class SendMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(SendMediatorFactory.class);
 

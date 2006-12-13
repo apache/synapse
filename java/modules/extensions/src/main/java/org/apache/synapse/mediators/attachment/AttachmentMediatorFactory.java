@@ -30,9 +30,10 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.config.xml.OMElementUtils;
+import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.jaxen.JaxenException;
 
-public class AttachmentMediatorFactory implements MediatorFactory {
+public class AttachmentMediatorFactory extends AbstractMediatorFactory {
 
 	private static final Log log = LogFactory.getLog(AttachmentMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "attachments");

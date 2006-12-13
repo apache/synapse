@@ -46,7 +46,7 @@ import java.util.Iterator;
  *      &lt;header name="qname" action="remove"/&gt;
  *   </pre>
  */
-public class HeaderMediatorFactory implements MediatorFactory {
+public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(HeaderMediatorFactory.class);
 

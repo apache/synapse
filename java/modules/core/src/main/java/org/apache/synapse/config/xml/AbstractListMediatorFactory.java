@@ -32,7 +32,7 @@ import java.util.Iterator;
  * This implements the basic logic to build a list mediator from a given XML
  * configuration. It recursively builds the child mediators of the list.
  */
-public abstract class AbstractListMediatorFactory implements MediatorFactory {
+public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(AbstractListMediatorFactory.class);
 

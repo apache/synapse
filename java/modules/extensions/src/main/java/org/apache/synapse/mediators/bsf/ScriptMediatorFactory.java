@@ -27,6 +27,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.AbstractMediatorFactory;
 
 /**
  * Creates an instance of a Script mediator. <p/>
@@ -68,7 +69,7 @@ import org.apache.synapse.config.xml.MediatorFactory;
  * example when using JavaScript get/setPayloadXML use E4X XML objects, when using Ruby they
  * use REXML documents.
  */
-public class ScriptMediatorFactory implements MediatorFactory {
+public class ScriptMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE, "script");
 

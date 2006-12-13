@@ -28,9 +28,9 @@ import org.apache.synapse.Mediator;
 import java.util.Iterator;
 import java.util.List;
 
-public class BaseListMediatorSerializer extends BaseMediatorSerializer {
+public abstract class AbstractListMediatorSerializer extends AbstractMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(BaseListMediatorSerializer.class);
+    private static final Log log = LogFactory.getLog(AbstractListMediatorSerializer.class);
 
     public void serializeChildren(OMElement parent, List list)
     {

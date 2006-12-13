@@ -38,7 +38,7 @@ import javax.xml.namespace.QName;
  * &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
  * </pre>
  */
-public class PropertyMediatorFactory implements MediatorFactory {
+public class PropertyMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 

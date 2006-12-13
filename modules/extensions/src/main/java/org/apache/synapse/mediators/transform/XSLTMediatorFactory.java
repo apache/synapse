@@ -28,7 +28,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.OMElementUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
 import org.jaxen.JaxenException;
 
@@ -43,7 +43,7 @@ import javax.xml.namespace.QName;
  * &lt;/transform&gt;
  * </pre>
  */
-public class XSLTMediatorFactory implements MediatorFactory {
+public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");

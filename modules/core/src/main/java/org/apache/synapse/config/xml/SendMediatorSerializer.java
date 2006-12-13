@@ -71,8 +71,8 @@ import java.util.Iterator;
  * &lt;/send&gt;
  * </pre>
  */
-public class SendMediatorSerializer extends BaseMediatorSerializer
-    implements MediatorSerializer {
+public class SendMediatorSerializer extends AbstractMediatorSerializer
+     {
 
     private static final Log log = LogFactory.getLog(SendMediatorSerializer.class);
 

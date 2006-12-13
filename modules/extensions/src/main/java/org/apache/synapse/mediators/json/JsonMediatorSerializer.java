@@ -27,14 +27,14 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.BaseMediatorSerializer;
+import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 
 /**
  * <x:json/> mediator belongs to the http://ws.apache.org/ns/synapse/json namespace.
  * <p/>
  * <x:json (direction="JTX"|"XTJ)"/>
  */
-public class JsonMediatorSerializer extends BaseMediatorSerializer
+public class JsonMediatorSerializer extends AbstractMediatorSerializer
     implements MediatorSerializer {
 
     private static final OMNamespace jsonNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE+"/json", "json");

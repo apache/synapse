@@ -26,8 +26,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 
-public class DropMediatorSerializer extends BaseMediatorSerializer
-    implements MediatorSerializer {
+public class DropMediatorSerializer extends AbstractMediatorSerializer
+     {
 
     private static final Log log = LogFactory.getLog(DropMediatorSerializer.class);
 

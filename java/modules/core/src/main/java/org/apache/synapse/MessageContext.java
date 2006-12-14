@@ -170,13 +170,13 @@ public interface MessageContext {
      * Set the message if
      * @param messageID
      */
-    public void setMessageId(String messageID);
+    public void setWSAMessageID(String messageID);
 
     /**
      * Gets the message id
-     * @return the message id
+     * @return the WSA MessageID
      */
-    public String getMessageId();
+    public String getWSAMessageID();
 
     /**
      * If this message using MTOM?
@@ -245,5 +245,17 @@ public interface MessageContext {
      * @return true if this is a response to a fault message
      */
     public boolean isFaultResponse();
+
+    /**
+     * This is used to check whether the tracing should be enabled on the current mediator or not
+     * @return indicate whether tracing is on, off or unset
+     */
+    public int getTracingState();
+
+    /**
+     * This is used to set the value of tracing enable variable
+     * @param tracingState Set whether the tracing is enabled or not
+     */
+    public void setTracingState(int tracingState);
 
 }

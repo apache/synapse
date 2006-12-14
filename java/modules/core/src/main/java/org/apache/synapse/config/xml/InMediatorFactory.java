@@ -40,6 +40,9 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     public Mediator createMediator(OMElement elem) {
         InMediator filter = new InMediator();
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(filter,elem);
         super.addChildren(elem, filter);
         return filter;
     }

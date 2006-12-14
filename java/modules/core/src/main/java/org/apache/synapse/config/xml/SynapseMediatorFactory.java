@@ -44,6 +44,11 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
     public Mediator createMediator(OMElement elem) {
         SynapseMediator sm = new SynapseMediator();
+
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(sm,elem);
+
         super.addChildren(elem, sm);
         return sm;
     }

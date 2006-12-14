@@ -26,7 +26,6 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +39,7 @@ import java.util.List;
 public class SendMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SendMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /** The list of endpoints to which the message should be sent to. If none
      * are specified, the message is sent where its implicitly stated in the
@@ -61,6 +61,9 @@ public class SendMediator extends AbstractMediator {
         // seems like a woodstox issue. Use hack for now
         // synCtx.getEnvelope().build();
 
+        if (shouldTrace(synCtx.getTracingState())) {
+            trace.trace("Sending Message :: " + synCtx.getEnvelope());
+        }
         // if no endpoints are defined, send where implicitly stated
         if (endpoints.isEmpty()) {
             log.debug("Sending message using implicit message properties..");

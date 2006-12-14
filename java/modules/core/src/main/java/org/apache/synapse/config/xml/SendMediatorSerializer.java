@@ -84,7 +84,7 @@ public class SendMediatorSerializer extends AbstractMediatorSerializer
 
         SendMediator mediator = (SendMediator) m;
         OMElement send = fac.createOMElement("send", synNS);
-
+        finalizeSerialization(send, mediator);
         if (mediator.getEndpoints() != null) {
             Iterator iter = mediator.getEndpoints().iterator();
             while (iter.hasNext()) {

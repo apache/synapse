@@ -63,7 +63,9 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
             log.error(msg, e);
             throw new SynapseException(msg, e);
         }
-
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(classMediator,elem);
         classMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
 
         return classMediator;

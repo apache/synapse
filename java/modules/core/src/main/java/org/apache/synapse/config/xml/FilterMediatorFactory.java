@@ -50,7 +50,6 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
 
     public Mediator createMediator(OMElement elem) {
         FilterMediator filter = new FilterMediator();
-        super.addChildren(elem, filter);
 
         OMAttribute attXpath  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "xpath"));
         OMAttribute attSource = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
@@ -105,6 +104,10 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
             log.error(msg);
             throw new SynapseException(msg);
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(filter,elem);
+        super.addChildren(elem, filter);
         return filter;
     }
 

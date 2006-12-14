@@ -54,6 +54,7 @@ public class TryMediatorSerializer extends AbstractListMediatorSerializer
 
         TryMediator mediator = (TryMediator) m;
         OMElement tryMed = fac.createOMElement("try", synNS);
+        finalizeSerialization(tryMed,mediator);
 
         OMElement sequence = fac.createOMElement("sequence", synNS);
         super.serializeChildren(sequence, mediator.getList());

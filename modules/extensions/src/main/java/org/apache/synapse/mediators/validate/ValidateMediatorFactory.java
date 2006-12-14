@@ -114,6 +114,10 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
                 "the <validate> mediator");
         }
 
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(validateMediator,elem);
+
         // process properties
         validateMediator.addAllProperties(
             MediatorPropertyFactory.getMediatorProperties(elem));

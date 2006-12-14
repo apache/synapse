@@ -55,6 +55,10 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
 
         LogMediator logMediator = new LogMediator();
 
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(logMediator,elem);
+        
         // Set the high level set of properties to be logged (i.e. log level)
         OMAttribute level = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "level"));
         if (level != null) {

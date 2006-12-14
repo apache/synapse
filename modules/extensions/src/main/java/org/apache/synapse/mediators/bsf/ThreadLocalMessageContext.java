@@ -105,8 +105,8 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().getMessageID();
     }
 
-    public String getMessageId() {
-        return getMC().getMessageId();
+    public String getWSAMessageID() {
+        return getMC().getWSAMessageID();
     }
 
     public Object getProperty(String key) {
@@ -153,6 +153,10 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().isFaultResponse();
     }
 
+    public int getTracingState() {
+        return getMC().getTracingState();
+    }
+
     public boolean isResponse() {
         return getMC().isResponse();
     }
@@ -163,6 +167,10 @@ public class ThreadLocalMessageContext implements MessageContext {
 
     public void setConfiguration(SynapseConfiguration cfg) {
         getMC().setConfiguration(cfg);
+    }
+
+    public void setTracingState(int tracingState) {
+        getMC().setTracingState(tracingState);
     }
 
     public void setDoingMTOM(boolean b) {
@@ -201,8 +209,8 @@ public class ThreadLocalMessageContext implements MessageContext {
         getMC().setMessageID(string);
     }
 
-    public void setMessageId(String messageID) {
-        getMC().setMessageId(messageID);
+    public void setWSAMessageID(String messageID) {
+        getMC().setWSAMessageID(messageID);
     }
 
     public void setProperty(String key, Object value) {

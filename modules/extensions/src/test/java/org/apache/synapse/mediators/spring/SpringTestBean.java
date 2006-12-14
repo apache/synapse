@@ -22,13 +22,14 @@ package org.apache.synapse.mediators.spring;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
  * This is a very simple Spring bean, that has one int property, and a
  * reference to another bean. This second bean is invoked on each mediate()
  * call, and it keeps a count of the invocations to be tested by JUnit
  */
-public class SpringTestBean implements Mediator {
+public class SpringTestBean extends AbstractMediator {
 
     private int testProperty;
 

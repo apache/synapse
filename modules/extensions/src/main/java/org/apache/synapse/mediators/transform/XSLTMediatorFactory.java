@@ -76,6 +76,9 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
                     attSource.getAttributeValue());
             }
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(transformMediator,elem);
 
         transformMediator.addAllProperties(
             MediatorPropertyFactory.getMediatorProperties(elem));

@@ -60,7 +60,7 @@ public class ScriptMessageContext implements MessageContext {
      * Set the SOAP body payload from XML
      * 
      * @param payload
-     * @throws XMLStreamException
+     * 
      */
     public void setPayloadXML(Object payload) {
         mc.getEnvelope().getBody().setFirstChild(convertor.fromScript(payload));
@@ -190,12 +190,12 @@ public class ScriptMessageContext implements MessageContext {
         mc.setSoapAction(string);
     }
 
-    public void setMessageId(String messageID) {
-        mc.setMessageId(messageID);
+    public void setWSAMessageID(String messageID) {
+        mc.setWSAMessageID(messageID);
     }
 
-    public String getMessageId() {
-        return mc.getMessageId();
+    public String getWSAMessageID() {
+        return mc.getWSAMessageID();
     }
 
     public boolean isDoingMTOM() {
@@ -240,6 +240,14 @@ public class ScriptMessageContext implements MessageContext {
 
     public boolean isFaultResponse() {
         return mc.isFaultResponse();
+    }
+
+    public int getTracingState() {
+        return mc.getTracingState();
+    }
+
+    public void setTracingState(int tracingState) {
+        mc.setTracingState(tracingState);
     }
 
 }

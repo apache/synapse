@@ -54,6 +54,7 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer
 
         SwitchMediator mediator = (SwitchMediator) m;
         OMElement switchMed = fac.createOMElement("switch", synNS);
+        finalizeSerialization(switchMed,mediator);
 
         if (mediator.getSource() != null) {
             switchMed.addAttribute(fac.createOMAttribute(

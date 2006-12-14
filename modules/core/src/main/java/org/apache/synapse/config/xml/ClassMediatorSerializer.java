@@ -45,6 +45,8 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
         }
         ClassMediator mediator = (ClassMediator) m;
         OMElement clazz = fac.createOMElement("class", synNS);
+        finalizeSerialization(clazz, mediator);
+
         if (mediator.getClazz() != null) {
             clazz.addAttribute(fac.createOMAttribute(
                 "name", nullNS, mediator.getClazz().getName()));

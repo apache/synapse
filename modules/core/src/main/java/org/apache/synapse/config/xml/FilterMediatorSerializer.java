@@ -46,7 +46,7 @@ public class FilterMediatorSerializer extends AbstractListMediatorSerializer
 
         FilterMediator mediator = (FilterMediator) m;
         OMElement filter = fac.createOMElement("filter", synNS);
-        
+
         if (mediator.getSource() != null && mediator.getRegex() != null) {
             filter.addAttribute(fac.createOMAttribute(
                 "source", nullNS, mediator.getSource().toString()));
@@ -65,6 +65,7 @@ public class FilterMediatorSerializer extends AbstractListMediatorSerializer
                 "Should have either a 'source' and a 'regex' OR an 'xpath' ");
         }
 
+        finalizeSerialization(filter, mediator);
         super.serializeChildren(filter, mediator.getList());
 
         if (parent != null) {

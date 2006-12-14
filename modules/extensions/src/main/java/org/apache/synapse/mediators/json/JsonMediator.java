@@ -25,11 +25,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
 import javax.xml.namespace.QName;
 
-public class JsonMediator implements Mediator {
+public class JsonMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(JsonMediator.class);
 
@@ -97,8 +98,4 @@ public class JsonMediator implements Mediator {
         log.error(msg);
         throw new SynapseException(msg);
     }
-
-
-
-
 }

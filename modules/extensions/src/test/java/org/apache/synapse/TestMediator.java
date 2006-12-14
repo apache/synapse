@@ -20,11 +20,12 @@
 package org.apache.synapse;
 
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
  * Test mediator class.
  */
-public class TestMediator implements Mediator {
+public class TestMediator extends AbstractMediator {
 
     private org.apache.synapse.TestMediateHandler handlerTest = null;
 

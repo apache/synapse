@@ -51,6 +51,7 @@ public class HeaderMediatorSerializer extends AbstractMediatorSerializer
 
         HeaderMediator mediator = (HeaderMediator) m;
         OMElement header = fac.createOMElement("header", synNS);
+        finalizeSerialization(header,mediator);
 
         QName qName = mediator.getQName();
         if (qName != null) {

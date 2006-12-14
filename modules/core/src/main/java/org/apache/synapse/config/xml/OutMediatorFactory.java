@@ -40,6 +40,11 @@ public class OutMediatorFactory extends AbstractListMediatorFactory {
 
     public Mediator createMediator(OMElement elem) {
         OutMediator filter = new OutMediator();
+
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(filter,elem);
+
         super.addChildren(elem, filter);
         return filter;
     }

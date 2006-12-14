@@ -112,4 +112,13 @@ public interface Constants {
     String HEADER_ACTION = "Action";
     /** Refers the ReplyTo header */
     String HEADER_REPLY_TO = "ReplyTo";
+
+    /** The tracing state -off */
+    int TRACING_OFF =0;
+    /** The tracing state-on */
+    int TRACING_ON =1;
+    /** The tracing state-unset */
+    int TRACING_UNSET=2;
+    /** Tracing logger */
+    String TRACE_LOGGER ="TRACE_LOGGER";
 }

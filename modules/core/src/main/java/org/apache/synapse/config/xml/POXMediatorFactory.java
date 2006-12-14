@@ -41,7 +41,11 @@ public class POXMediatorFactory extends AbstractMediatorFactory  {
     public Mediator createMediator(OMElement el) {
 		POXMediator restMediator = new POXMediator();
 		OMAttribute value = el.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-		if (value != null) {
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(restMediator,el);
+
+        if (value != null) {
 			String valueString = value.getAttributeValue();
 			if (valueString.toLowerCase().equals("true")) {
 				restMediator.setValue(true);

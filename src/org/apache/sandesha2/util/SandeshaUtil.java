@@ -65,7 +65,6 @@ import org.apache.axis2.engine.Handler;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.rampart.RampartMessageData;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -86,7 +85,6 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
-import org.apache.ws.security.handler.WSHandlerConstants;
 
 /**
  * Contains utility methods that are used in many plases of Sandesha2.
@@ -1088,27 +1086,12 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static boolean isWSRMAnonymousReplyTo (String replyTo) {
-		if (replyTo!=null && replyTo.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
+	public static boolean isWSRMAnonymous(String address) {
+		if (address!=null && address.startsWith(Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX))
 			return true;
 		else 
 			return false;
 	}
-
-	public static boolean isAnonymousURI (String address) {
-		if (address==null)
-			return false;
-		
-		if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address.trim()))
-			return true;
-		else if (AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address.trim()))
-			return true;
-		else if (isWSRMAnonymousReplyTo(address))
-			return true;
-		
-		return false;
-	}
-	
 	public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::executeAndStore, " + storageKey);

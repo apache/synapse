@@ -187,11 +187,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 																			// the
 																			// RMMsgCreator
 
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-
-		if (anonymousURI.equals(acksTo.getAddress())) {
+		if (acksTo.hasAnonymousAddress()) {
 
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext().getConfigurationContext());
 

@@ -8,7 +8,6 @@ package org.apache.sandesha2.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -22,8 +21,6 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -52,7 +49,7 @@ public class SequenceManager {
 	private static Log log = LogFactory.getLog(SequenceManager.class);
 
 	/**
-	 * Set up a new outbound sequence, triggered by the arrival of a create sequence message. As this
+	 * Set up a new inbound sequence, triggered by the arrival of a create sequence message. As this
 	 * is an inbound sequence, the sequencePropertyKey is the sequenceId.
 	 */
 	public static String setupNewSequence(RMMsgContext createSequenceMsg, StorageManager storageManager, SecurityManager securityManager, SecurityToken token)
@@ -85,7 +82,8 @@ public class SequenceManager {
 			throw new AxisFault(message);
 		}
 
-		ConfigurationContext configurationContext = createSequenceMsg.getMessageContext().getConfigurationContext();
+		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
+		ConfigurationContext configurationContext = createSeqContext.getConfigurationContext();
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
@@ -130,8 +128,22 @@ public class SequenceManager {
 		}		
 
 		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
-		nextMsgMgr.insert(new RMDBean(sequenceId, 1)); // 1 will be the
-															// next
+		
+		RMDBean rmdBean = new RMDBean();
+		rmdBean.setSequenceID(sequenceId);
+		rmdBean.setNextMsgNoToProcess(1);
+		
+		// If this sequence has a 'To' address that is anonymous then we must have got the
+		// message as a response to a poll. We need to make sure that we keep polling until
+		// the sequence is closed.
+		if(to.hasAnonymousAddress()) {
+			String newKey = SandeshaUtil.getUUID();
+			rmdBean.setPollingMode(true);
+			rmdBean.setReferenceMessageKey(newKey);
+			storageManager.storeMessageContext(newKey, createSeqContext);
+		}
+
+		nextMsgMgr.insert(rmdBean);
 
 		// message to invoke. This will apply for only in-order invocations.
 

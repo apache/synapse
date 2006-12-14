@@ -153,10 +153,6 @@ public class InMemoryStorageManager extends StorageManager {
 		return invokerBeanMgr;
 	}
 
-	public void init(ConfigurationContext context) {
-		setContext(context);
-	}
-
 	public static InMemoryStorageManager getInstance(
 			ConfigurationContext context) {
 		if (instance == null)
@@ -196,6 +192,7 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	public void storeMessageContext(String key,MessageContext msgContext) {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryStorageManager::storeMessageContext, key: " + key);
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		
 		if (storageMap==null) {
@@ -224,9 +221,12 @@ public class InMemoryStorageManager extends StorageManager {
 			envMap.put(key, clonedEnvelope);
 		}
 		
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::storeMessageContext, key: " + key);
 	}
 
 	public void updateMessageContext(String key,MessageContext msgContext) throws SandeshaStorageException { 
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryStorageManager::updateMessageContext, key: " + key);
+
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		
 		if (storageMap==null) {
@@ -246,9 +246,13 @@ public class InMemoryStorageManager extends StorageManager {
 			envMap.remove(key);
 		
 		storeMessageContext(key,msgContext);
+
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::updateMessageContext, key: " + key);
 	}
 	
 	public void removeMessageContext(String key) throws SandeshaStorageException { 
+		if(log.isDebugEnabled()) log.debug("Entry: InMemoryStorageManager::removeMessageContext, key: " + key);
+
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		HashMap envelopeMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
 		
@@ -259,23 +263,13 @@ public class InMemoryStorageManager extends StorageManager {
 		if (envelopeMap!=null)
 			envelopeMap.remove(key);
 		
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::removeMessageContext, key: " + key);
 	}
 	
 	public void  initStorage (AxisModule moduleDesc) {
 		
 	}
 
-	public SOAPEnvelope retrieveSOAPEnvelope(String key) throws SandeshaStorageException {
-		// TODO no real value
-		return null;
-	}
-
-	public void storeSOAPEnvelope(SOAPEnvelope envelope, String key) throws SandeshaStorageException {
-		// TODO no real value
-	}
-
-	
-	
 }
 
 

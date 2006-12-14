@@ -26,7 +26,6 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.EndpointReferenceHelper;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
@@ -141,12 +140,7 @@ public class RMMsgCreator {
 			}
 			// Finally fall back to using an anonymous endpoint
 			if (offeredEndpoint==null) {
-				String anon = null;
-				if(AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNamespaceValue)) {
-					anon = AddressingConstants.Final.WSA_ANONYMOUS_URL;
-				} else {
-					anon = AddressingConstants.Submission.WSA_ANONYMOUS_URL;
-				}
+				String anon = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
 				offeredEndpoint = new EndpointReference(anon);
 			}
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
@@ -172,14 +166,8 @@ public class RMMsgCreator {
 
 		if (replyTo == null) {
 			// using wsa:Anonymous as ReplyTo
-
-			String addressingNamespace = applicationRMMsg
-					.getAddressingNamespaceValue();
-			if (AddressingConstants.Submission.WSA_NAMESPACE
-					.equals(addressingNamespace))
-				replyTo = AddressingConstants.Submission.WSA_ANONYMOUS_URL;
-			else
-				replyTo = AddressingConstants.Final.WSA_ANONYMOUS_URL;
+			String addressingNamespace = applicationRMMsg.getAddressingNamespaceValue();
+			replyTo = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
 		}
 
 		if (to == null) {
@@ -287,11 +275,6 @@ public class RMMsgCreator {
 
 		if (terminateMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
-
-		// setUpMessage(referenceMessage, terminateMessage);
-
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(referenceMessage
-				.getEnvelope()));
 
 		terminateMessage.setMessageID(SandeshaUtil.getUUID());
 
@@ -595,8 +578,12 @@ public class RMMsgCreator {
 			makeConnection.setAddress(address);
 		}
 		
-		//setting the addressing properties
-		makeConnectionMessageCtx.setTo(new EndpointReference (referenceMessage.getTo().getAddress()));
+		// Setting the addressing properties. As this is a poll we must send it to an non-anon
+		// EPR, so we check both To and ReplyTo from the reference message
+		EndpointReference epr = referenceMessage.getTo();
+		if(epr.hasAnonymousAddress()) epr = referenceMessage.getReplyTo();
+		
+		makeConnectionMessageCtx.setTo(epr);
 		makeConnectionMessageCtx.setWSAAction(SpecSpecificConstants.getMakeConnectionAction(rmVersion));
 		makeConnectionMessageCtx.setMessageID(SandeshaUtil.getUUID());
 		

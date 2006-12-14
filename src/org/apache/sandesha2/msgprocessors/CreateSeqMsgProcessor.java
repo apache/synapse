@@ -48,7 +48,6 @@ import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
-import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
@@ -267,12 +266,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			}
 
 			EndpointReference toEPR = new EndpointReference(toBean.getValue());
-
-			String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(newSequenceId,
-					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-
-			if (anonymousURI.equals(toEPR.getAddress())) {
+			if (toEPR.hasAnonymousAddress()) {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");

@@ -19,7 +19,6 @@ package org.apache.sandesha2.polling;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
@@ -30,11 +29,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -50,6 +52,11 @@ public class PollingManager extends Thread {
 	private ConfigurationContext configurationContext = null;
 	private StorageManager storageManager = null;
 	private boolean poll = false;
+
+	// Variables used to help round-robin across the sequences that we can poll for 
+	private int rmsIndex = 0;
+	private int rmdIndex = 0;
+
 	/**
 	 * By adding an entry to this, the PollingManager will be asked to do a polling request on this sequence.
 	 */
@@ -62,8 +69,13 @@ public class PollingManager extends Thread {
 			Transaction t = null;
 			try {
 				t = storageManager.getTransaction();
-				internalRun();
+				pollRMDSide();
 				t.commit();
+
+				t = storageManager.getTransaction();
+				pollRMSSide();
+				t.commit();
+
 				t = null;
 			} catch (Exception e) {
 				if(log.isDebugEnabled()) log.debug("Exception", e);
@@ -84,50 +96,74 @@ public class PollingManager extends Thread {
 		}
 	}
 	
-	private void internalRun() throws AxisFault {
-		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
+	private void pollRMSSide() throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMSSide");
 		
+		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
+		RMSBean findRMS = new RMSBean();
+		findRMS.setPollingMode(true);
+		List results = rmsBeanManager.find(findRMS);
+		int size = results.size();
+		log.debug("Choosing one from " + size + " RMS sequences");
+		if(rmsIndex >= size) {
+			rmsIndex = 0;
+			if (size == 0) {
+				if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide, nothing to poll");
+				return;
+			}
+		}
+		RMSBean beanToPoll = (RMSBean) results.get(rmsIndex++);
+		pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey());
+
+		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide");
+	}
+
+	private void pollRMDSide() throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMDSide");
 		//geting the sequences to be polled.
 		//if shedule contains any requests, do the earliest one.
 		//else pick one randomly.
-		
+		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 		String sequenceId = getNextSheduleEntry ();
-		RMDBean nextMsgBean = null;
 
 		RMDBean findBean = new RMDBean();
 		findBean.setPollingMode(true);
 		findBean.setSequenceID(sequenceId); // Note that this may be null
 		List results = nextMsgMgr.find(findBean);
 		int size = results.size();
-		if (size>0) {
-			Random random = new Random ();
-			int item = random.nextInt(size);
-			nextMsgBean = (RMDBean) results.get(item);
-		}
 		
-		//If not valid entry is found, try again later.
-		if (nextMsgBean==null) {
-			if(log.isDebugEnabled()) log.debug("No polling requests queued");
-			return;
+		log.debug("Choosing one from " + size + " RMD sequences");
+		if(rmdIndex >= size) {
+			rmdIndex = 0;
+			if (size == 0) {
+				if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide, nothing to poll");
+				return;
+			}
 		}
-		sequenceId = nextMsgBean.getSequenceID();
-		
-		if(log.isDebugEnabled()) log.debug("Polling for sequence " + sequenceId);
+		RMDBean nextMsgBean = (RMDBean) results.get(rmdIndex++);
+		pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey());
+
+		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMDSide");
+	}
+
+	private void pollForSequence(String sequenceId, String sequencePropertyKey, String referenceMsgKey) throws SandeshaException, SandeshaStorageException, AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey);
 
 		//create a MakeConnection message  
-		String referenceMsgKey = nextMsgBean.getReferenceMessageKey();
-		
-		String sequencePropertyKey = sequenceId;
 		String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,storageManager);
 		String WSRMAnonReplyToURI = null;
-		if (SandeshaUtil.isWSRMAnonymousReplyTo(replyTo))
+		if (SandeshaUtil.isWSRMAnonymous(replyTo)) {
+			// If we are polling on a RM anon URI then we don't want to include the sequence id
+			// in the MakeConnection message.
+			sequenceId = null;
 			WSRMAnonReplyToURI = replyTo;
+		}
 		
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,configurationContext);
 		RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
-				sequenceId , WSRMAnonReplyToURI,storageManager);
+				sequenceId, WSRMAnonReplyToURI, storageManager);
 		
 		// Put our transaction onto the message context
 		makeConnectionRMMessage.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
@@ -159,7 +195,9 @@ public class PollingManager extends Thread {
 		
 		SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey);
 		
-		senderBeanMgr.insert(makeConnectionSenderBean);				
+		senderBeanMgr.insert(makeConnectionSenderBean);
+		
+		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollForSequence");
 	}
 	
 	private synchronized String getNextSheduleEntry () {
@@ -168,12 +206,11 @@ public class PollingManager extends Thread {
 		
 		if (sheduledPollingRequests.size()>0) {
 			sequenceId = (String) sheduledPollingRequests.keySet().iterator().next();
-			Integer sequencEntryCount = (Integer) sheduledPollingRequests.get(sequenceId);
+			Integer sequencEntryCount = (Integer) sheduledPollingRequests.remove(sequenceId);
 			
 			Integer leftCount = new Integer (sequencEntryCount.intValue() -1 );
-			if (leftCount.intValue()==0) 
-				sheduledPollingRequests.remove(sequenceId);
-			
+			if (leftCount.intValue() > 0) 
+				sheduledPollingRequests.put(sequenceId, leftCount);
 		}
 		
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::getNextSheduleEntry, " + sequenceId);

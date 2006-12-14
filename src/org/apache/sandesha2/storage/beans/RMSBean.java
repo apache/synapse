@@ -54,7 +54,11 @@ public class RMSBean extends RMBean {
 	private String securityTokenData;
 	
 
-//	private boolean pollingMode;
+	/**
+	 * Set to true if this RMS used a WS-RM anon replyTo, so that we can poll for messages
+	 * related to that URI.
+	 */
+	private boolean pollingMode;
 
 	
 	/**
@@ -124,6 +128,14 @@ public class RMSBean extends RMBean {
 		this.referenceMessageStoreKey = referenceMessageStoreKey;
 	}
 	
+	public boolean isPollingMode() {
+		return pollingMode;
+	}
+
+	public void setPollingMode(boolean pollingMode) {
+		this.pollingMode = pollingMode;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -133,6 +145,7 @@ public class RMSBean extends RMBean {
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		result.append("\nCreateSeq Msg Key: "); result.append(createSequenceMsgStoreKey);
 		result.append("\nReference Msg Key: "); result.append(referenceMessageStoreKey);
+		result.append("\nPolling          : "); result.append(pollingMode);
 		return result.toString();
 	}
 }

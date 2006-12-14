@@ -60,9 +60,10 @@ public interface Sandesha2Constants {
 	
 	public interface SPEC_2006_08 {
 		
-		String NS_URI = "http://docs.oasis-open.org/ws-rx/wsrm/200608";
-        String SEC_NS_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-		
+		String NS_URI               = "http://docs.oasis-open.org/ws-rx/wsrm/200608";
+		String ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsrm/200608/anonymous?id=";
+		String SEC_NS_URI           = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+
 		public interface Actions {
 			
 			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
@@ -551,8 +552,6 @@ public interface Sandesha2Constants {
 	String MODULE_CLASS_LOADER = "Sandesha2ModuleClassLoader";
 	
 	String SECURITY_MANAGER = "Sandesha2SecurityManager";
-	
-	String WSRM_ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsrm/200608/anonymous";
 	
 	String RM_IN_OUT_OPERATION_NAME = "RMInOutOperation";
 	

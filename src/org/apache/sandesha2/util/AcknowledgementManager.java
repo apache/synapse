@@ -87,7 +87,7 @@ public class AcknowledgementManager {
 				if(log.isDebugEnabled()) log.debug("Piggybacking ack for " + inboundSequenceId);
 				RMMsgCreator.addAckMessage(rmMessageContext, inboundSequenceId, inboundSequenceId, storageManager);
 			}
-			if(log.isDebugEnabled()) log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent, anon");
+			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
 			return;
 		}
 		

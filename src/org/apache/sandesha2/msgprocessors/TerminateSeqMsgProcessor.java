@@ -140,16 +140,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			
 			engine.send(outMessage);
 
-			String addressingNamespaceURI = SandeshaUtil
-					.getSequenceProperty(
-							sequencePropertyKey,
-							Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE,
-							storageManager);
-
-			String anonymousURI = SpecSpecificConstants
-					.getAddressingAnonymousURI(addressingNamespaceURI);
-
-			if (anonymousURI.equals(toEPR.getAddress())) {
+			if (toEPR.hasAnonymousAddress()) {
 				terminateSeqMsg.getOperationContext().setProperty(
 						org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {

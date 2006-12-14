@@ -296,13 +296,15 @@ public class SequenceProcessor {
 		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 		
-		boolean anonAck = ackRMMsgCtx.getTo().hasAnonymousAddress();
+		EndpointReference ackTo = ackRMMsgCtx.getTo();
 		EndpointReference replyTo = rmMsgCtx.getReplyTo();
+		boolean anonAck = ackTo == null || ackTo.hasAnonymousAddress();
+		boolean anonReply = replyTo == null || replyTo.hasAnonymousAddress();
 
 		// Only use the backchannel for ack messages if we are sure that the application
 		// doesn't need it. A 1-way MEP should be complete by now.
 		boolean complete = ackMsgCtx.getOperationContext().isComplete();
-		if (anonAck && !complete && (replyTo == null || replyTo.hasAnonymousAddress())) {
+		if (anonAck && anonReply && !complete) {
 			if (log.isDebugEnabled()) log.debug("Exit: SequenceProcessor::sendAckIfNeeded, avoiding using backchannel");
 			return;
 		}

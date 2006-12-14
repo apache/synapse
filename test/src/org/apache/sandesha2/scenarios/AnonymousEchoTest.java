@@ -17,6 +17,7 @@
 package org.apache.sandesha2.scenarios;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.Constants;
@@ -25,6 +26,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
@@ -50,21 +52,39 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		startServer(repoPath, axis2_xml);
 	}
 	
-	public void testSyncEcho () throws Exception {
+	public void testSyncEchoWithOffer() throws Exception {
+
+		Options clientOptions = new Options ();
+		String offeredSequenceID = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+		
+		runSyncEchoTest(clientOptions);
+		
+	}
+	
+	public void testSyncEchoWithRMAnon() throws Exception {
+
+		Options clientOptions = new Options ();
+		EndpointReference ref = new EndpointReference(
+				Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX +
+				SandeshaUtil.getUUID());
+		clientOptions.setReplyTo(ref);
+		runSyncEchoTest(clientOptions);
+		
+	}
+
+	public void runSyncEchoTest(Options clientOptions) throws Exception {
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = repoPath + File.separator + "client_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
-		Options clientOptions = new Options ();
 		clientOptions.setAction(echoAction);
 		clientOptions.setTo(new EndpointReference (to));
 		String sequenceKey = SandeshaUtil.getUUID();
-		String offeredSequenceID = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
@@ -93,7 +113,12 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 				assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, sequenceReport.getSequenceStatus());
 	
 				//assertions for the in sequence
-				sequenceReport = SandeshaClient.getIncomingSequenceReport(offeredSequenceID, configContext);
+				ArrayList reports = SandeshaClient.getIncomingSequenceReports(configContext);
+				assertEquals("Reports count", 1, reports.size());
+				
+				sequenceReport = (SequenceReport) reports.get(0);
+				String offer = (String) clientOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
+				if(offer != null) assertEquals("Offered id", offer, sequenceReport.getSequenceID());
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 				assertEquals(SequenceReport.SEQUENCE_DIRECTION_IN, sequenceReport.getSequenceDirection());
 				assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, sequenceReport.getSequenceStatus());
@@ -110,5 +135,4 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}
-	
 }

@@ -22,7 +22,6 @@ import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -131,6 +130,19 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(createSeqResponseRMMsgCtx);
 		
 		createSeqBean.setSequenceID(newOutSequenceId);
+
+		// We must poll for any reply-to that uses the anonymous URI. If it is a ws-a reply to then
+		// the create must include an offer (or this client cannot be identified). If the reply-to
+		// is the RM anon URI template then the offer is not required.
+		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
+			String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
+							Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
+			if(SandeshaUtil.isWSRMAnonymous(replyToAddress)) {
+				createSeqBean.setPollingMode(true);
+				SandeshaUtil.startPollingManager(configCtx);
+			}
+		}
+		
 		createSeqMgr.update(createSeqBean);
 
 		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
@@ -154,6 +166,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			sequencePropMgr.insert(newToken);
 		}
 
+		
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
 		if (accept != null) {
@@ -183,20 +196,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setNextMsgNoToProcess(1);
 			
 
-			boolean pollingMode = false;
-			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-				String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
-								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
-				if (replyToAddress!=null) {
-					if (AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(replyToAddress))
-						pollingMode = true;
-					else if (AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(replyToAddress))
-						pollingMode = true;
-					else if (replyToAddress.startsWith(Sandesha2Constants.WSRM_ANONYMOUS_URI_PREFIX))
-						pollingMode = true;
-				}
-			}
-			
 			//Storing the referenceMessage of the sending side sequence as the reference message
 			//of the receiving side as well.
 			//This can be used when creating new outgoing messages.
@@ -208,12 +207,19 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			storageManager.storeMessageContext(newMessageStoreKey,referenceMsg);
 			
 			rMDBean.setReferenceMessageKey(newMessageStoreKey);
-			
-			rMDBean.setPollingMode(pollingMode);
-			
-			//if PollingMode is true, starting the pollingmanager.
-			if (pollingMode)
-				SandeshaUtil.startPollingManager(configCtx);
+
+			// If this is an offered sequence that needs polling then we need to setup the
+			// rmdBean for polling too, so that it still gets serviced after the outbound
+			// sequence terminates.
+			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
+				String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
+								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
+				EndpointReference ref = new EndpointReference(replyToAddress);
+				if(!createSeqBean.isPollingMode() && ref.hasAnonymousAddress()) {
+					rMDBean.setPollingMode(true);
+					SandeshaUtil.startPollingManager(configCtx);
+				}
+			}
 			
 			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 			nextMsgMgr.insert(rMDBean);

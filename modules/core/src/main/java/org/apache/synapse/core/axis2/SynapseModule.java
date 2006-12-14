@@ -26,17 +26,20 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.MDC;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
-import org.apache.neethi.Assertion;
-import org.apache.neethi.Policy;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Iterator;
 
 /**
  * This is the Synapse Module implementation class, which would initialize Synapse when it is
@@ -45,15 +48,30 @@ import java.lang.reflect.InvocationTargetException;
 public class SynapseModule implements Module {
 
     private static final Log log = LogFactory.getLog(SynapseModule.class);
-
     private static final String SYNAPSE_SERVICE_NAME = "synapse";
     private static final QName MEDIATE_OPERATION_Q_NAME = new QName("mediate");
 
     public void init(ConfigurationContext configurationContext,
-                     AxisModule axisModule) throws AxisFault {
+        AxisModule axisModule) throws AxisFault {
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            if (addr != null) {
+                // Get IP Address
+                String ipAddr = addr.getHostAddress();
+                if (ipAddr != null)
+                    MDC.put("ip", ipAddr);
+
+                // Get hostname
+                String hostname = addr.getHostName();
+                MDC.put("host", hostname);
+            }
+
+        }
+        catch (UnknownHostException e) {
+            log.warn("Unable to report hostname or IP address for tracing", e);
+        }
 
         log.info("Deploying the Synapse service..");
-
         // Dynamically initialize the Synapse Service and deploy it into Axis2
         AxisConfiguration axisCfg = configurationContext.getAxisConfiguration();
         AxisService synapseService = new AxisService(SYNAPSE_SERVICE_NAME);
@@ -71,7 +89,7 @@ public class SynapseModule implements Module {
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
             proxy.buildAxisService(synCfg, axisCfg);
-            if(!proxy.isStartOnLoad()) {
+            if (!proxy.isStartOnLoad()) {
                 proxy.stop(synCfg);
             }
         }
@@ -80,7 +98,7 @@ public class SynapseModule implements Module {
     }
 
     private static SynapseConfiguration initializeSynapse(
-            ConfigurationContext cfgCtx) {
+        ConfigurationContext cfgCtx) {
 
         AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
 
@@ -96,21 +114,21 @@ public class SynapseModule implements Module {
 
         if (config != null) {
             log.info("System property '" + Constants.SYNAPSE_XML +
-                     "' specifies synapse configuration as " + config);
+                "' specifies synapse configuration as " + config);
             synapseConfiguration =
-                    SynapseConfigurationBuilder.getConfiguration(config);
+                SynapseConfigurationBuilder.getConfiguration(config);
         } else if (configParam != null) {
             log.info(
-                    "Synapse configuration is available via the " +
+                "Synapse configuration is available via the " +
                     "'SynapseConfiguration' parameter in axis2.xml");
             synapseConfiguration = SynapseConfigurationBuilder
-                    .getConfiguration(configParam.getValue().toString().trim());
+                .getConfiguration(configParam.getValue().toString().trim());
         } else {
             log.warn("System property '" + Constants.SYNAPSE_XML +
-                     "' is not specified or 'SynapseConfiguration' Parameter " +
-                     "is not available via axis2.xml.  Using default configuration..");
+                "' is not specified or 'SynapseConfiguration' Parameter " +
+                "is not available via axis2.xml.  Using default configuration..");
             synapseConfiguration =
-                    SynapseConfigurationBuilder.getDefaultConfiguration();
+                SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
@@ -127,8 +145,8 @@ public class SynapseModule implements Module {
             String clazz = (String) synEnvImpl.getValue();
             try {
                 Constructor constr = Class.forName(clazz).getDeclaredConstructor(
-                        new Class [] {ConfigurationContext.class});
-                synapseEnvParam.setValue(constr.newInstance(new Object[] {cfgCtx}));
+                    new Class[]{ConfigurationContext.class});
+                synapseEnvParam.setValue(constr.newInstance(new Object[]{cfgCtx}));
             } catch (ClassNotFoundException e) {
                 handleException("Cannot find Synapse environment implementation : " + clazz, e);
             } catch (NoSuchMethodException e) {
@@ -150,7 +168,7 @@ public class SynapseModule implements Module {
 
         } catch (AxisFault e) {
             String msg =
-                    "Could not set parameters '" + Constants.SYNAPSE_CONFIG +
+                "Could not set parameters '" + Constants.SYNAPSE_CONFIG +
                     "' and/or '" + Constants.SYNAPSE_ENV +
                     "'to the Axis2 configuration : " + e.getMessage();
             log.fatal(msg, e);
@@ -173,7 +191,7 @@ public class SynapseModule implements Module {
     }
 
     public void shutdown(ConfigurationContext configurationContext)
-            throws AxisFault {
+        throws AxisFault {
         // FixMe
     }
 

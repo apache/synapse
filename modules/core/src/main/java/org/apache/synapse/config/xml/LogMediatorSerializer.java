@@ -46,6 +46,7 @@ public class LogMediatorSerializer extends AbstractMediatorSerializer
 
         LogMediator mediator = (LogMediator) m;
         OMElement log = fac.createOMElement("log", synNS);
+        finalizeSerialization(log,mediator);
 
         if (mediator.getLogLevel() != LogMediator.SIMPLE) {
             log.addAttribute(fac.createOMAttribute(

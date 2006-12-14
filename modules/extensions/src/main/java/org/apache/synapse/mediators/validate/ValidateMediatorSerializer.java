@@ -51,6 +51,7 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
 
         ValidateMediator mediator = (ValidateMediator) m;
         OMElement validate = fac.createOMElement("validate", synNS);
+        finalizeSerialization(validate,mediator);
 
         if (mediator.getSource() != null) {
             validate.addAttribute(fac.createOMAttribute(

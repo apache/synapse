@@ -52,6 +52,7 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
         } else {
             handleException("Invalid XSLT mediator. XSLT registry key is required");
         }
+        finalizeSerialization(xslt,mediator);
 
         if (mediator.getSource() != null &&
             !XSLTMediator.DEFAULT_XPATH.toString().equals(mediator.getSource().toString())) {

@@ -39,7 +39,13 @@ public class RMMediatorFactory extends AbstractMediatorFactory  {
     public Mediator createMediator(OMElement elem) {
         log.info("RMMediatorFactory  :: createMediator()");
         //TODO: Fill properties if needed
-        return new RMMediator();
+        Mediator rmMediator = new RMMediator();
+
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(rmMediator,elem);
+
+        return rmMediator;
     }
 
     public QName getTagQName() {

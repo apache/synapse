@@ -54,6 +54,7 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer
         } else {
             handleException("Invalid mediator. Bean name required.");
         }
+        finalizeSerialization(spring,mediator);
 
         if (mediator.getConfigKey() != null) {
             spring.addAttribute(fac.createOMAttribute(

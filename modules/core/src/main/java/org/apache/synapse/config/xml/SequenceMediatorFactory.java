@@ -83,6 +83,9 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 throw new SynapseException(msg);
             }
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(seqMediator,elem);
 
         return seqMediator;
     }

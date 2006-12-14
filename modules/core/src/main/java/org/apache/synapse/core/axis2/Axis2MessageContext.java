@@ -56,6 +56,8 @@ public class Axis2MessageContext implements MessageContext {
 
     private boolean faultResponse = false;
 
+    private int tracingState = Constants.TRACING_UNSET;
+
     public SynapseConfiguration getConfiguration() {
         return cfg;
     }
@@ -163,11 +165,11 @@ public class Axis2MessageContext implements MessageContext {
         return axis2MessageContext.getWSAAction();
     }
 
-    public void setMessageId(String messageID) {
+    public void setWSAMessageID(String messageID) {
         axis2MessageContext.setWSAMessageId(messageID);
     }
 
-    public String getMessageId() {
+    public String getWSAMessageID() {
         return axis2MessageContext.getMessageID();
     }
 
@@ -222,6 +224,14 @@ public class Axis2MessageContext implements MessageContext {
 
     public boolean isFaultResponse() {
         return this.faultResponse;
+    }
+
+    public int getTracingState() {
+        return tracingState;
+    }
+
+    public void setTracingState(int tracingState) {
+        this.tracingState= tracingState;
     }
 
     public org.apache.axis2.context.MessageContext getAxis2MessageContext() {

@@ -62,6 +62,10 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
         } else if (key == null) {
             handleException("A 'key' attribute is required for a Spring mediator definition");
         } else {
+
+             // after successfully creating the mediator
+             // set its common attributes such as tracing etc
+            initMediator(sm,elem);
             sm.setBeanName(bean.getAttributeValue());
             sm.setConfigKey(key.getAttributeValue());
             return sm;

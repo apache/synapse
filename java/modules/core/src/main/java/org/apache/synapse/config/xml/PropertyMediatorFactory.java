@@ -76,6 +76,9 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory  {
                 throw new SynapseException(msg);
             }
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(propMediator,elem);
 
         return propMediator;
     }

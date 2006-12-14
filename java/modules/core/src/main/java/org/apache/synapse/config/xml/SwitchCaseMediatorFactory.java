@@ -55,6 +55,10 @@ public class SwitchCaseMediatorFactory extends AbstractListMediatorFactory {
             throw new SynapseException(msg);
         }
 
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(switchCaseMediator,elem);
+
         super.addChildren(elem, switchCaseMediator);
         return switchCaseMediator;
     }

@@ -145,6 +145,14 @@ public class TestMessageContext implements MessageContext {
     public void setSoapAction(String string) {
     }
 
+    public void setWSAMessageID(String messageID) {
+        //Todo
+    }
+
+    public String getWSAMessageID() {
+        return null;  //Todo
+    }
+
     public void setMessageId(String messageID) {
     }
 
@@ -189,6 +197,13 @@ public class TestMessageContext implements MessageContext {
 
     public boolean isFaultResponse() {
         return false;
+    }
+
+    public int getTracingState() {
+        return 0;
+    }
+
+    public void setTracingState(int tracingState) {
     }
 
     public MessageContext getSynapseContext() {

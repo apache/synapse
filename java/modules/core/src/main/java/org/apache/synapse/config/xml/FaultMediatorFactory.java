@@ -153,6 +153,10 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
             throw new SynapseException(msg);
         }
 
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(faultMediator,elem);
+
         OMElement node = elem.getFirstChildWithName(NODE_Q);
         if (node != null && node.getText() != null) {
             try {

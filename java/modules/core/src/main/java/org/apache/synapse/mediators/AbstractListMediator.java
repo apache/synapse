@@ -21,8 +21,8 @@ package org.apache.synapse.mediators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,14 +40,19 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
     protected List mediators = new ArrayList();
 
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Implicit Sequence <" + getType() + "> :: mediate()");
-
-        Iterator it = mediators.iterator();
-        while (it.hasNext()) {
-            Mediator m = (Mediator) it.next();
-            if (!m.mediate(synCtx)) {
-                return false;
+        try {
+            log.debug("Implicit Sequence <" + getType() + "> :: mediate()");
+            saveAndSetTraceState(synCtx);
+            Iterator it = mediators.iterator();            
+            while (it.hasNext()) {
+                Mediator m = (Mediator) it.next();
+                if (!m.mediate(synCtx)) {
+                    return false;
+                }
             }
+        }
+        finally {
+            restoreTracingState(synCtx);
         }
         return true;
     }

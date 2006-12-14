@@ -41,6 +41,9 @@ public class SwitchCaseDefaultMediatorFactory extends AbstractListMediatorFactor
 
         SwitchCaseMediator switchCaseMediator = new SwitchCaseMediator();
         switchCaseMediator.setDefaultCase(true);
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(switchCaseMediator,elem);
         super.addChildren(elem, switchCaseMediator);
         return switchCaseMediator;
     }

@@ -52,6 +52,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
 
         SequenceMediator mediator = (SequenceMediator) m;
         OMElement sequence = fac.createOMElement("sequence", synNS);
+        finalizeSerialization(sequence,mediator);
 
         if (mediator.getRef() != null) {
             sequence.addAttribute(fac.createOMAttribute(

@@ -54,6 +54,7 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer
 
         FaultMediator mediator = (FaultMediator) m;
         OMElement fault = fac.createOMElement("makefault", synNS);
+        finalizeSerialization(fault,mediator);
 
         if(mediator.getSoapVersion()==FaultMediator.SOAP11) {
            fault.addAttribute(fac.createOMAttribute(

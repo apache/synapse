@@ -87,6 +87,10 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
 
         SendMediator sm =  new SendMediator();
 
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(sm,elem);
+
         Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
         while (iter.hasNext()) {
 

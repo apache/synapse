@@ -38,4 +38,12 @@ public interface Constants {
     public static final String NULL_NAMESPACE    = "";
     public static final String RAMPART_POLICY    = "rampartPolicy";
     public static final String SANDESHA_POLICY   = "sandeshaPolicy";
+
+    /** The trace local name */
+    public static final String TRACE_ATTRIB_NAME ="trace";
+    /** The Trace value 'enable' */
+    public static final String TRACE_ENABLE ="enable";
+    /** The Trace value 'disable' */
+    public static final  String TRACE_DISABLE ="disable";
+
 }

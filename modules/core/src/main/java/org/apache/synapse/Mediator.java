@@ -44,4 +44,16 @@ public interface Mediator {
      * @return a String representation of the mediator type
      */
     public String getType();
+
+    /**
+     * This is used to check whether the tracing should be enabled on the current mediator or not
+     * @return value that indicate whether tracing is on, off or unset
+     */
+    public int getTraceState();
+
+    /**
+     * This is used to set the value of tracing enable variable
+     * @param traceState Set whether the tracing is enabled or not
+     */
+    public void setTraceState(int traceState);
 }

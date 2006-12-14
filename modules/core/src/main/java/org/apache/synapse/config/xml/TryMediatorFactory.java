@@ -98,6 +98,9 @@ public class TryMediatorFactory extends AbstractListMediatorFactory {
                 }
             }
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(tryMediator,elem);
 
         return tryMediator;
     }

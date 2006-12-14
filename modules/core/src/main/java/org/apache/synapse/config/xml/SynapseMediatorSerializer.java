@@ -46,6 +46,8 @@ public class SynapseMediatorSerializer extends AbstractListMediatorSerializer
 
         SynapseMediator mediator = (SynapseMediator) m;
         OMElement rules = fac.createOMElement("rules", synNS);
+        finalizeSerialization(rules,mediator);
+
         super.serializeChildren(rules, mediator.getList());
 
         if (parent != null) {

@@ -76,6 +76,9 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory  {
                 throw new SynapseException(msg);
             }
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(switchMediator,elem);
 
         Iterator iter = elem.getChildrenWithName(CASE_Q);
         while (iter.hasNext()) {

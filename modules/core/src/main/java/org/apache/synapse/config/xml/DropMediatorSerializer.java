@@ -39,6 +39,7 @@ public class DropMediatorSerializer extends AbstractMediatorSerializer
 
         DropMediator mediator = (DropMediator) m;
         OMElement drop = fac.createOMElement("drop", synNS);
+        finalizeSerialization(drop,mediator);
 
         if (parent != null) {
             parent.addChild(drop);

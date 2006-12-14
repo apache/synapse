@@ -44,6 +44,8 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer
 
         PropertyMediator mediator = (PropertyMediator) m;
         OMElement property = fac.createOMElement("set-property", synNS);
+        finalizeSerialization(property,mediator);
+
         if (mediator.getName() != null) {
             property.addAttribute(fac.createOMAttribute(
                 "name", nullNS, mediator.getName()));

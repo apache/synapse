@@ -21,13 +21,14 @@ package org.apache.synapse.mediators.ext;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
  * Since the class mediator always "instantiates" a new instance of a class
  * use a static member variable just to test this.. This class is not nice.. :-)
  * but does what is expected... :-(
  */
-public class ClassMediatorTestMediator implements Mediator {
+public class ClassMediatorTestMediator extends AbstractMediator {
 
     public static boolean invoked = false;
 

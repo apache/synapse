@@ -24,10 +24,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.mediators.MediatorProperty;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.MediatorProperty;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,6 +39,28 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
     protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
     protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
     private static final Log log = LogFactory.getLog(AbstractMediatorSerializer.class);
+
+    /**
+     * Perform common functions and finalize the mediator serialization.
+     * i.e. process any common attributes
+     *
+     * @param mediatorOmElement the OMElement being created
+     * @param mediator          the Mediator instance being serialized
+     */
+    public void finalizeSerialization(OMElement mediatorOmElement, Mediator mediator) {
+        int traceState = mediator.getTraceState();
+        String traceValue = null;
+        if (traceState == org.apache.synapse.Constants.TRACING_ON) {
+            traceValue = Constants.TRACE_ENABLE;
+        } else if (traceState == org.apache.synapse.Constants.TRACING_OFF) {
+            traceValue = Constants.TRACE_DISABLE;
+        }
+        if (traceValue != null) {
+            mediatorOmElement.addAttribute(fac.createOMAttribute(
+                Constants.TRACE_ATTRIB_NAME, nullNS, traceValue));
+        }
+
+    }
 
     public void serializeMediatorProperties(OMElement parent, Collection props) {
 

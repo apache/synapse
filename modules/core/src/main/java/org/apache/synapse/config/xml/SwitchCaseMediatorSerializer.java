@@ -44,6 +44,7 @@ public class SwitchCaseMediatorSerializer extends AbstractListMediatorSerializer
         } else {
             caseElem = fac.createOMElement("case", synNS);
         }
+        finalizeSerialization(caseElem,mediator);
 
         if (!mediator.isDefaultCase()) {
             if (mediator.getRegex() != null) {

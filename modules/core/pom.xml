@@ -58,7 +58,7 @@
                                     <version>${addressing.version}</version>
                                     <type>mar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>target/lib</outputDirectory>
+                                    <outputDirectory>target/test_repos/synapse/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -110,31 +110,6 @@
                                 <copy file="target/synapse-incubating-${version}.mar"
                                     tofile="target/test_repos/synapse/modules/synapse-incubating-${version}.mar"/>
 
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-
-                    <execution>
-                        <id>populate_repo</id>
-                        <phase>process-test-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <echo message="*** Populating the testing repository ***"/>
-
-                                <!--<copy todir="target/test_repos/client/modules">-->
-                                    <!--<fileset dir="target/lib">-->
-                                        <!--<include name="**/addressing*.mar"/>-->
-                                    <!--</fileset>-->
-                                <!--</copy>-->
-
-                                <copy todir="target/test_repos/synapse/modules">
-                                    <fileset dir="target/lib">
-                                        <include name="**/*.mar"/>
-                                    </fileset>
-                                </copy>
                             </tasks>
                         </configuration>
                         <goals>

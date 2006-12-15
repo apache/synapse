@@ -48,9 +48,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisDescription;
@@ -63,6 +61,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler;
 import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -615,7 +614,7 @@ public class SandeshaUtil {
 			OperationContext referenceOpCtx = referenceMessage.getOperationContext();
 			MessageContext referenceRequestMessage = null;
 			if (referenceOpCtx!=null) 
-				referenceRequestMessage=referenceOpCtx.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+				referenceRequestMessage=referenceOpCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 			
 			if (propertiesFromRefReqMsg!=null && referenceRequestMessage!=null) {
 				String value = (String) propertiesFromRefReqMsg.getValue();
@@ -657,15 +656,15 @@ public class SandeshaUtil {
 	}
 
 	private static void copyNecessaryPropertiesFromRelatedContext(MessageContext fromMessage, MessageContext toMessage) throws SandeshaException {
-		toMessage.setProperty(MessageContextConstants.TRANSPORT_URL, fromMessage
-				.getProperty(MessageContextConstants.TRANSPORT_URL));
+		toMessage.setProperty(Constants.Configuration.TRANSPORT_URL, fromMessage
+				.getProperty(Constants.Configuration.TRANSPORT_URL));
 		
 		String addressingVersion = (String) fromMessage.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
 		if (addressingVersion==null) {
 			OperationContext opCtx = fromMessage.getOperationContext();
 			if (opCtx!=null) {
 				try {
-					MessageContext requestMsg = opCtx.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					MessageContext requestMsg = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 					if (requestMsg!=null)
 						addressingVersion = (String) requestMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
 				} catch (AxisFault e) {
@@ -714,7 +713,7 @@ public class SandeshaUtil {
 		return retArr;
 	}
 
-	public static ArrayList getArrayListFromMsgsString(String str) throws SandeshaException {
+	public static ArrayList getArrayListFromMsgsString(String str) {
 
 		if (str == null || "".equals(str))
 			return new ArrayList();
@@ -1043,8 +1042,6 @@ public class SandeshaUtil {
 		
 		String sequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
 		String internalSequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
-		
-		
 
 		int type = rmMsgContext.getMessageType();
 		int flow = rmMsgContext.getMessageContext().getFLOW();
@@ -1054,7 +1051,8 @@ public class SandeshaUtil {
 				propertyKey = sequenceId;
 			else
 				propertyKey = internalSequenceId;
-		} else if (flow==MessageContext.IN_FLOW) {
+		} else if (flow==MessageContext.IN_FLOW || 
+							 flow==MessageContext.IN_FAULT_FLOW) {
 			if (isSequenceResponseMessageType(type))
 				propertyKey = internalSequenceId;
 			else
@@ -1225,7 +1223,7 @@ public class SandeshaUtil {
 		return pollingManager;
 	}
 	
-	public static void shedulePollingRequest (String sequenceId, ConfigurationContext configurationContext) throws SandeshaException { 
+	public static void shedulePollingRequest (String sequenceId, ConfigurationContext configurationContext) { 
 		PollingManager pollingManager = getPollingManager(configurationContext);
 		pollingManager.shedulePollingRequest(sequenceId);
 	}

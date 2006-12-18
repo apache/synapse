@@ -99,5 +99,10 @@ echo " Using JAVA_HOME:   $JAVA_HOME"
 echo " Using AXIS2 Repository :   $AXIS2_HOME/repository"
 echo " Using AXIS2 Configuration :   $AXIS2_HOME/repository/conf/axis2.xml"
 
-java -classpath $AXIS2_CLASSPATH org.apache.axis2.transport.SimpleAxis2Server \
--repo $AXIS2_HOME/repository -conf $AXIS2_HOME/repository/conf/axis2.xml $*
+PORT="-Dport=9000"
+if [ "$1" == "-port" ]; then
+  PORT="-Dport=$2"
+fi
+
+java $PORT -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
+-repo $AXIS2_HOME/repository -conf $AXIS2_HOME/repository/conf/axis2.xml

@@ -57,7 +57,7 @@
                                     <artifactId>addressing</artifactId>
                                     <version>${addressing.version}</version>
                                     <type>mar</type>
-                                    <overWrite>false</overWrite>
+                                    <overWrite>true</overWrite>
                                     <outputDirectory>target/test_repos/synapse/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>

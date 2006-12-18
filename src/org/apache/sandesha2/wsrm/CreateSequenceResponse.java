@@ -115,7 +115,6 @@ public class CreateSequenceResponse implements IOMRMPart {
 		OMFactory factory = bodyElement.getOMFactory();
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-		OMNamespace addressingNamespace = factory.createOMNamespace(addressingNamespaceValue,Sandesha2Constants.WSA.NS_PREFIX_ADDRESSING);
 		
 		OMElement createSequenceResponseElement = factory.createOMElement(
 				Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE,

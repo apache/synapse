@@ -34,8 +34,6 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
  */
 public class AckNone implements IOMRMElement {
 
-	private OMNamespace rmNamespace = null;
-	
 	private String namespaceValue = null;
 	
 	public AckNone(String namespaceValue) throws SandeshaException {

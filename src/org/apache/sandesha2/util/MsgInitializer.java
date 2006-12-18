@@ -21,17 +21,10 @@ import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
@@ -177,11 +170,6 @@ public class MsgInitializer {
 	 * @throws SandeshaException
 	 */
 	private static boolean validateMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
-
-		ConfigurationContext configContext = rmMsgCtx.getMessageContext().getConfigurationContext();
-		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, axisConfiguration);
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 
 		String sequenceID = null;
 

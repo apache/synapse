@@ -55,7 +55,7 @@ public class UsesSequenceSTR implements IOMRMPart {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement header) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement header) throws OMException {
 
 		OMFactory factory = header.getOMFactory();
 		if (factory==null)
@@ -64,7 +64,7 @@ public class UsesSequenceSTR implements IOMRMPart {
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement header) throws OMException,SandeshaException {
+	public OMElement toOMElement(OMElement header) throws OMException {
 
 		if (header == null || !(header instanceof SOAPHeader))
 			throw new OMException();
@@ -90,7 +90,7 @@ public class UsesSequenceSTR implements IOMRMPart {
 		return header;
 	}
 
-	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
 
 		if (header==null) {

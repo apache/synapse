@@ -20,8 +20,6 @@ package org.apache.sandesha2.storage.inmemory;
 import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -30,8 +28,6 @@ import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMBean;
 
 public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBeanMgr {
-	
-	private static final Log log = LogFactory.getLog(InMemoryInvokerBeanMgr.class);
 
 	public InMemoryInvokerBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.STORAGE_MAP);

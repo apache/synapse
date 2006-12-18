@@ -21,7 +21,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;

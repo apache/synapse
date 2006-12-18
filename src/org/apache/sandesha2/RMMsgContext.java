@@ -31,9 +31,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
-import org.apache.sandesha2.wsrm.IOMRMElement;
 import org.apache.sandesha2.wsrm.IOMRMPart;
-import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * This class is used to hold a MessageContext within Sandesha. This is used to

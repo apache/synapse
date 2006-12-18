@@ -18,9 +18,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -196,7 +196,7 @@ public class SequenceManager {
 			OperationContext opCtx = firstAplicationMsgCtx.getOperationContext();
 			if (opCtx != null) {
 				try {
-					MessageContext requestMsg = opCtx.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					MessageContext requestMsg = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 					if (requestMsg != null)
 						addressingNamespace = (String) requestMsg
 								.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
@@ -252,7 +252,7 @@ public class SequenceManager {
 			OperationContext opContext = firstAplicationMsgCtx.getOperationContext();
 			try {
 				MessageContext requestMessage = opContext
-						.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+						.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 				if (requestMessage == null) {
 					String message = SandeshaMessageHelper
 							.getMessage(SandeshaMessageKeys.cannotFindReqMsgFromOpContext);

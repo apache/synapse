@@ -61,8 +61,6 @@ public class Identifier implements Sandesha2Constants, IOMRMElement {
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		
-		OMFactory factory = element.getOMFactory();
-		
 		OMElement identifierPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
 		if (identifierPart == null)

@@ -33,8 +33,6 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.client.async.AsyncResult;
-import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
@@ -339,8 +337,7 @@ public class SandeshaClient {
 		// setting a new squenceKey if not already set.
 		String oldSequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 
-		if (sequenceKey != null)
-		  options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
+	  options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, sequenceKey);
 
 		String rmSpecVersion = (String) options.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
 
@@ -1056,23 +1053,6 @@ public class SandeshaClient {
 		throw new SandeshaException(SandeshaMessageHelper.getMessage(
 				SandeshaMessageKeys.cannotFindSequence, sequenceID
 				));
-	}
-
-	private class DummyCallback extends Callback {
-
-		public void onComplete(AsyncResult result) {
-			// TODO Auto-generated method stub
-			System.out.println(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.dummyCallback));
-		}
-
-		public void onError(Exception e) {
-			// TODO Auto-generated method stub
-			System.out.println(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.dummyCallbackError));
-
-		}
-
 	}
 
 	public static SequenceReport getIncomingSequenceReport(String sequenceID, ConfigurationContext configCtx)

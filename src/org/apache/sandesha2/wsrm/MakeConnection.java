@@ -29,7 +29,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.util.SandeshaUtil;
 
 public class MakeConnection implements IOMRMPart {
 
@@ -48,7 +47,7 @@ public class MakeConnection implements IOMRMPart {
 		this.namespaceValue = namespaceValue;
 	}
 
-	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPBody body = envelope.getBody();
 		
 		//detach if already exist.
@@ -97,7 +96,7 @@ public class MakeConnection implements IOMRMPart {
 		return false;
 	}
 
-	public OMElement toOMElement(OMElement body) throws OMException, SandeshaException {
+	public OMElement toOMElement(OMElement body) throws OMException {
 
 		if (body == null || !(body instanceof SOAPBody)) {
 			String message = "MakeConnection element can only be added to a SOAP Body ";
@@ -105,10 +104,10 @@ public class MakeConnection implements IOMRMPart {
 					SandeshaMessageHelper.getMessage(message));
 		}
 
-		if (identifier==null && address==null) {
+	/*	if (identifier==null && address==null) {
 			String message = "Invalid MakeConnection object. Both Identifier and Address are null";
 		}
-		
+		*/
 		OMFactory factory = body.getOMFactory();
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 

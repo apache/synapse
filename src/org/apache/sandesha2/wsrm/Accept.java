@@ -58,8 +58,6 @@ public class Accept implements IOMRMElement {
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException,AxisFault {
-
-		OMFactory factory = element.getOMFactory();
 		
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
 				rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.ACCEPT));

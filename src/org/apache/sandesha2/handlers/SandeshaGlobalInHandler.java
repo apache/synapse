@@ -22,10 +22,6 @@ import java.util.Iterator;
 
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFault;
-import org.apache.axiom.soap.SOAPFaultCode;
-import org.apache.axiom.soap.SOAPFaultSubCode;
-import org.apache.axiom.soap.SOAPFaultValue;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
@@ -44,7 +40,6 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
-import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -324,12 +319,4 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 	public String getName() {
 		return Sandesha2Constants.GLOBAL_IN_HANDLER_NAME;
 	}
-
-	private AxisFault getAxisFaultFromFromSOAPFault(SOAPFault faultPart) {
-		AxisFault axisFault = new AxisFault(faultPart.getCode(), faultPart.getReason(), faultPart.getNode(), faultPart
-				.getRole(), faultPart.getDetail());
-
-		return axisFault;
-	}
-
 }

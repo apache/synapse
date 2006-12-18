@@ -27,8 +27,6 @@ import java.util.Properties;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -43,8 +41,6 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
  */
 
 public class PropertyManager {
-
-	private static final Log log = LogFactory.getLog(PropertyManager.class);
 
 	public static SandeshaPolicyBean loadPropertiesFromDefaultValues() throws SandeshaException {
 		SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();

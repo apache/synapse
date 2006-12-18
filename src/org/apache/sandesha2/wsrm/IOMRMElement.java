@@ -21,7 +21,6 @@ package org.apache.sandesha2.wsrm;
  * This is the base interface for all RM infoset objects.
  */
 
-import org.apache.sandesha2.SandeshaException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 

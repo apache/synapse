@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.axis2.context.AbstractContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
@@ -31,8 +29,6 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMBean;
 
 public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
-
-	private static final Log log = LogFactory.getLog(InMemoryRMDBeanMgr.class);
 
 	public InMemoryRMDBeanMgr(InMemoryStorageManager mgr, AbstractContext context) {
 		super(mgr, context, Sandesha2Constants.BeanMAPs.NEXT_MESSAGE);

@@ -50,8 +50,6 @@ public class AckFinal implements IOMRMElement {
 
 	public Object fromOMElement(OMElement element) throws OMException {
 		
-		OMFactory factory = element.getOMFactory();
-		
 		OMElement finalPart = element.getFirstChildWithName(new QName(
 				namespaceValue, Sandesha2Constants.WSRM_COMMON.FINAL));
 		if (finalPart == null)

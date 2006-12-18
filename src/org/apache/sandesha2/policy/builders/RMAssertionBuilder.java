@@ -16,7 +16,6 @@
 package org.apache.sandesha2.policy.builders;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 

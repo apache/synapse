@@ -113,7 +113,7 @@ public class RangeString {
 		Collections.sort(sortedList);
 		String returnString = "";
 		for(int i=0; i<sortedList.size(); i++){
-			returnString = returnString + (rangeMap.get((Long)sortedList.get(i))).toString();
+			returnString = returnString + (rangeMap.get(sortedList.get(i))).toString();
 		}
 		
 		return returnString;
@@ -132,7 +132,7 @@ public class RangeString {
 		Collections.sort(sortedList);
 		String returnString = "[";
 		for(int i=0; i<sortedList.size(); i++){
-			Range r = (Range)rangeMap.get((Long)sortedList.get(i));
+			Range r = (Range)rangeMap.get(sortedList.get(i));
 			for(long l=r.lowerValue; l<=r.upperValue;l++){
 				if(i==0 && l==r.lowerValue){
 					//first time does not need leading ','

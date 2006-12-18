@@ -47,7 +47,7 @@ public class MessagePending implements IOMRMPart {
 		this.namespaceValue = namespaceValue;
 	}
 	
-	public void toSOAPEnvelope(SOAPEnvelope envelope) throws SandeshaException {
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
 		SOAPHeader header = envelope.getHeader();
 		
 		if (header==null) {
@@ -90,8 +90,7 @@ public class MessagePending implements IOMRMPart {
 		return messagePendingElement;
 	}
 
-	public OMElement toOMElement(OMElement headerElement) throws OMException,
-			SandeshaException {
+	public OMElement toOMElement(OMElement headerElement) throws OMException {
 		if (!(headerElement instanceof SOAPHeader)) {
 			String message = "'MessagePending' element can only be added to a SOAP Header";
 			throw new OMException(message);

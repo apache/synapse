@@ -109,6 +109,15 @@ if [ "$1" == "-sample" ]; then
 SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
 fi
 
+if [ "$3" == "-sample" ]; then
+SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$4.xml
+fi
+
+PORT="-Dport=8080"
+if [ "$1" == "-port" ]; then
+  PORT="-Dport=$2"
+fi
+
 # ----- Execute The Requested Command -----------------------------------------
 
 cd $SYNAPSE_HOME
@@ -117,4 +126,4 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseHTTPServer $SYNAPSE_HOME/repository
+$JAVA_HOME/bin/java $PORT $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseHTTPServer $SYNAPSE_HOME/repository

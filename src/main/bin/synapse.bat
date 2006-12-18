@@ -29,22 +29,24 @@ set DEFAULT_SYNAPSE_HOME=
 set _USE_CLASSPATH=yes
 set _SYNAPSE_XML=
 set _XDEBUG=
+set _PORT=
 
 rem Slurp the command line arguments. This loop allows for an unlimited number
 rem of arguments (up to the command line limit, anyway).
+
+:setupArgs
+if ""%1""=="""" goto doneStart
 if ""%1""==""-sample"" goto synapseSample
+if ""%1""==""-noclasspath"" goto clearclasspath
+if ""%1""==""-xdebug"" goto xdebug
+if ""%1""==""-port"" goto port
+set SYNAPSE_CMD_LINE_ARGS=%SYNAPSE_CMD_LINE_ARGS% %1
+shift
+goto setupArgs
 
 set SYNAPSE_CMD_LINE_ARGS=%1
 if ""%1""=="""" goto doneStart
 shift
-
-:setupArgs
-if ""%1""=="""" goto doneStart
-if ""%1""==""-noclasspath"" goto clearclasspath
-if ""%1""==""-xdebug"" goto xdebug
-set SYNAPSE_CMD_LINE_ARGS=%SYNAPSE_CMD_LINE_ARGS% %1
-shift
-goto setupArgs
 
 rem here is there is a -noclasspath in the options
 :clearclasspath
@@ -52,11 +54,19 @@ set _USE_CLASSPATH=no
 shift
 goto setupArgs
 
-rem here is there is a -xdebug in the options
+rem is there is a -xdebug in the options
 :xdebug
 set _XDEBUG=-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000
 shift
 goto setupArgs
+
+rem is a custom port specified
+:port
+shift
+set _PORT="-Dport=%1"
+shift
+goto setupArgs
+
 
 rem This label provides a place for the argument list loop to break out
 rem and for NT handling to skip to.
@@ -105,9 +115,9 @@ if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\reposit
 
 set SYNAPSE_ENDORSED="%SYNAPSE_HOME%\lib\endorsed";"%JAVA_ENDORSED_DIRS%";"%JAVA_HOME%\lib\endorsed"
 
-@echo on
+@rem @echo on
 cd %SYNAPSE_HOME%
-"%_JAVACMD%" %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseHTTPServer %SYNAPSE_CMD_LINE_ARGS%
+"%_JAVACMD%" %_PORT% %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseHTTPServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 
 :end

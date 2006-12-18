@@ -47,13 +47,24 @@ goto end
 
 :checkJava
 set _JAVACMD=%JAVACMD%
+set _PORT=
 
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java.exe
-if  "%AXIS2_CMD_LINE_ARGS%" == "" goto defaultParams
 
-goto runAxis2
+:setupArgs
+if ""%1""=="""" goto defaultParams
+if ""%1""==""-port"" goto port
+shift
+goto setupArgs
+
+rem is a custom port specified
+:port
+shift
+set _PORT="-Dport=%1"
+shift
+goto setupArgs
 
 :defaultParams
 set AXIS2_CMD_LINE_ARGS=-repo "%AXIS2_HOME%\repository" -conf "%AXIS2_HOME%\repository\conf\axis2.xml"
@@ -75,7 +86,7 @@ echo Using JAVA_HOME    %JAVA_HOME%
 echo Using AXIS2_HOME   %AXIS2_HOME%
 
 cd %AXIS2_HOME%
-"%_JAVACMD%" %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" org.apache.axis2.transport.SimpleAxis2Server %AXIS2_CMD_LINE_ARGS%
+"%_JAVACMD%" %_PORT% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" samples.util.SampleAxis2Server %AXIS2_CMD_LINE_ARGS%
 goto end
 
 :end

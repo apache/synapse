@@ -24,6 +24,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import java.io.File;
@@ -35,6 +37,8 @@ import java.net.Socket;
  * Starts all transports as specified on the axis2.xml
  */
 public class SynapseHTTPServer {
+
+    private static final Log log = LogFactory.getLog(SynapseHTTPServer.class);
 
     public static void printUsage() {
         System.out.println("Usage: SynapseHTTPServer <repository>");
@@ -93,7 +97,22 @@ public class SynapseHTTPServer {
 
         if (trsIn != null) {
 
-            int port = Integer.parseInt(trsIn.getParameter("port").getValue().toString());
+            int port = 8080;
+
+            String strPort = System.getProperty("port");
+            if(strPort != null) {
+                // port is specified as a VM parameter
+                try {
+                    port = new Integer(strPort).intValue();
+                } catch (NumberFormatException e) {
+                    // user supplied parameter is not a valid integer. so use the port in configuration.
+                    log.error("Given port is not a valid integer. Port specified in the configuration is used for the server.");
+                    port = Integer.parseInt(trsIn.getParameter("port").getValue().toString());
+                }
+
+            } else {
+                port = Integer.parseInt(trsIn.getParameter("port").getValue().toString());
+            }
 
             while (true) {
                 ServerSocket sock = null;

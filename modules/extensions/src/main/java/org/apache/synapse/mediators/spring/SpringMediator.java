@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.config.Util;
 import org.apache.synapse.config.Property;
@@ -43,6 +44,7 @@ import org.springframework.core.io.InputStreamResource;
 public class SpringMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SpringMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
      * The Spring bean ref to be used
@@ -59,6 +61,10 @@ public class SpringMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Spring mediator");
+        }
         Property dp = synCtx.getConfiguration().getPropertyObject(configKey);
 
         // if the configKey refers to a dynamic property
@@ -78,16 +84,24 @@ public class SpringMediator extends AbstractMediator {
             Object o = appContext.getBean(beanName);    
             if (o != null && Mediator.class.isAssignableFrom(o.getClass())) {
                 Mediator m = (Mediator) o;
+                if (shouldTrace) {
+                    trace.trace("Loaded mediator from bean : " + beanName + " executing...");
+                }
                 return m.mediate(synCtx);
 
             } else {
+                if (shouldTrace) {
+                    trace.trace("Unable to load mediator from bean : " + beanName);
+                }
                 handleException("Could not load bean named : " + beanName +
                     " from the Spring configuration with key : " + configKey);
             }
         } else {
             handleException("Cannot reference Spring application context with key : " + configKey);
         }
-
+        if (shouldTrace) {
+            trace.trace("End : Spring mediator");
+        }
         return true;
     }
 

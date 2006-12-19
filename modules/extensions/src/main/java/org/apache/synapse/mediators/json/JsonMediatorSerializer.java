@@ -56,7 +56,7 @@ public class JsonMediatorSerializer extends AbstractMediatorSerializer
         } else {
             handleException("Invalid mediator. Direction is required");
         }
-
+        finalizeSerialization(json,mediator);
         if (parent != null) {
             parent.addChild(json);
         }

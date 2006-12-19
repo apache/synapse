@@ -137,7 +137,17 @@ public class ProxyServiceSerializer {
         if (service.isWsSecEnabled()) {
             proxy.addChild(fac.createOMElement("enableSec", synNS));
         }
-
+        int traceState = service.getTraceState();
+        String traceValue = null;
+        if (traceState == org.apache.synapse.Constants.TRACING_ON) {
+            traceValue = Constants.TRACE_ENABLE;
+        } else if (traceState == org.apache.synapse.Constants.TRACING_OFF) {
+            traceValue = Constants.TRACE_DISABLE;
+        }
+        if (traceValue != null) {
+            proxy.addAttribute(fac.createOMAttribute(
+                    Constants.TRACE_ATTRIB_NAME, nullNS, traceValue));
+        }
         if (parent != null) {
             parent.addChild(proxy);
         }

@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
@@ -33,6 +34,7 @@ import javax.xml.namespace.QName;
 public class JsonMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(JsonMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     private String direction;
 
@@ -40,7 +42,10 @@ public class JsonMediator extends AbstractMediator {
     private static final String XJT = "XTJ";
 
     public boolean mediate(MessageContext synMsgCtx) {
-
+        boolean shouldTrace = shouldTrace(synMsgCtx.getTracingState());
+        if(shouldTrace) {
+            trace.trace("Start : Json mediator ");
+        }
         if (direction.equalsIgnoreCase(JTX)) {
             // Json_To_Xml
 
@@ -48,10 +53,17 @@ public class JsonMediator extends AbstractMediator {
             // Xml_To_Json
             org.apache.axis2.context.MessageContext mc =
                     ((Axis2MessageContext) synMsgCtx).getAxis2MessageContext();
+            String xmlEnvelope =synMsgCtx.getEnvelope().toString();
+            if (shouldTrace) {
+                trace.trace("XML Envelope : " + xmlEnvelope);
+            }
             JSONObject xmlToJSonObj = null;
             try {
                 xmlToJSonObj =
-                        XML.toJSONObject(synMsgCtx.getEnvelope().toString());
+                        XML.toJSONObject(xmlEnvelope);
+                if (shouldTrace) {
+                    trace.trace("Json Object  : " + xmlToJSonObj.toString());
+                }
             } catch (JSONException e) {
                 log.error(e);
                 handleException(
@@ -78,8 +90,10 @@ public class JsonMediator extends AbstractMediator {
                     "'direction' contain a signal other than JTX or XJT");
         }
 
-
-        return true;  //To change body of implemented methods use File | Settings | File Templates.
+        if(shouldTrace) {
+            trace.trace("End : Json mediator ");
+        }
+        return true;
     }
 
     public String getType() {

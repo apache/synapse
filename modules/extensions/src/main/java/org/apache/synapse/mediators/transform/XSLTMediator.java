@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 import org.apache.synapse.config.Util;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -58,6 +59,7 @@ import java.util.List;
 public class XSLTMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(XSLTMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /** The property key/name which refers to the XSLT to be used for the transformation */
     private String xsltKey = null;
@@ -99,13 +101,19 @@ public class XSLTMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("XSLT mediator mediate()");
-
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : XSLT mediator");
+        }
         log.debug("Performing XSLT transformation against property with key : " + xsltKey);
-        performXLST(synCtx);
+        performXLST(synCtx,shouldTrace);
+        if (shouldTrace) {
+            trace.trace("Start : XSLT mediator");
+        }
         return true;
     }
 
-    private void performXLST(MessageContext msgCtx) {
+    private void performXLST(MessageContext msgCtx,boolean shouldTrace) {
 
         Source transformSrc = null;
         ByteArrayOutputStream baosForTarget = new ByteArrayOutputStream();
@@ -114,6 +122,9 @@ public class XSLTMediator extends AbstractMediator {
         StreamResult transformTgt = new StreamResult(baosForTarget);
 
         OMNode sourceNode = getTransformSource(msgCtx);
+        if (shouldTrace) {
+            trace.trace("Transformation source : " + sourceNode.toString());
+        }
         if (log.isDebugEnabled()) {
             log.debug("Transformation source : " + sourceNode);
         }
@@ -172,7 +183,9 @@ public class XSLTMediator extends AbstractMediator {
             StAXOMBuilder builder = new StAXOMBuilder(
                 new ByteArrayInputStream(baosForTarget.toByteArray()));
             OMElement result = builder.getDocumentElement();
-
+            if (shouldTrace) {
+                trace.trace("Transformation result : " + result.toString());
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Transformation result : " + result);
             }

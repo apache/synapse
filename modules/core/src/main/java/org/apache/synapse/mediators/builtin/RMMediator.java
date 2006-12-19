@@ -48,6 +48,7 @@ import javax.xml.namespace.QName;
 public class RMMediator extends AbstractMediator {
 
     private static Log log = LogFactory.getLog(RMMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     private static final String EMPTY_RM_ENGAGED_SERVICE =
             "__EMPTY_RM_ENGAGED_SERVICE__";
@@ -56,6 +57,10 @@ public class RMMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext synCtx) {
         log.debug("RM Mediator  ::  mediate() ");
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if(shouldTrace) {
+            trace.trace("Start : RM mediator");
+        }
         org.apache.axis2.context.MessageContext msgCtx =
                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         Object obj = msgCtx.getProperty(org.apache.synapse.Constants.MESSAGE_RECEIVED_RM_ENGAGED);
@@ -76,6 +81,9 @@ public class RMMediator extends AbstractMediator {
 
         } catch (AxisFault axisFault) {
             throw new SynapseException(axisFault);
+        }
+        if (shouldTrace) {
+            trace.trace("End : RM mediator");
         }
         return false;
 

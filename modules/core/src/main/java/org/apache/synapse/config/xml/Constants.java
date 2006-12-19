@@ -45,5 +45,10 @@ public interface Constants {
     public static final String TRACE_ENABLE ="enable";
     /** The Trace value 'disable' */
     public static final  String TRACE_DISABLE ="disable";
-
+    
+    // -- variables for the scoping of a property mediator --
+    /** The String value for a Synapse messagecontext property */
+    public static final String SCOPE_CORRELATE = org.apache.synapse.Constants.SCOPE_CORRELATE;
+    /** The String value for an Axis2 messagecontext property */
+    public static final String SCOPE_AXIS2 = org.apache.synapse.Constants.SCOPE_AXIS2;
 }

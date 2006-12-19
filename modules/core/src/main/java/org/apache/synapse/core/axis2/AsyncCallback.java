@@ -74,20 +74,13 @@ public class AsyncCallback extends Callback {
         synapseInMessageContext.setTo(null);
 
         // now set properties to co-relate to the request i.e. copy over
-        // correlate/* messgae properties from original message to response received
-        Iterator iter = synapseOutMsgCtx.getPropertyKeySet().iterator();
+        // correlation messgae properties from original message to response received
+        Iterator iter = synapseOutMsgCtx.getCorrelationPropertyKeySet().iterator();
 
         while (iter.hasNext()) {
             Object key = iter.next();
-
-            if (key instanceof String &&
-                ((String) key).startsWith(Constants.CORRELATE)) {
-
-                synapseInMessageContext.setProperty(
-                        (String) key,
-                        synapseOutMsgCtx.getProperty((String) key)
-                );
-            }
+            synapseInMessageContext.setProperty(
+                (String) key, synapseOutMsgCtx.getCorrelationProperty((String) key));
         }
 
         // sets the out sequence if present to the in MC to mediate the response

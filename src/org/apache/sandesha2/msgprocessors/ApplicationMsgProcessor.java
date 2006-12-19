@@ -591,8 +591,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		SequencePropertyBean toBean = sequencePropertyMgr.retrieve(internalSequenceId,
 				Sandesha2Constants.SequenceProperties.TO_EPR);
-		SequencePropertyBean replyToBean = sequencePropertyMgr.retrieve(internalSequenceId,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
 
 		if (toBean == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
@@ -601,11 +599,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		EndpointReference toEPR = new EndpointReference(toBean.getValue());
-
-		EndpointReference replyToEPR = null;
-		if (replyToBean != null) {
-			replyToEPR = new EndpointReference(replyToBean.getValue());
-		}
 
 		if (toEPR == null || toEPR.getAddress() == null || "".equals(toEPR.getAddress())) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
@@ -627,9 +620,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsg.setTo(new EndpointReference(newToStr));
 		else
 			rmMsg.setTo(toEPR);
-
-		if (replyToEPR != null)
-			rmMsg.setReplyTo(replyToEPR);
 
 		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId, storageManager);
 		if (rmVersion == null)

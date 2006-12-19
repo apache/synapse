@@ -88,9 +88,11 @@ public class InMemoryStorageManager extends StorageManager {
 				result = new InMemoryTransaction(this, name, id);
 				transactions.put(key, result);
 			} else {
-				// We just returned an existing transaction. That might be ok, but it
-				// might be an indication of a real problem.
+				// We don't want to return an existing transaction, as someone else should
+				// decide if we commit it or not. If we get here then we probably have a
+				// bug.
 				if(log.isDebugEnabled()) log.debug("Possible re-used transaction: " + result);
+				result = null;
 			}
 		}
 		return result;

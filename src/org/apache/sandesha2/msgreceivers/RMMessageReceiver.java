@@ -25,7 +25,6 @@ import org.apache.axis2.receivers.AbstractMessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
@@ -57,23 +56,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		// that we will have a MsgProcessor every time.
 		MsgProcessor msgProcessor = MsgProcessorFactory.getMessageProcessor(rmMsgCtx);
 		if(msgProcessor != null) {
-			boolean withinTransaction = false;
-			String withinTransactionStr = (String) msgCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-			if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr)) {
-				withinTransaction = true;
-			}
-
 			Transaction transaction = null;
-			if (!withinTransaction) {
+			
+			try {
 				ConfigurationContext context = msgCtx.getConfigurationContext();
 				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());				
 				transaction = storageManager.getTransaction();
-				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-			}
-			
-			boolean rolledBack = false;
-			
-			try {
 
 				msgProcessor.processInMessage(rmMsgCtx);
 
@@ -83,11 +71,10 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 				// message should not be sent in a exception situation.
 				msgCtx.pause();
 	
-				if (!withinTransaction) {
+				if (transaction != null) {
 					try {
 						transaction.rollback();
-						msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-						rolledBack = true;
+						transaction = null;
 					} catch (Exception e1) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
 						log.debug(message, e);
@@ -97,10 +84,9 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
 				throw new AxisFault(message, e);
 			} finally {
-				if (!withinTransaction && !rolledBack) {
+				if (transaction != null) {
 					try {
 						transaction.commit();
-						msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 					} catch (Exception e) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
 						log.debug(message, e);

@@ -137,8 +137,6 @@ public class MessageRetransmissionAdjuster {
 			StorageManager storageManager) throws SandeshaException {
 		ConfigurationContext configurationContext = messageContext.getConfigurationContext();
 
-		configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, messageContext
-				.getProperty(Sandesha2Constants.WITHIN_TRANSACTION));
 		SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configurationContext);
 		TerminateManager.timeOutSendingSideSequence(configurationContext,sequencePropertyKey ,internalSequenceID, false, storageManager);
 

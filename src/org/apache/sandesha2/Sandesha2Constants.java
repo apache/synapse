@@ -541,8 +541,6 @@ public interface Sandesha2Constants {
 	
 	String POLLING_MANAGER = "PollingManager";
 	
-	String WITHIN_TRANSACTION = "WithinTransaction";
-	
 	String STORAGE_MANAGER_PARAMETER  = "Sandesha2StorageManager";
 	
 	String POST_FAILURE_MESSAGE = "PostFailureMessage";

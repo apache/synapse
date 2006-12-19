@@ -73,7 +73,6 @@ public class Sender extends SandeshaThread {
 			doPauseIfNeeded();
 
 			Transaction transaction = null;
-			boolean rolebacked = false;
 
 			try {
 				if (context == null) {
@@ -85,7 +84,6 @@ public class Sender extends SandeshaThread {
 					throw new SandeshaException(message);
 				}
 				
-				// TODO make sure this locks on reads.
 				transaction = storageManager.getTransaction();
 
 				SenderBeanMgr mgr = storageManager.getSenderBeanMgr();
@@ -116,7 +114,10 @@ public class Sender extends SandeshaThread {
 					continue;
 				}
 
-				transaction.commit();
+				if(transaction != null) {
+					transaction.commit();
+					transaction = null;
+				}
 
 				// start a worker which will work on this messages.
 				SenderWorker worker = new SenderWorker(context, senderBean);
@@ -141,7 +142,7 @@ public class Sender extends SandeshaThread {
 				if (transaction != null) {
 					try {
 						transaction.rollback();
-						rolebacked = true;
+						transaction = null;
 					} catch (Exception e1) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1
 								.toString());
@@ -153,9 +154,10 @@ public class Sender extends SandeshaThread {
 
 				log.debug(message, e);
 			} finally {
-				if (transaction != null && !rolebacked) {
+				if (transaction != null) {
 					try {
 						transaction.commit();
+						transaction = null;
 					} catch (Exception e) {
 						String message = SandeshaMessageHelper
 								.getMessage(SandeshaMessageKeys.commitError, e.toString());

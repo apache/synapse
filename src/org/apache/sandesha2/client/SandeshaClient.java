@@ -110,20 +110,10 @@ public class SandeshaClient {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 
-		String withinTransactionStr = (String) configurationContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-		boolean withinTransaction = false;
-		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr))
-			withinTransaction = true;
-
 		Transaction reportTransaction = null;
-		if (!withinTransaction) {
-			reportTransaction = storageManager.getTransaction();
-			configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		}
-
-		boolean rolebacked = false;
 
 		try {
+			reportTransaction = storageManager.getTransaction();
 
 			sequenceReport.setInternalSequenceID(internalSequenceID);
 
@@ -177,16 +167,12 @@ public class SandeshaClient {
 			fillOutgoingSequenceInfo(sequenceReport, internalSequenceID, outSequenceID, seqPropMgr);
 
 		} catch (Exception e) {
-			if (!withinTransaction && reportTransaction!=null) {
+			if (reportTransaction!=null) {
 				reportTransaction.rollback();
-				configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-				rolebacked = true;
+				reportTransaction = null;
 			}
 		} finally {
-			if (!withinTransaction && !rolebacked && reportTransaction!=null) {
-				reportTransaction.commit();
-				configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-			}
+			if (reportTransaction!=null) reportTransaction.commit();
 		}
 
 		return sequenceReport;
@@ -237,20 +223,10 @@ public class SandeshaClient {
 		SandeshaReport sandeshaReport = new SandeshaReport();
 		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean();
 
-		String withinTransactionStr = (String) configurationContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-		boolean withinTransaction = false;
-		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr))
-			withinTransaction = true;
-
 		Transaction reportTransaction = null;
-		if (!withinTransaction) {
-			reportTransaction = storageManager.getTransaction();
-			configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		}
-
-		boolean rolebacked = false;
 
 		try {
+			reportTransaction = storageManager.getTransaction();
 
 			internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
 			Collection collection = seqPropMgr.find(internalSequenceFindBean);
@@ -285,16 +261,12 @@ public class SandeshaClient {
 			}
 
 		} catch (Exception e) {
-			if (!withinTransaction && reportTransaction!=null) {
+			if (reportTransaction!=null) {
 				reportTransaction.rollback();
-				configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-				rolebacked = true;
+				reportTransaction = null;
 			}
 		} finally {
-			if (!withinTransaction && !rolebacked && reportTransaction!=null) {
-				reportTransaction.commit();
-				configurationContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-			}
+			if (reportTransaction!=null) reportTransaction.commit();
 		}
 
 		return sandeshaReport;
@@ -641,13 +613,14 @@ public class SandeshaClient {
 		String sequenceID = null;
 		
 		try
-		{			
+		{
+			transaction = storageManager.getTransaction();
 			sequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceID, storageManager);		
 		}
 		finally
 		{
 			// Commit the transaction as it was only a retrieve
-			transaction.commit();
+			if(transaction != null) transaction.commit();
 		}
 		
 		if (sequenceID == null)
@@ -683,17 +656,18 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 
 		// Get a transaction to obtain sequence information
-		Transaction transaction = storageManager.getTransaction();
-		
+		Transaction transaction = null;
 		String sequenceID = null;
 		
 		try
 		{
+			transaction = storageManager.getTransaction();
 			sequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceID, storageManager);
 		}
 		finally
 		{
-			transaction.commit();
+			// Commit the tran whatever happened
+			if(transaction != null) transaction.commit();
 		}
 		
 		if (sequenceID == null)
@@ -802,21 +776,12 @@ public class SandeshaClient {
 	public static void forceDispatchOfInboundMessages(ConfigurationContext configContext, 
 			String sequenceID,
 			boolean allowLaterDeliveryOfMissingMessages)throws SandeshaException{
-		String withinTransactionStr = (String) configContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-		boolean withinTransaction = false;
-		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr))
-			withinTransaction = true;
 
 		Transaction reportTransaction = null;
-		if (!withinTransaction) {
-			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
-			reportTransaction = storageManager.getTransaction();
-			configContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		}
-
-		boolean rolledback = false;
 
 		try {
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, configContext.getAxisConfiguration());
+			reportTransaction = storageManager.getTransaction();
 
 			//only do this if we are running inOrder
 			if(SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration()).isInOrder()){
@@ -830,16 +795,12 @@ public class SandeshaClient {
 			}
 			
 		} catch (Exception e) {
-			if (!withinTransaction && reportTransaction!=null) {
+			if (reportTransaction!=null) {
 				reportTransaction.rollback();
-				configContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-				rolledback = true;
+				reportTransaction = null;
 			}
 		} finally {
-			if (!withinTransaction && !rolledback && reportTransaction!=null) {
-				reportTransaction.commit();
-				configContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-			}
+			if(reportTransaction != null) reportTransaction.commit();
 		}
 	}
 
@@ -869,17 +830,18 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		
 		// Get a transaction for getting the sequence properties
-		Transaction transaction = storageManager.getTransaction();
-
+		Transaction transaction = null;
 		String sequenceID = null;
 		
 		try
 		{
+			transaction = storageManager.getTransaction();
 			sequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceID, storageManager);
 		}
 		finally
 		{
-			transaction.commit();
+			// Commit the tran whatever happened
+			if(transaction != null) transaction.commit();
 		}
 		
 		if (sequenceID == null)
@@ -1061,20 +1023,10 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx,configCtx.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		String withinTransactionStr = (String) configCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-		boolean withinTransaction = false;
-		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr))
-			withinTransaction = true;
-
 		Transaction reportTransaction = null;
-		if (!withinTransaction) {
-			reportTransaction = storageManager.getTransaction();
-			configCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		}
-		
-		boolean rolebacked = false;
 
 		try {
+			reportTransaction = storageManager.getTransaction();
 
 			SequenceReport sequenceReport = new SequenceReport();
 
@@ -1083,7 +1035,6 @@ public class SandeshaClient {
 
 			Iterator iter = completedMessageList.iterator();
 			while (iter.hasNext()) {
-				;
 				sequenceReport.addCompletedMessage((Long) iter.next());
 			}
 
@@ -1101,16 +1052,12 @@ public class SandeshaClient {
 			return sequenceReport;
 
 		} catch (Exception e) {
-			if (!withinTransaction && reportTransaction!=null) {
+			if (reportTransaction!=null) {
 				reportTransaction.rollback();
-				configCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-				rolebacked = true;
+				reportTransaction = null;
 			}
 		} finally {
-			if (!withinTransaction && !rolebacked && reportTransaction!=null) {
-				reportTransaction.commit();
-				configCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-			}
+			if (reportTransaction!=null) reportTransaction.commit();
 		}
 
 		return null;
@@ -1142,17 +1089,18 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 
 		// Get a transaction to obtain sequence information
-		Transaction transaction = storageManager.getTransaction();
-		
+		Transaction transaction = null;
 		String sequenceID = null;
 		
 		try
 		{
+			transaction = storageManager.getTransaction();
 			sequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceID, storageManager);
 		}
 		finally
 		{
-			transaction.commit();
+			// Commit the tran whatever happened
+			if(transaction != null) transaction.commit();
 		}
 		
 		if (sequenceID == null)
@@ -1328,15 +1276,14 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
-		Transaction transaction = storageManager.getTransaction();
-
+		Transaction transaction = null;
 		String resultString = null;
     
 		try 
-		{		
+		{
+			transaction = storageManager.getTransaction();
 			// Lookup the last failed to send error
 			SequencePropertyBean errorBean = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR);
-		
 			
 			// Get the value from the 
 			if (errorBean != null)
@@ -1344,7 +1291,8 @@ public class SandeshaClient {
 		}
 		finally
 		{
-			transaction.commit();
+			// Commit the tran whatever happened
+			if(transaction != null) transaction.commit();
 		}
 		
 		if (log.isDebugEnabled())
@@ -1387,12 +1335,13 @@ public class SandeshaClient {
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		// Create a transaction for the retrieve operation
-		Transaction transaction = storageManager.getTransaction();
-	
+		Transaction transaction = null;
 		long resultTime = -1;
 
 		try
-		{		
+		{
+			transaction = storageManager.getTransaction();
+			
 			// Lookup the last failed to send error
 			SequencePropertyBean errorTSBean = 
 				seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP);
@@ -1404,7 +1353,7 @@ public class SandeshaClient {
 		finally
 		{
 			// commit the transaction as it was only a retrieve
-			transaction.commit();
+			if(transaction != null) transaction.commit();
 		}
 		
 		if (log.isDebugEnabled())

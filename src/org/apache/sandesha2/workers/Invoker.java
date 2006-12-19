@@ -156,10 +156,17 @@ public class Invoker extends SandeshaThread {
 							}
 						}
 						
-						transaction.commit();
 					}
 					catch(Exception e){
-						transaction.rollback();
+						if(transaction != null) {
+							transaction.rollback();
+							transaction = null;
+						}
+					} finally {
+						if(transaction != null) {
+							transaction.commit();
+							transaction = null;
+						}
 					}
 		
 				}//end while
@@ -228,7 +235,6 @@ public class Invoker extends SandeshaThread {
 			doPauseIfNeeded();
 
 			Transaction transaction = null;
-			boolean rolebacked = false;
 
 			try {
 				StorageManager storageManager = SandeshaUtil
@@ -321,7 +327,10 @@ public class Invoker extends SandeshaThread {
 
 					String messageContextKey = bean.getMessageContextRefKey();
 					
-					transaction.commit();
+					if(transaction != null) {
+						transaction.commit();
+						transaction = null;
+					}
 
 					// start a new worker thread and let it do the invocation.
 					InvokerWorker worker = new InvokerWorker(context,
@@ -343,7 +352,7 @@ public class Invoker extends SandeshaThread {
 				if (transaction != null) {
 					try {
 						transaction.rollback();
-						rolebacked = true;
+						transaction = null;
 					} catch (Exception e1) {
 						String message = SandeshaMessageHelper.getMessage(
 								SandeshaMessageKeys.rollbackError, e1
@@ -355,9 +364,10 @@ public class Invoker extends SandeshaThread {
 						.getMessage(SandeshaMessageKeys.invokeMsgError);
 				log.debug(message, e);
 			} finally {
-				if (!rolebacked && transaction != null) {
+				if (transaction != null) {
 					try {
 						transaction.commit();
+						transaction = null;
 					} catch (Exception e) {
 						String message = SandeshaMessageHelper.getMessage(
 								SandeshaMessageKeys.commitError, e.toString());

@@ -70,12 +70,12 @@ public class PollingManager extends Thread {
 			try {
 				t = storageManager.getTransaction();
 				pollRMDSide();
-				t.commit();
+				if(t != null) t.commit();
+				t = null;
 
 				t = storageManager.getTransaction();
 				pollRMSSide();
-				t.commit();
-
+				if(t != null) t.commit();
 				t = null;
 			} catch (Exception e) {
 				if(log.isDebugEnabled()) log.debug("Exception", e);
@@ -85,7 +85,6 @@ public class PollingManager extends Thread {
 					} catch(Exception e2) {
 						if(log.isDebugEnabled()) log.debug("Exception during rollback", e);
 					}
-					t = null;
 				}
 			}
 			try {
@@ -164,9 +163,6 @@ public class PollingManager extends Thread {
 		RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
 				sequenceId, WSRMAnonReplyToURI, storageManager);
-		
-		// Put our transaction onto the message context
-		makeConnectionRMMessage.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
 		
 		makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
 		//storing the MakeConnection message.

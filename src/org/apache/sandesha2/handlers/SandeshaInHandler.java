@@ -85,20 +85,10 @@ public class SandeshaInHandler extends AbstractHandler {
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
-		boolean withinTransaction = false;
-		String withinTransactionStr = (String) msgCtx.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-		if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr)) {
-			withinTransaction = true;
-		}
-
 		Transaction transaction = null;
-		if (!withinTransaction) {
-			transaction = storageManager.getTransaction();
-			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		}
-		boolean rolebacked = false;
 
 		try {
+			transaction = storageManager.getTransaction();
 
 			AxisService axisService = msgCtx.getAxisService();
 			if (axisService == null) {
@@ -146,11 +136,10 @@ public class SandeshaInHandler extends AbstractHandler {
 			msgCtx.pause();
 			returnValue = InvocationResponse.SUSPEND;
 			
-			if (!withinTransaction) {
+			if (transaction != null) {
 				try {
 					transaction.rollback();
-					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-					rolebacked = true;
+					transaction = null;
 				} catch (Exception e1) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
 					log.debug(message, e);
@@ -161,10 +150,9 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault(message, e);
 		} 
 		finally {
-			if (!withinTransaction && !rolebacked) {
+			if (transaction != null) {
 				try {
 					transaction.commit();
-					msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				} catch (Exception e) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
 					log.debug(message, e);

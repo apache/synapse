@@ -505,9 +505,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqMsg.setRelationships(null); // create seq msg does not
 												// relateTo anything
 		
-		// Set that the create sequence message is part of a transaction.
-		createSeqMsg.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-		
 		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key that will be used to store 
 																	   //the create sequence message.
 		

@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -60,19 +59,15 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 			String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsg);
 			
-			//endint the transaction before invocation.
-			transaction.commit();
+			// ending the transaction before invocation.
+			if(transaction != null) {
+				transaction.commit();
+				transaction = null;
+			}
 				
 			boolean invoked = false;
 			
 			try {
-
-				// Invocation is not done within a transation. This
-				// may get changed when WS-AT is available.
-				
-				// Invoking the message.
-				msgToInvoke.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
-						Sandesha2Constants.VALUE_TRUE);
 
 				boolean postFailureInvocation = false;
 
@@ -154,15 +149,14 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					nextMsgMgr.update(rMDBean);
 				}				
 			}
-		} catch (SandeshaStorageException e) {
-			transaction.rollback();
-		} catch (SandeshaException e) {
-			log.error(e.toString(), e);
 		} catch (Exception e) {
 			log.error(e.toString(), e);
+			if(transaction != null) {
+				transaction.rollback();
+				transaction = null;
+			}
 		} finally {
-			if (transaction!=null && transaction.isActive())
-				transaction.commit();
+			if (transaction!=null) transaction.commit();
 			
 			if (workId !=null && lock!=null) {
 				lock.removeWork(workId);

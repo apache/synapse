@@ -75,9 +75,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			return returnValue; // Reinjected messages are not processed by Sandesha2 inflow
 													// handlers
 
-		boolean withinTransaction = false;
 		Transaction transaction = null;
-		boolean rolebacked = false;
 
 		try {
 			
@@ -88,11 +86,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				if (log.isDebugEnabled())
 					log.debug("Exit: SandeshaGlobalInHandler::invoke, !isRMGlobalMessage " + returnValue);
 				return returnValue;
-			}
-
-			String withinTransactionStr = (String) msgContext.getProperty(Sandesha2Constants.WITHIN_TRANSACTION);
-			if (withinTransactionStr != null && Sandesha2Constants.VALUE_TRUE.equals(withinTransactionStr)) {
-				withinTransaction = true;
 			}
 
 			StorageManager storageManager = null;
@@ -109,10 +102,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				return returnValue;
 			}
 
-			if (!withinTransaction) {
-				transaction = storageManager.getTransaction();
-				msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-			}
+			transaction = storageManager.getTransaction();
 
 			RMMsgContext rmMessageContext = MsgInitializer.initializeMessage(msgContext);
 
@@ -143,11 +133,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			msgContext.pause();
 			returnValue = InvocationResponse.SUSPEND;
 
-			if (!withinTransaction && transaction != null) {
+			if (transaction != null) {
 				try {
 					transaction.rollback();
-					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-					rolebacked = true;
+					transaction = null;
 				} catch (Exception e1) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
 					log.debug(message, e);
@@ -159,10 +148,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				log.debug("Exit: SandeshaGlobalInHandler::invoke ", e);
 			throw new AxisFault(message, e);
 		} finally {
-			if (!withinTransaction && !rolebacked && transaction != null) {
+			if (transaction != null) {
 				try {
 					transaction.commit();
-					msgContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
 				} catch (Exception e) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
 					if (log.isDebugEnabled())

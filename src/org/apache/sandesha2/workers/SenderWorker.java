@@ -71,13 +71,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			String key = senderBean.getMessageContextRefKey();
 			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
       
-      if (msgCtx == null) {
-        // This sender bean has already been processed
-        return;
-      }
+			if (msgCtx == null) {
+				// This sender bean has already been processed
+				return;
+			}
       
-			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_TRUE);
-
 			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
 			boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(rmMsgCtx, senderBean, configurationContext,
@@ -168,9 +166,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			// have to commit the transaction before sending. This may
 			// get changed when WS-AT is available.
-			transaction.commit();
-			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
-					Sandesha2Constants.VALUE_FALSE);
+			if(transaction != null) {
+				transaction.commit();
+				transaction = null;
+			}
 
 			try {
 
@@ -252,22 +251,25 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					seqPropMgr.insert(etsBean);
 					
 					// Commit the properties
-					transaction.commit();
+					if(transaction != null) {
+						transaction.commit();
+						transaction = null;
+					}
 				}
 				catch (Exception e1)
 				{
 					if (log.isErrorEnabled())
 						log.error(e1);
 					
-					if (transaction != null && transaction.isActive())
+					if (transaction != null) {
 						transaction.rollback();
+						transaction = null;
+					}
 				}
 				
-			} finally {
-				transaction = storageManager.getTransaction();
-				msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION,
-						Sandesha2Constants.VALUE_TRUE);
 			}
+			// Establish the transaction for post-send processing
+			transaction = storageManager.getTransaction();
 
 			// update or delete only if the object is still present.
 			SenderBean bean1 = senderBeanMgr
@@ -288,12 +290,13 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			if (successfullySent) {
 				if (!msgCtx.isServerSide())
-        {
-          // Commit the transaction to release the SenderBean
-          transaction.commit();
-          transaction = storageManager.getTransaction();
+				{
+					// Commit the transaction to release the SenderBean
+					transaction.commit();
+					transaction = null;
+					transaction = storageManager.getTransaction();
 					checkForSyncResponses(msgCtx);
-        }
+				}
 			}
 
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)
@@ -318,35 +321,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						storageManager);
 			}
 
-			msgCtx.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, Sandesha2Constants.VALUE_FALSE);
-		} catch (SandeshaStorageException e) { 
-			if (log.isDebugEnabled())
-				log.debug("Caught exception", e);
-			if (transaction!=null && transaction.isActive())
-				transaction.rollback();
-		} catch (SandeshaException e) {
-			if (log.isDebugEnabled())
-				log.debug("Caught exception", e);
-			if (transaction!=null && transaction.isActive())
-				transaction.rollback();
-		} catch (MissingResourceException e) {
-			if (log.isFatalEnabled())
-			  log.fatal("Unable to load message bundle", e);
-			if (transaction!=null && transaction.isActive())
-				transaction.rollback();
-		} catch (AxisFault e) {
-			if (log.isDebugEnabled())
-				log.debug("Caught exception", e);
-			if (transaction!=null && transaction.isActive())
-				transaction.rollback();
 		} catch (Exception e) {
-			if (log.isDebugEnabled())
-				log.debug("Caught exception", e);
-			if (transaction!=null && transaction.isActive())
+			if (log.isDebugEnabled()) log.debug("Caught exception", e);
+			if (transaction!=null) {
 				transaction.rollback();
+				transaction = null;
+			}
 		} finally {
-			if (transaction!=null && transaction.isActive())
-				transaction.commit();
+			if (transaction!=null) transaction.commit();
 			
 			if (lock!=null && workId!=null) {
 				lock.removeWork(workId);
@@ -439,12 +421,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 				return;
 			}
-
-			// if the request msg ctx is withina a transaction, processing if
-			// the response should also happen
-			// withing the same transaction
-			responseMessageContext.setProperty(Sandesha2Constants.WITHIN_TRANSACTION, msgCtx
-					.getProperty(Sandesha2Constants.WITHIN_TRANSACTION));
 
 			if (resenvelope != null) {
 				responseMessageContext.setEnvelope(resenvelope);

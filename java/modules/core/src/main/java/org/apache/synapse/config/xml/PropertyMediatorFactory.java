@@ -19,17 +19,17 @@
 
 package org.apache.synapse.config.xml;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.jaxen.JaxenException;
-
-import javax.xml.namespace.QName;
 
 /**
  * Creates a set-property mediator through the supplied XML configuration
@@ -50,6 +50,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory  {
         OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
         OMAttribute expression = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "expression"));
+        OMAttribute scope = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "scope"));
 
         if (name == null) {
             String msg = "The 'name' attribute is required for the configuration of a property mediator";
@@ -75,6 +76,18 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory  {
                 log.error(msg);
                 throw new SynapseException(msg);
             }
+        }
+
+        if (scope != null) {
+        	if (!Constants.SCOPE_CORRELATE.equals(scope.getAttributeValue()) && 
+                    !Constants.SCOPE_AXIS2.equals(scope.getAttributeValue())) {
+        		String msg = "Only '" + Constants.SCOPE_CORRELATE + "' or '" + Constants.SCOPE_AXIS2
+        		        + "' values are allowed for attribute scope for a property mediator"
+                        + ", Unsupported scope " + scope.getAttributeValue();
+                log.error(msg);
+                throw new SynapseException(msg);
+        	}
+            propMediator.setScope(scope.getAttributeValue());
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc

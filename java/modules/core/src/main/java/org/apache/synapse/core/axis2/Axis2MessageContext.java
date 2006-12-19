@@ -48,6 +48,7 @@ public class Axis2MessageContext implements MessageContext {
     private SynapseConfiguration cfg = null;
     private SynapseEnvironment   env = null;
     private Map properties = new HashMap();
+    private Map correlationProperties = new HashMap();
 
     /** The Axis2 MessageContext reference */
     private org.apache.axis2.context.MessageContext axis2MessageContext = null;
@@ -85,12 +86,24 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
+    public Object getCorrelationProperty(String key) {
+        return correlationProperties.get(key);
+    }
+
     public void setProperty(String key, Object value) {
         properties.put(key, value);
     }
 
+    public void setCorrelationProperty(String key, Object value) {
+        correlationProperties.put(key, value);
+    }
+
     public Set getPropertyKeySet() {
         return properties.keySet();
+    }
+
+    public Set getCorrelationPropertyKeySet() {
+        return correlationProperties.keySet();
     }
 
     //--------------------

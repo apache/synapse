@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 import org.apache.synapse.config.Util;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.mediators.AbstractListMediator;
@@ -62,6 +63,7 @@ import java.util.*;
 public class ValidateMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(ValidateMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
      * Default schema language (http://www.w3.org/2001/XMLSchema) and validator feature ids.
@@ -145,7 +147,10 @@ public class ValidateMediator extends AbstractListMediator {
 
         log.debug("ValidateMediator - Validate mediator mediate()");
         ByteArrayInputStream baisFromSource = null;
-
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Validate mediator");
+        }
         try {
             // create a byte array output stream and serialize the source node into it
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
@@ -153,7 +158,11 @@ public class ValidateMediator extends AbstractListMediator {
                 XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
             // serialize the validation target and get an input stream into it
-            getValidateSource(synCtx).serialize(xsWriterForSource);
+            OMNode validateSource = getValidateSource(synCtx);
+            if (shouldTrace) {
+                trace.trace("Validate Source : " + validateSource.toString());
+            }
+            validateSource.serialize(xsWriterForSource);
             baisFromSource = new ByteArrayInputStream(baosForSource.toByteArray());
 
         } catch (Exception e) {
@@ -182,6 +191,10 @@ public class ValidateMediator extends AbstractListMediator {
                         log.debug("Failed message envelope : " + synCtx.getEnvelope());
                     }
                     // super.mediate() invokes the "on-fail" sequence of mediators
+                    if (shouldTrace) {
+                        trace.trace("Validation failed. Invoking the \"on-fail\" " +
+                            "sequence of mediators");
+                    }
                     return super.mediate(synCtx);
                 }
             }
@@ -193,6 +206,9 @@ public class ValidateMediator extends AbstractListMediator {
 
         log.debug("validation of element returned by the XPath expression : " + source +
             " succeeded against the given schemas and the current message");
+        if (shouldTrace) {
+            trace.trace("End : Validate mediator");
+        }
         return true;
     }
 

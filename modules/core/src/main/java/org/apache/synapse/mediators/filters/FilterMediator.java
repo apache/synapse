@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.filters;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
@@ -36,23 +37,36 @@ import java.util.regex.Pattern;
 public class FilterMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
     private static final Log log = LogFactory.getLog(FilterMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     private AXIOMXPath source = null;
     private Pattern regex = null;
     private AXIOMXPath xpath = null;
 
     /**
      * Executes the list of sub/child mediators, if the filter condition is satisfied
+     *
      * @param synCtx the current message
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Filter mediator mediate()");
-        if (test(synCtx)) {
-            log.debug("Filter condition satisfied.. executing child mediators");
-            return super.mediate(synCtx);
-        } else {
-            log.debug("Filter condition failed.. will skip executing child mediators");
-            return true;
+
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        try {
+            if (shouldTrace) {
+                trace.trace("Start : Filter mediator ");
+            }
+            if (test(synCtx)) {
+                log.debug("Filter condition satisfied.. executing child mediators");
+                return super.mediate(synCtx);
+            } else {
+                log.debug("Filter condition failed.. will skip executing child mediators");
+                return true;
+            }
+        } finally {
+            if (shouldTrace) {
+                trace.trace("End : Filter mediator ");
+            }
         }
     }
 
@@ -61,6 +75,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * or Regex (against a source XPath). When a regular expression is supplied
      * the source XPath is evaluated into a String value, and matched against
      * the given regex
+     *
      * @param synCtx the current message for evaluation of the test condition
      * @return true if evaluation of the XPath/Regex results in true
      */
@@ -68,11 +83,20 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
         try {
             if (xpath != null) {
                 log.debug("Evaluating XPath expression : " + xpath);
+                if (shouldTrace(synCtx.getTracingState())) {
+                    trace.trace("XPath expression : " + xpath + " evaluates to : " +
+                        xpath.booleanValueOf(synCtx.getEnvelope()));
+                }
                 return xpath.booleanValueOf(synCtx.getEnvelope());
 
             } else if (source != null && regex != null) {
                 log.debug("Evaluating regular expression : " + regex.pattern() + " against source : " + source);
-                return regex.matcher(Axis2MessageContext.getStringValue(source, synCtx)).matches();
+                String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
+                if (shouldTrace(synCtx.getTracingState())) {
+                    trace.trace("Regular expression : " + regex.pattern() + " and Source " +
+                        sourceString + " matches : " + regex.matcher(sourceString).matches());
+                }
+                return regex.matcher(sourceString).matches();
 
             } else {
                 log.error("Invalid configuration specified");

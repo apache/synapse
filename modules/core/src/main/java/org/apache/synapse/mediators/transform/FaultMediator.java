@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -46,6 +47,7 @@ import java.net.URI;
 public class FaultMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(FaultMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /** Make a SOAP 1.1 fault */
     public static final int SOAP11 = 1;
@@ -72,28 +74,31 @@ public class FaultMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext synCtx) {
         log.debug("Fault mediator mediate()");
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         SOAPEnvelope envelop = synCtx.getEnvelope();
-
+        if(shouldTrace) {
+            trace.trace("Start : Fault mediator");
+        }
         switch (soapVersion) {
             case SOAP11:
-                return makeSOAPFault(synCtx, SOAP11);
+                return makeSOAPFault(synCtx, SOAP11,shouldTrace);
             case SOAP12:
-                return makeSOAPFault(synCtx, SOAP12);
+                return makeSOAPFault(synCtx, SOAP12,shouldTrace);
             default : {
                 if (envelop != null) {
                     if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(envelop.getNamespace().getName())) {
-                        return makeSOAPFault(synCtx, SOAP12);
+                        return makeSOAPFault(synCtx, SOAP12,shouldTrace);
                     } else {
-                        return makeSOAPFault(synCtx, SOAP11);
+                        return makeSOAPFault(synCtx, SOAP11,shouldTrace);
                     }
                 } else {
-                    return makeSOAPFault(synCtx, SOAP11);
+                    return makeSOAPFault(synCtx, SOAP11,shouldTrace);
                 }
             }
         }
     }
 
-    private boolean makeSOAPFault(MessageContext synCtx, int soapVersion) {
+    private boolean makeSOAPFault(MessageContext synCtx, int soapVersion,boolean shouldTrace) {
 
         log.debug("Creating a SOAP fault using SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2"));
         // get the correct SOAP factory to be used
@@ -140,13 +145,19 @@ public class FaultMediator extends AbstractMediator {
 
         // overwrite current message envelope with new fault envelope
         try {
+            if (shouldTrace) {
+                trace.trace("Original SOAP Message : " + synCtx.getEnvelope().toString());
+                trace.trace("Fault Message created : " + faultEnvelope.toString());
+            }
             synCtx.setEnvelope(faultEnvelope);
         } catch (AxisFault af) {
             String msg = "Error replacing SOAP envelope with a fault envelope " + af.getMessage();
             log.error(msg);
             throw new SynapseException(af);
         }
-
+        if (shouldTrace) {
+            trace.trace("End : Fault mediator");
+        }
         return true;
     }
 

@@ -65,6 +65,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             if (e != null) {
                 seqMediator.setErrorHandler(e.getAttributeValue());
             }
+            initMediator(seqMediator, elem);
             super.addChildren(elem, seqMediator);
 
         } else {
@@ -83,9 +84,6 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 throw new SynapseException(msg);
             }
         }
-        // after successfully creating the mediator
-        // set its common attributes such as tracing etc
-        initMediator(seqMediator,elem);
 
         return seqMediator;
     }

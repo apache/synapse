@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
 
@@ -36,14 +37,26 @@ import org.apache.synapse.mediators.AbstractListMediator;
 public class SynapseMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(SynapseMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
      * Perform the mediation specified by the rule set
+     *
      * @param synCtx the message context
      * @return as per standard mediate() semantics
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Synapse main mediator :: mediate()");
-        return super.mediate(synCtx);
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        try {
+            if (shouldTrace) {
+                trace.trace("Start : Synapse main mediator");
+            }
+            return super.mediate(synCtx);
+        } finally {
+            if (shouldTrace) {
+                trace.trace("End : Synapse main mediator");
+            }
+        }
     }
 }

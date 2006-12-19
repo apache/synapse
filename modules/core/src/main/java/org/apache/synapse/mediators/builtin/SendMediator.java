@@ -60,8 +60,9 @@ public class SendMediator extends AbstractMediator {
         // results in an unbound URI exception for no credible reason - needs more investigation
         // seems like a woodstox issue. Use hack for now
         // synCtx.getEnvelope().build();
-
-        if (shouldTrace(synCtx.getTracingState())) {
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Send mediator");
             trace.trace("Sending Message :: " + synCtx.getEnvelope());
         }
         // if no endpoints are defined, send where implicitly stated
@@ -84,7 +85,9 @@ public class SendMediator extends AbstractMediator {
                     singleEndpoint.getRef());
                 eprAddress = singleEndpoint.getAddress().toString();
             }
-            
+            if (shouldTrace) {
+                trace.trace("Sending to Endpoint : " + eprAddress);
+            }
             if (singleEndpoint.isForcePOX()) {
             	synCtx.setDoingPOX(true);
             } else if (singleEndpoint.isForceSOAP()) {
@@ -143,6 +146,9 @@ public class SendMediator extends AbstractMediator {
             String msg = "The send mediator currently supports only one endpoint";
             log.error(msg);
             throw new UnsupportedOperationException(msg);
+        }
+        if (shouldTrace) {
+            trace.trace("End : Send mediator");
         }
         return false;
     }

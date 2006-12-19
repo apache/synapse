@@ -76,7 +76,17 @@ public class ProxyServiceFactory {
                 proxy.setTransports(transportList);
             }
         }
-
+        OMAttribute trace = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, Constants.TRACE_ATTRIB_NAME));
+        if (trace != null) {
+            String traceValue = trace.getAttributeValue();
+            if (traceValue != null) {
+                if (traceValue.equals(Constants.TRACE_ENABLE)) {
+                    proxy.setTraceState(org.apache.synapse.Constants.TRACING_ON);
+                } else if (traceValue.equals(Constants.TRACE_DISABLE)) {
+                    proxy.setTraceState(org.apache.synapse.Constants.TRACING_OFF);
+                }
+            }
+        }
         OMAttribute startOnLoad = elem.getAttribute(
                 new QName(Constants.NULL_NAMESPACE, "startOnLoad"));
         if(startOnLoad != null) {

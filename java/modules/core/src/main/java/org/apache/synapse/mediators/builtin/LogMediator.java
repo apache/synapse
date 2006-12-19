@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -41,7 +42,7 @@ import java.util.List;
 public class LogMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(LogMediator.class);
-
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     public static final int CUSTOM = 0;
     public static final int SIMPLE = 1;
     public static final int HEADERS = 2;
@@ -54,12 +55,22 @@ public class LogMediator extends AbstractMediator {
 
     /**
      * Logs the current message according to the supplied semantics
+     *
      * @param synCtx (current) message to be logged
      * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Log mediator :: mediate()");
-        log.info(getLogMessage(synCtx));
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Log mediator");
+        }
+        String logMessage = getLogMessage(synCtx);
+        log.info(logMessage);
+        if (shouldTrace) {
+            trace.trace(logMessage);
+            trace.trace("End : Log mediator");
+        }
         return true;
     }
 
@@ -130,7 +141,7 @@ public class LogMediator extends AbstractMediator {
             while (iter.hasNext()) {
                 MediatorProperty prop = (MediatorProperty) iter.next();
                 sb.append(separator + prop.getName() + " = " +
-                    (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synCtx)));
+                        (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synCtx)));
             }
         }
     }

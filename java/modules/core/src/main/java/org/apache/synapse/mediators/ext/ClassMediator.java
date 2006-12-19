@@ -21,9 +21,10 @@ package org.apache.synapse.mediators.ext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -42,38 +43,54 @@ import java.util.List;
 public class ClassMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(ClassMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     private Class clazz = null;
     private List properties = new ArrayList();
 
     /**
      * Delegate mediation to a new instance of the specified class
+     *
      * @param synCtx the message context
      * @return as per standard semantics
      */
     public boolean mediate(MessageContext synCtx) {
 
         log.debug("Class mediator <" + clazz.getName() + ">:: mediate()");
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Class mediator");
+        }
         Mediator m = null;
         try {
-            m = (Mediator) clazz.newInstance();
+            try {
+                m = (Mediator) clazz.newInstance();
+            } catch (Exception e) {
+                String msg = "Error while creating an instance of the specified mediator class : " + clazz.getName();
+                if (shouldTrace)
+                    trace.trace(msg);
+                log.error(msg, e);
+                throw new SynapseException(msg, e);
+            }
 
-        } catch (Exception e) {
-            String msg = "Error while creating an instance of the specified mediator class : " + clazz.getName();
-            log.error(msg, e);
-            throw new SynapseException(msg, e);
+            setProperties(m, synCtx, shouldTrace);
+            if (shouldTrace) {
+                trace.trace("Executing an instance of the specified class : " + clazz.getName());
+            }
+            return m.mediate(synCtx);
+        } finally {
+            if (shouldTrace) {
+                trace.trace("End : Class mediator");
+            }
         }
-
-        setProperties(m, synCtx);
-
-        return m.mediate(synCtx);
     }
 
     /**
      * Only String properties are supported
+     *
      * @param m the mediator
      */
-    private void setProperties(Mediator m, MessageContext synCtx) {
+    private void setProperties(Mediator m, MessageContext synCtx, boolean shouldTrace) {
 
         Iterator iter = properties.iterator();
         while (iter.hasNext()) {
@@ -88,12 +105,18 @@ public class ClassMediator extends AbstractMediator {
             try {
                 Method method = m.getClass().getMethod(mName, new Class[] {String.class});
                 log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
+                if (shouldTrace) {
+                    trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
+                }
                 method.invoke(m, new Object[] { value });
 
             } catch (Exception e) {
                 String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
                     " mediator : " + m.getClass() + " : " + e.getMessage();
                 log.error(msg);
+                if (shouldTrace) {
+                    trace.trace(msg);
+                }
                 throw new SynapseException(msg, e);
             }
         }

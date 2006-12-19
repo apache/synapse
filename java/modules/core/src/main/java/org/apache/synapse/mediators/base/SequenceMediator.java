@@ -21,16 +21,17 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
  * The Sequence mediator either refers to a named Sequence mediator instance
  * or is a *Named* list/sequence of other (child) Mediators
- *
+ * <p/>
  * If this instance defines a sequence mediator, then the name is required, and
  * an errorHandler sequence name optional. If this instance refers to another (defined)
  * sequence mediator, the errorHandler will not have a meaning, and if an error in
@@ -39,6 +40,7 @@ import org.apache.synapse.mediators.AbstractListMediator;
 public class SequenceMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(SequenceMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     private String name = null;
     private String ref = null;
     private String errorHandler = null;
@@ -55,35 +57,65 @@ public class SequenceMediator extends AbstractListMediator {
      * @return as per standard mediator result
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Sequence mediator <" + (name == null? "anonymous" : name ) +"> :: mediate()");
+        log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (ref == null) {
             try {
+                if (shouldTrace) {
+                    trace.trace("Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
+                }
                 return super.mediate(synCtx);
 
             } catch (SynapseException e) {
 
                 if (errorHandler != null) {
+                    if (shouldTrace) {
+                        trace.trace("Sequence " + name + " encountered an exception. " +
+                            "Locating error handler sequence : " + errorHandler);
+                    }
                     // set exception information to message context
                     Axis2MessageContext.setErrorInformation(synCtx, e);
 
                     Mediator errHandler = synCtx.getConfiguration().getNamedSequence(errorHandler);
                     if (errHandler == null) {
+                        if (shouldTrace) {
+                            trace.trace("Sequence " + name + "; error handler sequence named '" +
+                                errorHandler + "' not found");
+                        }
                         handleException("Error handler sequence mediator instance named " +
-                            errorHandler + " cannot be found");
+                                errorHandler + " cannot be found");
                     } else {
+                        if (shouldTrace) {
+                            trace.trace("Sequence " + name + "; Executing error handler sequence : "
+                                + errorHandler);
+                        }
                         return errHandler.mediate(synCtx);
                     }
-                
+
                 } else {
+                    if (shouldTrace) {
+                        trace.trace("Sequence " + name + " encountered an exception, but does " +
+                            "not specify an error handler");
+                    }
                     throw e;
+                }
+            } finally {
+                if (shouldTrace) {
+                    trace.trace("End : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }
             }
 
         } else {
             Mediator m = synCtx.getConfiguration().getNamedSequence(ref);
             if (m == null) {
-                handleException("Sequence mediator instance named " + ref + " cannot be found.");
+                if (shouldTrace) {
+                    trace.trace("Sequence named " + ref + " cannot be found.");
+                }
+                handleException("Sequence named " + ref + " cannot be found.");
             } else {
+                if (shouldTrace) {
+                    trace.trace("Executing sequence named " + ref);
+                }
                 return m.mediate(synCtx);
             }
         }

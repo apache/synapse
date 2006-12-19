@@ -52,6 +52,9 @@ public class JsonMediatorFactory extends AbstractMediatorFactory {
             handleException("JSON element doesnot contain 'direction' attribute.");
         } else {
             jsonMediator.setDirection(direction.getAttributeValue().trim());
+            // after successfully creating the mediator
+            // set its common attributes such as tracing etc
+            initMediator(jsonMediator, elem);
         }
         return jsonMediator;
     }

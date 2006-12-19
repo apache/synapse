@@ -54,6 +54,7 @@ import java.util.*;
 public class ProxyService {
 
     private static final Log log = LogFactory.getLog(ProxyService.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     /** The proxy service name */
     private String name;
     /** The proxy service description */
@@ -88,6 +89,9 @@ public class ProxyService {
     private boolean running = false;
 
     public static final String ALL_TRANSPORTS = "all";
+
+    /** The variable that indicate tracing on or off for the current mediator */
+    protected int traceState = Constants.TRACING_UNSET;
 
     public ProxyService() {}
 
@@ -392,5 +396,23 @@ public class ProxyService {
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    /**
+     * Returns the int value that indicate the tracing state
+     *
+     * @return Returns the int value that indicate the tracing state
+     */
+    public int getTraceState() {
+        return traceState;
+    }
+
+    /**
+     * Set the tracing State variable
+     *
+     * @param traceState
+     */
+    public void setTraceState(int traceState) {
+        this.traceState = traceState;
     }
 }

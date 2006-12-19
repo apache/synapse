@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -37,6 +38,7 @@ public class PropertyMediator extends AbstractMediator {
     private String name = null;
     private String value = null;
     private AXIOMXPath expression = null;
+    private String scope = null;
 
     private static final Log log = LogFactory.getLog(PropertyMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
@@ -54,13 +56,32 @@ public class PropertyMediator extends AbstractMediator {
         }
 
         String value = (getValue() != null ? getValue() : Axis2MessageContext.getStringValue(getExpression(), smc));
-        log.debug("Setting property : " + getName() + " = " + value);
+        log.debug("Setting property : " + getName() +
+            " (scope:" + (scope == null ? "default" : scope) + ") = " + value);
         if (shouldTrace) {
-            trace.trace("Property Name : " + getName() + " set to " +
+            trace.trace("Property Name : " + getName() +
+                " (scope:" + (scope == null ? "default" : scope) + ") set to " +
                 (getValue() != null ? " value = " + getValue() :
                     " result of expression " + getExpression() + " = " + value));
         }
-        smc.setProperty(getName(), value);
+
+        if (scope == null) {
+            smc.setProperty(getName(), value);
+
+        } else if(Constants.SCOPE_CORRELATE.equals(getScope())) {
+            smc.setCorrelationProperty(getName(), value);
+
+        } else if (Constants.SCOPE_AXIS2.equals(getScope()) && smc instanceof Axis2MessageContext) {
+            Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                axis2smc.getAxis2MessageContext();
+            axis2MessageCtx.getConfigurationContext().setProperty(getName(), value);
+
+        } else {
+            String msg = "Unsupported scope : " + scope + " for set-property mediator";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
 
         if (shouldTrace) {
             trace.trace("End : Property mediator");
@@ -90,5 +111,13 @@ public class PropertyMediator extends AbstractMediator {
 
     public void setExpression(AXIOMXPath expression) {
         this.expression = expression;
+    }
+    
+    public String getScope() {
+    	return scope;
+    }
+    
+    public void setScope(String scope) {
+    	this.scope = scope;
     }
 }

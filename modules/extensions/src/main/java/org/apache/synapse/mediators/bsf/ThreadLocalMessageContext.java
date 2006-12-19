@@ -113,6 +113,10 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().getProperty(key);
     }
 
+    public Object getCorrelationProperty(String key) {
+        return getMC().getCorrelationProperty(key);
+    }
+
     public Set getPropertyKeySet() {
         return getMC().getPropertyKeySet();
     }
@@ -215,6 +219,14 @@ public class ThreadLocalMessageContext implements MessageContext {
 
     public void setProperty(String key, Object value) {
         getMC().setProperty(key, value);
+    }
+
+    public void setCorrelationProperty(String key, Object value) {
+        getMC().setCorrelationProperty(key, value);
+    }
+
+    public Set getCorrelationPropertyKeySet() {
+        return getMC().getCorrelationPropertyKeySet();
     }
 
     public void setRelatesTo(RelatesTo[] reference) {

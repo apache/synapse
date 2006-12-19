@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -30,22 +31,31 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class POXMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(LogMediator.class);
-    private boolean value=false;
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private boolean value = false;
 
     /**
      * Halts further mediation of the current message by returning false.
+     *
      * @param synCtx the current message
      * @return false always
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Rest mediator :: mediate()");
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : POX Mediator. setDoingPOX(" + value + ")");
+        }
         synCtx.setDoingPOX(value);
+        if (shouldTrace) {
+            trace.trace("End : POX Mediator");
+        }
         return true;
     }
-    
+
     public void setValue(boolean value) {
 		this.value = value;
     }
-    
+
     public boolean getValue() { return value;}
 }

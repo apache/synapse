@@ -42,7 +42,7 @@ import java.util.Iterator;
 public class HeaderMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(HeaderMediator.class);
-
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
 
@@ -63,13 +63,19 @@ public class HeaderMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Header mediator <" + (action == ACTION_SET ? "Set" : "Remove") + "> :: mediate()");
-
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if(shouldTrace) {
+            trace.trace("Start : Header mediator, action = " +
+                (action == ACTION_SET ? "set" : "remove"));
+        }
         if (action == ACTION_SET) {
             String value = (getValue() != null ? getValue() :
                 Axis2MessageContext.getStringValue(getExpression(), synCtx));
 
             log.debug("Setting header : " + qName + " to : " + value);
-
+            if(shouldTrace) {
+                trace.trace("Set Header : " + qName + " to : " + value);
+            }
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
                 if (Constants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(new EndpointReference(value));
@@ -89,6 +95,10 @@ public class HeaderMediator extends AbstractMediator {
         } else {
             log.debug("Removing header : " + qName + " from current message");
 
+            if (shouldTrace) {
+                trace.trace("Remove Header : " + qName);
+            }
+
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
                 if (Constants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(null);
@@ -107,6 +117,9 @@ public class HeaderMediator extends AbstractMediator {
                 removeFromHeaderList(synCtx.getEnvelope().getHeader().
                     getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
             }
+        }
+        if (shouldTrace) {
+            trace.trace("End : Header mediator");
         }
         return true;
     }

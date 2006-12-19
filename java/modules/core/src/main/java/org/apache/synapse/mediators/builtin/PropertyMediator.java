@@ -23,6 +23,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Constants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -38,6 +39,7 @@ public class PropertyMediator extends AbstractMediator {
     private AXIOMXPath expression = null;
 
     private static final Log log = LogFactory.getLog(PropertyMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
      * Sets a property into the current (local) Synapse Context
@@ -46,9 +48,23 @@ public class PropertyMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext smc) {
         log.debug("Set-Property mediator :: mediate()");
+        boolean shouldTrace = shouldTrace(smc.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Property mediator");
+        }
+
         String value = (getValue() != null ? getValue() : Axis2MessageContext.getStringValue(getExpression(), smc));
         log.debug("Setting property : " + getName() + " = " + value);
+        if (shouldTrace) {
+            trace.trace("Property Name : " + getName() + " set to " +
+                (getValue() != null ? " value = " + getValue() :
+                    " result of expression " + getExpression() + " = " + value));
+        }
         smc.setProperty(getName(), value);
+
+        if (shouldTrace) {
+            trace.trace("End : Property mediator");
+        }
         return true;
     }
 

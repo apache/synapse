@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.filters;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -39,44 +40,76 @@ import java.util.List;
 public class SwitchMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SwitchMediator.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
-    /** The XPath expression specifying the source element to apply the switch case expressions against */
+    /**
+     * The XPath expression specifying the source element to apply the switch case expressions against
+     */
     private AXIOMXPath source = null;
-    /** The list of switch cases */
+    /**
+     * The list of switch cases
+     */
     private List cases = new ArrayList();
-    /** The default switch case, if any */
+    /**
+     * The default switch case, if any
+     */
     private SwitchCaseMediator defaultCase = null;
 
     /**
      * Iterate over switch cases and find match and execute selected sequence
+     *
      * @param synCtx current context
      * @return as per standard semantics
      */
     public boolean mediate(MessageContext synCtx) {
 
         log.debug("Switch mediator :: mediate()");
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Switch mediator");
+        }
         String sourceText = Axis2MessageContext.getStringValue(source, synCtx);
         log.debug("Applying switch case regex patterns against evaluated source value : " + sourceText);
-        Iterator iter = cases.iterator();
+        try {
+            saveAndSetTraceState(synCtx);
+            if (shouldTrace) {
+                trace.trace("Source Value : " + sourceText);
+                trace.trace("Start Case mediator list");
+            }
+            Iterator iter = cases.iterator();
 
-        while (iter.hasNext()) {
-            SwitchCaseMediator swCase = (SwitchCaseMediator) iter.next();
-            if (swCase.matches(sourceText)) {
-                return swCase.mediate(synCtx);
+            while (iter.hasNext()) {
+                SwitchCaseMediator swCase = (SwitchCaseMediator) iter.next();
+                if (swCase.matches(sourceText)) {
+                    if (shouldTrace) {
+                        trace.trace("Executing case for : " + swCase.getRegex());
+                    }
+                    return swCase.mediate(synCtx);
+                }
+            }
+            if (shouldTrace) {
+                trace.trace("End Case mediator lis");
+            }
+            if (defaultCase != null) {
+                log.debug("Executing default case");
+                if (shouldTrace) {
+                    trace.trace("Executing default case");
+                }
+                return defaultCase.mediate(synCtx);
+            }
+        } finally {
+            restoreTracingState(synCtx);
+            if (shouldTrace) {
+                trace.trace("End : Switch mediator");
             }
         }
-
-        if (defaultCase != null) {
-            log.debug("Executing default switch case");
-            return defaultCase.mediate(synCtx);
-        }
-
         return true;
     }
 
     /**
      * Adds the given mediator (Should be a SwitchCaseMediator) to the list of cases
      * of this Switch mediator
+     *
      * @param m the SwitchCaseMediator instance to be added
      */
     public void addCase(SwitchCaseMediator m) {
@@ -85,6 +118,7 @@ public class SwitchMediator extends AbstractMediator {
 
     /**
      * Get the list of cases
+     *
      * @return the cases list
      */
     public List getCases() {
@@ -93,6 +127,7 @@ public class SwitchMediator extends AbstractMediator {
 
     /**
      * Return the source XPath expression set
+     *
      * @return thje source XPath expression
      */
     public AXIOMXPath getSource() {
@@ -101,6 +136,7 @@ public class SwitchMediator extends AbstractMediator {
 
     /**
      * Sets the source XPath expression
+     *
      * @param source the XPath expression to be used as the source
      */
     public void setSource(AXIOMXPath source) {
@@ -109,6 +145,7 @@ public class SwitchMediator extends AbstractMediator {
 
     /**
      * Get default case
+     *
      * @return the default csae
      */
     public SwitchCaseMediator getDefaultCase() {

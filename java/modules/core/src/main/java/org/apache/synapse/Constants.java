@@ -48,10 +48,17 @@ public interface Constants {
     String SYNAPSE_XML = "synapse.xml";
 
     // -- Synapse message context property keys --
-    /** Properties on an outgoing message context starting with this prefix
-     * would be copied over to the incoming reply for correlation
+    /**
+     * The scope for a set-property mediator, when the property should be copied over
+     * to the response message - if any, for correlation
      */
-    String CORRELATE = "correlate/";
+    String SCOPE_CORRELATE = "correlate";
+
+    /**
+     * The scope for a set-property mediator, when the property should be set
+     *  on the underlying Axis2 message context
+     */
+    String SCOPE_AXIS2 = "axis2";
 
     /** An string name which holds the out sequence property in the MessageContext */
     String OUT_SEQUENCE = "outSequence";

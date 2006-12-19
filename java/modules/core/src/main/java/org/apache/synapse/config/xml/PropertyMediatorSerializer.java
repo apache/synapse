@@ -65,6 +65,11 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer
         } else {
             handleException("Invalid property mediator. Value or expression is required");
         }
+        
+        if (mediator.getScope() != null) {
+            // if we have already built a mediator with scope, scope should be valid, now save it
+            property.addAttribute(fac.createOMAttribute("scope", nullNS, mediator.getScope()));
+        }
 
         if (parent != null) {
             parent.addChild(property);

@@ -93,20 +93,13 @@ public class Axis2Sender {
                 synapseOutMessageContext.setResponse(true);
 
                 // now set properties to co-relate to the request i.e. copy over
-                // correlate/* messgae properties from original message to response received
-                Iterator iter = synapseInMessageContext.getPropertyKeySet().iterator();
+                // correlation messgae properties from original message to response received
+                Iterator iter = synapseInMessageContext.getCorrelationPropertyKeySet().iterator();
 
                 while (iter.hasNext()) {
                     Object key = iter.next();
-
-                    if (key instanceof String &&
-                        ((String) key).startsWith(Constants.CORRELATE)) {
-
-                        synapseOutMessageContext.setProperty(
-                                (String) key,
-                                synapseInMessageContext.getProperty((String) key)
-                        );
-                    }
+                    synapseOutMessageContext.setProperty(
+                        (String) key, synapseInMessageContext.getCorrelationProperty((String) key));
                 }
 
                 // if we have a SOAP Fault, log it - irrespective of the mediation logic

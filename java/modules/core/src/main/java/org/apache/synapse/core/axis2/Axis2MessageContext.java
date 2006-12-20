@@ -79,6 +79,8 @@ public class Axis2MessageContext implements MessageContext {
         Object ret = properties.get(key);
         if (ret != null) {
             return ret;
+        } else if (correlationProperties.get(key) != null) {
+            return correlationProperties.get(key);
         } else if (getConfiguration() != null) {
             return getConfiguration().getProperty(key);
         } else {

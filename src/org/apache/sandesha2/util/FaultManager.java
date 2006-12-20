@@ -111,8 +111,7 @@ public class FaultManager {
 			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForCreateSequenceRefused, refused sequence");
-			getFault(createSequenceRMMsg, data, createSequenceRMMsg.getAddressingNamespaceValue(),
-					storageManager);
+			getFault(createSequenceRMMsg, data, storageManager);
 		}
 
 		if (log.isDebugEnabled())
@@ -171,8 +170,7 @@ public class FaultManager {
 			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForLastMsgNumberExceeded, lastMessageNumberExceeded");
-			getFault(applicationRMMessage, faultData, applicationRMMessage.getAddressingNamespaceValue(),
-					storageManager);
+			getFault(applicationRMMessage, faultData, storageManager);
 		}
 
 		if (log.isDebugEnabled())
@@ -258,7 +256,7 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForUnknownSequence, Sequence unknown");
-			getFault(rmMessageContext, data, rmMessageContext.getAddressingNamespaceValue(), storageManager);
+			getFault(rmMessageContext, data, storageManager);
 		}
 
 		if (log.isDebugEnabled())
@@ -331,8 +329,7 @@ public class FaultManager {
 
 				if (log.isDebugEnabled())
 					log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-				getFault(ackRMMessageContext, data, ackRMMessageContext.getAddressingNamespaceValue(),
-						storageManager);
+				getFault(ackRMMessageContext, data, storageManager);
 			}
 		
 		}
@@ -380,7 +377,7 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
-			getFault(referenceRMMessage, data, referenceRMMessage.getAddressingNamespaceValue(), storageManager);
+			getFault(referenceRMMessage, data, storageManager);
 		}
 
 		if (log.isDebugEnabled())
@@ -393,13 +390,12 @@ public class FaultManager {
 	 * 
 	 * @param referenceRMMsgContext - Message in reference to which the fault will be generated.
 	 * @param data - data for the fault
-	 * @param addressingNamespaceURI
 	 * @param storageManager
 	 * @return - The dummy fault to be thrown out.
 	 * 
 	 * @throws AxisFault
 	 */
-	public static void getFault (RMMsgContext referenceRMMsgContext, FaultData data, String addressingNamespaceURI,
+	public static void getFault (RMMsgContext referenceRMMsgContext, FaultData data,
 			StorageManager storageManager) throws AxisFault {
 		
 		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();

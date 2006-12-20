@@ -45,16 +45,13 @@ public class CreateSequenceResponse implements IOMRMPart {
 	
 	private String rmNamespaceValue = null;
 	
-	private String addressingNamespaceValue = null;
-	
-	public CreateSequenceResponse(String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+	public CreateSequenceResponse(String rmNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					rmNamespaceValue));
 		
 		this.rmNamespaceValue = rmNamespaceValue;
-		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 
 	public String getNamespaceValue() {
@@ -91,7 +88,7 @@ public class CreateSequenceResponse implements IOMRMPart {
 						new QName(rmNamespaceValue,
 						Sandesha2Constants.WSRM_COMMON.ACCEPT));
 		if (acceptPart != null) {
-			accept = new Accept(rmNamespaceValue,addressingNamespaceValue);
+			accept = new Accept(rmNamespaceValue);
 			accept.fromOMElement(createSeqResponsePart);
 		}
 

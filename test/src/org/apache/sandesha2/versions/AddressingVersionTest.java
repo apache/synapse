@@ -19,7 +19,6 @@ package org.apache.sandesha2.versions;
 import java.io.File;
 
 import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -45,61 +44,25 @@ public class AddressingVersionTest extends SandeshaTestCase {
 		startServer(repoPath, axis2_xml);
 	}
 	
-	public void testAddressingFinal () throws AxisFault,InterruptedException  {
-		
-		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		
-		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+	public void testAddressingFinal() throws Exception  {
 		Options clientOptions = new Options ();
-		clientOptions.setAction(pingAction);
-		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		
-		clientOptions.setTo(new EndpointReference (to));
-		
-		String sequenceKey = "sequence1";
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		
-		//setting the addressing version as Final
 		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Final.WSA_NAMESPACE);
-
-		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		//serviceClient.
-		
-		serviceClient.setOptions(clientOptions);
-		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
-
-		long limit = System.currentTimeMillis() + waitTime;
-		Error lastError = null;
-		while(System.currentTimeMillis() < limit) {
-			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
-			
-			try {
-				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
-
-				lastError = null;
-				break;
-			} catch(Error e) {
-				lastError = e;
-			}
-		}
-		if(lastError != null) throw lastError;
-
-		configContext.getListenerManager().stop();
-		serviceClient.cleanup();
+		runAddressingTest(clientOptions);
 	}
 	
-	public void testAddressingSubmission () throws AxisFault,InterruptedException  {
-		
+	public void testAddressingSubmission() throws Exception  {
+		Options clientOptions = new Options ();
+		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+		runAddressingTest(clientOptions);
+	}
+
+	public void testAddressingNone() throws Exception  {
+		Options clientOptions = new Options ();
+		clientOptions.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+		runAddressingTest(clientOptions);
+	}
+
+	private void runAddressingTest(Options clientOptions) throws Exception {
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
@@ -107,26 +70,17 @@ public class AddressingVersionTest extends SandeshaTestCase {
 
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		Options clientOptions = new Options ();
 		clientOptions.setAction(pingAction);
 		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		
 		clientOptions.setTo(new EndpointReference (to));
-		
 		String sequenceKey = "sequence1";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		
-		//setting the addressing version as Submission
-		clientOptions.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,AddressingConstants.Submission.WSA_NAMESPACE);
+		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		//serviceClient.
-		
 		serviceClient.setOptions(clientOptions);
 		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
-		serviceClient.fireAndForget(getPingOMBlock("ping3"));
+		serviceClient.fireAndForget(getPingOMBlock("ping"));
 
 		long limit = System.currentTimeMillis() + waitTime;
 		Error lastError = null;
@@ -150,5 +104,4 @@ public class AddressingVersionTest extends SandeshaTestCase {
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}
-	
 }

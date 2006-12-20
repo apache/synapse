@@ -128,23 +128,6 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		}
 	}
 
-	private void continueUncompletedSequences(StorageManager storageManager,
-			ConfigurationContext configCtx) {
-		// server side continues
-		// SandeshaUtil.startInvokerIfStopped(configCtx);
-
-		// server side re-injections
-
-		// reinject everything that has been acked within the in-handler but
-		// have not been invoked.
-
-		// client side continues
-		// SandeshaUtil.startSenderIfStopped(configCtx);
-
-		// client side re-injections
-
-	}
-	
 	public PolicyExtension getPolicyExtension() {
 		return new RMPolicyExtension();
 	}
@@ -153,26 +136,6 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		//removing the threads started by Sandesha2.
 		SandeshaUtil.stopSender (configurationContext);
 		SandeshaUtil.stopInvoker(configurationContext);
-	}
-
-	// Removing data of uncontinuuable sequences so that the sandesha2 system
-	// will not be confused
-	private void cleanStorage(StorageManager storageManager) throws AxisFault {
-
-		
-
-		// server side cleaning
-
-		// cleaning NextMsgData
-		// Cleaning InvokerData
-
-		// client side cleaning
-
-		// cleaning RetransmitterData
-		// cleaning CreateSequenceData
-
-		// cleaning sequence properties
-
 	}
 
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {

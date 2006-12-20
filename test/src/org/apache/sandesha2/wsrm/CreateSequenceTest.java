@@ -23,17 +23,15 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 
 public class CreateSequenceTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
 	String rmNamespaceValue = Sandesha2Constants.SPEC_2005_02.NS_URI;
-	String addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;
+	String addressingNamespaceValue = Sandesha2Constants.SPEC_2005_02.ADDRESSING_NS_URI;
 	
     public CreateSequenceTest() {
         super("CreateSequenceTest");
@@ -41,7 +39,7 @@ public class CreateSequenceTest extends SandeshaTestCase {
 
     public void testfromOMElement()  throws AxisFault {
     	
-        CreateSequence createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
+        CreateSequence createSequence = new CreateSequence(rmNamespaceValue);
         createSequence.fromOMElement(getSOAPEnvelope("", "CreateSequence.xml").getBody());
 
         AcksTo acksTo = createSequence.getAcksTo();
@@ -54,10 +52,10 @@ public class CreateSequenceTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope()  throws AxisFault {
-        CreateSequence createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
+        CreateSequence createSequence = new CreateSequence(rmNamespaceValue);
 
-        AcksTo acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
-        acksTo.setAddress(new EndpointReference("http://127.0.0.1:9090/axis/services/RMService"));
+        EndpointReference epr = new EndpointReference("http://127.0.0.1:9090/axis/services/RMService");
+        AcksTo acksTo = new AcksTo(epr, rmNamespaceValue, addressingNamespaceValue);
         createSequence.setAcksTo(acksTo);
 
         SequenceOffer sequenceOffer = new SequenceOffer(rmNamespaceValue);

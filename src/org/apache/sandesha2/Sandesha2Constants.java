@@ -19,6 +19,8 @@ package org.apache.sandesha2;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis2.addressing.AddressingConstants;
+
 /**
  * Contains all the Sandesha2Constants of Sandesha2.
  * Please see sub-interfaces to see grouped data.
@@ -37,6 +39,8 @@ public interface Sandesha2Constants {
 		String NS_URI = "http://schemas.xmlsoap.org/ws/2005/02/rm";
 		
 		String SEC_NS_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+		
+		String ADDRESSING_NS_URI = AddressingConstants.Submission.WSA_NAMESPACE;
 		
 		public interface Actions {
 
@@ -63,6 +67,7 @@ public interface Sandesha2Constants {
 		String NS_URI               = "http://docs.oasis-open.org/ws-rx/wsrm/200608";
 		String ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsrm/200608/anonymous?id=";
 		String SEC_NS_URI           = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+		String ADDRESSING_NS_URI    = AddressingConstants.Final.WSA_NAMESPACE;
 
 		public interface Actions {
 			
@@ -249,9 +254,6 @@ public interface Sandesha2Constants {
 											   // sequenceId to share data b/w
 											   // sequences
 		
-		//Addressing version of a sequence. All messages of a sequence should have this addressing versio
-		String ADDRESSING_NAMESPACE_VALUE = "AddressingNamespaceValue";
-
 		//For incoming sequences this gives the msg no's of the messages that were
 		//received (may be an ack was sent - depending on the policy)
 		//For out going sequences this gives the messages that were sent and that were successfully

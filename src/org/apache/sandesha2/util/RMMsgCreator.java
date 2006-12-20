@@ -30,6 +30,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -53,7 +54,7 @@ import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
 import org.apache.sandesha2.wsrm.Endpoint;
-import org.apache.sandesha2.wsrm.IOMRMElement;
+import org.apache.sandesha2.wsrm.IOMRMPart;
 import org.apache.sandesha2.wsrm.Identifier;
 import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -118,10 +119,17 @@ public class RMMsgCreator {
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
-		String addressingNamespaceValue = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-
-		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue, addressingNamespaceValue);
+		// Decide which addressing version to use. We copy the version that the application
+		// is already using (if set), and fall back to the level in the spec if that isn't
+		// found.
+		String addressingNamespace = (String) applicationMsgContext.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
+		if(addressingNamespace == null) addressingNamespace = SpecSpecificConstants.getAddressingNamespace(rmNamespaceValue);
+		
+		// If acksTo has not been set, then default to anonaymous, using the correct spec level
+		String anon = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
+		if(acksToEPR == null) acksToEPR = new EndpointReference(anon);
+		
+		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue);
 
 		// Adding sequence offer - if present
 		OperationContext operationcontext = applicationMsgContext.getOperationContext();
@@ -140,7 +148,6 @@ public class RMMsgCreator {
 			}
 			// Finally fall back to using an anonymous endpoint
 			if (offeredEndpoint==null) {
-				String anon = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
 				offeredEndpoint = new EndpointReference(anon);
 			}
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
@@ -151,8 +158,7 @@ public class RMMsgCreator {
 				createSequencePart.setSequenceOffer(offerPart);
 				
 				if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(rmNamespaceValue)) {
-					Endpoint endpoint = new Endpoint (rmNamespaceValue,addressingNamespaceValue);
-					endpoint.setEPR (offeredEndpoint);
+					Endpoint endpoint = new Endpoint (offeredEndpoint, rmNamespaceValue, addressingNamespace);
 					offerPart.setEndpoint(endpoint);
 				}
 			}
@@ -164,12 +170,6 @@ public class RMMsgCreator {
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,
 				storageManager);
 
-		if (replyTo == null) {
-			// using wsa:Anonymous as ReplyTo
-			String addressingNamespace = applicationRMMsg.getAddressingNamespaceValue();
-			replyTo = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
-		}
-
 		if (to == null) {
 			String message = SandeshaMessageHelper
 					.getMessage(SandeshaMessageKeys.toBeanNotSet);
@@ -178,18 +178,14 @@ public class RMMsgCreator {
 
 		// TODO store and retrieve a full EPR instead of just the address.
 		EndpointReference toEPR = new EndpointReference(to);
-		EndpointReference replyToEPR = new EndpointReference(replyTo);
-
 		createSeqRMMsg.setTo(toEPR);
-		createSeqRMMsg.setReplyTo(replyToEPR);
 
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
+		if(replyTo != null) {
+			EndpointReference replyToEPR = new EndpointReference(replyTo);
+			createSeqRMMsg.setReplyTo(replyToEPR);
+		}
 
-		if (acksToEPR==null || acksToEPR.getAddress() == null || "".equals(acksToEPR.getAddress()))
-			acksToEPR = new EndpointReference(anonymousURI);
-
-
-		AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue,addressingNamespaceValue);
+		AcksTo acksTo = new AcksTo(acksToEPR, rmNamespaceValue, addressingNamespace);
 		createSequencePart.setAcksTo(acksTo);
 		
 		createSeqRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ, createSequencePart);
@@ -319,29 +315,14 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws AxisFault
 	 */
-	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, MessageContext outMessage,
-			String newSequenceID, StorageManager storageManager) throws AxisFault {
+	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, String newSequenceID) throws AxisFault {
 
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(createSeqMessage
-				.getSOAPEnvelope()));
+		CreateSequence cs = (CreateSequence) createSeqMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+		String namespace = createSeqMessage.getRMNamespaceValue();
 
-		IOMRMElement messagePart = createSeqMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		CreateSequence cs = (CreateSequence) messagePart;
-
-		String rmVersion = SandeshaUtil.getRMVersion(newSequenceID, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-		String addressingNamespaceValue = SandeshaUtil.getSequenceProperty(newSequenceID,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-
-		CreateSequenceResponse response = new CreateSequenceResponse(rmNamespaceValue,
-				addressingNamespaceValue);
-
-		Identifier identifier = new Identifier(rmNamespaceValue);
+		CreateSequenceResponse response = new CreateSequenceResponse(namespace);
+		Identifier identifier = new Identifier(namespace);
 		identifier.setIndentifer(newSequenceID);
-
 		response.setIdentifier(identifier);
 
 		SequenceOffer offer = cs.getSequenceOffer();
@@ -350,124 +331,99 @@ public class RMMsgCreator {
 
 			if (outSequenceId != null && !"".equals(outSequenceId)) {
 
-				Accept accept = new Accept(rmNamespaceValue, addressingNamespaceValue);
-				EndpointReference acksToEPR = SandeshaUtil.cloneEPR (createSeqMessage.getTo());
+				Accept accept = new Accept(namespace);
+
+				// Putting the To EPR as the AcksTo for the response sequence. We echo back the
+				// addressing version that the create used.
+				String addressingNamespace = cs.getAddressingNamespaceValue();
+				EndpointReference acksToEPR = createSeqMessage.getTo();
+				if(acksToEPR != null) {
+					acksToEPR = SandeshaUtil.cloneEPR(acksToEPR);
+				} else {
+					String anon = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
+					acksToEPR = new EndpointReference(anon);
+				}
 				
-				//putting the To EPR as the AcksTo for the response sequence.
-				AcksTo acksTo = new AcksTo(acksToEPR,rmNamespaceValue, addressingNamespaceValue);
+				AcksTo acksTo = new AcksTo(acksToEPR, namespace, cs.getAddressingNamespaceValue());
 				accept.setAcksTo(acksTo);
 				response.setAccept(accept);
 			}
-
 		}
 
-		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		response.toOMElement(envelope.getBody());
-		outMessage.setWSAAction(SpecSpecificConstants.getCreateSequenceResponseAction(SandeshaUtil.getRMVersion(
-				newSequenceID, storageManager)));
-		outMessage.setSoapAction(SpecSpecificConstants.getCreateSequenceResponseSOAPAction(SandeshaUtil.getRMVersion(
-				newSequenceID, storageManager)));
-		outMessage.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, addressingNamespaceValue);
+		String version = SpecSpecificConstants.getSpecVersionString(namespace);
+		String action = SpecSpecificConstants.getCreateSequenceResponseAction(version);
 
-		String newMessageId = SandeshaUtil.getUUID();
-		outMessage.setMessageID(newMessageId);
-
-		outMessage.setEnvelope(envelope);
-
-		RMMsgContext createSeqResponse = null;
-		try {
-			createSeqResponse = MsgInitializer.initializeMessage(outMessage);
-		} catch (SandeshaException ex) {
-			throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInnitMessage), ex);
-		}
-
-		createSeqResponse.setMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE, response);
-
-		createSeqMessage.getMessageContext().setServerSide(true);
-
-		// Ensure the correct token is used to secure the create sequence response
-		secureOutboundMessage(newSequenceID, outMessage);
-		
-		return createSeqResponse;
+		return createResponseMsg(createSeqMessage, response,
+				Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE,
+				newSequenceID, action);
 	}
 
-	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg, MessageContext outMessage,
-			StorageManager storageManager) throws AxisFault {
+	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg) throws AxisFault {
         
-		RMMsgContext terminateSeqResponseRMMsg = new RMMsgContext(outMessage);
-
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(terminateSeqRMMsg
-				.getSOAPEnvelope()));
-
 		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 		String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 
 		String namespace = terminateSeqRMMsg.getRMNamespaceValue();
-		terminateSeqResponseRMMsg.setRMNamespaceValue(namespace);
 
 		TerminateSequenceResponse terminateSequenceResponse = new TerminateSequenceResponse(namespace);
 		Identifier identifier = new Identifier(namespace);
 		identifier.setIndentifer(sequenceID);
 		terminateSequenceResponse.setIdentifier(identifier);
 
-		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		terminateSeqResponseRMMsg.setSOAPEnvelop(envelope);
-		terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,
-				terminateSequenceResponse);
+		String version = SpecSpecificConstants.getSpecVersionString(namespace);
+		String action = SpecSpecificConstants.getTerminateSequenceResponseAction(version);
 
-		outMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceResponseAction(SandeshaUtil.getRMVersion(
-				sequenceID, storageManager)));
-		outMessage.setSoapAction(SpecSpecificConstants.getTerminateSequenceResponseAction(SandeshaUtil.getRMVersion(
-				sequenceID, storageManager)));
-
-		terminateSeqResponseRMMsg.addSOAPEnvelope();
-
-		terminateSeqResponseRMMsg.getMessageContext().setServerSide(true);
-		
-		// Ensure the correct token is used to secure the terminate sequence response
-		secureOutboundMessage(sequenceID, outMessage);
-		
-		return terminateSeqResponseRMMsg;
+		return createResponseMsg(terminateSeqRMMsg, terminateSequenceResponse,
+				Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,
+				sequenceID, action);
 	}
 
-	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg, MessageContext outMessage,
-			StorageManager storageManager) throws AxisFault {
-
-		RMMsgContext closeSeqResponseRMMsg = new RMMsgContext(outMessage);
-
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(closeSeqRMMsg
-				.getSOAPEnvelope()));
+	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg) throws AxisFault {
 
 		CloseSequence closeSequence = (CloseSequence) closeSeqRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
 		String sequenceID = closeSequence.getIdentifier().getIdentifier();
 
 		String namespace = closeSeqRMMsg.getRMNamespaceValue();
-		closeSeqResponseRMMsg.setRMNamespaceValue(namespace);
 
 		CloseSequenceResponse closeSequenceResponse = new CloseSequenceResponse(namespace);
 		Identifier identifier = new Identifier(namespace);
 		identifier.setIndentifer(sequenceID);
 		closeSequenceResponse.setIdentifier(identifier);
 
+		String version = SpecSpecificConstants.getSpecVersionString(namespace);
+		String action = SpecSpecificConstants.getCloseSequenceResponseAction(version);
+
+		return createResponseMsg(closeSeqRMMsg, closeSequenceResponse,
+				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE,
+				sequenceID, action);
+	}
+
+	private static RMMsgContext createResponseMsg(RMMsgContext requestMsg, IOMRMPart part, int messagePartId,
+			String sequenceID, String action) throws AxisFault {
+
+		MessageContext outMessage = Utils.createOutMessageContext(requestMsg.getMessageContext());
+		RMMsgContext responseRMMsg = new RMMsgContext(outMessage);
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(requestMsg.getSOAPEnvelope()));
+
+		String namespace = requestMsg.getRMNamespaceValue();
+		responseRMMsg.setRMNamespaceValue(namespace);
+
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		closeSeqResponseRMMsg.setSOAPEnvelop(envelope);
-		closeSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE,
-				closeSequenceResponse);
+		responseRMMsg.setSOAPEnvelop(envelope);
+		responseRMMsg.setMessagePart(messagePartId, part);
 
-		outMessage.setWSAAction(SpecSpecificConstants.getCloseSequenceResponseAction(SandeshaUtil.getRMVersion(
-				sequenceID, storageManager)));
-		outMessage.setSoapAction(SpecSpecificConstants.getCloseSequenceResponseAction(SandeshaUtil.getRMVersion(
-				sequenceID, storageManager)));
+		outMessage.setWSAAction(action);
+		outMessage.setSoapAction(action);
 
-		closeSeqResponseRMMsg.addSOAPEnvelope();
-		closeSeqResponseRMMsg.getMessageContext().setServerSide(true);
+		responseRMMsg.addSOAPEnvelope();
+		responseRMMsg.getMessageContext().setServerSide(true);
 
-		// Ensure the correct token is used to secure the close sequence response
+		// Ensure the correct token is used to secure the message
 		secureOutboundMessage(sequenceID, outMessage);
 		
-		return closeSeqResponseRMMsg;
+		return responseRMMsg;
 	}
 
 	/**

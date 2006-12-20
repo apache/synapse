@@ -39,25 +39,15 @@ public class MessageValidator {
 			if (sequenceID != null) {
 				String rmVersionOfSequence = SandeshaUtil.getSequenceProperty(sequenceID,
 						Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, storageManager);
-				String addressingNamespaceOfSequence = SandeshaUtil.getSequenceProperty(sequenceID,
-						Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
 
 				String rmNamespaceOfMsg = rmMsg.getRMNamespaceValue();
 				String rmNamespaceOfSequence = null;
 				if (rmVersionOfSequence != null)
 					rmNamespaceOfSequence = SpecSpecificConstants.getRMNamespaceValue(rmVersionOfSequence);
-				String addressingNamespaceOfMsg = rmMsg.getAddressingNamespaceValue();
 
 				if (rmNamespaceOfSequence != null && !rmNamespaceOfSequence.equals(rmNamespaceOfMsg)) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rmNamespaceNotMatchSequence,
 							rmNamespaceOfMsg, rmNamespaceOfSequence, sequenceID);
-					throw new SandeshaException(message);
-				}
-
-				if (addressingNamespaceOfSequence != null
-						&& !addressingNamespaceOfSequence.equals(addressingNamespaceOfMsg)) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.wsaNamespaceNotMatchSequence,
-							addressingNamespaceOfMsg, addressingNamespaceOfSequence, sequenceID);
 					throw new SandeshaException(message);
 				}
 

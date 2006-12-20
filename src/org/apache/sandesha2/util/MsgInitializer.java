@@ -156,9 +156,6 @@ public class MsgInitializer {
 
 		rmMsgContext.setRMNamespaceValue(rmNamespace);
 
-		String addressingNamespaceValue = elements.getAddressingNamespaceValue();
-		if (addressingNamespaceValue != null)
-			rmMsgContext.setAddressingNamespaceValue(addressingNamespaceValue);
 	}
 
 	/**
@@ -229,7 +226,7 @@ public class MsgInitializer {
 		} else if (closeSequenceResponse != null) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE);
 			sequenceID = closeSequenceResponse.getIdentifier().getIdentifier(); 
-		} else if (makeConnection != null){ {
+		} else if (makeConnection != null){
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
 			if (makeConnection.getIdentifier()!=null) {
 				sequenceID = makeConnection.getIdentifier().getIdentifier();
@@ -239,7 +236,6 @@ public class MsgInitializer {
 				throw new SandeshaException (
 						"Invalid MakeConnection message. Either Address or Identifier must be present");
 			}
-		}
 		} else
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.UNKNOWN);
 		

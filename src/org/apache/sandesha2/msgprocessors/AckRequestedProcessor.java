@@ -28,7 +28,6 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -179,13 +178,6 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		ackMsgCtx.setReplyTo(msgContext.getTo());
 		RMMsgCreator.addAckMessage(ackRMMsgCtx,sequencePropertyKey,sequenceId, storageManager);
 		ackRMMsgCtx.getMessageContext().setServerSide(true);
-		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, msgContext
-				.getProperty(AddressingConstants.WS_ADDRESSING_VERSION)); // TODO
-																			// do
-																			// this
-																			// in
-																			// the
-																			// RMMsgCreator
 
 		if (acksTo.hasAnonymousAddress()) {
 

@@ -16,13 +16,11 @@
 
 package org.apache.sandesha2.wsrm;
 
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -33,7 +31,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
 	String rmNamespaceValue = Sandesha2Constants.SPEC_2005_02.NS_URI;
-	String addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;
+	String addressingNamespaceValue = Sandesha2Constants.SPEC_2005_02.ADDRESSING_NS_URI;
 	
     public CreateSequenceResponseTest() {
         super("CreateSequenceResponseTest");
@@ -41,7 +39,7 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testFromOMElement() throws AxisFault {
-        CreateSequenceResponse res = new CreateSequenceResponse(rmNamespaceValue,addressingNamespaceValue);
+        CreateSequenceResponse res = new CreateSequenceResponse(rmNamespaceValue);
         SOAPEnvelope env = getSOAPEnvelope("", "CreateSequenceResponse.xml");
         res.fromOMElement(env.getBody());
 
@@ -55,16 +53,15 @@ public class CreateSequenceResponseTest extends SandeshaTestCase {
     }
 
     public void testToSOAPEnvelope()  throws AxisFault {
-        CreateSequenceResponse res = new CreateSequenceResponse(rmNamespaceValue,addressingNamespaceValue);
+        CreateSequenceResponse res = new CreateSequenceResponse(rmNamespaceValue);
 
         Identifier identifier = new Identifier(rmNamespaceValue);
         identifier.setIndentifer("uuid:88754b00-161a-11da-b6d6-8198de3c47c5");
         res.setIdentifier(identifier);
 
-        Accept accept = new Accept(rmNamespaceValue,addressingNamespaceValue);
-        AcksTo acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
-        Address address = new Address(addressingNamespaceValue);
-        acksTo.setAddress (new EndpointReference ("http://localhost:8070/axis/services/TestService"));
+        EndpointReference epr = new EndpointReference ("http://localhost:8070/axis/services/TestService");
+        Accept accept = new Accept(rmNamespaceValue);
+        AcksTo acksTo = new AcksTo(epr, rmNamespaceValue, addressingNamespaceValue);
         accept.setAcksTo(acksTo);
         res.setAccept(accept);
 

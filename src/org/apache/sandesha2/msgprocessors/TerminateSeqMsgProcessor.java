@@ -28,7 +28,6 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -249,18 +248,8 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceId);
 
-		MessageContext terminateSeqMsg = terminateSeqRMMsg.getMessageContext();
-
-		MessageContext outMessage = null;
-
-		try {
-			outMessage = Utils.createOutMessageContext(terminateSeqMsg);
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1);
-		}
-
-		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg,
-				outMessage, storageManager);
+		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg);
+		MessageContext outMessage = terminateSeqResponseRMMsg.getMessageContext();
 
 		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, sequencePropertyKey, 
 				sequenceId,	storageManager);

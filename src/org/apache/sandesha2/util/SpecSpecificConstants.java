@@ -304,6 +304,17 @@ public class SpecSpecificConstants {
 					addressingNSURI));
 	}
 	
+	public static String getAddressingNamespace(String rmNamespace) throws SandeshaException {
+		if(Sandesha2Constants.SPEC_2006_08.NS_URI.equals(rmNamespace)) {
+			return Sandesha2Constants.SPEC_2006_08.ADDRESSING_NS_URI;
+		} else if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespace)) {
+			return Sandesha2Constants.SPEC_2005_02.ADDRESSING_NS_URI;
+		}
+
+		throw new SandeshaException (SandeshaMessageHelper.getMessage(
+				SandeshaMessageKeys.unknownRMNamespace,	rmNamespace));
+	}
+	
 	public static String getSecurityNamespace (String rmNamespace) {
 		if(rmNamespace.equals(Sandesha2Constants.SPEC_2005_02.NS_URI)) {
 			return Sandesha2Constants.SPEC_2005_02.SEC_NS_URI;

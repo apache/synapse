@@ -47,30 +47,34 @@ public class CreateSequence implements IOMRMPart {
 	
 	private String rmNamespaceValue = null;
 	
-	private String addressingNamespaceValue = null;
-	
 	private String secNamespaceValue = null;
 	
 	private OMElement securityTokenReference = null;
 	
-	public CreateSequence(String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
+	// Constructor used while parsing
+	public CreateSequence(String rmNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					rmNamespaceValue));
 		
 		this.rmNamespaceValue = rmNamespaceValue;
-		this.addressingNamespaceValue = addressingNamespaceValue;
 		this.secNamespaceValue = SpecSpecificConstants.getSecurityNamespace(rmNamespaceValue);
 	}
 	
-	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String rmNamespaceValue,String addressingNamespaceValue) throws SandeshaException {
-		this (rmNamespaceValue,addressingNamespaceValue);
+	// Constructor used while writing
+	public CreateSequence (AcksTo acksTo,SOAPFactory factory,String rmNamespaceValue) throws SandeshaException {
+		this (rmNamespaceValue);
 		this.acksTo = acksTo;
 	}
 
 	public String getNamespaceValue() {
 		return rmNamespaceValue;
+	}
+	
+	public String getAddressingNamespaceValue() {
+		if(acksTo != null) return acksTo.getAddressingNamespaceValue();
+		return null;
 	}
 
 	public Object fromOMElement(OMElement bodyElement) throws OMException,AxisFault {
@@ -83,14 +87,13 @@ public class CreateSequence implements IOMRMPart {
 					SandeshaMessageKeys.noCreateSeqPartInElement,
 					bodyElement.toString()));
 		
-		acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
+		acksTo = new AcksTo(rmNamespaceValue);
 		acksTo.fromOMElement(createSequencePart);
 
 		OMElement offerPart = createSequencePart.getFirstChildWithName(new QName(rmNamespaceValue,
 																	   Sandesha2Constants.WSRM_COMMON.SEQUENCE_OFFER));
 		if (offerPart != null) {
 			sequenceOffer = new SequenceOffer(rmNamespaceValue);
-			sequenceOffer.setAddressingNamespace(addressingNamespaceValue);
 			sequenceOffer.fromOMElement(createSequencePart);
 		}
 

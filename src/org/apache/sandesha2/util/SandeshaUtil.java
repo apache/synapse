@@ -587,8 +587,7 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			
-
-			//copyint properties as configured in the module.xml properties. Module xml has several
+			//copying properties as configured in the module.xml properties. Module xml has several
 			//properties which gives comma seperated lists of property names that have to be copited
 			//from various places when creating related messages.
 			
@@ -672,8 +671,10 @@ public class SandeshaUtil {
 				}
 			}
 		}
-		
 		toMessage.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,addressingVersion);
+		
+		toMessage.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, fromMessage
+				.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES));
 	}
 
 	//TODO change this method.
@@ -837,23 +838,6 @@ public class SandeshaUtil {
 		}
 
 		return executionChainStr;
-	}
-
-	// TODO complete below.
-	public static ArrayList getExecutionChainFromString(String executionChainStr, ConfigurationContext configContext)
-			throws SandeshaException {
-		String[] nameStrs = executionChainStr.split(Sandesha2Constants.EXECUTIN_CHAIN_SEPERATOR);
-
-		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
-
-		int length = nameStrs.length;
-		for (int i = 0; i < length; i++) {
-			String nameStr = nameStrs[i];
-			// axisConfiguration.get
-
-		}
-
-		return null; // not complete yet.
 	}
 
 	public static void printSOAPEnvelope(SOAPEnvelope envelope, OutputStream out) throws SandeshaException {

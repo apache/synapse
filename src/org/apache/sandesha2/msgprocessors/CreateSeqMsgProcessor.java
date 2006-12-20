@@ -27,7 +27,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -97,14 +96,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		}
 
 		MessageContext outMessage = null;
-		try {
-			outMessage = Utils.createOutMessageContext(createSeqMsg); // createing
-																		// a new
-																		// response
-																		// message.
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1);
-		}
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		try {
@@ -112,10 +103,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			// sequence state.
 			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
 			
-			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, outMessage,
-					newSequenceId, storageManager); // converting the blank out
-													// message in to a create
-			// sequence response.
+			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, newSequenceId);
+			outMessage = createSeqResponse.getMessageContext();
+			
 			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
 
 			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); // for
@@ -158,7 +148,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 																				// is a
 																				// dummy
 																				// value.
-					
 					
 					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
@@ -257,21 +246,19 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						e);
 			}
 
+			boolean anon = true;
 			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,
 					Sandesha2Constants.SequenceProperties.TO_EPR);
-			if (toBean == null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-				log.debug(message);
-				throw new SandeshaException(message);
+			if (toBean != null) {
+				EndpointReference toEPR = new EndpointReference(toBean.getValue());
+				if (!toEPR.hasAnonymousAddress()) anon = false;
 			}
-
-			EndpointReference toEPR = new EndpointReference(toBean.getValue());
-			if (toEPR.hasAnonymousAddress()) {
+			if(anon) {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 			}
-
+			
 		} catch (AxisFault e1) {
 			throw new SandeshaException(e1);
 		}

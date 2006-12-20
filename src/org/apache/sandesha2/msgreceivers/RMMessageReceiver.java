@@ -49,7 +49,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		if(log.isDebugEnabled()) log.debug("Entry: RMMessageReceiver::receive");
 		
 		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-		if(log.isDebugEnabled()) log.debug("MsgReceiver got type:" + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));	
+		if(log.isDebugEnabled()) log.debug("MsgReceiver got type: " + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));	
 
 		// Note that some messages (such as stand-alone acks) will be routed here, but
 		// the headers will already have been processed. Therefore we should not assume

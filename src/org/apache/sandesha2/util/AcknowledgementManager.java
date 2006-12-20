@@ -29,7 +29,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -258,11 +257,6 @@ public class AcknowledgementManager {
 
 		// adding the SequenceAcknowledgement part.
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequencePropertyKey ,sequenceId, storageManager);
-
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-
-		ackMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, addressingNamespaceURI);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::generateAckMessage");

@@ -330,22 +330,20 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		OperationContext operationContext = msgContext.getOperationContext();
 
 		// SENDING THE CREATE SEQUENCE.
-		EndpointReference acksToEPR = new EndpointReference(null); //use this to hold the acksTo EPR
 		if (sendCreateSequence) {
+			EndpointReference acksToEPR = null;
 			SequencePropertyBean responseCreateSeqAdded = seqPropMgr.retrieve(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
-
-			String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
 
 			if (responseCreateSeqAdded == null) {
 				responseCreateSeqAdded = new SequencePropertyBean(sequencePropertyKey,
 						Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT, "true");
 				seqPropMgr.insert(responseCreateSeqAdded);
 
-				if (serviceContext != null)
-						acksToEPR.setAddress((String) msgContext.getProperty(SandeshaClientConstants.AcksTo));
+				if (serviceContext != null) {
+					String address = (String) msgContext.getProperty(SandeshaClientConstants.AcksTo);
+					if(address != null) acksToEPR = new EndpointReference(address);
+				}
 
 				if (msgContext.isServerSide()) {
 					// we do not set acksTo value to anonymous when the create
@@ -366,28 +364,25 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					acksToEPR = requestMessage.getTo();
 
 				} else {
-					if (acksToEPR.getAddress() == null){
+					if (acksToEPR == null){
 						EndpointReference replyToEPR = msgContext.getReplyTo();
 						
 						if(replyToEPR!=null && !replyToEPR.getAddress().equals("")){
 							//use the replyTo address as acksTo
 							if (log.isDebugEnabled())
-								log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + acksToEPR.getAddress());
+								log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + replyToEPR.getAddress());
 							
 							acksToEPR = replyToEPR;
-						}
-						else{
-							acksToEPR.setAddress(anonymousURI);
 						}
 					}
 				}
 
-				if (acksToEPR.getAddress()!=null && !anonymousURI.equals(acksToEPR.getAddress()) && !serverSide) {
+				if (acksToEPR != null && !acksToEPR.hasAnonymousAddress() && !serverSide) {
 					String transportIn = (String) configContext // TODO verify
 							.getProperty(MessageContext.TRANSPORT_IN);
 					if (transportIn == null)
 						transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
-				} else if (acksToEPR.getAddress() == null && serverSide) {
+				} else if (acksToEPR == null && serverSide) {
 //					String incomingSequencId = SandeshaUtil
 //							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
 					
@@ -402,16 +397,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						if (bean != null) {
 							String beanAcksToValue = bean.getValue();
 							if (beanAcksToValue != null)
-								acksToEPR.setAddress(beanAcksToValue);
+								acksToEPR = new EndpointReference(beanAcksToValue);
 						}
 					} catch (AxisFault e) {
 						throw new SandeshaException (e);
-					}
-				} else if (anonymousURI.equals(acksToEPR.getAddress())) {
-					// set transport in.
-					Object trIn = msgContext.getProperty(MessageContext.TRANSPORT_IN);
-					if (trIn == null) {
-						// TODO
 					}
 				}
 				addCreateSequenceMessage(rmMsgCtx, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
@@ -546,13 +535,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		createSeqMgr.insert(rMSBean);
 
-		String addressingNamespaceURI = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, storageManager);
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceURI);
-
-		if (createSeqMsg.getReplyTo() == null)
-			createSeqMsg.setReplyTo(new EndpointReference(anonymousURI));
-
+//		if (createSeqMsg.getReplyTo() == null) {
+//			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(createSeqMsg);
+//			createSeqMsg.setReplyTo(new EndpointReference(anonymousURI));
+//		}
+//		
 		SenderBean createSeqEntry = new SenderBean();
 		createSeqEntry.setMessageContextRefKey(createSequenceMessageStoreKey);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());

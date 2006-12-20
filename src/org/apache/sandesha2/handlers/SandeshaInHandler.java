@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
@@ -101,14 +100,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			//This is responsible for Sandesha2 specific 
 			FaultManager.processMessagesForFaults(msgCtx);
 			
-			RMMsgContext rmMsgCtx = null;
-			try {
-				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
-			} catch (SandeshaException ex) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInnitMessage);
-				log.debug(message);
-				throw new AxisFault(message, ex);
-			}
+			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
 			// validating the message
 			MessageValidator.validateMessage(rmMsgCtx, storageManager);

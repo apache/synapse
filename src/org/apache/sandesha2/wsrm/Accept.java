@@ -40,23 +40,31 @@ public class Accept implements IOMRMElement {
 	
 	private String rmNamespaceValue;
 	
-	private String addressingNamespaceValue;
-
-
-	public Accept(String rmNamespaceValue, String addressingNamespaceValue) throws SandeshaException {
+	// Constructor used during parsing
+	public Accept(String rmNamespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownNamespace,
 					rmNamespaceValue));
 		
-		this.addressingNamespaceValue = addressingNamespaceValue;
 		this.rmNamespaceValue = rmNamespaceValue;
+	}
+	
+	// Constructor used during writing
+	public Accept(String rmNamespace, AcksTo acksTo) throws SandeshaException {
+		this(rmNamespace);
+		this.acksTo = acksTo;
 	}
 
 	public String getNamespaceValue(){
 		return rmNamespaceValue;
 	}
-
+	
+	public String getAddressingNamespaceValue() {
+		if(acksTo != null) return acksTo.getAddressingNamespaceValue();
+		return null;
+	}
+	
 	public Object fromOMElement(OMElement element) throws OMException,AxisFault {
 		
 		OMElement acceptPart = element.getFirstChildWithName(new QName(
@@ -66,7 +74,7 @@ public class Accept implements IOMRMElement {
 					SandeshaMessageKeys.noAcceptPartInElement,
 					element.toString()));
 
-		acksTo = new AcksTo(rmNamespaceValue,addressingNamespaceValue);
+		acksTo = new AcksTo(rmNamespaceValue);
 		acksTo.fromOMElement(acceptPart);
 
 		return this;

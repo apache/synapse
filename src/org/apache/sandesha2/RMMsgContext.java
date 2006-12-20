@@ -23,13 +23,10 @@ import java.util.Iterator;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMPart;
 
@@ -47,8 +44,6 @@ public class RMMsgContext {
 	private int messageType;
 
 	private String rmNamespaceValue = null;
-	
-	private String addressingNamespaceValue = null;
 	
 	private String rmSpecVersion = null;
 	
@@ -318,19 +313,6 @@ public class RMMsgContext {
 		return msgContext.getFLOW();
 	}
 
-	public String getAddressingNamespaceValue() {
-		return addressingNamespaceValue;
-	}
-
-	public void setAddressingNamespaceValue(String addressingNamespaceValue) throws SandeshaException {
-		if (!AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNamespaceValue) &&
-			!AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNamespaceValue))
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownWSAVersion, addressingNamespaceValue));
-		
-		this.addressingNamespaceValue = addressingNamespaceValue;
-	}
-	
 	/**
 	 * This will return the sequenceId if it could be derived from the SOAP envelope, in the
 	 * message initiation.

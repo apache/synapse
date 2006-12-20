@@ -21,18 +21,20 @@ public class Endpoint implements IOMRMElement {
 	
 	private String addressingNamespaceValue = null;
 
-	public Endpoint (String rmNamespaceValue,String addressingNamespaceValue) throws AxisFault {
+	// Constructor used while parsing
+	public Endpoint (String rmNamespaceValue) throws AxisFault {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					rmNamespaceValue));
 		
 		this.rmNamespaceValue = rmNamespaceValue;
-		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
+	// Constructor used while writing
 	public Endpoint (EndpointReference epr, String rmNamespaceValue, String addressingNamespaceValue) throws AxisFault {
-		this (rmNamespaceValue,addressingNamespaceValue);
+		this (rmNamespaceValue);
+		this.addressingNamespaceValue = addressingNamespaceValue;
 		this.epr = epr;
 	}
 
@@ -64,7 +66,7 @@ public class Endpoint implements IOMRMElement {
 		OMFactory factory = element.getOMFactory();
 		
 		QName endpoint = new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.ENDPOINT, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-	    OMElement endpointElement =	EndpointReferenceHelper.toOM (factory,epr, endpoint,addressingNamespaceValue);
+	    OMElement endpointElement =	EndpointReferenceHelper.toOM (factory, epr, endpoint, addressingNamespaceValue);
 		
 		element.addChild(endpointElement);
 		return element;
@@ -74,14 +76,7 @@ public class Endpoint implements IOMRMElement {
 		return epr;
 	}
 
-	public void setEPR(EndpointReference epr) {
-		this.epr = epr;
-	}
-	
 	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
-			return true;
-		
 		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
 			return true;
 		

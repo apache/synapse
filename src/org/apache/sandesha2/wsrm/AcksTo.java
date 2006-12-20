@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.wsrm;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -42,24 +44,30 @@ public class AcksTo implements IOMRMElement {
 	private String rmNamespaceValue = null;
 	
 	private String addressingNamespaceValue = null;
-
-	public AcksTo (String rmNamespaceValue,String addressingNamespaceValue) throws AxisFault {
+	
+	// Constructor used while parsing
+	public AcksTo (String rmNamespaceValue) throws AxisFault {
 		if (!isNamespaceSupported(rmNamespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
 					rmNamespaceValue));
 		
 		this.rmNamespaceValue = rmNamespaceValue;
-		this.addressingNamespaceValue = addressingNamespaceValue;
 	}
 	
-	public AcksTo (EndpointReference epr ,String rmNamespaceValue, String addressingNamespaceValue) throws AxisFault {
-		this (rmNamespaceValue,addressingNamespaceValue);
+	// Constructor used while writing
+	public AcksTo (EndpointReference epr, String rmNamespaceValue, String addressingNamespaceValue) throws AxisFault {
+		this (rmNamespaceValue);
+		this.addressingNamespaceValue = addressingNamespaceValue;
 		this.epr = epr;
 	}
 
-	public String getNamespaceValue(){
+	public String getNamespaceValue() {
 		return rmNamespaceValue;
+	}
+	
+	public String getAddressingNamespaceValue() {
+		return addressingNamespaceValue;
 	}
 
 	public Object fromOMElement(OMElement element) throws OMException,AxisFault {
@@ -72,6 +80,15 @@ public class AcksTo implements IOMRMElement {
 					element.toString()));
 
 		epr = EndpointReferenceHelper.fromOM (acksToPart);
+
+		// Sniff the addressing namespace from the Address child of the EPR
+		Iterator children = acksToPart.getChildElements();
+		while(children.hasNext() && addressingNamespaceValue == null) {
+			OMElement child = (OMElement) children.next();
+			if("Address".equals(child.getLocalName())) {
+				addressingNamespaceValue = child.getNamespace().getNamespaceURI();
+			}
+		}
 
 		return this;
 	}
@@ -96,10 +113,6 @@ public class AcksTo implements IOMRMElement {
 		return epr;
 	}
 
-	public void setAddress(EndpointReference epr) {
-		this.epr = epr;
-	}
-	
 	public boolean isNamespaceSupported (String namespaceName) {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;

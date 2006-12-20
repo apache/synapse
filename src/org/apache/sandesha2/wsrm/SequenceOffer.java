@@ -44,8 +44,6 @@ public class SequenceOffer implements IOMRMElement {
 	
 	private String namespaceValue = null;
 	
-	private String addressingNamespace = null;
-
 	public SequenceOffer(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -82,12 +80,7 @@ public class SequenceOffer implements IOMRMElement {
 		OMElement endpointPart = sequenceOfferPart
 				.getFirstChildWithName(new QName (namespaceValue,Sandesha2Constants.WSRM_COMMON.ENDPOINT));
 		if (endpointPart != null) {
-			if (addressingNamespace==null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.addressingNamespaceNotSet);
-				throw new SandeshaException (message);
-			}
-			
-			endpoint = new Endpoint (namespaceValue, addressingNamespace);
+			endpoint = new Endpoint (namespaceValue);
 			endpoint.fromOMElement (endpointPart);
 		}
 
@@ -154,12 +147,4 @@ public class SequenceOffer implements IOMRMElement {
 		return false;
 	}
 
-	public String getAddressingNamespace() {
-		return addressingNamespace;
-	}
-
-	public void setAddressingNamespace(String addressingNamespace) {
-		this.addressingNamespace = addressingNamespace;
-	}
-	
 }

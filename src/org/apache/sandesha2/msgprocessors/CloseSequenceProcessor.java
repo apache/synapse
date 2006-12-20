@@ -28,7 +28,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -119,16 +118,8 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 
 		MessageContext closeSequenceMsg = rmMsgCtx.getMessageContext();
 
-		MessageContext closeSequenceResponseMsg = null;
-
-		try {
-			closeSequenceResponseMsg = Utils.createOutMessageContext(closeSequenceMsg);
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1);
-		}
-
-		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, closeSequenceResponseMsg,
-				storageManager);
+		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx);
+		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();
 
 		while (sequenceAckIter.hasNext()) {
 			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();

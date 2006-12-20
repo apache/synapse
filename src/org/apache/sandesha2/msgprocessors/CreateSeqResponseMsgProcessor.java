@@ -26,6 +26,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -92,12 +94,20 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		}
 
 		RelatesTo relatesTo = createSeqResponseRMMsgCtx.getMessageContext().getRelatesTo();
-		if (relatesTo == null) {
+		String createSeqMsgId = null;
+		if (relatesTo != null) {
+			createSeqMsgId = relatesTo.getValue();
+		} else {
+			// Work out the related message from the operation context
+			OperationContext context = createSeqResponseRMMsgCtx.getMessageContext().getOperationContext();
+			MessageContext createSeq = context.getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+			if(createSeq != null) createSeqMsgId = createSeq.getMessageID();
+		}
+		if(createSeqMsgId == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.relatesToNotAvailable);
 			log.error(message);
 			throw new SandeshaException(message);
 		}
-		String createSeqMsgId = relatesTo.getValue();
 
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
@@ -194,7 +204,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			RMDBean rMDBean = new RMDBean();
 			rMDBean.setSequenceID(offeredSequenceId);
 			rMDBean.setNextMsgNoToProcess(1);
-			
 
 			//Storing the referenceMessage of the sending side sequence as the reference message
 			//of the receiving side as well.
@@ -215,7 +224,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
 								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
 				EndpointReference ref = new EndpointReference(replyToAddress);
-				if(!createSeqBean.isPollingMode() && ref.hasAnonymousAddress()) {
+				if(!createSeqBean.isPollingMode() && (replyToAddress == null || ref.hasAnonymousAddress())) {
 					rMDBean.setPollingMode(true);
 					SandeshaUtil.startPollingManager(configCtx);
 				}
@@ -239,12 +248,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
 			msgsBean.setValue("");
 			sequencePropMgr.insert(msgsBean);
-
-			// setting the addressing version.
-			String addressingNamespace = createSeqResponseRMMsgCtx.getAddressingNamespaceValue();
-			SequencePropertyBean addressingVersionBean = new SequencePropertyBean(offeredSequenceId,
-					Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, addressingNamespace);
-			sequencePropMgr.insert(addressingVersionBean);
 
 			// Store the security token for the offered sequence
 			if(tokenData != null) {

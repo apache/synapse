@@ -133,8 +133,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			
 			if(!ignoreNextMsg){
 				// updating the next msg to invoke
-
-				String s = invokerBean.getSequenceID();
 				RMDBean rMDBean = nextMsgMgr.retrieve(sequenceId);
 				long nextMsgNo = rMDBean.getNextMsgNoToProcess();
 				

@@ -25,13 +25,12 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -60,7 +59,6 @@ public class RMElements {
 	private MessagePending messagePending = null;
 	private MakeConnection makeConnection = null;
 	private String rmNamespaceValue = null;
-	private String addressingNamespaceValue = null;
 	
 	public RMElements () {
 		sequenceAcknowledgements = new ArrayList ();
@@ -69,7 +67,6 @@ public class RMElements {
 	
 	public RMElements (String addressingNamespace) {
 		this ();
-		this.addressingNamespaceValue = addressingNamespace;
 	}
 	
 	public void fromSOAPEnvelope(SOAPEnvelope envelope, String action) throws AxisFault {
@@ -93,17 +90,6 @@ public class RMElements {
 			return;
 		}
 		
-		String addressingNamespaceTmp = getAddressingNamespaceValue (envelope,action);
-		if (addressingNamespaceTmp!=null) {
-			addressingNamespaceValue = addressingNamespaceTmp;
-		}
-		
-		if (addressingNamespaceValue==null) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownWSAVersion, envelope.toString());
-			throw new SandeshaException (message);
-		}
-		
 		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
 				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
 		if (sequenceElement != null) {
@@ -116,7 +102,7 @@ public class RMElements {
 						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
 		
 		if (createSeqElement != null) {
-			createSequence = new CreateSequence(rmNamespaceValue,addressingNamespaceValue);
+			createSequence = new CreateSequence(rmNamespaceValue);
 			createSequence.fromOMElement(envelope.getBody());
 		}
 
@@ -125,7 +111,7 @@ public class RMElements {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
 		if (createSeqResElement != null) {
-			createSequenceResponse = new CreateSequenceResponse(rmNamespaceValue,addressingNamespaceValue);
+			createSequenceResponse = new CreateSequenceResponse(rmNamespaceValue);
 			createSequenceResponse.fromOMElement(envelope.getBody());
 		}
 
@@ -332,6 +318,7 @@ public class RMElements {
 	}
 	
 	private String getRMNamespaceValue (SOAPEnvelope envelope, String action) {
+		
 		SOAPHeader header = envelope.getHeader();
 		if (header!=null) {
 			ArrayList headers = header.getHeaderBlocksWithNSURI(Sandesha2Constants.SPEC_2005_02.NS_URI);
@@ -343,54 +330,34 @@ public class RMElements {
 				return Sandesha2Constants.SPEC_2006_08.NS_URI;
 		}
 		
-		//rm control messages with parts in the body will be identified by the wsa:action.
-		if (action==null)
-			return null;
-		
-		if (action.equals(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2005_02.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2005_02.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT))
-			return Sandesha2Constants.SPEC_2005_02.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2005_02.NS_URI;
-		
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		if (action.equals(Sandesha2Constants.SPEC_2006_08.Actions.ACTION_MAKE_CONNECTION))
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		
-		return null;   //a version could not be found
-	}
-	
-	private String getAddressingNamespaceValue (SOAPEnvelope envelope, String action) {
-		SOAPHeader header = envelope.getHeader();
-		if (header!=null) {
-			ArrayList headers = header.getHeaderBlocksWithNSURI(AddressingConstants.Submission.WSA_NAMESPACE);
-			if (headers!=null && headers.size()>0)
-				return AddressingConstants.Submission.WSA_NAMESPACE;
+		//rm control messages with parts in the body will be identified by the wsa:action,
+		//except when ws-addressing headers are turned off
+		if (action!=null) {
+			if(action.startsWith(Sandesha2Constants.SPEC_2005_02.NS_URI)) {
+				return Sandesha2Constants.SPEC_2005_02.NS_URI;
+			}
 			
-			headers = header.getHeaderBlocksWithNSURI(AddressingConstants.Final.WSA_NAMESPACE);
-			if (headers!=null && headers.size()>0)
-				return AddressingConstants.Final.WSA_NAMESPACE;
+			if (action.startsWith(Sandesha2Constants.SPEC_2006_08.NS_URI))
+				return Sandesha2Constants.SPEC_2006_08.NS_URI;
+		}
+		
+		// As a final resort check the body namespace
+		SOAPBody body = envelope.getBody();
+		if(body != null) {
+			Iterator elements = body.getChildElements();
+			if(elements.hasNext()) {
+				OMElement firstBodyElement = (OMElement) elements.next();
+				String namespace = firstBodyElement.getNamespace().getNamespaceURI();
+				if(namespace.equals(Sandesha2Constants.SPEC_2005_02.NS_URI) ||
+				   namespace.equals(Sandesha2Constants.SPEC_2006_08.NS_URI)  ) {
+					return namespace;
+				}
+			}
 		}
 		
 		return null;   //a version could not be found
 	}
-
+	
 	public CloseSequence getCloseSequence() {
 		return closeSequence;
 	}
@@ -413,10 +380,6 @@ public class RMElements {
 	
 	public void setUsesSequenceSTR(UsesSequenceSTR header) {
 		usesSequenceSTR = header;
-	}
-
-	public String getAddressingNamespaceValue() {
-		return addressingNamespaceValue;
 	}
 
 	public MakeConnection getMakeConnection() {

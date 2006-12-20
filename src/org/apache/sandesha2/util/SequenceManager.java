@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -90,21 +89,11 @@ public class SequenceManager {
 		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(sequenceId,
 				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
 
-		// setting the addressing version
-		String addressingNamespaceValue = createSequenceMsg.getAddressingNamespaceValue();
-		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean(sequenceId,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, addressingNamespaceValue);
-		seqPropMgr.insert(addressingNamespaceBean);
-
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespaceValue);
-
 		// If no replyTo value. Send responses as sync.
 		SequencePropertyBean toBean = null;
 		if (replyTo != null) {
 			toBean = new SequencePropertyBean(sequenceId, Sandesha2Constants.SequenceProperties.TO_EPR, replyTo
 					.getAddress());
-		} else {
-			toBean = new SequencePropertyBean(sequenceId, Sandesha2Constants.SequenceProperties.TO_EPR, anonymousURI);
 		}
 
 		SequencePropertyBean replyToBean = new SequencePropertyBean(sequenceId,
@@ -188,50 +177,12 @@ public class SequenceManager {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		// setting the addressing version
-		String addressingNamespace = (String) firstAplicationMsgCtx
-				.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-
-		if (addressingNamespace == null) {
-			OperationContext opCtx = firstAplicationMsgCtx.getOperationContext();
-			if (opCtx != null) {
-				try {
-					MessageContext requestMsg = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					if (requestMsg != null)
-						addressingNamespace = (String) requestMsg
-								.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-				} catch (AxisFault e) {
-					throw new SandeshaException(e);
-				}
-			}
-		}
-
-		if (addressingNamespace == null)
-			addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE; // defaults
-																			// to
-																			// Final.
-																			// Make
-																			// sure
-																			// this
-																			// is
-																			// synchronized
-																			// with
-																			// addressing.
-
-		SequencePropertyBean addressingNamespaceBean = new SequencePropertyBean(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ADDRESSING_NAMESPACE_VALUE, addressingNamespace);
-		seqPropMgr.insert(addressingNamespaceBean);
-		
-		
 		//setting the SOAPVersion Bean.
 		String SOAPVersion = firstAplicationMsgCtx.getOptions().getSoapVersionURI();
 		SequencePropertyBean SOAPVersionBean = new SequencePropertyBean (sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.SOAP_VERSION, SOAPVersion);
 		
 		seqPropMgr.insert(SOAPVersionBean);
-		
-
-		String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
 
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		String acksTo = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AcksTo);
@@ -290,29 +241,25 @@ public class SequenceManager {
 				throw new SandeshaException(message);
 			}
 		} else {
-			
-			//setting replyTo, which defaults to anonymous
-			String replyTo = anonymousURI;
 			EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
-			if (replyToEPR!=null) replyTo = replyToEPR.getAddress();
-			
-			replyToBean = new SequencePropertyBean(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyTo);
+			if (replyToEPR!=null) {
+				replyToBean = new SequencePropertyBean(sequencePropertyKey,
+						Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
+			}
 
-			//TODO set AcksToBean.
 		}
 		
-		// Default value for acksTo is anonymous (this happens only for the
-		// client side)
-		if (acksTo == null) {
-			acksTo = anonymousURI;
+		// Default value for acksTo is anonymous (this happens only for the client side)
+		boolean anonAcks = true;
+		if (acksTo != null) {
+			acksToBean = new SequencePropertyBean(sequencePropertyKey, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
+					acksTo);
+			EndpointReference epr = new EndpointReference(acksTo);
+			anonAcks = epr.hasAnonymousAddress();
 		}
 
-		acksToBean = new SequencePropertyBean(sequencePropertyKey, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
-				acksTo);
-
 		// start the in listner for the client side, if acksTo is not anonymous.
-		if (!firstAplicationMsgCtx.isServerSide() && !anonymousURI.equals(acksTo)) {
+		if (!firstAplicationMsgCtx.isServerSide() && !anonAcks) {
 
 			String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
 			if (transportInProtocol == null) {
@@ -372,26 +319,23 @@ public class SequenceManager {
 		SandeshaUtil.startSenderForTheSequence(configurationContext, sequencePropertyKey);
 
 		
-		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonymousURI);
+		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonAcks);
 
 	}
 
-	private static void updateClientSideListnerIfNeeded(MessageContext messageContext, String addressingAnonymousURI)
+	private static void updateClientSideListnerIfNeeded(MessageContext messageContext, boolean anonAcks)
 			throws SandeshaException {
 		if (messageContext.isServerSide())
 			return; // listners are updated only for the client side.
 
 		String transportInProtocol = messageContext.getOptions().getTransportInProtocol();
 
-		String acksTo = (String) messageContext.getProperty(SandeshaClientConstants.AcksTo);
-		String mep = messageContext.getAxisOperation().getMessageExchangePattern();
-
 		boolean startListnerForAsyncAcks = false;
 		boolean startListnerForAsyncControlMsgs = false; // For async
 															// createSerRes &
 															// terminateSeq.
 
-		if (acksTo != null && !addressingAnonymousURI.equals(acksTo)) {
+		if (!anonAcks) {
 			// starting listner for async acks.
 			startListnerForAsyncAcks = true;
 		}

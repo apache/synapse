@@ -164,10 +164,18 @@ public class SequenceProcessor {
 		}
 
 		if (msgNo > highestInMsgNo) {
+			// If WS-Addressing is turned off there may not be a message id written into the SOAP
+			// headers, but we can still fake one up to help us match up requests and replies within
+			// this end of the connection.
+			String messageId = msgCtx.getMessageID();
+			if(messageId == null) {
+				messageId = SandeshaUtil.getUUID();
+				msgCtx.setMessageID(messageId);
+			}
 			SequencePropertyBean highestMsgNoBean = new SequencePropertyBean(propertyKey,
 					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, Long.toString(msgNo));
 			SequencePropertyBean highestMsgIdBean = new SequencePropertyBean(propertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_ID, msgCtx.getMessageID());
+					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_ID, messageId);
 
 			if (highetsInMsgNoStr != null) {
 				seqPropMgr.update(highestMsgNoBean);

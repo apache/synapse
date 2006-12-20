@@ -50,6 +50,11 @@ public class RMDBean extends RMBean {
 	 */
 	private String referenceMessageKey;
 	
+	private long highestInMessageNumber = 0;
+	
+	private String highestInMessageId;
+	
+	
 
 	public RMDBean() {
 
@@ -106,6 +111,22 @@ public class RMDBean extends RMBean {
 		this.referenceMessageKey = referenceMessageKey;
 	}
 	
+	public String getHighestInMessageId() {
+  	return highestInMessageId;
+  }
+
+	public void setHighestInMessageId(String highestInMessageId) {
+  	this.highestInMessageId = highestInMessageId;
+  }
+
+	public long getHighestInMessageNumber() {
+  	return highestInMessageNumber;
+  }
+
+	public void setHighestInMessageNumber(long highestInMessageNumber) {
+  	this.highestInMessageNumber = highestInMessageNumber;
+  }
+	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -113,6 +134,9 @@ public class RMDBean extends RMBean {
 		result.append("\nNext Msg # : "); result.append(nextMsgNoToProcess);
 		result.append("\nPolling    : "); result.append(pollingMode);
 		result.append("\nRef Msg Key: "); result.append(referenceMessageKey);
+		result.append("\nHishestInMessageNumber: "); result.append(highestInMessageNumber);
+		result.append("\nHishestInMessageKey: "); result.append(highestInMessageId);
 		return result.toString();
 	}
+
 }

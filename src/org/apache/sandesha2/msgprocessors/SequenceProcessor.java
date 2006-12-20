@@ -151,17 +151,19 @@ public class SequenceProcessor {
 			throw new SandeshaException(message);
 		}
 
-		String key = SandeshaUtil.getUUID(); // key to store the message.
+		// Pause the messages bean if not the right message to invoke.
+		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
+		RMDBean bean = mgr.retrieve(sequenceId);
 
+		if (bean == null) {
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
+					sequenceId));
+		}
+
+		String key = SandeshaUtil.getUUID(); // key to store the message.
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
-		String highetsInMsgNoStr = SandeshaUtil.getSequenceProperty(propertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, storageManager);
-
-		long highestInMsgNo = 0;
-		if (highetsInMsgNoStr != null) {
-			highestInMsgNo = Long.parseLong(highetsInMsgNoStr);
-		}
+		long highestInMsgNo = bean.getHighestInMessageNumber();
 
 		if (msgNo > highestInMsgNo) {
 			// If WS-Addressing is turned off there may not be a message id written into the SOAP
@@ -172,18 +174,11 @@ public class SequenceProcessor {
 				messageId = SandeshaUtil.getUUID();
 				msgCtx.setMessageID(messageId);
 			}
-			SequencePropertyBean highestMsgNoBean = new SequencePropertyBean(propertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, Long.toString(msgNo));
-			SequencePropertyBean highestMsgIdBean = new SequencePropertyBean(propertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_ID, messageId);
-
-			if (highetsInMsgNoStr != null) {
-				seqPropMgr.update(highestMsgNoBean);
-				seqPropMgr.update(highestMsgIdBean);
-			} else {
-				seqPropMgr.insert(highestMsgNoBean);
-				seqPropMgr.insert(highestMsgIdBean);
-			}
+			
+			bean.setHighestInMessageId(messageId);
+			bean.setHighestInMessageNumber(msgNo);
+			// Update the bean
+			mgr.update(bean);
 		}
 
 		String messagesStr = "";
@@ -217,17 +212,6 @@ public class SequenceProcessor {
 			seqPropMgr.update(msgsBean);
 		}
 
-		// Pause the messages bean if not the right message to invoke.
-		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
-		RMDBean bean = mgr.retrieve(sequenceId);
-
-		if (bean == null) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
-					sequenceId));
-		}
-
-		InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
-
 		// inorder invocation is still a global property
 		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
 				msgCtx.getConfigurationContext().getAxisConfiguration()).isInOrder();
@@ -238,6 +222,8 @@ public class SequenceProcessor {
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
 		
 		if (inOrderInvocation && !msgNoPresentInList) {
+
+			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
 			// saving the message.
 			try {

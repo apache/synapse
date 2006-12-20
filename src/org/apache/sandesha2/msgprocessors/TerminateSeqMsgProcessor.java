@@ -39,7 +39,9 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
@@ -164,19 +166,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		String highestImMsgNumberStr = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_NUMBER, storageManager);
-		String highestImMsgId = SandeshaUtil.getSequenceProperty(requestSidesequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_IN_MSG_ID, storageManager);
+		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
+		RMDBean bean = mgr.retrieve(sequenceId);
 
-		long highestInMsgNo = 0;
-		if (highestImMsgNumberStr != null) {
-			if (highestImMsgId == null)
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.highestMsgIdNotStored, sequenceId));
-
-			highestInMsgNo = Long.parseLong(highestImMsgNumberStr);
-		}
+		long highestInMsgNo = bean.getHighestInMessageNumber();
 
 		// following will be valid only for the server side, since the obtained
 		// int. seq ID is only valid there.
@@ -193,9 +186,9 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			} else {
 				// Mark up the highest inbound message as if it had the last message flag on it.
 				// 
-				String inMsgId = highestImMsgId;
+				String inMsgId = bean.getHighestInMessageId();
 				SequencePropertyBean lastInMsgBean = new SequencePropertyBean(requestSidesequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.LAST_IN_MSG_ID, highestImMsgId);
+						Sandesha2Constants.SequenceProperties.LAST_IN_MSG_ID, bean.getHighestInMessageId());
 				seqPropMgr.insert(lastInMsgBean);
 				
 				// If an outbound message has already gone out with that relatesTo, then we can terminate

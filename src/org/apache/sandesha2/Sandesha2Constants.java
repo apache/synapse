@@ -274,15 +274,11 @@ public interface Sandesha2Constants {
 
 		String REPLY_TO_EPR = "ReplyToEPR";
 
-		String APP_MSG_PROCESSOR_LIST = "AppMsgProcessorList";
-
 		String OUT_CREATE_SEQUENCE_SENT = "OutCreateSeqSent";
 
 		String NEXT_MESSAGE_NUMBER = "NextMsgNo";
 
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
-
-		String CHECK_RESPONSE = "CheckResponse";
 
 		String OFFERED_SEQUENCE = "OfferedSequence";
 
@@ -296,8 +292,6 @@ public interface Sandesha2Constants {
 		
 		String TRANSPORT_TO = "TransportTo";
 		
-		String OUT_SEQ_ACKSTO = "OutSequenceAcksTo";
-		
 		String SEQUENCE_CLOSED = "SequenceClosed";
 		
 		String SEQUENCE_CLOSED_CLIENT = "SequenceClosedClient"; //indicates the client has sent a close sequence
@@ -305,15 +299,6 @@ public interface Sandesha2Constants {
 		String SEQUENCE_TERMINATED = "SequenceTerminated";
 		
 		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
-		
-//		String LAST_MESSAGE = "LastMessage";
-
-		String REQUEST_SIDE_SEQUENCE_ID = "RequestSideSequenceID"; 		//used only at the server side
-		
-		// A pair of properties to keep track of the highest received message
-		// for an inbound sequence.
-		String HIGHEST_IN_MSG_NUMBER = "HighestInMsgNumber";
-		String HIGHEST_IN_MSG_ID = "HighestInMsgId";
 		
 		// Once an inbound sequence is closed, or we receive a message with the
 		// 'LastMessage' marker, we record the message id of the highest message

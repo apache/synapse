@@ -302,6 +302,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		} else {
 			// in the client side, user will set the RM version.
 			specVersion = (String) msgContext.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+			
+			// If the spec version is null, look in the axis operation to see value has been set
+			if (specVersion == null && msgContext.getAxisOperation().getParameter(SandeshaClientConstants.RM_SPEC_VERSION) != null) 
+				specVersion = (String) msgContext.getAxisOperation().getParameter(SandeshaClientConstants.RM_SPEC_VERSION).getValue();						
+			
 		}
 
 		if (specVersion == null)

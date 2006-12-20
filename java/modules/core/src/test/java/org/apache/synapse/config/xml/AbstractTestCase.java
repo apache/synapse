@@ -82,4 +82,8 @@ public abstract class AbstractTestCase extends TestCase {
         String parentXML = "<synapse xmlns=\"http://ws.apache.org/ns/synapse\"><definitions></definitions></synapse>";
         return createOMElement(parentXML);
     }
+
+    protected boolean compare(OMElement inputElement, OMElement serializedElement) throws XMLComparisonException {
+        return  comparator.compare(inputElement, serializedElement);
+    }
 }

@@ -10,11 +10,14 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RangeString;
@@ -112,7 +115,7 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 
 	}
 	
-	public void testForceInvokeWithDiscardGaps () throws AxisFault,InterruptedException  {
+	public void testForceInvokeWithDiscardGaps () throws AxisFault  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
@@ -139,11 +142,12 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(3));
 			serviceClient.fireAndForget(getPingOMBlock("ping3"));
 	
-			Thread.sleep(5000);
+			String internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+			waitForMessageToBeAcked(serviceClient, internalSequenceId);
 			
 			StorageManager mgr = SandeshaUtil.getInMemoryStorageManager(configContext);
 			Transaction t = mgr.getTransaction();
-			String inboundSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(SandeshaUtil.getInternalSequenceID(to, sequenceKey),
+			String inboundSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceId,
 					mgr);
 			t.commit();
 			
@@ -164,4 +168,51 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 
 	}
 	
+  /**
+   * Waits for the maximum of "waittime" for a message to be acked, before returning control to the application.
+   * @throws SandeshaException 
+   */
+  private void waitForMessageToBeAcked(ServiceClient serviceClient, String internalSequenceId) throws SandeshaException
+  {
+    // Get the highest out message number
+    ConfigurationContext context = serviceClient.getServiceContext().getConfigurationContext();
+    StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+    
+    // Get the sequence property bean manager
+    SequencePropertyBeanMgr beanMgr = storageManager.getSequencePropertyBeanMgr();
+    
+    // Get a transaction for the property finding
+    Transaction transaction = storageManager.getTransaction();
+    
+    // Get the highest out message property
+    SequencePropertyBean bean = beanMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_NUMBER);
+    
+    transaction.commit();
+    
+    Long highestOutMsgKey = Long.valueOf(bean.getValue());
+    
+    long timeNow = System.currentTimeMillis();
+    long timeToComplete = timeNow + waitTime;
+    boolean complete = false;    
+    
+    while (!complete && timeNow < timeToComplete)
+    {
+      timeNow = System.currentTimeMillis();
+
+      try
+      {                              
+        SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+        
+        if (sequenceReport.getCompletedMessages().contains(highestOutMsgKey))
+          complete = true;
+        else
+          Thread.sleep(tickTime);
+  
+      }
+      catch (Exception e)
+      {
+        // Ignore
+      }
+    }
+  }
 }

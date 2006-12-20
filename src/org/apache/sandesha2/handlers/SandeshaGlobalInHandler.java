@@ -280,21 +280,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			log.debug("Enter: SandeshaGlobalInHandler::processDroppedMessage");
 
 		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			String sequenceId = null;
-
-			if (sequence != null) {
-				sequenceId = sequence.getIdentifier().getIdentifier();
-			}
-
-			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-			SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(sequenceId,
-					Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-			String receivedMsgStr = receivedMsgsBean.getValue();
 
 			// Even though the duplicate message is dropped, hv to send the ack
 			// if needed.
-			SequenceProcessor.sendAckIfNeeded(rmMsgContext, receivedMsgStr, storageManager);
+			SequenceProcessor.sendAckIfNeeded(rmMsgContext, storageManager);
 
 		}
 		if (log.isDebugEnabled())

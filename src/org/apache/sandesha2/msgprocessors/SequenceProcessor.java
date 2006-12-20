@@ -263,7 +263,7 @@ public class SequenceProcessor {
 		}
 
 		// Sending acknowledgements
-		sendAckIfNeeded(rmMsgCtx, messagesStr, storageManager);
+		sendAckIfNeeded(rmMsgCtx, storageManager);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: SequenceProcessor::processReliableMessage " + msgCtxPaused);
@@ -284,7 +284,7 @@ public class SequenceProcessor {
 		return false;
 	}
 
-	public static void sendAckIfNeeded(RMMsgContext rmMsgCtx, String messagesStr, StorageManager storageManager)
+	public static void sendAckIfNeeded(RMMsgContext rmMsgCtx, StorageManager storageManager)
 			throws AxisFault {
 
 		if (log.isDebugEnabled())
@@ -351,6 +351,7 @@ public class SequenceProcessor {
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
 			ackBean.setReSend(false);
 			ackBean.setSequenceID(sequencePropertyKey);
+			ackBean.setInternalSequenceID(sequencePropertyKey);
 			EndpointReference to = ackMsgCtx.getTo();
 			if (to!=null)
 				ackBean.setToAddress(to.getAddress());

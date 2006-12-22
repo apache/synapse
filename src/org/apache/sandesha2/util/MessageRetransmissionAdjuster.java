@@ -74,6 +74,9 @@ public class MessageRetransmissionAdjuster {
 
 		boolean continueSending = true;
 		if (timeOutSequence) {
+			// Warn the user that the sequence has timed out
+			//if (log.isWarnEnabled())
+			//	log.warn();
 			stopRetransmission(retransmitterBean);
 
 			// Only messages of outgoing sequences get retransmitted. So named

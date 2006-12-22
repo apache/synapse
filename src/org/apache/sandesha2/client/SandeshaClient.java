@@ -19,6 +19,7 @@ package org.apache.sandesha2.client;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.MissingResourceException;
 
 import javax.xml.namespace.QName;
@@ -45,6 +46,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
@@ -324,22 +326,108 @@ public class SandeshaClient {
 		String oldAction = options.getAction();
 		options.setAction(SpecSpecificConstants.getCreateSequenceAction(rmSpecVersion));
 		
+		ServiceContext serviceContext = serviceClient.getServiceContext();
+		if (serviceContext == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.serviceContextNotSet));
+
+		ConfigurationContext configurationContext = serviceContext.getConfigurationContext();
+
+		// cleanup previous sequence
+		cleanupTerminatedSequence(to, oldSequenceKey, SandeshaUtil.getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration()));
+		
 		try {			
 			//just to inform the sender.
 			serviceClient.fireAndForget (null);
 		} catch (AxisFault e) {
 			throw new SandeshaException(e);
 		}
-
-		options.setAction(oldAction);
-		
-		options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
-		options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
+		finally {
+			options.setAction(oldAction);
+			
+			options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
+			options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);
+		}
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaClient::createSequence");
 	}
 
+	/**
+	 * If a user has requested to create a new sequence which was previously terminated, we need to clean up
+	 * any previous properties that might have been stored.
+	 * @param to
+	 * @param sequenceKey
+	 * @throws SandeshaStorageException 
+	 */
+	private static final void cleanupTerminatedSequence(String to, String sequenceKey, StorageManager storageManager) throws SandeshaException {
+		String internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
+		
+		if (log.isTraceEnabled())
+			log.trace("Checking if sequence " + internalSequenceId + " previously terminated");
+		
+		Transaction tran = storageManager.getTransaction();
+		
+		try {
+			
+			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+			
+			boolean terminatedSequence = false;
+			
+			//see if the sequence is terminated
+			SequencePropertyBean sequenceTerminated = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
+			if(sequenceTerminated!=null){
+				terminatedSequence = true;
+			}
+	
+			//see if the sequence is timed out
+			SequencePropertyBean sequenceTimedout = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
+			if(sequenceTimedout!=null){
+				terminatedSequence = true;
+			}
+	
+			if (terminatedSequence) {		
+				// We need to find out the original sequence id for this sequence by doing a backwards lookup
+				SequencePropertyBean bean = new SequencePropertyBean();
+				bean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+				bean.setValue(internalSequenceId);
+				bean = seqPropMgr.findUnique(bean);
+				
+				String sequenceId = null;
+				if (bean != null)
+				  sequenceId = bean.getSequencePropertyKey(); 
+				
+				// Find all properties which have a matching internal sequence id				
+				removeBeans(sequenceId, seqPropMgr);
+				removeBeans(internalSequenceId, seqPropMgr);
+			}
+		
+		} catch (SandeshaException e) {
+			tran.rollback();
+			tran = null;
+			
+			throw e;
+		} 
+		
+		tran.commit();
+	}
+	
+	private static final void removeBeans(String sequenceId, SequencePropertyBeanMgr seqPropMgr) throws SandeshaStorageException {
+		// Find all properties which have a matching sequence id
+		SequencePropertyBean bean = new SequencePropertyBean();
+		bean.setSequencePropertyKey(sequenceId);
+		List beans = seqPropMgr.find(bean);
+		
+		Iterator iterator = beans.iterator();
+		
+		while (iterator.hasNext()) {
+			bean = (SequencePropertyBean)iterator.next();
+			
+			seqPropMgr.delete(bean.getSequencePropertyKey(), bean.getName());				
+		}
+
+	}
+	
 	/**
 	 * Clients can use this to create a sequence sequence.
 	 * 

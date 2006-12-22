@@ -454,9 +454,81 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		finally {
 			configContext.getListenerManager().stop();
 			serviceClient.cleanup();			
-		}
-		
+		}		
 	}
+	
+  /**
+	 * Checks the following scenario
+	 * 
+	 * 1) send an application message (will generate the create sequence)
+	 * 2) terminate the sequence
+	 * 3) Issue wait until sequence completed (with a wait time)
+	 * 4) Create a new sequence
+	 * 5) send another application message 
+	 * 6) terminate the sequence
+	 * 7) Ensure that the sequence was terminated
+	 * 
+	 */
+	public void testTerminateCreateWithWait () throws Exception {
+
+		startServer(server_repoPath, server_axis2_xml);
+
+		String to = "http://127.0.0.1:" + 9999 + "/axis2/services/RMSampleService";
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+		
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+		
+		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
+		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+	   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
+	       Sandesha2Constants.SPEC_VERSIONS.v1_1);
+		clientOptions.setTo(new EndpointReference (to));
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		
+		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
+			//serviceClient.
+		serviceClient.setOptions(clientOptions);
+			
+		try{
+			// 1) Send the application message
+			serviceClient.fireAndForget(getPingOMBlock("ping1"));
+		
+			// 2) Terminate the sequence
+			SandeshaClient.terminateSequence(serviceClient);
+
+			// 3) wait for the sequence completion (30 second wait)
+			SandeshaClient.waitUntilSequenceCompleted(serviceClient, 30000);
+
+			// 4) Create a new Sequence to the same endpoint
+			SandeshaClient.createSequence(serviceClient, false, null);
+			
+			// 5) Send the second application message (this should use a new sequence)
+			serviceClient.fireAndForget(getPingOMBlock("ping2"));			
+
+			// 6) Terminate the sequence
+			SandeshaClient.terminateSequence(serviceClient);
+
+			// 7) wait for the sequence completion (30 second wait)
+			SandeshaClient.waitUntilSequenceCompleted(serviceClient, 30000);
+
+			// 8) Check that the sequence has terminated
+			SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+			assertNotNull(report);
+			assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, report.getSequenceStatus());
+
+		}
+		finally {
+			configContext.getListenerManager().stop();
+			serviceClient.cleanup();			
+		}		
+	}
+
 //	
 //	public void testCloseSequence () {
 //		

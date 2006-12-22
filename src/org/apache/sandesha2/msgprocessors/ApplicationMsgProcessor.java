@@ -231,6 +231,12 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
 		}
 
+		//see if the sequence is timed out
+		SequencePropertyBean sequenceTimedout = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
+		if(sequenceTimedout!=null){
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
+		}
+
 		// saving the used message number
 		if (!dummyMessage)
 			setNextMsgNo(configContext, sequencePropertyKey, messageNumber, storageManager);

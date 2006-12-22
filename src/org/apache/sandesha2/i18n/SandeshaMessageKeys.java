@@ -42,6 +42,7 @@ public class SandeshaMessageKeys {
 	public static final String sendMsgError="sendMsgError";
 	public static final String cannotSendMsgAsSequenceClosed="cannotSendMsgAsSequenceClosed";
 	public static final String cannotSendMsgAsSequenceTerminated="cannotSendMsgAsSequenceTerminated";
+	public static final String cannotSendMsgAsSequenceTimedout="cannotSendMsgAsSequenceTimedout";
 	public static final String noValidSyncResponse="noValidSyncResponse";
 	public static final String generalError="generalError";
 	public static final String classLoaderNotFound="classLoaderNotFound";
@@ -281,6 +282,6 @@ public class SandeshaMessageKeys {
 	public final static String couldNotSendCloseResponse="couldNotSendCloseResponse";
 	public final static String couldNotSendCloseSeqNotFound="couldNotSendCloseSeqNotFound";
 	
-    public final static String couldNotLoadModulePolicies = "couldNotLoadModulePolicies";
-    public final static String modulePoliciesLoaded = "modulePoliciesLoaded";
+	public final static String couldNotLoadModulePolicies = "couldNotLoadModulePolicies";
+	public final static String modulePoliciesLoaded = "modulePoliciesLoaded";
 }

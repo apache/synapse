@@ -319,10 +319,6 @@ public interface Sandesha2Constants {
 		String SOAP_VERSION = "SOAPVersion";
 		
 		String OFFERED_ENDPOINT = "OfferedEndpoint";
-		
-		static final String LAST_FAILED_TO_SEND_ERROR = "LastFailToSendError";
-		
-		static final String LAST_FAILED_TO_SEND_ERROR_TIMESTAMP = "LastFailToSendErrorTimeStamp";
 
 	}
 

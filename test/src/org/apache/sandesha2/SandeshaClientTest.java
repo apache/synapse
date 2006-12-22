@@ -598,7 +598,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 			
 			try {
 				// Check that the last error and last error time stamp have been set
-				String lastSendError = SandeshaClient.getLastSendError(serviceClient);
+				Exception lastSendError = SandeshaClient.getLastSendError(serviceClient);
 				long lastSendErrorTime = SandeshaClient.getLastSendErrorTimestamp(serviceClient);
 				
 				// Check the values are valid

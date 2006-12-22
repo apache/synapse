@@ -1,7 +1,6 @@
 package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
-import java.util.MissingResourceException;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
@@ -10,13 +9,13 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -24,13 +23,11 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -124,15 +121,13 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				RequestResponseTransport t = null;
 				MessageContext inMsg = null;
 				OperationContext op = msgCtx.getOperationContext();
-				if(op != null) inMsg = op.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+				if(op != null) inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 				if(inMsg != null) t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 				if(t == null) {
 					if(log.isDebugEnabled()) log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
 					return;
 				}
 			}
-
-			updateMessage(msgCtx);
 
 			int messageType = senderBean.getMessageType();
 			
@@ -201,7 +196,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					RequestResponseTransport t = null;
 					MessageContext inMsg = null;
 					OperationContext op = msgCtx.getOperationContext();
-					if(op != null) inMsg = op.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					if(op != null) inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 					if(inMsg != null) t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 					if(t != null) {
 						if(log.isDebugEnabled()) log.debug("Signalling transport in " + t);
@@ -228,27 +223,15 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					// Get the internal sequence id from the context
 					String internalSequenceId = (String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
 					
-					// Get the sequence property bean manager
-					SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
+					RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 					
-					// Add the new sequence property beans.
-					String exceptionStr = SandeshaUtil.getStackTrace(e);
-					SequencePropertyBean eBean = 
-						new SequencePropertyBean(internalSequenceId, 
-																	   Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR, 
-																	   exceptionStr);
+					if (bean != null) {						
+						bean.setLastSendError(e);
+						bean.setLastSendErrorTimestamp(System.currentTimeMillis());
+					}
 					
-					SequencePropertyBean etsBean = 
-						new SequencePropertyBean(internalSequenceId, 
-																	   Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP, 
-																	   String.valueOf(System.currentTimeMillis()));
-					
-					
-					// Insert the exception bean
-					seqPropMgr.insert(eBean);
-					
-					// Insert the timestamp bean
-					seqPropMgr.insert(etsBean);
+					// Update the RMSBean
+					storageManager.getRMSBeanMgr().update(bean);
 					
 					// Commit the properties
 					if(transaction != null) {
@@ -337,10 +320,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SenderWorker::run");
-	}
-	
-	private void updateMessage(MessageContext msgCtx1) throws SandeshaException {
-		// do updates if required.
 	}
 	
 	private boolean isAckPiggybackableMsgType(int messageType) {

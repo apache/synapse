@@ -18,9 +18,7 @@
 package org.apache.sandesha2.util;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,6 +71,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -749,13 +748,22 @@ public class SandeshaUtil {
 		return Sandesha2Constants.INTERNAL_SEQUENCE_PREFIX + ":" + sequenceID;
 	}
 
+	public static final RMSBean getRMSBeanFromInternalSequenceId(StorageManager storageManager, String internalSequenceID) 
+	
+	throws SandeshaException {
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+		RMSBean bean = new RMSBean();
+		bean.setInternalSequenceID(internalSequenceID);
+		
+		bean = rmsBeanMgr.findUnique(bean);
+
+		return bean;
+	}
+	
 	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
 			StorageManager storageManager) throws SandeshaException {
 
-		RMSBean createSeqFindBean = new RMSBean();
-		createSeqFindBean.setInternalSequenceID(internalSequenceID);
-
-		RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(createSeqFindBean);
+		RMSBean rMSBean = getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 
 		String sequeunceID = null;
 		if (rMSBean != null && 
@@ -1183,22 +1191,6 @@ public class SandeshaUtil {
 		return newMsg;
 		
 	}
-
-	/**
-	 * Returns an Exception as a String
-	 * 
-	 * @param exc
-	 * @return
-	 */
-  public static String getStackTrace(Throwable exc)
-  {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    PrintWriter pw = new PrintWriter(baos);
-    exc.printStackTrace(pw);
-    pw.flush();
-    String stackTrace = baos.toString();
-    return stackTrace;
-  }
   
 	public static PollingManager getPollingManager (ConfigurationContext configurationContext) {
 		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(

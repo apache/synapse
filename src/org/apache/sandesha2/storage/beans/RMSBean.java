@@ -75,6 +75,16 @@ public class RMSBean extends RMBean {
 	 */
 	private String referenceMessageStoreKey;
 	
+	/** 
+	 * This is the last error that was encountered when sending a message
+	 */
+	private Exception lastSendError = null;
+	
+	/**
+	 * This is the timestamp of when the last error occured when sending
+	 */
+	private long lastSendErrorTimestamp = -1;
+	
 	public RMSBean() {
 	}
 
@@ -135,6 +145,24 @@ public class RMSBean extends RMBean {
 	public void setPollingMode(boolean pollingMode) {
 		this.pollingMode = pollingMode;
 	}
+
+	public Exception getLastSendError() {
+  	return lastSendError;
+  }
+
+	public void setLastSendError(Exception lastSendError) {
+  	this.lastSendError = lastSendError;
+  }
+
+
+	public long getLastSendErrorTimestamp() {
+  	return lastSendErrorTimestamp;
+  }
+
+
+	public void setLastSendErrorTimestamp(long lastSendErrorTimestamp) {
+  	this.lastSendErrorTimestamp = lastSendErrorTimestamp;
+  }
 
 	public String toString() {
 		StringBuffer result = new StringBuffer();

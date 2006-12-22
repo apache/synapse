@@ -1252,7 +1252,7 @@ public class SandeshaClient {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static String getLastSendError(ServiceClient serviceClient) 
+	public static Exception getLastSendError(ServiceClient serviceClient) 
 	
 	throws SandeshaException
 	{
@@ -1274,20 +1274,18 @@ public class SandeshaClient {
 
 		// Get the in use storage manager and the sequence property bean manager
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		Transaction transaction = null;
-		String resultString = null;
+		Exception resultException = null;
     
 		try 
 		{
 			transaction = storageManager.getTransaction();
-			// Lookup the last failed to send error
-			SequencePropertyBean errorBean = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR);
+			RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 			
-			// Get the value from the 
-			if (errorBean != null)
-				resultString = errorBean.getValue();
+			if (bean != null) {						
+				resultException = bean.getLastSendError();
+			}
 		}
 		finally
 		{
@@ -1296,9 +1294,9 @@ public class SandeshaClient {
 		}
 		
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaClient::getLastSendError, " + resultString);
+			log.debug("Exit: SandeshaClient::getLastSendError, " + resultException);
 		
-		return resultString;
+		return resultException;
 	}
 	
 	/**
@@ -1332,7 +1330,6 @@ public class SandeshaClient {
 
 		// Get the in use storage manager and the sequence property bean manager
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		// Create a transaction for the retrieve operation
 		Transaction transaction = null;
@@ -1342,13 +1339,11 @@ public class SandeshaClient {
 		{
 			transaction = storageManager.getTransaction();
 			
-			// Lookup the last failed to send error
-			SequencePropertyBean errorTSBean = 
-				seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.LAST_FAILED_TO_SEND_ERROR_TIMESTAMP);
-				
-			// Get the value from the 
-			if (errorTSBean != null)
-				resultTime = Long.valueOf(errorTSBean.getValue()).longValue();
+			RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+			
+			if (bean != null) {						
+				resultTime = bean.getLastSendErrorTimestamp();
+			}
 		}
 		finally
 		{

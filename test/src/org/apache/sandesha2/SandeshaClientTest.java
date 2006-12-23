@@ -473,7 +473,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 
 		startServer(server_repoPath, server_axis2_xml);
 
-		String to = "http://127.0.0.1:" + 9999 + "/axis2/services/RMSampleService";
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";

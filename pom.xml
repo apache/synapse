@@ -25,14 +25,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>Apache-Synapse-Incubating</artifactId>
-    <version>SNAPSHOT</version>
+    <artifactId>Apache-Synapse</artifactId>
+    <version>0.91</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
 
     <packaging>pom</packaging>
-    <url>http://incubator.apache.org/synapse/</url>
+    <url>http://ws.apache.org/synapse/</url>
 
     <issueManagement>
         <url>http://issues.apache.org/jira/browse/SYNAPSE</url>
@@ -66,11 +66,11 @@
     </licenses>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/synapse/trunk/java
+        <connection>http://svn.apache.org/repos/asf/webservices/synapse/trunk/java
         </connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/synapse/trunk/java
+        <developerConnection>https://svn.apache.org/repos/asf/webservices/synapse/trunk/java
         </developerConnection>
-        <url>http://svn.apache.org/viewvc/incubator/synapse/trunk/java/</url>
+        <url>http://svn.apache.org/viewvc/webservices/synapse/trunk/java/</url>
     </scm>
 
     <organization>
@@ -93,7 +93,7 @@
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
                                 <descriptor>src/main/assembly/src.xml</descriptor>
                             </descriptors>
-                            <finalName>synapse-${synapse.version}-incubating</finalName>
+                            <finalName>synapse-${synapse.version}</finalName>
                         </configuration>
                     </plugin>
 
@@ -155,7 +155,7 @@
                             <Specification-Title>${pom.artifactId}</Specification-Title>
                             <Specification-Vendor>Apache Software Foundation</Specification-Vendor>
                             <Specification-Version>${pom.version}</Specification-Version>
-                            <Implementation-Title>Apache Synapse Incubating</Implementation-Title>
+                            <Implementation-Title>Apache Synapse</Implementation-Title>
                             <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
                             <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>
                             <Implementation-Version>${pom.version}</Implementation-Version>
@@ -206,17 +206,17 @@
         <dependencies>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-incubating-core</artifactId>
+                <artifactId>synapse-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-incubating-extensions</artifactId>
+                <artifactId>synapse-extensions</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-incubating-samples</artifactId>
+                <artifactId>synapse-samples</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -540,7 +540,7 @@
     </modules>
 
     <properties>
-        <synapse.version>SNAPSHOT</synapse.version>
+        <synapse.version>0.91</synapse.version>
         <axis2.version>1.1.051</axis2.version>
         <rampart.version>1.1</rampart.version>
         <axiom.version>1.2.1</axiom.version>

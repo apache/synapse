@@ -1,14 +1,10 @@
-Apache Synapse 0.90 build  (December 2006)
+Apache Synapse 0.91 build  (January 2007)
 
-http://incubator.apache.org/synapse/
+http://ws.apache.org/synapse/
 ------------------------------------------------------
 
-Apache Synapse is an effort undergoing incubation at the Apache Software Foundation (ASF),
-sponsored by the Web Services PMC. Incubation is required of all newly accepted projects 
-until a further review indicates that the infrastructure, communications, and decision 
-making process have stabilized in a manner consistent with other successful ASF projects. 
-While incubation status is not necessarily a reflection of the completeness or stability 
-of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
+Synapse graduated from the Apache Incubator on the 2nd of January 2007. The 0.91 release
+is its first public release after graduation.
 
 -------------------
 Documentation

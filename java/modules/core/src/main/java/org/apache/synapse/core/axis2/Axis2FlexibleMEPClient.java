@@ -19,31 +19,37 @@
 
 package org.apache.synapse.core.axis2;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
-import org.apache.axis2.context.*;
-import org.apache.axis2.description.*;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.ServiceGroupContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
-import org.apache.synapse.SynapseException;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -114,7 +120,7 @@ public class Axis2FlexibleMEPClient {
                     org.apache.synapse.config.xml.Constants.SANDESHA_POLICY,
                     getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
-
+            copyRMOptions(originalInMsgCtx, clientOptions);
 
             // always send each and every message in a new sequence and terminate sequence
             //clientOptions.setProperty("Sandesha2LastMessage", "true");
@@ -179,6 +185,22 @@ public class Axis2FlexibleMEPClient {
         // set SOAP envelope on the message context, removing WS-A headers
         newMC.setEnvelope(removeAddressingHeaders(ori));
         return newMC;
+    }
+    
+    private static void copyRMOptions(MessageContext oriContext, Options targetOptions) {
+        Options oriOptions = oriContext.getOptions();
+        if(oriOptions.getProperty(Constants.SANDESHA_LAST_MESSAGE) != null) {
+            targetOptions.setProperty(Constants.SANDESHA_LAST_MESSAGE, 
+                    oriOptions.getProperty(Constants.SANDESHA_LAST_MESSAGE));
+        }
+        if(oriOptions.getProperty(Constants.SANDESHA_SPEC_VERSION) != null) {
+            targetOptions.setProperty(Constants.SANDESHA_SPEC_VERSION, 
+                    oriOptions.getProperty(Constants.SANDESHA_SPEC_VERSION));
+        }
+        if(oriOptions.getProperty(Constants.SANDESHA_SEQUENCE_KEY) != null) {
+            targetOptions.setProperty(Constants.SANDESHA_SEQUENCE_KEY, 
+                    oriOptions.getProperty(Constants.SANDESHA_SEQUENCE_KEY));
+        }
     }
     
     /**

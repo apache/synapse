@@ -28,9 +28,9 @@
   
 <section name="Apache Synapse">
 	<p>
-  The Synapse project will create a robust, lightweight
+  The Synapse project is a robust, lightweight
   implementation of a highly scalable and distributed service mediation
-  framework based on Web services specifications.
+  framework based on Web services and XML specifications.
 	</p>
 
  	<p>For more information, see:</p>
@@ -41,8 +41,8 @@
   <li><a href="Synapse_Userguide.html">The Synapse User Guide</a><a href="http://wiki.apache.org/incubator/Synapse/0.90/SynapseUserGuide">(In Progress)</a></li>
   
   <li>The WS Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
-  <li>The Incubator Wiki <a href="http://wiki.apache.org/incubator/Synapse">http://wiki.apache.org/incubator/Synapse</a></li>
-  <li>The Original proposal: <a href="http://wiki.apache.org/incubator/SynapseProposal">http://wiki.apache.org/incubator/SynapseProposal</a></li>
+  <!--li>The Incubator Wiki <a href="http://wiki.apache.org/incubator/Synapse">http://wiki.apache.org/incubator/Synapse</a></li-->
+  <!--li>The Original proposal: <a href="http://wiki.apache.org/incubator/SynapseProposal">http://wiki.apache.org/incubator/SynapseProposal</a></li-->
   <li>The Developer mailing list:  <a href="mailto:synapse-dev-subscribe@ws.apache.org">Subscribe</a></li>
   <li>The User mailing list:  <a href="mailto:synapse-user-subscribe@ws.apache.org">Subscribe</a></li>
   </ul>
@@ -55,15 +55,9 @@
 </section>
 	
 <section name="Status">
-	<p>Synapse is an effort undergoing incubation at the Apache Software Foundation (ASF),
-	sponsored by the Web Services PMC. Incubation is required of all newly accepted projects 
-	until a further review indicates that the infrastructure, communications, and decision making process 
-	have stabilized in a manner consistent with other successful ASF projects. 
-	While incubation status is not necessarily a reflection of the completeness or 
-	stability of the code, it does indicate that the project has 
-	yet to be fully endorsed by the ASF.</p>
+	<p>Synapse has graduated from the incubator! Synapse was officially accepted as a sub-project of the Apache WS project on the 2nd January 2007.</p>
 	
-	<p>We are currently finalizing the 0.90 release of Synapse. Its ket features are </p>
+	<p>The latest release of Synapse is <a href="http://incubator.apache.org/synapse/download/0.90/download.cgi">0.90</a>. Its key features are </p>
 
 	<ul>
 	<li><p> A streamlined configuration model and a new XML syntax</p></li>

@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -344,13 +345,15 @@ public class RMElements {
 		// As a final resort check the body namespace
 		SOAPBody body = envelope.getBody();
 		if(body != null) {
-			Iterator elements = body.getChildElements();
-			if(elements.hasNext()) {
-				OMElement firstBodyElement = (OMElement) elements.next();
-				String namespace = firstBodyElement.getNamespace().getNamespaceURI();
-				if(namespace.equals(Sandesha2Constants.SPEC_2005_02.NS_URI) ||
-				   namespace.equals(Sandesha2Constants.SPEC_2006_08.NS_URI)  ) {
-					return namespace;
+			OMElement element = body.getFirstElement();
+			if(element != null) {
+				OMNamespace namespace = element.getNamespace();
+				if(namespace != null) {
+					String uri = namespace.getNamespaceURI();
+					if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(uri) ||
+					   Sandesha2Constants.SPEC_2006_08.NS_URI.equals(uri)  ) {
+						return uri;
+					}
 				}
 			}
 		}

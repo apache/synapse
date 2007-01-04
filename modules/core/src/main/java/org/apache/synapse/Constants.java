@@ -128,4 +128,17 @@ public interface Constants {
     int TRACING_UNSET=2;
     /** Tracing logger */
     String TRACE_LOGGER ="TRACE_LOGGER";
+    
+    //  -- Synapse property values for WS-RM sequence handling --
+    /** WS-RM version 1.0*/
+    String SEQUENCE_VERSION_1_0 = "1.0";
+    /** WS-RM version 1.1*/
+    String SEQUENCE_VERSION_1_1 = "1.1";
+    
+    /** Sandesha last message property name */
+    String SANDESHA_LAST_MESSAGE = "Sandesha2LastMessage";
+    /** Sandesha last sequence key property name */
+    String SANDESHA_SEQUENCE_KEY = "Sandesha2SequenceKey";
+    /** Sandesha WS-RM specification version property name */
+    String SANDESHA_SPEC_VERSION = "Sandesha2RMSpecVersion";
 }

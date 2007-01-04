@@ -1,6 +1,6 @@
 Building Synapse from Source
 
-The Synapse source code is available at http://svn.apache.org/viewcvs.cgi/incubator/synapse/trunk/java/
+The Synapse source code is available at http://svn.apache.org/repos/asf/webservices/synapse/trunk/java
 
 To build Synapse, you will need JDK 1.4.x or 1.5.x., Maven 2 and any of its dependencies.
 

@@ -24,7 +24,7 @@
       <item name="Home" href="index.html"/>
       <item name="Download Synapse">
         <item name="Releases" href="download.cgi"/>
-        <item name="Source Code" href="http://svn.apache.org/viewcvs.cgi/incubator/synapse/trunk/java/"/>
+        <item name="Source Code" href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/"/>
       </item>
       <item name="Documentation">
       	<item name="Synapse configuration language and syntax" href="Synapse_Configuration_Language.html"/>

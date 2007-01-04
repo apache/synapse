@@ -25,12 +25,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.synapse</groupId>
-        <artifactId>Apache-Synapse-Incubating</artifactId>
-        <version>SNAPSHOT</version>
+        <artifactId>Apache-Synapse</artifactId>
+        <version>0.91</version>
     </parent>
 
     <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse-incubating-extensions</artifactId>
+    <artifactId>synapse-extensions</artifactId>
     
     <name>Apache Synapse - Extensions</name>
     <description>Apache Synapse - Extensions</description>
@@ -63,7 +63,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-incubating-core</artifactId>
+            <artifactId>synapse-core</artifactId>
         </dependency>
 
         <!-- external JARs -->

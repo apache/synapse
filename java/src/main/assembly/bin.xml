@@ -70,7 +70,7 @@
             <directory>modules/core/target</directory>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
-                <include>synapse-incubating-${synapse.version}.mar</include>
+                <include>synapse-${synapse.version}.mar</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -146,7 +146,7 @@
             <!--<directory>target</directory>-->
             <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
             <!--<includes>-->
-                <!--<include>synapse-incubator.jar</include>-->
+                <!--<include>synapse.jar</include>-->
             <!--</includes>-->
         <!--</fileSet>-->
 
@@ -154,21 +154,21 @@
             <directory>modules/core/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>synapse-incubating-core-${synapse.version}.jar</include>
+                <include>synapse-core-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/samples/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>synapse-incubating-samples-${synapse.version}.jar</include>
+                <include>synapse-samples-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/extensions/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>synapse-incubating-extensions-${synapse.version}.jar</include>
+                <include>synapse-extensions-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>

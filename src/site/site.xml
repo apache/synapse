@@ -22,7 +22,7 @@
 
     <bannerLeft>
         <name>Apache Synapse</name>
-        <href>incubator.apache.org/synapse/</href>
+        <href>ws.apache.org/synapse/</href>
     </bannerLeft>
 
     <skin>
@@ -36,7 +36,7 @@
     <body>
         <links>
             <item name="Apache" href="http://www.apache.org/"/>
-            <item name="Incubator" href="http://incubator.apache.org/"/>
+            <!--item name="Incubator" href="http://incubator.apache.org/"/-->
             <item name="WebServices" href="http://ws.apache.org/"/>
         </links>
 

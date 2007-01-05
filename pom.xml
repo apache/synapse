@@ -66,9 +66,9 @@
     </licenses>
 
     <scm>
-        <connection>http://svn.apache.org/repos/asf/webservices/synapse/trunk/java
+        <connection>scm:svn:http://svn.apache.org/repos/asf/webservices/synapse/trunk/java
         </connection>
-        <developerConnection>https://svn.apache.org/repos/asf/webservices/synapse/trunk/java
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/webservices/synapse/trunk/java
         </developerConnection>
         <url>http://svn.apache.org/viewvc/webservices/synapse/trunk/java/</url>
     </scm>
@@ -578,7 +578,7 @@
     </properties>
 
     <developers>
-        <!-- If you are a committer and your name is not listed here, please include -->
+        <!-- If you are a committer and your name is not listed here, please include/edit -->
         <developer>
             <name>Saminda Abeyruwan</name>
             <id>saminda</id>
@@ -638,6 +638,21 @@
             <email>jnekanayake AT gmail.com</email>
         </developer>
         <developer>
+            <name>Indika Kumara</name>
+            <email>indika@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Chathura Ekanayake</name>
+            <email>chathura@wso2.com</email>
+            <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Tijs Rademakers</name>
+            <email>t.rademakers@chello.nl</email>
+            <organization>Atos Origin</organization>
+        </developer>
+        <developer>
             <name>Asankha Perera</name>
             <id>asankha</id>
             <email>asankha AT wso2.com</email>
@@ -648,19 +663,6 @@
     <contributors>
         <contributor>
             <name>Hadrian Zbarcea</name>
-        </contributor>
-        <contributor>
-            <name>Indika Kumara</name>
-            <email>indika@wso2.com</email>
-            <organization>WSO2</organization>
-        </contributor>
-        <contributor>
-            <name>Chathura Ekanayake</name>
-            <email>chathura@wso2.com</email>
-            <organization>WSO2</organization>
-        </contributor>
-        <contributor>
-            <name>Tijs Rademakers</name>
         </contributor>
         <contributor>
             <name>Sanjesh Pathak</name>

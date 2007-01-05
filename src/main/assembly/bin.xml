@@ -30,7 +30,6 @@
             <directory>src/main/release</directory>
             <outputDirectory>synapse-${synapse.version}</outputDirectory>
             <includes>
-                <include>DISCLAIMER</include>
                 <include>LICENSE</include>
                 <include>NOTICE</include>
                 <include>README.txt</include>

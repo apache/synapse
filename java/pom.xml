@@ -455,24 +455,33 @@
             <name>asankha-m2</name>
             <url>http://people.apache.org/~asankha/maven2/</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>wso2</id>
             <name>wso2</name>
             <url>http://dist.wso2.org/maven/</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>ibiblio-m2</id>
             <name>Ibiblio Maven 2 Repo</name>
             <url>http://www.ibiblio.org/maven2</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>ibiblio-m1</id>
@@ -480,8 +489,11 @@
             <layout>legacy</layout>
             <url>http://www.ibiblio.org/maven</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>Apache Repo1</id>
@@ -489,8 +501,11 @@
             <layout>legacy</layout>
             <url>http://repo1.maven.org/maven/</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>Apache Zones</id>
@@ -498,8 +513,11 @@
             <layout>legacy</layout>
             <url>http://ws.zones.apache.org/repository/</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>Apache People</id>
@@ -507,8 +525,11 @@
             <layout>legacy</layout>
             <url>http://people.apache.org/repository</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>Apache People Ibiblio RSync</id>
@@ -516,8 +537,11 @@
             <layout>legacy</layout>
             <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>Jibx</id>
@@ -525,8 +549,11 @@
             <layout>legacy</layout>
             <url>http://jibx.sourceforge.net/maven/</url>
             <releases>
-                <updatePolicy>interval:1440</updatePolicy>
+            	<updatePolicy>never</updatePolicy>
             </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
         </repository>
 
     </repositories>

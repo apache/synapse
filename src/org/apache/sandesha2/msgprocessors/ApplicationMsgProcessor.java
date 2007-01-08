@@ -187,30 +187,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 
-		// the message number that was last used.
-		long systemMessageNumber = getPreviousMsgNo(configContext, sequencePropertyKey, storageManager);
-
-		// The number given by the user has to be larger than the last stored
-		// number.
-		if (givenMessageNumber > 0 && givenMessageNumber <= systemMessageNumber) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgNumberNotLargerThanLastMsg, Long
-					.toString(givenMessageNumber));
-			throw new SandeshaException(message);
-		}
-
-		// Finding the correct message number.
-		long messageNumber = -1;
-		if (givenMessageNumber > 0) // if given message number is valid use it.
-									// (this is larger than the last stored due
-									// to the last check)
-			messageNumber = givenMessageNumber;
-		else if (systemMessageNumber > 0) { // if system message number is valid
-											// use it.
-			messageNumber = systemMessageNumber + 1;
-		} else { // This is the first message (systemMessageNumber = -1)
-			messageNumber = 1;
-		}
-
 		// A dummy message is a one which will not be processed as a actual
 		// application message.
 		// The RM handlers will simply let these go.
@@ -236,10 +212,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if(sequenceTimedout!=null){
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
 		}
-
-		// saving the used message number
-		if (!dummyMessage)
-			setNextMsgNo(configContext, sequencePropertyKey, messageNumber, storageManager);
 
 		boolean sendCreateSequence = false;
 
@@ -298,25 +270,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		if (specVersion == null)
-			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); // TODO
-																			// change
-																			// the
-																			// default
-																			// to
-																			// v1_1.
-
-		if (messageNumber == 1) {
-			if (outSequenceID == null) { // out sequence will be set for the
+			// TODO change the default to v1_1
+			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); 
+		
+		if (outSequenceID == null) { // out sequence will be set for the
 										// server side, in the case of an offer.
-				sendCreateSequence = true; // message number being one and not
+			sendCreateSequence = true; // message number being one and not
 											// having an out sequence, implies
 											// that a create sequence has to be
 											// send.
-			}
-
-			// if first message - setup the sending side sequence - both for the
-			// server and the client sides
-			SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
 		}
 
 		ServiceContext serviceContext = msgContext.getServiceContext();
@@ -326,6 +288,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		// SENDING THE CREATE SEQUENCE.
 		if (sendCreateSequence) {
+
+			// if first message - setup the sending side sequence - both for the
+			// server and the client sides
+			SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
+			
 			EndpointReference acksToEPR = null;
 			SequencePropertyBean responseCreateSeqAdded = seqPropMgr.retrieve(sequencePropertyKey,
 					Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
@@ -408,6 +375,30 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
 		}
 		
+		// the message number that was last used.
+		long systemMessageNumber = rmsBean.getNextMessageNumber();
+
+		// The number given by the user has to be larger than the last stored
+		// number.
+		if (givenMessageNumber > 0 && givenMessageNumber <= systemMessageNumber) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgNumberNotLargerThanLastMsg, Long
+					.toString(givenMessageNumber));
+			throw new SandeshaException(message);
+		}
+
+		// Finding the correct message number.
+		long messageNumber = -1;
+		if (givenMessageNumber > 0) // if given message number is valid use it.
+									// (this is larger than the last stored due
+									// to the last check)
+			messageNumber = givenMessageNumber;
+		else if (systemMessageNumber > 0) { // if system message number is valid
+											// use it.
+			messageNumber = systemMessageNumber + 1;
+		} else { // This is the first message (systemMessageNumber = -1)
+			messageNumber = 1;
+		}
+		
 		if (lastMessage) {
 			rmsBean.setLastOutMessage(messageNumber);
 			// Update the rmsBean
@@ -417,6 +408,16 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		// set this as the response highest message.
 		rmsBean.setHighestOutMessageNumber(messageNumber);
 		
+		// saving the used message number
+		if (!dummyMessage)
+			rmsBean.setNextMessageNumber(messageNumber);
+		
+		if (messageNumber == 1 && !sendCreateSequence) {
+			// if first message - setup the sending side sequence - both for the
+			// server and the client sides
+			SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
+		}
+
 		RelatesTo relatesTo = msgContext.getRelatesTo();
 		if(relatesTo != null) {
 			rmsBean.setHighestOutRelatesTo(relatesTo.getValue());
@@ -747,62 +748,4 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processResponseMessage");
 	}
-
-	private long getPreviousMsgNo(ConfigurationContext context, String sequencePropertyKey, StorageManager storageManager)
-			throws SandeshaException {
-		if (log.isDebugEnabled())
-			log.debug("Enter: ApplicationMsgProcessor::getPreviousMsgNo, " + sequencePropertyKey);
-
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean nextMsgNoBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
-
-		long nextMsgNo = -1;
-		if (nextMsgNoBean != null) {
-			Long nextMsgNoLng = new Long(nextMsgNoBean.getValue());
-			nextMsgNo = nextMsgNoLng.longValue();
-		}
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: ApplicationMsgProcessor::getPreviousMsgNo, " + nextMsgNo);
-
-		return nextMsgNo;
-	}
-
-	private void setNextMsgNo(ConfigurationContext context, String sequencePropertyKey, long msgNo,
-			StorageManager storageManager) throws SandeshaException {
-
-		if (log.isDebugEnabled())
-			log.debug("Enter: ApplicationMsgProcessor::setNextMsgNo, " + sequencePropertyKey + ", " + msgNo);
-
-		if (msgNo <= 0) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgNumberMustBeLargerThanZero, Long
-					.toString(msgNo));
-			throw new SandeshaException(message);
-		}
-
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean nextMsgNoBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
-
-		boolean update = true;
-		if (nextMsgNoBean == null) {
-			update = false;
-			nextMsgNoBean = new SequencePropertyBean();
-			nextMsgNoBean.setSequencePropertyKey(sequencePropertyKey);
-			nextMsgNoBean.setName(Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
-		}
-
-		nextMsgNoBean.setValue(new Long(msgNo).toString());
-		if (update)
-			seqPropMgr.update(nextMsgNoBean);
-		else
-			seqPropMgr.insert(nextMsgNoBean);
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: ApplicationMsgProcessor::setNextMsgNo");
-	}
-	
 }

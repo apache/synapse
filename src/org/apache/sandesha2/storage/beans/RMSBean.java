@@ -95,6 +95,11 @@ public class RMSBean extends RMSequenceBean {
 	 * Keeps track of the highest transmitted message
 	 */
   private String highestOutRelatesTo = null;
+  
+  /**
+   * The next sequence number to apply to the message
+   */
+  private long nextMessageNumber = -1;
 	
 	public RMSBean() {
 	}
@@ -195,6 +200,15 @@ public class RMSBean extends RMSequenceBean {
   	this.highestOutRelatesTo = highestOutRelatesTo;
   }
 
+	public long getNextMessageNumber() {
+  	return nextMessageNumber;
+  }
+
+
+	public void setNextMessageNumber(long nextMessageNumber) {
+  	this.nextMessageNumber = nextMessageNumber;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -208,7 +222,7 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nLastOutMessageNumber: "); result.append(lastOutMessage);
 		result.append("\nHighestOutMessage: "); result.append(highestOutMessageNumber);
 		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);
+		result.append("\nNextMessageNumber: "); result.append(nextMessageNumber);
 		return result.toString();
 	}
-
 }

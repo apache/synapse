@@ -276,8 +276,6 @@ public interface Sandesha2Constants {
 
 		String OUT_CREATE_SEQUENCE_SENT = "OutCreateSeqSent";
 
-		String NEXT_MESSAGE_NUMBER = "NextMsgNo";
-
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 
 		String OFFERED_SEQUENCE = "OfferedSequence";

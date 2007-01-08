@@ -97,12 +97,12 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			
 			//we deliver msg 2
 			//set highest out msg number to 1
+			String internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
 			t = mgr.getTransaction();
-			SequencePropertyBean nextMsgNoBean = 
-					mgr.getSequencePropertyBeanMgr().
-					retrieve(SandeshaUtil.getInternalSequenceID(to, sequenceKey),
-					Sandesha2Constants.SequenceProperties.NEXT_MESSAGE_NUMBER);
-			nextMsgNoBean.setValue("1");
+			RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(mgr, internalSequenceId);
+			rmsBean.setNextMessageNumber(1);
+			// Update the bean
+			mgr.getRMSBeanMgr().update(rmsBean);
 			t.commit();
 			
 			clientOptions.setProperty(SandeshaClientConstants.MESSAGE_NUMBER,new Long(2));

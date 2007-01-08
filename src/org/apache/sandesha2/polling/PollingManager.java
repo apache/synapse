@@ -148,6 +148,16 @@ public class PollingManager extends Thread {
 	private void pollForSequence(String sequenceId, String sequencePropertyKey, String referenceMsgKey) throws SandeshaException, SandeshaStorageException, AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey);
 
+		// Don't poll for a terminated sequence
+		// TODO once the 'terminated' flag is a property on the RMS / RMD bean, we should
+		// be able to filter out terminated sequences before we get here.
+		String terminated = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
+				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED, storageManager);
+		if(terminated != null && "true".equals(terminated)) {
+			if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollForSequence, already terminated");
+			return;
+		}
+		
 		//create a MakeConnection message  
 		String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,storageManager);

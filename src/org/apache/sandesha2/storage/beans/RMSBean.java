@@ -83,7 +83,19 @@ public class RMSBean extends RMSequenceBean {
 	 * The last Out message number
 	 */
 	private long lastOutMessage = 0;
-
+	
+	/**
+	 * The Highest out message number
+	 * Keeps track of the highest transmitted message
+	 */
+	private long highestOutMessageNumber = 0;
+	
+	/**
+	 * The highest out message relates to message id	 
+	 * Keeps track of the highest transmitted message
+	 */
+  private String highestOutRelatesTo = null;
+	
 	public RMSBean() {
 	}
 
@@ -164,6 +176,25 @@ public class RMSBean extends RMSequenceBean {
   	this.lastOutMessage = lastOutMessage;
   }
 
+	public long getHighestOutMessageNumber() {
+  	return highestOutMessageNumber;
+  }
+
+
+	public void setHighestOutMessageNumber(long highestOutMessageNumber) {
+  	this.highestOutMessageNumber = highestOutMessageNumber;
+  }
+
+
+	public String getHighestOutRelatesTo() {
+  	return highestOutRelatesTo;
+  }
+
+
+	public void setHighestOutRelatesTo(String highestOutRelatesTo) {
+  	this.highestOutRelatesTo = highestOutRelatesTo;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -175,8 +206,9 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nReference Msg Key: "); result.append(referenceMessageStoreKey);
 		result.append("\nPolling          : "); result.append(pollingMode);
 		result.append("\nLastOutMessageNumber: "); result.append(lastOutMessage);
+		result.append("\nHighestOutMessage: "); result.append(highestOutMessageNumber);
+		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);
 		return result.toString();
 	}
-
 
 }

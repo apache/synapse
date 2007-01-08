@@ -305,11 +305,6 @@ public interface Sandesha2Constants {
 		// in the sequence.
 		String LAST_IN_MSG_ID = "LastInMessageId";
 		
-		// A pair pf properties to keep track of the highest transmitted message
-		// for an outbound sequence.
-		String HIGHEST_OUT_MSG_NUMBER = "HighestOutMsgNumber";
-		String HIGHEST_OUT_RELATES_TO = "HighestOutRelatesTo";
-		
 		String SECURITY_TOKEN = "SecurityToken";
 		
 		String SOAP_VERSION = "SOAPVersion";

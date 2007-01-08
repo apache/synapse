@@ -241,17 +241,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (!dummyMessage)
 			setNextMsgNo(configContext, sequencePropertyKey, messageNumber, storageManager);
 
-		// set this as the response highest message.
-		SequencePropertyBean responseHighestMsgBean = new SequencePropertyBean(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_NUMBER, new Long(messageNumber).toString());
-		seqPropMgr.insert(responseHighestMsgBean);
-		RelatesTo relatesTo = msgContext.getRelatesTo();
-		if(relatesTo != null) {
-			SequencePropertyBean responseRelatesToBean = new SequencePropertyBean(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.HIGHEST_OUT_RELATES_TO, relatesTo.getValue());
-			seqPropMgr.insert(responseRelatesToBean);
-		}
-
 		boolean sendCreateSequence = false;
 
 		String outSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceId, storageManager);
@@ -413,7 +402,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 		
-		if (rmsBean == null && lastMessage) {
+		if (rmsBean == null) {
 			RMSBean findBean = new RMSBean();
 			findBean.setInternalSequenceID(internalSequenceId);
 			rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
@@ -425,7 +414,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			storageManager.getRMSBeanMgr().update(rmsBean);
 		}
 
+		// set this as the response highest message.
+		rmsBean.setHighestOutMessageNumber(messageNumber);
+		
+		RelatesTo relatesTo = msgContext.getRelatesTo();
+		if(relatesTo != null) {
+			rmsBean.setHighestOutRelatesTo(relatesTo.getValue());
+		}
 
+		// Update the rmsBean
+		storageManager.getRMSBeanMgr().update(rmsBean);
+		
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {
 			SOAPEnvelope envelope = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(env))

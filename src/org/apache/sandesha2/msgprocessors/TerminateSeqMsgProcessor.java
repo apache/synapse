@@ -194,20 +194,20 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				
 				// If an outbound message has already gone out with that relatesTo, then we can terminate
 				// right away.
-				String highestOutRelatesTo = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.HIGHEST_OUT_RELATES_TO, storageManager);
-				if(highestOutRelatesTo != null && highestOutRelatesTo.equals(inMsgId)) {
-					String highOutMessageNumberString = SandeshaUtil.getSequenceProperty(responseSideSequencePropertyKey,
-							Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_NUMBER, storageManager);
-					highestOutMsgNo = Long.parseLong(highOutMessageNumberString);
-					addResponseSideTerminate = true;
-					
-					// It is possible that the message has gone out, but not been acked yet. In that case
-					// we can store the HIGHEST_OUT_MSG_NUMBER as the LAST_OUT_MESSAGE_NO, so that when the
-					// ack arrives we will terminate the sequence
-					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, responseSideInternalSequenceId);
-					rmsBean.setLastOutMessage(highestOutMsgNo);
-					storageManager.getRMSBeanMgr().update(rmsBean);
+				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, responseSideInternalSequenceId);
+
+				if(rmsBean != null) {
+					String highestOutRelatesTo = rmsBean.getHighestOutRelatesTo();
+					if (highestOutRelatesTo != null && highestOutRelatesTo.equals(inMsgId)) {
+						highestOutMsgNo = rmsBean.getHighestOutMessageNumber();
+						addResponseSideTerminate = true;
+						
+						// It is possible that the message has gone out, but not been acked yet. In that case
+						// we can store the HIGHEST_OUT_MSG_NUMBER as the LAST_OUT_MESSAGE_NO, so that when the
+						// ack arrives we will terminate the sequence
+						rmsBean.setLastOutMessage(highestOutMsgNo);
+						storageManager.getRMSBeanMgr().update(rmsBean);
+					}
 				}
 			}
 

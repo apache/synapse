@@ -17,8 +17,8 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -178,18 +178,16 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
     ConfigurationContext context = serviceClient.getServiceContext().getConfigurationContext();
     StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
     
-    // Get the sequence property bean manager
-    SequencePropertyBeanMgr beanMgr = storageManager.getSequencePropertyBeanMgr();
-    
     // Get a transaction for the property finding
     Transaction transaction = storageManager.getTransaction();
     
     // Get the highest out message property
-    SequencePropertyBean bean = beanMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.HIGHEST_OUT_MSG_NUMBER);
+    RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
     
     transaction.commit();
     
-    Long highestOutMsgKey = Long.valueOf(bean.getValue());
+    long highestOutMsgNum = rmsBean.getHighestOutMessageNumber();
+    Long highestOutMsgKey = new Long(highestOutMsgNum);
     
     long timeNow = System.currentTimeMillis();
     long timeToComplete = timeNow + waitTime;

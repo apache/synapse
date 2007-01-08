@@ -57,7 +57,7 @@
 <section name="Status">
 	<p>Synapse has graduated from the incubator! Synapse was officially accepted as a sub-project of the Apache WS project on the 2nd January 2007.</p>
 	
-	<p>The latest release of Synapse is <a href="">0.91</a>. Its key features are </p>
+	<p>The latest release of Synapse is <a href="http://ws.apache.org/synapse/download/0.91/download.cgi">0.91</a>. Its key features are </p>
 
 	<ul>
 	<li><p> A streamlined configuration model and a new XML syntax</p></li>
@@ -68,8 +68,8 @@
 	<li><p> Support for WS-Reliable Messaging and WS-Security through WS-Policies</p></li>
 	<li><p> Script mediator supporting all BSF scripting languages </p></li>
 	<li><p> Support for error handling and recovery </p></li>
-    <li><p> Support for WS-RM sequences </p></li>
-    <li><p> Many built in mediators </p></li>
+  <li><p> Support for WS-RM sequences </p></li>
+  <li><p> Many built in mediators </p></li>
 	<li><p> Maven 2 based build process</p></li>
 	<li><p> Many samples and a built-in Axis2 server to try out and experiment with samples (Samples includes WS-Security, JMS POX/Text messages, Script mediation and many more samples which can be run out of the box) </p></li>
 	<li><p> Enhanced documentation </p></li>

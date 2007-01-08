@@ -252,13 +252,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			seqPropMgr.insert(responseRelatesToBean);
 		}
 
-		if (lastMessage) {
-			SequencePropertyBean responseLastMsgKeyBean = new SequencePropertyBean(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, new Long(messageNumber).toString());
-
-			seqPropMgr.insert(responseLastMsgKeyBean);
-		}
-
 		boolean sendCreateSequence = false;
 
 		String outSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceId, storageManager);
@@ -340,6 +333,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		OperationContext operationContext = msgContext.getOperationContext();
 
+		RMSBean rmsBean = null;
+		
 		// SENDING THE CREATE SEQUENCE.
 		if (sendCreateSequence) {
 			EndpointReference acksToEPR = null;
@@ -414,9 +409,22 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 						throw new SandeshaException (e);
 					}
 				}
-				addCreateSequenceMessage(rmMsgCtx, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
+				rmsBean = addCreateSequenceMessage(rmMsgCtx, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
 			}
 		}
+		
+		if (rmsBean == null && lastMessage) {
+			RMSBean findBean = new RMSBean();
+			findBean.setInternalSequenceID(internalSequenceId);
+			rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
+		}
+		
+		if (lastMessage) {
+			rmsBean.setLastOutMessage(messageNumber);
+			// Update the rmsBean
+			storageManager.getRMSBeanMgr().update(rmsBean);
+		}
+
 
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {
@@ -468,7 +476,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	private void addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
+	private RMSBean addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
@@ -571,7 +579,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		retransmitterMgr.insert(createSeqEntry);
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage");
+			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage, " + rMSBean);
+		return rMSBean;
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg, String internalSequenceId, String outSequenceID, long messageNumber,

@@ -309,10 +309,6 @@ public interface Sandesha2Constants {
 		// for an outbound sequence.
 		String HIGHEST_OUT_MSG_NUMBER = "HighestOutMsgNumber";
 		String HIGHEST_OUT_RELATES_TO = "HighestOutRelatesTo";
-
-		// Once the last message for any outbound sequence has been acknowledged,
-		// we can safely close the sequence.
-		String LAST_OUT_MESSAGE_NO = "LastOutMessage";
 		
 		String SECURITY_TOKEN = "SecurityToken";
 		

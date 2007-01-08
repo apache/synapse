@@ -22,7 +22,7 @@ package org.apache.sandesha2.storage.beans;
  * There is on object of this for each sequence.
  */
 
-public class RMSBean extends RMBean {
+public class RMSBean extends RMSequenceBean {
 	
 	private static final long serialVersionUID = 7051201094510208784L;
 
@@ -40,12 +40,6 @@ public class RMSBean extends RMBean {
 	 * This is the message ID of the create sequence message.
 	 */
 	private String createSeqMsgID;
-
-	/**
-	 * Comment for <code>sequenceID</code>
-	 * This is the actual Sequence ID of the sequence.
-	 */
-	private String sequenceID;
 	
 	/**
 	 * Comment for <code>securityTokenData</code>
@@ -84,7 +78,12 @@ public class RMSBean extends RMBean {
 	 * This is the timestamp of when the last error occured when sending
 	 */
 	private long lastSendErrorTimestamp = -1;
-	
+		
+	/**
+	 * The last Out message number
+	 */
+	private long lastOutMessage = 0;
+
 	public RMSBean() {
 	}
 
@@ -95,14 +94,6 @@ public class RMSBean extends RMBean {
 
 	public void setCreateSeqMsgID(String createSeqMsgID) {
 		this.createSeqMsgID = createSeqMsgID;
-	}
-
-	public String getSequenceID() {
-		return sequenceID;
-	}
-
-	public void setSequenceID(String sequenceID) {
-		this.sequenceID = sequenceID;
 	}
 
 	public String getInternalSequenceID() {
@@ -164,16 +155,28 @@ public class RMSBean extends RMBean {
   	this.lastSendErrorTimestamp = lastSendErrorTimestamp;
   }
 
+	
+	public long getLastOutMessage() {
+  	return lastOutMessage;
+  }
+
+	public void setLastOutMessage(long lastOutMessage) {
+  	this.lastOutMessage = lastOutMessage;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
-		result.append("\nSequence Id      : "); result.append(sequenceID);
+		result.append(super.toString());
 		result.append("\nInternal Seq Id  : "); result.append(internalSequenceID);
 		result.append("\nCreateSeq Msg Id : "); result.append(createSeqMsgID);
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		result.append("\nCreateSeq Msg Key: "); result.append(createSequenceMsgStoreKey);
 		result.append("\nReference Msg Key: "); result.append(referenceMessageStoreKey);
 		result.append("\nPolling          : "); result.append(pollingMode);
+		result.append("\nLastOutMessageNumber: "); result.append(lastOutMessage);
 		return result.toString();
 	}
+
+
 }

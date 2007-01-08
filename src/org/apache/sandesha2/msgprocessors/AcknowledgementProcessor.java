@@ -43,6 +43,7 @@ import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
@@ -226,27 +227,22 @@ public class AcknowledgementProcessor {
 
 		seqPropMgr.update(allCompletedMsgsBean);
 
-		String lastOutMsgNoStr = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, storageManager);
-		if (lastOutMsgNoStr != null) {
-			long highestOutMsgNo = 0;
-			if (lastOutMsgNoStr != null) {
-				highestOutMsgNo = Long.parseLong(lastOutMsgNoStr);
-			}
+		RMSBean bean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
+		
+		long highestOutMsgNo = bean.getLastOutMessage();
 
-			if (highestOutMsgNo > 0) {
-				boolean complete = AcknowledgementManager.verifySequenceCompletion(sequenceAck
-						.getAcknowledgementRanges().iterator(), highestOutMsgNo);
+		if (highestOutMsgNo > 0) {
+			boolean complete = AcknowledgementManager.verifySequenceCompletion(sequenceAck
+					.getAcknowledgementRanges().iterator(), highestOutMsgNo);
 
-				if (complete) {
+			if (complete) {
 					
-					//using create sequence message as the reference message.
+				//using create sequence message as the reference message.
 //					RMSBeanMgr createSeqBeanMgr = storageManager.getCreateSeqBeanMgr();
 //					RMSBean createSeqBean = createSeqBeanMgr.retrieve(msgId);
 //					
-					TerminateManager.addTerminateSequenceMessage(rmMsgCtx, sequencePropertyKey, outSequenceId, sequencePropertyKey,
-							storageManager);
-				}
+				TerminateManager.addTerminateSequenceMessage(rmMsgCtx, sequencePropertyKey, outSequenceId, sequencePropertyKey,
+						storageManager);
 			}
 		}
 

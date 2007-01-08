@@ -129,18 +129,18 @@ public class FaultManager {
 			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForLastMsgNumberExceeded");
+/*	
+ * TODO - This code currently doesn't actually work	
 		Sequence sequence = (Sequence) applicationRMMessage.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		long messageNumber = sequence.getMessageNumber().getMessageNumber();
 		String sequenceID = sequence.getIdentifier().getIdentifier();
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		boolean lastMessageNumberExceeded = false;
 		String reason = null;
-		SequencePropertyBean lastMessageBean = seqPropMgr.retrieve(sequenceID,
-				Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO);
-		if (lastMessageBean != null) {
-			long lastMessageNo = Long.parseLong(lastMessageBean.getValue());
+		
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
+		if (rmsBean != null) {
+			long lastMessageNo = rmsBean.getLastOutMessage();
 			if (messageNumber > lastMessageNo) {
 				lastMessageNumberExceeded = true;
 				reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgNumberLargerThanLastMsg, Long
@@ -172,7 +172,7 @@ public class FaultManager {
 				log.debug("Exit: FaultManager::checkForLastMsgNumberExceeded, lastMessageNumberExceeded");
 			getFault(applicationRMMessage, faultData, storageManager);
 		}
-
+*/
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForLastMsgNumberExceeded");
 	}

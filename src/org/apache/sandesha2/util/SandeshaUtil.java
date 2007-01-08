@@ -58,7 +58,6 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler;
-import org.apache.axis2.util.UUIDGenerator;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -111,7 +110,7 @@ public class SandeshaUtil {
 	 */
 	public static String getUUID() {
 		// String uuid = "uuid:" + UUIDGenerator.getUUID();
-		String uuid = UUIDGenerator.getUUID();
+		String uuid = org.apache.axiom.om.util.UUIDGenerator.getUUID();
 
 		return uuid;
 	}
@@ -760,6 +759,18 @@ public class SandeshaUtil {
 		return bean;
 	}
 	
+	public static final RMSBean getRMSBeanFromSequenceId(StorageManager storageManager, String sequenceID) 
+	
+	throws SandeshaException {
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+		RMSBean bean = new RMSBean();
+		bean.setSequenceID(sequenceID);
+		
+		bean = rmsBeanMgr.findUnique(bean);
+
+		return bean;
+	}
+
 	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
 			StorageManager storageManager) throws SandeshaException {
 

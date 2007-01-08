@@ -22,15 +22,9 @@ package org.apache.sandesha2.storage.beans;
  * There is one entry for each sequence.
  */
 
-public class RMDBean extends RMBean {
+public class RMDBean extends RMSequenceBean {
 	
 	private static final long serialVersionUID = -2976123838615087562L;
-
-	/**
-	 * Comment for <code>sequenceID</code>
-	 * The sequenceID of the representing sequence.
-	 */
-	private String sequenceID;
 
 	/**
 	 * Comment for <code>nextMsgNoToProcess</code>
@@ -61,7 +55,7 @@ public class RMDBean extends RMBean {
 	}
 
 	public RMDBean(String sequenceID, long nextNsgNo) {
-		this.sequenceID = sequenceID;
+		super(sequenceID);
 		this.nextMsgNoToProcess = nextNsgNo;
 	}
 
@@ -78,21 +72,6 @@ public class RMDBean extends RMBean {
 	 */
 	public void setNextMsgNoToProcess(long nextMsgNoToProcess) {
 		this.nextMsgNoToProcess = nextMsgNoToProcess;
-	}
-
-	/**
-	 * @return Returns the sequenceId.
-	 */
-	public String getSequenceID() {
-		return sequenceID;
-	}
-
-	/**
-	 * @param sequenceId
-	 *            The sequenceId to set.
-	 */
-	public void setSequenceID(String sequenceID) {
-		this.sequenceID = sequenceID;
 	}
 
 	public boolean isPollingMode() {
@@ -130,7 +109,7 @@ public class RMDBean extends RMBean {
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
-		result.append("\nSequence Id: "); result.append(sequenceID);
+		result.append(super.toString());
 		result.append("\nNext Msg # : "); result.append(nextMsgNoToProcess);
 		result.append("\nPolling    : "); result.append(pollingMode);
 		result.append("\nRef Msg Key: "); result.append(referenceMessageKey);

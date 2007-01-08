@@ -42,6 +42,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
@@ -204,9 +205,9 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 					// It is possible that the message has gone out, but not been acked yet. In that case
 					// we can store the HIGHEST_OUT_MSG_NUMBER as the LAST_OUT_MESSAGE_NO, so that when the
 					// ack arrives we will terminate the sequence
-					SequencePropertyBean lastOutMsgNoBean = new SequencePropertyBean(responseSideSequencePropertyKey,
-							Sandesha2Constants.SequenceProperties.LAST_OUT_MESSAGE_NO, highOutMessageNumberString);
-					seqPropMgr.insert(lastOutMsgNoBean);
+					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, responseSideInternalSequenceId);
+					rmsBean.setLastOutMessage(highestOutMsgNo);
+					storageManager.getRMSBeanMgr().update(rmsBean);
 				}
 			}
 

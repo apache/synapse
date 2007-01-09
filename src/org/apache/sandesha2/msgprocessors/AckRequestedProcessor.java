@@ -136,10 +136,6 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		// Check that the sequence requested exists
 		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 
-		// Check that the sequence isn't closed
-		// throwing a fault if the sequence is closed.
-		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
-
 		// Setting the ack depending on AcksTo.
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 		SequencePropertyBean versionBean = seqPropMgr.retrieve(sequencePropertyKey,

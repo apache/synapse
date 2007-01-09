@@ -123,7 +123,15 @@ public class RMMsgCreator {
 		// is already using (if set), and fall back to the level in the spec if that isn't
 		// found.
 		String addressingNamespace = (String) applicationMsgContext.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-		if(addressingNamespace == null) addressingNamespace = SpecSpecificConstants.getAddressingNamespace(rmNamespaceValue);
+		Boolean disableAddressing = (Boolean) applicationMsgContext.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
+		if(addressingNamespace == null) {
+			// Addressing may still be enabled, as it defaults to the final spec. The only time
+			// we follow the RM spec is when addressing has been explicitly disabled.
+			if(disableAddressing != null && disableAddressing.booleanValue())
+				addressingNamespace = SpecSpecificConstants.getAddressingNamespace(rmNamespaceValue);
+			else
+				addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
+		}
 		
 		// If acksTo has not been set, then default to anonaymous, using the correct spec level
 		String anon = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);

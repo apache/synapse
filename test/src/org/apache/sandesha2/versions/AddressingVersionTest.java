@@ -56,6 +56,11 @@ public class AddressingVersionTest extends SandeshaTestCase {
 		runAddressingTest(clientOptions);
 	}
 
+	public void testAddressingDefault() throws Exception  {
+		Options clientOptions = new Options ();
+		runAddressingTest(clientOptions);
+	}
+
 	public void testAddressingNone() throws Exception  {
 		Options clientOptions = new Options ();
 		clientOptions.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);

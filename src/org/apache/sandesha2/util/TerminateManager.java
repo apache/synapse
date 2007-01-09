@@ -353,13 +353,12 @@ public class TerminateManager {
 			toEPR = new EndpointReference (endpointBean.getValue());
 		}
 		
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
+		
 		if (toEPR==null) {
-			
-			SequencePropertyBean toBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
 
-			if (toBean!=null) {
-				toEPR = new EndpointReference(toBean.getValue());
+			if (rmsBean.getToEPR()!=null) {
+				toEPR = new EndpointReference(rmsBean.getToEPR());
 				if (toEPR == null) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
 					throw new SandeshaException(message);
@@ -370,10 +369,8 @@ public class TerminateManager {
 		if (toEPR!=null)
 			terminateRMMessage.setTo(toEPR);
 		
-		SequencePropertyBean replyToBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
-		if (replyToBean!=null) {
-			terminateRMMessage.setReplyTo(new EndpointReference (replyToBean.getValue()));
+		if (rmsBean.getReplyToEPR()!=null) {
+			terminateRMMessage.setReplyTo(new EndpointReference (rmsBean.getReplyToEPR()));
 		}
 		
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);

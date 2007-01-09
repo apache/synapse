@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.util.List;
+
 /**
  * This bean is used at the receiving side (of both server and client)
  * There is one entry for each sequence.
@@ -31,14 +33,7 @@ public class RMDBean extends RMSequenceBean {
 	 * The next message to be invoked of the representing sequence.
 	 */
 	private long nextMsgNoToProcess;
-	
-	/**
-	 * This tells weather this sequence is in the polling mode or not.
-	 * PollingManager will use this property decide the sequences that need
-	 * polling and will do MakeConnections on them.
-	 */
-	private boolean pollingMode=false;
-	
+		
 	/**
 	 * This will be used as a referenced 
 	 */
@@ -48,7 +43,7 @@ public class RMDBean extends RMSequenceBean {
 	
 	private String highestInMessageId;
 	
-	
+	private List serverCompletedMessages = null;
 
 	public RMDBean() {
 
@@ -72,14 +67,6 @@ public class RMDBean extends RMSequenceBean {
 	 */
 	public void setNextMsgNoToProcess(long nextMsgNoToProcess) {
 		this.nextMsgNoToProcess = nextMsgNoToProcess;
-	}
-
-	public boolean isPollingMode() {
-		return pollingMode;
-	}
-
-	public void setPollingMode(boolean pollingMode) {
-		this.pollingMode = pollingMode;
 	}
 
 	public String getReferenceMessageKey() {
@@ -111,11 +98,18 @@ public class RMDBean extends RMSequenceBean {
 		result.append(this.getClass().getName());
 		result.append(super.toString());
 		result.append("\nNext Msg # : "); result.append(nextMsgNoToProcess);
-		result.append("\nPolling    : "); result.append(pollingMode);
 		result.append("\nRef Msg Key: "); result.append(referenceMessageKey);
 		result.append("\nHishestInMessageNumber: "); result.append(highestInMessageNumber);
 		result.append("\nHishestInMessageKey: "); result.append(highestInMessageId);
 		return result.toString();
 	}
+
+	public List getServerCompletedMessages() {
+  	return serverCompletedMessages;
+  }
+
+	public void setServerCompletedMessages(List serverCompletedMessages) {
+  	this.serverCompletedMessages = serverCompletedMessages;
+  }
 
 }

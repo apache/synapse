@@ -37,6 +37,7 @@ import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -112,7 +113,7 @@ public class PollingManager extends Thread {
 			}
 		}
 		RMSBean beanToPoll = (RMSBean) results.get(rmsIndex++);
-		pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey());
+		pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll);
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide");
 	}
@@ -140,13 +141,13 @@ public class PollingManager extends Thread {
 			}
 		}
 		RMDBean nextMsgBean = (RMDBean) results.get(rmdIndex++);
-		pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey());
+		pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean);
 
 		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMDSide");
 	}
 
-	private void pollForSequence(String sequenceId, String sequencePropertyKey, String referenceMsgKey) throws SandeshaException, SandeshaStorageException, AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey);
+	private void pollForSequence(String sequenceId, String sequencePropertyKey, String referenceMsgKey, RMSequenceBean rmBean) throws SandeshaException, SandeshaStorageException, AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey + ", " + rmBean);
 
 		// Don't poll for a terminated sequence
 		// TODO once the 'terminated' flag is a property on the RMS / RMD bean, we should
@@ -159,8 +160,7 @@ public class PollingManager extends Thread {
 		}
 		
 		//create a MakeConnection message  
-		String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,storageManager);
+		String replyTo = rmBean.getReplyToEPR();
 		String WSRMAnonReplyToURI = null;
 		if (SandeshaUtil.isWSRMAnonymous(replyTo)) {
 			// If we are polling on a RM anon URI then we don't want to include the sequence id

@@ -42,6 +42,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
@@ -215,18 +216,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		boolean sendCreateSequence = false;
 
-		String outSequenceID = SandeshaUtil.getSequenceIDFromInternalSequenceID(internalSequenceId, storageManager);
-
-		// setting async ack endpoint for the server side. (if present)
-		if (serverSide) {
-//			String incomingSequenceID = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
-			SequencePropertyBean incomingToBean = seqPropMgr.retrieve(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.TO_EPR);
-			if (incomingToBean != null) {
-				String incomingTo = incomingToBean.getValue();
-				msgContext.setProperty(SandeshaClientConstants.AcksTo, incomingTo);
-			}
-		}
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 
 		// FINDING THE SPEC VERSION
 		String specVersion = null;
@@ -273,100 +263,92 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			// TODO change the default to v1_1
 			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); 
 		
-		if (outSequenceID == null) { // out sequence will be set for the
+		String outSequenceID = null;
+		if (rmsBean == null) { // out sequence will be set for the
 										// server side, in the case of an offer.
 			sendCreateSequence = true; // message number being one and not
 											// having an out sequence, implies
 											// that a create sequence has to be
 											// send.
+		} else {
+			outSequenceID = rmsBean.getSequenceID();
 		}
 
 		ServiceContext serviceContext = msgContext.getServiceContext();
 		OperationContext operationContext = msgContext.getOperationContext();
 
-		RMSBean rmsBean = null;
-		
 		// SENDING THE CREATE SEQUENCE.
 		if (sendCreateSequence) {
 
 			// if first message - setup the sending side sequence - both for the
 			// server and the client sides
-			SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
+			rmsBean = SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
 			
 			EndpointReference acksToEPR = null;
-			SequencePropertyBean responseCreateSeqAdded = seqPropMgr.retrieve(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT);
 
-			if (responseCreateSeqAdded == null) {
-				responseCreateSeqAdded = new SequencePropertyBean(sequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.OUT_CREATE_SEQUENCE_SENT, "true");
-				seqPropMgr.insert(responseCreateSeqAdded);
+			if (serviceContext != null) {
+				String address = (String) msgContext.getProperty(SandeshaClientConstants.AcksTo);
+				if(address != null) acksToEPR = new EndpointReference(address);
+			}
 
-				if (serviceContext != null) {
-					String address = (String) msgContext.getProperty(SandeshaClientConstants.AcksTo);
-					if(address != null) acksToEPR = new EndpointReference(address);
+			if (msgContext.isServerSide()) {
+				// we do not set acksTo value to anonymous when the create
+				// sequence is send from the server.
+				MessageContext requestMessage;
+				try {
+					requestMessage = operationContext
+							.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+				} catch (AxisFault e) {
+					throw new SandeshaException(e);
 				}
 
-				if (msgContext.isServerSide()) {
-					// we do not set acksTo value to anonymous when the create
-					// sequence is send from the server.
-					MessageContext requestMessage;
-					try {
-						requestMessage = operationContext
-								.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					} catch (AxisFault e) {
-						throw new SandeshaException(e);
-					}
+				if (requestMessage == null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.requestMsgNotPresent);
+					log.debug(message);
+					throw new SandeshaException(message);
+				}
+				acksToEPR = requestMessage.getTo();
 
-					if (requestMessage == null) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.requestMsgNotPresent);
-						log.debug(message);
-						throw new SandeshaException(message);
-					}
-					acksToEPR = requestMessage.getTo();
-
-				} else {
-					if (acksToEPR == null){
-						EndpointReference replyToEPR = msgContext.getReplyTo();
+			} else {
+				if (acksToEPR == null){
+					EndpointReference replyToEPR = msgContext.getReplyTo();
 						
-						if(replyToEPR!=null && !replyToEPR.getAddress().equals("")){
-							//use the replyTo address as acksTo
-							if (log.isDebugEnabled())
-								log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + replyToEPR.getAddress());
+					if(replyToEPR!=null && !replyToEPR.getAddress().equals("")){
+						//use the replyTo address as acksTo
+						if (log.isDebugEnabled())
+							log.debug("Using replyTo " + replyToEPR + " EPR as AcksTo, addr=" + replyToEPR.getAddress());
 							
-							acksToEPR = replyToEPR;
-						}
+						acksToEPR = replyToEPR;
 					}
 				}
+			}
 
-				if (acksToEPR != null && !acksToEPR.hasAnonymousAddress() && !serverSide) {
-					String transportIn = (String) configContext // TODO verify
-							.getProperty(MessageContext.TRANSPORT_IN);
-					if (transportIn == null)
-						transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
-				} else if (acksToEPR == null && serverSide) {
+			if (acksToEPR != null && !acksToEPR.hasAnonymousAddress() && !serverSide) {
+				String transportIn = (String) configContext // TODO verify
+						.getProperty(MessageContext.TRANSPORT_IN);
+				if (transportIn == null)
+					transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
+			} else if (acksToEPR == null && serverSide) {
 //					String incomingSequencId = SandeshaUtil
 //							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
 					
-					try {
-						MessageContext requestMsgContext = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-						RMMsgContext requestRMMsgContext = MsgInitializer.initializeMessage(requestMsgContext);
+				try {
+					MessageContext requestMsgContext = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+					RMMsgContext requestRMMsgContext = MsgInitializer.initializeMessage(requestMsgContext);
+											
+					String requestSideSequencePropertyKey = SandeshaUtil.getSequencePropertyKey(requestRMMsgContext);
+					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, requestSideSequencePropertyKey);
 						
-						String requestSideSequencePropertyKey = SandeshaUtil.getSequencePropertyKey(requestRMMsgContext);
-						
-						SequencePropertyBean bean = seqPropMgr.retrieve(requestSideSequencePropertyKey,
-								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR);
-						if (bean != null) {
-							String beanAcksToValue = bean.getValue();
-							if (beanAcksToValue != null)
-								acksToEPR = new EndpointReference(beanAcksToValue);
-						}
-					} catch (AxisFault e) {
-						throw new SandeshaException (e);
+					if (rmdBean != null && rmdBean.getReplyToEPR() != null) {
+						String beanAcksToValue = rmdBean.getReplyToEPR();
+						if (beanAcksToValue != null)
+							acksToEPR = new EndpointReference(beanAcksToValue);
 					}
+				} catch (AxisFault e) {
+					throw new SandeshaException (e);
 				}
-				rmsBean = addCreateSequenceMessage(rmMsgCtx, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
 			}
+			rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
 		}
 		
 		if (rmsBean == null) {
@@ -423,6 +405,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmsBean.setHighestOutRelatesTo(relatesTo.getValue());
 		}
 
+		// setting async ack endpoint for the server side. (if present)
+		if (serverSide) {
+			if (rmsBean.getToEPR() != null) {
+				msgContext.setProperty(SandeshaClientConstants.AcksTo, rmsBean.getToEPR());
+			}
+		}
+
 		// Update the rmsBean
 		storageManager.getRMSBeanMgr().update(rmsBean);
 		
@@ -464,8 +453,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// processing the response if not an dummy.
 		if (!dummyMessage)
-			processResponseMessage(rmMsgCtx, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager);
-
+			processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager);
 		
 		//Users wont be able to get reliable response msgs in the back channel in the back channel of a 
 		//reliable message. If he doesn't have a endpoint he should use polling mechanisms.
@@ -476,17 +464,17 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	private RMSBean addCreateSequenceMessage(RMMsgContext applicationRMMsg, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
+	private RMSBean addCreateSequenceMessage(RMMsgContext applicationRMMsg, RMSBean rmsBean, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
-			log.debug("Enter: ApplicationMsgProcessor::addCreateSequenceMessage, " + internalSequenceId);
+			log.debug("Enter: ApplicationMsgProcessor::addCreateSequenceMessage, " + internalSequenceId + ", " + rmsBean);
 
 		MessageContext applicationMsg = applicationRMMsg.getMessageContext();
 		ConfigurationContext configCtx = applicationMsg.getConfigurationContext();
 
 		// generating a new create sequeuce message.
-		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(applicationRMMsg, sequencePropertyKey, acksTo,
+		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg, sequencePropertyKey, acksTo,
 				storageManager);
 
 		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
@@ -516,16 +504,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		String createSequenceMessageStoreKey = SandeshaUtil.getUUID(); // the key that will be used to store 
 																	   //the create sequence message.
 		
-		RMSBean rMSBean = new RMSBean();
-		rMSBean.setInternalSequenceID(internalSequenceId);
-		rMSBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
-		rMSBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
+		rmsBean.setInternalSequenceID(internalSequenceId);
+		rmsBean.setCreateSeqMsgID(createSeqMsg.getMessageID());
+		rmsBean.setCreateSequenceMsgStoreKey(createSequenceMessageStoreKey);
 		
 		//cloning the message and storing it as a reference.
 		MessageContext clonedMessage = SandeshaUtil.cloneMessageContext(createSeqMsg);
 		String clonedMsgStoreKey = SandeshaUtil.getUUID();
 		storageManager.storeMessageContext(clonedMsgStoreKey, clonedMessage);
-		rMSBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
+		rmsBean.setReferenceMessageStoreKey(clonedMsgStoreKey);
 		
 		
 		//TODO set the replyTo of CreateSeq (and others) to Anymomous if Application Msgs hv it as Anonymous.
@@ -549,10 +536,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(token != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			rMSBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
+			rmsBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
 		}
 		
-		createSeqMgr.insert(rMSBean);
+		createSeqMgr.insert(rmsBean);
 
 //		if (createSeqMsg.getReplyTo() == null) {
 //			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(createSeqMsg);
@@ -579,11 +566,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		retransmitterMgr.insert(createSeqEntry);
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage, " + rMSBean);
-		return rMSBean;
+			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage, " + rmsBean);
+		return rmsBean;
 	}
 
-	private void processResponseMessage(RMMsgContext rmMsg, String internalSequenceId, String outSequenceID, long messageNumber,
+	private void processResponseMessage(RMMsgContext rmMsg, RMSBean rmsBean, String internalSequenceId, String outSequenceID, long messageNumber,
 			String storageKey, StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId + ", " + outSequenceID);
@@ -593,22 +580,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 
-		SequencePropertyBean toBean = sequencePropertyMgr.retrieve(internalSequenceId,
-				Sandesha2Constants.SequenceProperties.TO_EPR);
-
-		if (toBean == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
-		EndpointReference toEPR = new EndpointReference(toBean.getValue());
-
-		if (toEPR == null || toEPR.getAddress() == null || "".equals(toEPR.getAddress())) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
+		EndpointReference toEPR = new EndpointReference(rmsBean.getToEPR());
 
 		String newToStr = null;
 		if (msg.isServerSide()) {

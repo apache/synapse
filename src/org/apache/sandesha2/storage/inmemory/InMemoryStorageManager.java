@@ -164,14 +164,18 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 	
 	public MessageContext retrieveMessageContext(String key,ConfigurationContext context) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::retrieveMessageContext, key: " + key);
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
-		if (storageMap==null)
+		if (storageMap==null) {
+			if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext");
 			return null;
+		}
 		
 		MessageContext messageContext = (MessageContext) storageMap.get(key);
 		
 		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
 		if(envMap==null) {
+			if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext");
 			return null;
 		}
 		
@@ -190,11 +194,12 @@ public class InMemoryStorageManager extends StorageManager {
 			}
 		}
 		
+		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext, " + messageContext);
 		return messageContext; 
 	}
 
 	public void storeMessageContext(String key,MessageContext msgContext) {
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryStorageManager::storeMessageContext, key: " + key);
+		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::storeMessageContext, key: " + key);
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		
 		if (storageMap==null) {
@@ -227,7 +232,7 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	public void updateMessageContext(String key,MessageContext msgContext) throws SandeshaStorageException { 
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryStorageManager::updateMessageContext, key: " + key);
+		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::updateMessageContext, key: " + key);
 
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		
@@ -252,8 +257,8 @@ public class InMemoryStorageManager extends StorageManager {
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::updateMessageContext, key: " + key);
 	}
 	
-	public void removeMessageContext(String key) throws SandeshaStorageException { 
-		if(log.isDebugEnabled()) log.debug("Entry: InMemoryStorageManager::removeMessageContext, key: " + key);
+	public void removeMessageContext(String key) { 
+		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::removeMessageContext, key: " + key);
 
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		HashMap envelopeMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
@@ -273,5 +278,6 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 }
+
 
 

@@ -41,6 +41,7 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.FaultManager;
@@ -101,9 +102,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		try {
 			// Create the new sequence id, as well as establishing the beans that handle the
 			// sequence state.
-			String newSequenceId = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
+			RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
 			
-			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, newSequenceId);
+			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean.getSequenceID());
 			outMessage = createSeqResponse.getMessageContext();
 			
 			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
@@ -142,12 +143,14 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					RMSBean rMSBean = new RMSBean();
 					rMSBean.setSequenceID(offeredSequenceID);
 					String outgoingSideInternalSequenceId = SandeshaUtil
-							.getOutgoingSideInternalSequenceID(newSequenceId);
+							.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
 					rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
-					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); // this
-																				// is a
-																				// dummy
-																				// value.
+					// this is a dummy value
+					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
+					
+					rMSBean.setToEPR(rmdBean.getToEPR());
+					rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
+					rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
 					
 					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
@@ -193,13 +196,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					createSeqResponse.addSOAPEnvelope();
 				}
 			}
-
-			EndpointReference acksTo = createSeqPart.getAcksTo().getEPR();
-			if (acksTo == null || acksTo.getAddress() == null || "".equals(acksTo.getAddress())) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence);
-				log.debug(message);
-				throw new AxisFault(message);
-			}
 			
 			// Add this sequence to the list of inbound sequences
 			SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
@@ -217,24 +213,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			}
 
 			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
-			incomingSequenceList.add(newSequenceId);
+			incomingSequenceList.add(rmdBean.getSequenceID());
 			incomingSequenceListBean.setValue(incomingSequenceList.toString());
 			seqPropMgr.update(incomingSequenceListBean);
 
 			
 			//TODO add createSequenceResponse message as the referenceMessage to the RMDBean.
-			
-
-			SequencePropertyBean acksToBean = new SequencePropertyBean(newSequenceId,
-					Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo.getAddress());
-
-			seqPropMgr.insert(acksToBean);
 
 			outMessage.setResponseWritten(true);
 
 			// commiting tr. before sending the response msg.
 
-			SequenceManager.updateLastActivatedTime(newSequenceId, storageManager);
+			SequenceManager.updateLastActivatedTime(rmdBean.getSequenceID(), storageManager);
 
 			AxisEngine engine = new AxisEngine(context);
 			try{
@@ -247,10 +237,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			}
 
 			boolean anon = true;
-			SequencePropertyBean toBean = seqPropMgr.retrieve(newSequenceId,
-					Sandesha2Constants.SequenceProperties.TO_EPR);
-			if (toBean != null) {
-				EndpointReference toEPR = new EndpointReference(toBean.getValue());
+			if (rmdBean.getToEPR() != null) {
+				EndpointReference toEPR = new EndpointReference(rmdBean.getToEPR());
 				if (!toEPR.hasAnonymousAddress()) anon = false;
 			}
 			if(anon) {

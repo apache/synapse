@@ -19,6 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -140,9 +141,6 @@ public class SequenceProcessor {
 		// updating the last activated time of the sequence.
 		SequenceManager.updateLastActivatedTime(propertyKey, storageManager);
 
-		SequencePropertyBean msgsBean = seqPropMgr.retrieve(propertyKey,
-				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
@@ -159,7 +157,7 @@ public class SequenceProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
 					sequenceId));
 		}
-
+		
 		String key = SandeshaUtil.getUUID(); // key to store the message.
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
@@ -177,21 +175,13 @@ public class SequenceProcessor {
 			
 			bean.setHighestInMessageId(messageId);
 			bean.setHighestInMessageNumber(msgNo);
-			// Update the bean
-			mgr.update(bean);
 		}
 
-		String messagesStr = "";
-		if (msgsBean != null)
-			messagesStr = msgsBean.getValue();
-		else {
-			msgsBean = new SequencePropertyBean();
-			msgsBean.setSequencePropertyKey(propertyKey);
-			msgsBean.setName(Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-			msgsBean.setValue(messagesStr);
-		}
-
-		boolean msgNoPresentInList = msgNoPresentInList(messagesStr, msgNo);
+		// Get the server completed messages list
+		List serverCompletedMessages = bean.getServerCompletedMessages();
+		
+		// If the message in the list of completed
+		boolean msgNoPresentInList = serverCompletedMessages.contains(new Long(msgNo));
 		
 		if (msgNoPresentInList
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
@@ -203,14 +193,11 @@ public class SequenceProcessor {
 
 		if (!msgNoPresentInList)
 		{
-			if (messagesStr != null && !"".equals(messagesStr))
-				messagesStr = messagesStr + "," + Long.toString(msgNo);
-			else
-				messagesStr = Long.toString(msgNo);
-	
-			msgsBean.setValue(messagesStr);
-			seqPropMgr.update(msgsBean);
+			serverCompletedMessages.add(new Long(msgNo));
 		}
+		
+		// Update the RMD bean
+		mgr.update(bean);
 
 		// inorder invocation is still a global property
 		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
@@ -254,20 +241,6 @@ public class SequenceProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Exit: SequenceProcessor::processReliableMessage " + msgCtxPaused);
 		return msgCtxPaused;
-	}
-
-	// TODO convert following from INT to LONG
-	private boolean msgNoPresentInList(String list, long no) {
-		String[] msgStrs = list.split(",");
-
-		int l = msgStrs.length;
-
-		for (int i = 0; i < l; i++) {
-			if (msgStrs[i].equals(Long.toString(no)))
-				return true;
-		}
-
-		return false;
 	}
 
 	public static void sendAckIfNeeded(RMMsgContext rmMsgCtx, StorageManager storageManager)

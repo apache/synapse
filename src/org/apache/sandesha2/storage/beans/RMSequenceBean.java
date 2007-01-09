@@ -30,6 +30,19 @@ public class RMSequenceBean extends RMBean {
 	 * The sequenceID of the representing sequence.
 	 */
 	private String sequenceID;
+	
+	private String toEPR;
+
+	private String replyToEPR;
+	
+	private String acksToEPR;
+
+	/**
+	 * This tells weather this sequence is in the polling mode or not.
+	 * PollingManager will use this property decide the sequences that need
+	 * polling and will do MakeConnections on them.
+	 */
+	private boolean pollingMode=false;
 
 	public RMSequenceBean() {
 
@@ -54,10 +67,45 @@ public class RMSequenceBean extends RMBean {
 		this.sequenceID = sequenceID;
 	}
 	
+	public String getAcksToEPR() {
+  	return acksToEPR;
+  }
+
+	public void setAcksToEPR(String acksToEPR) {
+  	this.acksToEPR = acksToEPR;
+  }
+
+	public String getReplyToEPR() {
+  	return replyToEPR;
+  }
+
+	public void setReplyToEPR(String replyToEPR) {
+  	this.replyToEPR = replyToEPR;
+  }
+
+	public String getToEPR() {
+  	return toEPR;
+  }
+
+	public void setToEPR(String toEPR) {
+  	this.toEPR = toEPR;
+  }
+
+	public boolean isPollingMode() {
+		return pollingMode;
+	}
+
+	public void setPollingMode(boolean pollingMode) {
+		this.pollingMode = pollingMode;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("\nSequence Id: "); result.append(sequenceID);
+		result.append("\ntoEPR        : "); result.append(toEPR);
+		result.append("\nreplyToEPR   : "); result.append(replyToEPR);
+		result.append("\nacksToEPR    : "); result.append(acksToEPR);
+		result.append("\nPolling    : "); result.append(pollingMode);
 		return result.toString();
 	}
-
 }

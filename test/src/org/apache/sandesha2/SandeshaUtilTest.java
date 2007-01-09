@@ -62,10 +62,15 @@ public class SandeshaUtilTest extends TestCase {
 	}
 	
 	public void testGetAckRangeArrayList () throws SandeshaException {
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
-		String msgNumberStr = "3,6,1,5,8,2";
+		ArrayList msgNumberArr = new ArrayList();
+		msgNumberArr.add(new Long(3));
+		msgNumberArr.add(new Long(6));
+		msgNumberArr.add(new Long(1));
+		msgNumberArr.add(new Long(5));
+		msgNumberArr.add(new Long(8));
+		msgNumberArr.add(new Long(2));	
 		
-		ArrayList list = SandeshaUtil.getAckRangeArrayList(msgNumberStr,factory,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		ArrayList list = SandeshaUtil.getAckRangeArrayList(msgNumberArr,Sandesha2Constants.SPEC_2005_02.NS_URI);
 		assertNotNull(list);
 		assertEquals(list.size(),3);
 		

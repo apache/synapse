@@ -47,6 +47,7 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.FaultManager;
@@ -140,12 +141,11 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
 
 		// Setting the ack depending on AcksTo.
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 		SequencePropertyBean versionBean = seqPropMgr.retrieve(sequencePropertyKey,
 				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 
-		EndpointReference acksTo = new EndpointReference(acksToBean.getValue());
+		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
 		String acksToStr = acksTo.getAddress();
 
 		if (acksToStr == null)

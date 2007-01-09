@@ -8,14 +8,15 @@ package org.apache.sandesha2.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.MessageContextConstants;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
@@ -35,6 +36,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
@@ -51,10 +53,15 @@ public class SequenceManager {
 	 * Set up a new inbound sequence, triggered by the arrival of a create sequence message. As this
 	 * is an inbound sequence, the sequencePropertyKey is the sequenceId.
 	 */
-	public static String setupNewSequence(RMMsgContext createSequenceMsg, StorageManager storageManager, SecurityManager securityManager, SecurityToken token)
+	public static RMDBean setupNewSequence(RMMsgContext createSequenceMsg, StorageManager storageManager, SecurityManager securityManager, SecurityToken token)
 			throws AxisFault {
-
+		if (log.isDebugEnabled())
+			log.debug("Enter: SequenceManager::setupNewSequence");
+		
 		String sequenceId = SandeshaUtil.getUUID();
+
+		// Generate the new RMD Bean
+		RMDBean rmdBean = new RMDBean();
 
 		EndpointReference to = createSequenceMsg.getTo();
 		if (to == null) {
@@ -86,27 +93,14 @@ public class SequenceManager {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean receivedMsgBean = new SequencePropertyBean(sequenceId,
-				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
+		rmdBean.setServerCompletedMessages(new ArrayList());
+		
+		rmdBean.setReplyToEPR(to.getAddress());
+		rmdBean.setAcksToEPR(acksTo.getAddress());
 
 		// If no replyTo value. Send responses as sync.
-		SequencePropertyBean toBean = null;
-		if (replyTo != null) {
-			toBean = new SequencePropertyBean(sequenceId, Sandesha2Constants.SequenceProperties.TO_EPR, replyTo
-					.getAddress());
-		}
-
-		SequencePropertyBean replyToBean = new SequencePropertyBean(sequenceId,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, to.getAddress());
-		SequencePropertyBean acksToBean = new SequencePropertyBean(sequenceId,
-				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, acksTo.getAddress());
-		
-		seqPropMgr.insert(receivedMsgBean);
-		seqPropMgr.insert(replyToBean);
-		seqPropMgr.insert(acksToBean);
-
-		if (toBean != null)
-			seqPropMgr.insert(toBean);
+		if (replyTo != null)
+			rmdBean.setToEPR(replyTo.getAddress());
 
 		// Store the security token alongside the sequence
 		if(token != null) {
@@ -118,7 +112,6 @@ public class SequenceManager {
 
 		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 		
-		RMDBean rmdBean = new RMDBean();
 		rmdBean.setSequenceID(sequenceId);
 		rmdBean.setNextMsgNoToProcess(1);
 		
@@ -163,16 +156,21 @@ public class SequenceManager {
 
 		// TODO get the SOAP version from the create seq message.
 
-		return sequenceId;
+		if (log.isDebugEnabled())
+			log.debug("Exit: SequenceManager::setupNewSequence, " + rmdBean);
+		return rmdBean;
 	}
 
 	public void removeSequence(String sequence) {
 
 	}
 
-	public static void setupNewClientSequence(MessageContext firstAplicationMsgCtx, String sequencePropertyKey,
+	public static RMSBean setupNewClientSequence(MessageContext firstAplicationMsgCtx, String sequencePropertyKey,
 			String specVersion, StorageManager storageManager) throws SandeshaException {
-
+		if (log.isDebugEnabled())
+			log.debug("Enter: SequenceManager::setupNewClientSequence " + sequencePropertyKey);
+		
+		RMSBean rmsBean = new RMSBean();
 		ConfigurationContext configurationContext = firstAplicationMsgCtx.getConfigurationContext();
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
@@ -193,10 +191,7 @@ public class SequenceManager {
 			throw new SandeshaException(message);
 		}
 
-		SequencePropertyBean toBean = new SequencePropertyBean(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TO_EPR, toEPR.getAddress());
-		SequencePropertyBean replyToBean = null;
-		SequencePropertyBean acksToBean = null;
+		rmsBean.setToEPR(toEPR.getAddress());
 
 		if (firstAplicationMsgCtx.isServerSide()) {
 			// setting replyTo value, if this is the server side.
@@ -211,24 +206,12 @@ public class SequenceManager {
 					throw new SandeshaException(message);
 				}
 
-				EndpointReference replyToEPR = requestMessage.getTo(); // 'replyTo'
-																		// of
-																		// the
-																		// response
-																		// msg
-																		// is
-																		// the
-																		// 'to'
-																		// value
-																		// of
-																		// the
-																		// req
-																		// msg.
+				// replyTo of the response msg is the 'to' value of the req msg
+				EndpointReference replyToEPR = requestMessage.getTo(); 
+				
 				if (replyToEPR != null) {
-					replyToBean = new SequencePropertyBean(sequencePropertyKey,
-							Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
-					acksToBean = new SequencePropertyBean(sequencePropertyKey,
-							Sandesha2Constants.SequenceProperties.ACKS_TO_EPR, replyToEPR.getAddress());
+					rmsBean.setReplyToEPR(replyToEPR.getAddress());
+					rmsBean.setAcksToEPR(replyToEPR.getAddress());
 				} else {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
 					log.error(message);
@@ -243,8 +226,7 @@ public class SequenceManager {
 		} else {
 			EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
 			if (replyToEPR!=null) {
-				replyToBean = new SequencePropertyBean(sequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, replyToEPR.getAddress());
+				rmsBean.setReplyToEPR(replyToEPR.getAddress());
 			}
 
 		}
@@ -252,8 +234,7 @@ public class SequenceManager {
 		// Default value for acksTo is anonymous (this happens only for the client side)
 		boolean anonAcks = true;
 		if (acksTo != null) {
-			acksToBean = new SequencePropertyBean(sequencePropertyKey, Sandesha2Constants.SequenceProperties.ACKS_TO_EPR,
-					acksTo);
+			rmsBean.setAcksToEPR(acksTo);
 			EndpointReference epr = new EndpointReference(acksTo);
 			anonAcks = epr.hasAnonymousAddress();
 		}
@@ -289,14 +270,8 @@ public class SequenceManager {
 
 		seqPropMgr.insert(msgsBean);
 
-		seqPropMgr.insert(toBean);
-		if (acksToBean != null)
-			seqPropMgr.insert(acksToBean);
-		if (replyToBean != null)
-			seqPropMgr.insert(replyToBean);
-
 		// saving transportTo value;
-		String transportTo = (String) firstAplicationMsgCtx.getProperty(MessageContextConstants.TRANSPORT_URL);
+		String transportTo = (String) firstAplicationMsgCtx.getProperty(Constants.Configuration.TRANSPORT_URL);
 		if (transportTo != null) {
 			SequencePropertyBean transportToBean = new SequencePropertyBean();
 			transportToBean.setSequencePropertyKey(sequencePropertyKey);
@@ -315,12 +290,13 @@ public class SequenceManager {
 
 		// updating the last activated time.
 		updateLastActivatedTime(sequencePropertyKey, storageManager);
-
+		
 		SandeshaUtil.startSenderForTheSequence(configurationContext, sequencePropertyKey);
 
-		
 		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonAcks);
-
+		if (log.isDebugEnabled())
+			log.debug("Exit: SequenceManager::setupNewClientSequence " + rmsBean);
+		return rmsBean;
 	}
 
 	private static void updateClientSideListnerIfNeeded(MessageContext messageContext, boolean anonAcks)

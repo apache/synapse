@@ -43,6 +43,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckFinal;
@@ -80,7 +82,7 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext createCreateSeqMsg(RMMsgContext applicationRMMsg, String sequencePropertyKey,
+	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg, String sequencePropertyKey,
 			EndpointReference acksToEPR, StorageManager storageManager) throws AxisFault {
 
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
@@ -172,11 +174,8 @@ public class RMMsgCreator {
 			}
 		}
 		
-		String to = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TO_EPR, storageManager);
-		String replyTo = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.REPLY_TO_EPR,
-				storageManager);
+		String to = rmsBean.getToEPR();
+		String replyTo = rmsBean.getReplyToEPR();
 
 		if (to == null) {
 			String message = SandeshaMessageHelper
@@ -446,11 +445,7 @@ public class RMMsgCreator {
 		if(log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
 		
-		SOAPFactory factory = null;
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
-		factory = (SOAPFactory) envelope.getOMFactory();
-		
-		envelope = applicationMsg.getSOAPEnvelope();
 
 		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
 		if (rmVersion == null)
@@ -465,11 +460,9 @@ public class RMMsgCreator {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean seqBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-		String msgNoList = seqBean.getValue();
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
-		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(msgNoList, factory, rmNamespaceValue);
+		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
 		Iterator iterator = ackRangeArrayList.iterator();
 		while (iterator.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) iterator.next();

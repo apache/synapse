@@ -46,15 +46,7 @@ public class RMSBean extends RMSequenceBean {
 	 * This is the security token data needed to reconstruct the token that secures this sequence.
 	 */
 	private String securityTokenData;
-	
-
-	/**
-	 * Set to true if this RMS used a WS-RM anon replyTo, so that we can poll for messages
-	 * related to that URI.
-	 */
-	private boolean pollingMode;
-
-	
+		
 	/**
 	 * The key that is used to store the CreateSequence message in the Message Storage.
 	 * This is stored here, so that the CreateSequence message can be used as a reference when Sandesha
@@ -145,14 +137,6 @@ public class RMSBean extends RMSequenceBean {
 	public void setReferenceMessageStoreKey(String referenceMessageStoreKey) {
 		this.referenceMessageStoreKey = referenceMessageStoreKey;
 	}
-	
-	public boolean isPollingMode() {
-		return pollingMode;
-	}
-
-	public void setPollingMode(boolean pollingMode) {
-		this.pollingMode = pollingMode;
-	}
 
 	public Exception getLastSendError() {
   	return lastSendError;
@@ -218,7 +202,6 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		result.append("\nCreateSeq Msg Key: "); result.append(createSequenceMsgStoreKey);
 		result.append("\nReference Msg Key: "); result.append(referenceMessageStoreKey);
-		result.append("\nPolling          : "); result.append(pollingMode);
 		result.append("\nLastOutMessageNumber: "); result.append(lastOutMessage);
 		result.append("\nHighestOutMessage: "); result.append(highestOutMessageNumber);
 		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);

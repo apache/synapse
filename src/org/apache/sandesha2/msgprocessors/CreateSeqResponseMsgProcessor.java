@@ -112,15 +112,15 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 
-		RMSBean createSeqBean = createSeqMgr.retrieve(createSeqMsgId);
-		if (createSeqBean == null) {
+		RMSBean rmsBean = createSeqMgr.retrieve(createSeqMsgId);
+		if (rmsBean == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound);
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
 
 		// Check that the create sequence response message proves possession of the correct token
-		String tokenData = createSeqBean.getSecurityTokenData();
+		String tokenData = rmsBean.getSecurityTokenData();
 		if(tokenData != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			MessageContext crtSeqResponseCtx = createSeqResponseRMMsgCtx.getMessageContext();
@@ -129,7 +129,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			secManager.checkProofOfPossession(token, body, crtSeqResponseCtx);
 		}
 
-		String internalSequenceId = createSeqBean.getInternalSequenceID();
+		String internalSequenceId = rmsBean.getInternalSequenceID();
 		if (internalSequenceId == null || "".equals(internalSequenceId)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.tempSeqIdNotSet);
 			log.debug(message);
@@ -139,21 +139,20 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(createSeqResponseRMMsgCtx);
 		
-		createSeqBean.setSequenceID(newOutSequenceId);
+		rmsBean.setSequenceID(newOutSequenceId);
 
 		// We must poll for any reply-to that uses the anonymous URI. If it is a ws-a reply to then
 		// the create must include an offer (or this client cannot be identified). If the reply-to
 		// is the RM anon URI template then the offer is not required.
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-			String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
-							Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
+			String replyToAddress = rmsBean.getReplyToEPR();
 			if(SandeshaUtil.isWSRMAnonymous(replyToAddress)) {
-				createSeqBean.setPollingMode(true);
+				rmsBean.setPollingMode(true);
 				SandeshaUtil.startPollingManager(configCtx);
 			}
 		}
 		
-		createSeqMgr.update(createSeqBean);
+		createSeqMgr.update(rmsBean);
 
 		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
 		if (createSequenceSenderBean == null)
@@ -175,7 +174,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 					Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
 			sequencePropMgr.insert(newToken);
 		}
-
 		
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
@@ -192,16 +190,11 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 
 			String offeredSequenceId = offeredSequenceBean.getValue();
-			
-			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
-			SequencePropertyBean acksToBean = new SequencePropertyBean();
-			acksToBean.setName(Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
-			acksToBean.setSequencePropertyKey(offeredSequenceId);
-			acksToBean.setValue(acksToEPR.getAddress());
-
-			sequencePropMgr.insert(acksToBean);
 
 			RMDBean rMDBean = new RMDBean();
+			
+			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
+			rMDBean.setAcksToEPR(acksToEPR.getAddress());
 			rMDBean.setSequenceID(offeredSequenceId);
 			rMDBean.setNextMsgNoToProcess(1);
 
@@ -209,7 +202,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			//of the receiving side as well.
 			//This can be used when creating new outgoing messages.
 			
-			String referenceMsgStoreKey = createSeqBean.getReferenceMessageStoreKey();
+			String referenceMsgStoreKey = rmsBean.getReferenceMessageStoreKey();
 			MessageContext referenceMsg = storageManager.retrieveMessageContext(referenceMsgStoreKey, configCtx);
 			
 			String newMessageStoreKey = SandeshaUtil.getUUID();
@@ -221,27 +214,24 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			// rmdBean for polling too, so that it still gets serviced after the outbound
 			// sequence terminates.
 			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-				String replyToAddress = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
-								Sandesha2Constants.SequenceProperties.REPLY_TO_EPR, storageManager);
+				String replyToAddress = rmsBean.getReplyToEPR();
 				EndpointReference ref = new EndpointReference(replyToAddress);
-				if(!createSeqBean.isPollingMode() && (replyToAddress == null || ref.hasAnonymousAddress())) {
+				if(!rmsBean.isPollingMode() && (replyToAddress == null || ref.hasAnonymousAddress())) {
 					rMDBean.setPollingMode(true);
 					SandeshaUtil.startPollingManager(configCtx);
 				}
 			}
 			
-			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
-			nextMsgMgr.insert(rMDBean);
-
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
 
 			SequencePropertyBean specVersionBean = new SequencePropertyBean(offeredSequenceId,
 					Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, rmSpecVersion);
 			sequencePropMgr.insert(specVersionBean);
 
-			SequencePropertyBean receivedMsgBean = new SequencePropertyBean(offeredSequenceId,
-					Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
-			sequencePropMgr.insert(receivedMsgBean);
+			rMDBean.setServerCompletedMessages(new ArrayList());
+
+			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+			rmdBeanMgr.insert(rMDBean);
 
 			SequencePropertyBean msgsBean = new SequencePropertyBean();
 			msgsBean.setSequencePropertyKey(offeredSequenceId);

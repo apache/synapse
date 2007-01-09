@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -70,8 +71,10 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
@@ -125,13 +128,12 @@ public class SandeshaUtil {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static ArrayList getAckRangeArrayList(String msgNoStr, SOAPFactory factory, String rmNamespaceValue)
+	public static ArrayList getAckRangeArrayList(List completedMessages, String rmNamespaceValue)
 			throws SandeshaException {
 
 		ArrayList ackRanges = new ArrayList();
 
-		StringTokenizer tokenizer = new StringTokenizer(msgNoStr, ",");
-		ArrayList sortedMsgNoArrayList = getSortedMsgNoArrayList(tokenizer);
+		ArrayList sortedMsgNoArrayList = getSortedMsgNoArrayList(completedMessages);
 
 		Iterator iterator = sortedMsgNoArrayList.iterator();
 		long lower = 0;
@@ -172,28 +174,7 @@ public class SandeshaUtil {
 		return ackRanges;
 	}
 
-	private static ArrayList getSortedMsgNoArrayList(StringTokenizer tokenizer) throws SandeshaException {
-		ArrayList msgNubers = new ArrayList();
-
-		while (tokenizer.hasMoreElements()) {
-			String temp = tokenizer.nextToken();
-
-			try {
-				long msgNo = Long.parseLong(temp);
-				msgNubers.add(new Long(msgNo));
-			} catch (Exception ex) {
-				String message = SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.invalidMsgNumberList);
-				log.debug(message);
-				throw new SandeshaException(message);
-			}
-		}
-
-		ArrayList sortedMsgNumberList = sort(msgNubers);
-		return sortedMsgNumberList;
-	}
-
-	public static ArrayList sort(ArrayList list) {
+	public static ArrayList getSortedMsgNoArrayList(List list) {
 
 		ArrayList sortedList = new ArrayList();
 
@@ -771,6 +752,18 @@ public class SandeshaUtil {
 		return bean;
 	}
 
+	public static RMDBean getRMDBeanFromSequenceId(StorageManager storageManager, String sequenceID) 
+	
+	throws SandeshaException {
+		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+		RMDBean bean = new RMDBean();
+		bean.setSequenceID(sequenceID);
+		
+		bean = rmdBeanMgr.findUnique(bean);
+
+		return bean;
+  }
+
 	public static String getSequenceIDFromInternalSequenceID(String internalSequenceID,
 			StorageManager storageManager) throws SandeshaException {
 
@@ -1235,6 +1228,5 @@ public class SandeshaUtil {
 		}
 		
 		return newEPR;
-	}
-	
+	}	
 }

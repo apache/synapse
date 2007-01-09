@@ -43,6 +43,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -98,7 +99,7 @@ public class AcknowledgementManager {
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
 
-		piggybackLoop: while (it.hasNext()) {
+		while (it.hasNext()) {
 			SenderBean ackBean = (SenderBean) it.next();
 
 			long timeNow = System.currentTimeMillis();
@@ -187,20 +188,14 @@ public class AcknowledgementManager {
 		return completedMsgList;
 	}
 
-	public static ArrayList getServerCompletedMessagesList(String sequenceID, SequencePropertyBeanMgr seqPropMgr)
+	public static ArrayList getServerCompletedMessagesList(String sequenceID, StorageManager storageManager)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::getServerCompletedMessagesList");
+			log.debug("Enter: AcknowledgementManager::getServerCompletedMessagesList " + sequenceID);
 
-		SequencePropertyBean completedMessagesBean = null;
-
-		completedMessagesBean = seqPropMgr.retrieve(sequenceID,
-				Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-
-		ArrayList completedMsgList = null;
-		if (completedMessagesBean != null) {
-			completedMsgList = SandeshaUtil.getArrayListFromMsgsString(completedMessagesBean.getValue());
-		} else {
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
+		
+		if (rmdBean.getServerCompletedMessages() == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.completedMsgBeanIsNull, sequenceID);
 			SandeshaException e = new SandeshaException(message);
 			if(log.isDebugEnabled()) log.debug("Throwing exception", e);
@@ -209,7 +204,7 @@ public class AcknowledgementManager {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::getServerCompletedMessagesList");
-		return completedMsgList;
+		return (ArrayList)rmdBean.getServerCompletedMessages();
 	}
 
 	public static RMMsgContext generateAckMessage(RMMsgContext referenceRMMessage, String sequencePropertyKey ,String sequenceId,
@@ -219,13 +214,10 @@ public class AcknowledgementManager {
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		// Setting the ack depending on AcksTo.
-		SequencePropertyBean acksToBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.ACKS_TO_EPR);
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
-		EndpointReference acksTo = new EndpointReference(acksToBean.getValue());
+		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
 		String acksToStr = acksTo.getAddress();
 
 		if (acksToStr == null)

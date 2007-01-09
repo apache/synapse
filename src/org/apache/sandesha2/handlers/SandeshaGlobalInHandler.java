@@ -18,7 +18,7 @@
 package org.apache.sandesha2.handlers;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -38,8 +38,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -173,31 +172,19 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			String sequenceId = null;
 
 			long msgNo = sequence.getMessageNumber().getMessageNumber();
 			
 			String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgContext);
 
 			if (propertyKey != null && msgNo > 0) {
-				SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-				SequencePropertyBean receivedMsgsBean = seqPropMgr.retrieve(propertyKey,
-						Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
-				if (receivedMsgsBean != null) {
-					String receivedMsgStr = receivedMsgsBean.getValue();
-					ArrayList msgNoArrList = SandeshaUtil.getSplittedMsgNoArraylist(receivedMsgStr);
-
-					Iterator iterator = msgNoArrList.iterator();
-					while (iterator.hasNext()) {
-						String temp = (String) iterator.next();
-						String msgNoStr = new Long(msgNo).toString();
-						if (msgNoStr.equals(temp)) {
-							drop = true;
-						}
-					}
+				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, propertyKey);
+				if (rmdBean.getServerCompletedMessages() != null) {
+					if (rmdBean.getServerCompletedMessages().contains(new Long(msgNo)))
+						drop = true;
 				}
 
-				if (drop == false) {
+				if (!drop) {
 					// Checking for RM specific EMPTY_BODY LASTMESSAGE.
 					SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
 					boolean emptyBody = false;
@@ -210,26 +197,21 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 							log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
 							drop = true;
 
-							if (receivedMsgsBean == null) {
-								receivedMsgsBean = new SequencePropertyBean(sequenceId,
-										Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES, "");
-								seqPropMgr.insert(receivedMsgsBean);
+							if (rmdBean.getServerCompletedMessages() == null) {
+								rmdBean.setServerCompletedMessages(new ArrayList());
 							}
 
-							String receivedMsgStr = receivedMsgsBean.getValue();
-							if (!receivedMsgStr.equals("") && receivedMsgStr != null)
-								receivedMsgStr = receivedMsgStr + "," + Long.toString(msgNo);
-							else
-								receivedMsgStr = Long.toString(msgNo);
-
-							receivedMsgsBean.setValue(receivedMsgStr);
+							List serverCompletedMsgs = rmdBean.getServerCompletedMessages();
+							
+							// Add this message to the completed range
+							serverCompletedMsgs.add(Long.toString(msgNo));
+							
+							rmdBean.setServerCompletedMessages(serverCompletedMsgs);
 
 							// TODO correct the syntac into '[received msgs]'
 
-							seqPropMgr.update(receivedMsgsBean);
-							
-							drop = true;
-
+							// Update the rmdBean
+							storageManager.getRMDBeanMgr().update(rmdBean);
 						}
 					}
 				}

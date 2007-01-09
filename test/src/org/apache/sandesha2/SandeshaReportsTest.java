@@ -82,7 +82,6 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		TestCallback callback1 = new TestCallback ("Callback 1");
 		serviceClient.sendReceiveNonBlocking(getEchoOMBlock("echo1",sequenceKey),callback1);
 		
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		TestCallback callback2 = new TestCallback ("Callback 2");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo2",sequenceKey),callback2);
 
@@ -96,7 +95,7 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 				
 				//testing incoming sequence reports
@@ -106,7 +105,6 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 				assertEquals(incomingSequenceReport.getCompletedMessages().size(),2);
 				assertNotNull(incomingSequenceReport.getSequenceID());
 				assertEquals(incomingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_IN);
-				assertEquals(incomingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 				assertNotNull(incomingSequenceReport.getInternalSequenceID());
 				
 				assertEquals(incomingSequenceReport.getSequenceID(),incomingSequenceReport.getInternalSequenceID());  //for the incoming side, internalSequenceID==sequenceID
@@ -119,6 +117,12 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		}
 		if(lastError != null) throw lastError;
 
+		SandeshaClient.terminateSequence(serviceClient, sequenceKey);
+		SandeshaClient.waitUntilSequenceCompleted(serviceClient, sequenceKey);
+		
+		SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+		assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+		
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}

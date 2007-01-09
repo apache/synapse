@@ -246,14 +246,13 @@ public class SandeshaClient {
 			}
 
 			// incoming sequences
-			SequencePropertyBean serverCompletedMsgsFindBean = new SequencePropertyBean();
-			serverCompletedMsgsFindBean.setName(Sandesha2Constants.SequenceProperties.SERVER_COMPLETED_MESSAGES);
+			RMDBean rmdBean = new RMDBean();
+			Collection rmdBeans = storageManager.getRMDBeanMgr().find(rmdBean);
 
-			Collection serverCompletedMsgsBeans = seqPropMgr.find(serverCompletedMsgsFindBean);
-			Iterator iter = serverCompletedMsgsBeans.iterator();
+			Iterator iter = rmdBeans.iterator();
 			while (iter.hasNext()) {
-				SequencePropertyBean serverCompletedMsgsBean = (SequencePropertyBean) iter.next();
-				String sequenceID = serverCompletedMsgsBean.getSequencePropertyKey();
+				RMDBean serverCompletedMsgsBean = (RMDBean) iter.next();
+				String sequenceID = serverCompletedMsgsBean.getSequenceID();
 				sandeshaReport.addToIncomingSequenceList(sequenceID);
 
 				SequenceReport sequenceReport = getIncomingSequenceReport(sequenceID, configurationContext);
@@ -1119,8 +1118,8 @@ public class SandeshaClient {
 			SequenceReport sequenceReport = new SequenceReport();
 
 			ArrayList completedMessageList = AcknowledgementManager.getServerCompletedMessagesList(sequenceID,
-					seqPropMgr);
-
+					storageManager);
+			
 			Iterator iter = completedMessageList.iterator();
 			while (iter.hasNext()) {
 				sequenceReport.addCompletedMessage((Long) iter.next());

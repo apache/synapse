@@ -259,22 +259,13 @@ public interface Sandesha2Constants {
 		//For out going sequences this gives the messages that were sent and that were successfully
 		//acked by the other end point.
 		String CLIENT_COMPLETED_MESSAGES = "ClientCompletedMessages";
-		String SERVER_COMPLETED_MESSAGES = "ServerCompletedMessages";
 		
 		//For IN_ORDER sequences, we can have finite ranges of messages that can be
 		//delivered out of order. These are maintained as a String that is consistent
 		//with the form described in  org.apache.sandesha2.util.RangeString
 		String OUT_OF_ORDER_RANGES = "OutOfOrderRanges";
-		
-		String TO_EPR = "ToEPR";
-
-		String ACKS_TO_EPR = "acksToEPR";
 
 		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
-
-		String REPLY_TO_EPR = "ReplyToEPR";
-
-		String OUT_CREATE_SEQUENCE_SENT = "OutCreateSeqSent";
 
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 

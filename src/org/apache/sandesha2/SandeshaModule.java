@@ -133,9 +133,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 	}
 
 	public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
-		//removing the threads started by Sandesha2.
-		SandeshaUtil.stopSender (configurationContext);
-		SandeshaUtil.stopInvoker(configurationContext);
+		SandeshaUtil.
+			getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration())
+				.shutdown();
 	}
 
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {

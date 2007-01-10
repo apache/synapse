@@ -209,11 +209,6 @@ public class SandeshaUtil {
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::startSenderForTheSequence");
 	}
-	
-	public static void stopSender(ConfigurationContext context) throws SandeshaException {
-		SandeshaThread sender = getSandeshaStorageManager(context, context.getAxisConfiguration()).getSender();
-		sender.stopRunning();		
-	}
 
 	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) throws SandeshaException {
 		if (log.isDebugEnabled())
@@ -224,11 +219,6 @@ public class SandeshaUtil {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::startInvokerForTheSequence");			
-	}
-
-	public static void stopInvoker(ConfigurationContext context) throws SandeshaException {
-		SandeshaThread invoker = getSandeshaStorageManager(context, context.getAxisConfiguration()).getInvoker();
-		invoker.stopRunning();
 	}
 
 	public static void startPollingManager (ConfigurationContext configurationContext) throws SandeshaException {

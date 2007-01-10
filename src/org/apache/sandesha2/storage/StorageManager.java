@@ -49,6 +49,12 @@ public abstract class StorageManager {
 			this.context = context;
 	}
 	
+	public void shutdown(){
+		//shutdown the running threads
+		getSender().stopRunning();
+		getInvoker().stopRunning();
+	}
+	
 	public abstract void initStorage (AxisModule moduleDesc) throws SandeshaStorageException;
 
 	public abstract Transaction getTransaction();

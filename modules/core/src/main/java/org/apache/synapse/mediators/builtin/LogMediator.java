@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
@@ -119,8 +120,8 @@ public class LogMediator extends AbstractMediator {
         StringBuffer sb = new StringBuffer();
         Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
         while (iter.hasNext()) {
-            SOAPHeader header = (SOAPHeader) iter.next();
-            sb.append(separator + header.getLocalName() + " : " + header.getText());
+            SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) iter.next();
+            sb.append(separator + headerBlock.getLocalName() + " : " + headerBlock.getText());
         }
         setCustomProperties(sb, synCtx);
         return trimLeadingSeparator(sb);

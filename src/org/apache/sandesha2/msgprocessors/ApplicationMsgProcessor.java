@@ -201,10 +201,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if(sequenceClosed!=null){
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
 		}
-		
+
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		//see if the sequence is terminated
-		SequencePropertyBean sequenceTerminated = seqPropMgr.retrieve(internalSequenceId, Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		if(sequenceTerminated!=null){
+		if(rmsBean != null && rmsBean.isTerminateAdded()) {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));
 		}
 
@@ -213,10 +213,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if(sequenceTimedout!=null){
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
 		}
-
-		boolean sendCreateSequence = false;
-
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 
 		// FINDING THE SPEC VERSION
 		String specVersion = null;
@@ -264,6 +260,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); 
 		
 		String outSequenceID = null;
+
+		boolean sendCreateSequence = false;
 		if (rmsBean == null) { // out sequence will be set for the
 										// server side, in the case of an offer.
 			sendCreateSequence = true; // message number being one and not

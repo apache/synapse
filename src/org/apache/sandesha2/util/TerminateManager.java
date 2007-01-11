@@ -35,7 +35,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -188,12 +187,11 @@ public class TerminateManager {
 	public static void terminateSendingSide(ConfigurationContext configContext, String sequencePropertyKey, String internalSequenceID,
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean seqTerminatedBean = new SequencePropertyBean(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED, Sandesha2Constants.VALUE_TRUE);
-		seqPropMgr.insert(seqTerminatedBean);
-
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
+		// Indicate that the sequence is terminated
+		rmsBean.setTerminated(true);		
+		storageManager.getRMSBeanMgr().update(rmsBean);
+		
 		cleanSendingSideData (configContext, sequencePropertyKey , internalSequenceID, serverSide, storageManager);
 	}
 
@@ -201,14 +199,6 @@ public class TerminateManager {
 			SequencePropertyBeanMgr seqPropMgr) throws SandeshaException {
 
 		boolean addEntryWithSequenceID = false;
-
-		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES)) {
-			addEntryWithSequenceID = true;
-		}
-
-		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED)) {
-			addEntryWithSequenceID = true;
-		}
 
 		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED)) {
 			addEntryWithSequenceID = true;
@@ -239,20 +229,10 @@ public class TerminateManager {
 	private static boolean isPropertyDeletable(String name) {
 		boolean deleatable = true;
 
-		if (Sandesha2Constants.SequenceProperties.TERMINATE_ADDED.equals(name))
-			deleatable = false;
-
 		if (Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED.equals(name))
 			deleatable = false;
 
 		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
-			deleatable = false;
-
-		// if
-		// (Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION.equals(name))
-		// deleatable = false;
-
-		if (Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED.equals(name))
 			deleatable = false;
 
 		if (Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED.equals(name))
@@ -280,7 +260,6 @@ public class TerminateManager {
 
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
-		RMSBeanMgr rMSBeanMgr = storageManager.getRMSBeanMgr();
 
 		// removing retransmitterMgr entries and corresponding message contexts.
 		Collection collection = retransmitterBeanMgr.find(internalSequenceId);
@@ -298,7 +277,7 @@ public class TerminateManager {
 		createSeqFindBean.setInternalSequenceID(internalSequenceId);
 
 		RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(createSeqFindBean);
-		rMSBeanMgr.delete(rMSBean.getCreateSeqMsgID());
+		//rMSBeanMgr.delete(rMSBean.getCreateSeqMsgID());
 
 		String outSequenceID = rMSBean.getSequenceID();
 		
@@ -326,10 +305,9 @@ public class TerminateManager {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean terminated = seqPropMgr.retrieve(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 
-		if (terminated != null && terminated.getValue() != null && "true".equals(terminated.getValue())) {
+		if (rmsBean.isTerminateAdded()) {
 			if(log.isDebugEnabled())
 				log.debug("Exit: TerminateManager::addTerminateSequenceMessage - terminate was added previously.");
 			return;
@@ -352,8 +330,6 @@ public class TerminateManager {
 		if (endpointBean!=null) {
 			toEPR = new EndpointReference (endpointBean.getValue());
 		}
-		
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 		
 		if (toEPR==null) {
 
@@ -412,12 +388,9 @@ public class TerminateManager {
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
 
-		SequencePropertyBean terminateAdded = new SequencePropertyBean();
-		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequencePropertyKey(internalSequenceID);
-		terminateAdded.setValue("true");
+		rmsBean.setTerminateAdded(true);
 
-		seqPropMgr.insert(terminateAdded);
+		storageManager.getRMSBeanMgr().update(rmsBean);
 
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 		

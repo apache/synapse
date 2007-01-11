@@ -151,8 +151,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				SandeshaUtil.startPollingManager(configCtx);
 			}
 		}
-		
-		createSeqMgr.update(rmsBean);
 
 		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
 		if (createSequenceSenderBean == null)
@@ -233,11 +231,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 			rmdBeanMgr.insert(rMDBean);
 
-			SequencePropertyBean msgsBean = new SequencePropertyBean();
-			msgsBean.setSequencePropertyKey(offeredSequenceId);
-			msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
-			msgsBean.setValue("");
-			sequencePropMgr.insert(msgsBean);
+			createSeqMgr.update(rmsBean);
 
 			// Store the security token for the offered sequence
 			if(tokenData != null) {

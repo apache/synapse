@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -42,10 +43,9 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -159,29 +159,21 @@ public class AcknowledgementManager {
 	 * @param outGoingMessage
 	 * @return
 	 */
-	public static ArrayList getClientCompletedMessagesList(String internalSequenceID, String sequenceID, SequencePropertyBeanMgr seqPropMgr)
+	public static List getClientCompletedMessagesList(String internalSequenceID, String sequenceID, StorageManager storageManager)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::getClientCompletedMessagesList " + internalSequenceID + ", " + sequenceID);
     
-		SequencePropertyBean completedMessagesBean = null;
-		if (internalSequenceID != null)
-			completedMessagesBean = seqPropMgr.retrieve(internalSequenceID,
-					Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
 
-		if (completedMessagesBean == null)
-			completedMessagesBean = seqPropMgr.retrieve(sequenceID,
-					Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
-
-		ArrayList completedMsgList = null;
-		if (completedMessagesBean != null) {
-			completedMsgList = SandeshaUtil.getArrayListFromString(completedMessagesBean.getValue());
-		} else {
+		if (rmsBean == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.completedMsgBeanIsNull, sequenceID);
 			SandeshaException e = new SandeshaException(message);
 			if(log.isDebugEnabled()) log.debug("Throwing exception", e);
 			throw e;
 		}
+		
+		List completedMsgList = rmsBean.getClientCompletedMessages();
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::getClientCompletedMessagesList");

@@ -36,6 +36,11 @@ public class RMSequenceBean extends RMBean {
 	private String replyToEPR;
 	
 	private String acksToEPR;
+  
+  /**
+   * Indicates that a sequence is terminated
+   */
+  private boolean terminated = false;
 
 	/**
 	 * This tells weather this sequence is in the polling mode or not.
@@ -99,6 +104,15 @@ public class RMSequenceBean extends RMBean {
 		this.pollingMode = pollingMode;
 	}
 
+	public boolean isTerminated() {
+  	return terminated;
+  }
+
+
+	public void setTerminated(boolean terminated) {
+  	this.terminated = terminated;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("\nSequence Id: "); result.append(sequenceID);
@@ -106,6 +120,7 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nreplyToEPR   : "); result.append(replyToEPR);
 		result.append("\nacksToEPR    : "); result.append(acksToEPR);
 		result.append("\nPolling    : "); result.append(pollingMode);
+		result.append("\nTerminated       : "); result.append(terminated);		
 		return result.toString();
 	}
 }

@@ -883,20 +883,19 @@ public class SandeshaUtil {
 		SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr.retrieve(id, name);
 		if (sequencePropertyBean == null)
 			return null;
-		else
-			return sequencePropertyBean.getValue();
+		
+		return sequencePropertyBean.getValue();
 	}
 
 	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String sequencePropertyKey,
 			StorageManager storageManager) throws SandeshaException {
 
-		String clientCompletedMessages = getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES, storageManager);
-		ArrayList ackedMsgsList = getArrayListFromString(clientCompletedMessages);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, sequencePropertyKey);
+		List ackedMsgsList = rmsBean.getClientCompletedMessages();
 
 		long smallestMsgNo = 1;
 		for (long tempMsgNo = smallestMsgNo; tempMsgNo <= highestInMsgNo; tempMsgNo++) {
-			if (!ackedMsgsList.contains(new Long(tempMsgNo).toString()))
+			if (!ackedMsgsList.contains(new Long(tempMsgNo)))
 				return false;
 		}
 

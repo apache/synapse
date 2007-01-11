@@ -263,12 +263,8 @@ public class SequenceManager {
 
 		}
 
-		SequencePropertyBean msgsBean = new SequencePropertyBean();
-		msgsBean.setSequencePropertyKey(sequencePropertyKey);
-		msgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
-		msgsBean.setValue("");
-
-		seqPropMgr.insert(msgsBean);
+		// New up the client completed messages list
+		rmsBean.setClientCompletedMessages(new ArrayList());
 
 		// saving transportTo value;
 		String transportTo = (String) firstAplicationMsgCtx.getProperty(Constants.Configuration.TRANSPORT_URL);
@@ -437,54 +433,4 @@ public class SequenceManager {
 
 		return sequenceTimedOut;
 	}
-
-	public static long getOutGoingSequenceAckedMessageCount(String sequencePropertyKey, StorageManager storageManager)
-			throws SandeshaException {
-		// / Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean ackedMsgBean = seqPropBeanMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
-		if (ackedMsgBean == null)
-			return 0; // No acknowledgement has been received yet.
-
-		long noOfMessagesAcked = Long.parseLong(ackedMsgBean.getValue());
-		// / transaction.commit();
-
-		return noOfMessagesAcked;
-	}
-
-	public static boolean isOutGoingSequenceCompleted(String internalSequenceID, StorageManager storageManager)
-			throws SandeshaException {
-		// / Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean terminateAddedBean = seqPropBeanMgr.retrieve(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		if (terminateAddedBean == null)
-			return false;
-
-		if ("true".equals(terminateAddedBean.getValue()))
-			return true;
-
-		return false;
-	}
-
-	public static boolean isIncomingSequenceCompleted(String sequenceID, StorageManager storageManager)
-			throws SandeshaException {
-
-		// / Transaction transaction = storageManager.getTransaction();
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean terminateReceivedBean = seqPropBeanMgr.retrieve(sequenceID,
-				Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
-		boolean complete = false;
-
-		if (terminateReceivedBean != null && "true".equals(terminateReceivedBean.getValue()))
-			complete = true;
-
-		// / transaction.commit();
-		return complete;
-	}
-
 }

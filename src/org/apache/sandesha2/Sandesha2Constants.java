@@ -253,13 +253,7 @@ public interface Sandesha2Constants {
 											   // property. This is used as the
 											   // sequenceId to share data b/w
 											   // sequences
-		
-		//For incoming sequences this gives the msg no's of the messages that were
-		//received (may be an ack was sent - depending on the policy)
-		//For out going sequences this gives the messages that were sent and that were successfully
-		//acked by the other end point.
-		String CLIENT_COMPLETED_MESSAGES = "ClientCompletedMessages";
-		
+				
 		//For IN_ORDER sequences, we can have finite ranges of messages that can be
 		//delivered out of order. These are maintained as a String that is consistent
 		//with the form described in  org.apache.sandesha2.util.RangeString
@@ -270,8 +264,6 @@ public interface Sandesha2Constants {
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 
 		String OFFERED_SEQUENCE = "OfferedSequence";
-
-		String TERMINATE_ADDED = "TerminateAdded";
 		
 		String TERMINATE_RECEIVED = "TerminateReceived";
 		
@@ -284,8 +276,6 @@ public interface Sandesha2Constants {
 		String SEQUENCE_CLOSED = "SequenceClosed";
 		
 		String SEQUENCE_CLOSED_CLIENT = "SequenceClosedClient"; //indicates the client has sent a close sequence
-		
-		String SEQUENCE_TERMINATED = "SequenceTerminated";
 		
 		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
 		

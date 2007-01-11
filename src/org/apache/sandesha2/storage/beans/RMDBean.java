@@ -43,6 +43,9 @@ public class RMDBean extends RMSequenceBean {
 	
 	private String highestInMessageId;
 	
+	/** For incoming sequences this gives the msg no's of the messages that were
+	 * received (may be an ack was sent - depending on the policy)
+	 */
 	private List serverCompletedMessages = null;
 
 	public RMDBean() {

@@ -118,12 +118,11 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		setUpHighestMsgNumbers(context, storageManager,sequencePropertyKey, sequenceId, terminateSeqRMMsg);
 
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		rmdBean.setTerminated(true);		
+		storageManager.getRMDBeanMgr().update(rmdBean);
+
 		TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequencePropertyKey, sequenceId, storageManager);
-
-		SequencePropertyBean terminatedBean = new SequencePropertyBean(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED, Sandesha2Constants.VALUE_TRUE);
-
-		sequencePropertyBeanMgr.insert(terminatedBean);
 
 		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
@@ -273,8 +272,6 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			log.debug("Exit: TerminateSeqMsgProcessor::addTerminateSequenceResponse");
 
 		return terminateSeqResponseRMMsg;
-
-
 	}
 
 	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
@@ -285,11 +282,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		// Get the parent processor to setup the out message
 		setupOutMessage(rmMsgCtx);
 		
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(getStorageManager(), getInternalSequenceID());
+		
 		// Check if the sequence is already terminated (stored on the internal sequenceid)
-		String terminated = SandeshaUtil.getSequenceProperty(getInternalSequenceID(),
-				Sandesha2Constants.SequenceProperties.TERMINATE_ADDED, getStorageManager());
-
-		if (terminated != null && "true".equals(terminated)) {
+		if (rmsBean.isTerminateAdded()) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.terminateAddedPreviously);
 			log.debug(message);
 			if (log.isDebugEnabled())
@@ -317,12 +313,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		rmMsgCtx.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(getRMVersion()));
 		rmMsgCtx.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(getRMVersion()));
 		
-		SequencePropertyBean terminateAdded = new SequencePropertyBean();
-		terminateAdded.setName(Sandesha2Constants.SequenceProperties.TERMINATE_ADDED);
-		terminateAdded.setSequencePropertyKey(getInternalSequenceID());
-		terminateAdded.setValue("true");
+		rmsBean.setTerminateAdded(true);
 
-		getStorageManager().getSequencePropertyBeanMgr().insert(terminateAdded);
+		// Update the RMSBean with the terminate added flag
+		getStorageManager().getRMSBeanMgr().update(rmsBean);
 
 		// Send the outgoing message
 		// Set a retransmitter lastSentTime so that terminate will be send with

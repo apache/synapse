@@ -212,24 +212,15 @@ public class AcknowledgementProcessor {
 
 		// setting the completed_messages list. This gives all the messages of
 		// the sequence that were acked.
-		SequencePropertyBean allCompletedMsgsBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
-		if (allCompletedMsgsBean == null) {
-			allCompletedMsgsBean = new SequencePropertyBean();
-			allCompletedMsgsBean.setSequencePropertyKey(sequencePropertyKey);
-			allCompletedMsgsBean.setName(Sandesha2Constants.SequenceProperties.CLIENT_COMPLETED_MESSAGES);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 
-			seqPropMgr.insert(allCompletedMsgsBean);
-		}
-
-		String str = ackedMessagesList.toString();
-		allCompletedMsgsBean.setValue(str);
-
-		seqPropMgr.update(allCompletedMsgsBean);
-
-		RMSBean bean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
+		// Set the completed message list
+		rmsBean.setClientCompletedMessages(ackedMessagesList);
 		
-		long highestOutMsgNo = bean.getLastOutMessage();
+		long highestOutMsgNo = rmsBean.getLastOutMessage();
+		
+		// Update the RMSBean
+		storageManager.getRMSBeanMgr().update(rmsBean);
 
 		if (highestOutMsgNo > 0) {
 			boolean complete = AcknowledgementManager.verifySequenceCompletion(sequenceAck

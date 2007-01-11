@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.util.List;
+
 /**
  * This bean is used at the sending side (of both server and client)
  * There is on object of this for each sequence.
@@ -92,6 +94,17 @@ public class RMSBean extends RMSequenceBean {
    * The next sequence number to apply to the message
    */
   private long nextMessageNumber = -1;
+  
+	/** 
+	 * For out going sequences this gives the messages that were sent and that were successfully
+	 * acked by the other end point.
+	 */
+  private List clientCompletedMessages = null;
+  
+  /**
+   * Indicates that a terminate sequence message was added.
+   */
+  private boolean terminateAdded = false;
 	
 	public RMSBean() {
 	}
@@ -193,6 +206,25 @@ public class RMSBean extends RMSequenceBean {
   	this.nextMessageNumber = nextMessageNumber;
   }
 
+	public List getClientCompletedMessages() {
+  	return clientCompletedMessages;
+  }
+
+
+	public void setClientCompletedMessages(List clientCompletedMessages) {
+  	this.clientCompletedMessages = clientCompletedMessages;
+  }
+
+
+	public boolean isTerminateAdded() {
+  	return terminateAdded;
+  }
+
+
+	public void setTerminateAdded(boolean terminateAdded) {
+  	this.terminateAdded = terminateAdded;
+  }
+	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -206,6 +238,8 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nHighestOutMessage: "); result.append(highestOutMessageNumber);
 		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);
 		result.append("\nNextMessageNumber: "); result.append(nextMessageNumber);
+		result.append("\nTerminateAdded   : "); result.append(terminateAdded);
 		return result.toString();
 	}
+
 }

@@ -97,7 +97,7 @@ public class PollingManager extends Thread {
 	}
 	
 	private void pollRMSSide() throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMSSide");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMSSide");
 		
 		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
 		RMSBean findRMS = new RMSBean();
@@ -119,7 +119,7 @@ public class PollingManager extends Thread {
 	}
 
 	private void pollRMDSide() throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMDSide");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMDSide");
 		//geting the sequences to be polled.
 		//if shedule contains any requests, do the earliest one.
 		//else pick one randomly.
@@ -143,18 +143,16 @@ public class PollingManager extends Thread {
 		RMDBean nextMsgBean = (RMDBean) results.get(rmdIndex++);
 		pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean);
 
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollRMDSide");
+		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide");
 	}
 
 	private void pollForSequence(String sequenceId, String sequencePropertyKey, String referenceMsgKey, RMSequenceBean rmBean) throws SandeshaException, SandeshaStorageException, AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey + ", " + rmBean);
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey + ", " + rmBean);
 
 		// Don't poll for a terminated sequence
 		// TODO once the 'terminated' flag is a property on the RMS / RMD bean, we should
 		// be able to filter out terminated sequences before we get here.
-		String terminated = SandeshaUtil.getSequenceProperty(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.SEQUENCE_TERMINATED, storageManager);
-		if(terminated != null && "true".equals(terminated)) {
+		if(rmBean.isTerminated()) {
 			if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollForSequence, already terminated");
 			return;
 		}
@@ -207,7 +205,7 @@ public class PollingManager extends Thread {
 	}
 	
 	private synchronized String getNextSheduleEntry () {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::getNextSheduleEntry");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::getNextSheduleEntry");
 		String sequenceId = null;
 		
 		if (sheduledPollingRequests.size()>0) {
@@ -230,7 +228,7 @@ public class PollingManager extends Thread {
 	 * @throws SandeshaException
 	 */
 	public synchronized void start (ConfigurationContext configurationContext) throws SandeshaException {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::start");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::start");
 
 		this.configurationContext = configurationContext;
 		this.sheduledPollingRequests = new HashMap ();
@@ -246,19 +244,19 @@ public class PollingManager extends Thread {
 	 *
 	 */
 	public synchronized void stopPolling () {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::stopPolling");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::stopPolling");
 		setPoll(false);
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::stopPolling");
 	}
 	
 	public synchronized void setPoll (boolean poll) {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::setPoll");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::setPoll");
 		this.poll = poll;
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::setPoll");
 	}
 	
 	public synchronized boolean isPoll () {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::isPoll");
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::isPoll");
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::isPoll");
 		return poll;
 	}
@@ -274,7 +272,7 @@ public class PollingManager extends Thread {
 	 * @param sequenceId
 	 */
 	public synchronized void shedulePollingRequest (String sequenceId) {
-		if(log.isDebugEnabled()) log.debug("Entry: PollingManager::shedulePollingRequest, " + sequenceId);
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::shedulePollingRequest, " + sequenceId);
 		
 		if (sheduledPollingRequests.containsKey (sequenceId)) {
 			Integer sequenceEntryCount = (Integer) sheduledPollingRequests.get(sequenceId);

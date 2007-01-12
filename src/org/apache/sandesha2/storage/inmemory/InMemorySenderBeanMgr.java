@@ -52,7 +52,9 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		if (bean.getMessageID() == null)
 			throw new SandeshaStorageException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.nullMsgId));
-		return super.insert(bean.getMessageID(), bean);
+		boolean result = super.insert(bean.getMessageID(), bean);
+		mgr.getInMemoryTransaction().setSentMessages(true);
+		return result;
 	}
 
 	public List find(String internalSequenceID) throws SandeshaStorageException {
@@ -164,7 +166,9 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 	}
 	
 	public boolean update(SenderBean bean) throws SandeshaStorageException {
-		return super.update(bean.getMessageID(), bean);
+		boolean result = super.update(bean.getMessageID(), bean);
+		mgr.getInMemoryTransaction().setSentMessages(true);
+		return result;
 	}
 	
 	public SenderBean findUnique(SenderBean bean) throws SandeshaException {

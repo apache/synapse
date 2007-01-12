@@ -179,39 +179,37 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 			if (propertyKey != null && msgNo > 0) {
 				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, propertyKey);
-				if (rmdBean.getServerCompletedMessages() != null) {
-					if (rmdBean.getServerCompletedMessages().contains(new Long(msgNo)))
-						drop = true;
-				}
-
-				if (!drop) {
-					// Checking for RM specific EMPTY_BODY LASTMESSAGE.
-					SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
-					boolean emptyBody = false;
-					if (body.getChildElements().hasNext() == false) {
-						emptyBody = true;
-					}
-
-					if (emptyBody) {
-						if (sequence.getLastMessage() != null) {
-							log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
+				if (rmdBean != null) {
+					if (rmdBean.getServerCompletedMessages() != null) {
+						if (rmdBean.getServerCompletedMessages().contains(new Long(msgNo)))
 							drop = true;
-
-							if (rmdBean.getServerCompletedMessages() == null) {
-								rmdBean.setServerCompletedMessages(new ArrayList());
+					}
+	
+					if (!drop) {
+						// Checking for RM specific EMPTY_BODY LASTMESSAGE.
+						SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
+						boolean emptyBody = false;
+						if (body.getChildElements().hasNext() == false) {
+							emptyBody = true;
+						}
+	
+						if (emptyBody) {
+							if (sequence.getLastMessage() != null) {
+								log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
+								drop = true;
+	
+								List serverCompletedMsgs = rmdBean.getServerCompletedMessages();
+								
+								// Add this message to the completed range
+								serverCompletedMsgs.add(new Long(msgNo));
+								
+								rmdBean.setServerCompletedMessages(serverCompletedMsgs);
+	
+								// TODO correct the syntac into '[received msgs]'
+	
+								// Update the rmdBean
+								storageManager.getRMDBeanMgr().update(rmdBean);
 							}
-
-							List serverCompletedMsgs = rmdBean.getServerCompletedMessages();
-							
-							// Add this message to the completed range
-							serverCompletedMsgs.add(Long.toString(msgNo));
-							
-							rmdBean.setServerCompletedMessages(serverCompletedMsgs);
-
-							// TODO correct the syntac into '[received msgs]'
-
-							// Update the rmdBean
-							storageManager.getRMDBeanMgr().update(rmdBean);
 						}
 					}
 				}

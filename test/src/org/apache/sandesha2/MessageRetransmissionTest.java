@@ -60,15 +60,13 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 		//serviceClient.
 		
 		serviceClient.setOptions(clientOptions);
-		
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 //		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		//starting the server after a wait
-		Thread.sleep(10000);
+		Thread.sleep(3000);
 		startServer(server_repoPath, server_axis2_xml);
 
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		long limit = System.currentTimeMillis() + waitTime;
@@ -80,7 +78,6 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 
 				lastError = null;
@@ -90,7 +87,7 @@ public class MessageRetransmissionTest extends SandeshaTestCase {
 			}
 		}
 		if(lastError != null) throw lastError;
-
+		
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}

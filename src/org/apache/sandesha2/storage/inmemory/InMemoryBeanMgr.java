@@ -18,7 +18,7 @@ abstract class InMemoryBeanMgr {
 
 	private static final Log log = LogFactory.getLog(InMemoryBeanMgr.class);
 	private Hashtable table;
-	private InMemoryStorageManager mgr;
+	protected InMemoryStorageManager mgr;
 
 	protected InMemoryBeanMgr(InMemoryStorageManager mgr, AbstractContext context, String key) {
 		this.mgr = mgr;

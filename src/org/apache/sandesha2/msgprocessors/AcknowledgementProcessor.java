@@ -146,6 +146,7 @@ public class AcknowledgementProcessor {
 		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
 
 		ArrayList ackedMessagesList = new ArrayList();
+		boolean removedSenderBean = false;
 		while (ackRangeIterator.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator.next();
 			long lower = ackRange.getLowerValue();
@@ -160,6 +161,7 @@ public class AcknowledgementProcessor {
 					// removing the application message from the storage.
 					String storageKey = retransmitterBean.getMessageContextRefKey();
 					storageManager.removeMessageContext(storageKey);
+					removedSenderBean = true;
 				}
 
 				ackedMessagesList.add(new Long(messageNo));
@@ -213,9 +215,11 @@ public class AcknowledgementProcessor {
 		// setting the completed_messages list. This gives all the messages of
 		// the sequence that were acked.
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
-
-		// Set the completed message list
-		rmsBean.setClientCompletedMessages(ackedMessagesList);
+		
+		// Set the completed message list, but only if we have actually removed a SenderBean
+		// It is possible for the ACK messages arrive out of sequence
+		if (removedSenderBean)
+		  rmsBean.setClientCompletedMessages(ackedMessagesList);
 		
 		long highestOutMsgNo = rmsBean.getLastOutMessage();
 		

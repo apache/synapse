@@ -659,7 +659,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
 		serviceClient.setOptions(clientOptions);
-		
+	
 		serviceClient.fireAndForget(getPingOMBlock("ping1"));
 		
 		// Let an error occur before we start the server
@@ -687,7 +687,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		
 		startServer(server_repoPath, server_axis2_xml);
 
-		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.fireAndForget(getPingOMBlock("ping2"));
 		
 		
@@ -699,7 +698,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
 				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 
 				lastError = null;
@@ -710,6 +708,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		}
 		if(lastError != null) throw lastError;
 	
+		SandeshaClient.terminateSequence(serviceClient, sequenceKey);
+		
 		configContext.getListenerManager().stop();
 		serviceClient.cleanup();
 	}

@@ -47,7 +47,17 @@ public class Sender extends SandeshaThread {
 		if (log.isDebugEnabled())
 			log.debug("Enter: Sender::internalRun");
 
+		if (context == null) {
+			String message = SandeshaMessageHelper
+					.getMessage(SandeshaMessageKeys.configContextNotSet);
+			message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotCointinueSender, message);
+			log.debug(message);
+			throw new RuntimeException(message);
+		}
+
 		StorageManager storageManager = null;
+		boolean sleep = false;
 
 		try {
 			storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
@@ -61,28 +71,25 @@ public class Sender extends SandeshaThread {
 		while (isThreadStarted()) {
 
 			try {
-				Thread.sleep(Sandesha2Constants.SENDER_SLEEP_TIME);
+				synchronized (this) {		
+					if(sleep && !runMainLoop()) wait(Sandesha2Constants.SENDER_SLEEP_TIME);
+					// Indicate that we are running the main loop
+					setRanMainLoop();
+				}
 			} catch (InterruptedException e1) {
-				// e1.printStackTrace();
 				log.debug("Sender was interupted...");
 				log.debug(e1.getMessage());
 				log.debug("End printing Interrupt...");
+			} finally {
+				sleep = false;
 			}
-			
+
 			//pause if we have to
 			doPauseIfNeeded();
 
 			Transaction transaction = null;
 
 			try {
-				if (context == null) {
-					String message = SandeshaMessageHelper
-							.getMessage(SandeshaMessageKeys.configContextNotSet);
-					message = SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.cannotCointinueSender, message);
-					log.debug(message);
-					throw new SandeshaException(message);
-				}
 				
 				transaction = storageManager.getTransaction();
 
@@ -94,6 +101,9 @@ public class Sender extends SandeshaThread {
 								.getMessage(SandeshaMessageKeys.senderBeanNotFound);
 						log.debug(message);
 					}
+					
+					// As there was no work to do, we sleep for a while on the next loop.
+					sleep = true;
 					continue;
 				}
 
@@ -111,6 +121,9 @@ public class Sender extends SandeshaThread {
 										workId);
 						log.debug(message);
 					}
+					// As there is already a worker running we are probably looping
+					// too fast, so sleep on the next loop.
+					sleep = true;
 					continue;
 				}
 

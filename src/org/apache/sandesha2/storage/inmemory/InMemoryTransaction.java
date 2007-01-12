@@ -43,6 +43,8 @@ public class InMemoryTransaction implements Transaction {
 	private int    threadId;
 	private ArrayList enlistedBeans = new ArrayList();
 	private InMemoryTransaction waitingForTran = null;
+	private boolean sentMessages = false;
+	private boolean receivedMessages = false;
 	
 	InMemoryTransaction(InMemoryStorageManager manager, String threadName, int id) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
@@ -54,6 +56,8 @@ public class InMemoryTransaction implements Transaction {
 	
 	public void commit() {
 		releaseLocks();
+		if(sentMessages) manager.getSender().wakeThread();
+		if(receivedMessages) manager.getInvoker().wakeThread();
 	}
 
 	public void rollback() {
@@ -110,6 +114,7 @@ public class InMemoryTransaction implements Transaction {
 				}
 			}
 		}
+		
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryTransaction::enlist");
 	}
 	
@@ -141,5 +146,15 @@ public class InMemoryTransaction implements Transaction {
 		result.append("]");
 		return result.toString();
 	}
+
+	public void setReceivedMessages(boolean receivedMessages) {
+		this.receivedMessages = receivedMessages;
+	}
+
+	public void setSentMessages(boolean sentMessages) {
+		this.sentMessages = sentMessages;
+	}
 }
+
+
 

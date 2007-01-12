@@ -221,16 +221,21 @@ public class Invoker extends SandeshaThread {
 		// If this invoker is working for several sequences, we use round-robin to
 		// try and give them all a chance to invoke messages.
 		int nextIndex = 0;
+		boolean sleep = false;
+		boolean processedMessage = false;
 
 		while (isThreadStarted()) {
 
 			try {
-				Thread.sleep(Sandesha2Constants.INVOKER_SLEEP_TIME);
+				if(sleep && !runMainLoop()) Thread.sleep(Sandesha2Constants.INVOKER_SLEEP_TIME);
+				// Indicate that we are running the main loop
+				setRanMainLoop();
 			} catch (InterruptedException ex) {
-				log.debug("Invoker was Inturrepted....");
-				log.debug(ex.getMessage());
+				log.debug("Invoker was Interrupted.", ex);
+			} finally {
+				sleep = false;
 			}
-					
+
 			//pause if we have to
 			doPauseIfNeeded();
 
@@ -259,6 +264,7 @@ public class Invoker extends SandeshaThread {
 				if (allSequencesBean == null) {
 					if (log.isDebugEnabled())
 						log.debug("AllSequencesBean not found");
+					sleep = true;
 					continue;
 				}
 				
@@ -269,7 +275,14 @@ public class Invoker extends SandeshaThread {
 				log.debug("Choosing one from " + size + " sequences");
 				if(nextIndex >= size) {
 					nextIndex = 0;
-					if (size == 0) continue;
+
+					// We just looped over the set of sequences. If we didn't process any
+					// messages on this loop then we sleep before the next one
+					if(size == 0 || !processedMessage) {
+						sleep = true;
+					}
+					processedMessage = false;
+					continue;
 				}
 				String sequenceId = (String) allSequencesList.get(nextIndex++);
 				log.debug("Chose sequence " + sequenceId);
@@ -284,11 +297,15 @@ public class Invoker extends SandeshaThread {
 					// cleaning the invalid data of the all sequences.
 					allSequencesBean.setValue(allSequencesList.toString());
 					sequencePropMgr.update(allSequencesBean);
+					if (allSequencesList.size() == 0)
+						sleep = true;
 					continue;
 				}
 
 				long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
 				if (nextMsgno <= 0) {
+					// Make sure we sleep on the next loop, so that we don't spin in a tight loop
+					sleep = true;
 					if (log.isDebugEnabled())
 						log.debug("Invalid Next Message Number " + nextMsgno);
 					String message = SandeshaMessageHelper.getMessage(
@@ -300,16 +317,20 @@ public class Invoker extends SandeshaThread {
 				List invokerBeans = storageMapMgr.find(
 						new InvokerBean(null, nextMsgno, sequenceId));
 				
+				// If there aren't any beans to process then move on to the next sequence
+				if (invokerBeans.size() == 0) {
+					continue;
+				}
+				
 				//add any msgs that belong to out of order windows
 				addOutOfOrderInvokerBeansToList(sequenceId, 
 						storageManager, invokerBeans);
 				
 				Iterator stMapIt = invokerBeans.iterator();
-				
+
 				//TODO correct the locking mechanism to have one lock per sequence.
 				
 				if (stMapIt.hasNext()) { //some invokation work is present
-
 					InvokerBean bean = (InvokerBean) stMapIt.next();
 					//see if this is an out of order msg
 					boolean beanIsOutOfOrderMsg = bean.getMsgNo()!=nextMsgno;
@@ -322,6 +343,10 @@ public class Invoker extends SandeshaThread {
 					if (getWorkerLock().isWorkPresent(workId)) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
 						log.debug(message);
+						
+						// As there is already a worker assigned we are probably dispatching
+						// messages too quickly, so we sleep before trying the next sequence.
+						sleep = true;
 						continue;
 					}
 
@@ -346,8 +371,9 @@ public class Invoker extends SandeshaThread {
 					//adding the workId to the lock after assigning it to a thread makes sure 
 					//that all the workIds in the Lock are handled by threads.
 					getWorkerLock().addWork(workId);
+					
+					processedMessage = true;
 				}
-
 			} catch (Exception e) {
 				if (transaction != null) {
 					try {

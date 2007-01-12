@@ -2,6 +2,8 @@ package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axis2.AxisFault;
@@ -277,7 +279,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					// Commit the transaction to release the SenderBean
 					transaction.commit();
 					transaction = null;
-					transaction = storageManager.getTransaction();
 					checkForSyncResponses(msgCtx);
 				}
 			}
@@ -285,7 +286,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)
 					&&
 					 (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmMsgCtx.getRMNamespaceValue()))) {
-				
+				transaction = storageManager.getTransaction();
 				//terminate message sent using the SandeshaClient. Since the terminate message will simply get the
 				//InFlow of the reference message get called which could be zero sized (OutOnly operations).
 				
@@ -367,6 +368,15 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// ctx.
 			OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
 			if (requestMsgOpCtx != null) {
+				
+				// If the AxisOperation object doesn't have a message receiver, it means that this was
+				// an out only op where we have added an ACK to the response.  Set the requestMsgOpCtx to
+				// be the RMIn
+				if (requestMsgOpCtx.getAxisOperation().getMessageReceiver() == null) {
+					// Generate a new RM In Only operation
+					requestMsgOpCtx = new OperationContext( msgCtx.getAxisService().getOperation(new QName("RMInOnlyOperation")));					
+				}
+				
 				responseMessageContext.setOperationContext(requestMsgOpCtx);
 				
 				if (responseMessageContext.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE) == null) {
@@ -402,6 +412,15 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 			if (resenvelope != null) {
+				if (log.isDebugEnabled())
+				{
+					log.debug("RECEIVED " + resenvelope.getHeader());
+					if (requestMsgOpCtx != null) {
+					log.debug("A:" + requestMsgOpCtx.getOperationName());
+					log.debug("B:" + requestMsgOpCtx.getAxisOperation().getName());
+					log.debug("C:" + requestMsgOpCtx.getAxisOperation().getMessageReceiver());
+					}
+				}
 				responseMessageContext.setEnvelope(resenvelope);
 				AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 

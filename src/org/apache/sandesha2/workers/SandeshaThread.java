@@ -44,7 +44,8 @@ public abstract class SandeshaThread extends Thread{
 	
 	protected transient ThreadFactory threadPool;
 	protected ConfigurationContext context = null;
-	
+	private boolean reRunThread;
+
 	public SandeshaThread(int sleepTime) {
 		this.sleepTime = sleepTime;
   	lock = new WorkerLock ();
@@ -172,6 +173,36 @@ public abstract class SandeshaThread extends Thread{
 			hasPausedRunning = false;
 	}
 
+	/**
+	 * Wake the current thread as there is work to be done.
+	 * Also flag that if we miss a notify, then there is 
+	 * work to be done.  Implementing threads should check this value
+	 * before waiting
+	 *
+	 */
+	public synchronized void wakeThread() {
+		reRunThread = true;
+		
+		if (!hasPausedRunning)
+			notify();
+	}
+	
+	/**
+	 * Indicate that the main loop has been run	 
+	 */
+	public synchronized void setRanMainLoop() {
+		reRunThread = false;
+	}
+	
+	/**
+	 * Test to check if a notify has been called when not waiting
+	 * 
+	 * @return
+	 */
+	protected synchronized boolean runMainLoop () {
+		return reRunThread;
+	}
+	
 	/**
 	 * The main work loop, to be implemented by any child class.
 	 */

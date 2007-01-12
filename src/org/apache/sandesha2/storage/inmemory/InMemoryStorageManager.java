@@ -97,7 +97,16 @@ public class InMemoryStorageManager extends StorageManager {
 		}
 		return result;
 	}
-	
+
+	InMemoryTransaction getInMemoryTransaction() {
+		InMemoryTransaction result = null;
+		synchronized (transactions) {
+			Thread key = Thread.currentThread();
+			result = (InMemoryTransaction) transactions.get(key);
+		}
+		return result;
+	}
+
 	void removeTransaction(Transaction t) {
 		synchronized (transactions) {
 			Collection entries = transactions.values();
@@ -278,6 +287,8 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 }
+
+
 
 
 

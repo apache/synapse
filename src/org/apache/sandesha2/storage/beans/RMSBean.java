@@ -105,6 +105,18 @@ public class RMSBean extends RMSequenceBean {
    * Indicates that a terminate sequence message was added.
    */
   private boolean terminateAdded = false;
+  
+  /**
+   * The number of messages that were acked
+   */
+  private long numberOfMessagesAcked = 0;
+  
+  /**
+   * Indicates the client has sent a close sequence
+   */
+  private boolean sequenceClosedClient = false;
+  
+  private String transportTo;
 	
 	public RMSBean() {
 	}
@@ -142,7 +154,6 @@ public class RMSBean extends RMSequenceBean {
 		this.createSequenceMsgStoreKey = createSequenceMsgStoreKey;
 	}
 
-
 	public String getReferenceMessageStoreKey() {
 		return referenceMessageStoreKey;
 	}
@@ -159,16 +170,13 @@ public class RMSBean extends RMSequenceBean {
   	this.lastSendError = lastSendError;
   }
 
-
 	public long getLastSendErrorTimestamp() {
   	return lastSendErrorTimestamp;
   }
 
-
 	public void setLastSendErrorTimestamp(long lastSendErrorTimestamp) {
   	this.lastSendErrorTimestamp = lastSendErrorTimestamp;
   }
-
 	
 	public long getLastOutMessage() {
   	return lastOutMessage;
@@ -182,16 +190,13 @@ public class RMSBean extends RMSequenceBean {
   	return highestOutMessageNumber;
   }
 
-
 	public void setHighestOutMessageNumber(long highestOutMessageNumber) {
   	this.highestOutMessageNumber = highestOutMessageNumber;
   }
 
-
 	public String getHighestOutRelatesTo() {
   	return highestOutRelatesTo;
   }
-
 
 	public void setHighestOutRelatesTo(String highestOutRelatesTo) {
   	this.highestOutRelatesTo = highestOutRelatesTo;
@@ -201,7 +206,6 @@ public class RMSBean extends RMSequenceBean {
   	return nextMessageNumber;
   }
 
-
 	public void setNextMessageNumber(long nextMessageNumber) {
   	this.nextMessageNumber = nextMessageNumber;
   }
@@ -210,21 +214,42 @@ public class RMSBean extends RMSequenceBean {
   	return clientCompletedMessages;
   }
 
-
 	public void setClientCompletedMessages(List clientCompletedMessages) {
   	this.clientCompletedMessages = clientCompletedMessages;
   }
-
 
 	public boolean isTerminateAdded() {
   	return terminateAdded;
   }
 
-
 	public void setTerminateAdded(boolean terminateAdded) {
   	this.terminateAdded = terminateAdded;
   }
+
+	public boolean isSequenceClosedClient() {
+  	return sequenceClosedClient;
+  }
+
+	public void setSequenceClosedClient(boolean sequenceClosedClient) {
+  	this.sequenceClosedClient = sequenceClosedClient;
+  }
 	
+	public long getNumberOfMessagesAcked() {
+  	return numberOfMessagesAcked;
+  }
+
+	public void setNumberOfMessagesAcked(long numberOfMessagesAcked) {
+  	this.numberOfMessagesAcked = numberOfMessagesAcked;
+  }
+	
+	public String getTransportTo() {
+  	return transportTo;
+  }
+
+	public void setTransportTo(String transportTo) {
+  	this.transportTo = transportTo;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -239,7 +264,9 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);
 		result.append("\nNextMessageNumber: "); result.append(nextMessageNumber);
 		result.append("\nTerminateAdded   : "); result.append(terminateAdded);
+		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
+		result.append("\nNumAckedMsgs     : "); result.append(numberOfMessagesAcked);
+		result.append("\nTransportTo      : "); result.append(transportTo);
 		return result.toString();
 	}
-
 }

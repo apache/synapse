@@ -168,8 +168,9 @@ public class AcknowledgementProcessor {
 			}
 		}
 
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 		// updating the last activated time of the sequence.
-		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
+		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 
 		while (nackIterator.hasNext()) {
 			Nack nack = (Nack) nackIterator.next();
@@ -193,33 +194,14 @@ public class AcknowledgementProcessor {
 
 		// setting acked message date.
 		// TODO add details specific to each message.
-		long noOfMsgsAcked = getNoOfMessagesAcked(sequenceAck.getAcknowledgementRanges().iterator());
-		SequencePropertyBean noOfMsgsAckedBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
-		boolean added = false;
-
-		if (noOfMsgsAckedBean == null) {
-			added = true;
-			noOfMsgsAckedBean = new SequencePropertyBean();
-			noOfMsgsAckedBean.setSequencePropertyKey(sequencePropertyKey);
-			noOfMsgsAckedBean.setName(Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED);
-		}
-
-		noOfMsgsAckedBean.setValue(Long.toString(noOfMsgsAcked));
-
-		if (added)
-			seqPropMgr.insert(noOfMsgsAckedBean);
-		else
-			seqPropMgr.update(noOfMsgsAckedBean);
-
-		// setting the completed_messages list. This gives all the messages of
-		// the sequence that were acked.
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 		
 		// Set the completed message list, but only if we have actually removed a SenderBean
 		// It is possible for the ACK messages arrive out of sequence
-		if (removedSenderBean)
+		if (removedSenderBean) {
 		  rmsBean.setClientCompletedMessages(ackedMessagesList);
+			long noOfMsgsAcked = ackedMessagesList.size();
+			rmsBean.setNumberOfMessagesAcked(noOfMsgsAcked);
+		}
 		
 		long highestOutMsgNo = rmsBean.getLastOutMessage();
 		
@@ -255,20 +237,4 @@ public class AcknowledgementProcessor {
 
 		return null;
 	}
-
-	private static long getNoOfMessagesAcked(Iterator ackRangeIterator) {
-		long noOfMsgs = 0;
-		while (ackRangeIterator.hasNext()) {
-			AcknowledgementRange acknowledgementRange = (AcknowledgementRange) ackRangeIterator.next();
-			long lower = acknowledgementRange.getLowerValue();
-			long upper = acknowledgementRange.getUpperValue();
-
-			for (long i = lower; i <= upper; i++) {
-				noOfMsgs++;
-			}
-		}
-
-		return noOfMsgs;
-	}
-
 }

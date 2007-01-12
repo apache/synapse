@@ -99,158 +99,145 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		MessageContext outMessage = null;
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		try {
-			// Create the new sequence id, as well as establishing the beans that handle the
-			// sequence state.
-			RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
+		// Create the new sequence id, as well as establishing the beans that handle the
+		// sequence state.
+		RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
 			
-			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean.getSequenceID());
-			outMessage = createSeqResponse.getMessageContext();
+		RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean.getSequenceID());
+		outMessage = createSeqResponse.getMessageContext();
 			
-			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
+		createSeqResponse.setFlow(MessageContext.OUT_FLOW);
 
-			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); // for
-																									// making
-																									// sure
-																									// that
-																									// this
-																									// wont
-																									// be
-																									// processed
-																									// again.
-			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
-					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+		// for making sure that this won't be processed again
+		createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); 
+		
+		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
+				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
 
 			// OFFER PROCESSING
-			SequenceOffer offer = createSeqPart.getSequenceOffer();
-			if (offer != null) {
-				Accept accept = createSeqResPart.getAccept();
-				if (accept == null) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart);
-					log.debug(message);
-					throw new SandeshaException(message);
-				}
-
-				String offeredSequenceID = offer.getIdentifer().getIdentifier(); // offered
-																					// seq.
-																					// id.
-
-				boolean offerEcepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
-
-				if (offerEcepted) {
-					// Setting the CreateSequence table entry for the outgoing
-					// side.
-					RMSBean rMSBean = new RMSBean();
-					rMSBean.setSequenceID(offeredSequenceID);
-					String outgoingSideInternalSequenceId = SandeshaUtil
-							.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
-					rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
-					// this is a dummy value
-					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
-					
-					rMSBean.setToEPR(rmdBean.getToEPR());
-					rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
-					rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
-					
-					String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
-
-					RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
-					createSeqMgr.insert(rMSBean);
-
-					// Setting sequence properties for the outgoing sequence.
-					// Only will be used by the server side response path. Will
-					// be wasted properties for the client side.
-
-					// setting the internal_sequence_id
-					SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
-					internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-					internalSequenceBean.setSequencePropertyKey(offeredSequenceID);
-					internalSequenceBean.setValue(outgoingSideInternalSequenceId);
-					seqPropMgr.insert(internalSequenceBean);
-					
-					Endpoint endpoint = offer.getEndpoint();
-					if (endpoint!=null) {
-						// setting the OfferedEndpoint
-						SequencePropertyBean offeredEndpointBean = new SequencePropertyBean();
-						offeredEndpointBean.setName(Sandesha2Constants.SequenceProperties.OFFERED_ENDPOINT);
-					
-						//currently we can only serialize the Address part of the Endpoint.
-						//TODO correct this to serialize the whole EPR.
-						offeredEndpointBean.setValue(endpoint.getEPR().getAddress());  
-						offeredEndpointBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
-						seqPropMgr.insert(offeredEndpointBean);
-					}
-					
-					// Store the inbound token (if any) with the new sequence
-					if(token != null) {
-						String tokenData = secManager.getTokenRecoveryData(token);
-						SequencePropertyBean tokenBean = new SequencePropertyBean(
-								outgoingSideSequencePropertyKey,
-								Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
-								tokenData);
-						seqPropMgr.insert(tokenBean);
-					}
-				} else {
-					// removing the accept part.
-					createSeqResPart.setAccept(null);
-					createSeqResponse.addSOAPEnvelope();
-				}
+		SequenceOffer offer = createSeqPart.getSequenceOffer();
+		if (offer != null) {
+			Accept accept = createSeqResPart.getAccept();
+			if (accept == null) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart);
+				log.debug(message);
+				throw new SandeshaException(message);
 			}
+
+			// offered seq id
+			String offeredSequenceID = offer.getIdentifer().getIdentifier(); 
+			
+			boolean offerEcepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
+
+			if (offerEcepted) {
+				// Setting the CreateSequence table entry for the outgoing
+				// side.
+				RMSBean rMSBean = new RMSBean();
+				rMSBean.setSequenceID(offeredSequenceID);
+				String outgoingSideInternalSequenceId = SandeshaUtil
+						.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
+				rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
+				// this is a dummy value
+				rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
+					
+				rMSBean.setToEPR(rmdBean.getToEPR());
+				rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
+				rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
+				rMSBean.setLastActivatedTime(System.currentTimeMillis());
+				
+				String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
+
+				RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+				rmsBeanMgr.insert(rMSBean);
+
+				// Setting sequence properties for the outgoing sequence.
+				// Only will be used by the server side response path. Will
+				// be wasted properties for the client side.
+
+				// setting the internal_sequence_id
+				SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
+				internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
+				internalSequenceBean.setSequencePropertyKey(offeredSequenceID);
+				internalSequenceBean.setValue(outgoingSideInternalSequenceId);
+				seqPropMgr.insert(internalSequenceBean);
+					
+				Endpoint endpoint = offer.getEndpoint();
+				if (endpoint!=null) {
+					// setting the OfferedEndpoint
+					SequencePropertyBean offeredEndpointBean = new SequencePropertyBean();
+					offeredEndpointBean.setName(Sandesha2Constants.SequenceProperties.OFFERED_ENDPOINT);
+				
+					//currently we can only serialize the Address part of the Endpoint.
+					//TODO correct this to serialize the whole EPR.
+					offeredEndpointBean.setValue(endpoint.getEPR().getAddress());  
+					offeredEndpointBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
+					seqPropMgr.insert(offeredEndpointBean);
+				}
+					
+				// Store the inbound token (if any) with the new sequence
+				if(token != null) {
+					String tokenData = secManager.getTokenRecoveryData(token);
+					SequencePropertyBean tokenBean = new SequencePropertyBean(
+							outgoingSideSequencePropertyKey,
+							Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
+							tokenData);
+					seqPropMgr.insert(tokenBean);
+				}
+			} else {
+				// removing the accept part.
+				createSeqResPart.setAccept(null);
+				createSeqResponse.addSOAPEnvelope();
+			}
+		}
 			
 			// Add this sequence to the list of inbound sequences
-			SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
-					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-					Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+		SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
+				Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
+				Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
 
-			if (incomingSequenceListBean == null) {
-				incomingSequenceListBean = new SequencePropertyBean();
-				incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
-				incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-				incomingSequenceListBean.setValue(null);
+		if (incomingSequenceListBean == null) {
+			incomingSequenceListBean = new SequencePropertyBean();
+			incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
+			incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
+			incomingSequenceListBean.setValue(null);
 
-				// this get inserted before
-				seqPropMgr.insert(incomingSequenceListBean);
-			}
-
-			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
-			incomingSequenceList.add(rmdBean.getSequenceID());
-			incomingSequenceListBean.setValue(incomingSequenceList.toString());
-			seqPropMgr.update(incomingSequenceListBean);
-
-			
-			//TODO add createSequenceResponse message as the referenceMessage to the RMDBean.
-
-			outMessage.setResponseWritten(true);
-
-			// commiting tr. before sending the response msg.
-
-			SequenceManager.updateLastActivatedTime(rmdBean.getSequenceID(), storageManager);
-
-			AxisEngine engine = new AxisEngine(context);
-			try{
-				engine.send(outMessage);				
-			}
-			catch(AxisFault e){
-				throw new SandeshaException(
-						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCreateSeqResponse, e.toString()), 
-						e);
-			}
-
-			boolean anon = true;
-			if (rmdBean.getToEPR() != null) {
-				EndpointReference toEPR = new EndpointReference(rmdBean.getToEPR());
-				if (!toEPR.hasAnonymousAddress()) anon = false;
-			}
-			if(anon) {
-				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-			} else {
-				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-			}
-			
-		} catch (AxisFault e1) {
-			throw new SandeshaException(e1);
+			// this get inserted before
+			seqPropMgr.insert(incomingSequenceListBean);
 		}
 
+		ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
+		incomingSequenceList.add(rmdBean.getSequenceID());
+		incomingSequenceListBean.setValue(incomingSequenceList.toString());
+		seqPropMgr.update(incomingSequenceListBean);
+			
+		//TODO add createSequenceResponse message as the referenceMessage to the RMDBean.
+
+		outMessage.setResponseWritten(true);
+
+		rmdBean.setLastActivatedTime(System.currentTimeMillis());
+		storageManager.getRMDBeanMgr().update(rmdBean);
+
+		AxisEngine engine = new AxisEngine(context);
+		try{
+			engine.send(outMessage);				
+		}
+		catch(AxisFault e){
+			throw new SandeshaException(
+					SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCreateSeqResponse, e.toString()), 
+					e);
+		}
+
+		boolean anon = true;
+		if (rmdBean.getToEPR() != null) {
+			EndpointReference toEPR = new EndpointReference(rmdBean.getToEPR());
+			if (!toEPR.hasAnonymousAddress()) anon = false;
+		}
+		if(anon) {
+			createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+		} else {
+				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+		}
+			
 		createSeqRMMsg.pause();
 
 		if (log.isDebugEnabled())

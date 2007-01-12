@@ -229,9 +229,6 @@ public class TerminateManager {
 	private static boolean isPropertyDeletable(String name) {
 		boolean deleatable = true;
 
-		if (Sandesha2Constants.SequenceProperties.NO_OF_OUTGOING_MSGS_ACKED.equals(name))
-			deleatable = false;
-
 		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
 			deleatable = false;
 
@@ -355,10 +352,8 @@ public class TerminateManager {
 		terminateRMMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
 		terminateRMMessage.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
 
-		SequencePropertyBean transportToBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
-		if (transportToBean != null) {
-			terminateRMMessage.setProperty(Constants.Configuration.TRANSPORT_URL, transportToBean.getValue());
+		if (rmsBean.getTransportTo() != null) {
+			terminateRMMessage.setProperty(Constants.Configuration.TRANSPORT_URL, rmsBean.getTransportTo());
 		}
 
 		terminateRMMessage.addSOAPEnvelope();
@@ -366,6 +361,8 @@ public class TerminateManager {
 		String key = SandeshaUtil.getUUID();
 
 		SenderBean terminateBean = new SenderBean();
+		terminateBean.setInternalSequenceID(internalSequenceID);
+		terminateBean.setSequenceID(outSequenceId);
 		terminateBean.setMessageContextRefKey(key);
 
 		// Set a retransmitter lastSentTime so that terminate will be send with

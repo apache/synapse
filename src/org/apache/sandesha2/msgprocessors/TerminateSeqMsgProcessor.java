@@ -48,7 +48,6 @@ import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.util.WSRMMessageSender;
@@ -104,13 +103,6 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		FaultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId, storageManager);
 
-		SequencePropertyBean terminateReceivedBean = new SequencePropertyBean();
-		terminateReceivedBean.setSequencePropertyKey(sequencePropertyKey);
-		terminateReceivedBean.setName(Sandesha2Constants.SequenceProperties.TERMINATE_RECEIVED);
-		terminateReceivedBean.setValue("true");
-
-		sequencePropertyBeanMgr.insert(terminateReceivedBean);
-
 		// add the terminate sequence response if required.
 		RMMsgContext terminateSequenceResponse = null;
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired(terminateSeqRMMsg.getRMSpecVersion()))
@@ -120,11 +112,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 		rmdBean.setTerminated(true);		
+		rmdBean.setLastActivatedTime(System.currentTimeMillis());
 		storageManager.getRMDBeanMgr().update(rmdBean);
 
 		TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequencePropertyKey, sequenceId, storageManager);
-
-		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		//sending the terminate sequence response
 		if (terminateSequenceResponse != null) {
@@ -134,11 +125,9 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			
 			AxisEngine engine = new AxisEngine(terminateSeqMsg
 					.getConfigurationContext());
-			
-			
+						
 			outMessage.setServerSide(true);
-			
-			
+						
 			engine.send(outMessage);
 
 			if (toEPR.hasAnonymousAddress()) {
@@ -164,8 +153,6 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::setUpHighestMsgNumbers, " + sequenceId);
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
 		RMDBean bean = mgr.retrieve(sequenceId);
 
@@ -187,9 +174,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				// Mark up the highest inbound message as if it had the last message flag on it.
 				// 
 				String inMsgId = bean.getHighestInMessageId();
-				SequencePropertyBean lastInMsgBean = new SequencePropertyBean(requestSidesequencePropertyKey,
-						Sandesha2Constants.SequenceProperties.LAST_IN_MSG_ID, bean.getHighestInMessageId());
-				seqPropMgr.insert(lastInMsgBean);
+				bean.setLastInMessageId(inMsgId);
+				
+				// Update the RMDBean
+				storageManager.getRMDBeanMgr().update(bean);
 				
 				// If an outbound message has already gone out with that relatesTo, then we can terminate
 				// right away.

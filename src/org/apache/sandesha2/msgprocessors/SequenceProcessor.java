@@ -55,7 +55,6 @@ import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -138,9 +137,6 @@ public class SequenceProcessor {
 		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
 		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 
-		// updating the last activated time of the sequence.
-		SequenceManager.updateLastActivatedTime(propertyKey, storageManager);
-
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
 		if (msgNo == 0) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
@@ -157,6 +153,9 @@ public class SequenceProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
 					sequenceId));
 		}
+		
+		// updating the last activated time of the sequence.
+		bean.setLastActivatedTime(System.currentTimeMillis());
 		
 		String key = SandeshaUtil.getUUID(); // key to store the message.
 		// updating the Highest_In_Msg_No property which gives the highest

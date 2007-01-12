@@ -269,12 +269,7 @@ public class SequenceManager {
 		// saving transportTo value;
 		String transportTo = (String) firstAplicationMsgCtx.getProperty(Constants.Configuration.TRANSPORT_URL);
 		if (transportTo != null) {
-			SequencePropertyBean transportToBean = new SequencePropertyBean();
-			transportToBean.setSequencePropertyKey(sequencePropertyKey);
-			transportToBean.setName(Sandesha2Constants.SequenceProperties.TRANSPORT_TO);
-			transportToBean.setValue(transportTo);
-
-			seqPropMgr.insert(transportToBean);
+			rmsBean.setTransportTo(transportTo);
 		}
 
 		// setting the spec version for the client side.
@@ -285,7 +280,7 @@ public class SequenceManager {
 		seqPropMgr.insert(specVerionBean);
 
 		// updating the last activated time.
-		updateLastActivatedTime(sequencePropertyKey, storageManager);
+		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		
 		SandeshaUtil.startSenderForTheSequence(configurationContext, sequencePropertyKey);
 
@@ -363,58 +358,7 @@ public class SequenceManager {
 
 	}
 
-	/**
-	 * Takes the internalSeqID as the param. Not the sequenceID.
-	 * 
-	 * @param internalSequenceID
-	 * @param configContext
-	 * @throws SandeshaException
-	 */
-	public static void updateLastActivatedTime(String sequencePropertyKey, StorageManager storageManager)
-			throws SandeshaException {
-		// Transaction lastActivatedTransaction =
-		// storageManager.getTransaction();
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean lastActivatedBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
-
-		boolean added = false;
-
-		if (lastActivatedBean == null) {
-			added = true;
-			lastActivatedBean = new SequencePropertyBean();
-			lastActivatedBean.setSequencePropertyKey(sequencePropertyKey);
-			lastActivatedBean.setName(Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
-		}
-
-		long currentTime = System.currentTimeMillis();
-		lastActivatedBean.setValue(Long.toString(currentTime));
-
-		if (added)
-			sequencePropertyBeanMgr.insert(lastActivatedBean);
-		else
-			sequencePropertyBeanMgr.update(lastActivatedBean);
-
-	}
-
-	public static long getLastActivatedTime(String propertyKey, StorageManager storageManager) throws SandeshaException {
-
-		SequencePropertyBeanMgr seqPropBeanMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean lastActivatedBean = seqPropBeanMgr.retrieve(propertyKey,
-				Sandesha2Constants.SequenceProperties.LAST_ACTIVATED_TIME);
-
-		long lastActivatedTime = -1;
-
-		if (lastActivatedBean != null) {
-			lastActivatedTime = Long.parseLong(lastActivatedBean.getValue());
-		}
-
-		return lastActivatedTime;
-	}
-
-	public static boolean hasSequenceTimedOut(String propertyKey, RMMsgContext rmMsgCtx, StorageManager storageManager)
+	public static boolean hasSequenceTimedOut(String internalSequenceId, RMMsgContext rmMsgCtx, StorageManager storageManager)
 			throws SandeshaException {
 
 		// operation is the lowest level, Sandesha2 could be engaged.
@@ -426,11 +370,14 @@ public class SequenceManager {
 
 		boolean sequenceTimedOut = false;
 
-		long lastActivatedTime = getLastActivatedTime(propertyKey, storageManager);
-		long timeNow = System.currentTimeMillis();
-		if (lastActivatedTime > 0 && (lastActivatedTime + propertyBean.getInactivityTimeoutInterval() < timeNow))
-			sequenceTimedOut = true;
-
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+		
+		if (rmsBean != null) {
+			long lastActivatedTime = rmsBean.getLastActivatedTime();
+			long timeNow = System.currentTimeMillis();
+			if (lastActivatedTime > 0 && (lastActivatedTime + propertyBean.getInactivityTimeoutInterval() < timeNow))
+				sequenceTimedOut = true;
+		}
 		return sequenceTimedOut;
 	}
 }

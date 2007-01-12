@@ -159,11 +159,8 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		setupOutMessage(rmMsgCtx);
 
 		//write into the sequence proeprties that the client is now closed
-		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
-		sequenceClosedBean.setSequencePropertyKey(getInternalSequenceID());
-		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED_CLIENT);
-		sequenceClosedBean.setValue(Sandesha2Constants.VALUE_TRUE);
-		getStorageManager().getSequencePropertyBeanMgr().insert(sequenceClosedBean);
+		getRMSBean().setSequenceClosedClient(true);
+		getStorageManager().getRMSBeanMgr().update(getRMSBean());
 
 		AxisOperation closeOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE,

@@ -50,6 +50,7 @@ public class WSRMMessageSender  {
 	private boolean sequenceExists;
 	private String outSequenceID;
 	private String rmVersion;
+	private RMSBean rmsBean;
 	
 	/**
 	 * Extracts information from the rmMsgCtx specific for processing out messages
@@ -76,13 +77,10 @@ public class WSRMMessageSender  {
 		sequenceExists = false;
 		outSequenceID = null;
 		
-		// Get the Create sequence bean with the matching internal sequenceid 
-		RMSBean createSeqFindBean = new RMSBean();
-		createSeqFindBean.setInternalSequenceID(internalSequenceID);
-
-		RMSBean rMSBean = storageManager.getRMSBeanMgr().findUnique(createSeqFindBean);
+		// Get the RMSBean with the matching internal sequenceid 
+		rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 		
-		if (rMSBean == null)
+		if (rmsBean == null)
 		{
 			if (log.isDebugEnabled())
 				log.debug("Exit: WSRMParentProcessor::setupOutMessage Sequence doesn't exist");
@@ -91,10 +89,10 @@ public class WSRMMessageSender  {
 					SandeshaMessageKeys.couldNotSendTerminateSeqNotFound, internalSequenceID));			
 		}
 		
-		if (rMSBean.getSequenceID() != null)
+		if (rmsBean.getSequenceID() != null)
 		{
 			sequenceExists = true;		
-			outSequenceID = rMSBean.getSequenceID();
+			outSequenceID = rmsBean.getSequenceID();
 		}
 		else
 			outSequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;			
@@ -117,8 +115,7 @@ public class WSRMMessageSender  {
 
 		rmMsgCtx.setTo(new EndpointReference(toAddress));
 		
-		String transportTo = SandeshaUtil.getSequenceProperty(internalSequenceID,
-				Sandesha2Constants.SequenceProperties.TRANSPORT_TO, storageManager);
+		String transportTo = rmsBean.getTransportTo();
 		if (transportTo != null) {
 			rmMsgCtx.setProperty(Constants.Configuration.TRANSPORT_URL, transportTo);
 		}		
@@ -213,5 +210,9 @@ public class WSRMMessageSender  {
 	public final String getRMVersion() {
   	return rmVersion;
   }
+	
+	public final RMSBean getRMSBean() {
+		return rmsBean;
+	}
 
 }

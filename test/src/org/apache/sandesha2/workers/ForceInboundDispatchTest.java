@@ -9,7 +9,6 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
@@ -19,7 +18,6 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -84,14 +82,9 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			assertNotNull(rMDBean);
 			assertEquals(rMDBean.getNextMsgNoToProcess(), 4);
 			
-			//also check that the sequence has an out of order gap that contains msg 2
-			SequencePropertyBean outOfOrderRanges = 
-				serverStore.getSequencePropertyBeanMgr().retrieve(
-							inboundSequenceID, 
-							Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES);
-			
-			assertNotNull(outOfOrderRanges);
-			RangeString rangeString = new RangeString(outOfOrderRanges.getValue());
+			//also check that the sequence has an out of order gap that contains msg 2			
+			assertNotNull(rMDBean.getOutOfOrderRanges());
+			RangeString rangeString = new RangeString(rMDBean.getOutOfOrderRanges());
 			assertTrue(rangeString.isMessageNumberInRanges(2));
 			t.commit();
 			

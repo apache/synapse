@@ -253,11 +253,6 @@ public interface Sandesha2Constants {
 											   // property. This is used as the
 											   // sequenceId to share data b/w
 											   // sequences
-				
-		//For IN_ORDER sequences, we can have finite ranges of messages that can be
-		//delivered out of order. These are maintained as a String that is consistent
-		//with the form described in  org.apache.sandesha2.util.RangeString
-		String OUT_OF_ORDER_RANGES = "OutOfOrderRanges";
 
 		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
 
@@ -265,25 +260,10 @@ public interface Sandesha2Constants {
 
 		String OFFERED_SEQUENCE = "OfferedSequence";
 		
-		String TERMINATE_RECEIVED = "TerminateReceived";
-		
-		String LAST_ACTIVATED_TIME = "LastActivatedTime";
-		
-		String NO_OF_OUTGOING_MSGS_ACKED = "NoOfOutGoingMessagesAcked";
-		
-		String TRANSPORT_TO = "TransportTo";
-		
 		String SEQUENCE_CLOSED = "SequenceClosed";
 		
-		String SEQUENCE_CLOSED_CLIENT = "SequenceClosedClient"; //indicates the client has sent a close sequence
-		
 		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
-		
-		// Once an inbound sequence is closed, or we receive a message with the
-		// 'LastMessage' marker, we record the message id of the highest message
-		// in the sequence.
-		String LAST_IN_MSG_ID = "LastInMessageId";
-		
+				
 		String SECURITY_TOKEN = "SecurityToken";
 		
 		String SOAP_VERSION = "SOAPVersion";

@@ -42,11 +42,26 @@ public class RMDBean extends RMSequenceBean {
 	private long highestInMessageNumber = 0;
 	
 	private String highestInMessageId;
-	
-	/** For incoming sequences this gives the msg no's of the messages that were
+
+	/**
+	 * Once an inbound sequence is closed, or we receive a message with the
+	 * 'LastMessage' marker, we record the message id of the highest message
+	 * in the sequence.
+	 */
+	private String lastInMessageId;
+
+	/** 
+	 * For incoming sequences this gives the msg no's of the messages that were
 	 * received (may be an ack was sent - depending on the policy)
 	 */
 	private List serverCompletedMessages = null;
+	
+	/**
+	 * For IN_ORDER sequences, we can have finite ranges of messages that can be
+	 * delivered out of order. These are maintained as a String that is consistent
+	 * with the form described in  org.apache.sandesha2.util.RangeString
+	 */
+	private String outOfOrderRanges = null;
 
 	public RMDBean() {
 
@@ -95,17 +110,6 @@ public class RMDBean extends RMSequenceBean {
 	public void setHighestInMessageNumber(long highestInMessageNumber) {
   	this.highestInMessageNumber = highestInMessageNumber;
   }
-	
-	public String toString() {
-		StringBuffer result = new StringBuffer();
-		result.append(this.getClass().getName());
-		result.append(super.toString());
-		result.append("\nNext Msg # : "); result.append(nextMsgNoToProcess);
-		result.append("\nRef Msg Key: "); result.append(referenceMessageKey);
-		result.append("\nHishestInMessageNumber: "); result.append(highestInMessageNumber);
-		result.append("\nHishestInMessageKey: "); result.append(highestInMessageId);
-		return result.toString();
-	}
 
 	public List getServerCompletedMessages() {
   	return serverCompletedMessages;
@@ -115,4 +119,32 @@ public class RMDBean extends RMSequenceBean {
   	this.serverCompletedMessages = serverCompletedMessages;
   }
 
+	public String getLastInMessageId() {
+  	return lastInMessageId;
+  }
+
+	public void setLastInMessageId(String lastInMessageId) {
+  	this.lastInMessageId = lastInMessageId;
+  }
+
+	public String getOutOfOrderRanges() {
+  	return outOfOrderRanges;
+  }
+
+	public void setOutOfOrderRanges(String outOfOrderRanges) {
+  	this.outOfOrderRanges = outOfOrderRanges;
+  }
+	
+	public String toString() {
+		StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getName());
+		result.append(super.toString());
+		result.append("\nNext Msg # : "); result.append(nextMsgNoToProcess);
+		result.append("\nRef Msg Key: "); result.append(referenceMessageKey);
+		result.append("\nHishestInMessageNumber: "); result.append(highestInMessageNumber);
+		result.append("\nHishestInMessageKey: "); result.append(highestInMessageId);
+		result.append("\nLastInMessageId: "); result.append(lastInMessageId);
+		result.append("\nOutOfOrderRanges   :"); result.append(outOfOrderRanges);
+		return result.toString();
+	}
 }

@@ -76,8 +76,8 @@ public class Invoker extends SandeshaThread {
 	
 			InvokerBeanMgr storageMapMgr = storageManager
 					.getInvokerBeanMgr();
-			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
-			RMDBean rMDBean = nextMsgMgr.retrieve(sequenceID);
+			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+			RMDBean rMDBean = rmdBeanMgr.retrieve(sequenceID);
 			
 			if (rMDBean != null) {
 				
@@ -124,7 +124,6 @@ public class Invoker extends SandeshaThread {
 						if(msgNumber>highestMsgNumberInvoked){
 							highestMsgNumberInvoked = invoker.getMsgNo();
 							rMDBean.setNextMsgNoToProcess(highestMsgNumberInvoked+1);
-							nextMsgMgr.update(rMDBean);
 							
 							if(allowLaterDeliveryOfMissingMessages){
 								//we also need to update the sequence OUT_OF_ORDER_RANGES property
@@ -134,26 +133,19 @@ public class Invoker extends SandeshaThread {
 								Range r = new Range(firstMessageInOutOfOrderWindow,highestMsgNumberInvoked);
 										
 								RangeString rangeString = null;
-								SequencePropertyBeanMgr seqPropertyManager = storageManager.getSequencePropertyBeanMgr();
-								SequencePropertyBean outOfOrderRanges = 
-									seqPropertyManager.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES);
-								if(outOfOrderRanges==null){
+								if(rMDBean.getOutOfOrderRanges()==null){
 									//insert a new blank one one
-									outOfOrderRanges = new SequencePropertyBean(sequenceID,
-											Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES,
-											"");
-
-									seqPropertyManager.insert(outOfOrderRanges);
 									rangeString = new RangeString("");
 								}
 								else{
-									rangeString = new RangeString(outOfOrderRanges.getValue());
+									rangeString = new RangeString(rMDBean.getOutOfOrderRanges());
 								}
 								//update the range String with the new value
 								rangeString.addRange(r);
-								outOfOrderRanges.setValue(rangeString.toString());
-								seqPropertyManager.update(outOfOrderRanges);
+								rMDBean.setOutOfOrderRanges(rangeString.toString());
 							}
+							
+							rmdBeanMgr.update(rMDBean);
 						}
 						
 					}
@@ -179,21 +171,19 @@ public class Invoker extends SandeshaThread {
 	}
 
 	private void addOutOfOrderInvokerBeansToList(String sequenceID, 
-			StorageManager strMgr, List list)throws SandeshaException{
+			StorageManager storageManager, List list)throws SandeshaException{
 		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::addOutOfOrderInvokerBeansToList");
+			log.debug("Enter: InOrderInvoker::addOutOfOrderInvokerBeansToList " + sequenceID + ", " + list);
 		
-		SequencePropertyBeanMgr seqPropertyManager = strMgr.getSequencePropertyBeanMgr();
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
 		
-		SequencePropertyBean outOfOrderRanges = 
-			seqPropertyManager.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.OUT_OF_ORDER_RANGES);		
-		if(outOfOrderRanges!=null){
-			String sequenceRanges = outOfOrderRanges.getValue();
+		if(rmdBean != null && rmdBean.getOutOfOrderRanges() != null){
+			String sequenceRanges = rmdBean.getOutOfOrderRanges();
 			RangeString rangeString = new RangeString(sequenceRanges);
 			//we now have the set of ranges that can be delivered out of order.
 			//Look for any invokable message that lies in one of those ranges
 			Iterator invokerBeansIterator = 
-				strMgr.getInvokerBeanMgr().find(
+				storageManager.getInvokerBeanMgr().find(
 						new InvokerBean(null, 
 														0,  //finds all invoker beans
 														sequenceID)).iterator();

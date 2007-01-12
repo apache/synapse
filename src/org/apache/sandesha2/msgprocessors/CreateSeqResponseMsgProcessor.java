@@ -48,7 +48,6 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -110,9 +109,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		}
 
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
-		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 
-		RMSBean rmsBean = createSeqMgr.retrieve(createSeqMsgId);
+		RMSBean rmsBean = rmsBeanMgr.retrieve(createSeqMsgId);
 		if (rmsBean == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound);
 			log.debug(message);
@@ -231,7 +230,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 			rmdBeanMgr.insert(rMDBean);
 
-			createSeqMgr.update(rmsBean);
+			rmsBean.setLastActivatedTime(System.currentTimeMillis());
+			rmsBeanMgr.update(rmsBean);
 
 			// Store the security token for the offered sequence
 			if(tokenData != null) {
@@ -365,8 +365,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			// updating the message. this will correct the SOAP envelope string.
 			storageManager.updateMessageContext(key, applicationMsg);
 		}
-
-		SequenceManager.updateLastActivatedTime(sequencePropertyKey, storageManager);
 
 		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext().setProperty(
 				org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");

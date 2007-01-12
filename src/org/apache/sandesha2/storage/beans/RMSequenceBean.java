@@ -36,6 +36,8 @@ public class RMSequenceBean extends RMBean {
 	private String replyToEPR;
 	
 	private String acksToEPR;
+	
+	private long lastActivatedTime;
   
   /**
    * Indicates that a sequence is terminated
@@ -108,9 +110,16 @@ public class RMSequenceBean extends RMBean {
   	return terminated;
   }
 
-
 	public void setTerminated(boolean terminated) {
   	this.terminated = terminated;
+  }
+
+	public long getLastActivatedTime() {
+  	return lastActivatedTime;
+  }
+
+	public void setLastActivatedTime(long lastActivatedTime) {
+  	this.lastActivatedTime = lastActivatedTime;
   }
 
 	public String toString() {
@@ -121,6 +130,7 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nacksToEPR    : "); result.append(acksToEPR);
 		result.append("\nPolling    : "); result.append(pollingMode);
 		result.append("\nTerminated       : "); result.append(terminated);		
+		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);		
 		return result.toString();
 	}
 }

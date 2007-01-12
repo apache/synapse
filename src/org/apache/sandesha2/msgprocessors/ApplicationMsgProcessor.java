@@ -137,10 +137,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(inboundSequence);
 
-			// Deciding weather this is the last message. We assume it is if it relates to
+			// Deciding whether this is the last message. We assume it is if it relates to
 			// a message which arrived with the LastMessage flag on it.
-			String lastRequestId = SandeshaUtil.getSequenceProperty(inboundSequence,
-					Sandesha2Constants.SequenceProperties.LAST_IN_MSG_ID, storageManager);
+			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);			
+			// Get the last in message
+			String lastRequestId = rmdBean.getLastInMessageId();
 			RelatesTo relatesTo = msgContext.getRelatesTo();
 			if(relatesTo != null && lastRequestId != null &&
 					lastRequestId.equals(relatesTo.getValue())) {
@@ -196,13 +197,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (dummyMessageString != null && Sandesha2Constants.VALUE_TRUE.equals(dummyMessageString))
 			dummyMessage = true;
 
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+
 		//see if the sequence is closed
-		SequencePropertyBean sequenceClosed = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED_CLIENT);
-		if(sequenceClosed!=null){
+		if(rmsBean != null && rmsBean.isSequenceClosedClient()){
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceClosed, internalSequenceId));
 		}
 
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		//see if the sequence is terminated
 		if(rmsBean != null && rmsBean.isTerminateAdded()) {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, internalSequenceId));

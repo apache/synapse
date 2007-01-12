@@ -101,8 +101,13 @@ public class SandeshaClient {
 		return getOutgoingSequenceReport(internalSequenceID, configurationContext);
 	}
 
-	public static SequenceReport getOutgoingSequenceReport(String internalSequenceID,
+	public static SequenceReport getOutgoingSequenceReport(String internalSequenceID,	
 			ConfigurationContext configurationContext) throws SandeshaException {
+	  return getOutgoingSequenceReport(internalSequenceID, configurationContext, true);
+	}
+	
+	public static SequenceReport getOutgoingSequenceReport(String internalSequenceID,
+			ConfigurationContext configurationContext, boolean createTransaction) throws SandeshaException {
 
 		SequenceReport sequenceReport = new SequenceReport();
 		sequenceReport.setSequenceDirection(SequenceReport.SEQUENCE_DIRECTION_OUT);
@@ -114,7 +119,8 @@ public class SandeshaClient {
 		Transaction reportTransaction = null;
 
 		try {
-			reportTransaction = storageManager.getTransaction();
+			if (createTransaction)
+				reportTransaction = storageManager.getTransaction();
 
 			sequenceReport.setInternalSequenceID(internalSequenceID);
 

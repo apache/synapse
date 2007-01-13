@@ -50,13 +50,10 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.CreateSequence;
-import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -111,7 +108,7 @@ public class FaultManager {
 			
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForCreateSequenceRefused, refused sequence");
-			getFault(createSequenceRMMsg, data, storageManager);
+			getFault(createSequenceRMMsg, data);
 		}
 
 		if (log.isDebugEnabled())
@@ -256,7 +253,7 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForUnknownSequence, Sequence unknown");
-			getFault(rmMessageContext, data, storageManager);
+			getFault(rmMessageContext, data);
 		}
 
 		if (log.isDebugEnabled())
@@ -329,7 +326,7 @@ public class FaultManager {
 
 				if (log.isDebugEnabled())
 					log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-				getFault(ackRMMessageContext, data, storageManager);
+				getFault(ackRMMessageContext, data);
 			}
 		
 		}
@@ -339,19 +336,15 @@ public class FaultManager {
 	}
 
 	public static void checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
-			StorageManager storageManager) throws AxisFault {
+			RMDBean rmdBean) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		boolean sequenceClosed = false;
 		String reason = null;
-		SequencePropertyBean sequenceClosedBean = seqPropMgr.retrieve(sequenceID,
-				Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
-		if (sequenceClosedBean != null && Sandesha2Constants.VALUE_TRUE.equals(sequenceClosedBean.getValue())) {
+		if (rmdBean.isClosed()) {
 			sequenceClosed = true;
 			reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosed, sequenceID);
 		}
@@ -377,7 +370,7 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
-			getFault(referenceRMMessage, data, storageManager);
+			getFault(referenceRMMessage, data);
 		}
 
 		if (log.isDebugEnabled())
@@ -390,13 +383,11 @@ public class FaultManager {
 	 * 
 	 * @param referenceRMMsgContext - Message in reference to which the fault will be generated.
 	 * @param data - data for the fault
-	 * @param storageManager
 	 * @return - The dummy fault to be thrown out.
 	 * 
 	 * @throws AxisFault
 	 */
-	public static void getFault (RMMsgContext referenceRMMsgContext, FaultData data,
-			StorageManager storageManager) throws AxisFault {
+	public static void getFault (RMMsgContext referenceRMMsgContext, FaultData data) throws AxisFault {
 		
 		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
 		

@@ -458,8 +458,6 @@ public class RMMsgCreator {
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
@@ -469,10 +467,7 @@ public class RMMsgCreator {
 			sequenceAck.addAcknowledgementRanges(ackRange);
 		}
 
-		SequencePropertyBean sequenceClosedBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
-
-		if (sequenceClosedBean != null && Sandesha2Constants.VALUE_TRUE.equals(sequenceClosedBean.getValue())) {
+		if (rmdBean.isClosed()) {
 			// sequence is closed. so add the 'Final' part.
 			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
 				AckFinal ackFinal = new AckFinal(rmNamespaceValue);

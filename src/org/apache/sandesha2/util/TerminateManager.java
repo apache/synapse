@@ -200,10 +200,6 @@ public class TerminateManager {
 
 		boolean addEntryWithSequenceID = false;
 
-		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED)) {
-			addEntryWithSequenceID = true;
-		}
-
 		if (propertyBean.getName().equals(Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT)) {
 			addEntryWithSequenceID = true;
 		}
@@ -230,9 +226,6 @@ public class TerminateManager {
 		boolean deleatable = true;
 
 		if (Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID.equals(name))
-			deleatable = false;
-
-		if (Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED.equals(name))
 			deleatable = false;
 
 		if (Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT.equals(name))
@@ -300,8 +293,6 @@ public class TerminateManager {
 		if(log.isDebugEnabled())
 			log.debug("Enter: TerminateManager::addTerminateSequenceMessage " + outSequenceId + ", " + internalSequenceID);
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 
 		if (rmsBean.isTerminateAdded()) {
@@ -322,11 +313,8 @@ public class TerminateManager {
 		
 		EndpointReference toEPR = null;
 		
-		SequencePropertyBean endpointBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.OFFERED_ENDPOINT);
-		if (endpointBean!=null) {
-			toEPR = new EndpointReference (endpointBean.getValue());
-		}
+		if (rmsBean.getOfferedEndPoint() != null)
+			toEPR = new EndpointReference (rmsBean.getOfferedEndPoint());
 		
 		if (toEPR==null) {
 

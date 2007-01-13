@@ -49,7 +49,6 @@ import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.Nack;
@@ -180,15 +179,13 @@ public class AcknowledgementProcessor {
 		}
 		
 		//adding a MakeConnection for the response sequence if needed.
-		String offeredSequenceId = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
-				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
-		if (offeredSequenceId!=null) {
+		if (rmsBean.getOfferedSequence() != null) {
 
 			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = rMDBeanMgr.retrieve(outSequenceId);
 			
 			if (rMDBean!=null && rMDBean.isPollingMode())
-				SandeshaUtil.shedulePollingRequest(offeredSequenceId, configCtx);
+				SandeshaUtil.shedulePollingRequest(rmsBean.getOfferedSequence(), configCtx);
 			
 		}
 

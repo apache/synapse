@@ -32,6 +32,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
@@ -75,15 +76,14 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 
 		//shedulling a polling request for the response side.
-		String offeredSequenceId = SandeshaUtil.getSequenceProperty(sequencePropertyKey, 
-				Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE, storageManager);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
 		
-		if (offeredSequenceId!=null) {
+		if (rmsBean.getOfferedSequence()!=null) {
 			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = rMDBeanMgr.retrieve(sequenceId);
 			
 			if (rMDBean!=null && rMDBean.isPollingMode())
-				SandeshaUtil.shedulePollingRequest(offeredSequenceId, configContext);
+				SandeshaUtil.shedulePollingRequest(rmsBean.getOfferedSequence(), configContext);
 		}
 
 		TerminateManager.terminateSendingSide (configContext, sequencePropertyKey,internalSequenceID, msgContext.isServerSide(),

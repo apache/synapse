@@ -39,6 +39,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
@@ -88,11 +89,9 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 
 		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 		
-		SequencePropertyBean sequenceClosedBean = new SequencePropertyBean();
-		sequenceClosedBean.setSequencePropertyKey(sequencePropertyKey);
-		sequenceClosedBean.setName(Sandesha2Constants.SequenceProperties.SEQUENCE_CLOSED);
-		sequenceClosedBean.setValue(Sandesha2Constants.VALUE_TRUE);
-		sequencePropMgr.insert(sequenceClosedBean);
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		rmdBean.setClosed(true);
+		storageManager.getRMDBeanMgr().update(rmdBean);
 
 		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
 
@@ -143,8 +142,6 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 					sequenceId, e.toString());
 			throw new SandeshaException(message, e);
 		}
-		
-
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: CloseSequenceProcessor::processInMessage " + Boolean.FALSE);

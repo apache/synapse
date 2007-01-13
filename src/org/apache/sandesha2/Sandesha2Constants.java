@@ -257,19 +257,10 @@ public interface Sandesha2Constants {
 		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
 
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
-
-		String OFFERED_SEQUENCE = "OfferedSequence";
-		
-		String SEQUENCE_CLOSED = "SequenceClosed";
 		
 		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
 				
 		String SECURITY_TOKEN = "SecurityToken";
-		
-		String SOAP_VERSION = "SOAPVersion";
-		
-		String OFFERED_ENDPOINT = "OfferedEndpoint";
-
 	}
 
 	public interface SOAPVersion {

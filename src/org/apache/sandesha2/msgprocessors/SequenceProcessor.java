@@ -133,8 +133,16 @@ public class SequenceProcessor {
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
 
+		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
+		RMDBean bean = mgr.retrieve(sequenceId);
+
+		if (bean == null) {
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
+					sequenceId));
+		}
+
 		// throwing a fault if the sequence is closed.
-		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, storageManager);
+		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean);
 		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
@@ -146,13 +154,6 @@ public class SequenceProcessor {
 		}
 
 		// Pause the messages bean if not the right message to invoke.
-		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
-		RMDBean bean = mgr.retrieve(sequenceId);
-
-		if (bean == null) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
-					sequenceId));
-		}
 		
 		// updating the last activated time of the sequence.
 		bean.setLastActivatedTime(System.currentTimeMillis());

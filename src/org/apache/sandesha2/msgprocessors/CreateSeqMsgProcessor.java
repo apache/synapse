@@ -164,14 +164,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				Endpoint endpoint = offer.getEndpoint();
 				if (endpoint!=null) {
 					// setting the OfferedEndpoint
-					SequencePropertyBean offeredEndpointBean = new SequencePropertyBean();
-					offeredEndpointBean.setName(Sandesha2Constants.SequenceProperties.OFFERED_ENDPOINT);
-				
-					//currently we can only serialize the Address part of the Endpoint.
-					//TODO correct this to serialize the whole EPR.
-					offeredEndpointBean.setValue(endpoint.getEPR().getAddress());  
-					offeredEndpointBean.setSequencePropertyKey(outgoingSideSequencePropertyKey);
-					seqPropMgr.insert(offeredEndpointBean);
+					rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
 				}
 					
 				// Store the inbound token (if any) with the new sequence

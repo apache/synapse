@@ -39,7 +39,6 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
@@ -480,20 +479,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage
 				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 
 		SequenceOffer offer = createSequencePart.getSequenceOffer();
 		if (offer != null) {
 			String offeredSequenceId = offer.getIdentifer().getIdentifier();
 
-			SequencePropertyBean offeredSequenceBean = new SequencePropertyBean();
-			offeredSequenceBean.setName(Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
-			offeredSequenceBean.setSequencePropertyKey(sequencePropertyKey);
-			offeredSequenceBean.setValue(offeredSequenceId);
-
-			seqPropMgr.insert(offeredSequenceBean);
+			rmsBean.setOfferedSequence(offeredSequenceId);
 		}
 
 		MessageContext createSeqMsg = createSeqRMMessage.getMessageContext();
@@ -538,7 +530,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmsBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));
 		}
 		
-		createSeqMgr.insert(rmsBean);
+		storageManager.getRMSBeanMgr().insert(rmsBean);
 
 //		if (createSeqMsg.getReplyTo() == null) {
 //			String anonymousURI = SpecSpecificConstants.getAddressingAnonymousURI(createSeqMsg);

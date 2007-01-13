@@ -175,24 +175,19 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
 		if (accept != null) {
-			// Find offered sequence from internal sequence id.
-			SequencePropertyBean offeredSequenceBean = sequencePropMgr.retrieve(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.OFFERED_SEQUENCE);
 
 			// TODO this should be detected in the Fault manager.
-			if (offeredSequenceBean == null) {
+			if (rmsBean.getOfferedSequence() == null) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.accptButNoSequenceOffered);
 				log.debug(message);
 				throw new SandeshaException(message);
 			}
 
-			String offeredSequenceId = offeredSequenceBean.getValue();
-
 			RMDBean rMDBean = new RMDBean();
 			
 			EndpointReference acksToEPR = accept.getAcksTo().getEPR();
 			rMDBean.setAcksToEPR(acksToEPR.getAddress());
-			rMDBean.setSequenceID(offeredSequenceId);
+			rMDBean.setSequenceID(rmsBean.getOfferedSequence());
 			rMDBean.setNextMsgNoToProcess(1);
 
 			//Storing the referenceMessage of the sending side sequence as the reference message
@@ -221,7 +216,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
 
-			SequencePropertyBean specVersionBean = new SequencePropertyBean(offeredSequenceId,
+			SequencePropertyBean specVersionBean = new SequencePropertyBean(rmsBean.getOfferedSequence(),
 					Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, rmSpecVersion);
 			sequencePropMgr.insert(specVersionBean);
 
@@ -235,7 +230,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			// Store the security token for the offered sequence
 			if(tokenData != null) {
-				SequencePropertyBean newToken = new SequencePropertyBean(offeredSequenceId,
+				SequencePropertyBean newToken = new SequencePropertyBean(rmsBean.getOfferedSequence(),
 						Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
 				sequencePropMgr.insert(newToken);
 			}
@@ -256,7 +251,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 
 			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
-			incomingSequenceList.add(offeredSequenceId);
+			incomingSequenceList.add(rmsBean.getOfferedSequence());
 			incomingSequenceListBean.setValue(incomingSequenceList.toString());
 			sequencePropMgr.update(incomingSequenceListBean);
 		}

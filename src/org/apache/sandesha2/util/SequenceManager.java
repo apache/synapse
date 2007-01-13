@@ -175,13 +175,6 @@ public class SequenceManager {
 
 		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		//setting the SOAPVersion Bean.
-		String SOAPVersion = firstAplicationMsgCtx.getOptions().getSoapVersionURI();
-		SequencePropertyBean SOAPVersionBean = new SequencePropertyBean (sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.SOAP_VERSION, SOAPVersion);
-		
-		seqPropMgr.insert(SOAPVersionBean);
-
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		String acksTo = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AcksTo);
 

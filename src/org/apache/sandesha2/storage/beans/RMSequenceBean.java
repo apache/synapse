@@ -38,11 +38,16 @@ public class RMSequenceBean extends RMBean {
 	private String acksToEPR;
 	
 	private long lastActivatedTime;
-  
+ 
+  /**
+   * Indicates that a sequence is closed
+   */
+  private boolean closed = false;
+
   /**
    * Indicates that a sequence is terminated
    */
-  private boolean terminated = false;
+  private boolean terminated = false;  
 
 	/**
 	 * This tells weather this sequence is in the polling mode or not.
@@ -106,6 +111,14 @@ public class RMSequenceBean extends RMBean {
 		this.pollingMode = pollingMode;
 	}
 
+	public boolean isClosed() {
+  	return closed;
+  }
+
+	public void setClosed(boolean closed) {
+  	this.closed = closed;
+  }
+
 	public boolean isTerminated() {
   	return terminated;
   }
@@ -124,11 +137,12 @@ public class RMSequenceBean extends RMBean {
 
 	public String toString() {
 		StringBuffer result = new StringBuffer();
-		result.append("\nSequence Id: "); result.append(sequenceID);
+		result.append("\nSequence Id  : "); result.append(sequenceID);
 		result.append("\ntoEPR        : "); result.append(toEPR);
 		result.append("\nreplyToEPR   : "); result.append(replyToEPR);
 		result.append("\nacksToEPR    : "); result.append(acksToEPR);
 		result.append("\nPolling    : "); result.append(pollingMode);
+		result.append("\nClosed       : "); result.append(closed);		
 		result.append("\nTerminated       : "); result.append(terminated);		
 		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);		
 		return result.toString();

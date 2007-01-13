@@ -117,6 +117,10 @@ public class RMSBean extends RMSequenceBean {
   private boolean sequenceClosedClient = false;
   
   private String transportTo;
+  
+  private String offeredEndPoint = null;
+  
+  private String offeredSequence = null;
 	
 	public RMSBean() {
 	}
@@ -250,6 +254,22 @@ public class RMSBean extends RMSequenceBean {
   	this.transportTo = transportTo;
   }
 
+	public String getOfferedEndPoint() {
+  	return offeredEndPoint;
+  }
+
+	public void setOfferedEndPoint(String offeredEndPoint) {
+  	this.offeredEndPoint = offeredEndPoint;
+  }
+	
+	public String getOfferedSequence() {
+  	return offeredSequence;
+  }
+
+	public void setOfferedSequence(String offeredSequence) {
+  	this.offeredSequence = offeredSequence;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -267,6 +287,8 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
 		result.append("\nNumAckedMsgs     : "); result.append(numberOfMessagesAcked);
 		result.append("\nTransportTo      : "); result.append(transportTo);
+		result.append("\nOfferedEndPoint  : "); result.append(offeredEndPoint);
+		result.append("\nOfferedSequence  : "); result.append(offeredSequence);
 		return result.toString();
 	}
 }

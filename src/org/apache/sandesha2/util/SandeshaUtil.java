@@ -220,6 +220,13 @@ public class SandeshaUtil {
 	}
 
 	public static void startPollingManager (ConfigurationContext configurationContext) throws SandeshaException {
+		// Only start the polling manager if we are configured to use MakeConnection
+		SandeshaPolicyBean policy = getPropertyBean(configurationContext.getAxisConfiguration());
+		if(!policy.isEnableMakeConnection()) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionDisabled);
+			throw new SandeshaException(message);
+		}
+		
 		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
 				Sandesha2Constants.POLLING_MANAGER);
 		

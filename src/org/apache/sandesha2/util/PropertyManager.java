@@ -64,6 +64,9 @@ public class PropertyManager {
 
 		propertyBean.setSecurityManagerClass(Sandesha2Constants.Properties.DefaultValues.SecurityManager);
 		
+		propertyBean.setEnableMakeConnection(Sandesha2Constants.Properties.DefaultValues.EnableMakeConnection);
+		propertyBean.setEnableRMAnonURI(Sandesha2Constants.Properties.DefaultValues.EnableRMAnonURI);
+		
 		return propertyBean;
 	}
 

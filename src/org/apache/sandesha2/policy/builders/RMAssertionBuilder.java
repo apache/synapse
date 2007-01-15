@@ -132,6 +132,22 @@ public class RMAssertionBuilder implements AssertionBuilder {
                 	}
                 	
                 }
+            } else if(Sandesha2Constants.Assertions.ELEM_MAKE_CONNECTION.equals(name)) {
+                if (element!=null) {
+                	// Read the nested assertions
+                	
+                	OMElement enabledElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_ENABLED);
+                	if (enabledElem!=null) {
+                		String data = enabledElem.getText().trim();
+                		propertyBean.setEnableMakeConnection(Boolean.parseBoolean(data));
+                	}
+                	
+                	OMElement useRMAnonElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI);
+                	if (useRMAnonElem!=null) {
+                		String data = useRMAnonElem.getText().trim();
+                		propertyBean.setEnableRMAnonURI(Boolean.parseBoolean(data));
+                	}
+                }
             }
         }
     }

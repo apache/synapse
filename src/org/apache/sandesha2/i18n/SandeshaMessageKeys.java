@@ -163,6 +163,7 @@ public class SandeshaMessageKeys {
 	public static final String acksToStrNotSet="acksToStrNotSet";
 	public static final String invalidSequenceID="invalidsequenceID";
 	public static final String cantSendMakeConnectionNoTransportOut="cantSendMakeConnectionNoTransportOut";
+	public static final String makeConnectionDisabled="makeConnectionDisabled";
 	
 	public static final String noCreateSeqResponse="noCreateSeqResponse";
 	public static final String noTerminateSeqPart="noTerminateSeqPart";

@@ -110,6 +110,12 @@
 	      
 	      <!-- This will not be overriden by service level policies -->
 				<sandesha2:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</sandesha2:SecurityManager>
+				
+				<sandesha2:MakeConnection>
+				  <sandesha2:Enabled>true</sandesha2:Enabled>
+				  <sandesha2:UseRMAnonURI>true</sandesha2:UseRMAnonURI>
+				</sandesha2:MakeConnection>
+				
 			</wsp:Policy>
 		</sandesha2:RMAssertion>
 	</wsp:Policy>

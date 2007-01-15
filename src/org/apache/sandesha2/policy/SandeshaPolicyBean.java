@@ -59,6 +59,10 @@ public class SandeshaPolicyBean implements Assertion {
     private boolean exponentialBackoff;
 
     private int maximumRetransmissionCount;
+    
+    private boolean enableMakeConnection;
+    
+    private boolean enableRMAnonURI;
 
     public void setInactiveTimeoutInterval(long value, String measure) {
         long timeOut = -1;
@@ -250,6 +254,22 @@ public class SandeshaPolicyBean implements Assertion {
         writer.writeCharacters(getSecurityManagerClass());
         writer.writeEndElement();
         
+        // <wsrm:MakeConnection>
+        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MAKE_CONNECTION.getLocalPart(), namespaceURI);
+        
+        // <wsrm:Enabled />
+        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_ENABLED.getLocalPart(), namespaceURI);
+        writer.writeCharacters(Boolean.toString(isEnableMakeConnection()));
+        writer.writeEndElement();
+        
+        // <wsrm:UseRMAnonURI />
+        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI.getLocalPart(), namespaceURI);
+        writer.writeCharacters(Boolean.toString(isEnableRMAnonURI()));
+        writer.writeEndElement();
+        
+        // </wsrm:MakeConnection>
+        writer.writeEndElement();
+        
         // </wsp:Policy>
         writer.writeEndElement();
 
@@ -298,7 +318,23 @@ public class SandeshaPolicyBean implements Assertion {
         this.inactivityTimeoutMeasure = inactivityTimeoutMeasure;
     }
 
-    public boolean equal(PolicyComponent policyComponent) {
+    public boolean isEnableMakeConnection() {
+		return enableMakeConnection;
+	}
+
+	public void setEnableMakeConnection(boolean enableMakeConnection) {
+		this.enableMakeConnection = enableMakeConnection;
+	}
+
+	public boolean isEnableRMAnonURI() {
+		return enableRMAnonURI;
+	}
+
+	public void setEnableRMAnonURI(boolean enableRMAnonURI) {
+		this.enableRMAnonURI = enableRMAnonURI;
+	}
+
+	public boolean equal(PolicyComponent policyComponent) {
         // TODO
         return false;
     }    

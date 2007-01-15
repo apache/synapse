@@ -346,6 +346,10 @@ public interface Sandesha2Constants {
 		String RetransmissionCount = "RetransmissionCount";
 
 		String SecurityManager = "SecurityManager";
+
+		String EnableMakeConnection = "EnableMakeConnection";
+		
+		String EnableRMAnonURI = "EnableRMAnonURI";
 		
 		public interface DefaultValues {
 			
@@ -374,6 +378,10 @@ public interface Sandesha2Constants {
 			int MaximumRetransmissionCount = 10;
 			
 			String SecurityManager = "org.apache.sandesha2.security.dummy.DummySecurityManager";
+
+			boolean EnableMakeConnection = true;
+			
+			boolean EnableRMAnonURI = true;
 		}
 	}
 	
@@ -463,6 +471,8 @@ public interface Sandesha2Constants {
 	
 	static final String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
 	
+	static final String RM_ANON_UUID = "RMAnonymousUUID";
+	
 	static final String propertiesToCopyFromReferenceMessage = "propertiesToCopyFromReferenceMessage";
 	
 	static final String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";
@@ -502,6 +512,9 @@ public interface Sandesha2Constants {
         public static final String ELEM_SEC_MGR = "SecurityManager";
         public static final String ELEM_INMEMORY_STORAGE_MGR = "InMemoryStorageManager";
         public static final String ELEM_PERMANENT_STORAGE_MGR = "PermanentStorageManager";
+        public static final String ELEM_MAKE_CONNECTION = "MakeConnection";
+        public static final String ELEM_ENABLED = "Enabled";
+        public static final String ELEM_USE_RM_ANON_URI = "UseRMAnonURI";
         
         public static final QName Q_ELEM_POLICY = new QName(URI_POLICY_NS, ELEM_POLICY, ATTR_WSP);
         public static final QName Q_ELEM_RMASSERTION = new QName(URI_RM_POLICY_NS, ELEM_RMASSERTION, ATTR_WSRM);
@@ -518,5 +531,8 @@ public interface Sandesha2Constants {
         public static final QName Q_ELEM_SEC_MGR = new QName(URI_RM_POLICY_NS, ELEM_SEC_MGR, ATTR_WSRM);
         public static final QName Q_ELEM_INMEMORY_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_INMEMORY_STORAGE_MGR, ATTR_WSRM);
         public static final QName Q_ELEM_PERMANENT_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_PERMANENT_STORAGE_MGR, ATTR_WSRM);
+        public static final QName Q_ELEM_MAKE_CONNECTION = new QName(URI_RM_POLICY_NS, ELEM_MAKE_CONNECTION, ATTR_WSRM);
+        public static final QName Q_ELEM_ENABLED = new QName(URI_RM_POLICY_NS, ELEM_ENABLED, ATTR_WSRM);
+        public static final QName Q_ELEM_USE_RM_ANON_URI = new QName(URI_RM_POLICY_NS, ELEM_USE_RM_ANON_URI, ATTR_WSRM);
     }
 }

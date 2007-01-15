@@ -39,7 +39,6 @@ import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.Invoker;
@@ -55,7 +54,6 @@ public class InMemoryStorageManager extends StorageManager {
     private final String ENVELOPE_MAP_KEY = "Sandesha2EnvelopeMap";
     private RMSBeanMgr  rMSBeanMgr = null;
     private RMDBeanMgr rMDBeanMgr = null;
-    private SequencePropertyBeanMgr sequencePropertyBeanMgr = null;
     private SenderBeanMgr senderBeanMgr = null;
     private InvokerBeanMgr invokerBeanMgr = null;
     private Sender sender = null;
@@ -69,7 +67,6 @@ public class InMemoryStorageManager extends StorageManager {
 		this.rMDBeanMgr = new InMemoryRMDBeanMgr (this, context);
 		this.senderBeanMgr = new InMemorySenderBeanMgr (this, context);
 		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (this, context);
-		this.sequencePropertyBeanMgr = new InMemorySequencePropertyBeanMgr (this, context);
 		this.sender = new Sender();
 		this.invoker = new Invoker();
 	}
@@ -154,10 +151,6 @@ public class InMemoryStorageManager extends StorageManager {
 
 	public SenderBeanMgr getSenderBeanMgr() {
 		return senderBeanMgr;
-	}
-
-	public SequencePropertyBeanMgr getSequencePropertyBeanMgr() {
-		return sequencePropertyBeanMgr;
 	}
 
 	public InvokerBeanMgr getInvokerBeanMgr() {
@@ -287,6 +280,7 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 }
+
 
 
 

@@ -50,10 +50,8 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
@@ -389,8 +387,6 @@ public class SandeshaClient {
 		
 		try {
 			
-			SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-			
 			RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 			//see if the sequence is terminated
 			boolean terminatedSequence = false;
@@ -403,9 +399,6 @@ public class SandeshaClient {
 			}
 	
 			if (terminatedSequence) {		
-				// Find all properties which have a matching internal sequence id				
-				removeBeans(rmsBean.getSequenceID(), seqPropMgr);
-				removeBeans(rmsBean.getInternalSequenceID(), seqPropMgr);
 				// Delete the rmsBean
 				storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
 			}
@@ -418,22 +411,6 @@ public class SandeshaClient {
 		} 
 		
 		tran.commit();
-	}
-	
-	private static final void removeBeans(String sequenceId, SequencePropertyBeanMgr seqPropMgr) throws SandeshaStorageException {
-		// Find all properties which have a matching sequence id
-		SequencePropertyBean bean = new SequencePropertyBean();
-		bean.setSequencePropertyKey(sequenceId);
-		List beans = seqPropMgr.find(bean);
-		
-		Iterator iterator = beans.iterator();
-		
-		while (iterator.hasNext()) {
-			bean = (SequencePropertyBean)iterator.next();
-			
-			seqPropMgr.delete(bean.getSequencePropertyKey(), bean.getName());				
-		}
-
 	}
 	
 	/**
@@ -451,7 +428,6 @@ public class SandeshaClient {
 		if (options == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.optionsObjectNotSet));
-
 		
 		String newSequenceKey = SandeshaUtil.getUUID();
 		createSequence(serviceClient, offer, newSequenceKey);

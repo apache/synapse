@@ -24,7 +24,6 @@ import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.workers.SandeshaThread;
 
 /**
@@ -68,8 +67,6 @@ public abstract class StorageManager {
 	public abstract RMDBeanMgr getRMDBeanMgr();
 
 	public abstract SenderBeanMgr getSenderBeanMgr();
-
-	public abstract SequencePropertyBeanMgr getSequencePropertyBeanMgr();
 
 	public abstract InvokerBeanMgr getInvokerBeanMgr();
 	

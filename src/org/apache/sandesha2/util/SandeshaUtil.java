@@ -73,10 +73,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -852,17 +850,6 @@ public class SandeshaUtil {
 		} catch (FactoryConfigurationError e) {
 			throw new SandeshaException(e.getMessage());
 		}
-	}
-
-	public static String getSequenceProperty(String id, String name, StorageManager storageManager)
-			throws SandeshaException {
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
-
-		SequencePropertyBean sequencePropertyBean = sequencePropertyBeanMgr.retrieve(id, name);
-		if (sequencePropertyBean == null)
-			return null;
-		
-		return sequencePropertyBean.getValue();
 	}
 
 	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String sequencePropertyKey,

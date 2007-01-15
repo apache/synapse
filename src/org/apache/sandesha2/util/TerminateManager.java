@@ -37,12 +37,10 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 
 /**
  * Contains logic to remove all the storad data of a sequence. Methods of this
@@ -177,6 +175,7 @@ public class TerminateManager {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		rmsBean.setTimedOut(true);
+		storageManager.getRMSBeanMgr().update(rmsBean);
 
 		cleanSendingSideData(sequencePropertyKey,internalSequenceId, serverside, storageManager);
 	}
@@ -184,7 +183,6 @@ public class TerminateManager {
 	private static void cleanSendingSideData(String sequencePropertyKey,String internalSequenceId,
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
 		// removing retransmitterMgr entries and corresponding message contexts.
@@ -196,19 +194,6 @@ public class TerminateManager {
 
 			String messageStoreKey = retransmitterBean.getMessageContextRefKey();
 			storageManager.removeMessageContext(messageStoreKey);
-		}
-		
-		// removing sequence properties
-		SequencePropertyBean findSequencePropertyBean1 = new SequencePropertyBean();
-		findSequencePropertyBean1.setSequencePropertyKey(sequencePropertyKey);
-		collection = sequencePropertyBeanMgr.find(findSequencePropertyBean1);
-		iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			SequencePropertyBean sequencePropertyBean = (SequencePropertyBean) iterator.next();
-
-			// TODO all properties which hv the temm:Seq:id as the key should be
-			// deletable.
-			sequencePropertyBeanMgr.delete(sequencePropertyBean.getSequencePropertyKey(), sequencePropertyBean.getName());
 		}
 	}
 

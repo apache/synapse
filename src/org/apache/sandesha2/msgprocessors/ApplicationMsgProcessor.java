@@ -40,11 +40,9 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
@@ -104,7 +102,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configContext, configContext
 				.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		boolean serverSide = msgContext.isServerSide();
 
@@ -234,16 +231,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			Sequence sequence = (Sequence) requestRMMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			String requestSequenceID = sequence.getIdentifier().getIdentifier();
 			
-			String requestSideSequencePropertyKey = SandeshaUtil.getSequencePropertyKey(requestRMMsgCtx);
-			
-			SequencePropertyBean specVersionBean = seqPropMgr.retrieve(requestSideSequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
-			if (specVersionBean == null) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.specVersionPropertyNotAvailable, requestSequenceID));
-			}
+			RMDBean bean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, requestSequenceID);
 
-			specVersion = specVersionBean.getValue();
+			specVersion = bean.getRMVersion();
 		} else {
 			// in the client side, user will set the RM version.
 			specVersion = (String) msgContext.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
@@ -567,7 +557,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		MessageContext msg = rmMsg.getMessageContext();
 
-		SequencePropertyBeanMgr sequencePropertyMgr = storageManager.getSequencePropertyBeanMgr();
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 
 		EndpointReference toEPR = new EndpointReference(rmsBean.getToEPR());
@@ -587,10 +576,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		else
 			rmMsg.setTo(toEPR);
 
-		String rmVersion = SandeshaUtil.getRMVersion(internalSequenceId, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.specVersionPropertyNotAvailable, internalSequenceId));
+		String rmVersion = rmsBean.getRMVersion();
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
@@ -626,14 +612,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				Object obj = msg.getProperty(SandeshaClientConstants.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
 
-					SequencePropertyBean specVersionBean = sequencePropertyMgr.retrieve(internalSequenceId,
-							Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
-					if (specVersionBean == null)
-						throw new SandeshaException(SandeshaMessageHelper
-								.getMessage(SandeshaMessageKeys.specVersionNotSet));
-
-					String specVersion = specVersionBean.getValue();
-					if (SpecSpecificConstants.isLastMessageIndicatorRequired(specVersion))
+					if (SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion))
 						sequence.setLastMessage(new LastMessage(rmNamespaceValue));
 				}
 			}

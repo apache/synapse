@@ -20,6 +20,8 @@ package org.apache.sandesha2;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 
@@ -37,8 +39,16 @@ public class MessageValidator {
 			String sequenceID = SandeshaUtil.getSequenceIDFromRMMessage(rmMsg);
 
 			if (sequenceID != null) {
-				String rmVersionOfSequence = SandeshaUtil.getSequenceProperty(sequenceID,
-						Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, storageManager);
+				String rmVersionOfSequence = null;
+				
+				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
+				if (rmsBean != null)
+					rmVersionOfSequence = rmsBean.getRMVersion();
+				else {
+					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
+					if (rmdBean != null)
+						rmVersionOfSequence = rmdBean.getRMVersion();
+				}
 
 				String rmNamespaceOfMsg = rmMsg.getRMNamespaceValue();
 				String rmNamespaceOfSequence = null;

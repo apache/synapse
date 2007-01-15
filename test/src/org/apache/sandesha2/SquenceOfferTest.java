@@ -17,7 +17,6 @@
 package org.apache.sandesha2;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -27,7 +26,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaReport;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
 

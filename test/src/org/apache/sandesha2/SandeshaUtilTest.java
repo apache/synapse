@@ -20,8 +20,6 @@ package org.apache.sandesha2;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 

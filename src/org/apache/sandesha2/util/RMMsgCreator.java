@@ -45,6 +45,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckFinal;
@@ -98,7 +99,7 @@ public class RMMsgCreator {
 			// except for configCtx).
 			AxisOperation createSequenceOperation = SpecSpecificConstants.getWSRMOperation(
 					Sandesha2Constants.MessageTypes.CREATE_SEQ,
-					SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager),
+					rmsBean.getRMVersion(),
 					applicationMsgContext.getAxisService());
 
 			createSeqmsgContext = SandeshaUtil
@@ -115,11 +116,7 @@ public class RMMsgCreator {
         
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
-		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
 
 		// Decide which addressing version to use. We copy the version that the application
 		// is already using (if set), and fall back to the level in the spec if that isn't
@@ -219,10 +216,8 @@ public class RMMsgCreator {
 			secMgr.applySecurityToken(token, createSeqRMMsg.getMessageContext());
 		}
 
-		createSeqRMMsg.setAction(SpecSpecificConstants.getCreateSequenceAction(SandeshaUtil.getRMVersion(
-				sequencePropertyKey, storageManager)));
-		createSeqRMMsg.setSOAPAction(SpecSpecificConstants.getCreateSequenceSOAPAction(SandeshaUtil.getRMVersion(
-				sequencePropertyKey, storageManager)));
+		createSeqRMMsg.setAction(SpecSpecificConstants.getCreateSequenceAction(rmsBean.getRMVersion()));
+		createSeqRMMsg.setSOAPAction(SpecSpecificConstants.getCreateSequenceSOAPAction(rmsBean.getRMVersion()));
 
 		createSeqRMMsg.addSOAPEnvelope();
 		
@@ -237,7 +232,7 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext createTerminateSequenceMessage(RMMsgContext referenceRMMessage, String sequenceId,
+	public static RMMsgContext createTerminateSequenceMessage(RMMsgContext referenceRMMessage, RMSBean rmsBean, String sequenceId,
 			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 		if (referenceMessage == null)
@@ -245,7 +240,7 @@ public class RMMsgCreator {
 
 		AxisOperation terminateOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.TERMINATE_SEQ,
-				SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager),
+				rmsBean.getRMVersion(),
 				referenceMessage.getAxisService());
 
 		ConfigurationContext configCtx = referenceMessage.getConfigurationContext();
@@ -264,13 +259,9 @@ public class RMMsgCreator {
 																								// messages
 																								// correctly.
 
-		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
 
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-
-		if (!SpecSpecificConstants.isTerminateSequenceResponseRequired(rmVersion)) {
+		if (!SpecSpecificConstants.isTerminateSequenceResponseRequired(rmsBean.getRMVersion())) {
 			terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null);
 		}
 
@@ -440,18 +431,15 @@ public class RMMsgCreator {
 	 * @param sequenceId
 	 * @throws SandeshaException
 	 */
-	public static void addAckMessage(RMMsgContext applicationMsg, String sequencePropertyKey ,String sequenceId, StorageManager storageManager)
+	public static void addAckMessage(RMMsgContext applicationMsg, RMSequenceBean rmBean, String sequencePropertyKey ,
+			String sequenceId, StorageManager storageManager)
 			throws SandeshaException {
 		if(log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
 		
 		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
 
-		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmBean.getRMVersion());
 
 		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
 		Identifier id = new Identifier(rmNamespaceValue);
@@ -469,7 +457,7 @@ public class RMMsgCreator {
 
 		if (rmdBean.isClosed()) {
 			// sequence is closed. so add the 'Final' part.
-			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
+			if (SpecSpecificConstants.isAckFinalAllowed(rmBean.getRMVersion())) {
 				AckFinal ackFinal = new AckFinal(rmNamespaceValue);
 				sequenceAck.setAckFinal(ackFinal);
 			}
@@ -480,10 +468,8 @@ public class RMMsgCreator {
 		sequenceAck.toOMElement(envelope.getHeader());
 		
 		if (applicationMsg.getWSAAction()==null) {
-			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(SandeshaUtil.getRMVersion(
-					sequenceId, storageManager)));
-			applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(SandeshaUtil
-					.getRMVersion(sequenceId, storageManager)));
+			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(rmBean.getRMVersion()));
+			applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(rmBean.getRMVersion()));
 		}
 		
 		applicationMsg.setMessageId(SandeshaUtil.getUUID());

@@ -55,6 +55,8 @@ public class RMSequenceBean extends RMBean {
 	 * polling and will do MakeConnections on them.
 	 */
 	private boolean pollingMode=false;
+	
+	private String rMVersion;
 
 	public RMSequenceBean() {
 
@@ -135,6 +137,14 @@ public class RMSequenceBean extends RMBean {
   	this.lastActivatedTime = lastActivatedTime;
   }
 
+	public String getRMVersion() {
+  	return rMVersion;
+  }
+
+	public void setRMVersion(String rmVersion) {
+  	this.rMVersion = rmVersion;
+  }
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("\nSequence Id  : "); result.append(sequenceID);
@@ -144,7 +154,8 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nPolling    : "); result.append(pollingMode);
 		result.append("\nClosed       : "); result.append(closed);		
 		result.append("\nTerminated       : "); result.append(terminated);		
-		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);		
+		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);	
+		result.append("\nRMVersion        : "); result.append(rMVersion);	
 		return result.toString();
 	}
 }

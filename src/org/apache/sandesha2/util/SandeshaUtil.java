@@ -854,28 +854,6 @@ public class SandeshaUtil {
 		}
 	}
 
-	/**
-	 * 
-	 * @param propertyKey
-	 *            for the client side - internalSequenceID, for the server side -
-	 *            sequenceID
-	 * @param configurationContext
-	 * @return
-	 * @throws SandeshaException
-	 */
-	public static String getRMVersion(String propertyKey, StorageManager storageManager)
-			throws SandeshaException {
-
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean specVersionBean = sequencePropertyBeanMgr.retrieve(propertyKey,
-				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
-
-		if (specVersionBean == null)
-			return null;
-
-		return specVersionBean.getValue();
-	}
-
 	public static String getSequenceProperty(String id, String name, StorageManager storageManager)
 			throws SandeshaException {
 		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();

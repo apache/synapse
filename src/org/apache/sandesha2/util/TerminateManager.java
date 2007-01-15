@@ -247,7 +247,7 @@ public class TerminateManager {
 			return;
 		}
 
-		RMMsgContext terminateRMMessage = RMMsgCreator.createTerminateSequenceMessage(referenceMessage, outSequenceId,
+		RMMsgContext terminateRMMessage = RMMsgCreator.createTerminateSequenceMessage(referenceMessage, rmsBean, outSequenceId,
 				sequencePropertyKey, storageManager);
 		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
 		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
@@ -280,9 +280,7 @@ public class TerminateManager {
 			terminateRMMessage.setReplyTo(new EndpointReference (rmsBean.getReplyToEPR()));
 		}
 		
-		String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
-		if (rmVersion == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
+		String rmVersion = rmsBean.getRMVersion();
 		terminateRMMessage.setWSAAction(SpecSpecificConstants.getTerminateSequenceAction(rmVersion));
 		terminateRMMessage.setSOAPAction(SpecSpecificConstants.getTerminateSequenceSOAPAction(rmVersion));
 

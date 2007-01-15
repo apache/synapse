@@ -144,6 +144,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
 				rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
 				rMSBean.setLastActivatedTime(System.currentTimeMillis());
+				rMSBean.setRMVersion(rmdBean.getRMVersion());
 				
 				String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 

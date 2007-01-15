@@ -97,7 +97,7 @@ public class WSRMMessageSender  {
 		else
 			outSequenceID = Sandesha2Constants.TEMP_SEQUENCE_ID;			
 
-		rmVersion = SandeshaUtil.getRMVersion(getInternalSequenceID(), getStorageManager());
+		rmVersion = rmsBean.getRMVersion();
 		if (rmVersion == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 

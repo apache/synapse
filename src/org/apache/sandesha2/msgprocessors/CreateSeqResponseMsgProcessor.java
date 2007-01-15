@@ -210,11 +210,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 			
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
-
-			SequencePropertyBean specVersionBean = new SequencePropertyBean(rmsBean.getOfferedSequence(),
-					Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION, rmSpecVersion);
-			sequencePropMgr.insert(specVersionBean);
-
+			rMDBean.setRMVersion(rmSpecVersion);
+			
 			rMDBean.setServerCompletedMessages(new ArrayList());
 
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
@@ -268,11 +265,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			if (applicationMsg == null)
 				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unavailableAppMsg));
 
-			String rmVersion = SandeshaUtil.getRMVersion(sequencePropertyKey, storageManager);
-			if (rmVersion == null)
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
-
-			String assumedRMNamespace = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
+			String assumedRMNamespace = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
 
 			RMMsgContext applicaionRMMsg = MsgInitializer.initializeMessage(applicationMsg);
 

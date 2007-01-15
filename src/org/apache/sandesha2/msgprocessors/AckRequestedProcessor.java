@@ -138,8 +138,6 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		// Setting the ack depending on AcksTo.
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
-		SequencePropertyBean versionBean = seqPropMgr.retrieve(sequencePropertyKey,
-				Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
 
 		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
 		String acksToStr = acksTo.getAddress();
@@ -149,7 +147,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.ACK,
-				versionBean.getValue(),
+				rmdBean.getRMVersion(),
 				msgContext.getAxisService());
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(rmMsgCtx, ackOperation);
 
@@ -172,7 +170,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx,sequencePropertyKey,sequenceId, storageManager);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx,rmdBean,sequencePropertyKey,sequenceId, storageManager);
 		ackRMMsgCtx.getMessageContext().setServerSide(true);
 
 		if (acksTo.hasAnonymousAddress()) {

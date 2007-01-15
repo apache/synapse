@@ -125,8 +125,6 @@ public class SequenceManager {
 			storageManager.storeMessageContext(newKey, createSeqContext);
 		}
 
-		nextMsgMgr.insert(rmdBean);
-
 		// message to invoke. This will apply for only in-order invocations.
 
 		SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
@@ -147,12 +145,9 @@ public class SequenceManager {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDecideRMVersion));
 		}
 
-		SequencePropertyBean specVerionBean = new SequencePropertyBean();
-		specVerionBean.setSequencePropertyKey(sequenceId);
-		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
-		specVerionBean.setValue(specVersion);
+		rmdBean.setRMVersion(specVersion);
 
-		seqPropMgr.insert(specVerionBean);
+		nextMsgMgr.insert(rmdBean);
 
 		// TODO get the SOAP version from the create seq message.
 
@@ -172,8 +167,6 @@ public class SequenceManager {
 		
 		RMSBean rmsBean = new RMSBean();
 		ConfigurationContext configurationContext = firstAplicationMsgCtx.getConfigurationContext();
-
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		String acksTo = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AcksTo);
@@ -266,11 +259,7 @@ public class SequenceManager {
 		}
 
 		// setting the spec version for the client side.
-		SequencePropertyBean specVerionBean = new SequencePropertyBean();
-		specVerionBean.setSequencePropertyKey(sequencePropertyKey);
-		specVerionBean.setName(Sandesha2Constants.SequenceProperties.RM_SPEC_VERSION);
-		specVerionBean.setValue(specVersion);
-		seqPropMgr.insert(specVerionBean);
+		rmsBean.setRMVersion(specVersion);
 
 		// updating the last activated time.
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());

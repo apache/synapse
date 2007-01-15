@@ -246,8 +246,6 @@ public interface Sandesha2Constants {
 	}
 
 	public interface SequenceProperties {
-		
-		String RM_SPEC_VERSION = "WSRMSpecVersion";
 
 		String ALL_SEQUENCES = "AllSequences"; //this is not a sequence
 											   // property. This is used as the

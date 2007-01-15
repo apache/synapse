@@ -29,10 +29,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.TerminateSequenceResponse;
@@ -52,24 +50,22 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		ConfigurationContext context = terminateResRMMsg.getConfigurationContext();
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		TerminateSequenceResponse tsResponse = (TerminateSequenceResponse)
 		  terminateResRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
 		
 		String sequenceId = tsResponse.getIdentifier().getIdentifier();
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
-		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,rmsBean.getInternalSequenceID());
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(terminateResRMMsg);
 
 		// Check that the sender of this TerminateSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		if(rmsBean != null && rmsBean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 			OMElement body = terminateResRMMsg.getSOAPEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(rmsBean.getSecurityTokenData());
 			secManager.checkProofOfPossession(token, body, msgContext);
 		}
+
+		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,rmsBean.getInternalSequenceID());
 
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 

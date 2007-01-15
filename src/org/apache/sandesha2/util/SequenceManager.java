@@ -34,10 +34,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
 /**
@@ -91,8 +89,6 @@ public class SequenceManager {
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
 		ConfigurationContext configurationContext = createSeqContext.getConfigurationContext();
 
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
 		rmdBean.setServerCompletedMessages(new ArrayList());
 		
 		rmdBean.setReplyToEPR(to.getAddress());
@@ -105,9 +101,7 @@ public class SequenceManager {
 		// Store the security token alongside the sequence
 		if(token != null) {
 			String tokenData = securityManager.getTokenRecoveryData(token);
-			SequencePropertyBean tokenBean = new SequencePropertyBean(sequenceId,
-					Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
-			seqPropMgr.insert(tokenBean);
+			rmdBean.setSecurityTokenData(tokenData);
 		}		
 
 		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();

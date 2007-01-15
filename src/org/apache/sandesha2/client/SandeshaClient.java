@@ -199,9 +199,7 @@ public class SandeshaClient {
 			report.addCompletedMessage((Long)iter.next());
 		}
 		
-		SequencePropertyBean tokenBean = 
-			storageManager.getSequencePropertyBeanMgr().retrieve(rmsBean.getInternalSequenceID(), Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) report.setSecureSequence(true);
+		if(rmsBean.getSecurityTokenData() != null) report.setSecureSequence(true);
 	}
 
 	/**
@@ -1005,7 +1003,6 @@ public class SandeshaClient {
 			throws SandeshaException {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx,configCtx.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		Transaction reportTransaction = null;
 
@@ -1030,8 +1027,8 @@ public class SandeshaClient {
 
 			sequenceReport.setSequenceStatus(getServerSequenceStatus(sequenceID, storageManager));
 
-			SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequenceID, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-			if(tokenBean != null) sequenceReport.setSecureSequence(true);
+			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
+			if(rmdBean.getSecurityTokenData() != null) sequenceReport.setSecureSequence(true);
 			
 			return sequenceReport;
 

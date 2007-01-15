@@ -41,11 +41,9 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -110,7 +108,6 @@ public class AcknowledgementProcessor {
 				.getAxisConfiguration());
 
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
 		if (outSequenceId == null || "".equals(outSequenceId)) {
@@ -122,10 +119,9 @@ public class AcknowledgementProcessor {
 		// Check that the sender of this Ack holds the correct token
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 		String sequencePropertyKey = rmsBean.getInternalSequenceID();
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		if(rmsBean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(rmsBean.getSecurityTokenData());
 			
 			secManager.checkProofOfPossession(token, soapHeader, msgCtx);
 		}

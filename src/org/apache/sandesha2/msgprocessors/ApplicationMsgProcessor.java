@@ -513,7 +513,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 //		if (pollingMode)
 //			SandeshaUtil.startPollingManager(configCtx);
 		
-		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
+		SecurityToken token = (SecurityToken) createSeqRMMessage.getProperty(Sandesha2Constants.MessageContextProperties.SECURITY_TOKEN);
 		if(token != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
 			rmsBean.setSecurityTokenData(secManager.getTokenRecoveryData(token));

@@ -85,7 +85,7 @@ public class AcknowledgementManager {
 				String inboundSequenceId = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(outboundInternalSeq);
 				
 				if(log.isDebugEnabled()) log.debug("Piggybacking ack for " + inboundSequenceId);
-				RMMsgCreator.addAckMessage(rmMessageContext, rmsBean, inboundSequenceId, inboundSequenceId, storageManager);
+				RMMsgCreator.addAckMessage(rmMessageContext, rmsBean, inboundSequenceId, storageManager);
 			}
 			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
 			return;
@@ -240,7 +240,7 @@ public class AcknowledgementManager {
 		ackMsgCtx.setTo(acksTo);
 
 		// adding the SequenceAcknowledgement part.
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, rmdBean, sequencePropertyKey ,sequenceId, storageManager);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, rmdBean, sequenceId, storageManager);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::generateAckMessage");

@@ -253,8 +253,6 @@ public interface Sandesha2Constants {
 											   // sequences
 
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
-				
-		String SECURITY_TOKEN = "SecurityToken";
 	}
 
 	public interface SOAPVersion {
@@ -393,15 +391,15 @@ public interface Sandesha2Constants {
 		
 	}
 	
-	String IN_HANDLER_NAME = "SandeshaInHandler";
+	static final String IN_HANDLER_NAME = "SandeshaInHandler";
 
-	String OUT_HANDLER_NAME = "SandeshaOutHandler";
+	static final String OUT_HANDLER_NAME = "SandeshaOutHandler";
 
-	String GLOBAL_IN_HANDLER_NAME = "GlobalInHandler";
+	static final String GLOBAL_IN_HANDLER_NAME = "GlobalInHandler";
 
-	String APPLICATION_PROCESSING_DONE = "Sandesha2AppProcessingDone";
+	static final String APPLICATION_PROCESSING_DONE = "Sandesha2AppProcessingDone";
 
-	String ACK_WRITTEN = "AckWritten";
+	static final String ACK_WRITTEN = "AckWritten";
 
 	int INVOKER_SLEEP_TIME = 1000;
 
@@ -411,84 +409,85 @@ public interface Sandesha2Constants {
 
 	int TERMINATE_DELAY = 100;
 
-	String TEMP_SEQUENCE_ID = "uuid:tempID";
+	static final String TEMP_SEQUENCE_ID = "uuid:tempID";
 
-	String ACK_PROCSSED = "AckProcessed";
+	static final String ACK_PROCSSED = "AckProcessed";
 
-	String RM_ENABLE_KEY = "RMEnabled";
+	static final String RM_ENABLE_KEY = "RMEnabled";
 
 	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
 	
-	String PROPERTY_FILE = "sandesha2.properties";
+	static final String PROPERTY_FILE = "sandesha2.properties";
 	
-	String VALUE_NONE = "none";
+	static final String VALUE_NONE = "none";
 	
-	String VALUE_EMPTY = "empty";
+	static final String VALUE_EMPTY = "empty";
 	
-	String VALUE_TRUE = "true";
+	static final String VALUE_TRUE = "true";
 	
-	String VALUE_FALSE = "false";
+	static final String VALUE_FALSE = "false";
 	
-	String MESSAGE_STORE_KEY = "Sandesha2MessageStoreKey";
+	static final String MESSAGE_STORE_KEY = "Sandesha2MessageStoreKey";
 
-	String ORIGINAL_TRANSPORT_OUT_DESC = "Sandesha2OriginalTransportSender";
+	static final String ORIGINAL_TRANSPORT_OUT_DESC = "Sandesha2OriginalTransportSender";
 	
-	String SET_SEND_TO_TRUE = "Sandesha2SetSendToTrue";
+	static final String SET_SEND_TO_TRUE = "Sandesha2SetSendToTrue";
 	
-	String MESSAGE_TYPE = "Sandesha2MessageType";
+	static final String MESSAGE_TYPE = "Sandesha2MessageType";
 	
-	String QUALIFIED_FOR_SENDING = "Sandesha2QualifiedForSending";  //Sender will send messages only if this property is null (not set) or true.
+	static final String QUALIFIED_FOR_SENDING = "Sandesha2QualifiedForSending";  //Sender will send messages only if this property is null (not set) or true.
 
-	String QNAME_SEPERATOR = ",";
+	static final String QNAME_SEPERATOR = ",";
 	
-	String EXECUTIN_CHAIN_SEPERATOR = ".";
+	static final String EXECUTIN_CHAIN_SEPERATOR = ".";
 	
-	String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
+	static final String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
 	
-	String SANDESHA_PROPERTY_BEAN = "Sandesha2PropertyBean";
+	static final String SANDESHA_PROPERTY_BEAN = "Sandesha2PropertyBean";
 	
-	String LIST_SEPERATOR = ",";
+	static final String LIST_SEPERATOR = ",";
 	
-	String LIST_PART_SEPERATOR = "-";
+	static final String LIST_PART_SEPERATOR = "-";
 	
-	String INMEMORY_STORAGE_MANAGER = "inmemory";
+	static final String INMEMORY_STORAGE_MANAGER = "inmemory";
 	
-	String PERMANENT_STORAGE_MANAGER = "persistent";
+	static final String PERMANENT_STORAGE_MANAGER = "persistent";
 	
-	String DEFAULT_STORAGE_MANAGER = INMEMORY_STORAGE_MANAGER;
+	static final String DEFAULT_STORAGE_MANAGER = INMEMORY_STORAGE_MANAGER;
 	
-	String POLLING_MANAGER = "PollingManager";
+	static final String POLLING_MANAGER = "PollingManager";
 	
-	String STORAGE_MANAGER_PARAMETER  = "Sandesha2StorageManager";
+	static final String STORAGE_MANAGER_PARAMETER  = "Sandesha2StorageManager";
 	
-	String POST_FAILURE_MESSAGE = "PostFailureMessage";
+	static final String POST_FAILURE_MESSAGE = "PostFailureMessage";
 	
-	String REINJECTED_MESSAGE = "ReinjectedMessage";
+	static final String REINJECTED_MESSAGE = "ReinjectedMessage";
 	
-	String MODULE_CLASS_LOADER = "Sandesha2ModuleClassLoader";
+	static final String MODULE_CLASS_LOADER = "Sandesha2ModuleClassLoader";
 	
-	String SECURITY_MANAGER = "Sandesha2SecurityManager";
+	static final String SECURITY_MANAGER = "Sandesha2SecurityManager";
 	
-	String RM_IN_OUT_OPERATION_NAME = "RMInOutOperation";
+	static final String RM_IN_OUT_OPERATION_NAME = "RMInOutOperation";
 	
-	String RM_IN_ONLY_OPERATION = "RMInOnlyOperation";
+	static final String RM_IN_ONLY_OPERATION = "RMInOnlyOperation";
 	
-	String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
+	static final String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
 	
-	String propertiesToCopyFromReferenceMessage = "propertiesToCopyFromReferenceMessage";
+	static final String propertiesToCopyFromReferenceMessage = "propertiesToCopyFromReferenceMessage";
 	
-	String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";
+	static final String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";
 	
-	String [] SPEC_NS_URIS = {
+	static final String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI
 	};
 	
 	public interface MessageContextProperties{
-		String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
-		String SEQUENCE_ID = "WSRMSequenceId";
-		String MESSAGE_NUMBER = "WSRMMessageNumber";
-		String SEQUENCE_PROPERTY_KEY = "SequencePropertyKey";
+		static final String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
+		static final String SEQUENCE_ID = "WSRMSequenceId";
+		static final String MESSAGE_NUMBER = "WSRMMessageNumber";
+		static final String SEQUENCE_PROPERTY_KEY = "SequencePropertyKey";
+		static final String SECURITY_TOKEN = "SecurityToken";
 	}
     
     public interface Assertions {

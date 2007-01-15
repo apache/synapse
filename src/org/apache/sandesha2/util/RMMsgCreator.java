@@ -42,11 +42,9 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckFinal;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -202,7 +200,7 @@ public class RMMsgCreator {
 		if(token != null) {
 			OMElement str = secMgr.createSecurityTokenReference(token, createSeqmsgContext);
 			createSequencePart.setSecurityTokenReference(str);
-			createSeqRMMsg.setProperty(Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, token);
+			createSeqRMMsg.setProperty(Sandesha2Constants.MessageContextProperties.SECURITY_TOKEN, token);
 			
 			// If we are using token based security, and the 1.1 spec level, then we
 			// should introduce a UsesSequenceSTR header into the message.
@@ -228,12 +226,11 @@ public class RMMsgCreator {
 	 * Creates a new TerminateSequence message.
 	 * 
 	 * @param referenceRMMessage
-	 * @param sequenceId
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext createTerminateSequenceMessage(RMMsgContext referenceRMMessage, RMSBean rmsBean, String sequenceId,
-			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
+	public static RMMsgContext createTerminateSequenceMessage(RMMsgContext referenceRMMessage, RMSBean rmsBean,
+			StorageManager storageManager) throws AxisFault {
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 		if (referenceMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
@@ -251,14 +248,9 @@ public class RMMsgCreator {
 				terminateOperation);
 
 		OperationContext operationContext = terminateMessage.getOperationContext();
-		configCtx.registerOperationContext(terminateMessage.getMessageID(), operationContext); // to
-																								// receive
-																								// terminate
-																								// sequence
-																								// response
-																								// messages
-																								// correctly.
-
+		// to receive terminate sequence response messages correctly
+		configCtx.registerOperationContext(terminateMessage.getMessageID(), operationContext); 
+		
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
 
 		if (!SpecSpecificConstants.isTerminateSequenceResponseRequired(rmsBean.getRMVersion())) {
@@ -283,23 +275,16 @@ public class RMMsgCreator {
 
 		TerminateSequence terminateSequencePart = new TerminateSequence(rmNamespaceValue);
 		Identifier identifier = new Identifier(rmNamespaceValue);
-		identifier.setIndentifer(sequenceId);
+		identifier.setIndentifer(rmsBean.getSequenceID());
 		terminateSequencePart.setIdentifier(identifier);
 		terminateRMMessage.setMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ, terminateSequencePart);
 
-		terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null); // no
-																			// need
-																			// for
-																			// an
-																			// incoming
-																			// transport
-																			// for
-																			// an
-																			// terminate
+		// no need for an incoming transport for a terminate
 		// message. If this is put, sender will look for an response.
-
+		terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null); 
+		
 		// Ensure the correct token is used to secure the terminate sequence
-		secureOutboundMessage(sequencePropertyKey, terminateMessage);
+		secureOutboundMessage(rmsBean, terminateMessage);
 		
 		return terminateRMMessage;
 	}
@@ -313,14 +298,14 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws AxisFault
 	 */
-	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, String newSequenceID) throws AxisFault {
+	public static RMMsgContext createCreateSeqResponseMsg(RMMsgContext createSeqMessage, RMSequenceBean rmSequenceBean) throws AxisFault {
 
 		CreateSequence cs = (CreateSequence) createSeqMessage.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 		String namespace = createSeqMessage.getRMNamespaceValue();
 
 		CreateSequenceResponse response = new CreateSequenceResponse(namespace);
 		Identifier identifier = new Identifier(namespace);
-		identifier.setIndentifer(newSequenceID);
+		identifier.setIndentifer(rmSequenceBean.getSequenceID());
 		response.setIdentifier(identifier);
 
 		SequenceOffer offer = cs.getSequenceOffer();
@@ -351,12 +336,11 @@ public class RMMsgCreator {
 		String version = SpecSpecificConstants.getSpecVersionString(namespace);
 		String action = SpecSpecificConstants.getCreateSequenceResponseAction(version);
 
-		return createResponseMsg(createSeqMessage, response,
-				Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE,
-				newSequenceID, action);
+		return createResponseMsg(createSeqMessage, rmSequenceBean, response,
+				Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE,action);
 	}
 
-	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg) throws AxisFault {
+	public static RMMsgContext createTerminateSeqResponseMsg(RMMsgContext terminateSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
         
 		TerminateSequence terminateSequence = (TerminateSequence) terminateSeqRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
@@ -372,12 +356,11 @@ public class RMMsgCreator {
 		String version = SpecSpecificConstants.getSpecVersionString(namespace);
 		String action = SpecSpecificConstants.getTerminateSequenceResponseAction(version);
 
-		return createResponseMsg(terminateSeqRMMsg, terminateSequenceResponse,
-				Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE,
-				sequenceID, action);
+		return createResponseMsg(terminateSeqRMMsg, rmSequenceBean, terminateSequenceResponse,
+				Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE, action);
 	}
 
-	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg) throws AxisFault {
+	public static RMMsgContext createCloseSeqResponseMsg(RMMsgContext closeSeqRMMsg, RMSequenceBean rmSequenceBean) throws AxisFault {
 
 		CloseSequence closeSequence = (CloseSequence) closeSeqRMMsg
 				.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
@@ -393,13 +376,12 @@ public class RMMsgCreator {
 		String version = SpecSpecificConstants.getSpecVersionString(namespace);
 		String action = SpecSpecificConstants.getCloseSequenceResponseAction(version);
 
-		return createResponseMsg(closeSeqRMMsg, closeSequenceResponse,
-				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE,
-				sequenceID, action);
+		return createResponseMsg(closeSeqRMMsg, rmSequenceBean, closeSequenceResponse,
+				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE, action);
 	}
 
-	private static RMMsgContext createResponseMsg(RMMsgContext requestMsg, IOMRMPart part, int messagePartId,
-			String sequenceID, String action) throws AxisFault {
+	private static RMMsgContext createResponseMsg(RMMsgContext requestMsg, RMSequenceBean rmSequenceBean, IOMRMPart part, 
+			int messagePartId, String action) throws AxisFault {
 
 		MessageContext outMessage = Utils.createOutMessageContext(requestMsg.getMessageContext());
 		RMMsgContext responseRMMsg = new RMMsgContext(outMessage);
@@ -419,7 +401,7 @@ public class RMMsgCreator {
 		responseRMMsg.getMessageContext().setServerSide(true);
 
 		// Ensure the correct token is used to secure the message
-		secureOutboundMessage(sequenceID, outMessage);
+		secureOutboundMessage(rmSequenceBean, outMessage);
 		
 		return responseRMMsg;
 	}
@@ -431,7 +413,7 @@ public class RMMsgCreator {
 	 * @param sequenceId
 	 * @throws SandeshaException
 	 */
-	public static void addAckMessage(RMMsgContext applicationMsg, RMSequenceBean rmBean, String sequencePropertyKey ,
+	public static void addAckMessage(RMMsgContext applicationMsg, RMSequenceBean rmBean,
 			String sequenceId, StorageManager storageManager)
 			throws SandeshaException {
 		if(log.isDebugEnabled())
@@ -482,7 +464,7 @@ public class RMMsgCreator {
 		}
 		
 		// Ensure the message also contains the token that needs to be used
-		secureOutboundMessage(sequencePropertyKey, applicationMsg.getMessageContext());
+		secureOutboundMessage(rmdBean, applicationMsg.getMessageContext());
 		
 		if(log.isDebugEnabled()) 
 			log.debug("Exit: RMMsgCreator::addAckMessage");
@@ -537,20 +519,17 @@ public class RMMsgCreator {
 		return makeConnectionRMMessageCtx;
 	}
 
-	private static void secureOutboundMessage(String sequenceKey, MessageContext message)
+	private static void secureOutboundMessage(RMSequenceBean rmBean, MessageContext message)
 	throws SandeshaException
 	{
 		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::secureOutboundMessage");
 
 		ConfigurationContext configCtx = message.getConfigurationContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx.getAxisConfiguration());
-		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
 
-		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequenceKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		if(rmBean.getSecurityTokenData() != null) {
 			if(log.isDebugEnabled()) log.debug("Securing outbound message");
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(rmBean.getSecurityTokenData());
 			secManager.applySecurityToken(token, message);
 		}
 

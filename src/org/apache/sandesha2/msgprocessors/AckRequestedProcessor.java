@@ -46,10 +46,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -117,18 +115,13 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
 				configurationContext.getAxisConfiguration());
-
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
-
-		//not getting the sequencePropertyKey from the usual method since the ackRequest may be embedded in a message
-		//of a different sequence. (usual method SandeshaUtil.getSequencePropertyKey)
-		String sequencePropertyKey = sequenceId;
 		
 		// Check that the sender of this AckRequest holds the correct token
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+
+		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {;
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
 			
 			secManager.checkProofOfPossession(token, soapHeader, msgContext);
 		}
@@ -137,8 +130,6 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 
 		// Setting the ack depending on AcksTo.
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
-
 		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
 		String acksToStr = acksTo.getAddress();
 
@@ -170,7 +161,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx,rmdBean,sequencePropertyKey,sequenceId, storageManager);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx,rmdBean, sequenceId, storageManager);
 		ackRMMsgCtx.getMessageContext().setServerSide(true);
 
 		if (acksTo.hasAnonymousAddress()) {

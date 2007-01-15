@@ -38,9 +38,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -76,20 +74,19 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());
-		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
-		
+
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+
 		// Check that the sender of this CloseSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
 			OMElement body = msgCtx.getEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 
 		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
 		
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 		rmdBean.setClosed(true);
 		storageManager.getRMDBeanMgr().update(rmdBean);
 
@@ -117,7 +114,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 
 		MessageContext closeSequenceMsg = rmMsgCtx.getMessageContext();
 
-		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx);
+		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmdBean);
 		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();
 
 		while (sequenceAckIter.hasNext()) {

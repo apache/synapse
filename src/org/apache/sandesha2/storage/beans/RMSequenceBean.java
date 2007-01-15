@@ -57,6 +57,12 @@ public class RMSequenceBean extends RMBean {
 	private boolean pollingMode=false;
 	
 	private String rMVersion;
+	
+	/**
+	 * Comment for <code>securityTokenData</code>
+	 * This is the security token data needed to reconstruct the token that secures this sequence.
+	 */
+	private String securityTokenData;
 
 	public RMSequenceBean() {
 
@@ -145,6 +151,14 @@ public class RMSequenceBean extends RMBean {
   	this.rMVersion = rmVersion;
   }
 
+	public String getSecurityTokenData() {
+		return securityTokenData;
+	}
+
+	public void setSecurityTokenData(String securityTokenData) {
+		this.securityTokenData = securityTokenData;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("\nSequence Id  : "); result.append(sequenceID);
@@ -156,6 +170,7 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nTerminated       : "); result.append(terminated);		
 		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);	
 		result.append("\nRMVersion        : "); result.append(rMVersion);	
+		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		return result.toString();
 	}
 }

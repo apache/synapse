@@ -247,8 +247,7 @@ public class TerminateManager {
 			return;
 		}
 
-		RMMsgContext terminateRMMessage = RMMsgCreator.createTerminateSequenceMessage(referenceMessage, rmsBean, outSequenceId,
-				sequencePropertyKey, storageManager);
+		RMMsgContext terminateRMMessage = RMMsgCreator.createTerminateSequenceMessage(referenceMessage, rmsBean, storageManager);
 		terminateRMMessage.setFlow(MessageContext.OUT_FLOW);
 		terminateRMMessage.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 

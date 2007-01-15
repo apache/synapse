@@ -42,12 +42,6 @@ public class RMSBean extends RMSequenceBean {
 	 * This is the message ID of the create sequence message.
 	 */
 	private String createSeqMsgID;
-	
-	/**
-	 * Comment for <code>securityTokenData</code>
-	 * This is the security token data needed to reconstruct the token that secures this sequence.
-	 */
-	private String securityTokenData;
 		
 	/**
 	 * The key that is used to store the CreateSequence message in the Message Storage.
@@ -145,14 +139,6 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setInternalSequenceID(String internalSequenceID) {
 		this.internalSequenceID = internalSequenceID;
-	}
-
-	public String getSecurityTokenData() {
-		return securityTokenData;
-	}
-
-	public void setSecurityTokenData(String securityTokenData) {
-		this.securityTokenData = securityTokenData;
 	}
 
 	public String getCreateSequenceMsgStoreKey() {
@@ -289,7 +275,6 @@ public class RMSBean extends RMSequenceBean {
 		result.append(super.toString());
 		result.append("\nInternal Seq Id  : "); result.append(internalSequenceID);
 		result.append("\nCreateSeq Msg Id : "); result.append(createSeqMsgID);
-		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		result.append("\nCreateSeq Msg Key: "); result.append(createSequenceMsgStoreKey);
 		result.append("\nReference Msg Key: "); result.append(referenceMessageStoreKey);
 		result.append("\nLastOutMessageNumber: "); result.append(lastOutMessage);

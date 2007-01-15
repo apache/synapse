@@ -40,10 +40,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
@@ -90,14 +88,13 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
 		
 		// Check that the sender of this TerminateSequence holds the correct token
-		SequencePropertyBean tokenBean = sequencePropertyBeanMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
 			OMElement body = terminateSeqRMMsg.getSOAPEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
 			secManager.checkProofOfPossession(token, body, terminateSeqRMMsg.getMessageContext());
 		}
 
@@ -106,11 +103,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		// add the terminate sequence response if required.
 		RMMsgContext terminateSequenceResponse = null;
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired(terminateSeqRMMsg.getRMSpecVersion()))
-			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, sequencePropertyKey, sequenceId, storageManager);
+			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, rmdBean, sequencePropertyKey, sequenceId, storageManager);
 
 		setUpHighestMsgNumbers(context, storageManager,sequencePropertyKey, sequenceId, terminateSeqRMMsg);
 
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 		rmdBean.setTerminated(true);		
 		rmdBean.setLastActivatedTime(System.currentTimeMillis());
 		storageManager.getRMDBeanMgr().update(rmdBean);
@@ -222,13 +218,13 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			log.debug("Exit: TerminateSeqMsgProcessor::setUpHighestMsgNumbers");
 	}
 
-	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, String sequencePropertyKey,String sequenceId,
+	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, RMDBean rmdBean, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::addTerminateSequenceResponse, " + sequenceId);
 
-		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg);
+		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg, rmdBean);
 		MessageContext outMessage = terminateSeqResponseRMMsg.getMessageContext();
 
 		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, sequencePropertyKey, 

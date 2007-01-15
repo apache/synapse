@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.handlers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.axiom.soap.SOAPBody;

@@ -136,8 +136,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		}
 		createSeqResponseRMMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
 		
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(createSeqResponseRMMsgCtx);
-		
 		rmsBean.setSequenceID(newOutSequenceId);
 
 		// We must poll for any reply-to that uses the anonymous URI. If it is a ws-a reply to then
@@ -159,14 +157,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		retransmitterMgr.delete(createSeqMsgId);
 
 		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
-		
-		// Store the security token under the new sequence id
-		if(tokenData != null) {
-			SequencePropertyBean newToken = new SequencePropertyBean(sequencePropertyKey,
-					Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
-			sequencePropMgr.insert(newToken);
-		}
-		
+				
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
 		if (accept != null) {
@@ -215,17 +206,14 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setServerCompletedMessages(new ArrayList());
 
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-			rmdBeanMgr.insert(rMDBean);
 
 			rmsBean.setLastActivatedTime(System.currentTimeMillis());
 			rmsBeanMgr.update(rmsBean);
 
 			// Store the security token for the offered sequence
-			if(tokenData != null) {
-				SequencePropertyBean newToken = new SequencePropertyBean(rmsBean.getOfferedSequence(),
-						Sandesha2Constants.SequenceProperties.SECURITY_TOKEN, tokenData);
-				sequencePropMgr.insert(newToken);
-			}
+			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
+			
+			rmdBeanMgr.insert(rMDBean);
 			
 			// Add the offered sequence into the inbound sequences list
 			SequencePropertyBean incomingSequenceListBean = sequencePropMgr.retrieve(

@@ -103,7 +103,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		// sequence state.
 		RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
 			
-		RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean.getSequenceID());
+		RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean);
 		outMessage = createSeqResponse.getMessageContext();
 			
 		createSeqResponse.setFlow(MessageContext.OUT_FLOW);
@@ -145,8 +145,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
 				rMSBean.setLastActivatedTime(System.currentTimeMillis());
 				rMSBean.setRMVersion(rmdBean.getRMVersion());
-				
-				String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
 				// Setting sequence properties for the outgoing sequence.
 				// Only will be used by the server side response path. Will
@@ -159,17 +157,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				}
 	
 				RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
-				rmsBeanMgr.insert(rMSBean);
 
 				// Store the inbound token (if any) with the new sequence
-				if(token != null) {
-					String tokenData = secManager.getTokenRecoveryData(token);
-					SequencePropertyBean tokenBean = new SequencePropertyBean(
-							outgoingSideSequencePropertyKey,
-							Sandesha2Constants.SequenceProperties.SECURITY_TOKEN,
-							tokenData);
-					seqPropMgr.insert(tokenBean);
-				}
+				rMSBean.setSecurityTokenData(rmdBean.getSecurityTokenData());
+				
+				rmsBeanMgr.insert(rMSBean);
 			} else {
 				// removing the accept part.
 				createSeqResPart.setAccept(null);

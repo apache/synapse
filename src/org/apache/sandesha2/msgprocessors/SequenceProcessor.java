@@ -46,11 +46,9 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -96,15 +94,14 @@ public class SequenceProcessor {
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
 		
-		String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
-		
 		// Check that both the Sequence header and message body have been secured properly
-		SequencePropertyBean tokenBean = seqPropMgr.retrieve(propertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
-		if(tokenBean != null) {
+		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
+		RMDBean bean = mgr.retrieve(sequenceId);
+		
+		if(bean != null && bean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(msgCtx.getConfigurationContext());
 			
 			QName seqName = new QName(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.SEQUENCE);
@@ -113,7 +110,7 @@ public class SequenceProcessor {
 			OMElement body = envelope.getBody();
 			OMElement seqHeader = envelope.getHeader().getFirstChildWithName(seqName);
 			
-			SecurityToken token = secManager.recoverSecurityToken(tokenBean.getValue());
+			SecurityToken token = secManager.recoverSecurityToken(bean.getSecurityTokenData());
 			
 			secManager.checkProofOfPossession(token, seqHeader, msgCtx);
 			secManager.checkProofOfPossession(token, body, msgCtx);
@@ -132,9 +129,6 @@ public class SequenceProcessor {
 		// setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
-
-		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
-		RMDBean bean = mgr.retrieve(sequenceId);
 
 		if (bean == null) {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,

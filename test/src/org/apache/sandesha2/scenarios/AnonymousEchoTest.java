@@ -26,7 +26,6 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;
 import org.apache.sandesha2.client.SandeshaClient;
@@ -65,10 +64,6 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 	public void testSyncEchoWithRMAnon() throws Exception {
 
 		Options clientOptions = new Options ();
-		EndpointReference ref = new EndpointReference(
-				Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX +
-				SandeshaUtil.getUUID());
-		clientOptions.setReplyTo(ref);
 		runSyncEchoTest(clientOptions);
 		
 	}
@@ -87,11 +82,6 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-		
-		// Put in enough config to convince Axis that this is async, without setting up
-		// new WS-Adressing replyTo etc.
-		clientOptions.setUseSeparateListener(true);
-		clientOptions.setProperty(Constants.Configuration.USE_CUSTOM_LISTENER,Boolean.TRUE);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		serviceClient.setOptions(clientOptions);

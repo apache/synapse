@@ -18,17 +18,21 @@
 package org.apache.sandesha2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.modules.Module;
 import org.apache.axis2.modules.ModulePolicyExtension;
 import org.apache.axis2.modules.PolicyExtension;
+import org.apache.axis2.util.TargetResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.RMPolicyExtension;
@@ -109,6 +113,19 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		SecurityManager util = SandeshaUtil.getSecurityManager(configContext);
 		util.initSecurity(module);
 
+		// Mark the config context so that we can run sync 2-way interations over
+		// RM, but at the same time switch it off for unreliable messages.
+		configContext.setProperty(Constants.Configuration.USE_ASYNC_OPERATIONS, Boolean.TRUE);
+		configContext.getAxisConfiguration().addTargetResolver(
+				new TargetResolver() {
+					public void resolveTarget(MessageContext messageContext) {
+						String unreliable = (String) messageContext.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+						if("true".equals(unreliable)) {
+							messageContext.setProperty(Constants.Configuration.USE_ASYNC_OPERATIONS, Boolean.FALSE);
+						}
+					}
+				}
+		);
 	}
 
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {

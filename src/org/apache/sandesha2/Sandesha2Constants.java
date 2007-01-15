@@ -257,8 +257,6 @@ public interface Sandesha2Constants {
 		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
 
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
-		
-		String SEQUENCE_TIMED_OUT = "SequenceTimedOut";
 				
 		String SECURITY_TOKEN = "SecurityToken";
 	}

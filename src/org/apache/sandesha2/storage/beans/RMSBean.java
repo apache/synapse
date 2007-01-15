@@ -107,15 +107,20 @@ public class RMSBean extends RMSequenceBean {
   private boolean terminateAdded = false;
   
   /**
-   * The number of messages that were acked
+   * Indicates that a sequence has timed out.
    */
-  private long numberOfMessagesAcked = 0;
+  private boolean timedOut = false;
   
   /**
    * Indicates the client has sent a close sequence
    */
   private boolean sequenceClosedClient = false;
-  
+
+  /**
+   * The number of messages that were acked
+   */
+  private long numberOfMessagesAcked = 0;
+
   private String transportTo;
   
   private String offeredEndPoint = null;
@@ -230,6 +235,14 @@ public class RMSBean extends RMSequenceBean {
   	this.terminateAdded = terminateAdded;
   }
 
+	public boolean isTimedOut() {
+  	return timedOut;
+  }
+
+	public void setTimedOut(boolean timedOut) {
+  	this.timedOut = timedOut;
+  }
+
 	public boolean isSequenceClosedClient() {
   	return sequenceClosedClient;
   }
@@ -284,6 +297,7 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);
 		result.append("\nNextMessageNumber: "); result.append(nextMessageNumber);
 		result.append("\nTerminateAdded   : "); result.append(terminateAdded);
+		result.append("\nTimedOut         : "); result.append(timedOut);
 		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
 		result.append("\nNumAckedMsgs     : "); result.append(numberOfMessagesAcked);
 		result.append("\nTransportTo      : "); result.append(transportTo);

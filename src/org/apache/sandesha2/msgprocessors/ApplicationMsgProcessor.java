@@ -209,8 +209,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		//see if the sequence is timed out
-		SequencePropertyBean sequenceTimedout = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SEQUENCE_TIMED_OUT);
-		if(sequenceTimedout!=null){
+		if(rmsBean != null && rmsBean.isTimedOut()){
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
 		}
 

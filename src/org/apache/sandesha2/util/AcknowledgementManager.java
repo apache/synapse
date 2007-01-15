@@ -80,8 +80,8 @@ public class AcknowledgementManager {
 			Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			if(sequence != null) {
 				String outboundSequenceId = sequence.getIdentifier().getIdentifier();
-				String outboundInternalSeq = SandeshaUtil.getSequenceProperty(outboundSequenceId,
-						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outboundSequenceId);
+				String outboundInternalSeq = rmsBean.getInternalSequenceID();
 				String inboundSequenceId = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(outboundInternalSeq);
 				
 				if(log.isDebugEnabled()) log.debug("Piggybacking ack for " + inboundSequenceId);

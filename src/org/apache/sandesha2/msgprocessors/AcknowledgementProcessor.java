@@ -120,8 +120,8 @@ public class AcknowledgementProcessor {
 		}
 
 		// Check that the sender of this Ack holds the correct token
-		String sequencePropertyKey = SandeshaUtil.getSequenceProperty(outSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
+		String sequencePropertyKey = rmsBean.getInternalSequenceID();
 		SequencePropertyBean tokenBean = seqPropMgr.retrieve(sequencePropertyKey, Sandesha2Constants.SequenceProperties.SECURITY_TOKEN);
 		if(tokenBean != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
@@ -167,7 +167,6 @@ public class AcknowledgementProcessor {
 			}
 		}
 
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 		// updating the last activated time of the sequence.
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 

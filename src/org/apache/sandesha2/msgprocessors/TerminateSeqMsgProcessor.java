@@ -209,10 +209,9 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 				if (allAcked)
 				{
-					String internalSequenceID = SandeshaUtil.getSequenceProperty(outgoingSequnceID,
-							Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
+					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outgoingSequnceID);
 
-					TerminateManager.addTerminateSequenceMessage(terminateRMMsg, internalSequenceID, outgoingSequnceID,
+					TerminateManager.addTerminateSequenceMessage(terminateRMMsg, rmsBean.getInternalSequenceID(), outgoingSequnceID,
 							responseSideSequencePropertyKey, storageManager);
 				}
 			}

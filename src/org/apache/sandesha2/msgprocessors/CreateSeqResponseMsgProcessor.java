@@ -158,12 +158,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		// deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
 
-		// storing new out sequence id
 		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean internalSequenceBean = new SequencePropertyBean(newOutSequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, sequencePropertyKey);
-
-		sequencePropMgr.insert(internalSequenceBean);
 		
 		// Store the security token under the new sequence id
 		if(tokenData != null) {
@@ -371,7 +366,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processOutMessage");
 			log.debug("Exit: CreateSeqResponseMsgProcessor::processOutMessage " + Boolean.FALSE);

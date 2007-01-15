@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -59,9 +58,8 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		  terminateResRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ_RESPONSE);
 		
 		String sequenceId = tsResponse.getIdentifier().getIdentifier();
-		String internalSequenceID = SandeshaUtil.getSequenceProperty(sequenceId,
-				Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
-		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceID);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
+		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,rmsBean.getInternalSequenceID());
 		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(terminateResRMMsg);
 
 		// Check that the sender of this TerminateSequence holds the correct token
@@ -76,7 +74,6 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 
 		//shedulling a polling request for the response side.
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceId);
 		
 		if (rmsBean.getOfferedSequence()!=null) {
 			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
@@ -86,8 +83,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 				SandeshaUtil.shedulePollingRequest(rmsBean.getOfferedSequence(), configContext);
 		}
 
-		TerminateManager.terminateSendingSide (configContext, sequencePropertyKey,internalSequenceID, msgContext.isServerSide(),
-				storageManager);
+		TerminateManager.terminateSendingSide (rmsBean, msgContext.isServerSide(), storageManager);
 		
 		// Stop this message travelling further through the Axis runtime
 		terminateResRMMsg.pause();
@@ -96,7 +92,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		return true;
   }
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processOutMessage");
 		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processOutMessage " + Boolean.FALSE);
 		return false;

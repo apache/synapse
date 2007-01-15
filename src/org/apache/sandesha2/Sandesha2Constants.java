@@ -254,8 +254,6 @@ public interface Sandesha2Constants {
 											   // sequenceId to share data b/w
 											   // sequences
 
-		String INTERNAL_SEQUENCE_ID = "TempSequenceId";
-
 		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
 				
 		String SECURITY_TOKEN = "SecurityToken";

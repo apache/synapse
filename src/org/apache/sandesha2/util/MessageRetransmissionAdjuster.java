@@ -142,7 +142,7 @@ public class MessageRetransmissionAdjuster {
 
 		// Already an active transaction, so don't want a new one
 		SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configurationContext, false);
-		TerminateManager.timeOutSendingSideSequence(configurationContext,sequencePropertyKey ,internalSequenceID, false, storageManager);
+		TerminateManager.timeOutSendingSideSequence(sequencePropertyKey ,internalSequenceID, false, storageManager);
 
 		SandeshaListener listener = (SandeshaListener) messageContext
 				.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);

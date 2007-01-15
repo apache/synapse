@@ -147,26 +147,19 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				
 				String outgoingSideSequencePropertyKey = outgoingSideInternalSequenceId;
 
-				RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
-				rmsBeanMgr.insert(rMSBean);
-
 				// Setting sequence properties for the outgoing sequence.
 				// Only will be used by the server side response path. Will
 				// be wasted properties for the client side.
-
-				// setting the internal_sequence_id
-				SequencePropertyBean internalSequenceBean = new SequencePropertyBean();
-				internalSequenceBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-				internalSequenceBean.setSequencePropertyKey(offeredSequenceID);
-				internalSequenceBean.setValue(outgoingSideInternalSequenceId);
-				seqPropMgr.insert(internalSequenceBean);
 					
 				Endpoint endpoint = offer.getEndpoint();
 				if (endpoint!=null) {
 					// setting the OfferedEndpoint
 					rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
 				}
-					
+	
+				RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+				rmsBeanMgr.insert(rMSBean);
+
 				// Store the inbound token (if any) with the new sequence
 				if(token != null) {
 					String tokenData = secManager.getTokenRecoveryData(token);

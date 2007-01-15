@@ -296,12 +296,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
 						.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 				String sequenceID = terminateSequence.getIdentifier().getIdentifier();
-				ConfigurationContext configContext = msgCtx.getConfigurationContext();
 
-				String internalSequenceID = SandeshaUtil.getSequenceProperty(sequenceID,
-						Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID, storageManager);
-				String sequencePropertyKey = internalSequenceID; //property key of the sending side is the internal sequence Id.
-				TerminateManager.terminateSendingSide(configContext, sequencePropertyKey ,internalSequenceID, msgCtx.isServerSide(),
+				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
+				TerminateManager.terminateSendingSide(rmsBean, msgCtx.isServerSide(),
 						storageManager);
 			}
 

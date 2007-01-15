@@ -245,25 +245,23 @@ public class SandeshaClient {
 	public static SandeshaReport getSandeshaReport(ConfigurationContext configurationContext) throws SandeshaException {
 
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 		SandeshaReport sandeshaReport = new SandeshaReport();
-		SequencePropertyBean internalSequenceFindBean = new SequencePropertyBean();
 
 		Transaction reportTransaction = null;
 
 		try {
 			reportTransaction = storageManager.getTransaction();
 
-			internalSequenceFindBean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-			Collection collection = seqPropMgr.find(internalSequenceFindBean);
-			Iterator iterator = collection.iterator();
+			RMSBean findBean = new RMSBean();
+			List rmsBeans = storageManager.getRMSBeanMgr().find(findBean);
+			Iterator iterator = rmsBeans.iterator();
 			while (iterator.hasNext()) {
-				SequencePropertyBean bean = (SequencePropertyBean) iterator.next();
-				String sequenceID = bean.getSequencePropertyKey();
+				RMSBean bean = (RMSBean) iterator.next();
+				String sequenceID = bean.getSequenceID();
 				sandeshaReport.addToOutgoingSequenceList(sequenceID);
-				sandeshaReport.addToOutgoingInternalSequenceMap(sequenceID, bean.getValue());
+				sandeshaReport.addToOutgoingInternalSequenceMap(sequenceID, bean.getInternalSequenceID());
 
-				SequenceReport report = getOutgoingSequenceReport(bean.getValue(), configurationContext);
+				SequenceReport report = getOutgoingSequenceReport(bean.getInternalSequenceID(), configurationContext);
 
 				sandeshaReport.addToNoOfCompletedMessagesMap(sequenceID, report.getCompletedMessages().size());
 				sandeshaReport.addToSequenceStatusMap(sequenceID, report.getSequenceStatus());
@@ -407,19 +405,9 @@ public class SandeshaClient {
 			}
 	
 			if (terminatedSequence) {		
-				// We need to find out the original sequence id for this sequence by doing a backwards lookup
-				SequencePropertyBean bean = new SequencePropertyBean();
-				bean.setName(Sandesha2Constants.SequenceProperties.INTERNAL_SEQUENCE_ID);
-				bean.setValue(internalSequenceId);
-				bean = seqPropMgr.findUnique(bean);
-				
-				String sequenceId = null;
-				if (bean != null)
-				  sequenceId = bean.getSequencePropertyKey(); 
-				
 				// Find all properties which have a matching internal sequence id				
-				removeBeans(sequenceId, seqPropMgr);
-				removeBeans(internalSequenceId, seqPropMgr);
+				removeBeans(rmsBean.getSequenceID(), seqPropMgr);
+				removeBeans(rmsBean.getInternalSequenceID(), seqPropMgr);
 				// Delete the rmsBean
 				storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
 			}

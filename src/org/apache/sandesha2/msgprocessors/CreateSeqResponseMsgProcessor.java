@@ -41,11 +41,9 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
@@ -155,8 +153,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		// deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
-
-		SequencePropertyBeanMgr sequencePropMgr = storageManager.getSequencePropertyBeanMgr();
 				
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();
@@ -214,26 +210,6 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
 			
 			rmdBeanMgr.insert(rMDBean);
-			
-			// Add the offered sequence into the inbound sequences list
-			SequencePropertyBean incomingSequenceListBean = sequencePropMgr.retrieve(
-					Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-					Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-
-			if (incomingSequenceListBean == null) {
-				incomingSequenceListBean = new SequencePropertyBean();
-				incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
-				incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-				incomingSequenceListBean.setValue(null);
-
-				// this get inserted before
-				sequencePropMgr.insert(incomingSequenceListBean);
-			}
-
-			ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
-			incomingSequenceList.add(rmsBean.getOfferedSequence());
-			incomingSequenceListBean.setValue(incomingSequenceList.toString());
-			sequencePropMgr.update(incomingSequenceListBean);
 		}
 
 		SenderBean target = new SenderBean();

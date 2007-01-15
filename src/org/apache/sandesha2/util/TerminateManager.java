@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -141,8 +140,6 @@ public class TerminateManager {
 	 */
 	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-
-		removeReceivingSideProperties(configContext, sequencePropertyKey, sequenceId, storageManager);
 		
 		// removing nextMsgMgr entries
 		RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
@@ -155,25 +152,6 @@ public class TerminateManager {
 			 rMDBeanMgr.delete(rMDBean.getSequenceID());
 		}
 
-	}
-
-	private static void removeReceivingSideProperties(ConfigurationContext configContext, String sequencePropertyKey, 
-			String sequenceId, StorageManager storageManager) throws SandeshaException {
-		SequencePropertyBeanMgr sequencePropertyBeanMgr = storageManager.getSequencePropertyBeanMgr();
-		SequencePropertyBean allSequenceBean = sequencePropertyBeanMgr.retrieve(
-				Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-				Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-
-		if (allSequenceBean != null) {
-			log.debug("AllSequence bean is null");
-
-			ArrayList allSequenceList = SandeshaUtil.getArrayListFromString(allSequenceBean.getValue());
-			allSequenceList.remove(sequenceId);
-
-			// updating
-			allSequenceBean.setValue(allSequenceList.toString());
-			sequencePropertyBeanMgr.update(allSequenceBean);
-		}
 	}
 
 	/**

@@ -32,10 +32,8 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -240,27 +238,10 @@ public class Invoker extends SandeshaThread {
 				InvokerBeanMgr storageMapMgr = storageManager
 						.getInvokerBeanMgr();
 
-				SequencePropertyBeanMgr sequencePropMgr = storageManager
-						.getSequencePropertyBeanMgr();
-
 				transaction = storageManager.getTransaction();
-
-				// Getting the incomingSequenceIdList
-				SequencePropertyBean allSequencesBean = sequencePropMgr
-						.retrieve(
-								Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-								Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-
-				if (allSequencesBean == null) {
-					if (log.isDebugEnabled())
-						log.debug("AllSequencesBean not found");
-					sleep = true;
-					continue;
-				}
 				
 				// Pick a sequence using a round-robin approach
-				ArrayList allSequencesList = SandeshaUtil
-						.getArrayListFromString(allSequencesBean.getValue());
+				ArrayList allSequencesList = getSequences();
 				int size = allSequencesList.size();
 				log.debug("Choosing one from " + size + " sequences");
 				if(nextIndex >= size) {
@@ -282,11 +263,8 @@ public class Invoker extends SandeshaThread {
 					String message = "Next message not set correctly. Removing invalid entry.";
 					log.debug(message);
 	
-					allSequencesList.remove(nextIndex - 1);
-					
-					// cleaning the invalid data of the all sequences.
-					allSequencesBean.setValue(allSequencesList.toString());
-					sequencePropMgr.update(allSequencesBean);
+					stopThreadForSequence(sequenceId);
+					allSequencesList = getSequences();
 					if (allSequencesList.size() == 0)
 						sleep = true;
 					continue;

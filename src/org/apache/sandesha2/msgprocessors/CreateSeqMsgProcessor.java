@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.axiom.om.OMElement;
@@ -40,10 +39,8 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SequencePropertyBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SequencePropertyBean;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -97,7 +94,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		}
 
 		MessageContext outMessage = null;
-		SequencePropertyBeanMgr seqPropMgr = storageManager.getSequencePropertyBeanMgr();
 
 		// Create the new sequence id, as well as establishing the beans that handle the
 		// sequence state.
@@ -168,27 +164,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				createSeqResponse.addSOAPEnvelope();
 			}
 		}
-			
-			// Add this sequence to the list of inbound sequences
-		SequencePropertyBean incomingSequenceListBean = seqPropMgr.retrieve(
-				Sandesha2Constants.SequenceProperties.ALL_SEQUENCES,
-				Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-
-		if (incomingSequenceListBean == null) {
-			incomingSequenceListBean = new SequencePropertyBean();
-			incomingSequenceListBean.setSequencePropertyKey(Sandesha2Constants.SequenceProperties.ALL_SEQUENCES);
-			incomingSequenceListBean.setName(Sandesha2Constants.SequenceProperties.INCOMING_SEQUENCE_LIST);
-			incomingSequenceListBean.setValue(null);
-
-			// this get inserted before
-			seqPropMgr.insert(incomingSequenceListBean);
-		}
-
-		ArrayList incomingSequenceList = SandeshaUtil.getArrayListFromString(incomingSequenceListBean.getValue());
-		incomingSequenceList.add(rmdBean.getSequenceID());
-		incomingSequenceListBean.setValue(incomingSequenceList.toString());
-		seqPropMgr.update(incomingSequenceListBean);
-			
+						
 		//TODO add createSequenceResponse message as the referenceMessage to the RMDBean.
 
 		outMessage.setResponseWritten(true);
@@ -257,7 +233,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws SandeshaException {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processOutMessage");
 

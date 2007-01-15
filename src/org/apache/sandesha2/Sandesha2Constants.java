@@ -245,16 +245,6 @@ public interface Sandesha2Constants {
 		int MAX_MSG_PART_ID = 18;
 	}
 
-	public interface SequenceProperties {
-
-		String ALL_SEQUENCES = "AllSequences"; //this is not a sequence
-											   // property. This is used as the
-											   // sequenceId to share data b/w
-											   // sequences
-
-		String INCOMING_SEQUENCE_LIST = "IncomingSequenceList";
-	}
-
 	public interface SOAPVersion {
 		int v1_1 = 1;
 

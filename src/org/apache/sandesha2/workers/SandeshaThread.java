@@ -148,6 +148,10 @@ public abstract class SandeshaThread extends Thread{
 			super.start();
 		}		
 	}
+	
+	public synchronized ArrayList getSequences() {
+		return workingSequences;
+	}
 
 	protected synchronized boolean hasStoppedRunning() {
 		return hasStoppedRunning;

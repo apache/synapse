@@ -203,14 +203,14 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 
-			rmsBean.setLastActivatedTime(System.currentTimeMillis());
-			rmsBeanMgr.update(rmsBean);
-
 			// Store the security token for the offered sequence
 			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
 			
 			rmdBeanMgr.insert(rMDBean);
 		}
+		
+		rmsBean.setLastActivatedTime(System.currentTimeMillis());
+		rmsBeanMgr.update(rmsBean);
 
 		SenderBean target = new SenderBean();
 		target.setInternalSequenceID(internalSequenceId);

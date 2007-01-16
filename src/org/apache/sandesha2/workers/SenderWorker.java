@@ -410,14 +410,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			if (resenvelope != null) {
 				if (log.isDebugEnabled())
-				{
-					log.debug("RECEIVED " + resenvelope.getHeader());
-					if (requestMsgOpCtx != null) {
-					log.debug("A:" + requestMsgOpCtx.getOperationName());
-					log.debug("B:" + requestMsgOpCtx.getAxisOperation().getName());
-					log.debug("C:" + requestMsgOpCtx.getAxisOperation().getMessageReceiver());
-					}
-				}
+					log.debug("Response " + resenvelope.getHeader());
 				responseMessageContext.setEnvelope(resenvelope);
 				AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 

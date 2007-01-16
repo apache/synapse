@@ -88,7 +88,7 @@ public class RMSBeanMgrTest extends SandeshaTestCase {
         RMSBean target = new RMSBean();
         target.setInternalSequenceID("TmpSeqId1");
 
-        Iterator iter = mgr.find(target).iterator();
+        Iterator iter = mgr.find(target,true).iterator();
         RMSBean tmp = (RMSBean) iter.next();
         if (tmp.getCreateSeqMsgID().equals("CreateSeqMsgId1")) {
             tmp = (RMSBean) iter.next();

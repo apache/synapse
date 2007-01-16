@@ -46,11 +46,11 @@ public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 		return super.insert(bean.getSequenceID(), bean);
 	}
 
-	public List find(RMDBean bean) throws SandeshaStorageException {
-		return super.find(bean);
+	public List find(RMDBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
+		return super.find(bean, ignoreBooleans);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate) {
+	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
 		RMDBean bean = (RMDBean) matchInfo;
 		RMDBean temp = (RMDBean) candidate;
 
@@ -73,10 +73,10 @@ public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 	}
 
 	public Collection retrieveAll() throws SandeshaStorageException {
-		return super.find(null);
+		return super.find(null, false);
 	}
 	
-	public RMDBean findUnique(RMDBean bean) throws SandeshaException {
-		return (RMDBean) super.findUnique(bean);
+	public RMDBean findUnique(RMDBean bean, boolean ignoreBooleans) throws SandeshaException {
+		return (RMDBean) super.findUnique(bean, ignoreBooleans);
 	}
 }

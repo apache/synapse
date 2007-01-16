@@ -84,7 +84,7 @@ public class Invoker extends SandeshaThread {
 				long firstMessageInOutOfOrderWindow = rMDBean.getNextMsgNoToProcess();
 			
 				Iterator stMapIt = 
-					storageMapMgr.find(new InvokerBean(null, 0, sequenceID)).iterator();
+					storageMapMgr.find(new InvokerBean(null, 0, sequenceID), true).iterator();
 				
 				long highestMsgNumberInvoked = 0;
 				Transaction transaction = null;
@@ -183,8 +183,8 @@ public class Invoker extends SandeshaThread {
 			Iterator invokerBeansIterator = 
 				storageManager.getInvokerBeanMgr().find(
 						new InvokerBean(null, 
-														0,  //finds all invoker beans
-														sequenceID)).iterator();
+										0,  //finds all invoker beans
+										sequenceID), true).iterator();
 			
 			while(invokerBeansIterator.hasNext()){
 				InvokerBean invokerBean = (InvokerBean)invokerBeansIterator.next();
@@ -283,7 +283,7 @@ public class Invoker extends SandeshaThread {
 				}
 
 				List invokerBeans = storageMapMgr.find(
-						new InvokerBean(null, nextMsgno, sequenceId));
+						new InvokerBean(null, nextMsgno, sequenceId), true);
 				
 				// If there aren't any beans to process then move on to the next sequence
 				if (invokerBeans.size() == 0) {

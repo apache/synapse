@@ -80,7 +80,7 @@ abstract class InMemoryBeanMgr {
 		return true;
 	}
 
-	protected List find(RMBean matchInfo) throws SandeshaStorageException {
+	protected List find(RMBean matchInfo,boolean ignoreBooleans) throws SandeshaStorageException {
 		ArrayList beans = new ArrayList();
 		synchronized (table) {
 			if(matchInfo == null) {
@@ -89,7 +89,7 @@ abstract class InMemoryBeanMgr {
 				Iterator i = table.values().iterator();
 				while(i.hasNext()) {
 					RMBean candidate = (RMBean)i.next();
-					if(match(matchInfo, candidate)) {
+					if(match(matchInfo, candidate,ignoreBooleans)) {
 						beans.add(candidate);
 					}
 				}
@@ -114,13 +114,13 @@ abstract class InMemoryBeanMgr {
 		return beans;
 	}
 
-	protected RMBean findUnique (RMBean matchInfo) throws SandeshaException {
+	protected RMBean findUnique (RMBean matchInfo, boolean ignoreBooleans) throws SandeshaException {
 		RMBean result = null;
 		synchronized (table) {
 			Iterator i = table.values().iterator();
 			while(i.hasNext()) {
 				RMBean candidate = (RMBean)i.next();
-				if(match(matchInfo, candidate)) {
+				if(match(matchInfo, candidate,ignoreBooleans)) {
 					if(result == null) {
 						result = candidate;
 					} else {
@@ -145,5 +145,5 @@ abstract class InMemoryBeanMgr {
 		return result;
 	}
 
-	protected abstract boolean match(RMBean matchInfo, RMBean bean);
+	protected abstract boolean match(RMBean matchInfo, RMBean bean, boolean ignoreBooleans);
 }

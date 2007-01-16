@@ -215,7 +215,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setSequenceID(sequenceId);
-		Collection arr = createSeqMgr.find(createSeqFindBean);
+		Collection arr = createSeqMgr.find(createSeqFindBean,true);
 
 		if (arr.size() > 0) {
 			if (log.isDebugEnabled())

@@ -341,7 +341,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (rmsBean == null) {
 			RMSBean findBean = new RMSBean();
 			findBean.setInternalSequenceID(internalSequenceId);
-			rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
+			rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean,true);
 		}
 		
 		// the message number that was last used.

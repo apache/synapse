@@ -202,7 +202,7 @@ public class FaultManager {
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setSequenceID(sequenceID);
 
-		Collection coll = createSeqMgr.find(createSeqFindBean);
+		Collection coll = createSeqMgr.find(createSeqFindBean, true);
 		if (!coll.isEmpty()) {
 			validSequence = true;
 

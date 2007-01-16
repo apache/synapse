@@ -139,13 +139,13 @@ public class RMAssertionBuilder implements AssertionBuilder {
                 	OMElement enabledElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_ENABLED);
                 	if (enabledElem!=null) {
                 		String data = enabledElem.getText().trim();
-                		propertyBean.setEnableMakeConnection(Boolean.parseBoolean(data));
+                		propertyBean.setEnableMakeConnection(Boolean.valueOf(data).booleanValue());
                 	}
                 	
                 	OMElement useRMAnonElem = element.getFirstChildWithName(Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI);
                 	if (useRMAnonElem!=null) {
                 		String data = useRMAnonElem.getText().trim();
-                		propertyBean.setEnableRMAnonURI(Boolean.parseBoolean(data));
+                		propertyBean.setEnableRMAnonURI(Boolean.valueOf(data).booleanValue());
                 	}
                 }
             }

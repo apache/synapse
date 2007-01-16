@@ -49,11 +49,11 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 		return super.update(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public List find(RMSBean bean) throws SandeshaStorageException {
-		return super.find(bean);
+	public List find(RMSBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
+		return super.find(bean, ignoreBooleans);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate) {
+	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
 		boolean equal = true;
 		
 		RMSBean bean = (RMSBean) matchInfo;
@@ -72,12 +72,30 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 				&& !bean.getInternalSequenceID().equals(
 						temp.getInternalSequenceID()))
 			equal = false;
+		
+		if (!ignoreBooleans && !bean.isClosed()!=temp.isClosed())
+			equal = false;
 
+		if (!ignoreBooleans && !bean.isPollingMode()!=temp.isPollingMode())
+			equal = false;
+		
+		if (!ignoreBooleans && !bean.isSequenceClosedClient()!=temp.isSequenceClosedClient())
+			equal = false;
+		
+		if (!ignoreBooleans && !bean.isTerminateAdded()!=temp.isTerminateAdded())
+			equal = false;
+
+		if (!ignoreBooleans && !bean.isTerminated()!=temp.isTerminated())
+			equal = false;
+
+		if (!ignoreBooleans && !bean.isTimedOut()!=temp.isTimedOut())
+			equal = false;		
+		
 		return equal;
 	}
 
-	public RMSBean findUnique (RMSBean bean) throws SandeshaException {
-		return (RMSBean) super.findUnique(bean);
+	public RMSBean findUnique (RMSBean bean, boolean ignoreBooleans) throws SandeshaException {
+		return (RMSBean) super.findUnique(bean, ignoreBooleans);
 	}
 
 }

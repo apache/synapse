@@ -60,10 +60,10 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 	public List find(String internalSequenceID) throws SandeshaStorageException {
 		SenderBean temp = new SenderBean();
 		temp.setInternalSequenceID(internalSequenceID);
-		return super.find(temp);
+		return super.find(temp,false);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate) {
+	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemorySenderBeanMgr::match");
 		SenderBean bean = (SenderBean)matchInfo;
 		SenderBean temp = (SenderBean) candidate;
@@ -108,7 +108,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 			add = false;
 		}
 
-		if (bean.isSend() != temp.isSend()) {
+		if (!ignoreBooleans && bean.isSend() != temp.isSend()) {
 			log.debug("isSend didn't match");
 			add = false;
 		}
@@ -131,8 +131,8 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return add;
 	}
 
-	public List find(SenderBean bean) throws SandeshaStorageException {
-		return super.find(bean);
+	public List find(SenderBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
+		return super.find(bean, ignoreBooleans);
 	}
 
 	public SenderBean getNextMsgToSend() throws SandeshaStorageException {
@@ -141,7 +141,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		matcher.setSend(true);
 		matcher.setTimeToSend(System.currentTimeMillis());
 		
-		List matches = super.find(matcher);
+		List matches = super.find(matcher, false);
 		
 		// We either return an application message or an RM message. If we find
 		// an application message first then we carry on through the list to be
@@ -151,6 +151,9 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		Iterator i = matches.iterator();
 		while(i.hasNext()) {
 			SenderBean bean = (SenderBean) i.next();
+			if (bean.getTimeToSend()<0)
+				continue; //Beans with negative timeToSend values are not considered as candidates for sending.
+			
 			if(bean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				long number = bean.getMessageNumber();
 				if(result == null || result.getMessageNumber() > number) {
@@ -171,8 +174,8 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return result;
 	}
 	
-	public SenderBean findUnique(SenderBean bean) throws SandeshaException {
-		return (SenderBean) super.findUnique(bean);
+	public SenderBean findUnique(SenderBean bean, boolean ignoreBooleans) throws SandeshaException {
+		return (SenderBean) super.findUnique(bean, ignoreBooleans);
 	}
 
 	public SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {

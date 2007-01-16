@@ -34,11 +34,11 @@ public interface SenderBeanMgr extends RMBeanManager {
 
 	public boolean insert(SenderBean bean) throws SandeshaStorageException;
 
-	public List find(SenderBean bean) throws SandeshaStorageException;
+	public List find(SenderBean bean, boolean ignoreBooleans) throws SandeshaStorageException;
 
 	public List find(String internalSequenceID) throws SandeshaStorageException;
 	
-	public SenderBean findUnique (SenderBean bean) throws SandeshaException;
+	public SenderBean findUnique (SenderBean bean, boolean ignoreBooleans) throws SandeshaException;
 	
 	public SenderBean getNextMsgToSend() throws SandeshaStorageException;
 

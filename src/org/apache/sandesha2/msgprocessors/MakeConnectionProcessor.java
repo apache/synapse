@@ -68,7 +68,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//finding the beans that go with the criteria of the passed SenderBean
 		//The reSend flag is ignored for this selection, so there is no need to
 		//set it.
-		Collection collection = senderBeanMgr.find(findSenderBean);
+		Collection collection = senderBeanMgr.find(findSenderBean, false);
 		
 		//selecting a bean to send RANDOMLY. TODO- Should use a better mechanism.
 		int size = collection.size();

@@ -47,11 +47,11 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		return (InvokerBean) super.retrieve(key);
 	}
 
-	public List find(InvokerBean bean) throws SandeshaStorageException {
-		return super.find(bean);
+	public List find(InvokerBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
+		return super.find(bean, ignoreBooleans);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate) {
+	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
 		InvokerBean bean = (InvokerBean) matchInfo;
 		InvokerBean temp = (InvokerBean) candidate;
 
@@ -67,7 +67,7 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 				&& !bean.getSequenceID().equals(temp.getSequenceID()))
 			select = false;
 		
-		if (bean.isInvoked()!=temp.isInvoked())
+		if (!ignoreBooleans && bean.isInvoked()!=temp.isInvoked())
 			select = false;
 		
 		return select;
@@ -79,8 +79,8 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		return result;
 	}
 	
-	public InvokerBean findUnique(InvokerBean bean) throws SandeshaException {
-		return (InvokerBean) super.findUnique(bean);
+	public InvokerBean findUnique(InvokerBean bean, boolean ignoreBooleans) throws SandeshaException {
+		return (InvokerBean) super.findUnique(bean, ignoreBooleans);
 	}
 
 }

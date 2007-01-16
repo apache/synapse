@@ -139,6 +139,11 @@ public class Axis2FlexibleMEPClient {
             serviceCtx, clientOptions);
         mepClient.addMessageContext(axisOutMsgCtx);
 
+        // always set a callback as we decide if the send it blocking or non blocking within
+        // the MEP client. This does not cause an overhead, as we simply create a 'holder'
+        // object with a reference to the outgoing synapse message context synapseOutMessageContext
+        mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
+        
         if (clientOptions.isUseSeparateListener()) {
             mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
             axisOutMsgCtx.getOperationContext().setProperty(

@@ -274,7 +274,19 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 				// that soapAction+wsa:Action on response don't conflict
 				options.setAction("");
 			} else {
-				if (block) {
+                // transports are expected to be blocking by default, hence check if
+                // the outgoing transport explicitly states that its non-blocking
+                // need to update the Axis2 transports with a better method to indicate
+                // if they are non-blocking.
+                Parameter nonBlocking = transportOut.getParameter("non-blocking");
+                if (nonBlocking != null && "true".equals(nonBlocking.getValue())) {
+                    block = false;
+                    // ie override the option passed in
+                }
+
+                if (block) {
+                    this.setCallback(null);
+
 					// Send the SOAP Message and receive a response
 					MessageContext response = send(mc);
 					// check for a fault and return the result
@@ -292,6 +304,9 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 					}
 					completed = true;
 				} else {
+                    SynapseCallbackReceiver callbackReceiver = (SynapseCallbackReceiver) axisOp
+						.getMessageReceiver();
+				    callbackReceiver.addCallback(mc.getMessageID(), callback);
 					sc.getConfigurationContext().getThreadPool().execute(
 							new NonBlockingInvocationWorker(callback, mc));
 				}

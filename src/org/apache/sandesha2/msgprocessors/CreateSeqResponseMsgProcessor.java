@@ -190,7 +190,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
 				String replyToAddress = rmsBean.getReplyToEPR();
 				EndpointReference ref = new EndpointReference(replyToAddress);
-				if(!rmsBean.isPollingMode() && (replyToAddress == null || ref.hasAnonymousAddress())) {
+				if(rmsBean.isPollingMode() && (replyToAddress == null || ref.hasAnonymousAddress())) {
 					rMDBean.setPollingMode(true);
 					SandeshaUtil.startPollingManager(configCtx);
 				}

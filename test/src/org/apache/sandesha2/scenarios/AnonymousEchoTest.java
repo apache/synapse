@@ -51,15 +51,15 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		startServer(repoPath, axis2_xml);
 	}
 	
-//	public void testSyncEchoWithOffer() throws Exception {
-//
-//		Options clientOptions = new Options ();
-//		String offeredSequenceID = SandeshaUtil.getUUID();
-//		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
-//		
-//		runSyncEchoTest(clientOptions);
-//		
-//	}
+	public void testSyncEchoWithOffer() throws Exception {
+
+		Options clientOptions = new Options ();
+		String offeredSequenceID = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+		
+		runSyncEchoTest(clientOptions);
+		
+	}
 	
 	public void testSyncEchoWithRMAnon() throws Exception {
 
@@ -69,7 +69,7 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 	}
 
 	public void runSyncEchoTest(Options clientOptions) throws Exception {
-		String to = "http://127.0.0.1:" + 8070 + "/axis2/services/RMSampleService";
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
 		String axis2_xml = repoPath + File.separator + "client_axis2.xml";

@@ -43,15 +43,15 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 	private ConfigurationContext configurationContext = null;
 	private SenderBean senderBean = null;
-	private TransportOutDescription transportOut = null;
+	private RMMsgContext messageToSend = null;
 	
 	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean) {
 		this.configurationContext = configurationContext;
 		this.senderBean = senderBean;
 	}
 	
-	public void setTransportOut (TransportOutDescription transportOut) {
-		this.transportOut = transportOut;
+	public void setMessage(RMMsgContext msg) {
+		this.messageToSend = msg;
 	}
 	
 	public void run () {
@@ -68,14 +68,21 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			transaction = storageManager.getTransaction();
 
 			String key = senderBean.getMessageContextRefKey();
-			MessageContext msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
+			MessageContext msgCtx = null;
+			RMMsgContext   rmMsgCtx = null;
+			if(messageToSend != null) {
+				msgCtx = messageToSend.getMessageContext();
+				rmMsgCtx = messageToSend;
+			} else {
+				msgCtx = storageManager.retrieveMessageContext(key, configurationContext);
       
-			if (msgCtx == null) {
-				// This sender bean has already been processed
-				return;
+				if (msgCtx == null) {
+					// This sender bean has already been processed
+					return;
+				}
+      
+				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 			}
-      
-			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
 			boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(rmMsgCtx, senderBean, configurationContext,
 					storageManager);
@@ -152,13 +159,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 			// sending the message
-			
-			//if a different TransportOutDesc hs already been set, it will be used instead
-			//of the one from te MessageContext.
-			
-			if (transportOut!=null)
-				msgCtx.setTransportOut(transportOut);
-
 			boolean successfullySent = false;
 
 			// have to commit the transaction before sending. This may

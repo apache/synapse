@@ -118,16 +118,13 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		context.addMessageContext(returnMessage);
 		returnMessage.setOperationContext(context);
 		
-		// Store the response again
-		storageManager.updateMessageContext(messageStorageKey, returnMessage);
-		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//	1. A message being sent by the Sender thread.
 		//  2. A message being sent as a reply to an MakeConnection.
-		SenderWorker worker = new SenderWorker (configurationContext,senderBean);
-		worker.setTransportOut(rmMsgCtx.getMessageContext().getTransportOut());
-		
+		SenderWorker worker = new SenderWorker (configurationContext, senderBean);
+		worker.setMessage(returnRMMsg);
+
 		worker.run();
 		return false;
 	}
@@ -148,5 +145,6 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	private void setTransportProperties (MessageContext returnMessage, RMMsgContext makeConnectionMessage) {
         returnMessage.setProperty(MessageContext.TRANSPORT_OUT,makeConnectionMessage.getProperty(MessageContext.TRANSPORT_OUT));
         returnMessage.setProperty(Constants.OUT_TRANSPORT_INFO,makeConnectionMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
+        returnMessage.setTransportOut(makeConnectionMessage.getMessageContext().getTransportOut());
 	}
 }

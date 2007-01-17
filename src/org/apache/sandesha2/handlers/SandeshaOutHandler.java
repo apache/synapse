@@ -22,13 +22,11 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
@@ -72,24 +70,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 
 		//see if this message is unreliable i.e. WSRM not requried
-		//look at the msg ctx first
-		{
-			String unreliable = (String) msgCtx.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
-			if (null != unreliable && "true".equals(unreliable)) {
-				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message " + returnValue);
-				return returnValue;
-			}			
+		if(SandeshaUtil.isMessageUnreliable(msgCtx)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message " + returnValue);
+			return returnValue;
 		}
-		//look at the operation ctx
-		{
-			Parameter unreliable = msgCtx.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
-			if (null != unreliable && "true".equals(unreliable.getValue())) {
-				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaOutHandler::invoke, Skipping sandesha processing for unreliable message " + returnValue);
-				return returnValue;
-			}				
-		}
+
 		// Also do not apply RM to fault messages
 		{
 			if(msgCtx.isProcessingFault()) {

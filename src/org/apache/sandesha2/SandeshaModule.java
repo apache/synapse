@@ -32,7 +32,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.RMPolicyExtension;
@@ -119,10 +118,12 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		configContext.getAxisConfiguration().addTargetResolver(
 				new TargetResolver() {
 					public void resolveTarget(MessageContext messageContext) {
-						String unreliable = (String) messageContext.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
-						if("true".equals(unreliable)) {
+						if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::resolveTarget");
+						if(SandeshaUtil.isMessageUnreliable(messageContext)) {
+							if(log.isDebugEnabled()) log.debug("Unsetting USE_ASYNC_OPERATIONS for unreliable message");
 							messageContext.setProperty(Constants.Configuration.USE_ASYNC_OPERATIONS, Boolean.FALSE);
 						}
+						if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::resolveTarget");
 					}
 				}
 		);

@@ -65,6 +65,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
@@ -1190,4 +1191,28 @@ public class SandeshaUtil {
 		
 		return newEPR;
 	}	
+	
+	public static boolean isMessageUnreliable(MessageContext mc) {
+		if(log.isDebugEnabled()) log.debug("Entry: SandeshaUtil::isMessageUnreliable");
+		boolean result = false;
+
+		//look at the msg ctx first
+		String unreliable = (String) mc.getProperty(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+		if ("true".equals(unreliable)) {
+			if (log.isDebugEnabled()) log.debug("Unreliable message context");
+			result = true;
+		}			
+		
+		if(!result) {
+			//look at the operation
+			Parameter unreliableParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
+				if (log.isDebugEnabled()) log.debug("Unreliable operation");
+				result = true;
+			}
+		}
+		
+		if(log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::isMessageUnreliable, " + result);
+		return result;
+	}
 }

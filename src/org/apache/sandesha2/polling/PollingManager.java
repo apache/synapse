@@ -17,9 +17,7 @@
 
 package org.apache.sandesha2.polling;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.axis2.AxisFault;
@@ -104,9 +102,7 @@ public class PollingManager extends Thread {
 		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
 		RMSBean findRMS = new RMSBean();
 		findRMS.setPollingMode(true);
-		List list = rmsBeanManager.find(findRMS, true);
-		
-		List results = getListWithPollingMode (list);
+		List results = rmsBeanManager.find(findRMS);
 		
 		int size = results.size();
 		log.debug("Choosing one from " + size + " RMS sequences");
@@ -132,10 +128,9 @@ public class PollingManager extends Thread {
 		String sequenceId = getNextSheduleEntry ();
 
 		RMDBean findBean = new RMDBean();
+		findBean.setPollingMode(true);
 		findBean.setSequenceID(sequenceId); // Note that this may be null
-		List list = nextMsgMgr.find(findBean, true);
-		
-		List results = getListWithPollingMode (list);
+		List results = nextMsgMgr.find(findBean);
 		
 		int size = results.size();
 		
@@ -291,17 +286,6 @@ public class PollingManager extends Thread {
 		}
 		
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::shedulePollingRequest");
-	}
-	
-	private List getListWithPollingMode (List list) {
-		List results = new ArrayList ();
-		for (Iterator it=list.iterator();it.hasNext();) {
-			RMSequenceBean bean = (RMSequenceBean) it.next();
-			if (bean.isPollingMode()) 
-				results.add(bean);
-		}
-		
-		return results;
 	}
 	
 }

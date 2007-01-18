@@ -138,7 +138,7 @@ public class AcknowledgementProcessor {
 		input.setReSend(true);
 		input.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 		input.setInternalSequenceID(sequencePropertyKey);
-		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input,false);
+		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
 
 		ArrayList ackedMessagesList = new ArrayList();
 		boolean removedSenderBean = false;

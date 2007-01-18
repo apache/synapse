@@ -26,7 +26,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.RMBean;
 
 public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 
@@ -46,37 +45,19 @@ public class InMemoryRMDBeanMgr extends InMemoryBeanMgr implements RMDBeanMgr {
 		return super.insert(bean.getSequenceID(), bean);
 	}
 
-	public List find(RMDBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
-		return super.find(bean, ignoreBooleans);
+	public List find(RMDBean bean) throws SandeshaStorageException {
+		return super.find(bean);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
-		RMDBean bean = (RMDBean) matchInfo;
-		RMDBean temp = (RMDBean) candidate;
-
-		boolean equal = true;
-
-		if (bean.getNextMsgNoToProcess() > 0
-				&& bean.getNextMsgNoToProcess() != temp
-						.getNextMsgNoToProcess())
-			equal = false;
-
-		if (bean.getSequenceID() != null
-				&& !bean.getSequenceID().equals(temp.getSequenceID()))
-			equal = false;
-
-		return equal;
-	}
-
 	public boolean update(RMDBean bean) throws SandeshaStorageException {
 		return super.update(bean.getSequenceID(), bean);
 	}
 
 	public Collection retrieveAll() throws SandeshaStorageException {
-		return super.find(null, false);
+		return super.find(null);
 	}
 	
-	public RMDBean findUnique(RMDBean bean, boolean ignoreBooleans) throws SandeshaException {
-		return (RMDBean) super.findUnique(bean, ignoreBooleans);
+	public RMDBean findUnique(RMDBean bean) throws SandeshaException {
+		return (RMDBean) super.findUnique(bean);
 	}
 }

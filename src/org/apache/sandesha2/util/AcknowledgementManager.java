@@ -96,7 +96,7 @@ public class AcknowledgementManager {
 		findBean.setSend(true);
 		findBean.setToAddress(target.getAddress());
 
-		Collection collection = retransmitterBeanMgr.find(findBean, false);
+		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
 
 		while (it.hasNext()) {

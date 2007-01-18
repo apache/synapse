@@ -63,6 +63,24 @@ public class RMSBean extends RMSequenceBean {
 	private Exception lastSendError = null;
 	
 	/**
+	 * The highest out message relates to message id	 
+	 * Keeps track of the highest transmitted message
+	 */
+	private String highestOutRelatesTo = null;
+  
+	/** 
+	 * For out going sequences this gives the messages that were sent and that were successfully
+	 * acked by the other end point.
+	 */
+	private List clientCompletedMessages = null;
+  
+	private String transportTo;
+
+	private String offeredEndPoint = null;
+
+	private String offeredSequence = null;
+	
+	/**
 	 * This is the timestamp of when the last error occured when sending
 	 */
 	private long lastSendErrorTimestamp = -1;
@@ -79,48 +97,45 @@ public class RMSBean extends RMSequenceBean {
 	private long highestOutMessageNumber = 0;
 	
 	/**
-	 * The highest out message relates to message id	 
-	 * Keeps track of the highest transmitted message
+	 * The next sequence number to apply to the message
 	 */
-  private String highestOutRelatesTo = null;
+	private long nextMessageNumber = -1;
   
-  /**
-   * The next sequence number to apply to the message
-   */
-  private long nextMessageNumber = -1;
-  
-	/** 
-	 * For out going sequences this gives the messages that were sent and that were successfully
-	 * acked by the other end point.
+	/**
+	 * Indicates that a terminate sequence message was added.
 	 */
-  private List clientCompletedMessages = null;
+	private boolean terminateAdded = false;
   
-  /**
-   * Indicates that a terminate sequence message was added.
-   */
-  private boolean terminateAdded = false;
+	/**
+	 * Indicates that a sequence has timed out.
+	 */
+	private boolean timedOut = false;
   
-  /**
-   * Indicates that a sequence has timed out.
-   */
-  private boolean timedOut = false;
-  
-  /**
-   * Indicates the client has sent a close sequence
-   */
-  private boolean sequenceClosedClient = false;
+	/**
+	 * Indicates the client has sent a close sequence
+	 */
+	private boolean sequenceClosedClient = false;
 
-  /**
-   * The number of messages that were acked
-   */
-  private long numberOfMessagesAcked = 0;
+	/**
+	 * The number of messages that were acked
+	 */
+	private long numberOfMessagesAcked = 0;
 
-  private String transportTo;
-  
-  private String offeredEndPoint = null;
-  
-  private String offeredSequence = null;
-	
+	/**
+	 * Flags that are used to check if the primitive types on this bean
+	 * have been set. If a primitive type has not been set then it will
+	 * be ignored within the match method.
+	 */
+	private int rmsFlags = 0;
+	private static final int LAST_SEND_ERROR_TIME_FLAG = 0x00000001;
+	private static final int LAST_OUT_MSG_FLAG         = 0x00000010;
+	private static final int HIGHEST_OUT_MSG_FLAG      = 0x00000100;
+	private static final int NEXT_MSG_NUM_FLAG         = 0x00001000;
+	private static final int TERMINATE_ADDED_FLAG      = 0x00010000;
+	private static final int TIMED_OUT_FLAG            = 0x00100000;
+	private static final int SEQ_CLOSED_CLIENT_FLAG    = 0x01000000;
+	private static final int ACKED_MESSAGES_FLAG       = 0x10000000;
+
 	public RMSBean() {
 	}
 
@@ -171,6 +186,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setLastSendErrorTimestamp(long lastSendErrorTimestamp) {
   	this.lastSendErrorTimestamp = lastSendErrorTimestamp;
+  	this.rmsFlags |= LAST_SEND_ERROR_TIME_FLAG;
   }
 	
 	public long getLastOutMessage() {
@@ -179,6 +195,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setLastOutMessage(long lastOutMessage) {
   	this.lastOutMessage = lastOutMessage;
+  	this.rmsFlags |= LAST_OUT_MSG_FLAG;
   }
 
 	public long getHighestOutMessageNumber() {
@@ -187,6 +204,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setHighestOutMessageNumber(long highestOutMessageNumber) {
   	this.highestOutMessageNumber = highestOutMessageNumber;
+  	rmsFlags |= HIGHEST_OUT_MSG_FLAG;
   }
 
 	public String getHighestOutRelatesTo() {
@@ -203,6 +221,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setNextMessageNumber(long nextMessageNumber) {
   	this.nextMessageNumber = nextMessageNumber;
+  	rmsFlags |= NEXT_MSG_NUM_FLAG;
   }
 
 	public List getClientCompletedMessages() {
@@ -219,6 +238,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setTerminateAdded(boolean terminateAdded) {
   	this.terminateAdded = terminateAdded;
+  	this.rmsFlags |= TERMINATE_ADDED_FLAG;
   }
 
 	public boolean isTimedOut() {
@@ -227,6 +247,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setTimedOut(boolean timedOut) {
   	this.timedOut = timedOut;
+  	this.rmsFlags |= TIMED_OUT_FLAG;
   }
 
 	public boolean isSequenceClosedClient() {
@@ -235,6 +256,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setSequenceClosedClient(boolean sequenceClosedClient) {
   	this.sequenceClosedClient = sequenceClosedClient;
+  	this.rmsFlags |= SEQ_CLOSED_CLIENT_FLAG;
   }
 	
 	public long getNumberOfMessagesAcked() {
@@ -243,6 +265,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setNumberOfMessagesAcked(long numberOfMessagesAcked) {
   	this.numberOfMessagesAcked = numberOfMessagesAcked;
+  	this.rmsFlags |= ACKED_MESSAGES_FLAG;
   }
 	
 	public String getTransportTo() {
@@ -289,5 +312,71 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nOfferedEndPoint  : "); result.append(offeredEndPoint);
 		result.append("\nOfferedSequence  : "); result.append(offeredSequence);
 		return result.toString();
+	}
+	
+	public boolean match(RMBean matchInfo) {
+		RMSBean bean = (RMSBean) matchInfo;
+		boolean match = true;
+		
+		if(!super.match(matchInfo))
+			match = false;
+		
+		else if(bean.getInternalSequenceID() != null && !bean.getInternalSequenceID().equals(this.getInternalSequenceID()))
+			match = false;
+		
+		else if(bean.getCreateSeqMsgID() != null && !bean.getCreateSeqMsgID().equals(this.getCreateSeqMsgID()))
+			match = false;
+		
+		else if(bean.getCreateSequenceMsgStoreKey() != null && !bean.getCreateSequenceMsgStoreKey().equals(this.getCreateSequenceMsgStoreKey()))
+			match = false;
+		
+		else if(bean.getReferenceMessageStoreKey() != null && !bean.getReferenceMessageStoreKey().equals(this.getReferenceMessageStoreKey()))
+			match = false;
+
+// Avoid matching on the error information
+//		else if(bean.getLastSendError() != null && !bean.getLastSendError().equals(this.getLastSendError()))
+//			match = false;
+		
+		else if(bean.getHighestOutRelatesTo() != null && !bean.getHighestOutRelatesTo().equals(this.getHighestOutRelatesTo()))
+			match = false;
+		
+		else if(bean.getClientCompletedMessages() != null && !bean.getClientCompletedMessages().equals(this.getClientCompletedMessages()))
+			match = false;
+
+		else if(bean.getTransportTo() != null && !bean.getTransportTo().equals(this.getTransportTo()))
+			match = false;
+
+		else if(bean.getOfferedEndPoint() != null && !bean.getOfferedEndPoint().equals(this.getOfferedEndPoint()))
+			match = false;
+
+		else if(bean.getOfferedSequence() != null && !bean.getOfferedSequence().equals(this.getOfferedSequence()))
+			match = false;
+
+// Avoid matching on the error information
+//		else if((bean.rmsFlags & LAST_SEND_ERROR_TIME_FLAG) != 0 && bean.getLastSendErrorTimestamp() != this.getLastSendErrorTimestamp())
+//			match = false;
+		
+		else if((bean.rmsFlags & LAST_OUT_MSG_FLAG) != 0 && bean.getLastOutMessage() != this.getLastOutMessage())
+			match = false;
+		
+		else if((bean.rmsFlags & HIGHEST_OUT_MSG_FLAG) != 0 && bean.getHighestOutMessageNumber() != this.getHighestOutMessageNumber())
+			match = false;
+		
+		else if((bean.rmsFlags & NEXT_MSG_NUM_FLAG) != 0 && bean.getNextMessageNumber() != this.getNextMessageNumber())
+			match = false;
+		
+		else if((bean.rmsFlags & TERMINATE_ADDED_FLAG) != 0 && bean.isTerminateAdded() != this.isTerminateAdded())
+			match = false;
+		
+		else if((bean.rmsFlags & TIMED_OUT_FLAG) != 0 && bean.isTimedOut() != this.isTimedOut())
+			match = false;
+		
+		else if((bean.rmsFlags & SEQ_CLOSED_CLIENT_FLAG) != 0 && bean.isSequenceClosedClient() != this.isSequenceClosedClient())
+			match = false;
+		
+		else if((bean.rmsFlags & ACKED_MESSAGES_FLAG) != 0 && bean.getNumberOfMessagesAcked() != this.getNumberOfMessagesAcked())
+			match = false;
+		
+		return match;
 	}
 }

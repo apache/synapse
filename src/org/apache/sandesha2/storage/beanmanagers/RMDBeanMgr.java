@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.storage.beanmanagers;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.sandesha2.SandeshaException;
@@ -36,11 +35,10 @@ public interface RMDBeanMgr extends RMBeanManager {
 
 	public boolean insert(RMDBean bean) throws SandeshaStorageException;
 
-	public List find(RMDBean bean, boolean ignoreBooleans) throws SandeshaStorageException;
+	public List find(RMDBean bean) throws SandeshaStorageException;
 
 	public boolean update(RMDBean bean) throws SandeshaStorageException;
 	
-	public RMDBean findUnique (RMDBean bean, boolean ignoreBooleans) throws SandeshaException;
+	public RMDBean findUnique (RMDBean bean) throws SandeshaException;
 
-	public Collection retrieveAll() throws SandeshaStorageException;
 }

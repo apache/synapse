@@ -229,11 +229,9 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			// removing old acks.
 			SenderBean findBean = new SenderBean();
 			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-
-			// this will be set to true in the sandesha2TransportSender.
 			findBean.setSend(true);
 			findBean.setReSend(false);
-			Collection coll = retransmitterBeanMgr.find(findBean,false);
+			Collection coll = retransmitterBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 
 			if (it.hasNext()) {

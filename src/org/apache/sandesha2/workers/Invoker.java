@@ -83,8 +83,9 @@ public class Invoker extends SandeshaThread {
 				//that are missing) at the time the button is pressed.
 				long firstMessageInOutOfOrderWindow = rMDBean.getNextMsgNoToProcess();
 			
-				Iterator stMapIt = 
-					storageMapMgr.find(new InvokerBean(null, 0, sequenceID), true).iterator();
+				InvokerBean selector = new InvokerBean();
+				selector.setSequenceID(sequenceID);
+				Iterator stMapIt = storageMapMgr.find(selector).iterator();
 				
 				long highestMsgNumberInvoked = 0;
 				Transaction transaction = null;
@@ -180,11 +181,10 @@ public class Invoker extends SandeshaThread {
 			RangeString rangeString = new RangeString(sequenceRanges);
 			//we now have the set of ranges that can be delivered out of order.
 			//Look for any invokable message that lies in one of those ranges
+			InvokerBean selector = new InvokerBean();
+			selector.setSequenceID(sequenceID);
 			Iterator invokerBeansIterator = 
-				storageManager.getInvokerBeanMgr().find(
-						new InvokerBean(null, 
-										0,  //finds all invoker beans
-										sequenceID), true).iterator();
+				storageManager.getInvokerBeanMgr().find(selector).iterator();
 			
 			while(invokerBeansIterator.hasNext()){
 				InvokerBean invokerBean = (InvokerBean)invokerBeansIterator.next();
@@ -282,17 +282,19 @@ public class Invoker extends SandeshaThread {
 					throw new SandeshaException(message);
 				}
 
-				List invokerBeans = storageMapMgr.find(
-						new InvokerBean(null, nextMsgno, sequenceId), true);
+				InvokerBean selector = new InvokerBean();
+				selector.setSequenceID(sequenceId);
+				selector.setMsgNo(nextMsgno);
+				List invokerBeans = storageMapMgr.find(selector);
+				
+				//add any msgs that belong to out of order windows
+				addOutOfOrderInvokerBeansToList(sequenceId, 
+						storageManager, invokerBeans);
 				
 				// If there aren't any beans to process then move on to the next sequence
 				if (invokerBeans.size() == 0) {
 					continue;
 				}
-				
-				//add any msgs that belong to out of order windows
-				addOutOfOrderInvokerBeansToList(sequenceId, 
-						storageManager, invokerBeans);
 				
 				Iterator stMapIt = invokerBeans.iterator();
 

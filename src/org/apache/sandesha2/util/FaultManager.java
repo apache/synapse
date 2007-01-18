@@ -150,24 +150,20 @@ public class FaultManager {
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setSequenceID(sequenceID);
 
-		Collection coll = createSeqMgr.find(createSeqFindBean, true);
+		Collection coll = createSeqMgr.find(createSeqFindBean);
 		if (!coll.isEmpty()) {
 			validSequence = true;
 
 		} else {
 			// Look for an inbound sequence
 			RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
+			
+			RMDBean selector = new RMDBean();
+			selector.setSequenceID(sequenceID);
 
-			coll = mgr.retrieveAll();
-			Iterator it = coll.iterator();
-
-			while (it.hasNext()) {
-				RMDBean rMDBean = (RMDBean) it.next();
-				String tempId = rMDBean.getSequenceID();
-				if (tempId.equals(sequenceID)) {
-					validSequence = true;
-					break;
-				}
+			coll = mgr.find(selector);
+			if(!coll.isEmpty()) {
+				validSequence = true;
 			}
 		}
 

@@ -44,4 +44,11 @@ public abstract class RMBean implements Serializable {
 		public void setTransaction(Transaction transaction) {
 			this.transaction = transaction;
 		}
+		
+		/**
+		 * Check to see if this bean matches the match criteria passed in
+		 * as matchInfo. In order for a property of the bean to be checked
+		 * you must set the property on the matchInfo.
+		 */
+		public abstract boolean match(RMBean matchInfo);
 }

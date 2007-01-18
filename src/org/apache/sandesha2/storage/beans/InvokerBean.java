@@ -34,32 +34,41 @@ public class InvokerBean extends RMBean {
 	private String messageContextRefKey;
 
 	/**
-	 * Comment for <code>msgNo</code>
-	 * The message number of the message.
-	 */
-	private long msgNo;
-
-	/**
 	 * Comment for <code>sequenceID</code>
 	 * The sequence ID of the sequence the message belong to.
 	 */
 	private String sequenceID;
 	
 	/**
+	 * Comment for <code>msgNo</code>
+	 * The message number of the message.
+	 */
+	private long msgNo;
+
+	/**
 	 * Comment for <code>invoked</code>
 	 * Weather the message has been invoked by the invoker.
 	 */
 	private boolean invoked = false;
 	
-
+	/**
+	 * Flags that are used to check if the primitive types on this bean
+	 * have been set. If a primitive type has not been set then it will
+	 * be ignored within the match method.
+	 */
+	private int flags = 0;
+	private static final int MSG_NO_FLAG  = 0x00000001;
+	private static final int INVOKED_FLAG = 0x00000010;
+	
+	
 	public InvokerBean() {
 
 	}
 
 	public InvokerBean(String key, long msgNo, String sequenceId) {
-		this.messageContextRefKey = key;
-		this.msgNo = msgNo;
-		this.sequenceID = sequenceId;
+		this.setMessageContextRefKey(key);
+		this.setMsgNo(msgNo);
+		this.setSequenceID(sequenceId);
 	}
 
 	/**
@@ -90,6 +99,7 @@ public class InvokerBean extends RMBean {
 	 */
 	public void setMsgNo(long msgNo) {
 		this.msgNo = msgNo;
+		this.flags |= MSG_NO_FLAG;
 	}
 
 	/**
@@ -113,6 +123,7 @@ public class InvokerBean extends RMBean {
 	
 	public void setInvoked(boolean invoked) {
 		this.invoked = invoked;
+		this.flags |= INVOKED_FLAG;
 	}
 	
 	public String toString() {
@@ -124,4 +135,24 @@ public class InvokerBean extends RMBean {
 		result.append("\nMessage Key: "); result.append(messageContextRefKey);
 		return result.toString();
 	}
+	
+	public boolean match(RMBean matchInfo) {
+		InvokerBean bean = (InvokerBean) matchInfo;
+		boolean select = true;
+
+		if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(this.getMessageContextRefKey()))
+			select = false;
+
+		else if (bean.getSequenceID() != null && !bean.getSequenceID().equals(this.getSequenceID()))
+			select = false;
+
+		else if ((bean.flags & MSG_NO_FLAG) != 0 && bean.getMsgNo() != this.getMsgNo())
+			select = false;
+		
+		else if ((bean.flags & INVOKED_FLAG) != 0 && bean.isInvoked() != this.isInvoked())
+			select = false;
+		
+		return select;
+	}
+
 }

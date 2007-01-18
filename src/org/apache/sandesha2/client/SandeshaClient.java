@@ -124,7 +124,7 @@ public class SandeshaClient {
 			RMSBean createSeqFindBean = new RMSBean();
 			createSeqFindBean.setInternalSequenceID(internalSequenceID);
 
-			RMSBean rMSBean = createSeqMgr.findUnique(createSeqFindBean,true);
+			RMSBean rMSBean = createSeqMgr.findUnique(createSeqFindBean);
 
 			// if data not is available sequence has to be terminated or
 			// timedOut.
@@ -248,8 +248,7 @@ public class SandeshaClient {
 		try {
 			reportTransaction = storageManager.getTransaction();
 
-			RMSBean findBean = new RMSBean();
-			List rmsBeans = storageManager.getRMSBeanMgr().find(findBean,true);
+			List rmsBeans = storageManager.getRMSBeanMgr().find(null);
 			Iterator iterator = rmsBeans.iterator();
 			while (iterator.hasNext()) {
 				RMSBean bean = (RMSBean) iterator.next();
@@ -264,8 +263,7 @@ public class SandeshaClient {
 			}
 
 			// incoming sequences
-			RMDBean rmdBean = new RMDBean();
-			Collection rmdBeans = storageManager.getRMDBeanMgr().find(rmdBean, true);
+			Collection rmdBeans = storageManager.getRMDBeanMgr().find(null);
 
 			Iterator iter = rmdBeans.iterator();
 			while (iter.hasNext()) {

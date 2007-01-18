@@ -60,7 +60,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 	public List find(String internalSequenceID) throws SandeshaStorageException {
 		SenderBean temp = new SenderBean();
 		temp.setInternalSequenceID(internalSequenceID);
-		return super.find(temp,false);
+		return super.find(temp);
 	}
 	
 	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
@@ -131,8 +131,8 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return add;
 	}
 
-	public List find(SenderBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
-		return super.find(bean, ignoreBooleans);
+	public List find(SenderBean bean) throws SandeshaStorageException {
+		return super.find(bean);
 	}
 
 	public SenderBean getNextMsgToSend() throws SandeshaStorageException {
@@ -141,7 +141,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		matcher.setSend(true);
 		matcher.setTimeToSend(System.currentTimeMillis());
 		
-		List matches = super.find(matcher, false);
+		List matches = super.find(matcher);
 		
 		// We either return an application message or an RM message. If we find
 		// an application message first then we carry on through the list to be
@@ -174,8 +174,8 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return result;
 	}
 	
-	public SenderBean findUnique(SenderBean bean, boolean ignoreBooleans) throws SandeshaException {
-		return (SenderBean) super.findUnique(bean, ignoreBooleans);
+	public SenderBean findUnique(SenderBean bean) throws SandeshaException {
+		return (SenderBean) super.findUnique(bean);
 	}
 
 	public SenderBean retrieveFromMessageRefKey(String messageContextRefKey) {

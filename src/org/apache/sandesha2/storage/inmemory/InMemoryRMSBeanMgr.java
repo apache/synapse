@@ -25,7 +25,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.RMBean;
 
 public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 
@@ -49,53 +48,12 @@ public class InMemoryRMSBeanMgr extends InMemoryBeanMgr implements RMSBeanMgr {
 		return super.update(bean.getCreateSeqMsgID(), bean);
 	}
 
-	public List find(RMSBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
-		return super.find(bean, ignoreBooleans);
+	public List find(RMSBean bean) throws SandeshaStorageException {
+		return super.find(bean);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
-		boolean equal = true;
-		
-		RMSBean bean = (RMSBean) matchInfo;
-		RMSBean temp = (RMSBean) candidate;
-
-		if (bean.getCreateSeqMsgID() != null
-				&& !bean.getCreateSeqMsgID().equals(
-						temp.getCreateSeqMsgID()))
-			equal = false;
-
-		if (bean.getSequenceID() != null
-				&& !bean.getSequenceID().equals(temp.getSequenceID()))
-			equal = false;
-
-		if (bean.getInternalSequenceID() != null
-				&& !bean.getInternalSequenceID().equals(
-						temp.getInternalSequenceID()))
-			equal = false;
-		
-		if (!ignoreBooleans && !bean.isClosed()!=temp.isClosed())
-			equal = false;
-
-		if (!ignoreBooleans && !bean.isPollingMode()!=temp.isPollingMode())
-			equal = false;
-		
-		if (!ignoreBooleans && !bean.isSequenceClosedClient()!=temp.isSequenceClosedClient())
-			equal = false;
-		
-		if (!ignoreBooleans && !bean.isTerminateAdded()!=temp.isTerminateAdded())
-			equal = false;
-
-		if (!ignoreBooleans && !bean.isTerminated()!=temp.isTerminated())
-			equal = false;
-
-		if (!ignoreBooleans && !bean.isTimedOut()!=temp.isTimedOut())
-			equal = false;		
-		
-		return equal;
-	}
-
-	public RMSBean findUnique (RMSBean bean, boolean ignoreBooleans) throws SandeshaException {
-		return (RMSBean) super.findUnique(bean, ignoreBooleans);
+	public RMSBean findUnique (RMSBean bean) throws SandeshaException {
+		return (RMSBean) super.findUnique(bean);
 	}
 
 }

@@ -108,7 +108,7 @@ public class TerminateManager {
 		InvokerBean findStorageMapBean = new InvokerBean();
 		findStorageMapBean.setSequenceID(sequenceId);
 		findStorageMapBean.setInvoked(true);
-		Collection collection = storageMapBeanMgr.find(findStorageMapBean, false);
+		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			InvokerBean storageMapBean = (InvokerBean) iterator.next();
@@ -143,7 +143,7 @@ public class TerminateManager {
 		RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 		RMDBean findNextMsgBean = new RMDBean();
 		findNextMsgBean.setSequenceID(sequenceId);
-		Collection collection = rMDBeanMgr.find(findNextMsgBean, true);
+		Collection collection = rMDBeanMgr.find(findNextMsgBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			RMDBean rMDBean = (RMDBean) iterator.next();

@@ -37,25 +37,6 @@ public class RMSequenceBean extends RMBean {
 	
 	private String acksToEPR;
 	
-	private long lastActivatedTime;
- 
-  /**
-   * Indicates that a sequence is closed
-   */
-  private boolean closed = false;
-
-  /**
-   * Indicates that a sequence is terminated
-   */
-  private boolean terminated = false;  
-
-	/**
-	 * This tells weather this sequence is in the polling mode or not.
-	 * PollingManager will use this property decide the sequences that need
-	 * polling and will do MakeConnections on them.
-	 */
-	private boolean pollingMode=false;
-	
 	private String rMVersion;
 	
 	/**
@@ -64,12 +45,42 @@ public class RMSequenceBean extends RMBean {
 	 */
 	private String securityTokenData;
 
+	private long lastActivatedTime;
+ 
+	/**
+	 * Indicates that a sequence is closed
+	 */
+	private boolean closed = false;
+	
+	/**
+	 * Indicates that a sequence is terminated
+	 */
+	private boolean terminated = false;  
+
+	/**
+	 * This tells weather this sequence is in the polling mode or not.
+	 * PollingManager will use this property decide the sequences that need
+	 * polling and will do MakeConnections on them.
+	 */
+	private boolean pollingMode=false;
+	
+	/**
+	 * Flags that are used to check if the primitive types on this bean
+	 * have been set. If a primitive type has not been set then it will
+	 * be ignored within the match method.
+	 */
+	private int flags = 0;
+	private static final int LAST_ACTIVATED_TIME_FLAG    = 0x00000001;
+	private static final int CLOSED_FLAG                 = 0x00000010;
+	private static final int TERMINATED_FLAG             = 0x00000100;
+	private static final int POLLING_MODE_FLAG           = 0x00001000;
+
 	public RMSequenceBean() {
 
 	}
 
 	public RMSequenceBean(String sequenceID) {
-		this.sequenceID = sequenceID;
+		this.setSequenceID(sequenceID);
 	}
 
 	/**
@@ -117,6 +128,7 @@ public class RMSequenceBean extends RMBean {
 
 	public void setPollingMode(boolean pollingMode) {
 		this.pollingMode = pollingMode;
+		this.flags |= POLLING_MODE_FLAG;
 	}
 
 	public boolean isClosed() {
@@ -125,6 +137,7 @@ public class RMSequenceBean extends RMBean {
 
 	public void setClosed(boolean closed) {
   	this.closed = closed;
+  	this.flags |= CLOSED_FLAG;
   }
 
 	public boolean isTerminated() {
@@ -133,6 +146,7 @@ public class RMSequenceBean extends RMBean {
 
 	public void setTerminated(boolean terminated) {
   	this.terminated = terminated;
+  	this.flags |= TERMINATED_FLAG;
   }
 
 	public long getLastActivatedTime() {
@@ -141,6 +155,7 @@ public class RMSequenceBean extends RMBean {
 
 	public void setLastActivatedTime(long lastActivatedTime) {
   	this.lastActivatedTime = lastActivatedTime;
+  	this.flags |= LAST_ACTIVATED_TIME_FLAG;
   }
 
 	public String getRMVersion() {
@@ -172,5 +187,43 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nRMVersion        : "); result.append(rMVersion);	
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		return result.toString();
+	}
+	
+	public boolean match(RMBean matchInfo) {
+		RMSequenceBean bean = (RMSequenceBean) matchInfo;
+		boolean match = true;
+		
+		if(bean.getSequenceID() != null && !bean.getSequenceID().equals(this.getSequenceID()))
+			match = false;
+		
+		else if(bean.getToEPR() != null && !bean.getToEPR().equals(this.getToEPR()))
+			match = false;
+		
+		else if(bean.getReplyToEPR() != null && !bean.getReplyToEPR().equals(this.getReplyToEPR()))
+			match = false;
+		
+		else if(bean.getAcksToEPR() != null && !bean.getAcksToEPR().equals(this.getAcksToEPR()))
+			match = false;
+		
+		else if(bean.getRMVersion() != null && !bean.getRMVersion().equals(this.getRMVersion()))
+			match = false;
+		
+		else if(bean.getSecurityTokenData() != null && !bean.getSecurityTokenData().equals(this.getSecurityTokenData()))
+			match = false;
+
+// Avoid matching on the last active time
+//		else if((bean.flags & LAST_ACTIVATED_TIME_FLAG) != 0 && bean.getLastActivatedTime() != this.getLastActivatedTime())
+//			match = false;
+		
+		else if((bean.flags & CLOSED_FLAG) != 0 && bean.isClosed() != this.isClosed())
+			match = false;
+
+		else if((bean.flags & TERMINATED_FLAG) != 0 && bean.isTerminated() != this.isTerminated())
+			match = false;
+		
+		else if((bean.flags & POLLING_MODE_FLAG) != 0 && bean.isPollingMode() != this.isPollingMode())
+			match = false;
+		
+		return match;
 	}
 }

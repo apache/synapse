@@ -40,16 +40,29 @@ public class SenderBean extends RMBean {
 	private String messageContextRefKey;
 
 	/**
-	 * Comment for <code>send</code>
-	 * The sender will not send the message unless this property is true.
-	 */
-	private boolean send;
-
-	/**
 	 * Comment for <code>internalSequenceID</code>
 	 * Please see the comment of RMSBean.
 	 */
 	private String internalSequenceID;
+
+	/**
+	 * The sequenceID of the sequence this message belong to.
+	 * this may be null for some messages (e.g. create sequence);
+	 */
+	//TODO fill this property correctly
+	private String sequenceID;
+	
+	/**
+	 * Destination URL of the message to be sent. This can be used to decide weather the message cannot be sent,
+	 * before actyally reading the message from the storage.
+	 */
+	private String toAddress;
+	
+	/**
+	 * Comment for <code>send</code>
+	 * The sender will not send the message unless this property is true.
+	 */
+	private boolean send;
 
 	/**
 	 * Comment for <code>sentCount</code>
@@ -83,31 +96,30 @@ public class SenderBean extends RMBean {
 	private int messageType =0;
 	
 	/**
-	 * The sequenceID of the sequence this message belong to.
-	 * this may be null for some messages (e.g. create sequence);
+	 * Flags that are used to check if the primitive types on this bean
+	 * have been set. If a primitive type has not been set then it will
+	 * be ignored within the match method.
 	 */
-	//TODO fill this property correctly
-	private String sequenceID;
-	
-	/**
-	 * Destination URL of the message to be sent. This can be used to decide weather the message cannot be sent,
-	 * before actyally reading the message from the storage.
-	 */
-	private String toAddress;
-	
+	private int flags = 0;
+	private static final int SEND_FLAG         = 0x00000001;
+	private static final int SEND_COUNT_FLAG   = 0x00000010;
+	private static final int MSG_NUMBER_FLAG   = 0x00000100;
+	private static final int RESEND_FLAG       = 0x00001000;
+	private static final int TIME_TO_SEND_FLAG = 0x00010000;
+	private static final int MSG_TYPE_FLAG     = 0x00100000;
+
 	public SenderBean() {
 
 	}
 
 	public SenderBean(String messageID, String key,
 			boolean send,long timeToSend, String internalSequenceID, long messageNumber) {
-		this.messageID = messageID;
-		this.messageContextRefKey = key;
-		//this.LastSentTime = lastSentTime;
-		this.timeToSend = timeToSend;
-		this.send = send;
-		this.internalSequenceID = internalSequenceID;
-		this.messageNumber = messageNumber;
+		this.setMessageID(messageID);
+		this.setMessageContextRefKey(key);
+		this.setTimeToSend(timeToSend);
+		this.setSend(send);
+		this.setInternalSequenceID(internalSequenceID);
+		this.setMessageNumber(messageNumber);
 	}
 
 	public String getMessageContextRefKey() {
@@ -132,6 +144,7 @@ public class SenderBean extends RMBean {
 
 	public void setSend(boolean send) {
 		this.send = send;
+		this.flags |= SEND_FLAG;
 	}
 
 	public String getInternalSequenceID() {
@@ -148,6 +161,7 @@ public class SenderBean extends RMBean {
 
 	public void setSentCount(int sentCount) {
 		this.sentCount = sentCount;
+		this.flags |= SEND_COUNT_FLAG;
 	}
 
 	public long getMessageNumber() {
@@ -156,6 +170,7 @@ public class SenderBean extends RMBean {
 
 	public void setMessageNumber(long messageNumber) {
 		this.messageNumber = messageNumber;
+		this.flags |= MSG_NUMBER_FLAG;
 	}
 
 	public boolean isReSend() {
@@ -164,6 +179,7 @@ public class SenderBean extends RMBean {
 
 	public void setReSend(boolean reSend) {
 		this.reSend = reSend;
+		this.flags |= RESEND_FLAG;
 	}
 	
 	public long getTimeToSend() {
@@ -172,6 +188,7 @@ public class SenderBean extends RMBean {
 	
 	public void setTimeToSend(long timeToSend) {
 		this.timeToSend = timeToSend;
+		this.flags |= TIME_TO_SEND_FLAG;
 	}
 	
 	
@@ -181,6 +198,7 @@ public class SenderBean extends RMBean {
 	
 	public void setMessageType(int messagetype) {
 		this.messageType = messagetype;
+		this.flags |= MSG_TYPE_FLAG;
 	}
 
 	public String getSequenceID() {
@@ -213,5 +231,46 @@ public class SenderBean extends RMBean {
 		result.append("\nSent count     : "); result.append(sentCount);
 		result.append("\nTime to send   : "); result.append(timeToSend);
 		return result.toString();
+	}
+	
+	public boolean match(RMBean matchInfo) {
+		SenderBean bean = (SenderBean) matchInfo;
+		boolean match = true;
+		
+		if(bean.getMessageID() != null && !bean.getMessageID().equals(this.getMessageID()))
+			match = false;
+
+		else if(bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(this.getMessageContextRefKey()))
+			match = false;
+
+		else if(bean.getInternalSequenceID() != null && !bean.getInternalSequenceID().equals(this.getInternalSequenceID()))
+			match = false;
+
+		else if(bean.getSequenceID() != null && !bean.getSequenceID().equals(this.getSequenceID()))
+			match = false;
+
+		else if(bean.getToAddress() != null && !bean.getToAddress().equals(this.getToAddress()))
+			match = false;
+		
+		else if((bean.flags & SEND_FLAG) != 0 && bean.isSend() != this.isSend())
+			match = false;
+		
+		else if((bean.flags & SEND_COUNT_FLAG) != 0 && bean.getSentCount() != this.getSentCount())
+			match = false;
+		
+		else if((bean.flags & MSG_NUMBER_FLAG) != 0 && bean.getMessageNumber() != this.getMessageNumber())
+			match = false;
+		
+		else if((bean.flags & RESEND_FLAG) != 0 && bean.isReSend() != this.isReSend())
+			match = false;
+		
+		// Time is special - we don't match beans that should be sent after the time in the selector
+		else if((bean.flags & TIME_TO_SEND_FLAG) != 0 && bean.getTimeToSend() < this.getTimeToSend())
+			match = false;
+		
+		else if((bean.flags & MSG_TYPE_FLAG) != 0 && bean.getMessageType() != this.getMessageType())
+			match = false;
+		
+		return match;
 	}
 }

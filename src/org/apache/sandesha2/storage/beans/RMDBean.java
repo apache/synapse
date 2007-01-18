@@ -29,17 +29,9 @@ public class RMDBean extends RMSequenceBean {
 	private static final long serialVersionUID = -2976123838615087562L;
 
 	/**
-	 * Comment for <code>nextMsgNoToProcess</code>
-	 * The next message to be invoked of the representing sequence.
-	 */
-	private long nextMsgNoToProcess;
-		
-	/**
 	 * This will be used as a referenced 
 	 */
 	private String referenceMessageKey;
-	
-	private long highestInMessageNumber = 0;
 	
 	private String highestInMessageId;
 
@@ -63,13 +55,30 @@ public class RMDBean extends RMSequenceBean {
 	 */
 	private String outOfOrderRanges = null;
 
+	/**
+	 * Comment for <code>nextMsgNoToProcess</code>
+	 * The next message to be invoked of the representing sequence.
+	 */
+	private long nextMsgNoToProcess;
+		
+	private long highestInMessageNumber = 0;
+	
+	/**
+	 * Flags that are used to check if the primitive types on this bean
+	 * have been set. If a primitive type has not been set then it will
+	 * be ignored within the match method.
+	 */
+	private int rmdFlags = 0;
+	private static final int NEXT_MSG_NO_FLAG    = 0x00000001;
+	private static final int HIGHEST_IN_MSG_FLAG = 0x00000010;
+
 	public RMDBean() {
 
 	}
 
 	public RMDBean(String sequenceID, long nextNsgNo) {
 		super(sequenceID);
-		this.nextMsgNoToProcess = nextNsgNo;
+		this.setNextMsgNoToProcess(nextNsgNo);
 	}
 
 	/**
@@ -85,6 +94,7 @@ public class RMDBean extends RMSequenceBean {
 	 */
 	public void setNextMsgNoToProcess(long nextMsgNoToProcess) {
 		this.nextMsgNoToProcess = nextMsgNoToProcess;
+		this.rmdFlags |= NEXT_MSG_NO_FLAG;
 	}
 
 	public String getReferenceMessageKey() {
@@ -101,6 +111,7 @@ public class RMDBean extends RMSequenceBean {
 
 	public void setHighestInMessageId(String highestInMessageId) {
   	this.highestInMessageId = highestInMessageId;
+  	this.rmdFlags |= HIGHEST_IN_MSG_FLAG;
   }
 
 	public long getHighestInMessageNumber() {
@@ -147,4 +158,38 @@ public class RMDBean extends RMSequenceBean {
 		result.append("\nOutOfOrderRanges   :"); result.append(outOfOrderRanges);
 		return result.toString();
 	}
+
+	public boolean match(RMBean matchInfo) {
+		RMDBean bean = (RMDBean) matchInfo;
+
+		boolean equal = true;
+		
+		if(!super.match(matchInfo))
+			equal = false;
+
+		else if(bean.getReferenceMessageKey() != null && !bean.getReferenceMessageKey().equals(this.getReferenceMessageKey()))
+			equal = false;
+		
+		else if(bean.getHighestInMessageId() != null && !bean.getHighestInMessageId().equals(this.getHighestInMessageId()))
+			equal = false;
+		
+		else if(bean.getLastInMessageId() != null && !bean.getLastInMessageId().equals(this.getLastInMessageId()))
+			equal = false;
+		
+		else if(bean.getServerCompletedMessages() != null && !bean.getServerCompletedMessages().equals(this.getServerCompletedMessages()))
+			equal = false;
+		
+		else if(bean.getOutOfOrderRanges() != null && !bean.getOutOfOrderRanges().equals(this.getOutOfOrderRanges()))
+			equal = false;
+		
+		else if ((bean.rmdFlags & NEXT_MSG_NO_FLAG) != 0 && bean.getNextMsgNoToProcess() != this.getNextMsgNoToProcess())
+			equal = false;
+		
+		else if ((bean.rmdFlags & HIGHEST_IN_MSG_FLAG) != 0 && bean.getHighestInMessageNumber() != this.getHighestInMessageNumber())
+			equal = false;
+
+		return equal;
+	}
+
+
 }

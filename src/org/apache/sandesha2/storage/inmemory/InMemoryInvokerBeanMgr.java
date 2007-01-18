@@ -25,7 +25,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.storage.beans.RMBean;
 
 public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBeanMgr {
 
@@ -47,40 +46,18 @@ public class InMemoryInvokerBeanMgr extends InMemoryBeanMgr implements InvokerBe
 		return (InvokerBean) super.retrieve(key);
 	}
 
-	public List find(InvokerBean bean, boolean ignoreBooleans) throws SandeshaStorageException {
-		return super.find(bean, ignoreBooleans);
+	public List find(InvokerBean bean) throws SandeshaStorageException {
+		return super.find(bean);
 	}
 	
-	protected boolean match(RMBean matchInfo, RMBean candidate, boolean ignoreBooleans) {
-		InvokerBean bean = (InvokerBean) matchInfo;
-		InvokerBean temp = (InvokerBean) candidate;
-
-		boolean select = true;
-
-		if (bean.getMessageContextRefKey() != null && !bean.getMessageContextRefKey().equals(temp.getMessageContextRefKey()))
-			select = false;
-
-		if (bean.getMsgNo() != 0 && bean.getMsgNo() != temp.getMsgNo())
-			select = false;
-
-		if (bean.getSequenceID() != null
-				&& !bean.getSequenceID().equals(temp.getSequenceID()))
-			select = false;
-		
-		if (!ignoreBooleans && bean.isInvoked()!=temp.isInvoked())
-			select = false;
-		
-		return select;
-	}
-
 	public boolean update(InvokerBean bean) throws SandeshaStorageException {
 		boolean result = super.update(bean.getMessageContextRefKey(), bean);
 		mgr.getInMemoryTransaction().setReceivedMessages(true);
 		return result;
 	}
 	
-	public InvokerBean findUnique(InvokerBean bean, boolean ignoreBooleans) throws SandeshaException {
-		return (InvokerBean) super.findUnique(bean, ignoreBooleans);
+	public InvokerBean findUnique(InvokerBean bean) throws SandeshaException {
+		return (InvokerBean) super.findUnique(bean);
 	}
 
 }

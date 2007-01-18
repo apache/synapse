@@ -731,7 +731,7 @@ public class SandeshaUtil {
 		RMSBean bean = new RMSBean();
 		bean.setInternalSequenceID(internalSequenceID);
 		
-		bean = rmsBeanMgr.findUnique(bean, true);
+		bean = rmsBeanMgr.findUnique(bean);
 
 		return bean;
 	}
@@ -743,7 +743,7 @@ public class SandeshaUtil {
 		RMSBean bean = new RMSBean();
 		bean.setSequenceID(sequenceID);
 		
-		bean = rmsBeanMgr.findUnique(bean, true);
+		bean = rmsBeanMgr.findUnique(bean);
 
 		return bean;
 	}
@@ -755,7 +755,7 @@ public class SandeshaUtil {
 		RMDBean bean = new RMDBean();
 		bean.setSequenceID(sequenceID);
 		
-		bean = rmdBeanMgr.findUnique(bean, true);
+		bean = rmdBeanMgr.findUnique(bean);
 
 		return bean;
   }

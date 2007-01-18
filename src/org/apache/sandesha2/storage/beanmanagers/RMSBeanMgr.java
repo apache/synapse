@@ -38,8 +38,8 @@ public interface RMSBeanMgr extends RMBeanManager {
 
 	public boolean update(RMSBean bean) throws SandeshaStorageException;
 
-	public List find(RMSBean bean, boolean ignoreBooleans) throws SandeshaStorageException;
+	public List find(RMSBean bean) throws SandeshaStorageException;
 	
-	public RMSBean findUnique (RMSBean bean, boolean ignoreBooleans) throws SandeshaException;
+	public RMSBean findUnique (RMSBean bean) throws SandeshaException;
 
 }

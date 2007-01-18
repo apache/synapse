@@ -623,7 +623,7 @@ public class SandeshaClient {
 			if (status == SequenceReport.SEQUENCE_STATUS_TIMED_OUT)
 				done = true;
 
-			if (maxWaitingTime >= 0) {
+			if (!done && maxWaitingTime >= 0) {
 				long timeNow = System.currentTimeMillis();
 				if (timeNow > (startTime + maxWaitingTime))
 					done = true;

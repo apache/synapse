@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.storage.beans;
 
-import java.util.List;
+import org.apache.sandesha2.util.RangeString;
 
 /**
  * This bean is used at the receiving side (of both server and client)
@@ -43,17 +43,16 @@ public class RMDBean extends RMSequenceBean {
 	private String lastInMessageId;
 
 	/** 
-	 * For incoming sequences this gives the msg no's of the messages that were
-	 * received (may be an ack was sent - depending on the policy)
+	 * For incoming sequences this gives the msg ranges of the messages that
+	 * have been received (and also possibly an ack was sent, depending on the policy)
 	 */
-	private List serverCompletedMessages = null;
+	private RangeString serverCompletedMessages = null;
 	
 	/**
 	 * For IN_ORDER sequences, we can have finite ranges of messages that can be
-	 * delivered out of order. These are maintained as a String that is consistent
-	 * with the form described in  org.apache.sandesha2.util.RangeString
+	 * delivered out of order. These are maintained as a RangeString
 	 */
-	private String outOfOrderRanges = null;
+	private RangeString outOfOrderRanges = null;
 
 	/**
 	 * Comment for <code>nextMsgNoToProcess</code>
@@ -122,11 +121,11 @@ public class RMDBean extends RMSequenceBean {
   	this.highestInMessageNumber = highestInMessageNumber;
   }
 
-	public List getServerCompletedMessages() {
+	public RangeString getServerCompletedMessages() {
   	return serverCompletedMessages;
   }
 
-	public void setServerCompletedMessages(List serverCompletedMessages) {
+	public void setServerCompletedMessages(RangeString serverCompletedMessages) {
   	this.serverCompletedMessages = serverCompletedMessages;
   }
 
@@ -138,11 +137,11 @@ public class RMDBean extends RMSequenceBean {
   	this.lastInMessageId = lastInMessageId;
   }
 
-	public String getOutOfOrderRanges() {
+	public RangeString getOutOfOrderRanges() {
   	return outOfOrderRanges;
   }
 
-	public void setOutOfOrderRanges(String outOfOrderRanges) {
+	public void setOutOfOrderRanges(RangeString outOfOrderRanges) {
   	this.outOfOrderRanges = outOfOrderRanges;
   }
 	

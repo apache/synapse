@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -46,6 +45,8 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
@@ -140,26 +141,31 @@ public class AcknowledgementProcessor {
 		input.setInternalSequenceID(sequencePropertyKey);
 		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
 
-		ArrayList ackedMessagesList = new ArrayList();
-		boolean removedSenderBean = false;
+		RangeString ackedMessagesRanges = new RangeString(); //keep track of the ranges in the ack msgs
+		long numberOfNewMessagesAcked = 0;
+
 		while (ackRangeIterator.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator.next();
 			long lower = ackRange.getLowerValue();
 			long upper = ackRange.getUpperValue();
-			if(log.isDebugEnabled()) log.debug("Ack Range: " + lower + " - " + upper);
+			
+			if(log.isDebugEnabled()) 
+				log.debug("Ack Range: " + lower + " - " + upper);
 
+			//add this new range to the ongoing string
+			ackedMessagesRanges.addRange(new Range(lower, upper)); 
+			
 			for (long messageNo = lower; messageNo <= upper; messageNo++) {
 				SenderBean retransmitterBean = getRetransmitterEntry(retransmitterEntriesOfSequence, messageNo);
 				if (retransmitterBean != null) {
+					//this is a new ack range, not just the repeat of a previous one
 					retransmitterMgr.delete(retransmitterBean.getMessageID());
 
 					// removing the application message from the storage.
 					String storageKey = retransmitterBean.getMessageContextRefKey();
 					storageManager.removeMessageContext(storageKey);
-					removedSenderBean = true;
+					numberOfNewMessagesAcked++;
 				}
-
-				ackedMessagesList.add(new Long(messageNo));
 			}
 		}
 
@@ -187,11 +193,14 @@ public class AcknowledgementProcessor {
 		// setting acked message date.
 		// TODO add details specific to each message.
 		
-		// Set the completed message list, but only if we have actually removed a SenderBean
-		// It is possible for the ACK messages arrive out of sequence
-		if (removedSenderBean) {
-		  rmsBean.setClientCompletedMessages(ackedMessagesList);
-			long noOfMsgsAcked = ackedMessagesList.size();
+		// We overwrite the previous client completed message ranges with the
+		// latest view, but only if it is an update i.e. contained a new
+		// ack range (which is because we do not previous acks arriving late 
+		// to break us)
+		if (numberOfNewMessagesAcked>0) {
+		  rmsBean.setClientCompletedMessages(ackedMessagesRanges);
+			long noOfMsgsAcked = 
+				rmsBean.getNumberOfMessagesAcked() + numberOfNewMessagesAcked;
 			rmsBean.setNumberOfMessagesAcked(noOfMsgsAcked);
 		}
 		

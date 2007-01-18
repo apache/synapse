@@ -20,6 +20,8 @@ package org.apache.sandesha2;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 
@@ -59,16 +61,17 @@ public class SandeshaUtilTest extends TestCase {
 		
 	}
 	
-	public void testGetAckRangeArrayList () throws SandeshaException {
-		ArrayList msgNumberArr = new ArrayList();
-		msgNumberArr.add(new Long(3));
-		msgNumberArr.add(new Long(6));
-		msgNumberArr.add(new Long(1));
-		msgNumberArr.add(new Long(5));
-		msgNumberArr.add(new Long(8));
-		msgNumberArr.add(new Long(2));	
+	public void testGetAckRangesFromRangeStringOutOfOrder()throws SandeshaException{
 		
-		ArrayList list = SandeshaUtil.getAckRangeArrayList(msgNumberArr,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		RangeString rangeString = new RangeString();
+		rangeString.addRange(new Range(3));
+		rangeString.addRange(new Range(6));
+		rangeString.addRange(new Range(1));
+		rangeString.addRange(new Range(5));
+		rangeString.addRange(new Range(8));
+		rangeString.addRange(new Range(2));
+		
+		ArrayList list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
 		assertNotNull(list);
 		assertEquals(list.size(),3);
 		
@@ -91,6 +94,81 @@ public class SandeshaUtilTest extends TestCase {
 		assertNotNull(ackRange);
 		assertEquals(ackRange.getLowerValue(),8);
 		assertEquals(ackRange.getUpperValue(),8);
+		
+		assertFalse(it.hasNext());
+	}
+	
+	public void testGetAckRangesFromRangeStringGapFilling () throws SandeshaException {
+		//build a range string to represent the completed messages
+		RangeString rangeString = new RangeString();
+		rangeString.addRange(new Range(1,3));
+		rangeString.addRange(new Range(4));
+		//insert a gap - number 5 is missing
+		rangeString.addRange(new Range(6));
+		//insert a gap - 7 and 8 are missing
+		rangeString.addRange(new Range(9, 10));
+		
+		ArrayList list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		assertNotNull(list);
+		//we expect 3 ranges: [1-4] [6] [9-10]
+		assertEquals(list.size(),3);
+		
+		Iterator it = list.iterator();
+		AcknowledgementRange ackRange = null;
+		
+		ackRange = (AcknowledgementRange) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.getLowerValue(),1);
+		assertEquals(ackRange.getUpperValue(),4);
+		
+		ackRange = null;
+		ackRange = (AcknowledgementRange) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.getLowerValue(),6);
+		assertEquals(ackRange.getUpperValue(),6);
+		
+		ackRange = null;
+		ackRange = (AcknowledgementRange) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.getLowerValue(),9);
+		assertEquals(ackRange.getUpperValue(),10);
+		
+		assertFalse(it.hasNext());
+		
+		//ok, now plug a gap at msg 5
+		rangeString.addRange(new Range(5));
+		list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		assertNotNull(list);
+		//we expect 2 ranges: [1-6] [9-10]
+		it = list.iterator();
+		ackRange = null;
+		
+		ackRange = (AcknowledgementRange) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.getLowerValue(),1);
+		assertEquals(ackRange.getUpperValue(),6);
+		
+		ackRange = null;
+		ackRange = (AcknowledgementRange) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.getLowerValue(),9);
+		assertEquals(ackRange.getUpperValue(),10);
+		
+		assertFalse(it.hasNext());
+		
+		//plug all of the gaps - 7 and 8
+		rangeString.addRange(new Range(8));
+		rangeString.addRange(new Range(7,8)); 
+		list = SandeshaUtil.getAckRangeArrayList(rangeString,Sandesha2Constants.SPEC_2005_02.NS_URI);
+		assertNotNull(list);
+		//we expect 1 ranges: [1-10]
+		it = list.iterator();
+		ackRange = null;
+		
+		ackRange = (AcknowledgementRange) it.next();
+		assertNotNull(ackRange);
+		assertEquals(ackRange.getLowerValue(),1);
+		assertEquals(ackRange.getUpperValue(),10);
 		
 		assertFalse(it.hasNext());
 	}

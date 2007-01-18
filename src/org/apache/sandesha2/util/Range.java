@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.util;
 
+import java.io.Serializable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -25,12 +27,22 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 /**
  * Data structure to represent a range of values from lowerValue->upperValue inclusive.
  */
-public class Range {
+public class Range implements Serializable{
+
+	private static final long serialVersionUID = 1701339894096240940L;
 
 	private static final Log log = LogFactory.getLog(Range.class);
 	
 	long lowerValue;
 	long upperValue;
+	
+	/**
+	 * Create a range for a single number
+	 * @param value
+	 */
+	public Range(long value){
+		this(value, value);
+	}
 	
 	/**
 	 * 

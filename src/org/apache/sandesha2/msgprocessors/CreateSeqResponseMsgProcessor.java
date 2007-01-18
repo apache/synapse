@@ -45,6 +45,7 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
@@ -199,7 +200,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
 			rMDBean.setRMVersion(rmSpecVersion);
 			
-			rMDBean.setServerCompletedMessages(new ArrayList());
+			rMDBean.setServerCompletedMessages(new RangeString());
 
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 

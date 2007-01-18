@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.handlers;
 
-import java.util.List;
-
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
@@ -39,6 +37,8 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
@@ -180,7 +180,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, propertyKey);
 				if (rmdBean != null) {
 					if (rmdBean.getServerCompletedMessages() != null) {
-						if (rmdBean.getServerCompletedMessages().contains(new Long(msgNo)))
+						if (rmdBean.getServerCompletedMessages().isMessageNumberInRanges(msgNo))
+							//this msg is in a completed range
 							drop = true;
 					}
 	
@@ -197,11 +198,11 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 								log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
 								drop = true;
 	
-								List serverCompletedMsgs = rmdBean.getServerCompletedMessages();
+								RangeString serverCompletedMsgs = rmdBean.getServerCompletedMessages();
 								
-								// Add this message to the completed range
-								serverCompletedMsgs.add(new Long(msgNo));
-								
+								// Add this message to the completed ranges
+								serverCompletedMsgs.addRange(new Range(msgNo));
+								// Update with the new ranges
 								rmdBean.setServerCompletedMessages(serverCompletedMsgs);
 	
 								// TODO correct the syntac into '[received msgs]'

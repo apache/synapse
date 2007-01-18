@@ -8,7 +8,6 @@ package org.apache.sandesha2.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
@@ -89,7 +88,7 @@ public class SequenceManager {
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
 		ConfigurationContext configurationContext = createSeqContext.getConfigurationContext();
 
-		rmdBean.setServerCompletedMessages(new ArrayList());
+		rmdBean.setServerCompletedMessages(new RangeString());
 		
 		rmdBean.setReplyToEPR(to.getAddress());
 		rmdBean.setAcksToEPR(acksTo.getAddress());
@@ -243,8 +242,8 @@ public class SequenceManager {
 
 		}
 
-		// New up the client completed messages list
-		rmsBean.setClientCompletedMessages(new ArrayList());
+		// New up the client completed message ranges list
+		rmsBean.setClientCompletedMessages(new RangeString());
 
 		// saving transportTo value;
 		String transportTo = (String) firstAplicationMsgCtx.getProperty(Constants.Configuration.TRANSPORT_URL);

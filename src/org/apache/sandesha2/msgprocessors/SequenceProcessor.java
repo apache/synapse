@@ -19,7 +19,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -52,6 +51,8 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
@@ -171,11 +172,11 @@ public class SequenceProcessor {
 			bean.setHighestInMessageNumber(msgNo);
 		}
 
-		// Get the server completed messages list
-		List serverCompletedMessages = bean.getServerCompletedMessages();
-		
-		// If the message in the list of completed
-		boolean msgNoPresentInList = serverCompletedMessages.contains(new Long(msgNo));
+		// Get the server completed message ranges list
+		RangeString serverCompletedMessageRanges = bean.getServerCompletedMessages();
+		// See if the message is in the list of completed ranges
+		boolean msgNoPresentInList = 
+			serverCompletedMessageRanges.isMessageNumberInRanges(msgNo);
 		
 		if (msgNoPresentInList
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
@@ -187,7 +188,7 @@ public class SequenceProcessor {
 
 		if (!msgNoPresentInList)
 		{
-			serverCompletedMessages.add(new Long(msgNo));
+			serverCompletedMessageRanges.addRange(new Range(msgNo));
 		}
 		
 		// Update the RMD bean

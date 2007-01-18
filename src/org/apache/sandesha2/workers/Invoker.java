@@ -134,14 +134,14 @@ public class Invoker extends SandeshaThread {
 								RangeString rangeString = null;
 								if(rMDBean.getOutOfOrderRanges()==null){
 									//insert a new blank one one
-									rangeString = new RangeString("");
+									rangeString = new RangeString();
 								}
 								else{
-									rangeString = new RangeString(rMDBean.getOutOfOrderRanges());
+									rangeString = rMDBean.getOutOfOrderRanges();
 								}
 								//update the range String with the new value
 								rangeString.addRange(r);
-								rMDBean.setOutOfOrderRanges(rangeString.toString());
+								rMDBean.setOutOfOrderRanges(rangeString);
 							}
 							
 							rmdBeanMgr.update(rMDBean);
@@ -177,8 +177,7 @@ public class Invoker extends SandeshaThread {
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
 		
 		if(rmdBean != null && rmdBean.getOutOfOrderRanges() != null){
-			String sequenceRanges = rmdBean.getOutOfOrderRanges();
-			RangeString rangeString = new RangeString(sequenceRanges);
+			RangeString rangeString = rmdBean.getOutOfOrderRanges();
 			//we now have the set of ranges that can be delivered out of order.
 			//Look for any invokable message that lies in one of those ranges
 			InvokerBean selector = new InvokerBean();

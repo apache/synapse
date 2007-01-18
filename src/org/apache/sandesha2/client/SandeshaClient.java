@@ -188,9 +188,10 @@ public class SandeshaClient {
 			StorageManager storageManager) throws SandeshaException {
 		report.setSequenceID(rmsBean.getSequenceID());
 
-		List completedMessageList = 
-			AcknowledgementManager.getClientCompletedMessagesList(rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(),
-				storageManager);
+		List completedMessageList = AcknowledgementManager.
+		getClientCompletedMessageRanges(rmsBean.getInternalSequenceID(), 
+				rmsBean.getSequenceID(),
+				storageManager).getContainedElementsAsNumbersList();
 
 		Iterator iter = completedMessageList.iterator();
 		while (iter.hasNext()) {
@@ -985,8 +986,10 @@ public class SandeshaClient {
 
 			SequenceReport sequenceReport = new SequenceReport();
 
-			ArrayList completedMessageList = AcknowledgementManager.getServerCompletedMessagesList(sequenceID,
-					storageManager);
+			List completedMessageList = AcknowledgementManager.
+			getServerCompletedMessageRanges(
+				sequenceID,
+				storageManager).getContainedElementsAsNumbersList();
 			
 			Iterator iter = completedMessageList.iterator();
 			while (iter.hasNext()) {

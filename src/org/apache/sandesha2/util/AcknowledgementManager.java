@@ -17,11 +17,9 @@
 
 package org.apache.sandesha2.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -159,10 +157,10 @@ public class AcknowledgementManager {
 	 * @param outGoingMessage
 	 * @return
 	 */
-	public static List getClientCompletedMessagesList(String internalSequenceID, String sequenceID, StorageManager storageManager)
+	public static RangeString getClientCompletedMessageRanges(String internalSequenceID, String sequenceID, StorageManager storageManager)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::getClientCompletedMessagesList " + internalSequenceID + ", " + sequenceID);
+			log.debug("Enter: AcknowledgementManager::getClientCompletedMessageRanges " + internalSequenceID + ", " + sequenceID);
     
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
 
@@ -173,17 +171,17 @@ public class AcknowledgementManager {
 			throw e;
 		}
 		
-		List completedMsgList = rmsBean.getClientCompletedMessages();
+		RangeString completedMsgRanges = rmsBean.getClientCompletedMessages();
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementManager::getClientCompletedMessagesList");
-		return completedMsgList;
+			log.debug("Exit: AcknowledgementManager::getClientCompletedMessageRanges");
+		return completedMsgRanges;
 	}
 
-	public static ArrayList getServerCompletedMessagesList(String sequenceID, StorageManager storageManager)
+	public static RangeString getServerCompletedMessageRanges(String sequenceID, StorageManager storageManager)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::getServerCompletedMessagesList " + sequenceID);
+			log.debug("Enter: AcknowledgementManager::getServerCompletedMessageRanges " + sequenceID);
 
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
 		
@@ -195,8 +193,8 @@ public class AcknowledgementManager {
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementManager::getServerCompletedMessagesList");
-		return (ArrayList)rmdBean.getServerCompletedMessages();
+			log.debug("Exit: AcknowledgementManager::getServerCompletedMessageRanges");
+		return rmdBean.getServerCompletedMessages();
 	}
 
 	public static RMMsgContext generateAckMessage(RMMsgContext referenceRMMessage, String sequencePropertyKey ,String sequenceId,

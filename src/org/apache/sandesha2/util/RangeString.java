@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.util;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,13 +35,21 @@ import java.util.regex.Pattern;
  * Also performs task such as aggregation of ranges
  *
  */
-public class RangeString {
+public class RangeString implements Serializable{
 
+	private static final long serialVersionUID = -3487094584241136861L;
 	/**
 	 * Each entry in this map is a range
 	 * The key to each range entry is range.lowerValue
 	 */
-	private Map rangeMap;
+	private final Map rangeMap;
+	
+	/**
+	 * Creates an empty range string
+	 */
+	public RangeString(){
+		this(null);
+	}
 	
 	/**
 	 * Expects a String of the form
@@ -80,24 +89,77 @@ public class RangeString {
 		return null; 
 	}
 	
-	private Range getRangeImmediatelyAbove(long msgNumber){
-		//see if there is a range that starts imemdiately
-		//above the specified number
-		long targetRange = msgNumber + 1;
-		return (Range)rangeMap.get(new Long(targetRange));
+	/**
+	 * If the passed in evelopeRange encompasses several ranges, these are 
+	 * removed from the map 
+	 * @param currentRange
+	 * @return
+	 */
+	private void cleanUpRangesEnveloped(Range envelopeRange){
+		//see if there are any ranges that start at some point between 
+		//immediately above the start of the envelope range up to 
+		//its end 
+		long startOfRangeLookup = envelopeRange.lowerValue + 1;
+		long endOfRangeLookup = envelopeRange.upperValue;
+		for(long i=startOfRangeLookup; i<=endOfRangeLookup; i++){
+			Range removedRange = (Range)rangeMap.remove(new Long(i)); //remove if there is anything present
+			if(removedRange!=null && removedRange.upperValue>envelopeRange.upperValue){
+				//this range started in our envelope but stretched out beyond it so we
+				//can absorb its upper value
+				envelopeRange.upperValue = removedRange.upperValue;
+			}
+		}
+	}
+	
+	/**
+	 * Looks to see if there is a range that starts immediately above
+	 * this one. If so, that range is returned 
+	 * @param targetRange
+	 * @return
+	 */
+	private Range getRangeImmediatelyAbove(Range targetRange){
+		return (Range)rangeMap.get(new Long(targetRange.upperValue + 1));		
 	}
 	
 	
 	public boolean isMessageNumberInRanges(long messageNumber){
+		if(getRangeForMessageNumber(messageNumber)!=null){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	public Range getRangeForMessageNumber(long messageNumber){
 		Range below = getNextRangeBelow(messageNumber);
 		if(below!=null){
 			if(below.rangeContainsValue(messageNumber)){
 				//this range contains our value
-				return true;
+				return below;
 			}
 		}
 		
 		//if we made it here then we are not in any ranges
+		return null;		
+	}
+	
+	/**
+	 * Returns true if the numbers are contained in a single range
+	 * @param interestedRange
+	 * @return
+	 */
+	public boolean isRangeCompleted(Range interestedRange){
+		Range containingRange = getNextRangeBelow(interestedRange.lowerValue);
+		if(containingRange!=null){
+			//so we know there is a range below us, check to see if it
+			//stretches to us or over above us
+			if(containingRange.upperValue>=interestedRange.upperValue){
+				//it does, so this range is contained
+				return true;
+			}
+		}
+		//either their was no range at all or it did not reach high enough 
 		return false;
 	}
 	
@@ -106,11 +168,7 @@ public class RangeString {
 	 * @return a String of the form [x1,y1][x2,y2]...[xn,yn]
 	 */
 	public String toString(){
-		//iterate the rangeList creating an on-going string
-		Set keySet = rangeMap.keySet();
-		//sort the set
-		List sortedList = new LinkedList(keySet);
-		Collections.sort(sortedList);
+		List sortedList = getSortedKeyList();
 		String returnString = "";
 		for(int i=0; i<sortedList.size(); i++){
 			returnString = returnString + (rangeMap.get(sortedList.get(i))).toString();
@@ -120,34 +178,48 @@ public class RangeString {
 	}
 	
 	/**
-	 * Returns a list string of the form
-	 * [x1,x2,x3....xn] listing each discrete number contained in all of the ranges
-	 * in order
+	 * @return ordered array of each range object in the string 
 	 */
-	public String getContainedElementsAsListString(){
-		//iterate the rangeList creating an on-going string
+	public Range[] getRanges(){
+		List sortedKeyList = getSortedKeyList();
+		Range[] ranges = new Range[sortedKeyList.size()];
+		for(int i=0; i<ranges.length; i++){
+			ranges[i] = (Range)rangeMap.get(sortedKeyList.get(i));
+		}
+		return ranges;
+	}
+	
+	
+	private List getSortedKeyList(){
 		Set keySet = rangeMap.keySet();
 		//sort the set
 		List sortedList = new LinkedList(keySet);
 		Collections.sort(sortedList);
-		String returnString = "[";
-		for(int i=0; i<sortedList.size(); i++){
-			Range r = (Range)rangeMap.get(sortedList.get(i));
-			for(long l=r.lowerValue; l<=r.upperValue;l++){
-				if(i==0 && l==r.lowerValue){
-					//first time does not need leading ','
-					returnString += l;						
-				}
-				else{
-					returnString += "," + l;						
-				}
+		return sortedList;
+	}
+	
+	/**
+	 * Returns a List of the form
+	 * [x1,x2,x3....xn] listing each discrete number contained in all of the ranges
+	 * in order
+	 * NOTE: inefficient, should be avoided
+	 */
+	public List getContainedElementsAsNumbersList(){
+		List returnList = new LinkedList();
+		Range[] ranges = getRanges();
+		for(int i=0; i<ranges.length; i++){
+			for(long current = ranges[i].lowerValue; current<=ranges[i].upperValue; current++){
+				returnList.add(new Long(current));
 			}
 		}
-		
-		return returnString + "]";		
+		return returnList;
 	}
 	
 	public void addRange(Range r){
+		
+		Range finalRange = r; //we use this to keep track of the final range
+		//as we might aggregate this new range with existing ranges
+		
 		//first we try to aggregate existing ranges
 		boolean rangeAdded = false;
 		long indexKey = r.lowerValue;
@@ -160,11 +232,17 @@ public class RangeString {
 				//we do not quit yet, as maybe this has plugged a gap between
 				//an upper range. But we should mark the range as added.
 				rangeAdded = true;
+				finalRange = below; //as below now encompasses both ranges agrregated together 
+			}
+			else if(below.upperValue > r.lowerValue){
+				//the range below extends over this one - this range
+				//is already complete, so we do not need to add it at all.
+				return;
 			}
 		}
 		
 		//see if we can extend another range down
-		Range above = getRangeImmediatelyAbove(r.upperValue);
+		Range above = getRangeImmediatelyAbove(r);
 		if(above!=null){
 			//we can extend this down
 			//first remove it. Then we will either add it under its new key or 
@@ -174,13 +252,16 @@ public class RangeString {
 			if(rangeAdded){
 				//we extend down and up - join two ranges together
 				//Sicne we have removed the upper, we simply do not add it again and set the
-				//lower range to encompass both of them
+				//below range to encompass both of them
 				below.upperValue = above.upperValue;
+				//NOTE: finalRange has already been set when extending up
 			}
 			else{
-				//we did extend up but we did not extend down. Add the upper range back under its new key
+				//we did not extend up but we can extend down. 
+				//Add the upper range back under its new key
 				rangeAdded = true;				
 				rangeMap.put(new Long(above.lowerValue), above);
+				finalRange = above;
 			}
 
 		}
@@ -188,11 +269,16 @@ public class RangeString {
 		if(!rangeAdded){
 			//if we got here and did not add a range then we need to 
 			//genuinely add a new range object
-			rangeMap.put(new Long(r.lowerValue), r);			
+			rangeMap.put(new Long(r.lowerValue), r);
 		}
-
+		
+		//finally, we go through the new range we have added to make sure it
+		//does not now encompass any smaller ranges that were there before (but
+		//that could not be extended up or down)
+		cleanUpRangesEnveloped(finalRange);
 		
 	}
+	
 	
 
 }

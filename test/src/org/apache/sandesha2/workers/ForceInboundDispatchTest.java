@@ -84,7 +84,7 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 			
 			//also check that the sequence has an out of order gap that contains msg 2			
 			assertNotNull(rMDBean.getOutOfOrderRanges());
-			RangeString rangeString = new RangeString(rMDBean.getOutOfOrderRanges());
+			RangeString rangeString = rMDBean.getOutOfOrderRanges();
 			assertTrue(rangeString.isMessageNumberInRanges(2));
 			t.commit();
 			

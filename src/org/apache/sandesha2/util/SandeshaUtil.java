@@ -22,9 +22,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
@@ -118,84 +116,27 @@ public class SandeshaUtil {
 	}
 
 	/**
-	 * Used to convert a message number list (a comma seperated list of message
-	 * numbers) into a set of AcknowledgementRanges. This breaks the list, sort
-	 * the items and group them to create the AcknowledgementRange objects.
+	 * Used to convert a RangeString into a set of AcknowledgementRanges.
 	 * 
 	 * @param msgNoStr
 	 * @param factory
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static ArrayList getAckRangeArrayList(List completedMessages, String rmNamespaceValue)
+	public static ArrayList getAckRangeArrayList(RangeString completedMessageRanges, String rmNamespaceValue)
 			throws SandeshaException {
 
-		ArrayList ackRanges = new ArrayList();
+		ArrayList ackRanges = new ArrayList(); //the final ack ranges that we will build up
 
-		ArrayList sortedMsgNoArrayList = getSortedMsgNoArrayList(completedMessages);
-
-		Iterator iterator = sortedMsgNoArrayList.iterator();
-		long lower = 0;
-		long upper = 0;
-		boolean completed = true;
-
-		while (iterator.hasNext()) {
-			Long tempLng = (Long) iterator.next();
-			long temp = tempLng.longValue();
-			if (lower == 0) {
-				lower = temp;
-				upper = temp;
-				completed = false;
-			} else if (temp == (upper + 1)) {
-				upper = temp;
-				completed = false;
-			} else {
-				// add ackRange (lower,upper)
-				AcknowledgementRange ackRange = new AcknowledgementRange(rmNamespaceValue);
-				ackRange.setLowerValue(lower);
-				ackRange.setUpperValue(upper);
-				ackRanges.add(ackRange);
-
-				lower = temp;
-				upper = temp;
-				completed = false;
-			}
-		}
-
-		if (!completed) {
+		Range[] ranges = completedMessageRanges.getRanges();
+		for(int i=0; i<ranges.length; i++){
 			AcknowledgementRange ackRange = new AcknowledgementRange(rmNamespaceValue);
-			ackRange.setLowerValue(lower);
-			ackRange.setUpperValue(upper);
-			ackRanges.add(ackRange);
-			completed = true;
+			ackRange.setLowerValue(ranges[i].lowerValue);
+			ackRange.setUpperValue(ranges[i].upperValue);
+			ackRanges.add(ackRange);			
 		}
-
+		
 		return ackRanges;
-	}
-
-	public static ArrayList getSortedMsgNoArrayList(List list) {
-
-		ArrayList sortedList = new ArrayList();
-
-		long max = 0;
-		Iterator it1 = list.iterator();
-		while (it1.hasNext()) {
-			Long tempLng = (Long) it1.next();
-			long temp = tempLng.longValue();
-			if (temp > max)
-				max = temp;
-		}
-
-		int item = 0;
-		for (long i = 1; i <= max; i++) {
-			Long temp = new Long(i);
-			if (list.contains(temp)) {
-				sortedList.add(item, temp);
-				item++;
-			}
-		}
-
-		return sortedList;
 	}
 
 	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) throws SandeshaException {
@@ -293,19 +234,6 @@ public class SandeshaUtil {
 			return true;
 
 		return false;
-	}
-
-	public static ArrayList getSplittedMsgNoArraylist(String str) {
-
-		StringTokenizer tokenizer = new StringTokenizer(str, ",");
-
-		ArrayList results = new ArrayList();
-
-		while (tokenizer.hasMoreTokens()) {
-			results.add(tokenizer.nextToken());
-		}
-
-		return results;
 	}
 
 	public static String getServerSideIncomingSeqIdFromInternalSeqId(String internalSequenceId)
@@ -689,26 +617,6 @@ public class SandeshaUtil {
 		return retArr;
 	}
 
-	public static ArrayList getArrayListFromMsgsString(String str) {
-
-		if (str == null || "".equals(str))
-			return new ArrayList();
-
-		ArrayList retArr = new ArrayList();
-
-		StringTokenizer tokenizer = new StringTokenizer(str, ",");
-
-		while (tokenizer.hasMoreElements()) {
-			String nextToken = tokenizer.nextToken();
-			if (nextToken != null && !"".equals(nextToken)) {
-				Long lng = new Long(nextToken);
-				retArr.add(lng);
-			}
-		}
-
-		return retArr;
-	}
-
 	public static String getInternalSequenceID(String to, String sequenceKey) {
 		if (to == null && sequenceKey == null)
 			return null;
@@ -864,15 +772,16 @@ public class SandeshaUtil {
 			StorageManager storageManager) throws SandeshaException {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, sequencePropertyKey);
-		List ackedMsgsList = rmsBean.getClientCompletedMessages();
-
+		
+		RangeString ackedMsgRanges = rmsBean.getClientCompletedMessages();
 		long smallestMsgNo = 1;
-		for (long tempMsgNo = smallestMsgNo; tempMsgNo <= highestInMsgNo; tempMsgNo++) {
-			if (!ackedMsgsList.contains(new Long(tempMsgNo)))
-				return false;
+		Range interestedRange = new Range(smallestMsgNo, highestInMsgNo);
+		boolean allComplete = false;
+		if(ackedMsgRanges.isRangeCompleted(interestedRange)){
+			allComplete = true;
 		}
-
-		return true; // all message upto the highest have been acked.
+		return allComplete;
+	
 	}
 	
 	public static SandeshaPolicyBean getPropertyBean (AxisDescription axisDescription) throws SandeshaException {

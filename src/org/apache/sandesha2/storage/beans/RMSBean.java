@@ -17,7 +17,7 @@
 
 package org.apache.sandesha2.storage.beans;
 
-import java.util.List;
+import org.apache.sandesha2.util.RangeString;
 
 /**
  * This bean is used at the sending side (of both server and client)
@@ -69,10 +69,10 @@ public class RMSBean extends RMSequenceBean {
 	private String highestOutRelatesTo = null;
   
 	/** 
-	 * For out going sequences this gives the messages that were sent and that were successfully
+	 * For out going sequences this gives the message ranges that were sent and that were successfully
 	 * acked by the other end point.
 	 */
-	private List clientCompletedMessages = null;
+	private RangeString clientCompletedMessages = null;
   
 	private String transportTo;
 
@@ -224,11 +224,11 @@ public class RMSBean extends RMSequenceBean {
   	rmsFlags |= NEXT_MSG_NUM_FLAG;
   }
 
-	public List getClientCompletedMessages() {
+	public RangeString getClientCompletedMessages() {
   	return clientCompletedMessages;
   }
 
-	public void setClientCompletedMessages(List clientCompletedMessages) {
+	public void setClientCompletedMessages(RangeString clientCompletedMessages) {
   	this.clientCompletedMessages = clientCompletedMessages;
   }
 

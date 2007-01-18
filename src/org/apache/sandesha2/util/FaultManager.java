@@ -53,7 +53,6 @@ import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
-import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -63,57 +62,6 @@ import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 public class FaultManager {
 
 	private static final Log log = LogFactory.getLog(FaultManager.class);
-
-	/**
-	 * Check weather the CreateSequence should be refused and generate the fault
-	 * if it should.
-	 * 
-	 * @param messageContext
-	 * @return
-	 * @throws SandeshaException
-	 */
-	public static void checkForCreateSequenceRefused(MessageContext createSequenceMessage,
-			StorageManager storageManager) throws AxisFault {
-
-		if (log.isDebugEnabled())
-			log.debug("Enter: FaultManager::checkForCreateSequenceRefused");
-
-		RMMsgContext createSequenceRMMsg = MsgInitializer.initializeMessage(createSequenceMessage);
-
-		CreateSequence createSequence = (CreateSequence) createSequenceRMMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		if (createSequence == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts));
-
-		if (storageManager == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotGetStorageManager));
-
-		boolean refuseSequence = false;
-		String reason = "";
-
-		if (refuseSequence) {
-			FaultData data = new FaultData();
-			data.setType(Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED);
-			int SOAPVersion = SandeshaUtil.getSOAPVersion(createSequenceRMMsg.getSOAPEnvelope());
-			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-			else
-				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
-
-			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
-			data.setReason(reason);
-			
-			//Adding the create sequencePart as the detail.
-			data.setDetail(createSequenceMessage.getEnvelope().getBody().getFirstElement());
-			
-			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::checkForCreateSequenceRefused, refused sequence");
-			getFault(createSequenceRMMsg, data);
-		}
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: FaultManager::checkForCreateSequenceRefused");
-	}
 
 	/**
 	 * Check weather the LastMessage number has been exceeded and generate the

@@ -41,7 +41,6 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
@@ -74,8 +73,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 		ConfigurationContext context = createSeqMsg.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
-
-		FaultManager.checkForCreateSequenceRefused(createSeqMsg, storageManager);
 		
 		// If the inbound CreateSequence includes a SecurityTokenReference then
 		// ask the security manager to resolve that to a token for us. We also

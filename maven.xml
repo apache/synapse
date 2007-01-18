@@ -185,7 +185,9 @@
 
 		<!-- Replace the security manager in the module.xml file -->
 		<ant:unjar src="${maven.build.dir}/${mar.name}" dest="${secure.temp.path}"/>
-		<ant:copy  file="${dir.test.resources}/test.module.xml" tofile="${secure.temp.path}/META-INF/module.xml" overwrite="true"/>
+		<ant:replace file="${secure.temp.path}/META-INF/module.xml" 
+		  token="dummy.DummySecurityManager"
+		  value="UnitTestSecurityManager"/>
 		<ant:jar jarfile="${secure.client.path}/modules/${test.module.name}.mar" basedir="${secure.temp.path}"/>
 		<ant:jar jarfile="${secure.server.path}/modules/${test.module.name}.mar" basedir="${secure.temp.path}"/>
 		

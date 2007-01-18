@@ -74,8 +74,10 @@ public class EndpointSerializer {
         		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "soap"));
         	}
 
-            endpoint.addAttribute(fac.createOMAttribute(
-                    "name", nullNS, endpt.getName()));
+            if (endpt.getName() != null) {
+                endpoint.addAttribute(fac.createOMAttribute(
+                       "name", nullNS, endpt.getName()));
+            }
             if (endpt.getAddress() != null) {
                 endpoint.addAttribute(fac.createOMAttribute(
                     "address", nullNS, endpt.getAddress()));

@@ -17,9 +17,14 @@
 
 package org.apache.sandesha2;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -173,7 +178,21 @@ public class SandeshaUtilTest extends TestCase {
 		assertFalse(it.hasNext());
 	}
 	
-	
+	/**
+	 * Checks that a Fault message can be created from an empty MessageContext
+	 * 
+	 * @throws Exception
+	 */
+	public void testCreateFaultMessageContext() throws Exception {
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+		MessageContext messageContext = new MessageContext();
+		messageContext.setConfigurationContext(configContext);
+		messageContext = MessageContextBuilder.createFaultMessageContext(messageContext, new Exception());
+	}
+
 	
 	
 	

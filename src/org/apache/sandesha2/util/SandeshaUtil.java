@@ -1114,10 +1114,12 @@ public class SandeshaUtil {
 		
 		if(!result) {
 			//look at the operation
-			Parameter unreliableParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
-			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
-				if (log.isDebugEnabled()) log.debug("Unreliable operation");
-				result = true;
+			if (mc.getAxisOperation() != null) {
+				Parameter unreliableParam = mc.getAxisOperation().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+				if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
+					if (log.isDebugEnabled()) log.debug("Unreliable operation");
+					result = true;
+				}
 			}
 		}
 		

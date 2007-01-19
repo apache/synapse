@@ -108,6 +108,8 @@ public class SequenceManager {
 		rmdBean.setSequenceID(sequenceId);
 		rmdBean.setNextMsgNoToProcess(1);
 		
+		rmdBean.setToAddress(to.getAddress());
+		
 		// If this sequence has a 'To' address that is anonymous then we must have got the
 		// message as a response to a poll. We need to make sure that we keep polling until
 		// the sequence is closed.
@@ -354,5 +356,15 @@ public class SequenceManager {
 				sequenceTimedOut = true;
 		}
 		return sequenceTimedOut;
+	}
+	
+	public static boolean isValidIncomingSequence (String sequenceId, StorageManager storageManager) throws SandeshaException {
+		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+		RMDBean bean = rmdBeanMgr.retrieve(sequenceId);
+		
+		if (bean!=null)
+			return true;
+		else 
+			return false;
 	}
 }

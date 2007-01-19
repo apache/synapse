@@ -51,12 +51,22 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		startServer(repoPath, axis2_xml);
 	}
 	
-	public void testSyncEchoWithOffer() throws Exception {
+	public void testSyncEchoWithOffer_1_1 () throws Exception {
 
 		Options clientOptions = new Options ();
 		String offeredSequenceID = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
+		runSyncEchoTest(clientOptions);
 		
+	}
+	
+	public void testSyncEchoWithOffer_1_0 () throws Exception {
+
+		Options clientOptions = new Options ();
+		String offeredSequenceID = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
 		runSyncEchoTest(clientOptions);
 		
 	}
@@ -64,6 +74,7 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 	public void testSyncEchoWithRMAnon() throws Exception {
 
 		Options clientOptions = new Options ();
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		runSyncEchoTest(clientOptions);
 		
 	}
@@ -80,7 +91,7 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		String sequenceKey = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
+
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);

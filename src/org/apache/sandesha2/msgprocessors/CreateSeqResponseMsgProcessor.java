@@ -200,8 +200,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
 			rMDBean.setRMVersion(rmSpecVersion);
 			
+			rMDBean.setToAddress(createSeqResponseRMMsgCtx.getTo().getAddress());
 			rMDBean.setServerCompletedMessages(new RangeString());
-
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 
 			// Store the security token for the offered sequence

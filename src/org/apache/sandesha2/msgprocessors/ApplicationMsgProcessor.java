@@ -686,6 +686,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			appMsgEntry.setSend(true);
 			// Send will be set to true at the sender.
 			msg.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
+			appMsgEntry.setSequenceID(outSequenceID);
 		}
 		
 		EndpointReference to = rmMsg.getTo();

@@ -20,6 +20,7 @@ package org.apache.sandesha2.handlers;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -35,6 +36,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.Range;
@@ -103,23 +105,36 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			transaction = storageManager.getTransaction();
 
 			RMMsgContext rmMessageContext = MsgInitializer.initializeMessage(msgContext);
+			
+			//checking weather the Message belongs to the WSRM 1.0 Anonymous InOut scenario.
+			//If so instead of simply dropping duplicates we will have to attach the corresponding response,
+			//as long as the Message has not been acked.			
+			
+			EndpointReference replyTo = msgContext.getReplyTo();
+			String specVersion = rmMessageContext.getRMSpecVersion();
+				
+			boolean duplicateMessage = isDuplicateMessage (rmMessageContext, storageManager);
+			if (duplicateMessage)
+				msgContext.setProperty(Sandesha2Constants.DUPLICATE_MESSAGE, Boolean.TRUE);
 
-			// Dropping duplicates
-			boolean dropped = dropIfDuplicate(rmMessageContext, storageManager);
-			if (dropped) {
-				returnValue = InvocationResponse.ABORT; //the msg has been dropped
+			boolean dropDuplicates = true;
+			if ((replyTo!=null && replyTo.hasAnonymousAddress()) &&
+					(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)))
+					dropDuplicates = false;
+			
+			boolean shouldMessageBeDropped = shouldMessageBeDropped (rmMessageContext, storageManager);
+			
+			if ((duplicateMessage && dropDuplicates) || shouldMessageBeDropped) {
+
+				returnValue = InvocationResponse.ABORT; // the msg has been
+														// dropped
 				processDroppedMessage(rmMessageContext, storageManager);
 				if (log.isDebugEnabled())
-					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped " + returnValue);
+					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped "
+							+ returnValue);
 				return returnValue;
-			}
 
-			// Persisting the application messages
-			// if
-			// (rmMessageContext.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION)
-			// {
-			// SandeshaUtil.PersistMessageContext ()
-			// }
+			}
 
 			// Process if global processing possible. - Currently none
 			if (SandeshaUtil.isGloballyProcessableMessageType(rmMessageContext.getMessageType())) {
@@ -161,8 +176,34 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			log.debug("Exit: SandeshaGlobalInHandler::invoke " + returnValue);
 		return returnValue;
 	}
+	
+	
+	private boolean isDuplicateMessage (RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
+		boolean duplicate = false;
+		
+		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
-	private boolean dropIfDuplicate(RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
+			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			long msgNo = sequence.getMessageNumber().getMessageNumber();
+			
+			RMDBean findBean = new RMDBean ();
+			findBean.setSequenceID(sequence.getIdentifier().getIdentifier());
+			
+			RMDBean rmdBean = storageManager.getRMDBeanMgr().findUnique(findBean);
+			
+			RangeString serverCompletedMessages = rmdBean.getServerCompletedMessages();
+
+			if (serverCompletedMessages.isMessageNumberInRanges(msgNo))
+				duplicate = true;
+			
+		}
+		
+		return duplicate;
+	}
+
+	
+	private boolean shouldMessageBeDropped(RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
+		
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::dropIfDuplicate");
 
@@ -171,47 +212,37 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			String sequenceId = null;
 
-			long msgNo = sequence.getMessageNumber().getMessageNumber();
-			
-			String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgContext);
+			if (drop == false) {
+				// Checking for RM specific EMPTY_BODY LASTMESSAGE.
+				SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
+				boolean emptyBody = false;
+				if (body.getChildElements().hasNext() == false) {
+					emptyBody = true;
+				}
+				
+				if (emptyBody) {
+					if (sequence.getLastMessage() != null) {
+						log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
+						drop = true;
 
-			if (propertyKey != null && msgNo > 0) {
-				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, propertyKey);
-				if (rmdBean != null) {
-					if (rmdBean.getServerCompletedMessages() != null) {
-						if (rmdBean.getServerCompletedMessages().isMessageNumberInRanges(msgNo))
-							//this msg is in a completed range
-							drop = true;
+						//marking current message as a received message.
+						
+						RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+						
+						RMDBean findBean = new RMDBean ();
+						findBean.setSequenceID(sequenceId);
+						RMDBean rmdBean = rmdBeanMgr.findUnique(findBean);
+						
+						long messageNo = sequence.getMessageNumber().getMessageNumber();
+						rmdBean.getServerCompletedMessages().addRange (new Range (messageNo));
+						rmdBeanMgr.update(rmdBean);
+						
+						drop = true;
+
 					}
-	
-					if (!drop) {
-						// Checking for RM specific EMPTY_BODY LASTMESSAGE.
-						SOAPBody body = rmMsgContext.getSOAPEnvelope().getBody();
-						boolean emptyBody = false;
-						if (body.getChildElements().hasNext() == false) {
-							emptyBody = true;
-						}
-	
-						if (emptyBody) {
-							if (sequence.getLastMessage() != null) {
-								log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.emptyLastMsg));
-								drop = true;
-	
-								RangeString serverCompletedMsgs = rmdBean.getServerCompletedMessages();
-								
-								// Add this message to the completed ranges
-								serverCompletedMsgs.addRange(new Range(msgNo));
-								// Update with the new ranges
-								rmdBean.setServerCompletedMessages(serverCompletedMsgs);
-	
-								// TODO correct the syntac into '[received msgs]'
-	
-								// Update the rmdBean
-								storageManager.getRMDBeanMgr().update(rmdBean);
-							}
-						}
-					}
+
 				}
 			}
 		} else if (rmMsgContext.getMessageType() != Sandesha2Constants.MessageTypes.UNKNOWN) {
@@ -251,6 +282,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaGlobalInHandler::dropIfDuplicate, false");
+		
 		return false;
 	}
 
@@ -263,12 +295,13 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 			// Even though the duplicate message is dropped, hv to send the ack
 			// if needed.
-			SequenceProcessor.sendAckIfNeeded(rmMsgContext, storageManager);
+			SequenceProcessor.sendAckIfNeeded(rmMsgContext, storageManager,true);
 
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaGlobalInHandler::processDroppedMessage");
 	}
+
 
 	private void doGlobalProcessing(RMMsgContext rmMsgCtx) throws SandeshaException {
 	}

@@ -246,6 +246,10 @@ public class RMMsgCreator {
 
 		MessageContext terminateMessage = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,
 				terminateOperation);
+		
+		if (terminateMessage.getMessageID()==null) {
+			terminateMessage.setMessageID(SandeshaUtil.getUUID());
+		}
 
 		OperationContext operationContext = terminateMessage.getOperationContext();
 		// to receive terminate sequence response messages correctly
@@ -261,8 +265,6 @@ public class RMMsgCreator {
 
 		if (terminateMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
-
-		terminateMessage.setMessageID(SandeshaUtil.getUUID());
 
 		AxisOperation referenceMsgOperation = referenceMessage.getAxisOperation();
 		if (referenceMsgOperation != null) {
@@ -469,6 +471,7 @@ public class RMMsgCreator {
 		if(log.isDebugEnabled()) 
 			log.debug("Exit: RMMsgCreator::addAckMessage");
 	}
+	
 	
 	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,  String makeConnectionSeqId,
 			String makeConnectionAnonURI, StorageManager storageManager) throws AxisFault {

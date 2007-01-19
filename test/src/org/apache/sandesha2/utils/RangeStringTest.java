@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.sandesha2.util;
+package org.apache.sandesha2.utils;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.apache.sandesha2.SandeshaTestCase;
-
-import com.ibm.jvm.util.ByteArrayOutputStream;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
 
 public class RangeStringTest extends SandeshaTestCase{
 

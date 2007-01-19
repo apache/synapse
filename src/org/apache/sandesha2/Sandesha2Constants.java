@@ -477,6 +477,17 @@ public interface Sandesha2Constants {
 	
 	static final String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";
 	
+	static final String MSG_NO_OF_IN_MSG = "MsgNoOfInMsg";
+	
+	static final String DUPLICATE_MESSAGE = "DuplicateMessage";
+	
+	static final String MAKE_CONNECTION_RESPONSE = "MakeConnectionResponse";
+	
+	//In RM 1.1 AnonRMURI case we may not be terminating a request sequence unless the response side create sequence 
+	//msg hs been received through polling. This property will be used to track this.
+	String TERMINATE_ON_CREATE_SEQUENCE = "TerminateOnCS";
+	
+	
 	static final String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI

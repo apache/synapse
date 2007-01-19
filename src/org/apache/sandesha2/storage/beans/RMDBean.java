@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.sandesha2.util.RangeString;
 
 /**
@@ -53,6 +55,11 @@ public class RMDBean extends RMSequenceBean {
 	 * delivered out of order. These are maintained as a RangeString
 	 */
 	private RangeString outOfOrderRanges = null;
+	
+	/**
+	 * To Address of the messages that will be received for this sequence.
+	 */
+	private String toAddress;
 
 	/**
 	 * Comment for <code>nextMsgNoToProcess</code>
@@ -72,7 +79,6 @@ public class RMDBean extends RMSequenceBean {
 	private static final int HIGHEST_IN_MSG_FLAG = 0x00000010;
 
 	public RMDBean() {
-
 	}
 
 	public RMDBean(String sequenceID, long nextNsgNo) {
@@ -142,9 +148,17 @@ public class RMDBean extends RMSequenceBean {
   }
 
 	public void setOutOfOrderRanges(RangeString outOfOrderRanges) {
-  	this.outOfOrderRanges = outOfOrderRanges;
-  }
+		this.outOfOrderRanges = outOfOrderRanges;
+	}
 	
+	public String getToAddress() {
+		return toAddress;
+	}
+
+	public void setToAddress(String toAddress) {
+		this.toAddress = toAddress;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());

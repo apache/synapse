@@ -163,6 +163,10 @@ public class RMMsgContext {
 		}
 	}
 	
+	public void removeMessageParts (int messageType) {
+		rmMessageParts.remove (new Integer (messageType));
+	}
+	
 	//checks weather there can be multiple elements of these parts,
 	//if so getMessageParts method has to be called to get a ArrayList of parts..
 	public boolean isMultiPart (int messagePartId) {

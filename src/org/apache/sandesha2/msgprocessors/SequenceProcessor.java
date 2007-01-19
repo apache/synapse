@@ -19,6 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -30,8 +31,11 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.Handler.InvocationResponse;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -39,14 +43,17 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
@@ -65,10 +72,10 @@ public class SequenceProcessor {
 
 	private static final Log log = LogFactory.getLog(SequenceProcessor.class);
 
-	public boolean processSequenceHeader(RMMsgContext rmMsgCtx) throws AxisFault {
+	public InvocationResponse processSequenceHeader(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::processSequenceHeader");
-		boolean result = false;
+		InvocationResponse result = InvocationResponse.CONTINUE;
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		if(sequence != null) {
 			// This is a reliable message, so hand it on to the main routine
@@ -82,15 +89,15 @@ public class SequenceProcessor {
 		return result;
 	}
 	
-	public boolean processReliableMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public InvocationResponse processReliableMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::processReliableMessage");
 
-		boolean msgCtxPaused = false;
+		InvocationResponse result = InvocationResponse.CONTINUE;
 		
 		if (rmMsgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE) != null
 				&& rmMsgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE).equals("true")) {
-			return msgCtxPaused;
+			return result;
 		}
 
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
@@ -153,6 +160,115 @@ public class SequenceProcessor {
 		// updating the last activated time of the sequence.
 		bean.setLastActivatedTime(System.currentTimeMillis());
 		
+		
+		
+		if (sequence.getLastMessage()!=null) {
+			//setting this as the LastMessage number
+			bean.setLastInMessageId(msgCtx.getMessageID());
+		}
+		
+		//Check weather this is a duplicate message. Normally duplicate messages get dropped at the SandeshaGlobalInHandler
+		//But they can reach here if they belonged to the WSRM 1.0 Anonymous InOut Scenario
+		EndpointReference replyTo = rmMsgCtx.getReplyTo();
+		String specVersion = rmMsgCtx.getRMSpecVersion();
+		Boolean duplicateMessage = (Boolean) rmMsgCtx.getProperty(Sandesha2Constants.DUPLICATE_MESSAGE);
+		String mep = msgCtx.getAxisOperation().getMessageExchangePattern();
+		
+		if ((replyTo!=null && replyTo.hasAnonymousAddress()) &&
+			(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) &&
+			(duplicateMessage!=null && duplicateMessage.equals(Boolean.TRUE))){
+			
+			if (WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep)) {
+				//This scenario has to be handled only for meps with response messages
+				result = InvocationResponse.SUSPEND;
+				
+				if (log.isDebugEnabled())
+					log.debug("Exit: SequenceProcessor::processReliableMessage"	+ result);
+				return result;
+			}
+			
+		    String outgoingSideInternalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(sequenceId);
+		    RMSBean findRMSBean = new RMSBean ();
+		    findRMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
+		    
+		    RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+		    RMSBean rmsBean = rmsBeanMgr.findUnique (findRMSBean);
+		    if (rmsBean==null) {
+		    	String message = "Cannot find a entries for the response side sequence";
+		    	throw new SandeshaException (message);
+		    }
+		    
+		    String outgoingSideSequenceId = rmsBean.getSequenceID();
+		    if (outgoingSideSequenceId==null) {
+		    	String message = "Outgoing side SequenceId has not been set";
+		    	throw new SandeshaException (message);
+		    }
+		    
+		    SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
+		    SenderBean findSenderBean = new SenderBean ();
+		    findSenderBean.setSequenceID(outgoingSideSequenceId);
+		    findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+		    findSenderBean.setSend(true);
+		    
+		    List senderBeanList = senderBeanMgr.find(findSenderBean);
+		    for (Iterator it=senderBeanList.iterator();it.hasNext();) {
+		    	SenderBean senderBean = (SenderBean) it.next();
+		    	String messageContextKey = senderBean.getMessageContextRefKey();
+		    	MessageContext outMessageContext = storageManager.retrieveMessageContext(messageContextKey, configCtx);
+		    	
+		    	Long msgNoOfInMsg = (Long) outMessageContext.getProperty(Sandesha2Constants.MSG_NO_OF_IN_MSG);
+		    	if (msgNoOfInMsg == null) {
+					MessageContext inMsgContextOfOutMessage = outMessageContext.getOperationContext()
+															  .getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+					RMMsgContext inRMMsgContextOfOutMessage = MsgInitializer.initializeMessage(inMsgContextOfOutMessage);
+
+					if (inMsgContextOfOutMessage != null) {
+						Sequence sequenceOfInMsg = (Sequence) inRMMsgContextOfOutMessage.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+						if (sequenceOfInMsg == null) {
+							String message = "Sender has an invalid application message. No sequence part";
+							throw new SandeshaException(message);
+						}
+
+						long lng = sequenceOfInMsg.getMessageNumber().getMessageNumber();
+						msgNoOfInMsg = new Long(lng);
+						outMessageContext.setProperty(Sandesha2Constants.MSG_NO_OF_IN_MSG, msgNoOfInMsg);
+
+						// storing again will make sure that this new property get persisted.
+						storageManager.storeMessageContext(messageContextKey, outMessageContext);
+					}
+				}
+		    	
+		    	if (msgNoOfInMsg != null) {
+					
+					//if this message has being processed before, attaching the previous response instead of invoking it again.
+					if (msgNoOfInMsg.longValue()==sequence.getMessageNumber().getMessageNumber()) {
+						OperationContext operationContext = msgCtx.getOperationContext();
+						operationContext.addMessageContext(outMessageContext);
+						
+						outMessageContext.setOperationContext(operationContext);
+						outMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx.getProperty(MessageContext.TRANSPORT_OUT));
+						
+						// pausing the thread, causing the transport to wait.
+						// Sender will send the outMessage correctly, using
+						// RequestResponseTransportListner.
+
+						if (log.isDebugEnabled())
+							log.debug("Exit: SequenceProcessor::processReliableMessage"	+ result);
+						
+						result = InvocationResponse.SUSPEND;
+						return result;
+					}
+				}
+		    }
+
+		    String message = "Cant process the message. Cant find a suitable out message context for the duplicate message";
+			throw new SandeshaException (message);
+		    
+		} else if (duplicateMessage!=null && duplicateMessage.equals(Boolean.TRUE)) {
+			String message = "Unexpected scenario. This message should have been dropped in the pre-dispatch level";
+			throw new SandeshaException (message);
+		}		
+		
 		String key = SandeshaUtil.getUUID(); // key to store the message.
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
@@ -183,7 +299,7 @@ public class SequenceProcessor {
 			// this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
 			rmMsgCtx.pause();
-			msgCtxPaused = true;
+			result = InvocationResponse.SUSPEND;
 		}
 
 		if (!msgNoPresentInList)
@@ -203,8 +319,92 @@ public class SequenceProcessor {
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceId);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
 		
-		if (inOrderInvocation && !msgNoPresentInList) {
+		
+		
+		
+//		adding of acks
+		
+//		if acksTo anonymous 
+//			add an ack entry with an infinite ack interval so that it will be piggybacked by any possible response message
+//		else 
+//			add an ack entry here
+		
+		
+		String acksToAddress = bean.getAcksToEPR();
+		EndpointReference acksTo = new EndpointReference (acksToAddress);
+	
+		if (acksTo!=null && acksTo.hasAnonymousAddress()) {
+			
+			long timeToSend = -1;   //having a negative value for timeToSend will make this behave as having an infinite ack interval.
+			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager,false,true);
+			AcknowledgementManager.removeAckBeanEntries(sequenceId, storageManager);
+			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext ,sequenceId, timeToSend, storageManager);
+		} else { //Scenario 2 and Scenario 3
+			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
+			if (policyBean==null) {
+				String message = "Cant find the policy bean from the passed Axis2 description";
+				throw new SandeshaException (message);
+			}
+			
+			long ackInterval = policyBean.getAcknowledgementInterval();
+			long timeToSend = System.currentTimeMillis() + ackInterval;
+			
+			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequenceId, storageManager,false,true);
 
+			AcknowledgementManager.removeAckBeanEntries(sequenceId, storageManager);
+			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
+		}
+		
+		
+		
+		if (inOrderInvocation) {
+
+			//if replyTo is anonymous and this is not an InOnly message
+				//SUSPEND the execution for RM 1.0    
+				//Sender will attach a sync responseusing the RequestResponseTransport object.
+			//else
+				//ABORT the execution
+			
+			// if (acksTo is anonymous and no response message has been added)
+				//send an ack to the back channel now.
+			
+			//add an antry to the invoker
+			
+			if ((replyTo!=null && replyTo.hasAnonymousAddress() && 
+				 !WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep))) {
+				
+				if (specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) {
+					result = InvocationResponse.SUSPEND;
+					//in case of RM 1.0 result will be suspended, causing the anon-response to be added using RequestResponseTransport
+					//ack bean entry added previously may cause an ack to be piggybacked.
+				} else {
+					result = InvocationResponse.ABORT;
+					
+					//in this case, we will be adding a sync ack if acksTo is anonymous.
+					if (acksTo!=null && acksTo.hasAnonymousAddress()) {
+						Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
+						if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
+							RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager,false,true);
+							msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+							AcknowledgementManager.sendAckNow(ackRMMsgContext);
+						}
+					}
+				}
+			} else {
+				result = InvocationResponse.ABORT;
+			
+				//in this case, we will be adding a sync ack if acksTo is anonymous.
+				if (acksTo!=null && acksTo.hasAnonymousAddress()) {
+					Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
+					if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
+						RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager,false,true);
+						msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+						AcknowledgementManager.sendAckNow(ackRMMsgContext);
+					}
+				}
+			}
+
+			
 			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
 			// saving the message.
@@ -221,151 +421,74 @@ public class SequenceProcessor {
 				throw new SandeshaException(ex.getMessage(), ex);
 			}
 
-			// pause the message
-			rmMsgCtx.pause();
-			msgCtxPaused = true;
-
 			// Starting the invoker if stopped.
 			SandeshaUtil.startInvokerForTheSequence(msgCtx.getConfigurationContext(), sequenceId);
-
 		}
 
-		// Sending acknowledgements
-		sendAckIfNeeded(rmMsgCtx, storageManager);
-
+		
 		if (log.isDebugEnabled())
-			log.debug("Exit: SequenceProcessor::processReliableMessage " + msgCtxPaused);
-		return msgCtxPaused;
+			log.debug("Exit: SequenceProcessor::processReliableMessage " + result);
+		
+		return result;
 	}
 
-	public static void sendAckIfNeeded(RMMsgContext rmMsgCtx, StorageManager storageManager)
-			throws AxisFault {
+
+	public static void sendAckIfNeeded(RMMsgContext rmMsgCtx, StorageManager storageManager, boolean serverSide)
+					throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::sendAckIfNeeded");
 
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
-		
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+		String sequencePropertyKey = SandeshaUtil
+				.getSequencePropertyKey(rmMsgCtx);
+
+		Sequence sequence = (Sequence) rmMsgCtx
+				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
-		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
+		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
+				.getConfigurationContext();
 		if (configCtx == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet);
-			if(log.isDebugEnabled()) log.debug(message);
+			String message = SandeshaMessageHelper
+					.getMessage(SandeshaMessageKeys.configContextNotSet);
+			if (log.isDebugEnabled())
+				log.debug(message);
 			throw new SandeshaException(message);
 		}
-		
-		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
-		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-		
-		EndpointReference ackTo = ackRMMsgCtx.getTo();
-		EndpointReference replyTo = rmMsgCtx.getReplyTo();
-		boolean anonAck = ackTo == null || ackTo.hasAnonymousAddress();
-		boolean anonReply = replyTo == null || replyTo.hasAnonymousAddress();
 
-		// Only use the backchannel for ack messages if we are sure that the application
+		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(
+				rmMsgCtx , sequenceId, storageManager,
+				false, serverSide);
+		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
+
+		EndpointReference acksTo = ackRMMsgCtx.getTo();
+		EndpointReference replyTo = rmMsgCtx.getReplyTo();
+		boolean anonAck = (acksTo == null) || acksTo.hasAnonymousAddress();
+		boolean anonReply = (replyTo == null) || replyTo.hasAnonymousAddress();
+
+		// Only use the backchannel for ack messages if we are sure that the
+		// application
 		// doesn't need it. A 1-way MEP should be complete by now.
 		boolean complete = ackMsgCtx.getOperationContext().isComplete();
 		if (anonAck && anonReply && !complete) {
-			if (log.isDebugEnabled()) log.debug("Exit: SequenceProcessor::sendAckIfNeeded, avoiding using backchannel");
+			if (log.isDebugEnabled())
+				log
+						.debug("Exit: SequenceProcessor::sendAckIfNeeded, avoiding using backchannel");
 			return;
 		}
-			
-		if(anonAck) {
-			// setting CONTEXT_WRITTEN since acksto is anonymous
-			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
-				// operation context will be null when doing in a GLOBAL
-				// handler.
-				AxisOperation op = ackMsgCtx.getAxisOperation();
-				OperationContext opCtx = new OperationContext(op);
-				rmMsgCtx.getMessageContext().setOperationContext(opCtx);
-			}
 
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(
-					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+		long ackInterval = SandeshaUtil.getPropertyBean(
+				rmMsgCtx.getMessageContext().getAxisService())
+				.getAcknowledgementInterval();
 
-			rmMsgCtx.getMessageContext().setProperty(Sandesha2Constants.ACK_WRITTEN, "true");
-
-			ackRMMsgCtx.getMessageContext().setServerSide(true);
-			
-			AxisEngine engine = new AxisEngine(configCtx);
-			engine.send(ackRMMsgCtx.getMessageContext());
-
-		} else if(!anonAck) {
-
-			// / Transaction asyncAckTransaction =
-			// storageManager.getTransaction();
-
-			SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
-
-			String key = SandeshaUtil.getUUID();
-
-			SenderBean ackBean = new SenderBean();
-			ackBean.setMessageContextRefKey(key);
-			ackBean.setMessageID(ackMsgCtx.getMessageID());
-			ackBean.setReSend(false);
-			ackBean.setSequenceID(sequencePropertyKey);
-			ackBean.setInternalSequenceID(sequencePropertyKey);
-			EndpointReference to = ackMsgCtx.getTo();
-			if (to!=null)
-				ackBean.setToAddress(to.getAddress());
-
-			// this will be set to true in the sender.
-			ackBean.setSend(true);
-
-			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-
-			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			long ackInterval = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisService())
-					.getAcknowledgementInterval();
-
-			// Ack will be sent as stand alone, only after the retransmitter
-			// interval.
-			long timeToSend = System.currentTimeMillis() + ackInterval;
-
-			// removing old acks.
-			SenderBean findBean = new SenderBean();
-			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			findBean.setSend(true);
-			findBean.setReSend(false);
-			Collection coll = retransmitterBeanMgr.find(findBean);
-			Iterator it = coll.iterator();
-
-			if (it.hasNext()) {
-				SenderBean oldAckBean = (SenderBean) it.next();
-				timeToSend = oldAckBean.getTimeToSend(); // If there is an
-															// old ack. This ack
-															// will be sent in
-															// the old
-															// timeToSend.
-
-				// removing the retransmitted entry for the oldAck
-				retransmitterBeanMgr.delete(oldAckBean.getMessageID());
-
-				// removing the message store entry for the old ack
-				storageManager.removeMessageContext(oldAckBean.getMessageContextRefKey());
-			}
-
-			ackBean.setTimeToSend(timeToSend);
-
-			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-			
-			// / asyncAckTransaction.commit();
-
-			// passing the message through sandesha2sender
-			ackMsgCtx.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-			ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
-			
-			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
-
-			// inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
-
-			SandeshaUtil.startSenderForTheSequence(ackRMMsgCtx.getConfigurationContext(), sequenceId);
+		long timeToSend = System.currentTimeMillis() + ackInterval;
+		if (anonAck) {
+			AcknowledgementManager.sendAckNow(ackRMMsgCtx);
+		} else if (!anonAck) {
+			AcknowledgementManager.addAckBeanEntry(ackRMMsgCtx, sequenceId, timeToSend, storageManager);
 		}
-		
-		
+
 		if (log.isDebugEnabled())
 			log.debug("Exit: SequenceProcessor::sendAckIfNeeded");
 	}
+
 }

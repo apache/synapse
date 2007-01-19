@@ -68,8 +68,21 @@ public class TerminateManager {
 	 */
 	public static void cleanReceivingSideOnTerminateMessage(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
+
 		// clean senderMap
 
+		//removing any un-sent ack messages.
+		SenderBean findAckBean = new SenderBean ();
+		findAckBean.setSequenceID(sequenceId);
+		findAckBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
+		
+		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
+		Iterator ackBeans = senderBeanMgr.find(findAckBean).iterator();
+		while (ackBeans.hasNext()) {
+			SenderBean ackBean = (SenderBean) ackBeans.next();
+			senderBeanMgr.delete(ackBean.getMessageID());
+		}
+		
 		// Currently in-order invocation is done for default values.
 		boolean inOrderInvocation = SandeshaUtil.getDefaultPropertyBean(configContext.getAxisConfiguration())
 				.isInOrder();
@@ -197,8 +210,8 @@ public class TerminateManager {
 		}
 	}
 
-	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String internalSequenceID, String outSequenceId,
-			String sequencePropertyKey, StorageManager storageManager) throws AxisFault {
+	public static void addTerminateSequenceMessage(RMMsgContext referenceMessage, String internalSequenceID, String outSequenceId, StorageManager storageManager) throws AxisFault {
+	
 		if(log.isDebugEnabled())
 			log.debug("Enter: TerminateManager::addTerminateSequenceMessage " + outSequenceId + ", " + internalSequenceID);
 
@@ -258,6 +271,7 @@ public class TerminateManager {
 		terminateBean.setInternalSequenceID(internalSequenceID);
 		terminateBean.setSequenceID(outSequenceId);
 		terminateBean.setMessageContextRefKey(key);
+		terminateBean.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
 
 		// Set a retransmitter lastSentTime so that terminate will be send with
 		// some delay.
@@ -275,6 +289,12 @@ public class TerminateManager {
 
 		terminateBean.setReSend(false);
 		
+		terminateBean.setSequenceID(outSequenceId);
+		
+		terminateBean.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ);
+		terminateBean.setInternalSequenceID(internalSequenceID);
+		
+		
 		EndpointReference to = terminateRMMessage.getTo();
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
@@ -286,12 +306,14 @@ public class TerminateManager {
 		terminateRMMessage.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 		
 		//the propertyKey of the ackMessage will be the propertyKey for the terminate message as well.
-		terminateRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY, sequencePropertyKey);
+//		terminateRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY, sequencePropertyKey);
 		
 		// / addTerminateSeqTransaction.commit();
 		SandeshaUtil.executeAndStore(terminateRMMessage, key);
 		
 		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
+		
+		
 		retramsmitterMgr.insert(terminateBean);
 
 		if(log.isDebugEnabled())

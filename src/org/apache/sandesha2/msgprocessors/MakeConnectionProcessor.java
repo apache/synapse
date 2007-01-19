@@ -70,6 +70,13 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//set it.
 		Collection collection = senderBeanMgr.find(findSenderBean);
 		
+		//removing beans that does not pass the resend test
+		for (Iterator it=collection.iterator();it.hasNext();) {
+			SenderBean bean = (SenderBean) it.next();
+			if (!bean.isReSend() && bean.getSentCount()>0)
+				it.remove();
+		}
+		
 		//selecting a bean to send RANDOMLY. TODO- Should use a better mechanism.
 		int size = collection.size();
 		int itemToPick=-1;
@@ -107,6 +114,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			
 		String messageStorageKey = senderBean.getMessageContextRefKey();
 		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,configurationContext);
+		if (returnMessage==null) {
+			String message = "Cannot find the message stored with the key:" + messageStorageKey;
+			throw new SandeshaException (message);
+		}
+		
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
 		
 		if(pending) addMessagePendingHeader (returnRMMsg,pending);
@@ -118,6 +130,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		context.addMessageContext(returnMessage);
 		returnMessage.setOperationContext(context);
 		
+		returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
+		
+		// Store the response again
+		storageManager.updateMessageContext(messageStorageKey, returnMessage);
+		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//	1. A message being sent by the Sender thread.
@@ -126,6 +143,9 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		worker.setMessage(returnRMMsg);
 
 		worker.run();
+		
+		senderBeanMgr.insert(senderBean);
+		
 		return false;
 	}
 	
@@ -145,6 +165,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	private void setTransportProperties (MessageContext returnMessage, RMMsgContext makeConnectionMessage) {
         returnMessage.setProperty(MessageContext.TRANSPORT_OUT,makeConnectionMessage.getProperty(MessageContext.TRANSPORT_OUT));
         returnMessage.setProperty(Constants.OUT_TRANSPORT_INFO,makeConnectionMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
+        
+        Object contentType = makeConnectionMessage.getProperty(Constants.Configuration.CONTENT_TYPE);
+        returnMessage.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
+
         returnMessage.setTransportOut(makeConnectionMessage.getMessageContext().getTransportOut());
 	}
 }

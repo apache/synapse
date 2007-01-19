@@ -41,9 +41,11 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
@@ -188,6 +190,43 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 		} else {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+		}
+		
+
+		
+//		SequencePropertyBean findBean = new SequencePropertyBean ();
+//		findBean.setName (Sandesha2Constants.SequenceProperties.TERMINATE_ON_CREATE_SEQUENCE);
+//		findBean.setValue(createSeqMsg.getTo().getAddress());
+		
+		
+		
+		String toAddress = createSeqMsg.getTo().getAddress();
+		//if toAddress is RMAnon we may need to terminate the request side sequence here.
+		if (toAddress!=null && SandeshaUtil.isWSRMAnonymous(toAddress)) {
+
+			RMSBean findBean = new RMSBean ();
+			findBean.setReplyToEPR(toAddress);
+			
+			//TODO recheck
+			RMSBean rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
+			if (rmsBean!=null) {
+				
+				if (rmsBean.isTerminationPauserForCS()) {
+					//AckManager hs not done the termination. Do the termination here.
+					
+					MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
+					if (requestSideRefMessage==null) {
+						String message = "Reference message is not present for the sequence with property key " + rmsBean.getInternalSequenceID();
+						throw new SandeshaException (message);
+						
+					}
+					
+					RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
+					TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+				}
+				
+			}
+
 		}
 			
 		createSeqRMMsg.pause();

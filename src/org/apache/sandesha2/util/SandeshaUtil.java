@@ -768,16 +768,16 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String sequencePropertyKey,
+	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String internalSequenceId,
 			StorageManager storageManager) throws SandeshaException {
 
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, sequencePropertyKey);
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		
 		RangeString ackedMsgRanges = rmsBean.getClientCompletedMessages();
 		long smallestMsgNo = 1;
 		Range interestedRange = new Range(smallestMsgNo, highestInMsgNo);
 		boolean allComplete = false;
-		if(ackedMsgRanges.isRangeCompleted(interestedRange)){
+		if(ackedMsgRanges!=null && ackedMsgRanges.isRangeCompleted(interestedRange)){
 			allComplete = true;
 		}
 		return allComplete;

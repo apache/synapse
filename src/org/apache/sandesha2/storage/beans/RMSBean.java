@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.sandesha2.util.RangeString;
 
 /**
@@ -136,6 +138,13 @@ public class RMSBean extends RMSequenceBean {
 	private static final int SEQ_CLOSED_CLIENT_FLAG    = 0x01000000;
 	private static final int ACKED_MESSAGES_FLAG       = 0x10000000;
 
+  /**
+   * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
+   * for the response side, other wise PollingManager will pause the polling process in termination and we will never be able
+   * to get the CS.
+   */
+  private boolean terminationPauserForCS = false;
+  
 	public RMSBean() {
 	}
 
@@ -291,6 +300,15 @@ public class RMSBean extends RMSequenceBean {
 	public void setOfferedSequence(String offeredSequence) {
   	this.offeredSequence = offeredSequence;
   }
+	
+	public boolean isTerminationPauserForCS() {
+		return terminationPauserForCS;
+	}
+
+	public void setTerminationPauserForCS(boolean terminationPauserForCS) {
+		this.terminationPauserForCS = terminationPauserForCS;
+	}
+
 
 	public String toString() {
 		StringBuffer result = new StringBuffer();

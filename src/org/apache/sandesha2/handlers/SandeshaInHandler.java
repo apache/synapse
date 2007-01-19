@@ -18,25 +18,35 @@
 package org.apache.sandesha2.handlers;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.transport.RequestResponseTransport;
+import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
 import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Sequence;
 
 /**
  * This is invoked in the inFlow of an RM endpoint. This is responsible for
@@ -117,9 +127,7 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			// Process the Sequence header, if there is one
 			SequenceProcessor seqProcessor = new SequenceProcessor();
-			if(seqProcessor.processSequenceHeader(rmMsgCtx)) {
-				returnValue = InvocationResponse.SUSPEND;
-			}
+			returnValue = seqProcessor.processSequenceHeader(rmMsgCtx);
 
 		} catch (Exception e) {
 			if (log.isDebugEnabled())
@@ -154,6 +162,113 @@ public class SandeshaInHandler extends AbstractHandler {
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaInHandler::invoke " + returnValue);
 		return returnValue;
+	}
+	
+	
+	public void flowComplete(MessageContext msgContext) {
+		super.flowComplete(msgContext);
+		
+		Transaction transaction = null;
+		try {
+			//if in order is not enabled and server side and this is an application message
+			
+			//check the replyTo address
+			//check the AcksTo address of the incoming sequence
+
+//			if (replyTo is anonymous and this is not an InOnly message)
+//				add an HOLD response property
+//				SUSPEND the execution
+//				Sender will attach a sync response using the RequestResponseTransport object.
+//			else  (if acksTo is anonymous AND no response message has been added)
+//				send an ack to the back channel now.
+			
+			ConfigurationContext configurationContext = msgContext.getConfigurationContext();
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext, 
+																				   configurationContext.getAxisConfiguration());
+			
+			transaction = storageManager.getTransaction();
+			
+			RMMsgContext rmMsgContext = MsgInitializer.initializeMessage(msgContext);
+			
+			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
+			if (policyBean==null) {
+				String message = "Cant find a valid policy bean";
+				throw new SandeshaException (message);
+			}
+
+			boolean inOrder= policyBean.isInOrder();
+			
+			if (msgContext.isServerSide() && !inOrder && rmMsgContext.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
+				
+				String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgContext);
+				if (propertyKey==null) {
+					String message = "Cant find a sequencePropertyKey from the given message context";
+					throw new SandeshaException (message);
+				}
+				
+				Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+				String sequenceId = sequence.getIdentifier().getIdentifier();
+				
+				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+				
+				RMDBean findBean = new RMDBean ();
+				findBean.setSequenceID(sequenceId);
+				RMDBean rmdBean = rmdBeanMgr.findUnique(findBean);
+
+				if (rmdBean==null) {
+					String message = "RMDBean not available for the sequence:" + sequenceId;
+					throw new SandeshaException (message);
+				}
+				
+				String acksToAddress = rmdBean.getAcksToEPR();
+				
+				EndpointReference acksTo = new EndpointReference (acksToAddress);
+				EndpointReference replyTo = msgContext.getReplyTo();
+				
+				String mep = msgContext.getAxisOperation().getMessageExchangePattern();
+				String specVersion = rmMsgContext.getRMSpecVersion();
+				
+				if (replyTo!=null && replyTo.hasAnonymousAddress() && 
+					!WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep)){
+					
+					//for RM 1.0 this is done to attach a sync response using the RequestResponseTransport
+					if (specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0))
+						msgContext.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
+					
+				} else if (acksTo!=null && acksTo.hasAnonymousAddress()) {
+					
+					Object responseWritten = msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
+					if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
+						RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgContext , sequenceId, storageManager, false, true);
+						msgContext.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+						AcknowledgementManager.sendAckNow(ackRMMsgContext);
+					}
+					
+				}
+			}
+		} catch (AxisFault e) {
+			String message = "Got exception in flowCompletion of SandeshaInHandler";
+			log.error(message, e);
+			
+			if (transaction != null) {
+				try {
+					transaction.rollback();
+					transaction = null;
+				} catch (Exception e1) {
+					message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
+					log.debug(message, e);
+				}
+			}
+		} finally {
+			if (transaction != null) {
+				try {
+					transaction.commit();
+				} catch (Exception e) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
+					log.debug(message, e);
+				}
+			}
+		}
 	}
 
 }

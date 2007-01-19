@@ -90,7 +90,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		rmdBean.setClosed(true);
 		storageManager.getRMDBeanMgr().update(rmdBean);
 
-		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequencePropertyKey, sequenceId, storageManager);
+		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager, false, true);
 
 		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 

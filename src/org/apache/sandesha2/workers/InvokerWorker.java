@@ -121,8 +121,25 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 				
-				//TODO support WSRM 1.1 spce here ( there is no last message concept)
+				boolean highestMessage = false;
 				if (sequence.getLastMessage() != null) {
+					//this will work for RM 1.0 only
+					highestMessage = true;
+				} else {
+
+					RMDBean findBean = new RMDBean ();
+					findBean.setSequenceID(sequenceId);
+					RMDBean rmdBean = storageManager.getRMDBeanMgr().findUnique(findBean);
+					
+					if (rmdBean!=null && rmdBean.isTerminated()) {
+						long highestInMsgNo = rmdBean.getHighestInMessageNumber();
+						if (messageNo==highestInMsgNo)
+							highestMessage = true;
+					}
+				}
+				
+				if (highestMessage) {
+					//do cleaning stuff that hs to be done after the invocation of the last message.
 					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequencePropertyKey, sequenceId, storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)

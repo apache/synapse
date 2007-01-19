@@ -20,6 +20,7 @@ public class AddressableEchoTest extends SandeshaTestCase {
 
 	int serverPort = DEFAULT_SERVER_TEST_PORT;
 	private static boolean serverStarted = false; 
+	private static ConfigurationContext configContext = null;
 	
 	public AddressableEchoTest () {
 		super ("AddressableEchoTest");
@@ -31,8 +32,13 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 
-		if (!serverStarted)
+		if (!serverStarted) {
 			startServer(repoPath, axis2_xml);
+			String repoPathClient = "target" + File.separator + "repos" + File.separator + "client";
+			String axis2_xmlClient = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+			configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPathClient,axis2_xmlClient);
+
+		}
 		serverStarted = true;
 	}
 	
@@ -45,12 +51,7 @@ public class AddressableEchoTest extends SandeshaTestCase {
 
 	public void testAsyncEcho () throws Exception {
 	
-		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		
-		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-		
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";		
 
 		Options clientOptions = new Options ();
 		clientOptions.setAction(echoAction);
@@ -131,20 +132,12 @@ public class AddressableEchoTest extends SandeshaTestCase {
     //assertion that the out sequence is terminated.
 		SequenceReport outgoingSequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 		assertEquals(outgoingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-
-		configContext.getListenerManager().stop();
-		serviceClient.cleanup();
 	}
 	
 	public void testAsyncEchoWithOffer () throws AxisFault, InterruptedException {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
-		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-		
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		String sequenceKey = SandeshaUtil.getUUID();
 		String offeredSequenceId = SandeshaUtil.getUUID();

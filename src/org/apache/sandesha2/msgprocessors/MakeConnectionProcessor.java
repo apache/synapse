@@ -132,9 +132,6 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
 		
-		// Store the response again
-		storageManager.updateMessageContext(messageStorageKey, returnMessage);
-		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//	1. A message being sent by the Sender thread.
@@ -143,8 +140,6 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		worker.setMessage(returnRMMsg);
 
 		worker.run();
-		
-		senderBeanMgr.insert(senderBean);
 		
 		return false;
 	}

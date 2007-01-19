@@ -31,7 +31,8 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 
 public class AddressingVersionTest extends SandeshaTestCase {
-	
+
+	private static boolean serverStarted = false;
 
 	public AddressingVersionTest () {
 		super ("AddressingVersionTest");
@@ -41,7 +42,16 @@ public class AddressingVersionTest extends SandeshaTestCase {
 		super.setUp();
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-		startServer(repoPath, axis2_xml);
+		if (!serverStarted)
+			startServer(repoPath, axis2_xml);
+		serverStarted = true;
+	}
+	
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
 	}
 	
 	public void testAddressingFinal() throws Exception  {

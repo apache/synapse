@@ -20,7 +20,6 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 
 import junit.framework.TestCase;
 
@@ -35,9 +34,9 @@ public class CloseSequenceResponseTest extends TestCase {
 
     }
 
-    public void testFromOMElement() throws SandeshaException {
+    public void testFromOMElement()  {
     	
     }
 
-    public void testToSOAPEnvelope()  throws SandeshaException {}
+    public void testToSOAPEnvelope() {}
 }

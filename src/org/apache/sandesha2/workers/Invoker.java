@@ -215,6 +215,8 @@ public class Invoker extends SandeshaThread {
 
 			try {
 				if(sleep && !runMainLoop()) Thread.sleep(Sandesha2Constants.INVOKER_SLEEP_TIME);
+				if (!isThreadStarted())
+					continue;
 				// Indicate that we are running the main loop
 				setRanMainLoop();
 			} catch (InterruptedException ex) {
@@ -292,6 +294,8 @@ public class Invoker extends SandeshaThread {
 				
 				// If there aren't any beans to process then move on to the next sequence
 				if (invokerBeans.size() == 0) {
+					if (log.isDebugEnabled())
+						log.debug("No beans to invoke on sequence " + sequenceId);
 					continue;
 				}
 				
@@ -300,6 +304,9 @@ public class Invoker extends SandeshaThread {
 				//TODO correct the locking mechanism to have one lock per sequence.
 				
 				if (stMapIt.hasNext()) { //some invokation work is present
+					if (!isThreadStarted())
+						continue;
+					
 					InvokerBean bean = (InvokerBean) stMapIt.next();
 					//see if this is an out of order msg
 					boolean beanIsOutOfOrderMsg = bean.getMsgNo()!=nextMsgno;

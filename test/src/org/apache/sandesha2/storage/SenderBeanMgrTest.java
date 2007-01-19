@@ -72,7 +72,7 @@ public class SenderBeanMgrTest extends SandeshaTestCase {
         assertNotNull(mgr.retrieve("MsgId1"));
     }
 
-    public void testFind() throws SandeshaStorageException {
+    public void testFind() {
         try {
             mgr.insert(new SenderBean("MsgId2", "Key2", false , 1001 , "TmpSeqId2", 1002));
             mgr.insert(new SenderBean("MsgId3", "Key3", false , 1001 , "TmpSeqId2", 1003));
@@ -99,7 +99,7 @@ public class SenderBeanMgrTest extends SandeshaTestCase {
 
     }
 
-    public void testInsert() throws SandeshaStorageException {
+    public void testInsert() {
 //        try {
 //            mgr.insert(new SenderBean());
 //            fail("should throw an exception");

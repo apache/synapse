@@ -60,7 +60,7 @@ public class OptionalReliabilityTest extends SandeshaTestCase {
 		serviceClient.cleanup();
 	}
 
-	public void testSyncEcho () throws AxisFault, InterruptedException {
+	public void testSyncEcho () throws AxisFault {
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";

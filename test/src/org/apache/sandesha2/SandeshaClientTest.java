@@ -39,9 +39,26 @@ public class SandeshaClientTest extends SandeshaTestCase {
 
 	String server_repoPath = "target" + File.separator + "repos" + File.separator + "server";
 	String server_axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
+	private static boolean startedServer = false;
 
 	public SandeshaClientTest () {
 		super ("SandeshaClientTest");
+	}
+
+	public void setUp () throws Exception {
+		super.setUp();
+		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
+		if (!startedServer)
+			startServer(repoPath, axis2_xml);
+		startedServer = true;
+	}
+	
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
 	}
 
 	public void testCreateSequenceWithOffer () throws Exception {
@@ -63,7 +80,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
-		startServer(server_repoPath, server_axis2_xml);
 		try
 		{
 			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
@@ -112,7 +128,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	}
 	
 	public void testSequenceCloseTerminate()throws Exception{
-			startServer(server_repoPath, server_axis2_xml);
 			String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 			
 			String repoPath = "target" + File.separator + "repos" + File.separator + "client";
@@ -215,248 +230,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 //	}
 //
 
-    /**
-		 * Checks the following scenario
-		 * 
-		 * Don't start the server
-		 * 1) send an application message (will generate the create sequence)
-		 * 2) Send ACK Request (should not be rejected)
-		 * 3) start the server
-		 * 4) wait a bit then terminate sequence
-		 * 5) Issue wait until sequence completed (with a wait time)
-		 * 6) Ensure that the sequence was terminated
-		 * 
-		 */
-		public void testAckRequestWithWait () throws Exception {
-			String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-			
-			String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-			String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-			
-			ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-			
-			Options clientOptions = new Options ();
-			clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
-		       Sandesha2Constants.SPEC_VERSIONS.v1_1);
-			clientOptions.setTo(new EndpointReference (to));
-			
-			ServiceClient serviceClient = new ServiceClient (configContext,null);
-			clientOptions.setAction(pingAction);
-			
-			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
-			clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-				//serviceClient.
-			serviceClient.setOptions(clientOptions);
-				
-			try{
-				// 1) Send the application message
-				serviceClient.fireAndForget(getPingOMBlock("ping1"));
-				
-				// 2) Send Ack request for the sequence
-				SandeshaClient.sendAckRequest(serviceClient);
-								
-				// 3) Start the server			
-				startServer(server_repoPath, server_axis2_xml);
-
-				// 4) Wait a bit then terminate
-				long limit = System.currentTimeMillis() + waitTime;
-				Error lastError = null;
-				while(System.currentTimeMillis() < limit) {
-					Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
-					
-					try {
-						//now check the sequence is running
-						SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-						assertEquals(report.getSequenceStatus(), SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
-
-						lastError = null;
-						break;
-					} catch(Error e) {
-						lastError = e;
-					}
-				}
-				if(lastError != null) throw lastError;
-				
-				SandeshaClient.terminateSequence(serviceClient);
-				
-				// 5) wait for the sequence completion (30 second wait)
-				SandeshaClient.waitUntilSequenceCompleted(serviceClient, 30000);
-				
-				// 6) Check that the sequence has terminated
-				SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-				assertNotNull(report);
-				assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, report.getSequenceStatus());
-
-			}
-			finally {
-				configContext.getListenerManager().stop();
-				serviceClient.cleanup();			
-			}
-			
-		}
-
-		/**
-		 * Checks the following scenario
-		 * 
-		 * Don't start the server
-		 * 1) send an application message (will generate the create sequence)
-		 * 2) close the sequence
-		 * 3) send another application message (this should fail)
-		 * 4) start the server
-		 * 5) wait a bit then terminate sequence
-		 * 6) Issue wait until sequence completed (with a wait time)
-		 * 7) Ensure that the sequence was terminated
-		 * 
-		 */
-		public void testCloseSequenceWithWait () throws Exception {
-			String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-			
-			String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-			String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-			
-			ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-			
-			Options clientOptions = new Options ();
-			clientOptions.setAction(pingAction);
-			clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
-		       Sandesha2Constants.SPEC_VERSIONS.v1_1);
-			clientOptions.setTo(new EndpointReference (to));
-			
-			ServiceClient serviceClient = new ServiceClient (configContext,null);
-			
-			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
-			clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-				//serviceClient.
-			serviceClient.setOptions(clientOptions);
-				
-			try{
-				// 1) Send the application message
-				serviceClient.fireAndForget(getPingOMBlock("ping1"));
-				
-				// 2) Close the sequence
-				SandeshaClient.closeSequence(serviceClient);
-				
-				// 3) Send the second application message (this should fail)
-				try{
-					serviceClient.fireAndForget(getPingOMBlock("ping2"));
-					fail(); //this should have failed
-				}
-				catch(Exception e){
-					//good
-				}
-				
-				// 4) Start the server			
-				startServer(server_repoPath, server_axis2_xml);
-
-				// 5) Wait a bit then terminate
-				long limit = System.currentTimeMillis() + waitTime;
-				Error lastError = null;
-				while(System.currentTimeMillis() < limit) {
-					Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
-					
-					try {
-						//now check the sequence is running
-						SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-						assertEquals(report.getSequenceStatus(), SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
-
-						lastError = null;
-						break;
-					} catch(Error e) {
-						lastError = e;
-					}
-				}
-				if(lastError != null) throw lastError;
-				SandeshaClient.terminateSequence(serviceClient);
-				
-				// 6) wait for the sequence completion (30 second wait)
-				SandeshaClient.waitUntilSequenceCompleted(serviceClient, 30000);
-				
-				// 7) Check that the sequence has terminated
-				SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-				assertNotNull(report);
-				assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, report.getSequenceStatus());
-
-			}
-			finally {
-				configContext.getListenerManager().stop();
-				serviceClient.cleanup();			
-			}
-			
-		}
-
-  /**
-	 * Checks the following scenario
-	 * 
-	 * Don't start the server
-	 * 1) send an application message (will generate the create sequence)
-	 * 2) terminate the sequence
-	 * 3) send another application message (this should fail)
-	 * 4) start the server
-	 * 5) Issue wait until sequence completed (with a wait time)
-	 * 6) Ensure that the sequence was terminated
-	 * 
-	 */
-	public void testTerminateSequenceWithWait () throws Exception {
-		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		
-		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-		
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-		
-		Options clientOptions = new Options ();
-		clientOptions.setAction(pingAction);
-		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-	   clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, 
-	       Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		clientOptions.setTo(new EndpointReference (to));
-		
-		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		
-		String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
-		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-			//serviceClient.
-		serviceClient.setOptions(clientOptions);
-			
-		try{
-			// 1) Send the application message
-			serviceClient.fireAndForget(getPingOMBlock("ping1"));
-			
-			// 2) Terminate the sequence
-			SandeshaClient.terminateSequence(serviceClient);
-			
-			// 3) Send the second application message (this should fail)
-			try{
-				serviceClient.fireAndForget(getPingOMBlock("ping2"));
-				fail(); //this should have failed
-			}
-			catch(Exception e){
-				//good
-			}
-			
-			// 4) Start the server			
-			startServer(server_repoPath, server_axis2_xml);
-
-			// 5) wait for the sequence completion (30 second wait)
-			SandeshaClient.waitUntilSequenceCompleted(serviceClient, 30000);
-			
-			// 6) Check that the sequence has terminated
-			SequenceReport report = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-			assertNotNull(report);
-			assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, report.getSequenceStatus());
-
-		}
-		finally {
-			configContext.getListenerManager().stop();
-			serviceClient.cleanup();			
-		}		
-	}
-	
   /**
 	 * Checks the following scenario
 	 * 
@@ -470,8 +243,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	 * 
 	 */
 	public void testTerminateCreateWithWait () throws Exception {
-
-		startServer(server_repoPath, server_axis2_xml);
 
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
@@ -540,7 +311,6 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	 * SenderBean no longer exists for it.
 	 */
 	public void testAckRequest () throws Exception {
-		startServer(server_repoPath, server_axis2_xml);
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
@@ -631,87 +401,5 @@ public class SandeshaClientTest extends SandeshaTestCase {
 //	public void getSequenceIDTest () {
 //		
 //	}
-	
-	/**
-	 * Tests that the last error and timestamp are set for the simple case of the target service not being available
-	 */
-	public void testLastErrorAndTimestamp() throws Exception
-	{
-		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-		String transportTo = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
-
-		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
-		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
-
-		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
-
-		//clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		Options clientOptions = new Options ();
-		clientOptions.setAction(pingAction);
-		clientOptions.setSoapVersionURI(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
-		
-		clientOptions.setTo(new EndpointReference (to));
-		clientOptions.setProperty(Configuration.TRANSPORT_URL,transportTo);
-		
-		String sequenceKey = "sequence1";
-		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		
-		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		
-		serviceClient.setOptions(clientOptions);
-	
-		serviceClient.fireAndForget(getPingOMBlock("ping1"));
-		
-		// Let an error occur before we start the server
-		long limit = System.currentTimeMillis() + waitTime;
-		Error lastError = null;
-		while(System.currentTimeMillis() < limit) {
-			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
-			
-			try {
-				// Check that the last error and last error time stamp have been set
-				Exception lastSendError = SandeshaClient.getLastSendError(serviceClient);
-				long lastSendErrorTime = SandeshaClient.getLastSendErrorTimestamp(serviceClient);
-				
-				// Check the values are valid
-				assertNotNull(lastSendError);
-				assertTrue(lastSendErrorTime > -1);
-
-				lastError = null;
-				break;
-			} catch(Error e) {
-				lastError = e;
-			}
-		}
-		if(lastError != null) throw lastError;
-		
-		startServer(server_repoPath, server_axis2_xml);
-
-		serviceClient.fireAndForget(getPingOMBlock("ping2"));
-		
-		
-		limit = System.currentTimeMillis() + waitTime;
-		while(System.currentTimeMillis() < limit) {
-			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
-			
-			try {
-				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(2)));
-				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
-
-				lastError = null;
-				break;
-			} catch(Error e) {
-				lastError = e;
-			}
-		}
-		if(lastError != null) throw lastError;
-	
-		SandeshaClient.terminateSequence(serviceClient, sequenceKey);
-		
-		configContext.getListenerManager().stop();
-		serviceClient.cleanup();
-	}
 	
 }

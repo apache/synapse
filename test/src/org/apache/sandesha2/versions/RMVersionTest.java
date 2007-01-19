@@ -32,6 +32,8 @@ import org.apache.sandesha2.client.SequenceReport;
 
 public class RMVersionTest extends SandeshaTestCase {
 
+	private static boolean serverStarted = false;
+
 	public RMVersionTest () {
 		super ("RMVersionTest");
 	}
@@ -40,9 +42,18 @@ public class RMVersionTest extends SandeshaTestCase {
 		super.setUp();
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-		startServer(repoPath, axis2_xml);
+		if (!serverStarted)
+			startServer(repoPath, axis2_xml);
+		serverStarted = true;
 	}
 	
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
+	}
+
 	public void testRMSubmission () throws Exception  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";

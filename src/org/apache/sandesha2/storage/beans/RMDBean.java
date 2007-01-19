@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.storage.beans;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.sandesha2.util.RangeString;
 
 /**

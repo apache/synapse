@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;

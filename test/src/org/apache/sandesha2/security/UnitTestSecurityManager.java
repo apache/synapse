@@ -54,7 +54,6 @@ public class UnitTestSecurityManager extends SecurityManager {
 	}
 
 	public SecurityToken getSecurityToken(MessageContext message)
-	throws SandeshaException
 	{
 		log.debug("Enter: UnitTestSecurityManager::getSecurityToken(MessageContext)");
 
@@ -66,7 +65,6 @@ public class UnitTestSecurityManager extends SecurityManager {
 	}
 
 	public SecurityToken getSecurityToken(OMElement theSTR,	MessageContext message)
-	throws SandeshaException
 	{
 		log.debug("Enter: UnitTestSecurityManager::getSecurityToken(OMElement,MessageContext)");
 
@@ -79,15 +77,14 @@ public class UnitTestSecurityManager extends SecurityManager {
 		return result;
 	}
 
-	public String getTokenRecoveryData(SecurityToken token) throws SandeshaException {
+	public String getTokenRecoveryData(SecurityToken token)  {
 		log.debug("Enter: UnitTestSecurityManager::getTokenRecoveryData");
 		String key = ((UnitTestSecurityToken)token).getURI();
 		log.debug("Exit: UnitTestSecurityManager::getTokenRecoveryData " + key);
 		return key;
 	}
 
-	public SecurityToken recoverSecurityToken(String tokenData)
-			throws SandeshaException {
+	public SecurityToken recoverSecurityToken(String tokenData) {
 		log.debug("Enter: UnitTestSecurityManager::recoverSecurityToken");
 		SecurityToken result = (SecurityToken) tokens.get(tokenData);
 		log.debug("Exit: UnitTestSecurityManager::recoverSecurityToken " + result);
@@ -118,7 +115,7 @@ public class UnitTestSecurityManager extends SecurityManager {
 		log.debug("Exit: UnitTestSecurityManager::checkProofOfPossession");
 	}
 
-	public OMElement createSecurityTokenReference(SecurityToken token, MessageContext message) throws SandeshaException {
+	public OMElement createSecurityTokenReference(SecurityToken token, MessageContext message) {
 		log.debug("Enter: UnitTestSecurityManager::createSecurityTokenReference");
 
 		String uri = ((UnitTestSecurityToken)token).getURI();

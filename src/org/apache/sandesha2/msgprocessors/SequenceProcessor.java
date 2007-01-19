@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,8 +31,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
-import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
@@ -438,10 +435,7 @@ public class SequenceProcessor {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::sendAckIfNeeded");
-
-		String sequencePropertyKey = SandeshaUtil
-				.getSequencePropertyKey(rmMsgCtx);
-
+		
 		Sequence sequence = (Sequence) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();

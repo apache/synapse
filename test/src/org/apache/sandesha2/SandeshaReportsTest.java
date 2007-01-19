@@ -35,6 +35,8 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SandeshaReportsTest extends SandeshaTestCase {
 
+	private static boolean startedServer = false;
+
 	public SandeshaReportsTest () {
 		super ("SandeshaReportsTest");
 	}
@@ -45,7 +47,16 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 
-		startServer(repoPath, axis2_xml);
+		if (!startedServer)
+			startServer(repoPath, axis2_xml);
+		startedServer = true;
+	}
+	
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
 	}
 	
 	public void testSequenceReports () throws Exception  {

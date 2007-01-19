@@ -141,7 +141,7 @@ public class MessageContextPropertyTest extends SandeshaTestCase {
 		Long lastReceivedMessage = null;
 		String sequenceId = null;
 		
-		public void invokeBusinessLogic(MessageContext msgContext) throws AxisFault {
+		public void invokeBusinessLogic(MessageContext msgContext) {
 			Long msgNo = (Long) msgContext.getProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER);
 			String sequenceId = (String) msgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
 			

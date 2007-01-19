@@ -19,7 +19,6 @@ package org.apache.sandesha2.msgprocessors;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 

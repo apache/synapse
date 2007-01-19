@@ -41,7 +41,7 @@ public class SandeshaUtilTest extends TestCase {
 		assertTrue(UUID2.startsWith("urn:uuid:"));
 	}
 	
-	public void testInternalSequenceIDToSequenceKeyConversion()throws SandeshaException{
+	public void testInternalSequenceIDToSequenceKeyConversion() {
 		String toEPR = "http://127.0.0.1:1111/some_random_uri";
 		String sequenceKey = "1234abcd";
 		

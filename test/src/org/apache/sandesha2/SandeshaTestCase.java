@@ -199,8 +199,8 @@ public class SandeshaTestCase extends TestCase {
     public String getTestProperty (String key) {
     	if (properties!=null)
     		return properties.getProperty(key);
-    	else 
-    		return null;
+    	 
+    	return null;
     }
     
     public void overrideConfigurationContext (ConfigurationContext context,MessageReceiver messageReceiver, String operationName, boolean newOperation, int mep) throws Exception  {

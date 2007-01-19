@@ -40,6 +40,8 @@ import org.apache.sandesha2.util.SandeshaUtil;
  */
 public class AnonymousEchoTest extends SandeshaTestCase {
 
+	private static boolean startedServer = false;
+	
 	public AnonymousEchoTest () {
 		super ("AnonymousEchoTest");
 	}
@@ -48,11 +50,19 @@ public class AnonymousEchoTest extends SandeshaTestCase {
 		super.setUp();
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = repoPath + File.separator + "server_axis2.xml";
-		startServer(repoPath, axis2_xml);
+		if (!startedServer)
+			startServer(repoPath, axis2_xml);
+		startedServer = true;
 	}
-	
-	public void testSyncEchoWithOffer_1_1 () throws Exception {
 
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
+	}
+
+	public void testSyncEchoWithOffer_1_1 () throws Exception {	
 		Options clientOptions = new Options ();
 		String offeredSequenceID = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceID);

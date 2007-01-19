@@ -19,6 +19,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 public class AddressableEchoTest extends SandeshaTestCase {
 
 	int serverPort = DEFAULT_SERVER_TEST_PORT;
+	private static boolean serverStarted = false; 
 	
 	public AddressableEchoTest () {
 		super ("AddressableEchoTest");
@@ -30,9 +31,18 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 
-		startServer(repoPath, axis2_xml);
+		if (!serverStarted)
+			startServer(repoPath, axis2_xml);
+		serverStarted = true;
 	}
 	
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
+	}
+
 	public void testAsyncEcho () throws Exception {
 	
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
@@ -51,12 +61,11 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		
-		String acksTo = null;//serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+		String acksTo = null;
 		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		
 		serviceClient.setOptions(clientOptions);
-		//serviceClient.
 		
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
 		clientOptions.setUseSeparateListener(true);
@@ -136,28 +145,18 @@ public class AddressableEchoTest extends SandeshaTestCase {
 		
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);
 
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		String sequenceKey = SandeshaUtil.getUUID();
+		String offeredSequenceId = SandeshaUtil.getUUID();
 		Options clientOptions = new Options ();
 		clientOptions.setAction(echoAction);
-		clientOptions.setTo(new EndpointReference (to));
-		
-		String sequenceKey = SandeshaUtil.getUUID();
+		clientOptions.setTo(new EndpointReference (to));		
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
-		
-		ServiceClient serviceClient = new ServiceClient (configContext,null);
-		
-		String acksTo = null;//serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
-		clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+		clientOptions.setProperty(SandeshaClientConstants.AcksTo,null);
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-		
-		String offeredSequenceId = SandeshaUtil.getUUID();
-		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceId);
-		
-		serviceClient.setOptions(clientOptions);
-		//serviceClient.
-		
+		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,offeredSequenceId);		
 		clientOptions.setTransportInProtocol(Constants.TRANSPORT_HTTP);
-		clientOptions.setUseSeparateListener(true);
-		
+		clientOptions.setUseSeparateListener(true);	
 		clientOptions.setAction("urn:wsrm:EchoString");
 		
 		serviceClient.setOptions(clientOptions);

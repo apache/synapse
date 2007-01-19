@@ -70,7 +70,6 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 
 		String sequenceId = closeSequence.getIdentifier().getIdentifier();
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
 		
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
 				.getAxisConfiguration());

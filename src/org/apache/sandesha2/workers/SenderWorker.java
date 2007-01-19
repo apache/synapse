@@ -299,19 +299,16 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				}
 			}
 
-			if (successfullySent) {
-				if (!msgCtx.isServerSide())
-				{
-					// Commit the transaction to release the SenderBean
+			// Commit the transaction to release the SenderBean
 
-					if (transaction!=null)
-						transaction.commit();
-					
-					transaction = null;
-					checkForSyncResponses(msgCtx);
-				}
-			}
+			if (transaction!=null)
+				transaction.commit();
+			
+			transaction = null;
 
+			if (successfullySent && !msgCtx.isServerSide()) 
+				checkForSyncResponses(msgCtx);
+			
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)
 					&&
 					 (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmMsgCtx.getRMNamespaceValue()))) {
@@ -329,6 +326,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
 				TerminateManager.terminateSendingSide(rmsBean, msgCtx.isServerSide(),
 						storageManager);
+				
+				transaction.commit();
 			}
 
 		} catch (Exception e) {

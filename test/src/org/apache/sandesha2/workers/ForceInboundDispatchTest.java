@@ -23,7 +23,8 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class ForceInboundDispatchTest extends SandeshaTestCase  {
 
-	ConfigurationContext serverConfigCtx = null;
+	private static ConfigurationContext serverConfigCtx = null;
+	private static boolean startedServer = false;
 	
 	public ForceInboundDispatchTest () {
         super ("ForceDispatchTest");
@@ -33,9 +34,18 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 		super.setUp();
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 		String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-		serverConfigCtx = startServer(repoPath, axis2_xml);
+		if (!startedServer)
+			serverConfigCtx = startServer(repoPath, axis2_xml);
+		startedServer = true;
 	}
 	
+	/**
+	 * Override the teardown processing
+	 */
+	public void tearDown () {
+	
+	}
+
 	public void testForceInvoke () throws AxisFault,InterruptedException  {
 		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
@@ -123,7 +133,7 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 		
 		clientOptions.setTo(new EndpointReference (to));
 		
-		String sequenceKey = "sequence1";
+		String sequenceKey = "sequence2";
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
 		ServiceClient serviceClient = new ServiceClient (configContext,null);
 		serviceClient.setOptions(clientOptions);

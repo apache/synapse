@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.storage.beans;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.sandesha2.util.RangeString;
 
 /**
@@ -329,6 +327,10 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nTransportTo      : "); result.append(transportTo);
 		result.append("\nOfferedEndPoint  : "); result.append(offeredEndPoint);
 		result.append("\nOfferedSequence  : "); result.append(offeredSequence);
+		if (lastSendErrorTimestamp > 0) {
+			result.append("\nLastError        : "); result.append(lastSendError);
+			result.append("\nLastErrorTime    : "); result.append(lastSendErrorTimestamp);
+		}
 		return result.toString();
 	}
 	

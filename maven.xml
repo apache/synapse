@@ -394,6 +394,8 @@
         <ant:copy file="target/${jar.name}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="target/${mar.name}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="target/${client.jar.name}" todir="${dir.temp.dist.bin}" />
+        <ant:copy file="target/${policy.jar.name}" todir="${dir.temp.dist.bin}" />
+                
        <!-- <ant:copy file="${dir.config}/sandesha2.properties" todir="${dir.temp.dist.bin}" /> -->
         <ant:copy file="${apache.license.file}" todir="${dir.temp.dist.bin}" />
         <ant:copy file="${release.notes.file}" todir="${dir.temp.dist.bin}" />

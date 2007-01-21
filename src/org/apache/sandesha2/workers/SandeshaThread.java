@@ -146,6 +146,9 @@ public abstract class SandeshaThread extends Thread{
 			
 			runThread = true; // so that isStarted()=true.
 			super.start();
+			
+			// Set the SandeshaThread to have the same context classloader as the application
+			this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
 		}		
 	}
 	

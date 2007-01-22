@@ -29,21 +29,21 @@
         <version>SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.synapse</groupId>
-    <artifactId>synapse-samples</artifactId>
-
-    <name>Apache Synapse - Samples</name>
-    <description>Apache Synapse - Samples</description>
+    <artifactId>synapse-nhttp</artifactId>
+    <name>Apache Synapse - HttpCore-NIO</name>
+    <description>Apache Synapse - HttpCore-NIO</description>
     <packaging>jar</packaging>
 
     <build>
+        <sourceDirectory>src</sourceDirectory>
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
-        </dependency>
+
     </dependencies>
+
+    <properties>
+        
+    </properties>
 
 </project>

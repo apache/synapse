@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>0.91</version>
+        <version>SNAPSHOT</version>
     </parent>
 
     <groupId>org.apache.synapse</groupId>
@@ -121,4 +121,11 @@
 
         </plugins>
     </build>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-nhttp</artifactId>
+        </dependency>
+    </dependencies>
 </project>

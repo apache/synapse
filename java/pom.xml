@@ -26,7 +26,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
-    <version>0.91</version>
+    <version>SNAPSHOT</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -219,6 +219,11 @@
                 <artifactId>synapse-samples</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-nhttp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -404,10 +409,22 @@
             <version>${backport_util_concurrent.version}</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>httpcomponents-httpcore</groupId>
             <artifactId>jakarta-httpcore</artifactId>
             <version>${jakarta.httpcore.version}</version>
+        </dependency>-->
+
+        <!-- dependencies for nhttp transport -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>jakarta-httpcore</artifactId>
+            <version>${jakarta.httpcore.nio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>jakarta-httpcore-nio</artifactId>
+            <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
 
     </dependencies>
@@ -559,7 +576,7 @@
     </repositories>
 
     <modules>
-        <!--<module>modules/nhttp</module>-->
+        <module>modules/nhttp</module>
         <module>modules/core</module>
         <module>modules/extensions</module>
         <module>modules/samples</module>
@@ -567,7 +584,7 @@
     </modules>
 
     <properties>
-        <synapse.version>0.91</synapse.version>
+        <synapse.version>SNAPSHOT</synapse.version>
         <axis2.version>1.1.051</axis2.version>
         <rampart.version>1.1</rampart.version>
         <axiom.version>1.2.1</axiom.version>
@@ -584,7 +601,8 @@
         <commons.httpclient.version>3.0.1</commons.httpclient.version>
         <commons.codec.version>1.3</commons.codec.version>
         <commons.fileupload.version>1.1.1</commons.fileupload.version>
-        <jakarta.httpcore.version>4.0-alpha2</jakarta.httpcore.version>
+        <!--<jakarta.httpcore.version>4.0-alpha2</jakarta.httpcore.version>-->
+        <jakarta.httpcore.nio.version>4.0-alpha4-SNAPSHOT</jakarta.httpcore.nio.version>
 
         <log4j.version>1.2.13</log4j.version>
         <junit.version>3.8.2</junit.version>

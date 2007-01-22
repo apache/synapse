@@ -45,7 +45,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
     public void testSendMediatorWithSingleEndpoint() {
 
         String sendConfiguration = "<syn:send xmlns:syn=\"http://ws.apache.org/ns/synapse\">" +
-                "<syn:endpoint name=\"myendpoint\" address=\"http://ws.apache.org/axis2/services/Service1\" />" +
+                "<syn:endpoint address=\"http://ws.apache.org/axis2/services/Service1\" />" +
                 "</syn:send>";
 
         try {
@@ -58,8 +58,8 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
     public void testSendMediatorWithMultipleEndpoints() {
 
         String sendConfiguration = "<syn:send xmlns:syn=\"http://ws.apache.org/ns/synapse\">" +
-                "<syn:endpoint name=\"myendpoint1\" address=\"http://ws.apache.org/axis2/services/Service1\" />" +
-                "<syn:endpoint name=\"myendpoint2\" address=\"http://ws.apache.org/axis2/services/Service2\" />" +
+                "<syn:endpoint address=\"http://ws.apache.org/axis2/services/Service1\" />" +
+                "<syn:endpoint address=\"http://ws.apache.org/axis2/services/Service2\" />" +
                 "</syn:send>";
 
         try {

@@ -30,18 +30,24 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.transport.nhttp.HttpCoreNIOListener;
+import org.apache.axis2.transport.TransportListener;
+import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.AxisFault;
 import org.apache.synapse.Constants;
 import org.apache.synapse.utils.Services;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 
 public class SynapseCommodityServiceTest extends TestCase {
 
-    private SimpleHTTPServer synapseServer = null;
-    private SimpleHTTPServer businessServer = null;
+    private TransportListener synapseServer = null;
+    private TransportListener businessServer = null;
 
     protected void setUp() throws java.lang.Exception {
         // Initializing Synapse repository
@@ -68,17 +74,38 @@ public class SynapseCommodityServiceTest extends TestCase {
                                           "http://business.org", "http://business.org");
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
-        synapseServer = new SimpleHTTPServer(synapseConfigCtx, 10000);
-        businessServer = new SimpleHTTPServer(businessConfigCtx, 10001);
+        TransportInDescription synTrsIn = (TransportInDescription)
+            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+        synTrsIn.getParameter("port").setValue("10000");
+        startServer(synapseConfigCtx);
 
-        //starting servers
-        synapseServer.start();
-        businessServer.start();
+        TransportInDescription busTrsIn = (TransportInDescription)
+            businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+        busTrsIn.getParameter("port").setValue("10001");
+        startServer(businessConfigCtx);
+        System.out.println("");
     }
 
     protected void tearDown() throws java.lang.Exception {
-        businessServer.stop();
-        synapseServer.stop();
+        //businessServer.stop();
+        //synapseServer.stop();
+    }
+
+    private void startServer(ConfigurationContext configctx) throws AxisFault {
+        ListenerManager listenerManager = configctx.getListenerManager();
+        if (listenerManager == null) {
+            listenerManager = new ListenerManager();
+            listenerManager.init(configctx);
+        }
+
+        Iterator iter = configctx.getAxisConfiguration().
+            getTransportsIn().keySet().iterator();
+        while (iter.hasNext()) {
+            QName trp = (QName) iter.next();
+            TransportInDescription trsIn = (TransportInDescription)
+                configctx.getAxisConfiguration().getTransportsIn().get(trp);
+            listenerManager.addListener(trsIn, false);
+        }
     }
 
     public void testN2N() throws Exception {

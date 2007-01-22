@@ -43,6 +43,7 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
+import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.TerminateManager;
@@ -140,6 +141,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
 				rMSBean.setLastActivatedTime(System.currentTimeMillis());
 				rMSBean.setRMVersion(rmdBean.getRMVersion());
+				rMSBean.setClientCompletedMessages(new RangeString());
 
 				// Setting sequence properties for the outgoing sequence.
 				// Only will be used by the server side response path. Will

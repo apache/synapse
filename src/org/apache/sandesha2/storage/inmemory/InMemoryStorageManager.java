@@ -186,10 +186,8 @@ public class InMemoryStorageManager extends StorageManager {
 		
 		//Now clone the env and set it in the message context
 		if (envelope!=null) {
-			
-			XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
-			SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
 			try {
+				SOAPEnvelope clonedEnvelope = SandeshaUtil.cloneEnvelope(envelope);
 				messageContext.setEnvelope(clonedEnvelope);
 			} catch (AxisFault e) {
 				throw new SandeshaStorageException (e);
@@ -223,12 +221,10 @@ public class InMemoryStorageManager extends StorageManager {
 		}
 		
 		SOAPEnvelope envelope = msgContext.getEnvelope();
-		//storing a cloned version of the envelope in the Map.
-		if (envelope!=null) {			
-			XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
-			SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
-			envMap.put(key, clonedEnvelope);
-		}
+
+		//We are storing the original envelope here.
+		//Storing a cloned version will caus HeaderBlocks to loose their setProcessed information.
+		envMap.put(key, envelope);
 		
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::storeMessageContext, key: " + key);
 	}

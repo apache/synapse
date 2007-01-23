@@ -128,17 +128,45 @@ public interface Constants {
     int TRACING_UNSET=2;
     /** Tracing logger */
     String TRACE_LOGGER ="TRACE_LOGGER";
-    
+
     //  -- Synapse property values for WS-RM sequence handling --
     /** WS-RM version 1.0*/
     String SEQUENCE_VERSION_1_0 = "1.0";
     /** WS-RM version 1.1*/
     String SEQUENCE_VERSION_1_1 = "1.1";
-    
+
     /** Sandesha last message property name */
     String SANDESHA_LAST_MESSAGE = "Sandesha2LastMessage";
     /** Sandesha last sequence key property name */
     String SANDESHA_SEQUENCE_KEY = "Sandesha2SequenceKey";
     /** Sandesha WS-RM specification version property name */
     String SANDESHA_SPEC_VERSION = "Sandesha2RMSpecVersion";
+
+    /** The statistics state -off */
+    int STATISTICS_OFF =0;
+    /** The statistics state-on */
+    int STATISTICS_ON =1;
+    /** The statistics state-unset */
+    int STATISTICS_UNSET=2;
+    
+    /** */
+    String SYNAPSE_ERROR ="syapse_error" ;
+
+    /** key for lookup sequence statistics stack */
+    String SEQUENCE_STATISTICS_STACK ="sequence_statistics_stack";
+
+    /** key for lookup Proxy Service statistics stack */
+    String PROXYSERVICE_STATISTICS_STACK ="proxyservice_statistics_stack";
+
+    /** key for lookup Endpoint statistics stack */
+    String ENDPOINT_STATISTICS_STACK ="endpoint_statistics_stack";
+
+    /** Sequence statistics category*/
+    int  SEQUENCE_STATISTICS = 0;
+
+    /** Proxy Service statistics category */
+    int  PROXYSERVICE_STATISTICS = 1;
+
+    /** Endpoint statistics category*/
+    int ENDPOINT_STATISTICS = 2;
 }

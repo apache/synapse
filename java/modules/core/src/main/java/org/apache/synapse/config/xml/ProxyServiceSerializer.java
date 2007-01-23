@@ -133,10 +133,22 @@ public class ProxyServiceSerializer {
         if (service.isWsRMEnabled()) {
             proxy.addChild(fac.createOMElement("enableRM", synNS));
         }
-
         if (service.isWsSecEnabled()) {
             proxy.addChild(fac.createOMElement("enableSec", synNS));
         }
+
+        int isEnableStatistics = service.getStatisticsEnable();
+        String statisticsValue = null;
+        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+            statisticsValue = Constants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+            statisticsValue = Constants.STATISTICS_DISABLE;
+        }
+        if (statisticsValue != null) {
+            proxy.addAttribute(fac.createOMAttribute(
+                    Constants.TRACE_ATTRIB_NAME, nullNS, statisticsValue));
+        }
+
         int traceState = service.getTraceState();
         String traceValue = null;
         if (traceState == org.apache.synapse.Constants.TRACING_ON) {

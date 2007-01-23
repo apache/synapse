@@ -21,12 +21,15 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.statistics.StatisticsUtils;
+import org.apache.synapse.statistics.StatisticsStack;
+import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
 
 /**
  * The Sequence mediator either refers to a named Sequence mediator instance
@@ -45,6 +48,9 @@ public class SequenceMediator extends AbstractListMediator {
     private String ref = null;
     private String errorHandler = null;
 
+    /** To decide to whether statistics should have collected or not  */
+    private int statisticsEnable = Constants.STATISTICS_UNSET;
+
     /**
      * If this mediator refers to another named Sequence, execute that. Else
      * execute the list of mediators (children) contained within this. If a referenced
@@ -60,6 +66,17 @@ public class SequenceMediator extends AbstractListMediator {
         log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (ref == null) {
+            // Setting Required property to collect the sequence statistics
+            boolean isStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
+            if (isStatisticsEnable) {
+                StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                if (sequenceStack == null) {
+                    sequenceStack = new SequenceStatisticsStack();
+                    synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
+                }
+                String seqName = (name == null ? "anonymous" : name);
+                sequenceStack.put(seqName, System.currentTimeMillis(), !synCtx.isResponse(), isStatisticsEnable);
+            }
             try {
                 if (shouldTrace) {
                     trace.trace("Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
@@ -71,23 +88,22 @@ public class SequenceMediator extends AbstractListMediator {
                 if (errorHandler != null) {
                     if (shouldTrace) {
                         trace.trace("Sequence " + name + " encountered an exception. " +
-                            "Locating error handler sequence : " + errorHandler);
+                                "Locating error handler sequence : " + errorHandler);
                     }
                     // set exception information to message context
                     Axis2MessageContext.setErrorInformation(synCtx, e);
-
                     Mediator errHandler = synCtx.getConfiguration().getNamedSequence(errorHandler);
                     if (errHandler == null) {
                         if (shouldTrace) {
                             trace.trace("Sequence " + name + "; error handler sequence named '" +
-                                errorHandler + "' not found");
+                                    errorHandler + "' not found");
                         }
                         handleException("Error handler sequence mediator instance named " +
                                 errorHandler + " cannot be found");
                     } else {
                         if (shouldTrace) {
                             trace.trace("Sequence " + name + "; Executing error handler sequence : "
-                                + errorHandler);
+                                    + errorHandler);
                         }
                         return errHandler.mediate(synCtx);
                     }
@@ -95,11 +111,18 @@ public class SequenceMediator extends AbstractListMediator {
                 } else {
                     if (shouldTrace) {
                         trace.trace("Sequence " + name + " encountered an exception, but does " +
-                            "not specify an error handler");
+                                "not specify an error handler");
                     }
                     throw e;
                 }
+
             } finally {
+                //If this sequence is finished it's task normally
+                if (isStatisticsEnable) {
+                    StatisticsUtils.processSequenceStatistics(synCtx);
+                }
+                //If this sequence is a IN or OUT sequence of a proxy service
+                StatisticsUtils.processProxyServiceStatistics(synCtx);
                 if (shouldTrace) {
                     trace.trace("End : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }
@@ -149,5 +172,23 @@ public class SequenceMediator extends AbstractListMediator {
 
     public void setErrorHandler(String errorHandler) {
         this.errorHandler = errorHandler;
+    }
+
+    /**
+     * To check whether statistics should have collected or not
+     *
+     * @return Returns the int value that indicate statistics is enabled or not.
+     */
+    public int getStatisticsEnable() {
+        return statisticsEnable;
+    }
+
+    /**
+     * To set the statistics enable variable value
+     *
+     * @param statisticsEnable
+     */
+    public void setStatisticsEnable(int statisticsEnable) {
+        this.statisticsEnable = statisticsEnable;
     }
 }

@@ -76,7 +76,19 @@ public class EndpointFactory implements XMLToObjectMapper {
 				// right now an address is *required*
 				handleException("The 'address' attribute is required for an endpoint");
 			}
-		} else {
+            OMAttribute statistics = elem.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
+            if (statistics != null) {
+                String statisticsValue = statistics.getAttributeValue();
+                if (statisticsValue != null) {
+                    if (Constants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                        endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
+                    } else if (Constants.STATISTICS_DISABLE.equals(statisticsValue)) {
+                        endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                    }
+                }
+            }
+        } else {
 			OMAttribute reference = elem.getAttribute(new QName(
 					Constants.NULL_NAMESPACE, "ref"));
 			if (reference != null) {

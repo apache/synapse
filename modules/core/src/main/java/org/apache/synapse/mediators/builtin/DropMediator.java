@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**
@@ -41,6 +42,11 @@ public class DropMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Drop mediator :: mediate()");
+        //If drop mediator is a child of a sequence
+        // and if this sequence is a IN or OUT sequence of a proxy service
+        StatisticsUtils.processProxyServiceStatistics(synCtx);
+        //If this a sequence is not  a IN or OUT sequence of a proxy service
+        StatisticsUtils.processSequenceStatistics(synCtx);
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Drop mediator");

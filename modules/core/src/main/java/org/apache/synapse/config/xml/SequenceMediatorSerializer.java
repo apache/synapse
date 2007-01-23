@@ -52,6 +52,17 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
 
         SequenceMediator mediator = (SequenceMediator) m;
         OMElement sequence = fac.createOMElement("sequence", synNS);
+        int isEnableStatistics = mediator.getStatisticsEnable();
+        String statisticsValue = null;
+        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+            statisticsValue = Constants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+            statisticsValue = Constants.STATISTICS_DISABLE;
+        }
+        if (statisticsValue != null) {
+            sequence.addAttribute(fac.createOMAttribute(
+                    Constants.TRACE_ATTRIB_NAME, nullNS, statisticsValue));
+        }
 
         if (mediator.getRef() != null) {
             sequence.addAttribute(fac.createOMAttribute(

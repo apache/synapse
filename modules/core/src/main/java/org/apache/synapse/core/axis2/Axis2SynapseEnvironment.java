@@ -23,11 +23,14 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.statistics.StatisticsCollector;
+import org.apache.synapse.statistics.StatisticsUtils;
+
 
 /**
  * <p> This is the Axis2 implementation of the MessageContext
@@ -40,6 +43,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private ThreadFactory threadFactory = null;
 
     private SynapseConfiguration synapseConfig;
+    /** The StatisticsCollector object  */
+    private StatisticsCollector statisticsCollector;
 
     public Axis2SynapseEnvironment() {}
 
@@ -57,7 +62,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 synCtx.getConfiguration().getMainMediator().mediate(synCtx);
             }
         });*/
-
+        if (synCtx.isResponse()) {
+            //Process statistics related to a sequence which has send mediator as a child,end point
+            StatisticsUtils.processEndPointStatistics(synCtx);
+            StatisticsUtils.processProxyServiceStatistics(synCtx);
+            StatisticsUtils.processSequenceStatistics(synCtx);
+        }
         // if the outSequence property is present use that for the message mediation
         // if not use the main mediator to mediate the outgoing message
         if (synCtx.getProperty(Constants.OUT_SEQUENCE) != null) {
@@ -89,6 +99,24 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 = new org.apache.axis2.context.MessageContext();
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
         return mc;
+    }
+
+    /**
+     * This method returns the StatisticsCollector
+     *
+     * @return Retruns the StatisticsCollector
+     */
+    public StatisticsCollector getStatisticsCollector() {
+        return statisticsCollector;
+    }
+
+    /**
+     * To set the StatisticsCollector
+     *
+     * @param collector
+     */
+    public void setStatisticsCollector(StatisticsCollector collector) {
+        this.statisticsCollector = collector;
     }
 
 }

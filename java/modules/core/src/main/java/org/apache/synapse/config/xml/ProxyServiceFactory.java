@@ -57,6 +57,19 @@ public class ProxyServiceFactory {
             handleException("The 'name' attribute is required for a Proxy service definition");
         } else {
             proxy.setName(name.getAttributeValue());
+            OMAttribute statistics = elem.getAttribute(
+                    new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
+            if (statistics != null) {
+                String statisticsValue = statistics.getAttributeValue();
+                if (statisticsValue != null) {
+                    if (Constants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                        proxy.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
+                    } else if (Constants.STATISTICS_DISABLE.equals(statisticsValue)) {
+                        proxy.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                    }
+                }
+
+            }
         }
 
         OMAttribute trans = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "transports"));

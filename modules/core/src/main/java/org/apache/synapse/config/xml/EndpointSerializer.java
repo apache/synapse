@@ -84,7 +84,17 @@ public class EndpointSerializer {
             } else {
                 handleException("Invalid Endpoint. Address is required");
             }
-
+            int isEnableStatistics = endpt.getStatisticsEnable();
+            String statisticsValue = null;
+            if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+                statisticsValue = Constants.STATISTICS_ENABLE;
+            } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+                statisticsValue = Constants.STATISTICS_DISABLE;
+            }
+            if (statisticsValue != null) {
+                endpoint.addAttribute(fac.createOMAttribute(
+                        Constants.TRACE_ATTRIB_NAME, nullNS, statisticsValue));
+            }
             if (endpt.isAddressingOn()) {
             	OMElement addressing = fac.createOMElement("enableAddressing", synNS);
             	if (endpt.isUseSeparateListener()) {

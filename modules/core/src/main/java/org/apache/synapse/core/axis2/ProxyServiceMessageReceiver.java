@@ -25,8 +25,11 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.statistics.StatisticsUtils;
+import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 import org.apache.synapse.config.Endpoint;
 
 /**
@@ -102,9 +105,17 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 // it results in an unbound URI exception for no credible reason - needs more
                 // investigation seems like a woodstox issue. Use hack for now
                 //axisOutMsgContext.getEnvelope().build();
-                
-                log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
 
+                log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
+                // Setting Required property to collect the proxy service statistics
+                String endPointName = endpoint.getName();
+                boolean statisticsEnable;
+                statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
+                if (endPointName != null && statisticsEnable) {
+                    EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
+                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable);
+                    synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
+                }
                 AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
                 try {
                     axisOutMsgContext.setProperty(
@@ -116,18 +127,34 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     ae.send(axisOutMsgContext);
 
                 } catch (AxisFault e) {
+                    synCtx.setProperty(org.apache.synapse.Constants.SYNAPSE_ERROR,Boolean.TRUE);
                     log.error("Axis fault encountered while forwarding message to endpoint : "
                             + targetEndpoint, e);
+                } finally {
+                    if (statisticsEnable) {
+                        StatisticsUtils.processEndPointStatistics(synCtx);
+                    }
                 }
             }
 
         } else {
-            
+
             // if a named outSequence os specified set it as a property to the MessageContext
             if (targetOutSequence != null) {
                 log.debug("OutSequence " + targetOutSequence
                         + " for the proxy set to the MessageContext");
                 synCtx.setProperty(org.apache.synapse.Constants.OUT_SEQUENCE, targetOutSequence);
+            }
+            // Setting Required property to collect the proxy service statistics
+            boolean statisticsEnable;
+            ProxyService currentProxyService = synCtx.getConfiguration().getProxyService(name);
+            if (currentProxyService != null) {
+                statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == currentProxyService.getStatisticsEnable());
+                if (statisticsEnable) {
+                    ProxyServiceStatisticsStack proxyServiceStatisticsStack = new ProxyServiceStatisticsStack();
+                    proxyServiceStatisticsStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable);
+                    synCtx.setCorrelationProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
+                }
             }
 
             // if a named inSequence is specified, use it for message mediation

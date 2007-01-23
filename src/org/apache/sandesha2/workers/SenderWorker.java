@@ -12,7 +12,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.transport.RequestResponseTransport;
@@ -133,7 +132,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					MessageContext inMsg = null;
 					OperationContext op = msgCtx.getOperationContext();
 					if (op != null)
-						inMsg = op.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+						inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 					if (inMsg != null)
 						t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 

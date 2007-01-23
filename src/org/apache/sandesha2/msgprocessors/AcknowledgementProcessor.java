@@ -30,8 +30,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2006Constants;
 import org.apache.commons.logging.Log;
@@ -188,7 +188,7 @@ public class AcknowledgementProcessor {
 						if (inOutMessage) {	
 							OperationContext operationContext = applicationMessage.getOperationContext();
 							if (operationContext!=null) {
-								MessageContext responseMessage = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+								MessageContext responseMessage = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 								if (responseMessage==null) {
 									syncResponseNeeded = true;
 									

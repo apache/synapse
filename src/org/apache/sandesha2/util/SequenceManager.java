@@ -357,14 +357,4 @@ public class SequenceManager {
 		}
 		return sequenceTimedOut;
 	}
-	
-	public static boolean isValidIncomingSequence (String sequenceId, StorageManager storageManager) throws SandeshaException {
-		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-		RMDBean bean = rmdBeanMgr.retrieve(sequenceId);
-		
-		if (bean!=null)
-			return true;
-		else 
-			return false;
-	}
 }

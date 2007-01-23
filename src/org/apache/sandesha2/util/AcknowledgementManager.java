@@ -87,8 +87,7 @@ public class AcknowledgementManager {
 				String outboundInternalSeq = rmsBean.getInternalSequenceID();
 				String inboundSequenceId = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(outboundInternalSeq);
 				
-				boolean validSequence = SequenceManager.isValidIncomingSequence (inboundSequenceId,storageManager);
-				if (validSequence) {
+				if (SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId) != null) {
 					if(log.isDebugEnabled()) log.debug("Piggybacking ack for " + inboundSequenceId);
 					RMMsgCreator.addAckMessage(rmMessageContext, rmsBean, inboundSequenceId, storageManager);
 				}

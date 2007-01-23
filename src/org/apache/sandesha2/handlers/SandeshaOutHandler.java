@@ -20,9 +20,9 @@ package org.apache.sandesha2.handlers;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -112,7 +112,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			if(log.isDebugEnabled()) log.debug("Message Type: " + messageType);
 			if (messageType == Sandesha2Constants.MessageTypes.UNKNOWN) {
 				MessageContext requestMsgCtx = msgCtx.getOperationContext().getMessageContext(
-						OperationContextFactory.MESSAGE_LABEL_IN_VALUE);
+						WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
                 if (msgCtx.isServerSide()) { // for the server side
                     RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsgCtx);

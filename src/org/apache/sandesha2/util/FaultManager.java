@@ -17,7 +17,6 @@
 
 package org.apache.sandesha2.util;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,9 +47,6 @@ import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -140,34 +136,15 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForUnknownSequence, " + sequenceID);
 
-		MessageContext messageContext = rmMessageContext.getMessageContext();
-
-		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
-
 		boolean validSequence = false;
 
 		// Look for an outbound sequence
-		RMSBean createSeqFindBean = new RMSBean();
-		createSeqFindBean.setSequenceID(sequenceID);
-
-		Collection coll = createSeqMgr.find(createSeqFindBean);
-		if (!coll.isEmpty()) {
+		if (SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID) != null) {
 			validSequence = true;
-
-		} else {
 			// Look for an inbound sequence
-			RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
-			
-			RMDBean selector = new RMDBean();
-			selector.setSequenceID(sequenceID);
-
-			coll = mgr.find(selector);
-			if(!coll.isEmpty()) {
+		} else if(SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID) != null) { 
 				validSequence = true;
-			}
 		}
-
-		String rmNamespaceValue = rmMessageContext.getRMNamespaceValue();
 
 		if (!validSequence) {
 
@@ -175,6 +152,8 @@ public class FaultManager {
 				log.debug("Sequence not valid " + sequenceID);
 
 			// Return an UnknownSequence error
+			MessageContext messageContext = rmMessageContext.getMessageContext();
+
 			int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
 
 			FaultData data = new FaultData();
@@ -188,7 +167,7 @@ public class FaultManager {
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
-					rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+					rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 			identifierElement.setText(sequenceID);
 			
 			data.setDetail(identifierElement);

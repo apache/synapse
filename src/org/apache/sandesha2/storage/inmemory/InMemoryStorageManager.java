@@ -20,14 +20,11 @@ package org.apache.sandesha2.storage.inmemory;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -276,6 +273,7 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 }
+
 
 
 

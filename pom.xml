@@ -572,6 +572,17 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>apache-snapshot</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+            <releases>
+            	<updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
+        </repository>
 
     </repositories>
 

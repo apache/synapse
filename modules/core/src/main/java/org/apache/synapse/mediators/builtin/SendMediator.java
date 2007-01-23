@@ -26,6 +26,8 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,99 +58,115 @@ public class SendMediator extends AbstractMediator {
     public boolean mediate(MessageContext synCtx) {
         log.debug("Send mediator :: mediate()");
 
-        // TODO this may be really strange but true.. unless you call the below, sometimes it
-        // results in an unbound URI exception for no credible reason - needs more investigation
-        // seems like a woodstox issue. Use hack for now
-        // synCtx.getEnvelope().build();
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Send mediator");
-            trace.trace("Sending Message :: " + synCtx.getEnvelope());
-        }
-        // if no endpoints are defined, send where implicitly stated
-        if (endpoints.isEmpty()) {
-            log.debug("Sending message using implicit message properties..");
-            log.debug("Sending To: " + (synCtx.getTo() != null ?
-                synCtx.getTo().getAddress() : "null"));
-            log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
-                synCtx.getWSAAction() : "null"));
-            log.debug("Body : \n" + synCtx.getEnvelope());
-            synCtx.getEnvironment().send(synCtx);
+        try {
+            // TODO this may be really strange but true.. unless you call the below, sometimes it
+            // results in an unbound URI exception for no credible reason - needs more investigation
+            // seems like a woodstox issue. Use hack for now
+            // synCtx.getEnvelope().build();
 
-        } else if (endpoints.size() == 1) {
-            Endpoint singleEndpoint = (Endpoint) endpoints.get(0);
-            String eprAddress = null;
-            if (singleEndpoint.getAddress() != null) {
-                eprAddress = singleEndpoint.getAddress().toString();
-            } else {
-                singleEndpoint = synCtx.getConfiguration().getNamedEndpoint(
-                    singleEndpoint.getRef());
-                eprAddress = singleEndpoint.getAddress().toString();
-            }
             if (shouldTrace) {
-                trace.trace("Sending to Endpoint : " + eprAddress);
+                trace.trace("Start : Send mediator");
+                trace.trace("Sending Message :: " + synCtx.getEnvelope());
             }
-            if (singleEndpoint.isForcePOX()) {
-            	synCtx.setDoingPOX(true);
-            } else if (singleEndpoint.isForceSOAP()) {
-            	synCtx.setDoingPOX(false);
-            }
+            // if no endpoints are defined, send where implicitly stated
+            if (endpoints.isEmpty()) {
+                log.debug("Sending message using implicit message properties..");
+                log.debug("Sending To: " + (synCtx.getTo() != null ?
+                        synCtx.getTo().getAddress() : "null"));
+                log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                        synCtx.getWSAAction() : "null"));
+                log.debug("Body : \n" + synCtx.getEnvelope());
+                synCtx.getEnvironment().send(synCtx);
 
-            if (singleEndpoint.isUseMTOM()) {
-                synCtx.setDoingMTOM(true);
-            } else if (singleEndpoint.isUseSwa()) {
-                synCtx.setDoingSWA(true);
-            }
-
-            if (singleEndpoint.isUseSeparateListener())
-            {
-            	synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
-            }
-            
-            log.debug("Sending message to endpoint :: name = " +
-                singleEndpoint.getName() + " resolved address = " + eprAddress);
-
-            synCtx.setTo(new EndpointReference(eprAddress));
-            log.debug("Sending To: " + (synCtx.getTo() != null ?
-                synCtx.getTo().getAddress() : "null"));
-            log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
-                synCtx.getWSAAction() : "null"));
-            log.debug("Body : \n" + synCtx.getEnvelope());
-
-            // if RM is turned on
-            if (singleEndpoint.isReliableMessagingOn()) {
-                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
-                if (singleEndpoint.getWsRMPolicyKey() != null) {
-                    synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
-                        singleEndpoint.getWsRMPolicyKey());
+            } else if (endpoints.size() == 1) {
+                Endpoint singleEndpoint = (Endpoint) endpoints.get(0);
+                String eprAddress = null;
+                if (singleEndpoint.getAddress() != null) {
+                    eprAddress = singleEndpoint.getAddress().toString();
+                } else {
+                    singleEndpoint = synCtx.getConfiguration().getNamedEndpoint(
+                            singleEndpoint.getRef());
+                    eprAddress = singleEndpoint.getAddress().toString();
                 }
-            }
 
-            // if WS Security is specified
-            if (singleEndpoint.isSecurityOn()) {
-                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
-                if (singleEndpoint.getWsSecPolicyKey() != null) {
-                    synCtx.setProperty(Constants.OUTFLOW_SEC_POLICY,
-                        singleEndpoint.getWsSecPolicyKey());
+                if (shouldTrace) {
+                    trace.trace("Sending to Endpoint : " + eprAddress);
                 }
+                if (singleEndpoint.isForcePOX()) {
+                    synCtx.setDoingPOX(true);
+                } else if (singleEndpoint.isForceSOAP()) {
+                    synCtx.setDoingPOX(false);
+                }
+
+                if (singleEndpoint.isForcePOX()) {
+                    synCtx.setDoingPOX(true);
+                } else if (singleEndpoint.isForceSOAP()) {
+                    synCtx.setDoingPOX(false);
+                }
+
+                if (singleEndpoint.isUseMTOM()) {
+                    synCtx.setDoingMTOM(true);
+                } else if (singleEndpoint.isUseSwa()) {
+                    synCtx.setDoingSWA(true);
+                }
+
+                if (singleEndpoint.isUseSeparateListener()) {
+                    synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
+                }
+                String endPointName = singleEndpoint.getName();
+                log.debug("Sending message to endpoint :: name = " +
+                        endPointName + " resolved address = " + eprAddress);
+
+                 // Setting Required property to collect the End Point statistics
+                boolean statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == singleEndpoint.getStatisticsEnable());
+                if (endPointName != null && statisticsEnable) {
+                    EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
+                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable);
+                    synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
+                }
+                synCtx.setTo(new EndpointReference(eprAddress));
+                log.debug("Sending To: " + (synCtx.getTo() != null ?
+                        synCtx.getTo().getAddress() : "null"));
+                log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                        synCtx.getWSAAction() : "null"));
+                log.debug("Body : \n" + synCtx.getEnvelope());
+
+                // if RM is turned on
+                if (singleEndpoint.isReliableMessagingOn()) {
+                    synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
+                    synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
+                    if (singleEndpoint.getWsRMPolicyKey() != null) {
+                        synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
+                                singleEndpoint.getWsRMPolicyKey());
+                    }
+                }
+
+                // if WS Security is specified
+                if (singleEndpoint.isSecurityOn()) {
+                    synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
+                    synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
+                    if (singleEndpoint.getWsSecPolicyKey() != null) {
+                        synCtx.setProperty(Constants.OUTFLOW_SEC_POLICY,
+                                singleEndpoint.getWsSecPolicyKey());
+                    }
+                }
+
+                // if WS Addressing is specified
+                if (singleEndpoint.isAddressingOn()) {
+                    synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
+                }
+                synCtx.getEnvironment().send(synCtx);
+            } else {
+                String msg = "The send mediator currently supports only one endpoint";
+                synCtx.setProperty(Constants.SYNAPSE_ERROR, Boolean.TRUE);
+                log.error(msg);
+                throw new UnsupportedOperationException(msg);
             }
-
-            // if WS Addressing is specified
-            if (singleEndpoint.isAddressingOn()) {
-                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
+        } finally {
+            if (shouldTrace) {
+                trace.trace("End : Send mediator");
             }
-
-            synCtx.getEnvironment().send(synCtx);
-
-        } else {
-            String msg = "The send mediator currently supports only one endpoint";
-            log.error(msg);
-            throw new UnsupportedOperationException(msg);
-        }
-        if (shouldTrace) {
-            trace.trace("End : Send mediator");
         }
         return false;
     }

@@ -19,6 +19,7 @@
 
 package org.apache.synapse.config;
 
+import org.apache.synapse.Constants;
 
 
 /**
@@ -56,8 +57,9 @@ public class Endpoint {
     private boolean useMTOM = false;
     /** use SWA **/
     private boolean useSwa = false;
-	
-	
+
+    /** To decide to whether statistics should have collected or not */
+    private int statisticsEnable = Constants.STATISTICS_UNSET;
 
     /**
      * Return the name of the endpoint
@@ -188,7 +190,7 @@ public class Endpoint {
     }
 
 	public void setUseSeparateListener(boolean b) {
-		this.useSeparateListener = b;	
+		this.useSeparateListener = b;
 	}
 	public boolean isUseSeparateListener() {
 		return useSeparateListener;
@@ -224,5 +226,23 @@ public class Endpoint {
 
     public void setUseSwa(boolean useSwa) {
         this.useSwa = useSwa;
+    }
+
+    /**
+     * To check whether statistics should have collected or not
+     *
+     * @return Returns the int value that indicate statistics is enabled or not.
+     */
+    public int getStatisticsEnable() {
+        return statisticsEnable;
+    }
+
+    /**
+     * To set the statistics enable variable value
+     *
+     * @param statisticsEnable
+     */
+    public void setStatisticsEnable(int statisticsEnable) {
+        this.statisticsEnable = statisticsEnable;
     }
 }

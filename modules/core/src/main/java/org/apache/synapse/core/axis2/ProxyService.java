@@ -27,12 +27,12 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Util;
-import org.apache.neethi.PolicyEngine;
-import org.apache.neethi.Policy;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -89,6 +89,10 @@ public class ProxyService {
     private boolean running = false;
 
     public static final String ALL_TRANSPORTS = "all";
+
+    /**  To decide to whether statistics should have collected or not */
+    private int statisticsEnable = Constants.STATISTICS_UNSET;
+
 
     /** The variable that indicate tracing on or off for the current mediator */
     protected int traceState = Constants.TRACING_UNSET;
@@ -396,6 +400,24 @@ public class ProxyService {
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    /**
+     * To check whether statistics should have collected or not
+     *
+     * @return Returns the int value that indicate statistics is enabled or not.
+     */
+    public int getStatisticsEnable() {
+        return statisticsEnable;
+    }
+
+    /**
+     * To set the statistics enable variable value
+     *
+     * @param statisticsEnable
+     */
+    public void setStatisticsEnable(int statisticsEnable) {
+        this.statisticsEnable = statisticsEnable;
     }
 
     /**

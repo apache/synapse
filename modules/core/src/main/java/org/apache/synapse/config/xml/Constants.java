@@ -39,12 +39,18 @@ public interface Constants {
     public static final String RAMPART_POLICY    = "rampartPolicy";
     public static final String SANDESHA_POLICY   = "sandeshaPolicy";
 
-    /** The trace local name */
+    /** The Trace attribute name */
     public static final String TRACE_ATTRIB_NAME ="trace";
     /** The Trace value 'enable' */
     public static final String TRACE_ENABLE ="enable";
     /** The Trace value 'disable' */
-    public static final  String TRACE_DISABLE ="disable";
+    public static final  String TRACE_DISABLE ="disable";        
+    /** The statistics attribute name */
+    public static final String STATISTICS_ATTRIB_NAME ="statistics";
+    /** The statistics  value 'enable' */
+    public static final String STATISTICS_ENABLE ="enable";
+    /** The statistics  value 'disable' */
+    public static final  String STATISTICS_DISABLE ="disable";
     
     // -- variables for the scoping of a property mediator --
     /** The String value for a Synapse messagecontext property */

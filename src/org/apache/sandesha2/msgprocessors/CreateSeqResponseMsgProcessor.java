@@ -26,6 +26,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -199,7 +200,20 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			String rmSpecVersion = createSeqResponseRMMsgCtx.getRMSpecVersion();
 			rMDBean.setRMVersion(rmSpecVersion);
 			
-			rMDBean.setToAddress(createSeqResponseRMMsgCtx.getTo().getAddress());
+			EndpointReference toEPR = createSeqResponseRMMsgCtx.getTo();
+			if (toEPR==null) {
+				//Most probably this is a sync response message, using the replyTo of the request message
+				OperationContext operationContext = createSeqResponseRMMsgCtx.getMessageContext().getOperationContext();
+				if (operationContext!=null) {
+					MessageContext createSequnceMessage = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
+					if (createSequnceMessage!=null)
+						toEPR = createSequnceMessage.getReplyTo();
+				}
+			}
+			
+			if (toEPR!=null) 
+				rMDBean.setToAddress(toEPR.getAddress());
+			
 			rMDBean.setServerCompletedMessages(new RangeString());
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 

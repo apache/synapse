@@ -35,7 +35,7 @@ public class FaultMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testFaultMediatorSerializationSOAP11() throws Exception {
-        String inputXml = getXmlOfMediatorForSOAP11(SOAP11, "syn:Client", "reason", EMPTY, EMPTY);
+        String inputXml = getXmlOfMediatorForSOAP11(SOAP11, "ns2:Client", "reason", EMPTY, EMPTY);
         assertTrue(serialization(inputXml, faultMediatorFactory, faultMediatorSerializer));
         assertTrue(serialization(inputXml, faultMediatorSerializer));
     }
@@ -48,7 +48,7 @@ public class FaultMediatorSerializationTest extends AbstractTestCase {
 
     private String getXmlOfMediatorForSOAP11(String version, String attrOfCode, String attrOfReasion
             , String role, String details) throws Exception {
-        return "<makefault  version=\"" + version + "\" xmlns=\"http://ws.apache.org/ns/synapse\"><code value=\"" + attrOfCode + "\" xmlns:syn=\"http://ws.apache.org/ns/synapse\"/><reason value=\"" + attrOfReasion + "\"/>" +
+        return "<makefault  version=\"" + version + "\" xmlns=\"http://ws.apache.org/ns/synapse\"><code value=\"" + attrOfCode + "\" xmlns:ns2=\"http://ws.apache.org/ns/synapse\"/><reason value=\"" + attrOfReasion + "\"/>" +
                 "<role>" + role + "</role><detail>" + details + "</detail></makefault>";
 
     }

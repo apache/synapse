@@ -52,7 +52,7 @@ public class OMElementUtils {
         while (iter.hasNext()) {
             OMNamespace ns = (OMNamespace) iter.next();
             if (prefix.equals(ns.getPrefix())) {
-                return ns.getName();
+                return ns.getNamespaceURI();     
             }
         }
         return null;

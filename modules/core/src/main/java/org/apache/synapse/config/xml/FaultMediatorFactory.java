@@ -99,7 +99,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
                     throw new SynapseException(msg);
                 }
                 faultMediator.setFaultCodeValue(
-                    new QName(OMElementUtils.getNameSpaceWithPrefix(prefix, code), name));
+                    new QName(OMElementUtils.getNameSpaceWithPrefix(prefix, code), name, prefix));
                 
             } else if (expression != null) {
                 try {

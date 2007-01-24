@@ -26,6 +26,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.FaultMediator;
 
+import javax.xml.namespace.QName;
+
 /**
  * <pre>
  * &lt;makefault [version="soap11|soap12"]&gt;
@@ -67,7 +69,10 @@ public class FaultMediatorSerializer extends AbstractMediatorSerializer
         OMElement code = fac.createOMElement("code", synNS, fault);
         if (mediator.getFaultCodeValue() != null) {
             code.addAttribute(fac.createOMAttribute(
-                "value", nullNS, mediator.getFaultCodeValue().toString()));
+                "value", nullNS, mediator.getFaultCodeValue().getPrefix() + ":"
+                    + mediator.getFaultCodeValue().getLocalPart()));
+            code.declareNamespace(mediator.getFaultCodeValue().getNamespaceURI(),
+                    mediator.getFaultCodeValue().getPrefix());
 
         } else if (mediator.getFaultCodeExpr() != null) {
             code.addAttribute(fac.createOMAttribute(

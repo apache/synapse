@@ -128,7 +128,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 				returnValue = InvocationResponse.ABORT; // the msg has been
 														// dropped
-				processDroppedMessage(rmMessageContext, storageManager);
+				SequenceProcessor.sendAckIfNeeded(rmMessageContext, storageManager,true);
 				if (log.isDebugEnabled())
 					log.debug("Exit: SandeshaGlobalInHandler::invoke, dropped "
 							+ returnValue);
@@ -142,6 +142,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 
 		} catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("Caught an exception", e);
 			// message should not be sent in a exception situation.
 			msgContext.pause();
 			returnValue = InvocationResponse.SUSPEND;
@@ -186,15 +188,15 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			long msgNo = sequence.getMessageNumber().getMessageNumber();
 			
-			RMDBean findBean = new RMDBean ();
-			findBean.setSequenceID(sequence.getIdentifier().getIdentifier());
-			
-			RMDBean rmdBean = storageManager.getRMDBeanMgr().findUnique(findBean);
-			
-			RangeString serverCompletedMessages = rmdBean.getServerCompletedMessages();
+			RMDBean rmdBean = 
+				SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequence.getIdentifier().getIdentifier());
 
-			if (serverCompletedMessages.isMessageNumberInRanges(msgNo))
-				duplicate = true;
+			if (rmdBean != null) {
+				RangeString serverCompletedMessages = rmdBean.getServerCompletedMessages();
+	
+				if (serverCompletedMessages.isMessageNumberInRanges(msgNo))
+					duplicate = true;
+			}
 			
 		}
 		
@@ -285,23 +287,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		
 		return false;
 	}
-
-	private void processDroppedMessage(RMMsgContext rmMsgContext, StorageManager storageManager)
-			throws AxisFault {
-		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaGlobalInHandler::processDroppedMessage");
-
-		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-
-			// Even though the duplicate message is dropped, hv to send the ack
-			// if needed.
-			SequenceProcessor.sendAckIfNeeded(rmMsgContext, storageManager,true);
-
-		}
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaGlobalInHandler::processDroppedMessage");
-	}
-
 
 	private void doGlobalProcessing(RMMsgContext rmMsgCtx) throws SandeshaException {
 	}

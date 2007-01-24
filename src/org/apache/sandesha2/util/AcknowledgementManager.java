@@ -44,7 +44,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -230,15 +229,11 @@ public class AcknowledgementManager {
 
 		MessageContext referenceMsg = referenceRMMessage.getMessageContext();
 
-		RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-		RMDBean findBean = new RMDBean ();
-		findBean.setSequenceID(sequenceId);
-		RMDBean rmdBean = rmdBeanMgr.findUnique(findBean);
+		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
 		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());
-		String acksToStr = acksTo.getAddress();
 
-		if (acksToStr == null)
+		if (acksTo.getAddress() == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
 
 		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
@@ -409,6 +404,8 @@ public class AcknowledgementManager {
 	}
 	
 	public static void sendAckNow (RMMsgContext ackRMMsgContext) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: AcknowledgementManager::sendAckNow");
 
 		MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
 		ConfigurationContext configContext = ackMsgContext.getConfigurationContext();
@@ -432,7 +429,7 @@ public class AcknowledgementManager {
 		AxisEngine engine = new AxisEngine(configContext);
 		engine.send(ackMsgContext);
 		
-	}
-
-	
+		if (log.isDebugEnabled())
+			log.debug("Exit: AcknowledgementManager::sendAckNow");		
+	}	
 }

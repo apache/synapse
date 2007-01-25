@@ -171,6 +171,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>modules/nhttp/target</directory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <includes>
+                <include>synapse-nhttp-${synapse.version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/release/docs</directory>
             <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
             <includes>

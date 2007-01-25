@@ -27,6 +27,7 @@ import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.impl.reactor.DefaultConnectingIOReactor;
 import org.apache.http.nio.impl.DefaultClientIOEventDispatch;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
@@ -61,6 +62,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private ConfigurationContext cfgCtx;
     /** The IOReactor */
     private ConnectingIOReactor ioReactor = null;
+    /** The client handler */
+    private NHttpClientHandler handler = null;
 
     /**
      * Initialize the transport sender, and execute reactor in new seperate thread
@@ -93,7 +96,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             log.error("Error starting the IOReactor", e);
         }
 
-        NHttpClientHandler handler = new ClientHandler(cfgCtx, params);
+        handler = new ClientHandler(cfgCtx, params);
         IOEventDispatch ioEventDispatch = new DefaultClientIOEventDispatch(handler, params);
 
         try {
@@ -113,7 +116,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private HttpParams getClientParameters() {
         HttpParams params = new DefaultHttpParams(null);
         params
-            .setIntParameter(HttpConnectionParams.SO_TIMEOUT, 5000)
+            .setIntParameter(HttpConnectionParams.SO_TIMEOUT, 30000)
             .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, 10000)
             .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024)
             .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK, false)
@@ -169,9 +172,18 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             HttpHost httpHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
 
             Axis2HttpRequest axis2Req = new Axis2HttpRequest(epr, httpHost, msgContext);
-            SessionRequest req = ioReactor.connect(
-                new InetSocketAddress(url.getHost(), url.getPort()), null, axis2Req);
 
+            NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), url.getPort());
+
+            if (conn == null) {
+                SessionRequest req = ioReactor.connect(
+                    new InetSocketAddress(url.getHost(), url.getPort()), null, axis2Req);
+                log.debug("A new connection established");
+            } else {
+                ((ClientHandler) handler).submitRequest(conn, axis2Req);
+                log.debug("An existing connection reused");
+            }
+            
             axis2Req.streamMessageContents();
 
         } catch (MalformedURLException e) {
@@ -209,6 +221,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         } catch (IOException e) {
             handleException("IO Error sending response message", e);
         }
+
+        try {
+            worker.getIs().close();
+        } catch (IOException ignore) {}        
     }
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {

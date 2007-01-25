@@ -92,6 +92,37 @@ public class ClientHandler implements NHttpClientHandler {
     }
 
     /**
+     * Submit a new request over an already established connection, which has been 
+     * 'kept alive'
+     * @param conn the connection to use to send the request, which has been kept open
+     * @param axis2Req the new request
+     */
+    public void submitRequest(final NHttpClientConnection conn, Axis2HttpRequest axis2Req) {
+
+        try {
+            HttpContext context = conn.getContext();
+
+            context.setAttribute(HttpExecutionContext.HTTP_CONNECTION, conn);
+            context.setAttribute(HttpExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
+
+            context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
+            context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
+
+            HttpRequest request = axis2Req.getRequest();
+            request.getParams().setDefaults(this.params);
+            this.httpProcessor.process(request, context);
+
+            conn.submitRequest(request);
+            context.setAttribute(HttpExecutionContext.HTTP_REQUEST, request);
+
+        } catch (IOException e) {
+            handleException("I/O Error : " + e.getMessage(), e, conn);
+        } catch (HttpException e) {
+            handleException("Unexpected HTTP protocol error: " + e.getMessage(), e, conn);
+        }
+    }
+
+    /**
      * Invoked when the destination is connected
      * @param conn the connection being processed
      * @param attachment the attachment set previously
@@ -178,8 +209,10 @@ public class ClientHandler implements NHttpClientHandler {
 
             if (decoder.isCompleted()) {
                 sink.close();
-                 if (!connStrategy.keepAlive(response, context)) {
+                if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
+                } else {
+                    ConnectionPool.release(conn);
                 }
             }
 

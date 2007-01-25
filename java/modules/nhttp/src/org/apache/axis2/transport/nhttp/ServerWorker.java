@@ -205,6 +205,10 @@ public class ServerWorker implements Runnable {
         return os;
     }
 
+    public InputStream getIs() {
+        return is;
+    }
+
     public ServerHandler getServiceHandler() {
         return serverHandler;
     }

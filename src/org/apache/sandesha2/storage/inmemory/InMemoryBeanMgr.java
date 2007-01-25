@@ -125,7 +125,9 @@ abstract class InMemoryBeanMgr {
 						result = candidate;
 					} else {
 						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.nonUniqueResult);
+								SandeshaMessageKeys.nonUniqueResult,
+								result.toString(),
+								candidate.toString());
 						log.error(message);
 						throw new SandeshaException (message);
 					}

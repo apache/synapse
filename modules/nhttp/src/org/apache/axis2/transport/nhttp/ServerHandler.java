@@ -253,7 +253,11 @@ public class ServerHandler implements NHttpServiceHandler {
      * @param e the exception encountered
      */
     public void exception(NHttpServerConnection conn, IOException e) {
-        log.error("I/O error: " + e.getMessage());
+        if (e instanceof ConnectionClosedException) {
+            log.debug("I/O error: " + e.getMessage());
+        } else {
+            log.error("I/O error: " + e.getMessage());
+        }
         shutdownConnection(conn);
     }
 

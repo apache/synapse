@@ -102,6 +102,7 @@ public class PollingManager extends Thread {
 		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
 		RMSBean findRMS = new RMSBean();
 		findRMS.setPollingMode(true);
+		findRMS.setTerminated(false);
 		List results = rmsBeanManager.find(findRMS);
 		
 		int size = results.size();
@@ -129,6 +130,7 @@ public class PollingManager extends Thread {
 
 		RMDBean findBean = new RMDBean();
 		findBean.setPollingMode(true);
+		findBean.setTerminated(false);
 		findBean.setSequenceID(sequenceId); // Note that this may be null
 		List results = nextMsgMgr.find(findBean);
 		
@@ -148,16 +150,13 @@ public class PollingManager extends Thread {
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide");
 	}
 
-	private void pollForSequence(String sequenceId, String sequencePropertyKey, String referenceMsgKey, RMSequenceBean rmBean) throws SandeshaException, SandeshaStorageException, AxisFault {
+	private void pollForSequence(String sequenceId,
+								 String sequencePropertyKey,
+								 String referenceMsgKey,
+								 RMSequenceBean rmBean)
+	throws SandeshaException, SandeshaStorageException, AxisFault
+	{
 		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey + ", " + rmBean);
-
-		// Don't poll for a terminated sequence
-		// TODO once the 'terminated' flag is a property on the RMS / RMD bean, we should
-		// be able to filter out terminated sequences before we get here.
-		if(rmBean.isTerminated()) {
-			if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollForSequence, already terminated");
-			return;
-		}
 		
 		//create a MakeConnection message  
 		String replyTo = rmBean.getReplyToEPR();
@@ -183,7 +182,7 @@ public class PollingManager extends Thread {
 		
 		//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
 		SenderBean makeConnectionSenderBean = new SenderBean ();
-//		makeConnectionSenderBean.setInternalSequenceID(internalSequenceId);
+		makeConnectionSenderBean.setInternalSequenceID((rmBean instanceof RMSBean) ? sequencePropertyKey : null); // We only have internal ids for the RMS-side
 		makeConnectionSenderBean.setMessageContextRefKey(makeConnectionMsgStoreKey);
 		makeConnectionSenderBean.setMessageID(makeConnectionRMMessage.getMessageId());
 		makeConnectionSenderBean.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);

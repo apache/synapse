@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * Performs processing of the HTTP response received for our outgoing request. An instance of this
@@ -97,9 +98,13 @@ public class ClientWorker implements Runnable {
                 in,
                 outMsgCtx.getEnvelope().getNamespace().getNamespaceURI());
             responseMsgCtx.setEnvelope(envelope);
+
+            in.close();
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);
             return;
+        } catch (IOException e) {
+            log.error("Error closing input stream from which message was read", e);
         }
 
         AxisEngine engine = new AxisEngine(cfgCtx);

@@ -102,7 +102,6 @@
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
-    <!--<transportReceiver name="http" class="org.apache.axis2.transport.nhttp.AsyncHTTPListener"/>-->
     <!--<transportReceiver name="http"
                        class="org.apache.axis2.transport.http.SimpleHTTPServer">
         <parameter name="port" locked="false">8080</parameter>-->

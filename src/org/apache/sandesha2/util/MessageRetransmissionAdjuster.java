@@ -63,27 +63,31 @@ public class MessageRetransmissionAdjuster {
 		adjustNextRetransmissionTime(retransmitterBean, propertyBean);
 
 		int maxRetransmissionAttempts = propertyBean.getMaximumRetransmissionCount();
-
-		boolean timeOutSequence = false;
-		if (maxRetransmissionAttempts >= 0 && retransmitterBean.getSentCount() > maxRetransmissionAttempts)
-			timeOutSequence = true;
-
-		boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut(internalSequenceID, rmMsgCtx, storageManager);
-		if (sequenceTimedOut)
-			timeOutSequence = true;
-
+		
+		// We can only time out sequences if we can identify the correct sequence, and
+		// we need the internal sequence id for that.
 		boolean continueSending = true;
-		if (timeOutSequence) {
-			// Warn the user that the sequence has timed out
-			//if (log.isWarnEnabled())
-			//	log.warn();
-			stopRetransmission(retransmitterBean);
+		if(internalSequenceID != null) {
+			boolean timeOutSequence = false;
+			if (maxRetransmissionAttempts >= 0 && retransmitterBean.getSentCount() > maxRetransmissionAttempts)
+				timeOutSequence = true;
 
-			// Only messages of outgoing sequences get retransmitted. So named
-			// following method according to that.
-			
-			finalizeTimedOutSequence(sequencePropertyKey,internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
-			continueSending = false;
+			boolean sequenceTimedOut = SequenceManager.hasSequenceTimedOut(internalSequenceID, rmMsgCtx, storageManager);
+			if (sequenceTimedOut)
+				timeOutSequence = true;
+
+			if (timeOutSequence) {
+				// Warn the user that the sequence has timed out
+				//if (log.isWarnEnabled())
+				//	log.warn();
+				stopRetransmission(retransmitterBean);
+
+				// Only messages of outgoing sequences get retransmitted. So named
+				// following method according to that.
+				
+				finalizeTimedOutSequence(sequencePropertyKey,internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
+				continueSending = false;
+			}
 		}
 
 		if (log.isDebugEnabled())

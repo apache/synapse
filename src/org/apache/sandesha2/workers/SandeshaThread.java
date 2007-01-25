@@ -59,9 +59,11 @@ public abstract class SandeshaThread extends Thread{
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaThread::stopThreadForSequence, " + sequenceID);
 		
+		// We do not actually stop the thread here, as the workers are smart enough
+		// to sleep when there is no work to do. If we were to exit the thread then
+		// we wouldn't be able to start back up when the thread gets some more work
+		// to do.
 		workingSequences.remove(sequenceID);
-		if (workingSequences.size() == 0) 
-			runThread = false;		
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaThread::stopThreadForSequence");		
@@ -106,7 +108,7 @@ public abstract class SandeshaThread extends Thread{
 	
 	public synchronized void stopRunning() {
 		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaThread::stopRunning");
+			log.debug("Enter: SandeshaThread::stopRunning, " + this);
 
 		//NOTE: we do not take acount of pausing when stopping.
 		//The call to stop will wait until the invoker has exited the loop
@@ -124,7 +126,7 @@ public abstract class SandeshaThread extends Thread{
 		}
 		
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaThread::stopRunning");
+			log.debug("Exit: SandeshaThread::stopRunning, " + this);
 	}
 	
 	public synchronized boolean isThreadStarted() {
@@ -137,19 +139,29 @@ public abstract class SandeshaThread extends Thread{
 	
 
 	public synchronized void runThreadForSequence(ConfigurationContext context, String sequenceID){
-		if (!workingSequences.contains(sequenceID))
-			workingSequences.add(sequenceID);
+		if(log.isDebugEnabled()) log.debug("Entry: SandeshaThread::runThreadForSequence, " + this);
+
+		if (!workingSequences.contains(sequenceID))	workingSequences.add(sequenceID);
+		
 		if (!isThreadStarted()) {
+			if(log.isDebugEnabled()) log.debug("Starting thread");
+
 			this.context = context;
 			// Get the axis2 thread pool
 			threadPool = context.getThreadPool();
 			
 			runThread = true; // so that isStarted()=true.
+			
 			super.start();
 			
 			// Set the SandeshaThread to have the same context classloader as the application
 			this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
-		}		
+		} else {
+			if(log.isDebugEnabled()) log.debug("Waking thread");
+			wakeThread();
+		}
+
+		if(log.isDebugEnabled()) log.debug("Exit: SandeshaThread::runThreadForSequence");
 	}
 	
 	public synchronized ArrayList getSequences() {
@@ -222,6 +234,7 @@ public abstract class SandeshaThread extends Thread{
 			// flag that we have exited the run loop and notify any waiting
 			// threads
 			synchronized (this) {
+				if(log.isDebugEnabled()) log.debug("SandeshaThread really stopping " + this);
 				hasStoppedRunning = true;
 				notify();
 			}

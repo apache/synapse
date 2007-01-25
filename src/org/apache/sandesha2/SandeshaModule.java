@@ -53,8 +53,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 	// initialize the module
 	public void init(ConfigurationContext configContext,
 			AxisModule module) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::init, " + configContext);
 
-		//storing the Sadesha module as a property.
+		//storing the Sandesha module as a property.
 		configContext.setProperty(Sandesha2Constants.MODULE_CLASS_LOADER,module.getModuleClassLoader());
 
 		//init the i18n messages
@@ -127,9 +128,12 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 					}
 				}
 		);
+
+		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::init");
 	}
 
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::engageNotify, " + axisDescription);
 		
 		SandeshaPolicyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription);
 		if (parentPropertyBean==null) 
@@ -144,6 +148,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			parameter.setValue(axisDescPropertyBean);
 			axisDescription.addParameter(parameter);
 		}
+
+		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::engageNotify");
 	}
 
 	public PolicyExtension getPolicyExtension() {
@@ -151,9 +157,11 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 	}
 
 	public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::shutdown, " + configurationContext);
 		SandeshaUtil.
 			getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration())
 				.shutdown();
+		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::shutdown");
 	}
 
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {

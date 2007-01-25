@@ -60,23 +60,20 @@ public class SendMediator extends AbstractMediator {
 
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         try {
-            // TODO this may be really strange but true.. unless you call the below, sometimes it
-            // results in an unbound URI exception for no credible reason - needs more investigation
-            // seems like a woodstox issue. Use hack for now
-            // synCtx.getEnvelope().build();
-
             if (shouldTrace) {
                 trace.trace("Start : Send mediator");
                 trace.trace("Sending Message :: " + synCtx.getEnvelope());
             }
             // if no endpoints are defined, send where implicitly stated
             if (endpoints.isEmpty()) {
-                log.debug("Sending message using implicit message properties..");
-                log.debug("Sending To: " + (synCtx.getTo() != null ?
-                        synCtx.getTo().getAddress() : "null"));
-                log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
-                        synCtx.getWSAAction() : "null"));
-                log.debug("Body : \n" + synCtx.getEnvelope());
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending message using implicit message properties..");
+                    log.debug("Sending To: " + (synCtx.getTo() != null ?
+                            synCtx.getTo().getAddress() : "null"));
+                    log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                            synCtx.getWSAAction() : "null"));
+                    log.debug("Body : \n" + synCtx.getEnvelope());
+                }
                 synCtx.getEnvironment().send(synCtx);
 
             } else if (endpoints.size() == 1) {
@@ -115,8 +112,6 @@ public class SendMediator extends AbstractMediator {
                     synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
                 }
                 String endPointName = singleEndpoint.getName();
-                log.debug("Sending message to endpoint :: name = " +
-                        endPointName + " resolved address = " + eprAddress);
 
                  // Setting Required property to collect the End Point statistics
                 boolean statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == singleEndpoint.getStatisticsEnable());
@@ -126,11 +121,16 @@ public class SendMediator extends AbstractMediator {
                     synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
                 }
                 synCtx.setTo(new EndpointReference(eprAddress));
-                log.debug("Sending To: " + (synCtx.getTo() != null ?
-                        synCtx.getTo().getAddress() : "null"));
-                log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
-                        synCtx.getWSAAction() : "null"));
-                log.debug("Body : \n" + synCtx.getEnvelope());
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending message to endpoint :: name = " +
+                            endPointName + " resolved address = " + eprAddress);
+                    log.debug("Sending To: " + (synCtx.getTo() != null ?
+                            synCtx.getTo().getAddress() : "null"));
+                    log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                            synCtx.getWSAAction() : "null"));
+                    log.debug("Body : \n" + synCtx.getEnvelope());
+                }
 
                 // if RM is turned on
                 if (singleEndpoint.isReliableMessagingOn()) {

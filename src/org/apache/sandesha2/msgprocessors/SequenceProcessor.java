@@ -321,10 +321,10 @@ public class SequenceProcessor {
 //		else 
 //			add an ack entry here
 		
+		boolean backchannelFree = (replyTo != null && !replyTo.hasAnonymousAddress()) ||
+									WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep);
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
-		
-		if (acksTo!=null && acksTo.hasAnonymousAddress() && 
-			  WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep)) {
+		if (acksTo.hasAnonymousAddress() && backchannelFree) {
 			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
 			if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
 				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager,false,true);
@@ -339,7 +339,7 @@ public class SequenceProcessor {
 			}
 			//		having a negative value for timeToSend will make this behave as having an infinite ack interval.
 			long timeToSend = -1;   
-			if (acksTo!=null && !acksTo.hasAnonymousAddress()) {
+			if (!acksTo.hasAnonymousAddress()) {
 				long ackInterval = policyBean.getAcknowledgementInterval();
 				timeToSend = System.currentTimeMillis() + ackInterval;
 			}

@@ -250,6 +250,7 @@ public class SandeshaTestCase extends TestCase {
 			OMElement contents = body.getFirstElement();
 			this.resultStr = checkEchoOMBlock(contents);
 			completed = true;
+			System.out.println("TestCallback got text: '" + resultStr + "'");
 		}
 
 		public void onError (Exception e) {

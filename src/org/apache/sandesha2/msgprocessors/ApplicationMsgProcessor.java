@@ -400,9 +400,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmsBean.setNextMessageNumber(messageNumber);
 		
 		if (messageNumber == 1 && !sendCreateSequence) {
-			// if first message - setup the sending side sequence - both for the
-			// server and the client sides
-			SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
+			// Start the sender for the service side.
+			SandeshaUtil.startSenderForTheSequence(configContext, outSequenceID);
 		}
 
 		RelatesTo relatesTo = msgContext.getRelatesTo();

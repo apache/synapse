@@ -25,6 +25,9 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.statistics.StatisticsStack;
+import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
+import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 
 /**
  * This message receiver should be configured in the Axis2 configuration as the
@@ -47,6 +50,13 @@ public class SynapseMessageReceiver implements MessageReceiver {
         }
 
         MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
+        StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
+        if (synapseServiceStack== null) {
+            synapseServiceStack= new ProxyServiceStatisticsStack();
+            synCtx.setCorrelationProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
+        }
+        String name = "SynapseService";
+        synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true);
         synCtx.getEnvironment().injectMessage(synCtx);
 
         // Response handling mechanism for 200/202 and 5XX

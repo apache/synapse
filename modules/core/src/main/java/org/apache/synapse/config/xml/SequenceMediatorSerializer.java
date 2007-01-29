@@ -61,7 +61,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
         }
         if (statisticsValue != null) {
             sequence.addAttribute(fac.createOMAttribute(
-                    Constants.TRACE_ATTRIB_NAME, nullNS, statisticsValue));
+                    Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
         }
 
         if (mediator.getRef() != null) {

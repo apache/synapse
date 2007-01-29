@@ -128,11 +128,7 @@ public class WSRMMessageSender  {
 		rmMsgCtx.addSOAPEnvelope();
 
 		// Ensure the outbound message us secured using the correct token
-		if(getRMSBean().getSecurityTokenData() != null) {
-			SecurityManager secMgr = SandeshaUtil.getSecurityManager(configurationContext);
-			SecurityToken token = secMgr.recoverSecurityToken(getRMSBean().getSecurityTokenData());
-			secMgr.applySecurityToken(token, msgContext);
-		}
+		RMMsgCreator.secureOutboundMessage(getRMSBean(), msgContext);
 		
 		String key = SandeshaUtil.getUUID();
 

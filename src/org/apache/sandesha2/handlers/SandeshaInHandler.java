@@ -92,11 +92,12 @@ public class SandeshaInHandler extends AbstractHandler {
 					// handlers
 		}
 		
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+		if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Continuing beyond basic checks");
 
 		Transaction transaction = null;
 
 		try {
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 			transaction = storageManager.getTransaction();
 
 			AxisService axisService = msgCtx.getAxisService();
@@ -130,8 +131,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			returnValue = seqProcessor.processSequenceHeader(rmMsgCtx);
 
 		} catch (Exception e) {
-			if (log.isDebugEnabled())
-				log.debug("Exception caught during processInMessage", e);
+			if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Exception caught during processInMessage", e);
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
 			returnValue = InvocationResponse.SUSPEND;
@@ -150,6 +150,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			throw new AxisFault(message, e);
 		} 
 		finally {
+			if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Doing final processing");
 			if (transaction != null) {
 				try {
 					transaction.commit();

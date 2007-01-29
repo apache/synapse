@@ -18,6 +18,7 @@
 package org.apache.sandesha2.security;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
@@ -100,18 +101,22 @@ public class UnitTestSecurityManager extends SecurityManager {
 		
 		// Look for the header that we should have introduced in the 'apply' method
 		String key = ((UnitTestSecurityToken)token).getURI();
-		String foundToken = null;
+		boolean foundToken = false;
 		SOAPEnvelope env = message.getEnvelope();
 		SOAPHeader headers = env.getHeader();
 		if(headers != null) {
-			OMElement myHeader = headers.getFirstChildWithName(unitTestHeader);
-			if(myHeader != null) {
-				foundToken = myHeader.getText();
+			Iterator tokens = headers.getChildrenWithName(unitTestHeader);
+			while(tokens.hasNext()) {
+				OMElement myHeader = (OMElement) tokens.next();
+				String text = myHeader.getText();
+				if(key.equals(text)) {
+					foundToken = true;
+					break;
+				}
 			}
 		}
-		if(!key.equals(foundToken)) {
-			throw new SandeshaException("Message was not secured with the correct token");
-		}
+		if(!foundToken) throw new SandeshaException("Message was not secured with the correct token(s)");
+
 		log.debug("Exit: UnitTestSecurityManager::checkProofOfPossession");
 	}
 

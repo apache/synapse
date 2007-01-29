@@ -666,6 +666,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			rmMsg.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, ackRequested);
 		}
 
+		// Now that we have added the headers to the message, make sure that we secure it with
+		// the correct token.
+		RMMsgCreator.secureOutboundMessage(rmsBean, msg);
 
 		rmMsg.addSOAPEnvelope();
 

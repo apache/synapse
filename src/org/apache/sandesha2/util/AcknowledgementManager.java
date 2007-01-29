@@ -121,7 +121,8 @@ public class AcknowledgementManager {
 
 				// Adding the ack(s) to the application message
 				boolean acks = false;
-				SOAPHeader appMsgHeaders = rmMessageContext.getMessageContext().getEnvelope().getHeader();
+				MessageContext messageContext = rmMessageContext.getMessageContext();
+				SOAPHeader appMsgHeaders = messageContext.getEnvelope().getHeader();
 				
 				SOAPHeader headers = ackMsgContext.getEnvelope().getHeader();
 				if(headers != null) {
@@ -137,6 +138,12 @@ public class AcknowledgementManager {
 							
 							sequenceAcknowledgement.toOMElement(appMsgHeaders);
 							acks = true;
+							
+							// Make sure that the outbound message is secured with the token that
+							// matches the ack.
+							String seqId = sequenceAcknowledgement.getIdentifier().getIdentifier();
+							RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, seqId);
+							RMMsgCreator.secureOutboundMessage(rmdBean, messageContext);
 						}
 					}
 				}

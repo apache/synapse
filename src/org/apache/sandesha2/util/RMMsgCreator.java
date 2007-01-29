@@ -473,8 +473,13 @@ public class RMMsgCreator {
 	}
 	
 	
-	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,  String makeConnectionSeqId,
-			String makeConnectionAnonURI, StorageManager storageManager) throws AxisFault {
+	public static RMMsgContext createMakeConnectionMessage (RMMsgContext referenceRMMessage,
+															RMSequenceBean bean,
+															String makeConnectionSeqId,
+															String makeConnectionAnonURI,
+															StorageManager storageManager)
+	throws AxisFault
+	{
 		
 		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 		String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
@@ -516,13 +521,13 @@ public class RMMsgCreator {
 		//generating the SOAP Envelope.
 		makeConnectionRMMessageCtx.addSOAPEnvelope();
 		
-		// TODO work out how to find the correct sequence property key to look up the token
-		// that we should include in the makeConnection (assuming we need one)
+		// Secure the message using the correct token for the sequence that we are polling
+		secureOutboundMessage(bean, makeConnectionMessageCtx);		
 		
 		return makeConnectionRMMessageCtx;
 	}
 
-	private static void secureOutboundMessage(RMSequenceBean rmBean, MessageContext message)
+	public static void secureOutboundMessage(RMSequenceBean rmBean, MessageContext message)
 	throws SandeshaException
 	{
 		if(log.isDebugEnabled()) log.debug("Entry: RMMsgCreator::secureOutboundMessage");

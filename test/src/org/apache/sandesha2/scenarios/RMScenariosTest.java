@@ -29,16 +29,20 @@ public class RMScenariosTest extends SandeshaTestCase {
 	private int serverPort = DEFAULT_SERVER_TEST_PORT;
 	private String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 	
-	private String repoPath = "target" + File.separator + "repos" + File.separator + "server";
-	private String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
+	protected String repoPath = "target" + File.separator + "repos" + File.separator + "server";
+	protected String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
 
-	private String repoPathClient = "target" + File.separator + "repos" + File.separator + "client";
-	private String axis2_xmlClient = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+	protected String repoPathClient = "target" + File.separator + "repos" + File.separator + "client";
+	protected String axis2_xmlClient = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
 	
 	public RMScenariosTest () {
 		super ("RMScenariosTest");
 	}
 	
+	public RMScenariosTest (String name) {
+		super(name);
+	}
+
 	public void setUp () throws Exception {
 		super.setUp();
 
@@ -190,12 +194,12 @@ public class RMScenariosTest extends SandeshaTestCase {
 		        //assertions for the out sequence.
 				SequenceReport outgoingSequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 				System.out.println("Checking Outbound Sequence: " + outgoingSequenceReport.getSequenceID());
-				assertEquals (outgoingSequenceReport.getCompletedMessages().size(),3);
-				assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(1)));
-				assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(2)));
-				assertTrue(outgoingSequenceReport.getCompletedMessages().contains(new Long(3)));
-				assertEquals(outgoingSequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-				assertEquals(outgoingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+				assertEquals ("Outbound message count", 3, outgoingSequenceReport.getCompletedMessages().size());
+				assertTrue("Outbound message #1", outgoingSequenceReport.getCompletedMessages().contains(new Long(1)));
+				assertTrue("Outbound message #2", outgoingSequenceReport.getCompletedMessages().contains(new Long(2)));
+				assertTrue("Outbound message #3", outgoingSequenceReport.getCompletedMessages().contains(new Long(3)));
+				assertEquals("Outbound sequence status: TERMINATED", SequenceReport.SEQUENCE_STATUS_TERMINATED, outgoingSequenceReport.getSequenceStatus());
+				assertEquals("Outbound sequence direction: OUT", SequenceReport.SEQUENCE_DIRECTION_OUT, outgoingSequenceReport.getSequenceDirection());
 				
 				//assertions for the inbound sequence. The one we care about is a new sequence,
 				//so it will not exist in the oldSequences list.
@@ -203,26 +207,27 @@ public class RMScenariosTest extends SandeshaTestCase {
 				SequenceReport incomingSequenceReport = getNewReport(incomingSequences, oldIncomingReports);
 				System.out.println("Checking Inbound Sequence: " + incomingSequenceReport.getSequenceID());
 				String offer = (String) clientOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
-				if(offer != null) assertEquals(offer, incomingSequenceReport.getSequenceID());
-				assertEquals (incomingSequenceReport.getCompletedMessages().size(),3);
-				assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(1)));
-				assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(2)));
-				assertTrue(incomingSequenceReport.getCompletedMessages().contains(new Long(3)));
-				assertEquals(incomingSequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_IN);
-				assertEquals(SequenceReport.SEQUENCE_STATUS_TERMINATED, incomingSequenceReport.getSequenceStatus());
+				if(offer != null) assertEquals("Inbound seq id", offer, incomingSequenceReport.getSequenceID());
+				assertEquals ("Inbound message count", 3, incomingSequenceReport.getCompletedMessages().size());
+				assertTrue("Inbound message #1", incomingSequenceReport.getCompletedMessages().contains(new Long(1)));
+				assertTrue("Inbound message #2", incomingSequenceReport.getCompletedMessages().contains(new Long(2)));
+				assertTrue("Inbound message #3", incomingSequenceReport.getCompletedMessages().contains(new Long(3)));
+				assertEquals("Inbound sequence status: TERMINATED", SequenceReport.SEQUENCE_STATUS_TERMINATED, incomingSequenceReport.getSequenceStatus());
+				assertEquals("Inbound sequence direction: IN", SequenceReport.SEQUENCE_DIRECTION_IN, incomingSequenceReport.getSequenceDirection());
 				
-				assertTrue(callback1.isComplete());
-				assertEquals ("echo1", callback1.getResult());
+				assertTrue("Callback #1", callback1.isComplete());
+				assertEquals("Callback #1 data", "echo1", callback1.getResult());
 				
-				assertTrue(callback2.isComplete());
-				assertEquals ("echo1echo2", callback2.getResult());
+				assertTrue("Callback #2", callback2.isComplete());
+				assertEquals("Callback #2 data", "echo1echo2", callback2.getResult());
 				
-				assertTrue(callback3.isComplete());
-				assertEquals ("echo1echo2echo3", callback3.getResult());
+				assertTrue("Callback #3", callback3.isComplete());
+				assertEquals("Callback #3 data", "echo1echo2echo3", callback3.getResult());
 				
 				lastError = null;
 				break;
 			} catch(Error e) {
+				System.out.println("Possible error:" + e);
 				lastError = e;
 			}
 		}

@@ -65,7 +65,7 @@ public class PollingManager extends Thread {
 	
 	private final int POLLING_MANAGER_WAIT_TIME = 3000;
 	
-	public void run() {
+	private void internalRun() {
 		while (isPoll()) {
 			Transaction t = null;
 			try {
@@ -93,6 +93,14 @@ public class PollingManager extends Thread {
 			} catch (InterruptedException e) {
 				if(log.isDebugEnabled()) log.debug("Sleep was interrupted", e);
 			}
+		}
+	}
+	
+	public void run() {
+		try {
+			internalRun();
+		} catch(Exception e) {
+			if(log.isDebugEnabled()) log.debug("PollingManager thread ending", e);
 		}
 	}
 	
@@ -171,7 +179,7 @@ public class PollingManager extends Thread {
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,configurationContext);
 		RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
-				sequenceId, WSRMAnonReplyToURI, storageManager);
+				rmBean, sequenceId, WSRMAnonReplyToURI, storageManager);
 		
 		makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
 		//storing the MakeConnection message.

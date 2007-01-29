@@ -112,6 +112,9 @@ public class PropertyManager {
 			String inOrderInvocation = properties.getProperty(Sandesha2Constants.Properties.InOrderInvocation);
 			loadInOrderInvocation(inOrderInvocation, propertyBean);
 
+			String enableMakeConnection = properties.getProperty(Sandesha2Constants.Properties.EnableMakeConnection);
+			loadEnableMakeConnection(enableMakeConnection, propertyBean);
+			
 			String messageTypesToDrop = properties.getProperty(Sandesha2Constants.Properties.MessageTypesToDrop);
 			loadMessageTypesToDrop(messageTypesToDrop, propertyBean);
 
@@ -165,6 +168,10 @@ public class PropertyManager {
 		Parameter inOrderInvocationParam = desc.getParameter(Sandesha2Constants.Properties.InOrderInvocation);
 		String inOrderInvocation = (String) inOrderInvocationParam.getValue();
 		loadInOrderInvocation(inOrderInvocation, propertyBean);
+		
+		Parameter enableMakeConnectionParam = desc.getParameter(Sandesha2Constants.Properties.EnableMakeConnection);
+		String enableMakeConnection = (String) enableMakeConnectionParam.getValue();
+		loadEnableMakeConnection(enableMakeConnection, propertyBean);
 
 		Parameter messageTypesToDropParam = desc.getParameter(Sandesha2Constants.Properties.MessageTypesToDrop);
 		String messageTypesToDrop = (String) messageTypesToDropParam.getValue();
@@ -526,6 +533,19 @@ public class PropertyManager {
 				propertyBean.setInOrder(true);
 			} else if (inOrderInvocation.equalsIgnoreCase("false")) {
 				propertyBean.setInOrder(false);
+			}
+		}
+	}
+	
+	private static void loadEnableMakeConnection(String enableMakeConnection, SandeshaPolicyBean propertyBean)
+	throws SandeshaException {
+
+		if (enableMakeConnection != null) {
+			enableMakeConnection = enableMakeConnection.trim();
+			if (enableMakeConnection.equalsIgnoreCase("true")) {
+				propertyBean.setEnableMakeConnection(true);
+			} else if (enableMakeConnection.equalsIgnoreCase("false")) {
+				propertyBean.setEnableMakeConnection(false);
 			}
 		}
 	}

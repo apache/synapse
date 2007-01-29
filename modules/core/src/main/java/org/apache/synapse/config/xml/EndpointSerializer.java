@@ -93,7 +93,7 @@ public class EndpointSerializer {
             }
             if (statisticsValue != null) {
                 endpoint.addAttribute(fac.createOMAttribute(
-                        Constants.TRACE_ATTRIB_NAME, nullNS, statisticsValue));
+                        Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
             }
             if (endpt.isAddressingOn()) {
             	OMElement addressing = fac.createOMElement("enableAddressing", synNS);

@@ -41,6 +41,10 @@ public class StatisticsUtils {
         if (proxyServiceStatisticsStack != null) {
             proxyServiceStatisticsStack.reportToStatisticsCollector(statisticsCollector);
         }
+        ProxyServiceStatisticsStack synapseServiceStatisticsStack = (ProxyServiceStatisticsStack) synCtx.getProperty(Constants.SYNAPSESERVICE_STATISTICS_STACK);
+        if (synapseServiceStatisticsStack != null) {
+            synapseServiceStatisticsStack.reportToStatisticsCollector(statisticsCollector);
+        }
     }
 
     /**

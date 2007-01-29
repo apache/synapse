@@ -91,7 +91,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         HttpParams params = getClientParameters();
         try {
-            ioReactor = new DefaultConnectingIOReactor(1, params);
+            ioReactor = new DefaultConnectingIOReactor(2, params);
         } catch (IOException e) {
             log.error("Error starting the IOReactor", e);
         }

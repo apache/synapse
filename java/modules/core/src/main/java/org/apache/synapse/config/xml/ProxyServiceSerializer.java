@@ -146,7 +146,7 @@ public class ProxyServiceSerializer {
         }
         if (statisticsValue != null) {
             proxy.addAttribute(fac.createOMAttribute(
-                    Constants.TRACE_ATTRIB_NAME, nullNS, statisticsValue));
+                    Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
         }
 
         int traceState = service.getTraceState();

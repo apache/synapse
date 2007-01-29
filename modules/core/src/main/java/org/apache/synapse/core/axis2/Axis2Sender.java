@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.neethi.Policy;
 import org.apache.axiom.soap.SOAPFault;
 
@@ -40,56 +41,57 @@ public class Axis2Sender {
     private static final Log log = LogFactory.getLog(Axis2Sender.class);
 
     public static void sendOn(
-        org.apache.synapse.MessageContext synapseInMessageContext) {
+            org.apache.synapse.MessageContext synapseInMessageContext) {
 
         try {
-            Boolean wsAOn   = (Boolean) synapseInMessageContext.getProperty(
-                Constants.OUTFLOW_ADDRESSING_ON);
-            Boolean wsRmOn  = (Boolean) synapseInMessageContext.getProperty(
-                Constants.OUTFLOW_RM_ON);
+            Boolean wsAOn = (Boolean) synapseInMessageContext.getProperty(
+                    Constants.OUTFLOW_ADDRESSING_ON);
+            Boolean wsRmOn = (Boolean) synapseInMessageContext.getProperty(
+                    Constants.OUTFLOW_RM_ON);
             Boolean wsSecOn = (Boolean) synapseInMessageContext.getProperty(
-                Constants.OUTFLOW_SECURITY_ON);
+                    Constants.OUTFLOW_SECURITY_ON);
             Boolean separateListener = (Boolean) synapseInMessageContext.getProperty(
                     Constants.OUTFLOW_USE_SEPARATE_LISTENER);
 
             MessageContext axisOutMsgContext =
-                Axis2FlexibleMEPClient.send(
-                    // WS-A default is off
-                    (wsAOn != null && wsAOn.booleanValue()),
+                    Axis2FlexibleMEPClient.send(
+                            // WS-A default is off
+                            (wsAOn != null && wsAOn.booleanValue()),
 
-                    // WS-Sec default is off
-                    (wsSecOn != null && wsSecOn.booleanValue()),
+                            // WS-Sec default is off
+                            (wsSecOn != null && wsSecOn.booleanValue()),
 
-                    // The Rampart security policy
-                    (String) synapseInMessageContext.getProperty(
-                        Constants.OUTFLOW_SEC_POLICY),
+                            // The Rampart security policy
+                            (String) synapseInMessageContext.getProperty(
+                                    Constants.OUTFLOW_SEC_POLICY),
 
-                    // WS-RM default is off
-                    (wsRmOn != null && wsRmOn.booleanValue()),
+                            // WS-RM default is off
+                            (wsRmOn != null && wsRmOn.booleanValue()),
 
-                    // The Sandesha security policy
-                    (String) synapseInMessageContext.getProperty(
-                        Constants.OUTFLOW_RM_POLICY),
+                            // The Sandesha security policy
+                            (String) synapseInMessageContext.getProperty(
+                                    Constants.OUTFLOW_RM_POLICY),
 
-                    // use a separate listener
-                    (separateListener != null && separateListener.booleanValue()),
-                    
-                    // The Axis2 Message context of the Synapse MC
-                    synapseInMessageContext);
+                            // use a separate listener
+                            (separateListener != null && separateListener.booleanValue()),
 
-          
-            if (axisOutMsgContext != null && axisOutMsgContext.getEnvelope()!=null) { // if there is no response env will be null
+                            // The Axis2 Message context of the Synapse MC
+                            synapseInMessageContext);
+
+
+            if (axisOutMsgContext != null && axisOutMsgContext.getEnvelope() != null)
+            { // if there is no response env will be null
                 //set the response Envelop as a property in Original axisMsgCtx
                 synapseInMessageContext.setProperty(
-                    org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,
-                    axisOutMsgContext.getEnvelope());
+                        org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,
+                        axisOutMsgContext.getEnvelope());
 
                 // create the synapse message context for the response
                 org.apache.synapse.MessageContext synapseOutMessageContext =
-                    new Axis2MessageContext(
-                        axisOutMsgContext,
-                        synapseInMessageContext.getConfiguration(),
-                        synapseInMessageContext.getEnvironment());
+                        new Axis2MessageContext(
+                                axisOutMsgContext,
+                                synapseInMessageContext.getConfiguration(),
+                                synapseInMessageContext.getEnvironment());
                 synapseOutMessageContext.setResponse(true);
 
                 // now set properties to co-relate to the request i.e. copy over
@@ -99,30 +101,30 @@ public class Axis2Sender {
                 while (iter.hasNext()) {
                     Object key = iter.next();
                     synapseOutMessageContext.setProperty(
-                        (String) key, synapseInMessageContext.getCorrelationProperty((String) key));
+                            (String) key, synapseInMessageContext.getCorrelationProperty((String) key));
                 }
 
                 // if we have a SOAP Fault, log it - irrespective of the mediation logic
                 // http://issues.apache.org/jira/browse/SYNAPSE-42
                 if (synapseOutMessageContext.getEnvelope().getBody().hasFault()) {
                     SOAPFault fault = synapseOutMessageContext.getEnvelope().getBody().getFault();
-                    log.warn("Synapse received a SOAP fault from : " + synapseInMessageContext.getTo() + 
-                        (fault.getNode() != null ? " Node : " + fault.getNode().getNodeValue() : "") +
-                        (fault.getReason() != null ? " Reason : " + fault.getReason().getFirstSOAPText() : "") +
-                        (fault.getCode() != null ? " Code : " + fault.getCode().getValue() : ""));
+                    log.warn("Synapse received a SOAP fault from : " + synapseInMessageContext.getTo() +
+                            (fault.getNode() != null ? " Node : " + fault.getNode().getNodeValue() : "") +
+                            (fault.getReason() != null ? " Reason : " + fault.getReason().getFirstSOAPText() : "") +
+                            (fault.getCode() != null ? " Code : " + fault.getCode().getValue() : ""));
                 }
 
                 log.debug("Processing incoming message");
 
                 // sets the out sequence if present to the out MC to mediate the response
-                if(synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE) != null) {
+                if (synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE) != null) {
                     synapseOutMessageContext.setProperty(Constants.OUT_SEQUENCE,
                             synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE));
                 }
 
                 // send the response message through the synapse mediation flow
                 synapseInMessageContext.getEnvironment().
-                    injectMessage(synapseOutMessageContext);
+                        injectMessage(synapseOutMessageContext);
             }
 
         } catch (Exception e) {
@@ -133,13 +135,19 @@ public class Axis2Sender {
     public static void sendBack(org.apache.synapse.MessageContext smc) {
 
         MessageContext messageContext = ((Axis2MessageContext) smc).
-            getAxis2MessageContext();
+                getAxis2MessageContext();
         AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
 
         try {
             messageContext.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check if addressing is already engaged for this message.
             // if engaged we should use the addressing enabled Configuraion context.
+            if (smc.isResponse()) {
+                //Process statistics
+                StatisticsUtils.processEndPointStatistics(smc);
+                StatisticsUtils.processProxyServiceStatistics(smc);
+                StatisticsUtils.processSequenceStatistics(smc);
+            }
             ae.send(messageContext);
 
         } catch (AxisFault e) {

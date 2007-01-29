@@ -158,6 +158,9 @@ public interface Constants {
     /** key for lookup Proxy Service statistics stack */
     String PROXYSERVICE_STATISTICS_STACK ="proxyservice_statistics_stack";
 
+    /** key for lookup Proxy Service statistics stack */
+    String SYNAPSESERVICE_STATISTICS_STACK ="synapseservice_statistics_stack";      
+
     /** key for lookup Endpoint statistics stack */
     String ENDPOINT_STATISTICS_STACK ="endpoint_statistics_stack";
 

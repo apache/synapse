@@ -257,23 +257,10 @@ public class RMMsgCreator {
 		
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
 
-		if (!SpecSpecificConstants.isTerminateSequenceResponseRequired(rmsBean.getRMVersion())) {
-			terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null);
-		}
-
 		RMMsgContext terminateRMMessage = MsgInitializer.initializeMessage(terminateMessage);
 
 		if (terminateMessage == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.msgContextNotSet));
-
-		AxisOperation referenceMsgOperation = referenceMessage.getAxisOperation();
-		if (referenceMsgOperation != null) {
-			ArrayList outPhases = referenceMsgOperation.getPhasesOutFlow();
-			if (outPhases != null) {
-				terminateOperation.setPhasesOutFlow(outPhases);
-				terminateOperation.setPhasesOutFaultFlow(outPhases);
-			}
-		}
 
 		TerminateSequence terminateSequencePart = new TerminateSequence(rmNamespaceValue);
 		Identifier identifier = new Identifier(rmNamespaceValue);

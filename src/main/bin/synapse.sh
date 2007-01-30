@@ -105,16 +105,16 @@ SYNAPSE_ENDORSED=$JAVA_HOME/lib/endorsed
 # synapse.xml
 SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/synapse.xml
 
-if [ "$1" == "-sample" ]; then
+if [ "$1" = "-sample" ]; then
 SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
 fi
 
-if [ "$3" == "-sample" ]; then
+if [ "$3" = "-sample" ]; then
 SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$4.xml
 fi
 
 PORT="-Dport=8080"
-if [ "$1" == "-port" ]; then
+if [ "$1" = "-port" ]; then
   PORT="-Dport=$2"
 fi
 

@@ -100,7 +100,7 @@ echo " Using AXIS2 Repository :   $AXIS2_HOME/repository"
 echo " Using AXIS2 Configuration :   $AXIS2_HOME/repository/conf/axis2.xml"
 
 PORT="-Dport=9000"
-if [ "$1" == "-port" ]; then
+if [ "$1" = "-port" ]; then
   PORT="-Dport=$2"
 fi
 

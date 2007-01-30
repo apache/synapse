@@ -91,6 +91,10 @@ public class ClientHandler implements NHttpClientHandler {
             new DefaultThreadFactory(new ThreadGroup("Client Worker thread group"), "HttpClientWorker"));
     }
 
+    public void requestReady(final NHttpClientConnection conn) {
+        // The connection is ready for submission of a new request
+    }
+
     /**
      * Submit a new request over an already established connection, which has been 
      * 'kept alive'

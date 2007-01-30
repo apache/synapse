@@ -115,42 +115,27 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				return;	
 			}
 
-			String specVersion = rmMsgCtx.getRMSpecVersion();
-			
-			// If we are sending to the anonymous URI and this is WSRM 1.0 then we _must_ have a transport waiting,
+			// If we are sending to the anonymous URI then we _must_ have a transport waiting,
 			// or the message can't go anywhere. If there is nothing here then we leave the
-			// message in the sender queue, and a MakeConnection will hopefully pick it up
-			// soon.
-			// If this is RM 1.1 we have the MakeConnection mechanism so this check is not necessary.
+			// message in the sender queue, and a MakeConnection (or a retransmitted request)
+			// will hopefully pick it up soon.
+			Boolean makeConnection = (Boolean) msgCtx.getProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE);
 			EndpointReference toEPR = msgCtx.getTo();
-			if(toEPR.hasAnonymousAddress() ) {
-				
-				if (specVersion != null	&& Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) {
-					//for RM 1.0 we dont let this go forward until a valid RequestResponseTransport is available to attach a 
-					//async response.
-					RequestResponseTransport t = null;
-					MessageContext inMsg = null;
-					OperationContext op = msgCtx.getOperationContext();
-					if (op != null)
-						inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					if (inMsg != null)
-						t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+			if(toEPR.hasAnonymousAddress() &&
+				(makeConnection == null || !makeConnection.booleanValue())) {
 
-					if (t == null || !t.getStatus().equals(RequestResponseTransportStatus.WAITING)) {
-						if (log.isDebugEnabled())
-							log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
-						return;
-					}
-				} else {
-					//for RM 1.1 we dont let this go forward only if this is an response to a MakeConnection message
-					
-					Boolean makeConnectionResponse = (Boolean) msgCtx.getProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE);
-					
-					if (makeConnectionResponse==null || !Boolean.TRUE.equals(makeConnectionResponse)) {
-						if (log.isDebugEnabled())
-							log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
-						return;
-					}
+				RequestResponseTransport t = null;
+				MessageContext inMsg = null;
+				OperationContext op = msgCtx.getOperationContext();
+				if (op != null)
+					inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+				if (inMsg != null)
+					t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+
+				if (t == null || !t.getStatus().equals(RequestResponseTransportStatus.WAITING)) {
+					if (log.isDebugEnabled())
+						log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
+					return;
 				}
 			}
 			

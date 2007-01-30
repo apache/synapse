@@ -169,19 +169,11 @@ public class SequenceProcessor {
 		String specVersion = rmMsgCtx.getRMSpecVersion();
 		Boolean duplicateMessage = (Boolean) rmMsgCtx.getProperty(Sandesha2Constants.DUPLICATE_MESSAGE);
 		String mep = msgCtx.getAxisOperation().getMessageExchangePattern();
+		boolean syncReply = replyTo == null || replyTo.hasAnonymousAddress();
 		
-		if ((replyTo!=null && replyTo.hasAnonymousAddress()) &&
+		if (syncReply && !WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep) && 
 			(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) &&
 			(duplicateMessage!=null && duplicateMessage.equals(Boolean.TRUE))){
-			
-			if (WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep)) {
-				//This scenario has to be handled only for meps with response messages
-				result = InvocationResponse.SUSPEND;
-				
-				if (log.isDebugEnabled())
-					log.debug("Exit: SequenceProcessor::processReliableMessage"	+ result);
-				return result;
-			}
 			
 		    String outgoingSideInternalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(sequenceId);
 		    RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, outgoingSideInternalSequenceId);
@@ -243,11 +235,10 @@ public class SequenceProcessor {
 						// pausing the thread, causing the transport to wait.
 						// Sender will send the outMessage correctly, using
 						// RequestResponseTransportListner.
-
-						if (log.isDebugEnabled())
-							log.debug("Exit: SequenceProcessor::processReliableMessage"	+ result);
 						
 						result = InvocationResponse.SUSPEND;
+						if (log.isDebugEnabled())
+							log.debug("Exit: SequenceProcessor::processReliableMessage" + result);
 						return result;
 					}
 				}
@@ -257,8 +248,11 @@ public class SequenceProcessor {
 			throw new SandeshaException (message);
 		    
 		} else if (duplicateMessage!=null && duplicateMessage.equals(Boolean.TRUE)) {
-			String message = "Unexpected scenario. This message should have been dropped in the pre-dispatch level";
-			throw new SandeshaException (message);
+			// Abort processing this duplicate
+			result = InvocationResponse.ABORT;
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, dropping duplicate: " + result);
+			return result;
 		}		
 		
 		String key = SandeshaUtil.getUUID(); // key to store the message.
@@ -290,8 +284,10 @@ public class SequenceProcessor {
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			// this is a duplicate message and the invocation type is
 			// EXACTLY_ONCE.
-			rmMsgCtx.pause();
-			result = InvocationResponse.SUSPEND;
+			result = InvocationResponse.ABORT;
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, dropping duplicate: " + result);
+			return result;
 		}
 
 		if (!msgNoPresentInList)
@@ -310,9 +306,6 @@ public class SequenceProcessor {
 		//setting properties for the messageContext
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceId);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
-		
-		
-		
 		
 //		adding of acks
 		
@@ -352,47 +345,15 @@ public class SequenceProcessor {
 
 		if (inOrderInvocation) {
 
-			//if replyTo is anonymous and this is not an InOnly message
-				//SUSPEND the execution for RM 1.0    
-				//Sender will attach a sync responseusing the RequestResponseTransport object.
-			//else
-				//ABORT the execution
-			
-			// if (acksTo is anonymous and no response message has been added)
-				//send an ack to the back channel now.
-			
-			//add an antry to the invoker
-			
-			if ((replyTo!=null && replyTo.hasAnonymousAddress() && 
-				 !WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep))) {
-				
-				if (specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) {
-					result = InvocationResponse.SUSPEND;
-					//in case of RM 1.0 result will be suspended, causing the anon-response to be added using RequestResponseTransport
-					//ack bean entry added previously may cause an ack to be piggybacked.
-				} else {
-					result = InvocationResponse.ABORT;
-				}
-			} else {
-				result = InvocationResponse.ABORT;
-			}
-
-			
+			// Whatever the MEP, we suspend processing here and the invoker will do the real work
+			result = InvocationResponse.SUSPEND;
 			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
-			// saving the message.
-			try {
-				storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());
-				storageMapMgr.insert(new InvokerBean(key, msgNo, sequenceId));
+			storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());
+			storageMapMgr.insert(new InvokerBean(key, msgNo, sequenceId));
 
-				// This will avoid performing application processing more
-				// than
-				// once.
-				rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
-
-			} catch (Exception ex) {
-				throw new SandeshaException(ex.getMessage(), ex);
-			}
+			// This will avoid performing application processing more than once.
+			rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
 			// Starting the invoker if stopped.
 			SandeshaUtil.startInvokerForTheSequence(msgCtx.getConfigurationContext(), sequenceId);

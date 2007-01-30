@@ -125,6 +125,7 @@
                 <include>axis2server.sh</include>
                 <include>axis2server.bat</include>
             </includes>
+            <fileMode>755</fileMode>
         </fileSet>
 
         <!--<fileSet>-->

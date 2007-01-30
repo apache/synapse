@@ -153,9 +153,10 @@ public class Axis2FlexibleMEPClient {
 
         } else {
 
-            mepClient.execute(true);
+            // default behaviour changed to non-blocking
+            mepClient.execute(false);
 
-            MessageContext responseReceived =
+            /*MessageContext responseReceived =
                 mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
             if (responseReceived != null && responseReceived.getEnvelope() != null) {
@@ -167,7 +168,8 @@ public class Axis2FlexibleMEPClient {
 
             } else {
                 return null;
-            }
+            }*/
+            return null;
         }
     }
 

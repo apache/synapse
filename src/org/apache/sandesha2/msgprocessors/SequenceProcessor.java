@@ -374,47 +374,50 @@ public class SequenceProcessor {
 		
 		Sequence sequence = (Sequence) rmMsgCtx
 				.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-		String sequenceId = sequence.getIdentifier().getIdentifier();
-		ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
-				.getConfigurationContext();
-		if (configCtx == null) {
-			String message = SandeshaMessageHelper
-					.getMessage(SandeshaMessageKeys.configContextNotSet);
-			if (log.isDebugEnabled())
-				log.debug(message);
-			throw new SandeshaException(message);
-		}
+		
+		if(sequence!=null){
+			String sequenceId = sequence.getIdentifier().getIdentifier();
+			ConfigurationContext configCtx = rmMsgCtx.getMessageContext()
+					.getConfigurationContext();
+			if (configCtx == null) {
+				String message = SandeshaMessageHelper
+						.getMessage(SandeshaMessageKeys.configContextNotSet);
+				if (log.isDebugEnabled())
+					log.debug(message);
+				throw new SandeshaException(message);
+			}
 
-		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(
-				rmMsgCtx , sequenceId, storageManager,
-				false, serverSide);
-		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
+			RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(
+					rmMsgCtx , sequenceId, storageManager,
+					false, serverSide);
+			MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
 
-		EndpointReference acksTo = ackRMMsgCtx.getTo();
-		EndpointReference replyTo = rmMsgCtx.getReplyTo();
-		boolean anonAck = (acksTo == null) || acksTo.hasAnonymousAddress();
-		boolean anonReply = (replyTo == null) || replyTo.hasAnonymousAddress();
+			EndpointReference acksTo = ackRMMsgCtx.getTo();
+			EndpointReference replyTo = rmMsgCtx.getReplyTo();
+			boolean anonAck = (acksTo == null) || acksTo.hasAnonymousAddress();
+			boolean anonReply = (replyTo == null) || replyTo.hasAnonymousAddress();
 
-		// Only use the backchannel for ack messages if we are sure that the
-		// application
-		// doesn't need it. A 1-way MEP should be complete by now.
-		boolean complete = ackMsgCtx.getOperationContext().isComplete();
-		if (anonAck && anonReply && !complete) {
-			if (log.isDebugEnabled())
-				log
-						.debug("Exit: SequenceProcessor::sendAckIfNeeded, avoiding using backchannel");
-			return;
-		}
+			// Only use the backchannel for ack messages if we are sure that the
+			// application
+			// doesn't need it. A 1-way MEP should be complete by now.
+			boolean complete = ackMsgCtx.getOperationContext().isComplete();
+			if (anonAck && anonReply && !complete) {
+				if (log.isDebugEnabled())
+					log
+							.debug("Exit: SequenceProcessor::sendAckIfNeeded, avoiding using backchannel");
+				return;
+			}
 
-		long ackInterval = SandeshaUtil.getPropertyBean(
-				rmMsgCtx.getMessageContext().getAxisService())
-				.getAcknowledgementInterval();
+			long ackInterval = SandeshaUtil.getPropertyBean(
+					rmMsgCtx.getMessageContext().getAxisService())
+					.getAcknowledgementInterval();
 
-		long timeToSend = System.currentTimeMillis() + ackInterval;
-		if (anonAck) {
-			AcknowledgementManager.sendAckNow(ackRMMsgCtx);
-		} else if (!anonAck) {
-			AcknowledgementManager.addAckBeanEntry(ackRMMsgCtx, sequenceId, timeToSend, storageManager);
+			long timeToSend = System.currentTimeMillis() + ackInterval;
+			if (anonAck) {
+				AcknowledgementManager.sendAckNow(ackRMMsgCtx);
+			} else if (!anonAck) {
+				AcknowledgementManager.addAckBeanEntry(ackRMMsgCtx, sequenceId, timeToSend, storageManager);
+			}			
 		}
 
 		if (log.isDebugEnabled())

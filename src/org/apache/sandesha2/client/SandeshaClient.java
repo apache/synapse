@@ -403,13 +403,14 @@ public class SandeshaClient {
 			}
 		
 		} catch (SandeshaException e) {
-			tran.rollback();
+			if(tran!=null)
+				tran.rollback();
 			tran = null;
 			
 			throw e;
 		} 
-		
-		tran.commit();
+		if(tran!=null)
+			tran.commit();
 	}
 	
 	/**

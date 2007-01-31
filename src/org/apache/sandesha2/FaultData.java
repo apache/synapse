@@ -35,8 +35,12 @@ public class FaultData {
 	private String reason;
 
 	private OMElement detail;
+	
+	private String detailString;
 
 	private String sequenceId;
+	
+	private String exceptionString;
 
 	public OMElement getDetail() {
 		return detail;
@@ -85,4 +89,20 @@ public class FaultData {
 	public void setSequenceId(String sequenceId) {
 		this.sequenceId = sequenceId;
 	}
+
+	public String getDetailString() {
+  	return detailString;
+  }
+
+	public void setDetailString(String detailString) {
+  	this.detailString = detailString;
+  }
+
+	public String getExceptionString() {
+  	return exceptionString;
+  }
+
+	public void setExceptionString(String exceptionString) {
+  	this.exceptionString = exceptionString;
+  }
 }

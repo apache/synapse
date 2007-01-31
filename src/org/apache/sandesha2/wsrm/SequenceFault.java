@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.soap.SOAPBody;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -54,7 +54,7 @@ public class SequenceFault implements IOMRMElement {
 
 	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
 
-		if (body == null || !(body instanceof SOAPBody))
+		if (body == null || !(body instanceof SOAPHeader))
 			throw new OMException(
 					SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
@@ -80,7 +80,7 @@ public class SequenceFault implements IOMRMElement {
 
 	public OMElement toOMElement(OMElement body) throws OMException {
 
-		if (body == null || !(body instanceof SOAPBody))
+		if (body == null || !(body instanceof SOAPHeader))
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
 

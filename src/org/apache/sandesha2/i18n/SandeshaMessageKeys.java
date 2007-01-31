@@ -285,4 +285,8 @@ public class SandeshaMessageKeys {
 	
 	public final static String couldNotLoadModulePolicies = "couldNotLoadModulePolicies";
 	public final static String modulePoliciesLoaded = "modulePoliciesLoaded";
+	
+	public final static String createSequenceRefused = "createSequenceRefused";
+	public final static String referencedMessageNotFound = "referencedMessageNotFound";
+
 }

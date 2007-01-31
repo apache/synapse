@@ -81,8 +81,8 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg, String sequencePropertyKey,
-			EndpointReference acksToEPR, StorageManager storageManager) throws AxisFault {
+	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg,
+			EndpointReference acksToEPR) throws AxisFault {
 
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
 		if (applicationMsgContext == null)
@@ -131,8 +131,8 @@ public class RMMsgCreator {
 		}
 		
 		// If acksTo has not been set, then default to anonaymous, using the correct spec level
-		String anon = SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace);
-		if(acksToEPR == null) acksToEPR = new EndpointReference(anon);
+		if(acksToEPR == null) acksToEPR = 
+			new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
 		
 		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue);
 
@@ -153,7 +153,7 @@ public class RMMsgCreator {
 			}
 			// Finally fall back to using an anonymous endpoint
 			if (offeredEndpoint==null) {
-				offeredEndpoint = new EndpointReference(anon);
+				offeredEndpoint = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
 			}
 			if (offeredSequence != null && !"".equals(offeredSequence)) {
 				SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);

@@ -13,6 +13,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -80,9 +81,9 @@ public class SequenceManager {
 		EndpointReference acksTo = createSequence.getAcksTo().getEPR();
 
 		if (acksTo == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence);
-			log.debug(message);
-			throw new AxisFault(message);
+			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcksToPartInCreateSequence), new Exception());
+		} else if (acksTo.getAddress().equals(AddressingConstants.Final.WSA_NONE_URI)){
+			FaultManager.makeCreateSequenceRefusedFault(createSequenceMsg, "AcksTo can not be " + AddressingConstants.Final.WSA_NONE_URI, new Exception());
 		}
 
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
@@ -123,11 +124,6 @@ public class SequenceManager {
 		// message to invoke. This will apply for only in-order invocations.
 
 		SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
-
-		// stting the RM SPEC version for this sequence.
-		String createSequenceMsgAction = createSequenceMsg.getWSAAction();
-		if (createSequenceMsgAction == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noWSAACtionValue));
 
 		String messageRMNamespace = createSequence.getNamespaceValue();
 

@@ -37,6 +37,8 @@ public class FaultCode implements IOMRMElement {
 	private String faultCode = null;
 	
 	private String namespaceValue = null;
+
+	private String detail;
 	
 	public FaultCode(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -69,6 +71,15 @@ public class FaultCode implements IOMRMElement {
 
 		this.faultCode = faultCodePart.getText();
 
+		OMElement detailPart = sequenceFault
+			.getFirstChildWithName(new QName(namespaceValue,
+					Sandesha2Constants.WSRM_COMMON.DETAIL));
+		
+		this.faultCode = faultCodePart.getText();
+		
+		if (detailPart != null)
+			detail = detailPart.getText();
+
 		return sequenceFault;
 
 	}
@@ -89,10 +100,14 @@ public class FaultCode implements IOMRMElement {
 		
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement faultCodeElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.FAULT_CODE,rmNamespace);
+		OMElement detailElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.DETAIL,rmNamespace);
 
 		faultCodeElement.setText(faultCode);
 		sequenceFault.addChild(faultCodeElement);
 
+		detailElement.setText(detail);
+		sequenceFault.addChild(detailElement);
+		
 		return sequenceFault;
 	}
     
@@ -104,6 +119,14 @@ public class FaultCode implements IOMRMElement {
         return faultCode;
     }
 
+  	public void setDetail(String detail) {
+  		this.detail = detail; 
+    }
+
+  	public String getDetail() {
+  		return detail;
+  	}
+  	
 	public boolean isNamespaceSupported (String namespaceName) {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
@@ -113,4 +136,5 @@ public class FaultCode implements IOMRMElement {
 		
 		return false;
 	}
+
 }

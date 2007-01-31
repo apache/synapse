@@ -20,6 +20,8 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.Collection;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -41,6 +43,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.RangeString;
@@ -65,173 +68,206 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
 
-		MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
-		CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
-		if (createSeqPart == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
+		try {
+			CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg
+					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
+			if (createSeqPart == null) {
+				if (log.isDebugEnabled())
+					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts));
+				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+																										SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noCreateSeqParts), 
+																										new Exception());
+				// Return false if an Exception hasn't been thrown.
+				if (log.isDebugEnabled())
+					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+				return false;
 
-		ConfigurationContext context = createSeqMsg.getConfigurationContext();
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
-		
-		// If the inbound CreateSequence includes a SecurityTokenReference then
-		// ask the security manager to resolve that to a token for us. We also
-		// check that the Create was secured using the token.
-		SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
-		OMElement theSTR = createSeqPart.getSecurityTokenReference();
-		SecurityToken token = null;
-		if(theSTR != null) {
-			MessageContext msgcontext = createSeqRMMsg.getMessageContext();
-			token = secManager.getSecurityToken(theSTR, msgcontext);
-			
-			// The create must be the body part of this message, so we check the
-			// security of that element.
-			OMElement body = msgcontext.getEnvelope().getBody();
-			secManager.checkProofOfPossession(token, body, msgcontext);
-		}
-
-		MessageContext outMessage = null;
-
-		// Create the new sequence id, as well as establishing the beans that handle the
-		// sequence state.
-		RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
-			
-		RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean);
-		outMessage = createSeqResponse.getMessageContext();
-			
-		createSeqResponse.setFlow(MessageContext.OUT_FLOW);
-
-		// for making sure that this won't be processed again
-		createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); 
-		
-		CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
-				.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
-
-			// OFFER PROCESSING
-		SequenceOffer offer = createSeqPart.getSequenceOffer();
-		if (offer != null) {
-			Accept accept = createSeqResPart.getAccept();
-			if (accept == null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart);
-				log.debug(message);
-				throw new SandeshaException(message);
 			}
-
-			// offered seq id
-			String offeredSequenceID = offer.getIdentifer().getIdentifier(); 
+	
+			MessageContext createSeqMsg = createSeqRMMsg.getMessageContext();
+			ConfigurationContext context = createSeqMsg.getConfigurationContext();
+			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 			
-			boolean offerEcepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
-
-			if (offerEcepted) {
-				// Setting the CreateSequence table entry for the outgoing
-				// side.
-				RMSBean rMSBean = new RMSBean();
-				rMSBean.setSequenceID(offeredSequenceID);
-				String outgoingSideInternalSequenceId = SandeshaUtil
-						.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
-				rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
-				// this is a dummy value
-				rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
-					
-				rMSBean.setToEPR(rmdBean.getToEPR());
-				rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
-				rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
-				rMSBean.setLastActivatedTime(System.currentTimeMillis());
-				rMSBean.setRMVersion(rmdBean.getRMVersion());
-				rMSBean.setClientCompletedMessages(new RangeString());
-
-				// Setting sequence properties for the outgoing sequence.
-				// Only will be used by the server side response path. Will
-				// be wasted properties for the client side.
-					
-				Endpoint endpoint = offer.getEndpoint();
-				if (endpoint!=null) {
-					// setting the OfferedEndpoint
-					rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
+			// If the inbound CreateSequence includes a SecurityTokenReference then
+			// ask the security manager to resolve that to a token for us. We also
+			// check that the Create was secured using the token.
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(context);
+			OMElement theSTR = createSeqPart.getSecurityTokenReference();
+			SecurityToken token = null;
+			if(theSTR != null) {
+				MessageContext msgcontext = createSeqRMMsg.getMessageContext();
+				token = secManager.getSecurityToken(theSTR, msgcontext);
+				
+				// The create must be the body part of this message, so we check the
+				// security of that element.
+				OMElement body = msgcontext.getEnvelope().getBody();
+				secManager.checkProofOfPossession(token, body, msgcontext);
+			}
+	
+			MessageContext outMessage = null;
+	
+			// Create the new sequence id, as well as establishing the beans that handle the
+			// sequence state.
+			RMDBean rmdBean = SequenceManager.setupNewSequence(createSeqRMMsg, storageManager, secManager, token);
+				
+			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean);
+			outMessage = createSeqResponse.getMessageContext();
+				
+			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
+	
+			// for making sure that this won't be processed again
+			createSeqResponse.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true"); 
+			
+			CreateSequenceResponse createSeqResPart = (CreateSequenceResponse) createSeqResponse
+					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ_RESPONSE);
+	
+				// OFFER PROCESSING
+			SequenceOffer offer = createSeqPart.getSequenceOffer();
+			if (offer != null) {
+				Accept accept = createSeqResPart.getAccept();
+				if (accept == null) {
+					if (log.isDebugEnabled())
+						log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart));
+					FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+																											SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noAcceptPart), 
+																											new Exception());
+					// Return false if an Exception hasn't been thrown.
+					if (log.isDebugEnabled())
+						log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+					return false;
 				}
 	
-				RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
-
-				// Store the inbound token (if any) with the new sequence
-				rMSBean.setSecurityTokenData(rmdBean.getSecurityTokenData());
+				// offered seq id
+				String offeredSequenceID = offer.getIdentifer().getIdentifier(); 
 				
-				rmsBeanMgr.insert(rMSBean);
-			} else {
-				// removing the accept part.
-				createSeqResPart.setAccept(null);
-				createSeqResponse.addSOAPEnvelope();
-			}
-		}
+				boolean offerEcepted = offerAccepted(offeredSequenceID, context, createSeqRMMsg, storageManager);
+	
+				if (offerEcepted) {
+					// Setting the CreateSequence table entry for the outgoing
+					// side.
+					RMSBean rMSBean = new RMSBean();
+					rMSBean.setSequenceID(offeredSequenceID);
+					String outgoingSideInternalSequenceId = SandeshaUtil
+							.getOutgoingSideInternalSequenceID(rmdBean.getSequenceID());
+					rMSBean.setInternalSequenceID(outgoingSideInternalSequenceId);
+					// this is a dummy value
+					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
 						
-		//TODO add createSequenceResponse message as the referenceMessage to the RMDBean.
-
-		outMessage.setResponseWritten(true);
-
-		rmdBean.setLastActivatedTime(System.currentTimeMillis());
-		storageManager.getRMDBeanMgr().update(rmdBean);
-
-		AxisEngine engine = new AxisEngine(context);
-		try{
-			engine.send(outMessage);				
-		}
-		catch(AxisFault e){
-			throw new SandeshaException(
-					SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCreateSeqResponse, e.toString()), 
-					e);
-		}
-
-		boolean anon = true;
-		if (rmdBean.getToEPR() != null) {
-			EndpointReference toEPR = new EndpointReference(rmdBean.getToEPR());
-			if (!toEPR.hasAnonymousAddress()) anon = false;
-		}
-		if(anon) {
-			createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-		} else {
-				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-		}
-		
-
-		
-//		SequencePropertyBean findBean = new SequencePropertyBean ();
-//		findBean.setName (Sandesha2Constants.SequenceProperties.TERMINATE_ON_CREATE_SEQUENCE);
-//		findBean.setValue(createSeqMsg.getTo().getAddress());
-		
-		
-		
-		String toAddress = createSeqMsg.getTo().getAddress();
-		//if toAddress is RMAnon we may need to terminate the request side sequence here.
-		if (toAddress!=null && SandeshaUtil.isWSRMAnonymous(toAddress)) {
-
-			RMSBean findBean = new RMSBean ();
-			findBean.setReplyToEPR(toAddress);
-			
-			//TODO recheck
-			RMSBean rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
-			if (rmsBean!=null) {
-				
-				if (rmsBean.isTerminationPauserForCS()) {
-					//AckManager hs not done the termination. Do the termination here.
-					
-					MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
-					if (requestSideRefMessage==null) {
-						String message = "Reference message is not present for the sequence with property key " + rmsBean.getInternalSequenceID();
-						throw new SandeshaException (message);
+					rMSBean.setToEPR(rmdBean.getToEPR());
+					rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
+					rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
+					rMSBean.setLastActivatedTime(System.currentTimeMillis());
+					rMSBean.setRMVersion(rmdBean.getRMVersion());
+					rMSBean.setClientCompletedMessages(new RangeString());
+	
+					// Setting sequence properties for the outgoing sequence.
+					// Only will be used by the server side response path. Will
+					// be wasted properties for the client side.
 						
+					Endpoint endpoint = offer.getEndpoint();
+					if (endpoint!=null) {
+						// setting the OfferedEndpoint
+						rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
 					}
+		
+					RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+	
+					// Store the inbound token (if any) with the new sequence
+					rMSBean.setSecurityTokenData(rmdBean.getSecurityTokenData());
 					
-					RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
-					TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+					rmsBeanMgr.insert(rMSBean);
+				} else {
+					// removing the accept part.
+					createSeqResPart.setAccept(null);
+					createSeqResponse.addSOAPEnvelope();
 				}
-				
 			}
-
-		}
+							
+			//TODO add createSequenceResponse message as the referenceMessage to the RMDBean.
+	
+			outMessage.setResponseWritten(true);
+	
+			rmdBean.setLastActivatedTime(System.currentTimeMillis());
+			storageManager.getRMDBeanMgr().update(rmdBean);
+	
+			AxisEngine engine = new AxisEngine(context);
+			try{
+				engine.send(outMessage);				
+			}
+			catch(AxisFault e){
+				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCreateSeqResponse, 
+																						 SandeshaUtil.getStackTraceFromException(e)), e);
+				// Return false if an Exception hasn't been thrown.
+				if (log.isDebugEnabled())
+					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+				return false;
+			}
+	
+			boolean anon = true;
+			if (rmdBean.getToEPR() != null) {
+				EndpointReference toEPR = new EndpointReference(rmdBean.getToEPR());
+				if (!toEPR.hasAnonymousAddress()) anon = false;
+			}
+			if(anon) {
+				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
+			} else {
+					createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+			}
 			
-		createSeqRMMsg.pause();
+	//		SequencePropertyBean findBean = new SequencePropertyBean ();
+	//		findBean.setName (Sandesha2Constants.SequenceProperties.TERMINATE_ON_CREATE_SEQUENCE);
+	//		findBean.setValue(createSeqMsg.getTo().getAddress());
+			
+			String toAddress = createSeqMsg.getTo().getAddress();
+			//if toAddress is RMAnon we may need to terminate the request side sequence here.
+			if (toAddress!=null && SandeshaUtil.isWSRMAnonymous(toAddress)) {
+	
+				RMSBean findBean = new RMSBean ();
+				findBean.setReplyToEPR(toAddress);
+				
+				//TODO recheck
+				RMSBean rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
+				if (rmsBean!=null) {
+					
+					if (rmsBean.isTerminationPauserForCS()) {
+						//AckManager hs not done the termination. Do the termination here.
+						
+						MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
+						if (requestSideRefMessage==null) {
+							FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+									SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getInternalSequenceID()),
+									new Exception());						
+							// Return false if an Exception hasn't been thrown.
+							if (log.isDebugEnabled())
+								log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+							return false;
+						}
+						
+						RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
+						TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+					}
+				}
+			}
+				
+			createSeqRMMsg.pause();
+		}
+		catch (Exception e) {
+			if (log.isDebugEnabled())
+				log.debug("Caught an exception processing CreateSequence message", e);
+			// Does the message context already contain a fault ?
+			// If it doesn't then we can add the CreateSequenceRefusedFault.
+			if (createSeqRMMsg.getMessageContext().getProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME) == null && 
+					createSeqRMMsg.getMessageContext().getProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME) == null) {
+				// Add the fault details to the message
+				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, SandeshaUtil.getStackTraceFromException(e), e);				
+				
+				// Return false if an Exception hasn't been thrown.
+				if (log.isDebugEnabled())
+					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+				return false;
+			} 
+		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.TRUE);

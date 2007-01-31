@@ -81,8 +81,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 					}
 				}
 	
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
-				throw new AxisFault(message, e);
+				if (!(e instanceof AxisFault)) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
+					throw new AxisFault(message, e);
+				}
+				
+				throw (AxisFault)e;
 			} finally {
 				if (transaction != null) {
 					try {

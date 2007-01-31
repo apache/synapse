@@ -18,7 +18,9 @@
 package org.apache.sandesha2.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -1162,5 +1164,14 @@ public class SandeshaUtil {
 		}
 		
 		return clonedEnvelope;
+	}
+	
+	public static final String getStackTraceFromException(Exception e) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintWriter pw = new PrintWriter(baos);
+    e.printStackTrace(pw);
+    pw.flush();
+    String stackTrace = baos.toString();
+    return stackTrace;
 	}
 }

@@ -35,7 +35,10 @@ import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.FaultData;
@@ -258,6 +261,48 @@ public class FaultManager {
 			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement");
 	}
 
+	/**
+	 * Makes a Create sequence refused fault
+	 */
+	public static void makeCreateSequenceRefusedFault(RMMsgContext rmMessageContext, 
+																										String detail,
+																										Exception e) 
+	
+	throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::makeCreateSequenceRefusedFault, " + detail);
+		
+		// Return an UnknownSequence error
+		MessageContext messageContext = rmMessageContext.getMessageContext();
+
+		int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
+
+		FaultData data = new FaultData();
+		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+			data.setCode(SOAP11Constants.FAULT_CODE_RECEIVER);
+		else
+			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+
+		data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
+
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+		OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
+				rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		identifierElement.setText(detail);
+		data.setDetail(identifierElement);
+		data.setDetailString(detail);
+
+		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSequenceRefused));
+		
+		data.setType(Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED);
+		
+		data.setExceptionString(SandeshaUtil.getStackTraceFromException(e));
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::makeCreateSequenceRefusedFault");
+		getOrSendFault(rmMessageContext, data);
+	}
+	
 	public static void checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
 			RMDBean rmdBean) throws AxisFault {
 		if (log.isDebugEnabled())
@@ -298,6 +343,73 @@ public class FaultManager {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForSequenceClosed");
+	}
+	
+	/**
+	 * Adds the necessary Fault elements as properties to the message context.
+	 * Or if this is a SOAP11 Fault, generates the correct RM Fault and sends.
+	 * 
+	 * @param referenceRMMsgContext - Message in reference to which the fault will be generated.
+	 * @param data - data for the fault
+	 * @return - The dummy fault to be thrown out.
+	 * 
+	 * @throws AxisFault
+	 */
+	public static void getOrSendFault(RMMsgContext referenceRMMsgContext, FaultData data) throws AxisFault {
+		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
+		
+		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
+		SOAPFaultSubCode faultSubCode = factory.createSOAPFaultSubCode(faultCode);
+		
+		SOAPFaultValue faultColdValue = factory.createSOAPFaultValue(faultCode);
+		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
+		
+		faultColdValue.setText(data.getCode());
+		faultSubcodeValue.setText(data.getSubcode());
+
+		faultCode.setSubCode(faultSubCode);
+		
+		SOAPFaultReason reason = factory.createSOAPFaultReason();
+		SOAPFaultText reasonText = factory.createSOAPFaultText();
+		reasonText.setText(data.getReason());
+		reason.addSOAPText(reasonText);
+		
+		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
+		detail.addDetailEntry(data.getDetail());
+		
+		String SOAPNamespaceValue = factory.getSoapVersionURI();
+		
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
+			// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
+			MessageContext faultMessageContext = 
+				MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
+			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());
+			
+			referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
+					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+
+			if (log.isDebugEnabled())
+				log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
+			// Send the message
+			AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
+			engine.sendFault(faultMessageContext);
+			
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
+			
+			return;
+		} else {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
+			throw new SandeshaException (message);
+		}
+		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+		throw fault;		
+		
 	}
 	
 	/**

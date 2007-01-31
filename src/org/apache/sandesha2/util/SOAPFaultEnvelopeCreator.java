@@ -17,9 +17,7 @@
 
 package org.apache.sandesha2.util;
 
-import org.apache.axiom.om.OMConstants;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPFault;
@@ -115,7 +113,10 @@ public class SOAPFaultEnvelopeCreator {
 
 		FaultCode faultCode = new FaultCode(rmNamespaceValue);
 		faultCode.setFaultCode(faultData.getSubcode());
+		faultCode.setDetail(faultData.getDetailString());
 		sequenceFault.setFaultCode(faultCode);
+		
+		sequenceFault.toOMElement(faultMessageContext.getEnvelope().getHeader());
 	}
 
 	/**
@@ -137,33 +138,17 @@ public class SOAPFaultEnvelopeCreator {
 				.getSOAPVersion(faultMsgEnvelope));
 
 		SOAPFault fault = faultMsgEnvelope.getBody().getFault();
+		
+		// Set the faultcode
 		SOAPFaultCode faultCode = fault.getCode();
-
-		if (isSequenceFault(data)) {
-			faultCode.setText(data.getCode());
-		} else {
-			faultCode.setText(data.getSubcode());
-		}
-
-		SOAPFaultReason faultReason = fault.getReason();
-
-		OMNamespace namespace = factory.createOMNamespace(
-				OMConstants.XMLNS_URI, OMConstants.XMLNS_PREFIX);
-
-		faultReason.setText(data.getReason());
-		faultCode.getValue().setText(data.getSubcode());
-		SOAPFaultText faultText = faultReason.getSOAPFaultText("en");
-		if (faultText==null)
-    {
-			faultText = factory.createSOAPFaultText();
-      // Add the SOAP text
-      faultReason.addSOAPText(faultText);
-    }
-	
-    faultText.addAttribute("lang", "en", namespace);
-
-		faultText.setText(data.getReason());
-    
+		faultCode.getValue().setText(data.getCode());
+			
+		// Set the faultstring
+		fault.getReason().getFirstSOAPText().setText(data.getReason());
+		
+		if (data.getExceptionString() != null)
+			fault.getDetail().setText(data.getExceptionString());
+		
 		//SequenceFault header is added only for SOAP 1.1
 		if (isSequenceFault(data))
 			addSequenceFaultHeader(faultMsgContext, data, factory, rmNamespaceValue);

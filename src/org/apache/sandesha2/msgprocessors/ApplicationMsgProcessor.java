@@ -478,8 +478,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		ConfigurationContext configCtx = applicationMsg.getConfigurationContext();
 
 		// generating a new create sequeuce message.
-		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg, sequencePropertyKey, acksTo,
-				storageManager);
+		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg, acksTo);
 
 		createSeqRMMessage.setFlow(MessageContext.OUT_FLOW);
 		CreateSequence createSequencePart = (CreateSequence) createSeqRMMessage

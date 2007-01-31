@@ -130,6 +130,8 @@ public interface Sandesha2Constants {
 		
 		String FAULT_CODE = "FaultCode";
 
+		String DETAIL = "Detail";
+
 		String SEQUENCE_FAULT = "SequenceFault";
 
 		String ACKS_TO = "AcksTo";

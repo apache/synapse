@@ -81,6 +81,8 @@ public class TerminateManager {
 		while (ackBeans.hasNext()) {
 			SenderBean ackBean = (SenderBean) ackBeans.next();
 			senderBeanMgr.delete(ackBean.getMessageID());
+			
+			storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
 		}
 		
 		// Currently in-order invocation is done for default values.
@@ -152,16 +154,20 @@ public class TerminateManager {
 	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		
-		// removing nextMsgMgr entries
-		RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
-		RMDBean findNextMsgBean = new RMDBean();
-		findNextMsgBean.setSequenceID(sequenceId);
-		Collection collection = rMDBeanMgr.find(findNextMsgBean);
-		Iterator iterator = collection.iterator();
-		while (iterator.hasNext()) {
-			RMDBean rMDBean = (RMDBean) iterator.next();
-			 rMDBeanMgr.delete(rMDBean.getSequenceID());
-		}
+		// TODO We need to remove the RMDBean, but doing so quickly can stop
+		// the user from calling the sequence report to discover the state of
+		// the sequence. We should impement something with a little more delay,
+		// perhaps a few minutes.
+//		// removing nextMsgMgr entries
+//		RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
+//		RMDBean findNextMsgBean = new RMDBean();
+//		findNextMsgBean.setSequenceID(sequenceId);
+//		Collection collection = rMDBeanMgr.find(findNextMsgBean);
+//		Iterator iterator = collection.iterator();
+//		while (iterator.hasNext()) {
+//			RMDBean rMDBean = (RMDBean) iterator.next();
+//			 rMDBeanMgr.delete(rMDBean.getSequenceID());
+//		}
 
 	}
 

@@ -127,7 +127,11 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		}
 
 		// Check that the sequence requested exists
-		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, Unknown sequence ");
+			return false;
+		}
 
 		// Setting the ack depending on AcksTo.
 		EndpointReference acksTo = new EndpointReference(rmdBean.getAcksToEPR());

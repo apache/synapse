@@ -113,7 +113,10 @@ public class SOAPFaultEnvelopeCreator {
 
 		FaultCode faultCode = new FaultCode(rmNamespaceValue);
 		faultCode.setFaultCode(faultData.getSubcode());
-		faultCode.setDetail(faultData.getDetailString());
+		if (faultData.getDetailString() != null)
+			faultCode.setDetail(faultData.getDetailString());
+		else
+			faultCode.setDetailOMElement(faultData.getDetail());
 		sequenceFault.setFaultCode(faultCode);
 		
 		sequenceFault.toOMElement(faultMessageContext.getEnvelope().getHeader());

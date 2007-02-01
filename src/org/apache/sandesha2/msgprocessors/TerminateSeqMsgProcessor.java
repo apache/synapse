@@ -99,7 +99,11 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			secManager.checkProofOfPossession(token, body, terminateSeqRMMsg.getMessageContext());
 		}
 
-		FaultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId, storageManager);
+		if (FaultManager.checkForUnknownSequence(terminateSeqRMMsg, sequenceId, storageManager)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: TerminateSeqMsgProcessor::processInMessage, unknown sequence");
+			return false;
+		}
 
 		// add the terminate sequence response if required.
 		RMMsgContext terminateSequenceResponse = null;

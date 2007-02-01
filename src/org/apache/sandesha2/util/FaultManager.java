@@ -131,10 +131,10 @@ public class FaultManager {
 	 * predifined limit ( genenrates a Message Number Rollover fault)
 	 * 
 	 * @param msgCtx
-	 * @return
+	 * @return true if no exception has been thrown and the sequence doesn't exist 
 	 * @throws SandeshaException
 	 */
-	public static void checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
+	public static boolean checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
 			StorageManager storageManager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForUnknownSequence, " + sequenceID);
@@ -176,14 +176,18 @@ public class FaultManager {
 			data.setDetail(identifierElement);
 
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSequenceEstablished, sequenceID));
+			
+			data.setType(Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE);
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForUnknownSequence, Sequence unknown");
-			getFault(rmMessageContext, data);
+			getOrSendFault(rmMessageContext, data);
+			return true;
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForUnknownSequence");
+		return false;
 	}
 
 	/**
@@ -384,6 +388,10 @@ public class FaultManager {
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
 		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
+			
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
 			// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
 			MessageContext faultMessageContext = 
 				MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
@@ -397,10 +405,6 @@ public class FaultManager {
 			// Send the message
 			AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
 			engine.sendFault(faultMessageContext);
-			
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
 			
 			return;
 		} else {

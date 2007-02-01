@@ -137,7 +137,11 @@ public class AcknowledgementProcessor {
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
 		Iterator nackIterator = sequenceAck.getNackList().iterator();
 
-		FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager);
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence ");
+			return;
+		}
 		FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
 		
 		SenderBean input = new SenderBean();

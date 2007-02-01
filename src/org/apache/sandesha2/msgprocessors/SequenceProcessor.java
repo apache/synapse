@@ -128,16 +128,15 @@ public class SequenceProcessor {
 			throw new SandeshaException(message);
 		}
 
-		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
+			return InvocationResponse.ABORT;
+		}
 
 		// setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
-
-		if (bean == null) {
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindSequence,
-					sequenceId));
-		}
 
 		// throwing a fault if the sequence is closed.
 		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean);

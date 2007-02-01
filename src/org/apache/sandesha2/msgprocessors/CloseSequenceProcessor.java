@@ -84,7 +84,11 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 
-		FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager);
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: CloseSequenceProcessor::processInMessage, Unknown sequence " + sequenceId);
+			return false;
+		}
 		
 		rmdBean.setClosed(true);
 		storageManager.getRMDBeanMgr().update(rmdBean);

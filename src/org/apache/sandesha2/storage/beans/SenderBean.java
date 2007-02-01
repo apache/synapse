@@ -96,6 +96,11 @@ public class SenderBean extends RMBean {
 	private int messageType =0;
 	
 	/**
+	 * Flag to indicate if this is the last message for the sequence
+	 */
+	private boolean lastMessage = false;
+	
+	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
 	 * be ignored within the match method.
@@ -107,6 +112,7 @@ public class SenderBean extends RMBean {
 	private static final int RESEND_FLAG       = 0x00001000;
 	private static final int TIME_TO_SEND_FLAG = 0x00010000;
 	private static final int MSG_TYPE_FLAG     = 0x00100000;
+	private static final int LAST_MSG_FLAG     = 0x01000000;
 
 	public SenderBean() {
 
@@ -216,6 +222,15 @@ public class SenderBean extends RMBean {
 	public void setToAddress(String toAddress) {
 		this.toAddress = toAddress;
 	}
+
+	public boolean isLastMessage() {
+		return lastMessage;
+	}
+
+	public void setLastMessage(boolean lastMessage) {
+		this.lastMessage = lastMessage;
+		this.flags |= LAST_MSG_FLAG;
+	}
 	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
@@ -271,6 +286,10 @@ public class SenderBean extends RMBean {
 		else if((bean.flags & MSG_TYPE_FLAG) != 0 && bean.getMessageType() != this.getMessageType())
 			match = false;
 		
+		else if((bean.flags & LAST_MSG_FLAG) != 0 && bean.isLastMessage() != this.isLastMessage())
+			match = false;
+
 		return match;
 	}
+
 }

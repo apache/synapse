@@ -44,17 +44,10 @@ import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Accept;
-import org.apache.sandesha2.wsrm.AckRequested;
-import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
-import org.apache.sandesha2.wsrm.Identifier;
-import org.apache.sandesha2.wsrm.Sequence;
-import org.apache.sandesha2.wsrm.TerminateSequence;
 
 /**
  * Responsible for processing an incoming Create Sequence Response message.
@@ -226,105 +219,20 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		rmsBeanMgr.update(rmsBean);
 
+		// Locate and update all of the messages for this sequence, now that we know
+		// the sequence id.
 		SenderBean target = new SenderBean();
 		target.setInternalSequenceID(internalSequenceId);
 		target.setSend(false);
-
+		
 		Iterator iterator = retransmitterMgr.find(target).iterator();
 		while (iterator.hasNext()) {
 			SenderBean tempBean = (SenderBean) iterator.next();
-
-			// updating the application message
-			String key = tempBean.getMessageContextRefKey();
-			MessageContext applicationMsg = storageManager.retrieveMessageContext(key, configCtx);
-
-			// TODO make following exception message more understandable to the
-			// user (probably some others exceptions messages as well)
-			if (applicationMsg == null)
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unavailableAppMsg));
-
-			String assumedRMNamespace = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());
-
-			RMMsgContext applicaionRMMsg = MsgInitializer.initializeMessage(applicationMsg);
-
-			if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-				
-				Sequence sequencePart = (Sequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-				if (sequencePart == null) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
-					log.debug(message);
-					throw new SandeshaException(message);
-				}
-	
-				Identifier identifier = new Identifier(assumedRMNamespace);
-				identifier.setIndentifer(newOutSequenceId);
-	
-				sequencePart.setIdentifier(identifier);
-				
-			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-				
-				TerminateSequence sequencePart = (TerminateSequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
-				if (sequencePart == null) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
-					log.debug(message);
-					throw new SandeshaException(message);
-				}
-	
-				Identifier identifier = new Identifier(assumedRMNamespace);
-				identifier.setIndentifer(newOutSequenceId);
-	
-				sequencePart.setIdentifier(identifier);
-
-			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
-			
-				CloseSequence sequencePart = (CloseSequence) applicaionRMMsg.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
-				if (sequencePart == null) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
-					log.debug(message);
-					throw new SandeshaException(message);
-				}
-	
-				Identifier identifier = new Identifier(assumedRMNamespace);
-				identifier.setIndentifer(newOutSequenceId);
-	
-				sequencePart.setIdentifier(identifier);
-				
-			} else if (tempBean.getMessageType() == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
-
-				Iterator headerIterator = applicaionRMMsg.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
-								
-				AckRequested sequencePart = null;
-				while (headerIterator.hasNext()) {
-					sequencePart = (AckRequested) headerIterator.next(); 
-				}
-				
-				if (headerIterator.hasNext()) {
-					throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
-				}
-				
-				if (sequencePart == null) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.seqPartIsNull);
-					log.debug(message);
-					throw new SandeshaException(message);
-				}
-				
-				sequencePart.getIdentifier().setIndentifer(newOutSequenceId);
-					
-			}
-
-			try {
-				applicaionRMMsg.addSOAPEnvelope();
-			} catch (AxisFault e) {
-				throw new SandeshaException(e.getMessage(), e);
-			}
 
 			// asking to send the application msssage
 			tempBean.setSend(true);
 			tempBean.setSequenceID(newOutSequenceId);
 			retransmitterMgr.update(tempBean);
-
-			// updating the message. this will correct the SOAP envelope string.
-			storageManager.updateMessageContext(key, applicationMsg);
 		}
 
 		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext().setProperty(

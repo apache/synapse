@@ -1,6 +1,7 @@
 package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
@@ -30,6 +31,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
@@ -37,6 +39,12 @@ import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
+import org.apache.sandesha2.wsrm.AckRequested;
+import org.apache.sandesha2.wsrm.CloseSequence;
+import org.apache.sandesha2.wsrm.Identifier;
+import org.apache.sandesha2.wsrm.LastMessage;
+import org.apache.sandesha2.wsrm.MessageNumber;
+import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.TerminateSequence;
 
 public class SenderWorker extends SandeshaWorker implements Runnable {
@@ -149,16 +157,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			int messageType = senderBean.getMessageType();
 			
-//			if (messageType == Sandesha2Constants.MessageTypes.APPLICATION) {
-//				Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-//				String sequenceID = sequence.getIdentifier().getIdentifier();
-//			}
-
-//			if (AcknowledgementManager.ackRequired (rmMsgCtx)) {
-//				RMMsgCreator.addAckMessage(rmMsgCtx);
-			
-			//} else 
-				
 			if (isAckPiggybackableMsgType(messageType)) { // checking weather this message can carry piggybacked acks
 				// checking weather this message can carry piggybacked acks
 				// piggybacking if an ack if available for the same
@@ -332,12 +330,73 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			log.debug("Exit: SenderWorker::run");
 	}
 	
+	/**
+	 * Update the message before sending it. We adjust the retransmission intervals and send counts
+	 * for the message. If the message is an application message then we ensure that we have added
+	 * the Sequence header.
+	 */
 	private boolean updateMessage(RMMsgContext rmMsgContext, SenderBean senderBean, StorageManager storageManager) throws AxisFault {
 		
 		boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(
 				rmMsgContext, senderBean, rmMsgContext.getConfigurationContext(), storageManager);
+		if(!continueSending) return false;
 		
-		return continueSending;
+		Identifier id = null;
+
+		if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+			RMSequenceBean bean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, senderBean.getSequenceID());
+			String namespace = SpecSpecificConstants.getRMNamespaceValue(bean.getRMVersion());
+			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			if(sequence == null) {
+				sequence = new Sequence(namespace);
+				
+				MessageNumber msgNumber = new MessageNumber(namespace);
+				msgNumber.setMessageNumber(senderBean.getMessageNumber());
+				sequence.setMessageNumber(msgNumber);
+
+				if(senderBean.isLastMessage() &&
+				   SpecSpecificConstants.isLastMessageIndicatorRequired(bean.getRMVersion())) {
+					sequence.setLastMessage(new LastMessage(namespace));
+				}
+				
+				// We just create the id here, we will add the value in later
+				id = new Identifier(namespace);
+				sequence.setIdentifier(id);
+				
+				rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
+			}
+			
+		} else if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+			TerminateSequence terminate = (TerminateSequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+			id = terminate.getIdentifier();
+
+		} else if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
+			CloseSequence close = (CloseSequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
+			id = close.getIdentifier();
+		
+		} else if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
+			// The only time that we can have a message of this type is when we are sending a
+			// stand-alone ack request, and in that case we only expect to find a single ack
+			// request header in the message.
+			Iterator ackRequests = rmMsgContext.getMessageParts(Sandesha2Constants.MessageParts.ACK_REQUEST);
+			AckRequested ackRequest = (AckRequested) ackRequests.next(); 
+			if (ackRequests.hasNext()) {
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackRequestMultipleParts));
+			}
+			id = ackRequest.getIdentifier();
+		}
+		
+		// TODO consider adding an extra ack request, as we are about to send the message and we
+		// know which sequence it is associated with.
+
+		if(id != null && !senderBean.getSequenceID().equals(id.getIdentifier())) {
+			id.setIndentifer(senderBean.getSequenceID());
+
+			// Write the changes back into the message context
+			rmMsgContext.addSOAPEnvelope();
+		}
+		
+		return true;
 	}
 	
 	private boolean isAckPiggybackableMsgType(int messageType) {

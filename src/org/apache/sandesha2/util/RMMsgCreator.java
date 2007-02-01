@@ -91,27 +91,21 @@ public class RMMsgCreator {
 		if (context == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.configContextNotSet));
 
-		MessageContext createSeqmsgContext;
-		try {
-			// creating by copying common contents. (this will not set contexts
-			// except for configCtx).
-			AxisOperation createSequenceOperation = SpecSpecificConstants.getWSRMOperation(
-					Sandesha2Constants.MessageTypes.CREATE_SEQ,
-					rmsBean.getRMVersion(),
-					applicationMsgContext.getAxisService());
+		// creating by copying common contents. (this will not set contexts
+		// except for configCtx).
+		AxisOperation createSequenceOperation = SpecSpecificConstants.getWSRMOperation(
+				Sandesha2Constants.MessageTypes.CREATE_SEQ,
+				rmsBean.getRMVersion(),
+				applicationMsgContext.getAxisService());
 
-			createSeqmsgContext = SandeshaUtil
-					.createNewRelatedMessageContext(applicationRMMsg, createSequenceOperation);
-			
-			OperationContext createSeqOpCtx = createSeqmsgContext.getOperationContext();
-			String createSeqMsgId = SandeshaUtil.getUUID();
-			createSeqmsgContext.setMessageID(createSeqMsgId);
-			context.registerOperationContext(createSeqMsgId, createSeqOpCtx);
+		MessageContext createSeqmsgContext = SandeshaUtil
+				.createNewRelatedMessageContext(applicationRMMsg, createSequenceOperation);
+		
+		OperationContext createSeqOpCtx = createSeqmsgContext.getOperationContext();
+		String createSeqMsgId = SandeshaUtil.getUUID();
+		createSeqmsgContext.setMessageID(createSeqMsgId);
+		context.registerOperationContext(createSeqMsgId, createSeqOpCtx);
 
-		} catch (AxisFault e) {
-			throw new SandeshaException(e.getMessage(), e);
-		}
-        
 		RMMsgContext createSeqRMMsg = new RMMsgContext(createSeqmsgContext);
 
 		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion());

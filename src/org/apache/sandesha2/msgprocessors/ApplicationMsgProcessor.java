@@ -53,11 +53,7 @@ import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
 import org.apache.sandesha2.util.SpecSpecificConstants;
-import org.apache.sandesha2.wsrm.AckRequested;
 import org.apache.sandesha2.wsrm.CreateSequence;
-import org.apache.sandesha2.wsrm.Identifier;
-import org.apache.sandesha2.wsrm.LastMessage;
-import org.apache.sandesha2.wsrm.MessageNumber;
 import org.apache.sandesha2.wsrm.Sequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 
@@ -592,16 +588,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		else
 			rmMsg.setTo(toEPR);
 
-		String rmVersion = rmsBean.getRMVersion();
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
-
-		Sequence sequence = new Sequence(rmNamespaceValue);
-		MessageNumber msgNumber = new MessageNumber(rmNamespaceValue);
-		msgNumber.setMessageNumber(messageNumber);
-		sequence.setMessageNumber(msgNumber);
-
 		// setting last message
+		boolean lastMessage = false;
 		if (msg.isServerSide()) {
 			MessageContext requestMsg = null;
 
@@ -617,7 +605,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			if (requestSequence.getLastMessage() != null) {
-				sequence.setLastMessage(new LastMessage(rmNamespaceValue));
+				lastMessage = true;
 			}
 
 		} else {
@@ -627,50 +615,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			if (operationContext != null) {
 				Object obj = msg.getProperty(SandeshaClientConstants.LAST_MESSAGE);
 				if (obj != null && "true".equals(obj)) {
-
-					if (SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion))
-						sequence.setLastMessage(new LastMessage(rmNamespaceValue));
+					lastMessage = true;
 				}
 			}
 		}
 
-		AckRequested ackRequested = null;
-
-		boolean addAckRequested = false;
-		// if (!lastMessage)
-		// addAckRequested = true; //TODO decide the policy to add the
-		// ackRequested tag
-
-		// setting the Sequence id.
-		// Set send = true/false depending on the availability of the out
-		// sequence id.
-		String identifierStr = null;
-		if (outSequenceID == null) {
-			identifierStr = Sandesha2Constants.TEMP_SEQUENCE_ID;
-
-		} else {
-			identifierStr = outSequenceID;
-		}
-
-		Identifier id1 = new Identifier(rmNamespaceValue);
-		id1.setIndentifer(identifierStr);
-		sequence.setIdentifier(id1);
-		rmMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
-
-		if (addAckRequested) {
-			ackRequested = new AckRequested(rmNamespaceValue);
-			Identifier id2 = new Identifier(rmNamespaceValue);
-			id2.setIndentifer(identifierStr);
-			ackRequested.setIdentifier(id2);
-			rmMsg.setMessagePart(Sandesha2Constants.MessageParts.ACK_REQUEST, ackRequested);
-		}
-
-		// Now that we have added the headers to the message, make sure that we secure it with
-		// the correct token.
+		// Now that we have decided which sequence to use for the message, make sure that we secure
+		// it with the correct token.
 		RMMsgCreator.secureOutboundMessage(rmsBean, msg);
-
-		rmMsg.addSOAPEnvelope();
-
 
 		// Retransmitter bean entry for the application message
 		SenderBean appMsgEntry = new SenderBean();
@@ -680,6 +632,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		appMsgEntry.setTimeToSend(System.currentTimeMillis());
 		appMsgEntry.setMessageID(rmMsg.getMessageId());
 		appMsgEntry.setMessageNumber(messageNumber);
+		appMsgEntry.setLastMessage(lastMessage);
 		appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 		if (outSequenceID == null) {
 			appMsgEntry.setSend(false);

@@ -116,6 +116,7 @@
 				  <sandesha2:UseRMAnonURI>true</sandesha2:UseRMAnonURI>
 				</sandesha2:MakeConnection>
 				
+				<!-- <sandesha2:UseMessageSerialization>true</sandesha2:UseMessageSerialization> -->
 			</wsp:Policy>
 		</sandesha2:RMAssertion>
 	</wsp:Policy>

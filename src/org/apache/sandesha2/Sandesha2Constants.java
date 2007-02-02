@@ -355,6 +355,8 @@ public interface Sandesha2Constants {
 		
 		String EnableRMAnonURI = "EnableRMAnonURI";
 		
+		String UseMessageSerialization = "UseMessageSerialization";
+		
 		public interface DefaultValues {
 			
 			int RetransmissionInterval = 6000;
@@ -386,6 +388,8 @@ public interface Sandesha2Constants {
 			boolean EnableMakeConnection = true;
 			
 			boolean EnableRMAnonURI = true;
+			
+			boolean UseMessageSerialization = false;
 		}
 	}
 	
@@ -528,6 +532,7 @@ public interface Sandesha2Constants {
         public static final String ELEM_MAKE_CONNECTION = "MakeConnection";
         public static final String ELEM_ENABLED = "Enabled";
         public static final String ELEM_USE_RM_ANON_URI = "UseRMAnonURI";
+        public static final String ELEM_USE_SERIALIZATION = "UseMessageSerialization";
         
         public static final QName Q_ELEM_POLICY = new QName(URI_POLICY_NS, ELEM_POLICY, ATTR_WSP);
         public static final QName Q_ELEM_RMASSERTION = new QName(URI_RM_POLICY_NS, ELEM_RMASSERTION, ATTR_WSRM);
@@ -547,5 +552,6 @@ public interface Sandesha2Constants {
         public static final QName Q_ELEM_MAKE_CONNECTION = new QName(URI_RM_POLICY_NS, ELEM_MAKE_CONNECTION, ATTR_WSRM);
         public static final QName Q_ELEM_ENABLED = new QName(URI_RM_POLICY_NS, ELEM_ENABLED, ATTR_WSRM);
         public static final QName Q_ELEM_USE_RM_ANON_URI = new QName(URI_RM_POLICY_NS, ELEM_USE_RM_ANON_URI, ATTR_WSRM);
+        public static final QName Q_ELEM_USE_SERIALIZATION = new QName(URI_RM_POLICY_NS, ELEM_USE_SERIALIZATION, ATTR_WSRM);
     }
 }

@@ -42,8 +42,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 	private static boolean serverStarted = false; 
 	private static ConfigurationContext configContext = null;
 
-	private int serverPort = DEFAULT_SERVER_TEST_PORT;
-	private String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+	protected String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 	
 	protected String repoPath = "target" + File.separator + "repos" + File.separator + "server";
 	protected String axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";

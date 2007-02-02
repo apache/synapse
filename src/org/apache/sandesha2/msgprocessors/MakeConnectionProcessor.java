@@ -9,6 +9,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -117,10 +118,12 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			String namespace)
 	throws AxisFault
 	{
+		if(log.isDebugEnabled()) log.debug("Entry: MakeConnectionProcessor::replyToPoll");
 		TransportOutDescription transportOut = pollMessage.getMessageContext().getTransportOut();
 		if (transportOut==null) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cantSendMakeConnectionNoTransportOut);
+			if(log.isDebugEnabled()) log.debug(message);
 			throw new SandeshaException (message);
 		}
 			
@@ -128,6 +131,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,pollMessage.getConfigurationContext());
 		if (returnMessage==null) {
 			String message = "Cannot find the message stored with the key:" + messageStorageKey;
+			if(log.isDebugEnabled()) log.debug(message);
 			throw new SandeshaException (message);
 		}
 		
@@ -138,6 +142,12 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		// Link the response to the request
 		OperationContext context = pollMessage.getMessageContext().getOperationContext();
+		if(context == null) {
+			AxisOperation oldOperation = returnMessage.getAxisOperation();
+			context = new OperationContext(oldOperation);
+			context.addMessageContext(pollMessage.getMessageContext());
+			pollMessage.getMessageContext().setOperationContext(context);
+		}
 		context.addMessageContext(returnMessage);
 		returnMessage.setOperationContext(context);
 		
@@ -145,12 +155,13 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.
-		//	1. A message being sent by the Sender thread.
+		//  1. A message being sent by the Sender thread.
 		//  2. A message being sent as a reply to an MakeConnection.
 		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage);
 		worker.setMessage(returnRMMsg);
-
 		worker.run();
+		
+		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
 	}
 	
 	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) throws SandeshaException {

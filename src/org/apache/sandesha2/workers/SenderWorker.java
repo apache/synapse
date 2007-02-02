@@ -27,6 +27,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -127,12 +128,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// or the message can't go anywhere. If there is nothing here then we leave the
 			// message in the sender queue, and a MakeConnection (or a retransmitted request)
 			// will hopefully pick it up soon.
+			RequestResponseTransport t = null;
 			Boolean makeConnection = (Boolean) msgCtx.getProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE);
 			EndpointReference toEPR = msgCtx.getTo();
 			if(toEPR.hasAnonymousAddress() &&
 				(makeConnection == null || !makeConnection.booleanValue())) {
 
-				RequestResponseTransport t = null;
 				MessageContext inMsg = null;
 				OperationContext op = msgCtx.getOperationContext();
 				if (op != null)
@@ -185,37 +186,49 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 			try {
-
-				// had to fully build the SOAP envelope to support
-				// retransmissions.
-				// Otherwise a 'parserAlreadyAccessed' exception could
-				// get thrown in retransmissions.
-				// But this has a performance reduction.
-				msgCtx.getEnvelope().build();
-
-				ArrayList retransmittablePhases = (ArrayList) msgCtx.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
-				if (retransmittablePhases!=null) {
-					msgCtx.setExecutionChain(retransmittablePhases);
-				} else {
-					ArrayList emptyExecutionChain = new ArrayList ();
-					msgCtx.setExecutionChain(emptyExecutionChain);
-				}
-				
-				msgCtx.setCurrentHandlerIndex(0);
-				msgCtx.setCurrentPhaseIndex(0);
-				msgCtx.setPaused(false);
-			
 				AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
-				if (log.isDebugEnabled())
-					log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
-				InvocationResponse response = engine.resumeSend(msgCtx);
+				InvocationResponse response = InvocationResponse.CONTINUE;
+				
+				SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation());
+				if(policy.isUseMessageSerialization()) {
+					if(msgCtx.isPaused()) {
+						if (log.isDebugEnabled())
+							log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
+						msgCtx.setPaused(false);
+						msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+						response = engine.resumeSend(msgCtx);
+					} else {
+						if (log.isDebugEnabled())
+							log.debug("Sending a message : " + msgCtx.getEnvelope().getHeader());
+						msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+						engine.send(msgCtx);  // TODO check if this should return an invocation response
+					}
+				} else {
+					// had to fully build the SOAP envelope to support
+					// retransmissions.
+					// Otherwise a 'parserAlreadyAccessed' exception could
+					// get thrown in retransmissions.
+					// But this has a performance reduction.
+					msgCtx.getEnvelope().build();
+	
+					ArrayList retransmittablePhases = (ArrayList) msgCtx.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
+					if (retransmittablePhases!=null) {
+						msgCtx.setExecutionChain(retransmittablePhases);
+					} else {
+						ArrayList emptyExecutionChain = new ArrayList ();
+						msgCtx.setExecutionChain(emptyExecutionChain);
+					}
+					
+					msgCtx.setCurrentHandlerIndex(0);
+					msgCtx.setCurrentPhaseIndex(0);
+					msgCtx.setPaused(false);
+				
+					if (log.isDebugEnabled())
+						log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
+					response = engine.resumeSend(msgCtx);
+				}
 				if(log.isDebugEnabled()) log.debug("Engine resume returned " + response);
 				if(response != InvocationResponse.SUSPEND) {
-					RequestResponseTransport t = null;
-					MessageContext inMsg = null;
-					OperationContext op = msgCtx.getOperationContext();
-					if(op != null) inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					if(inMsg != null) t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 					if(t != null) {
 						if(log.isDebugEnabled()) log.debug("Signalling transport in " + t);
 						if(t != null) t.signalResponseReady();

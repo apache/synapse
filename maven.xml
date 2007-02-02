@@ -194,10 +194,41 @@
 		<delete dir="${build.temp.dir}"/>
 	</goal>
 
+	<goal name="serialize:create" prereqs="server:create,client:create">
+		<ant:property name="serialize.client.path" value="${build.repo.dir}/serialize-client"/>
+		<ant:property name="serialize.server.path" value="${build.repo.dir}/serialize-server"/>
+         
+		<ant:property name="serialize.temp.path" value="${build.temp.dir}/serialize" />
+		<ant:mkdir dir="${serialize.temp.path}" />
+				
+		<copy todir="${serialize.client.path}">
+		  <fileset dir="${build.repo.dir}/client">
+		    <exclude name="modules/${mar.name}"/>
+		  </fileset>
+		</copy>
+
+		<copy todir="${serialize.server.path}">
+		  <fileset dir="${build.repo.dir}/server">
+		    <exclude name="modules/${mar.name}"/>
+		  </fileset>
+		</copy>
+
+		<!-- Switch on serialization in the module.xml file -->
+		<ant:unjar src="${maven.build.dir}/${mar.name}" dest="${serialize.temp.path}"/>
+		<ant:replace file="${serialize.temp.path}/META-INF/module.xml" 
+		  token="&lt;!-- &lt;sandesha2:UseMessageSerialization>true&lt;/sandesha2:UseMessageSerialization> -->"
+		  value="&lt;sandesha2:UseMessageSerialization>true&lt;/sandesha2:UseMessageSerialization>"/>
+		<ant:jar jarfile="${serialize.client.path}/modules/${test.module.name}.mar" basedir="${serialize.temp.path}"/>
+		<ant:jar jarfile="${serialize.server.path}/modules/${test.module.name}.mar" basedir="${serialize.temp.path}"/>
+		
+		<delete dir="${build.temp.dir}"/>
+	</goal>
+
     <goal name="repo:create">
         <attainGoal name="server:create"/>
         <attainGoal name="client:create"/>
         <attainGoal name="secure:create"/>
+        <attainGoal name="serialize:create"/>
     </goal>	
     
 	<goal name="server:create" prereqs="mar,sample:create">

@@ -17,8 +17,8 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -29,9 +29,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2006Constants;
 import org.apache.commons.logging.Log;
@@ -43,6 +41,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -56,7 +55,6 @@ import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
-import org.apache.sandesha2.wsrm.Nack;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
@@ -135,7 +133,6 @@ public class AcknowledgementProcessor {
 		
 		if(log.isDebugEnabled()) log.debug("Got Ack for RM Sequence: " + outSequenceId + ", internalSeqId: " + internalSequenceId);
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
-		Iterator nackIterator = sequenceAck.getNackList().iterator();
 
 		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager)) {
 			if (log.isDebugEnabled())
@@ -149,106 +146,72 @@ public class AcknowledgementProcessor {
 			return;
 		}
 		
-		SenderBean input = new SenderBean();
-		input.setSend(true);
-		input.setReSend(true);
-		input.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
-		input.setInternalSequenceID(internalSequenceId);
-		Collection retransmitterEntriesOfSequence = retransmitterMgr.find(input);
-		
 		String replyToAddress = rmsBean.getReplyToEPR();
 		EndpointReference replyTo = new EndpointReference (replyToAddress);
-		boolean anonReplyTo = false;
-		if (replyTo.hasAnonymousAddress())
-			anonReplyTo = true;
+		boolean anonReplyTo = replyTo.hasAnonymousAddress();
 		
 		String rmVersion = rmMsgCtx.getRMSpecVersion();
 		
-		boolean syncResponseExpected = false;
-		RangeString ackedMessagesRanges = new RangeString(); //keep track of the ranges in the ack msgs
+		// Compare the clientCompletedMessages with the range we just got, to work out if there
+		// is any new information in this ack message
+		RangeString completedMessages = rmsBean.getClientCompletedMessages();
 		long numberOfNewMessagesAcked = 0;
 
-		while (ackRangeIterator.hasNext()) {
+		while(ackRangeIterator.hasNext()) {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator.next();
 			long lower = ackRange.getLowerValue();
 			long upper = ackRange.getUpperValue();
 			
-			if(log.isDebugEnabled()) 
-				log.debug("Ack Range: " + lower + " - " + upper);
-			
-			long rangeStart = lower;
-			long messageNo;
-			for (messageNo = lower; messageNo <= upper; messageNo++) {
-				SenderBean retransmitterBean = getRetransmitterEntry(retransmitterEntriesOfSequence, messageNo);
+			// Quick check to see if the whole range is covered
+			if(!completedMessages.isRangeCompleted(new Range(lower, upper))) {
+				// We have new info, so take each message one at a time
+				for (long messageNo = lower; messageNo <= upper; messageNo++) {
+					if(!completedMessages.isMessageNumberInRanges(messageNo)) {
+						// We have a new message to consider
+						numberOfNewMessagesAcked++;
+						completedMessages.addRange(new Range(messageNo, messageNo));
 
-				if (retransmitterBean != null) {
-					
-					// We've got an Ack for a message that hasn't been sent yet !
-					if (retransmitterBean.getSentCount() == 0) {
-						FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
-								storageManager, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalidNotSent));
-						if (log.isDebugEnabled())
-							log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack");
-						return;
-					}
-					
-					String storageKey = retransmitterBean.getMessageContextRefKey();
-					
-					boolean syncResponseNeeded = false;
-					if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && anonReplyTo) {
-						MessageContext applicationMessage = storageManager.retrieveMessageContext(storageKey, configCtx);
-						AxisOperation operation = applicationMessage.getAxisOperation();
-						boolean inOutMessage = false;
-						if (operation!=null && 
-								(WSDL20_2004Constants.MEP_URI_OUT_IN.equals(operation.getMessageExchangePattern()) ||
-										WSDL20_2006Constants.MEP_URI_OUT_IN.equals(operation.getMessageExchangePattern()))) 
-							inOutMessage = true;
+						SenderBean matcher = new SenderBean();
+						matcher.setSequenceID(outSequenceId);
+						matcher.setMessageNumber(messageNo);
+						
+						SenderBean retransmitterBean = retransmitterMgr.findUnique(matcher);
+						if (retransmitterBean != null) {
+							// Check we haven't got an Ack for a message that hasn't been sent yet !
+							if (retransmitterBean.getSentCount() == 0) {
+								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
+										storageManager, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalidNotSent));
+								if (log.isDebugEnabled())
+									log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack");
+								return;
+							}
 							
-						if (inOutMessage) {	
-							OperationContext operationContext = applicationMessage.getOperationContext();
-							if (operationContext!=null) {
-								MessageContext responseMessage = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-								if (responseMessage==null) {
+							String storageKey = retransmitterBean.getMessageContextRefKey();
+							
+							boolean syncResponseNeeded = false;
+							if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && anonReplyTo) {
+								MessageContext applicationMessage = storageManager.retrieveMessageContext(storageKey, configCtx);
+								AxisOperation operation = applicationMessage.getAxisOperation();
+								if (operation!=null && 
+										(WSDL20_2004Constants.MEP_URI_OUT_IN.equals(operation.getMessageExchangePattern()) ||
+												WSDL20_2006Constants.MEP_URI_OUT_IN.equals(operation.getMessageExchangePattern()))) 
 									syncResponseNeeded = true;
-									
-									//adding upto the current messageNo
-									//current one will not be considered as we need to get an sync response from an repeat of this.
-									if (rangeStart<messageNo) {
-										ackedMessagesRanges.addRange(new Range(rangeStart, messageNo-1)); 
-										rangeStart = messageNo+1;
-									}
-								}
+							}
+
+							if (!syncResponseNeeded) {
+								// removing the application message from the storage.
+								retransmitterMgr.delete(retransmitterBean.getMessageID());
+								storageManager.removeMessageContext(storageKey);
 							}
 						}
 					}
-
- 					if (!syncResponseNeeded) {
-						// removing the application message from the storage.
-						retransmitterMgr.delete(retransmitterBean.getMessageID());
-						storageManager.removeMessageContext(storageKey);
-						numberOfNewMessagesAcked++;
-					} else {
-						//sync response is needed at least for one message, this should stop the termination.
-						syncResponseExpected = true;
-					}
 				}
 			}
-			
-			if (rangeStart<=upper)
-				ackedMessagesRanges.addRange(new Range (rangeStart, upper));
-			
 		}
 
 		// updating the last activated time of the sequence.
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 
-		while (nackIterator.hasNext()) {
-			Nack nack = (Nack) nackIterator.next();
-			long msgNo = nack.getNackNumber();
-
-			// TODO - Process Nack
-		}
-		
 		//adding a MakeConnection for the response sequence if needed.
 		if (rmsBean.getOfferedSequence() != null) {
 
@@ -260,75 +223,25 @@ public class AcknowledgementProcessor {
 			
 		}
 
-		// setting acked message date.
-		// TODO add details specific to each message.
-		
 		// We overwrite the previous client completed message ranges with the
 		// latest view, but only if it is an update i.e. contained a new
 		// ack range (which is because we do not previous acks arriving late 
 		// to break us)
 		if (numberOfNewMessagesAcked>0) {
-		  rmsBean.setClientCompletedMessages(ackedMessagesRanges);
-			long noOfMsgsAcked = 
-				rmsBean.getNumberOfMessagesAcked() + numberOfNewMessagesAcked;
+			rmsBean.setClientCompletedMessages(completedMessages);
+			long noOfMsgsAcked = rmsBean.getNumberOfMessagesAcked() + numberOfNewMessagesAcked;
 			rmsBean.setNumberOfMessagesAcked(noOfMsgsAcked);
 		}
-		
-		long lastOutMessage = rmsBean.getLastOutMessage ();
 		
 		// Update the RMSBean
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
-		if (lastOutMessage > 0) {
-			boolean complete = AcknowledgementManager.verifySequenceCompletion(sequenceAck
-					.getAcknowledgementRanges().iterator(), lastOutMessage);
-
-			
-			//If this is RM 1.1 and RMAnonURI scenario, dont do the termination unless the response side createSequence has been
-			//received (RMDBean has been created) through polling, in this case termination will happen in the create sequence response processor.
-			boolean pauseTerminationForCS = false;
-			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals( rmVersion) && SandeshaUtil.isWSRMAnonymous(replyToAddress)) {
-				pauseTerminationForCS = true;
-				
-				RMDBean findBean = new RMDBean ();
-				findBean.setPollingMode(true);
-				
-				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
-				Iterator rmdBeanIteratort = rmdBeanMgr.find(findBean).iterator();
-				while (rmdBeanIteratort.hasNext()) {
-					RMDBean rmdBean = (RMDBean) rmdBeanIteratort.next();
-					String toAddress = rmdBean.getToAddress();
-					if (toAddress!=null && toAddress.equals(replyToAddress)) {
-						pauseTerminationForCS = false;
-						break;
-					}
-				}
-				
-				if (pauseTerminationForCS) {
-					rmsBean.setTerminationPauserForCS(true);
-					storageManager.getRMSBeanMgr().update(rmsBean);
-				}
-			}
-			
-			
-			if (complete && !pauseTerminationForCS && !syncResponseExpected && !rmsBean.isTerminateAdded()) {
-				TerminateManager.addTerminateSequenceMessage(rmMsgCtx, internalSequenceId, outSequenceId, storageManager);
-			}
-			
-		}
+		// Try and terminate the sequence
+		TerminateManager.checkAndTerminate(rmMsgCtx, storageManager, rmsBean);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementProcessor::processAckHeader");
 	}
 
-	private SenderBean getRetransmitterEntry(Collection collection, long msgNo) {
-		Iterator it = collection.iterator();
-		while (it.hasNext()) {
-			SenderBean bean = (SenderBean) it.next();
-			if (bean.getMessageNumber() == msgNo)
-				return bean;
-		}
 
-		return null;
-	}
 }

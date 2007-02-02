@@ -20,6 +20,7 @@ package org.apache.sandesha2.util;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -33,6 +34,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -57,6 +59,63 @@ public class TerminateManager {
 
 	public static HashMap receivingSideCleanMap = new HashMap();
 
+	public static void checkAndTerminate(RMMsgContext relatedMessage, StorageManager storageManager, RMSBean rmsBean)
+	throws SandeshaStorageException, AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: TerminateManager::checkAndTerminate");
+
+		long lastOutMessage = rmsBean.getLastOutMessage ();
+
+		if (lastOutMessage > 0 && !rmsBean.isTerminateAdded()) {
+			
+			boolean complete = AcknowledgementManager.verifySequenceCompletion(rmsBean.getClientCompletedMessages(), lastOutMessage);
+			
+			//If this is RM 1.1 and RMAnonURI scenario, dont do the termination unless the response side createSequence has been
+			//received (RMDBean has been created) through polling, in this case termination will happen in the create sequence response processor.
+			String rmVersion = rmsBean.getRMVersion();
+			String replyToAddress = rmsBean.getReplyToEPR();
+
+			if (complete &&
+					Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmVersion) && SandeshaUtil.isWSRMAnonymous(replyToAddress)) {
+				RMDBean findBean = new RMDBean ();
+				findBean.setPollingMode(true);
+				findBean.setToAddress(replyToAddress);
+
+				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+				List beans = rmdBeanMgr.find(findBean);
+				System.out.println("Checking replyTo" + replyToAddress);
+				if(beans.isEmpty()) {
+					System.out.println("No beans.");
+					rmsBean.setTerminationPauserForCS(true);
+					storageManager.getRMSBeanMgr().update(rmsBean);
+					complete = false;
+				} else {
+					System.out.println("Matcher:\n" + findBean + "\nFound beans:\n" + beans);
+				}
+			}
+			
+			// If we are doing sync 2-way over WSRM 1.0 then we may need to keep sending messages,
+			// so check to see if all the senders have been removed
+			EndpointReference replyTo = new EndpointReference (replyToAddress);
+			if (complete &&
+					Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && replyTo.hasAnonymousAddress()) {
+				SenderBean matcher = new SenderBean();
+				matcher.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+				matcher.setSequenceID(rmsBean.getSequenceID());
+				
+				List matches = storageManager.getSenderBeanMgr().find(matcher);
+				if(!matches.isEmpty()) complete = false;
+			}
+			
+			if (complete) {
+				addTerminateSequenceMessage(relatedMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+			}
+			
+		}
+
+		if(log.isDebugEnabled()) log.debug("Exit: TerminateManager::checkAndTerminate");
+	}
+	
+	
 	/**
 	 * Called by the receiving side to remove data related to a sequence. e.g.
 	 * After sending the TerminateSequence message. Calling this methods will

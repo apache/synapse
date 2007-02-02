@@ -284,29 +284,14 @@ public class AcknowledgementManager {
 	
 	
 
-	public static boolean verifySequenceCompletion(Iterator ackRangesIterator, long lastMessageNo) {
+	public static boolean verifySequenceCompletion(RangeString ackRanges, long lastMessageNo) {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::verifySequenceCompletion");
 
-		HashMap startMap = new HashMap();
-
-		while (ackRangesIterator.hasNext()) {
-			AcknowledgementRange temp = (AcknowledgementRange) ackRangesIterator.next();
-			startMap.put(new Long(temp.getLowerValue()), temp);
-		}
-
-		long start = 1;
 		boolean result = false;
-		while (!result) {
-			AcknowledgementRange temp = (AcknowledgementRange) startMap.get(new Long(start));
-			if (temp == null) {
-				break;
-			}
-
-			if (temp.getUpperValue() >= lastMessageNo)
-				result = true;
-
-			start = temp.getUpperValue() + 1;
+		Range complete = new Range(1, lastMessageNo);
+		if(ackRanges.isRangeCompleted(complete)) {
+			result = true;
 		}
 
 		if (log.isDebugEnabled())

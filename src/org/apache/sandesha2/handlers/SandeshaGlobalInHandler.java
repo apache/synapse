@@ -20,7 +20,6 @@ package org.apache.sandesha2.handlers;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -33,17 +32,13 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.msgprocessors.MakeConnectionProcessor;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.Range;
-import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.Sequence;
 
@@ -108,48 +103,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			transaction = storageManager.getTransaction();
 
 			RMMsgContext rmMessageContext = MsgInitializer.initializeMessage(msgContext);
-			EndpointReference replyTo = msgContext.getReplyTo();
-			String specVersion = rmMessageContext.getRMSpecVersion();
 				
-			boolean duplicateMessage = isDuplicateMessage (rmMessageContext, storageManager);
-
-			//checking weather the Message belongs to the WSRM 1.0 Anonymous InOut scenario.
-			//If so instead of simply dropping duplicates we will have to attach the corresponding response,
-			//as long as the Message has not been acked.			
-			if (duplicateMessage &&
-					(replyTo==null || replyTo.hasAnonymousAddress()) &&
-					(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0))) {
-
-				// Treat the duplicate message as a special kind of poll
-				Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-				
-			    SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
-			    SenderBean findSenderBean = new SenderBean ();
-			    findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
-			    findSenderBean.setInboundSequenceId(sequence.getIdentifier().getIdentifier());
-			    findSenderBean.setInboundMessageNumber(sequence.getMessageNumber().getMessageNumber());
-			    findSenderBean.setSend(true);
-		
-			    SenderBean replyMessageBean = senderBeanMgr.findUnique(findSenderBean);
-			    
-			    // this is effectively a poll for the replyMessage, wo re-use the logic in the MakeConnection
-			    // processor. This will use this thread to re-send the reply, writing it into the transport.
-			    // As the reply is now written we do not want to continue processing, or suspend, so we abort.
-			    if(replyMessageBean != null) {
-			    	if(log.isDebugEnabled()) log.debug("Found matching reply for replayed message");
-			    	MakeConnectionProcessor.replyToPoll(rmMessageContext, replyMessageBean, storageManager, false, null);
-			    } else {
-			    	if(log.isDebugEnabled()) log.debug("No matching reply for replayed message");
-			    }
-			    
-			    returnValue = InvocationResponse.ABORT;
-				if (log.isDebugEnabled()) log.debug("Exit: SandeshaGlobalInHandler::invoke " + returnValue);
-				return returnValue;
-			}
-			
 			boolean shouldMessageBeDropped = shouldMessageBeDropped (rmMessageContext, storageManager);
 			
-			if (duplicateMessage || shouldMessageBeDropped) {
+			if (shouldMessageBeDropped) {
 
 				returnValue = InvocationResponse.ABORT; // the msg has been
 														// dropped
@@ -167,11 +124,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 
 		} catch (Exception e) {
-			if (log.isDebugEnabled())
-				log.debug("Caught an exception", e);
-			// message should not be sent in a exception situation.
-			msgContext.pause();
-			returnValue = InvocationResponse.SUSPEND;
+			if (log.isDebugEnabled()) log.debug("Caught an exception", e);
 
 			if (transaction != null) {
 				try {
@@ -203,31 +156,6 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			log.debug("Exit: SandeshaGlobalInHandler::invoke " + returnValue);
 		return returnValue;
 	}
-	
-	
-	private boolean isDuplicateMessage (RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
-		boolean duplicate = false;
-		
-		if (rmMsgContext.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-
-			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			long msgNo = sequence.getMessageNumber().getMessageNumber();
-			
-			RMDBean rmdBean = 
-				SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequence.getIdentifier().getIdentifier());
-
-			if (rmdBean != null) {
-				RangeString serverCompletedMessages = rmdBean.getServerCompletedMessages();
-	
-				if (serverCompletedMessages.isMessageNumberInRanges(msgNo))
-					duplicate = true;
-			}
-			
-		}
-		
-		return duplicate;
-	}
-
 	
 	private boolean shouldMessageBeDropped(RMMsgContext rmMsgContext, StorageManager storageManager) throws AxisFault {
 		

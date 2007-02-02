@@ -192,6 +192,9 @@ public class RMDBean extends RMSequenceBean {
 		
 		else if(bean.getOutOfOrderRanges() != null && !bean.getOutOfOrderRanges().equals(this.getOutOfOrderRanges()))
 			equal = false;
+
+		else if(bean.getToAddress() != null && !bean.getToAddress().equals(this.getToAddress()))
+			equal = false;
 		
 		else if ((bean.rmdFlags & NEXT_MSG_NO_FLAG) != 0 && bean.getNextMsgNoToProcess() != this.getNextMsgNoToProcess())
 			equal = false;

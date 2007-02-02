@@ -17,18 +17,27 @@
 
 package org.apache.sandesha2.storage.inmemory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisModule;
+import org.apache.axis2.transport.RequestResponseTransport;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -48,7 +57,6 @@ public class InMemoryStorageManager extends StorageManager {
 
 	private static InMemoryStorageManager instance = null;
     private final String MESSAGE_MAP_KEY = "Sandesha2MessageMap";
-    private final String ENVELOPE_MAP_KEY = "Sandesha2EnvelopeMap";
     private RMSBeanMgr  rMSBeanMgr = null;
     private RMDBeanMgr rMDBeanMgr = null;
     private SenderBeanMgr senderBeanMgr = null;
@@ -56,16 +64,23 @@ public class InMemoryStorageManager extends StorageManager {
     private Sender sender = null;
     private Invoker invoker = null;
     private HashMap transactions = new HashMap();
+    private boolean useSerialization = false;
     
-	public InMemoryStorageManager(ConfigurationContext context) {
+	public InMemoryStorageManager(ConfigurationContext context)
+	throws SandeshaException
+	{
 		super(context);
 		
+		SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(context.getAxisConfiguration());
+		useSerialization = policy.isUseMessageSerialization();
+
 		this.rMSBeanMgr = new InMemoryRMSBeanMgr (this, context);
 		this.rMDBeanMgr = new InMemoryRMDBeanMgr (this, context);
 		this.senderBeanMgr = new InMemorySenderBeanMgr (this, context);
 		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (this, context);
 		this.sender = new Sender();
 		this.invoker = new Invoker();
+		
 	}
 
 	public Transaction getTransaction() {
@@ -155,7 +170,9 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	public static InMemoryStorageManager getInstance(
-			ConfigurationContext context) {
+			ConfigurationContext context)
+	throws SandeshaException
+	{
 		if (instance == null)
 			instance = new InMemoryStorageManager(context);
 
@@ -170,32 +187,55 @@ public class InMemoryStorageManager extends StorageManager {
 			return null;
 		}
 		
-		MessageContext messageContext = (MessageContext) storageMap.get(key);
-		
-		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
-		if(envMap==null) {
-			if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext");
-			return null;
-		}
-		
-		//Get hold of the original SOAP envelope
-		SOAPEnvelope envelope = (SOAPEnvelope)envMap.get(key);
-		
-		//Now clone the env and set it in the message context
-		if (envelope!=null) {
-			try {
-				SOAPEnvelope clonedEnvelope = SandeshaUtil.cloneEnvelope(envelope);
-				messageContext.setEnvelope(clonedEnvelope);
-			} catch (AxisFault e) {
-				throw new SandeshaStorageException (e);
+		MessageContext messageContext = null;
+		try {
+			if(useSerialization) {
+				SerializedStorageEntry entry = (SerializedStorageEntry) storageMap.get(key);
+				
+				if(entry != null) {
+					ByteArrayInputStream stream = new ByteArrayInputStream(entry.data);
+					ObjectInputStream is = new ObjectInputStream(stream);
+					messageContext = (MessageContext) is.readObject();
+					messageContext.activate(entry.context);
+
+					OperationContext opCtx = messageContext.getOperationContext();
+					if(opCtx != null) {
+						MessageContext inMsgCtx = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+						if(inMsgCtx != null) {
+							inMsgCtx.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, entry.inTransportControl);
+							inMsgCtx.setProperty(MessageContext.TRANSPORT_OUT,               entry.inTransportOut);
+							inMsgCtx.setProperty(Constants.OUT_TRANSPORT_INFO,               entry.inTransportOutInfo);
+						}
+					}
+					
+					messageContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, entry.transportControl);
+					messageContext.setProperty(MessageContext.TRANSPORT_OUT,               entry.transportOut);
+					messageContext.setProperty(Constants.OUT_TRANSPORT_INFO,               entry.transportOutInfo);
+				}
+
+			} else {
+				StorageEntry entry = (StorageEntry) storageMap.get(key);
+				
+				if(entry != null) {
+					messageContext = entry.msgContext;
+					SOAPEnvelope clonedEnvelope = SandeshaUtil.cloneEnvelope(entry.envelope);
+					messageContext.setEnvelope(clonedEnvelope);
+				}
 			}
+		} catch (Exception e) {
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.failedToLoadMessage, e.toString());
+			if(log.isDebugEnabled()) log.debug(message);
+			throw new SandeshaStorageException(message, e);
 		}
-		
+
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext, " + messageContext);
 		return messageContext; 
 	}
 
-	public void storeMessageContext(String key,MessageContext msgContext) {
+	public void storeMessageContext(String key,MessageContext msgContext)
+	throws SandeshaStorageException
+	{
 		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::storeMessageContext, key: " + key);
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
 		
@@ -207,21 +247,46 @@ public class InMemoryStorageManager extends StorageManager {
 		if (key==null)
 		    key = SandeshaUtil.getUUID();
 		
-		storageMap.put(key,msgContext);
-		
-		//Now get hold of the SOAP envelope and store it in the env map
-		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
-		
-		if(envMap==null) {
-			envMap = new HashMap ();
-			getContext().setProperty(ENVELOPE_MAP_KEY, envMap);
-		}
-		
-		SOAPEnvelope envelope = msgContext.getEnvelope();
+		try {
+			if(useSerialization) {
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				ObjectOutputStream s = new ObjectOutputStream(stream);
+				s.writeObject(msgContext);
+				s.close();
+				
+				SerializedStorageEntry entry = new SerializedStorageEntry();
+				entry.data = stream.toByteArray();
+				entry.context = msgContext.getConfigurationContext();
+				
+				OperationContext opCtx = msgContext.getOperationContext();
+				if(opCtx != null) {
+					MessageContext inMsgCtx = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+					if(inMsgCtx != null) {
+						entry.inTransportControl = inMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+						entry.inTransportOut     = inMsgCtx.getProperty(MessageContext.TRANSPORT_OUT);
+						entry.inTransportOutInfo = inMsgCtx.getProperty(Constants.OUT_TRANSPORT_INFO);
+					}
+				}
+				entry.transportControl = msgContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+				entry.transportOut     = msgContext.getProperty(MessageContext.TRANSPORT_OUT);
+				entry.transportOutInfo = msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
+				
+				storageMap.put(key, entry);
 
-		//We are storing the original envelope here.
-		//Storing a cloned version will caus HeaderBlocks to loose their setProcessed information.
-		envMap.put(key, envelope);
+			} else {
+				//We are storing the original envelope here.
+				//Storing a cloned version will caus HeaderBlocks to loose their setProcessed information.
+				StorageEntry entry = new StorageEntry();
+				entry.msgContext = msgContext;
+				entry.envelope = msgContext.getEnvelope();
+				storageMap.put(key,entry);
+			}
+		} catch(Exception e) {
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.failedToStoreMessage, e.toString());
+			if(log.isDebugEnabled()) log.debug(message);
+			throw new SandeshaStorageException(message, e);
+		}
 		
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::storeMessageContext, key: " + key);
 	}
@@ -236,16 +301,10 @@ public class InMemoryStorageManager extends StorageManager {
 					SandeshaMessageKeys.storageMapNotPresent));
 		}
 		
-		Object oldEntry = storageMap.get(key);
+		Object oldEntry = storageMap.remove(key);
 		if (oldEntry==null)
 			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.entryNotPresentForUpdating));
-		
-		HashMap envMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
-
-		storageMap.remove(key);
-		if (envMap!=null)
-			envMap.remove(key);
 		
 		storeMessageContext(key,msgContext);
 
@@ -256,14 +315,9 @@ public class InMemoryStorageManager extends StorageManager {
 		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::removeMessageContext, key: " + key);
 
 		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
-		HashMap envelopeMap = (HashMap) getContext().getProperty(ENVELOPE_MAP_KEY);
-		
 
 		if (storageMap!=null)
 			storageMap.remove(key);
-		
-		if (envelopeMap!=null)
-			envelopeMap.remove(key);
 		
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::removeMessageContext, key: " + key);
 	}
@@ -272,6 +326,20 @@ public class InMemoryStorageManager extends StorageManager {
 		
 	}
 
+	private class SerializedStorageEntry {
+		byte[]               data;
+		ConfigurationContext context;
+		Object               transportControl;
+		Object               transportOut;
+		Object               transportOutInfo;
+		Object               inTransportControl;
+		Object               inTransportOut;
+		Object               inTransportOutInfo;
+	}
+	private class StorageEntry {
+		MessageContext msgContext;
+		SOAPEnvelope   envelope;
+	}
 }
 
 

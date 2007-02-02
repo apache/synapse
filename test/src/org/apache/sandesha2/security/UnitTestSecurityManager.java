@@ -115,7 +115,11 @@ public class UnitTestSecurityManager extends SecurityManager {
 				}
 			}
 		}
-		if(!foundToken) throw new SandeshaException("Message was not secured with the correct token(s)");
+		if(!foundToken) {
+			SandeshaException e = new SandeshaException("Message was not secured with the correct token(s)");
+			e.printStackTrace(System.err);
+			throw e;
+		}
 
 		log.debug("Exit: UnitTestSecurityManager::checkProofOfPossession");
 	}

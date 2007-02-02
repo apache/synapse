@@ -98,7 +98,7 @@ public class InMemoryTransaction implements Transaction {
 					}
 
 					try {
-						if(log.isDebugEnabled()) log.debug("This " + this + " waiting for " + other);
+						if(log.isDebugEnabled()) log.debug("This " + this + " waiting for " + waitingForTran);
 						bean.wait();
 					} catch(InterruptedException e) {
 						// Do nothing

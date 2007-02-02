@@ -537,9 +537,6 @@ public class SandeshaUtil {
 				}
 			}
 
-            
-			newMessageContext.setExecutionChain(referenceMessage.getExecutionChain());
-
 			return newMessageContext;
 
 		} catch (AxisFault e) {
@@ -967,44 +964,58 @@ public class SandeshaUtil {
 		
 		MessageContext msgContext = rmMsgContext.getMessageContext();
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
-		
-		// message will be stored in the Sandesha2TransportSender
-		msgContext.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
 
-		TransportOutDescription transportOut = msgContext.getTransportOut();
+		SandeshaPolicyBean policy = getPropertyBean(msgContext.getAxisOperation());
+		if(policy.isUseMessageSerialization()) {
+			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_TRUE);
 
-		msgContext.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
-		msgContext.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
-
-		Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
-		msgContext.setTransportOut(sandesha2TransportOutDesc);
-
- 		// sending the message once through Sandesha2TransportSender.
- 		AxisEngine engine = new AxisEngine(configurationContext);
-
-		if (msgContext.isPaused())
-			engine.resumeSend(msgContext);
-		else {
-			//this invocation has to be a blocking one.
+			StorageManager store = getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration());
+			store.storeMessageContext(storageKey, msgContext);
 			
-			Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
-			if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue())
-				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
-			
-			engine.send(msgContext);
-			
-			msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
+		} else {
+			// message will be stored in the Sandesha2TransportSender
+			msgContext.setProperty(Sandesha2Constants.MESSAGE_STORE_KEY, storageKey);
+	
+			TransportOutDescription transportOut = msgContext.getTransportOut();
+	
+			msgContext.setProperty(Sandesha2Constants.ORIGINAL_TRANSPORT_OUT_DESC, transportOut);
+			msgContext.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
+	
+			Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
+			msgContext.setTransportOut(sandesha2TransportOutDesc);
+	
+	 		// sending the message once through Sandesha2TransportSender.
+	 		AxisEngine engine = new AxisEngine(configurationContext);
+	
+			if (msgContext.isPaused())
+				engine.resumeSend(msgContext);
+			else {
+				//this invocation has to be a blocking one.
+				
+				Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
+				if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue())
+					msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
+				
+				engine.send(msgContext);
+				
+				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
+			}
 		}
-
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::executeAndStore");
 	}
 	
-	public static void modifyExecutionChainForStoring (MessageContext message) {
+	public static void modifyExecutionChainForStoring (MessageContext message)
+	throws SandeshaException
+	{
 		
 		Object property = message.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
 		if (property!=null)
 			return; //Phases are already set. Dont hv to redo.
+		
+		SandeshaPolicyBean policy = getPropertyBean(message.getAxisOperation());
+		if(policy.isUseMessageSerialization())
+			return; // No need to mess with the transport when we use message serialization
 		
 		TransportOutDescription transportOutDescription = message.getTransportOut();
 		if (!(transportOutDescription instanceof Sandesha2TransportOutDesc))

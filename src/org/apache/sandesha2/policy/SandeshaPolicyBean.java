@@ -63,6 +63,8 @@ public class SandeshaPolicyBean implements Assertion {
     private boolean enableMakeConnection;
     
     private boolean enableRMAnonURI;
+    
+    private boolean useMessageSerialization;
 
     public void setInactiveTimeoutInterval(long value, String measure) {
         long timeOut = -1;
@@ -270,6 +272,11 @@ public class SandeshaPolicyBean implements Assertion {
         // </wsrm:MakeConnection>
         writer.writeEndElement();
         
+        // <wsrm:UseMessageSerialization />
+        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_USE_SERIALIZATION.getLocalPart(), namespaceURI);
+        writer.writeCharacters(Boolean.toString(isUseMessageSerialization()));
+        writer.writeEndElement();
+
         // </wsp:Policy>
         writer.writeEndElement();
 
@@ -334,8 +341,17 @@ public class SandeshaPolicyBean implements Assertion {
 		this.enableRMAnonURI = enableRMAnonURI;
 	}
 
+	public boolean isUseMessageSerialization() {
+		return useMessageSerialization;
+	}
+
+	public void setUseMessageSerialization(boolean useMessageSerialization) {
+		this.useMessageSerialization = useMessageSerialization;
+	}    
+
 	public boolean equal(PolicyComponent policyComponent) {
         // TODO
         return false;
-    }    
+    }
+
 }

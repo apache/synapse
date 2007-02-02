@@ -66,7 +66,7 @@ public class PropertyManager {
 		
 		propertyBean.setEnableMakeConnection(Sandesha2Constants.Properties.DefaultValues.EnableMakeConnection);
 		propertyBean.setEnableRMAnonURI(Sandesha2Constants.Properties.DefaultValues.EnableRMAnonURI);
-		
+		propertyBean.setUseMessageSerialization(Sandesha2Constants.Properties.DefaultValues.UseMessageSerialization);
 		return propertyBean;
 	}
 
@@ -114,6 +114,9 @@ public class PropertyManager {
 
 			String enableMakeConnection = properties.getProperty(Sandesha2Constants.Properties.EnableMakeConnection);
 			loadEnableMakeConnection(enableMakeConnection, propertyBean);
+			
+			String useSerlialization = properties.getProperty(Sandesha2Constants.Properties.UseMessageSerialization);
+			loadUseSerialization(useSerlialization, propertyBean);
 			
 			String messageTypesToDrop = properties.getProperty(Sandesha2Constants.Properties.MessageTypesToDrop);
 			loadMessageTypesToDrop(messageTypesToDrop, propertyBean);
@@ -172,6 +175,10 @@ public class PropertyManager {
 		Parameter enableMakeConnectionParam = desc.getParameter(Sandesha2Constants.Properties.EnableMakeConnection);
 		String enableMakeConnection = (String) enableMakeConnectionParam.getValue();
 		loadEnableMakeConnection(enableMakeConnection, propertyBean);
+
+		Parameter useSerializationParam = desc.getParameter(Sandesha2Constants.Properties.UseMessageSerialization);
+		String useSerialization = (String) useSerializationParam.getValue();
+		loadUseSerialization(useSerialization, propertyBean);
 
 		Parameter messageTypesToDropParam = desc.getParameter(Sandesha2Constants.Properties.MessageTypesToDrop);
 		String messageTypesToDrop = (String) messageTypesToDropParam.getValue();
@@ -546,6 +553,19 @@ public class PropertyManager {
 				propertyBean.setEnableMakeConnection(true);
 			} else if (enableMakeConnection.equalsIgnoreCase("false")) {
 				propertyBean.setEnableMakeConnection(false);
+			}
+		}
+	}
+
+	private static void loadUseSerialization(String useSerialization, SandeshaPolicyBean propertyBean)
+	throws SandeshaException {
+
+		if (useSerialization != null) {
+			useSerialization = useSerialization.trim();
+			if (useSerialization.equalsIgnoreCase("true")) {
+				propertyBean.setUseMessageSerialization(true);
+			} else if (useSerialization.equalsIgnoreCase("false")) {
+				propertyBean.setUseMessageSerialization(false);
 			}
 		}
 	}

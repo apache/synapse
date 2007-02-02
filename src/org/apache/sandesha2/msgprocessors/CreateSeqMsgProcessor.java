@@ -225,28 +225,25 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	
 				RMSBean findBean = new RMSBean ();
 				findBean.setReplyToEPR(toAddress);
+				findBean.setTerminationPauserForCS(true);
 				
 				//TODO recheck
 				RMSBean rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
-				if (rmsBean!=null) {
-					
-					if (rmsBean.isTerminationPauserForCS()) {
-						//AckManager hs not done the termination. Do the termination here.
-						
-						MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
-						if (requestSideRefMessage==null) {
-							FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
-									SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getInternalSequenceID()),
-									new Exception());						
-							// Return false if an Exception hasn't been thrown.
-							if (log.isDebugEnabled())
-								log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
-							return false;
-						}
-						
-						RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
-						TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+				if (rmsBean!=null) {					
+					//AckManager hs not done the termination. Do the termination here.
+					MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
+					if (requestSideRefMessage==null) {
+						FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getInternalSequenceID()),
+								new Exception());						
+						// Return false if an Exception hasn't been thrown.
+						if (log.isDebugEnabled())
+							log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+						return false;
 					}
+					
+					RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
+					TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
 				}
 			}
 				

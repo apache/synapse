@@ -24,6 +24,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
@@ -41,13 +42,17 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -164,8 +169,6 @@ public class SequenceProcessor {
 		}
 		
 		EndpointReference replyTo = rmMsgCtx.getReplyTo();
-		String mep = msgCtx.getAxisOperation().getMessageExchangePattern();
-		
 		String key = SandeshaUtil.getUUID(); // key to store the message.
 		// updating the Highest_In_Msg_No property which gives the highest
 		// message number retrieved from this sequence.
@@ -191,10 +194,47 @@ public class SequenceProcessor {
 		boolean msgNoPresentInList = 
 			serverCompletedMessageRanges.isMessageNumberInRanges(msgNo);
 		
+		String specVersion = rmMsgCtx.getRMSpecVersion();
 		if (msgNoPresentInList
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
-			// this is a duplicate message and the invocation type is
-			// EXACTLY_ONCE.
+			// this is a duplicate message and the invocation type is EXACTLY_ONCE. We try to return
+			// ack messages at this point, as if someone is sending duplicates then they may have
+			// missed earlier acks. We also have special processing for sync 2-way with RM 1.0
+			if((replyTo==null || replyTo.hasAnonymousAddress()) &&
+			   (specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0))) {
+
+			    SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
+			    SenderBean findSenderBean = new SenderBean ();
+			    findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+			    findSenderBean.setInboundSequenceId(sequence.getIdentifier().getIdentifier());
+			    findSenderBean.setInboundMessageNumber(sequence.getMessageNumber().getMessageNumber());
+			    findSenderBean.setSend(true);
+		
+			    SenderBean replyMessageBean = senderBeanMgr.findUnique(findSenderBean);
+			    
+			    // this is effectively a poll for the replyMessage, wo re-use the logic in the MakeConnection
+			    // processor. This will use this thread to re-send the reply, writing it into the transport.
+			    // As the reply is now written we do not want to continue processing, or suspend, so we abort.
+			    if(replyMessageBean != null) {
+			    	if(log.isDebugEnabled()) log.debug("Found matching reply for replayed message");
+			    	MakeConnectionProcessor.replyToPoll(rmMsgCtx, replyMessageBean, storageManager, false, null);
+					result = InvocationResponse.ABORT;
+					if (log.isDebugEnabled())
+						log.debug("Exit: SequenceProcessor::processReliableMessage, replayed message: " + result);
+					return result;
+			    }
+		    }
+			EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
+			if (acksTo.hasAnonymousAddress()) {
+				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager,false,true);
+				msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+				AcknowledgementManager.sendAckNow(ackRMMsgContext);
+				result = InvocationResponse.ABORT;
+				if (log.isDebugEnabled())
+					log.debug("Exit: SequenceProcessor::processReliableMessage, acking duplicate message: " + result);
+				return result;
+			}
+			
 			result = InvocationResponse.ABORT;
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, dropping duplicate: " + result);
@@ -208,6 +248,29 @@ public class SequenceProcessor {
 		
 		// Update the RMD bean
 		mgr.update(bean);
+		
+		// If we are doing sync 2-way over WSRM 1.0, then we may just have received one of
+		// the reply messages that we were looking for. If so we can remove the matching sender bean.
+		int mep = msgCtx.getAxisOperation().getAxisSpecifMEPConstant();
+		if(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0) &&
+				mep == WSDL20_2004Constants.MEP_CONSTANT_OUT_IN) {
+			RelatesTo relatesTo = msgCtx.getRelatesTo();
+			if(relatesTo != null) {
+				String messageId = relatesTo.getValue();
+				SenderBean matcher = new SenderBean();
+				matcher.setMessageID(messageId);
+				SenderBean sender = storageManager.getSenderBeanMgr().findUnique(matcher);
+				if(sender != null) {
+					if(log.isDebugEnabled()) log.debug("Deleting sender for sync-2-way message");
+					storageManager.removeMessageContext(sender.getMessageContextRefKey());
+					storageManager.getSenderBeanMgr().delete(messageId);
+					
+					// Try and terminate the corresponding outbound sequence
+					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sender.getSequenceID());
+					TerminateManager.checkAndTerminate(rmMsgCtx, storageManager, rmsBean);
+				}
+			}
+		}
 
 		// inorder invocation is still a global property
 		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
@@ -226,7 +289,7 @@ public class SequenceProcessor {
 //			add an ack entry here
 		
 		boolean backchannelFree = (replyTo != null && !replyTo.hasAnonymousAddress()) ||
-									WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep);
+									WSDL20_2004Constants.MEP_CONSTANT_IN_ONLY == mep;
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 		if (acksTo.hasAnonymousAddress() && backchannelFree) {
 			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);

@@ -148,6 +148,9 @@ public class RMAssertionBuilder implements AssertionBuilder {
                 		propertyBean.setEnableRMAnonURI(Boolean.valueOf(data).booleanValue());
                 	}
                 }
+            } else if (Sandesha2Constants.Assertions.ELEM_USE_SERIALIZATION.equals(name)) {
+            	String value = element.getText().trim();
+            	propertyBean.setUseMessageSerialization(Boolean.valueOf(value).booleanValue());
             }
         }
     }

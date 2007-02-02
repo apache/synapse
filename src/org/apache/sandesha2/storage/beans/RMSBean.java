@@ -331,6 +331,7 @@ public class RMSBean extends RMSequenceBean {
 			result.append("\nLastError        : "); result.append(lastSendError);
 			result.append("\nLastErrorTime    : "); result.append(lastSendErrorTimestamp);
 		}
+		result.append("\nClientCompletedMsgs: "); result.append(clientCompletedMessages);
 		return result.toString();
 	}
 	

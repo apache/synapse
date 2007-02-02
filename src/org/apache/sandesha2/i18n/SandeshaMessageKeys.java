@@ -145,6 +145,8 @@ public class SandeshaMessageKeys {
 	public static final String outMsgHasNoEnvelope="outMsgHasNoEnvelope";
 	public static final String msgNumberExceededLastMsgNo="msgNumberExceededLastMsgNo";
 	public static final String ackInvalid="ackInvalid";
+	public static final String ackInvalidHighMsg="ackInvalidHighMsg";
+	public static final String ackInvalidNotSent="ackInvalidNotSent";
 	public static final String highestMsgIdNotStored="highestMsgIdNotStored";
 	public static final String cannotHaveFinalWithNack="cannotHaveFinalWithNack";
 	public static final String accptButNoSequenceOffered="accptButNoSequenceOffered";

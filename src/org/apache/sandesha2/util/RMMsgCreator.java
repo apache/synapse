@@ -18,7 +18,6 @@
 package org.apache.sandesha2.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -47,7 +46,6 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.wsrm.Accept;
 import org.apache.sandesha2.wsrm.AckFinal;
-import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.AcksTo;
 import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.CloseSequence;
@@ -414,11 +412,7 @@ public class RMMsgCreator {
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
-		Iterator iterator = ackRangeArrayList.iterator();
-		while (iterator.hasNext()) {
-			AcknowledgementRange ackRange = (AcknowledgementRange) iterator.next();
-			sequenceAck.addAcknowledgementRanges(ackRange);
-		}
+		sequenceAck.setAckRanges(ackRangeArrayList);
 
 		if (rmdBean.isClosed()) {
 			// sequence is closed. so add the 'Final' part.

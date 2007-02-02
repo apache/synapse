@@ -142,7 +142,12 @@ public class AcknowledgementProcessor {
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence ");
 			return;
 		}
-		FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, storageManager);
+		
+		if (FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, sequenceAck, storageManager, rmsBean)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack range ");
+			return;
+		}
 		
 		SenderBean input = new SenderBean();
 		input.setSend(true);
@@ -177,6 +182,16 @@ public class AcknowledgementProcessor {
 				SenderBean retransmitterBean = getRetransmitterEntry(retransmitterEntriesOfSequence, messageNo);
 
 				if (retransmitterBean != null) {
+					
+					// We've got an Ack for a message that hasn't been sent yet !
+					if (retransmitterBean.getSentCount() == 0) {
+						FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
+								storageManager, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalidNotSent));
+						if (log.isDebugEnabled())
+							log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack");
+						return;
+					}
+					
 					String storageKey = retransmitterBean.getMessageContextRefKey();
 					
 					boolean syncResponseNeeded = false;

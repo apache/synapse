@@ -52,7 +52,7 @@ public class UnknownSequenceFaultTest extends SandeshaTestCase {
 	private ConfigurationContext serverConfigContext;
 	
 	public UnknownSequenceFaultTest() {
-		super("CreateSequenceProcessorTest");
+		super("UnknownSequenceFaultTest");
 	}
 
 	public void setUp() throws Exception {
@@ -60,11 +60,6 @@ public class UnknownSequenceFaultTest extends SandeshaTestCase {
 		serverConfigContext = startServer(server_repoPath, server_axis2_xml);
 	}
 
-	/**
-	 * Sends a Create Sequence message to an RM Destination that will be refused.
-	 * 
-	 * @throws Exception
-	 */
 	/**
 	 * Sends an Application message to an RM Destination that will be refused and should be
 	 * rejected with an unknown sequence fault
@@ -156,4 +151,5 @@ public class UnknownSequenceFaultTest extends SandeshaTestCase {
 		return outputStream.toByteArray();
 	}
 }
+
 

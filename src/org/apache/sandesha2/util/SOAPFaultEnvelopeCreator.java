@@ -74,7 +74,7 @@ public class SOAPFaultEnvelopeCreator {
 
 	/**
 	 * To find out weather this is a sequence fault. These faults are handeled differently 
-	 * accodting to the RM spec.
+	 * according to the RM spec.
 	 * 
 	 * @param faultData
 	 * @return
@@ -92,6 +92,9 @@ public class SOAPFaultEnvelopeCreator {
 			sequenceFault = true;
 
 		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE)
+			sequenceFault = true;
+
+		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT)
 			sequenceFault = true;
 
 		return sequenceFault;

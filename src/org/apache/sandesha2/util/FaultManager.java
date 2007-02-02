@@ -20,8 +20,6 @@ package org.apache.sandesha2.util;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -51,6 +49,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
@@ -198,15 +197,13 @@ public class FaultManager {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static void checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, StorageManager storageManager)
+	public static boolean checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, SequenceAcknowledgement sequenceAcknowledgement,
+			StorageManager storageManager, RMSBean rmsBean)
 			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForInvalidAcknowledgement");
 
 		// check lower<=upper
-		// TODO acked for not-send message
-
-		MessageContext ackMessageContext = ackRMMessageContext.getMessageContext();
 		if (ackRMMessageContext.getMessageType() != Sandesha2Constants.MessageTypes.ACK) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, MessageType not an ACK");
@@ -215,55 +212,78 @@ public class FaultManager {
 		boolean invalidAck = false;
 		String reason = null;
 		
-		Iterator sequenceAckIter = ackRMMessageContext.getMessageParts(
-				Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		
-		while (sequenceAckIter.hasNext()) {
-			SequenceAcknowledgement sequenceAcknowledgement = (SequenceAcknowledgement) sequenceAckIter.next();
-			List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
-			Iterator it = sequenceAckList.iterator();
+		List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
+		Iterator it = sequenceAckList.iterator();
 
-			while (it.hasNext()) {
-				AcknowledgementRange acknowledgementRange = (AcknowledgementRange) it.next();
-				long upper = acknowledgementRange.getUpperValue();
-				long lower = acknowledgementRange.getLowerValue();
+		while (it.hasNext()) {
+			AcknowledgementRange acknowledgementRange = (AcknowledgementRange) it.next();
+			long upper = acknowledgementRange.getUpperValue();
+			long lower = acknowledgementRange.getLowerValue();
 
-				if (lower > upper) {
-					invalidAck = true;
-					reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalid, Long.toString(lower), Long
-							.toString(upper));
-				}
+			if (lower > upper) {
+				invalidAck = true;
+				reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalid, Long.toString(lower), Long
+						.toString(upper));
+					
+				// check upper isn't bigger than the highest out msg number
+			} else if ( upper > rmsBean.getHighestOutMessageNumber() ) {
+				invalidAck = true;
+					
+				reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalidHighMsg, 
+						Long.toString(upper),
+						Long.toString(rmsBean.getHighestOutMessageNumber()));
 			}
-
+				
 			if (invalidAck) {
-				FaultData data = new FaultData();
-				int SOAPVersion = SandeshaUtil.getSOAPVersion(ackMessageContext.getEnvelope());
-				if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-					data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-				else
-					data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
-
-				data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
-				data.setReason(reason);
-
-				SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
-				OMElement dummyElement = factory.createOMElement("dummyElem", null);
-				sequenceAcknowledgement.toOMElement(dummyElement);
-
-				OMElement sequenceAckElement = dummyElement.getFirstChildWithName(new QName(
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
-				data.setDetail(sequenceAckElement);
-
-				if (log.isDebugEnabled())
-					log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-				getFault(ackRMMessageContext, data);
+				makeInvalidAcknowledgementFault(ackRMMessageContext, sequenceAcknowledgement, 
+						acknowledgementRange, storageManager, reason);
+				return true;
 			}
-		
-		}
+		}		
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement");
+		return false;
 	}
+
+	/**
+	 * Makes an InvalidAcknowledgement fault.
+	 * @param rmMsgCtx
+	 * @param storageManager
+	 * @param message
+	 * @throws AxisFault 
+	 */
+	public static void makeInvalidAcknowledgementFault(RMMsgContext rmMsgCtx, 
+			SequenceAcknowledgement sequenceAcknowledgement, AcknowledgementRange acknowledgementRange,
+			StorageManager storageManager, String reason) throws AxisFault {
+		FaultData data = new FaultData();
+		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMsgCtx.getMessageContext().getEnvelope());
+		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+		else
+			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+
+		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
+		data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+		data.setReason(reason);
+
+		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+
+		OMElement seqAckElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK,
+				rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+	
+		// Set the sequence Id
+		sequenceAcknowledgement.getIdentifier().toOMElement(seqAckElement);
+
+		// Set the Ack Range
+		acknowledgementRange.toOMElement(seqAckElement);
+		
+		data.setDetail(seqAckElement);
+							
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
+		getOrSendFault(rmMsgCtx, data);
+  }
 
 	/**
 	 * Makes a Create sequence refused fault

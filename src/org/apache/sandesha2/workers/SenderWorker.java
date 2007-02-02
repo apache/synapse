@@ -169,6 +169,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// sending the message
 			boolean successfullySent = false;
 
+			// Although not actually sent yet, update the send count to indicate an attempt
+			if (senderBean.isReSend()) {
+				SenderBean bean2 = senderBeanMgr
+				.retrieve(senderBean.getMessageID());
+				bean2.setSentCount(senderBean.getSentCount());
+				senderBeanMgr.update(bean2);
+			}
+			
 			// have to commit the transaction before sending. This may
 			// get changed when WS-AT is available.
 			if(transaction != null) {
@@ -269,7 +277,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					.retrieve(senderBean.getMessageID());
 			if (bean1 != null) {
 				if (senderBean.isReSend()) {
-					bean1.setSentCount(senderBean.getSentCount());
 					bean1.setTimeToSend(senderBean.getTimeToSend());
 					senderBeanMgr.update(bean1);
 				} else {

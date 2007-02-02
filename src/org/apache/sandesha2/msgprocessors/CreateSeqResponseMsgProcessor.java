@@ -26,7 +26,6 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -198,7 +197,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 				//Most probably this is a sync response message, using the replyTo of the request message
 				OperationContext operationContext = createSeqResponseRMMsgCtx.getMessageContext().getOperationContext();
 				if (operationContext!=null) {
-					MessageContext createSequnceMessage = operationContext.getMessageContext(OperationContextFactory.MESSAGE_LABEL_OUT_VALUE);
+					MessageContext createSequnceMessage = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
 					if (createSequnceMessage!=null)
 						toEPR = createSequnceMessage.getReplyTo();
 				}

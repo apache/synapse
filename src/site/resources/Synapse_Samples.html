@@ -633,6 +633,11 @@ messages</strong></p>
 Download and copy the BouncyCastle JAR file into your Synapse lib directory.
 (Note: the exact JAR you need to install depends on your JDK - for JDK 1.4 I
 have used bcprov-jdk13-132.jar)<br>
+<p>To use the Apache Rampart module, you would also need to ensure that
+Xerces has been made available in the Synapse lib directory (e.g.
+xercesImpl-2.8.1.jar). You may also need the unlimited strength JDK policy
+files for your JDK to be installed (e.g. see
+http://java.sun.com/j2se/1.4.2/download.html)</p>    
 Start the Synapse configuration numbered 50: i.e. synapse -sample 50<br>
 Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
 modules directory of the sample Axis2 server

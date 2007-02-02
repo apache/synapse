@@ -143,8 +143,6 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 	 */
 	public void testInvalidAcknowledgementFromBeanNotSentSOAPFault() throws Exception {
 		
-		org.apache.log4j.BasicConfigurator.configure();
-		
 		// Create an RMS on the service.
 		StorageManager storageManager = 
 			SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());
@@ -276,4 +274,5 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		return bean;
 	}
 }
+
 

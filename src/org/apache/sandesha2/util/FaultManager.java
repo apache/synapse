@@ -296,7 +296,7 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::makeCreateSequenceRefusedFault, " + detail);
 		
-		// Return an UnknownSequence error
+		// Return a CreateSequenceRefused error
 		MessageContext messageContext = rmMessageContext.getMessageContext();
 
 		int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
@@ -541,5 +541,49 @@ public class FaultManager {
 
 		return axisFault;
 	}
+
+	/** 
+	 * Checks to see if the message number received is == to the Long.MAX_VALUE
+	 * 
+	 * Throws and AxisFault, or sends a Fault message if the condition is met.
+	 * @throws AxisFault 
+	 */
+	public static boolean checkForMessageRolledOver(RMMsgContext rmMessageContext, String sequenceId, long msgNo)
+	
+	throws AxisFault {
+		if (msgNo == Long.MAX_VALUE) {
+			if (log.isDebugEnabled()) 
+				log.debug("Max message number reached " + msgNo);
+			// Return a CreateSequenceRefused error
+			MessageContext messageContext = rmMessageContext.getMessageContext();
+
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(messageContext.getEnvelope());
+
+			FaultData data = new FaultData();
+			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER);
+
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
+					rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			identifierElement.setText(sequenceId);
+			
+			OMElement maxMsgNumber = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MAX_MSG_NUMBER,
+					rmMessageContext.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			maxMsgNumber.setText(Long.toString(msgNo));
+			
+			data.setDetail(identifierElement);
+			data.setDetail2(maxMsgNumber);
+
+			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.messageNumberRollover));
+			
+			data.setType(Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER);
+
+			getOrSendFault(rmMessageContext, data);
+			
+			return true;
+		}
+	  return false;
+  }
 
 }

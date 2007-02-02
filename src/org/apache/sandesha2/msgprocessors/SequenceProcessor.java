@@ -124,6 +124,7 @@ public class SequenceProcessor {
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
 			return InvocationResponse.ABORT;
 		}
+		
 
 		// setting mustUnderstand to false.
 		sequence.setMustUnderstand(false);
@@ -132,8 +133,17 @@ public class SequenceProcessor {
 		// throwing a fault if the sequence is closed.
 		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean);
 		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
-
+		
 		long msgNo = sequence.getMessageNumber().getMessageNumber();
+		
+		if (FaultManager.checkForMessageRolledOver(rmMsgCtx, sequenceId, msgNo)) {
+			
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, Message rolled over " + msgNo);
+			
+			return InvocationResponse.ABORT;
+		}
+
 		if (msgNo == 0) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
 					.toString(msgNo));

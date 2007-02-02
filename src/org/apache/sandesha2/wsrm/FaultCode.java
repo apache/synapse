@@ -41,6 +41,8 @@ public class FaultCode implements IOMRMElement {
 	private String detail;
 	
 	private OMElement detailOMElement;
+
+	private OMElement extendedDetailOMElement;
 	
 	public FaultCode(String namespaceValue) throws SandeshaException {
 		if (!isNamespaceSupported(namespaceValue))
@@ -113,6 +115,10 @@ public class FaultCode implements IOMRMElement {
 		if (detail != null)
 			detailElement.setText(detail);
 		
+		if (extendedDetailOMElement != null) {
+			detailElement.addChild(extendedDetailOMElement);
+		}
+		
 		sequenceFault.addChild(detailElement);
 		
 		return sequenceFault;
@@ -142,6 +148,14 @@ public class FaultCode implements IOMRMElement {
     	this.detailOMElement = detailOMElement;
     }
 
+  	public void setExtendedDetailOMElement(OMElement detail2) {
+    	this.extendedDetailOMElement = detail2;
+    }
+
+  	public OMElement getExtendedDetailOMElement() {
+    	return extendedDetailOMElement;
+    }
+ 		
 	public boolean isNamespaceSupported (String namespaceName) {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
@@ -151,5 +165,6 @@ public class FaultCode implements IOMRMElement {
 		
 		return false;
 	}
+
 
 }

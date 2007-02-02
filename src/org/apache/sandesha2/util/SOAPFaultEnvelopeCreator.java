@@ -90,11 +90,11 @@ public class SOAPFaultEnvelopeCreator {
 
 		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED)
 			sequenceFault = true;
-
-		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE)
+		else if (faultType == Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE)
 			sequenceFault = true;
-
-		if (faultType == Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT)
+		else if (faultType == Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT)
+			sequenceFault = true;
+		else if (faultType == Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER)
 			sequenceFault = true;
 
 		return sequenceFault;
@@ -118,8 +118,10 @@ public class SOAPFaultEnvelopeCreator {
 		faultCode.setFaultCode(faultData.getSubcode());
 		if (faultData.getDetailString() != null)
 			faultCode.setDetail(faultData.getDetailString());
-		else
+		else {
 			faultCode.setDetailOMElement(faultData.getDetail());
+			faultCode.setExtendedDetailOMElement(faultData.getDetail2());
+		}
 		sequenceFault.setFaultCode(faultCode);
 		
 		sequenceFault.toOMElement(faultMessageContext.getEnvelope().getHeader());

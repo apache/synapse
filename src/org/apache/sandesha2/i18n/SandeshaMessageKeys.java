@@ -290,5 +290,6 @@ public class SandeshaMessageKeys {
 	
 	public final static String createSequenceRefused = "createSequenceRefused";
 	public final static String referencedMessageNotFound = "referencedMessageNotFound";
+	public final static String messageNumberRollover = "messageNumberRollover";
 
 }

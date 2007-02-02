@@ -156,6 +156,8 @@ public interface Sandesha2Constants {
 
 		String IDENTIFIER = "Identifier";
 
+		String MAX_MSG_NUMBER = "MaxMessageNumber";
+
 		String ACCEPT = "Accept";
 		
 		String NONE = "None";

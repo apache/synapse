@@ -59,6 +59,12 @@ public class SenderBean extends RMBean {
 	private String toAddress;
 	
 	/**
+	 * If this sender bean is handling a response message, then we record the sequence id
+	 * of the inbound message that generated this response.
+	 */
+	private String inboundSequence;
+	
+	/**
 	 * Comment for <code>send</code>
 	 * The sender will not send the message unless this property is true.
 	 */
@@ -101,6 +107,12 @@ public class SenderBean extends RMBean {
 	private boolean lastMessage = false;
 	
 	/**
+	 * If this sender bean is handling a response message, then we record the message number
+	 * of the inbound message that generated this response.
+	 */
+	private long inboundMessageNumber;
+	
+	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
 	 * be ignored within the match method.
@@ -113,6 +125,7 @@ public class SenderBean extends RMBean {
 	private static final int TIME_TO_SEND_FLAG = 0x00010000;
 	private static final int MSG_TYPE_FLAG     = 0x00100000;
 	private static final int LAST_MSG_FLAG     = 0x01000000;
+	private static final int IN_MSG_NUM_FLAG   = 0x10000000;
 
 	public SenderBean() {
 
@@ -232,6 +245,23 @@ public class SenderBean extends RMBean {
 		this.flags |= LAST_MSG_FLAG;
 	}
 	
+	public long getInboundMessageNumber() {
+		return inboundMessageNumber;
+	}
+
+	public void setInboundMessageNumber(long inboundMessageNumber) {
+		this.inboundMessageNumber = inboundMessageNumber;
+		this.flags |= IN_MSG_NUM_FLAG;
+	}
+
+	public String getInboundSequenceId() {
+		return inboundSequence;
+	}
+
+	public void setInboundSequenceId(String inboundSequence) {
+		this.inboundSequence = inboundSequence;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		// There is a lot of data in this bean, so we don't trace it all.
@@ -266,6 +296,9 @@ public class SenderBean extends RMBean {
 
 		else if(bean.getToAddress() != null && !bean.getToAddress().equals(this.getToAddress()))
 			match = false;
+
+		else if(bean.getInboundSequenceId() != null && !bean.getInboundSequenceId().equals(this.getInboundSequenceId()))
+			match = false;
 		
 		else if((bean.flags & SEND_FLAG) != 0 && bean.isSend() != this.isSend())
 			match = false;
@@ -287,6 +320,9 @@ public class SenderBean extends RMBean {
 			match = false;
 		
 		else if((bean.flags & LAST_MSG_FLAG) != 0 && bean.isLastMessage() != this.isLastMessage())
+			match = false;
+
+		else if((bean.flags & IN_MSG_NUM_FLAG) != 0 && bean.getInboundMessageNumber() != this.getInboundMessageNumber())
 			match = false;
 
 		return match;

@@ -481,8 +481,6 @@ public interface Sandesha2Constants {
 	
 	static final String MSG_NO_OF_IN_MSG = "MsgNoOfInMsg";
 	
-	static final String DUPLICATE_MESSAGE = "DuplicateMessage";
-	
 	static final String MAKE_CONNECTION_RESPONSE = "MakeConnectionResponse";
 	
 	//In RM 1.1 AnonRMURI case we may not be terminating a request sequence unless the response side create sequence 

@@ -66,13 +66,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	private static final Log log = LogFactory.getLog(ApplicationMsgProcessor.class);
 
 	private String inboundSequence = null;
+	private long   inboundMessageNumber;
 	
 	public ApplicationMsgProcessor() {
 		// Nothing to do
 	}
 	
-	public ApplicationMsgProcessor(String inboundSequenceId) {
+	public ApplicationMsgProcessor(String inboundSequenceId, long inboundMessageNumber) {
 		this.inboundSequence = inboundSequenceId;
+		this.inboundMessageNumber = inboundMessageNumber;
 	}
 	
 	public boolean processInMessage(RMMsgContext rmMsgCtx) {
@@ -634,6 +636,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		appMsgEntry.setMessageNumber(messageNumber);
 		appMsgEntry.setLastMessage(lastMessage);
 		appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+		appMsgEntry.setInboundSequenceId(inboundSequence);
+		appMsgEntry.setInboundMessageNumber(inboundMessageNumber);
 		if (outSequenceID == null) {
 			appMsgEntry.setSend(false);
 		} else {

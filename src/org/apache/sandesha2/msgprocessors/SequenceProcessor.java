@@ -17,9 +17,6 @@
 
 package org.apache.sandesha2.msgprocessors;
 
-import java.util.Iterator;
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -29,9 +26,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,14 +41,10 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
-import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
@@ -162,97 +153,8 @@ public class SequenceProcessor {
 			bean.setLastInMessageId(msgCtx.getMessageID());
 		}
 		
-		//Check weather this is a duplicate message. Normally duplicate messages get dropped at the SandeshaGlobalInHandler
-		//But they can reach here if they belonged to the WSRM 1.0 Anonymous InOut Scenario
 		EndpointReference replyTo = rmMsgCtx.getReplyTo();
-		String specVersion = rmMsgCtx.getRMSpecVersion();
-		Boolean duplicateMessage = (Boolean) rmMsgCtx.getProperty(Sandesha2Constants.DUPLICATE_MESSAGE);
 		String mep = msgCtx.getAxisOperation().getMessageExchangePattern();
-		boolean syncReply = replyTo == null || replyTo.hasAnonymousAddress();
-		
-		if (syncReply && !WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep) && 
-			(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) &&
-			(duplicateMessage!=null && duplicateMessage.equals(Boolean.TRUE))){
-			
-		    String outgoingSideInternalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(sequenceId);
-		    RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, outgoingSideInternalSequenceId);
-		    if (rmsBean==null) {
-		    	String message = "Cannot find a entries for the response side sequence";
-		    	throw new SandeshaException (message);
-		    }
-		    
-		    String outgoingSideSequenceId = rmsBean.getSequenceID();
-		    if (outgoingSideSequenceId==null) {
-		    	String message = "Outgoing side SequenceId has not been set";
-		    	throw new SandeshaException (message);
-		    }
-		    
-		    SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
-		    SenderBean findSenderBean = new SenderBean ();
-		    findSenderBean.setSequenceID(outgoingSideSequenceId);
-		    findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
-		    findSenderBean.setSend(true);
-		    
-		    List senderBeanList = senderBeanMgr.find(findSenderBean);
-		    for (Iterator it=senderBeanList.iterator();it.hasNext();) {
-		    	SenderBean senderBean = (SenderBean) it.next();
-		    	String messageContextKey = senderBean.getMessageContextRefKey();
-		    	MessageContext outMessageContext = storageManager.retrieveMessageContext(messageContextKey, configCtx);
-		    	
-		    	Long msgNoOfInMsg = (Long) outMessageContext.getProperty(Sandesha2Constants.MSG_NO_OF_IN_MSG);
-		    	if (msgNoOfInMsg == null) {
-					MessageContext inMsgContextOfOutMessage = outMessageContext.getOperationContext()
-															  .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					RMMsgContext inRMMsgContextOfOutMessage = MsgInitializer.initializeMessage(inMsgContextOfOutMessage);
-
-					if (inMsgContextOfOutMessage != null) {
-						Sequence sequenceOfInMsg = (Sequence) inRMMsgContextOfOutMessage.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-						if (sequenceOfInMsg == null) {
-							String message = "Sender has an invalid application message. No sequence part";
-							throw new SandeshaException(message);
-						}
-
-						long lng = sequenceOfInMsg.getMessageNumber().getMessageNumber();
-						msgNoOfInMsg = new Long(lng);
-						outMessageContext.setProperty(Sandesha2Constants.MSG_NO_OF_IN_MSG, msgNoOfInMsg);
-
-						// storing again will make sure that this new property get persisted.
-						storageManager.storeMessageContext(messageContextKey, outMessageContext);
-					}
-				}
-		    	
-		    	if (msgNoOfInMsg != null) {
-					
-					//if this message has being processed before, attaching the previous response instead of invoking it again.
-					if (msgNoOfInMsg.longValue()==sequence.getMessageNumber().getMessageNumber()) {
-						OperationContext operationContext = msgCtx.getOperationContext();
-						operationContext.addMessageContext(outMessageContext);
-						
-						outMessageContext.setOperationContext(operationContext);
-						outMessageContext.setProperty(MessageContext.TRANSPORT_OUT, msgCtx.getProperty(MessageContext.TRANSPORT_OUT));
-						
-						// pausing the thread, causing the transport to wait.
-						// Sender will send the outMessage correctly, using
-						// RequestResponseTransportListner.
-						
-						result = InvocationResponse.SUSPEND;
-						if (log.isDebugEnabled())
-							log.debug("Exit: SequenceProcessor::processReliableMessage" + result);
-						return result;
-					}
-				}
-		    }
-
-		    String message = "Cant process the message. Cant find a suitable out message context for the duplicate message";
-			throw new SandeshaException (message);
-		    
-		} else if (duplicateMessage!=null && duplicateMessage.equals(Boolean.TRUE)) {
-			// Abort processing this duplicate
-			result = InvocationResponse.ABORT;
-			if (log.isDebugEnabled())
-				log.debug("Exit: SequenceProcessor::processReliableMessage, dropping duplicate: " + result);
-			return result;
-		}		
 		
 		String key = SandeshaUtil.getUUID(); // key to store the message.
 		// updating the Highest_In_Msg_No property which gives the highest

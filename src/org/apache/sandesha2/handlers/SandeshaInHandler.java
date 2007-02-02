@@ -24,8 +24,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.transport.RequestResponseTransport;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.MessageValidator;
@@ -224,19 +222,8 @@ public class SandeshaInHandler extends AbstractHandler {
 				String acksToAddress = rmdBean.getAcksToEPR();
 				
 				EndpointReference acksTo = new EndpointReference (acksToAddress);
-				EndpointReference replyTo = msgContext.getReplyTo();
 				
-				String mep = msgContext.getAxisOperation().getMessageExchangePattern();
-				String specVersion = rmMsgContext.getRMSpecVersion();
-				
-				if (replyTo!=null && replyTo.hasAnonymousAddress() && 
-					!WSDL20_2004Constants.MEP_URI_IN_ONLY.equals(mep)){
-					
-					//for RM 1.0 this is done to attach a sync response using the RequestResponseTransport
-					if (specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0))
-						msgContext.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
-					
-				} else if (acksTo!=null && acksTo.hasAnonymousAddress()) {
+				if (acksTo!=null && acksTo.hasAnonymousAddress()) {
 					
 					Object responseWritten = msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
 					if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {

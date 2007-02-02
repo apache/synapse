@@ -104,28 +104,40 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
 			return false;
 		}
-			
-		TransportOutDescription transportOut = rmMsgCtx.getMessageContext().getTransportOut();
+		
+		replyToPoll(rmMsgCtx, senderBean, storageManager, pending, makeConnection.getNamespaceValue());
+		
+		return false;
+	}
+	
+	public static void replyToPoll(RMMsgContext pollMessage,
+			SenderBean matchingMessage,
+			StorageManager storageManager,
+			boolean pending,
+			String namespace)
+	throws AxisFault
+	{
+		TransportOutDescription transportOut = pollMessage.getMessageContext().getTransportOut();
 		if (transportOut==null) {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.cantSendMakeConnectionNoTransportOut);
 			throw new SandeshaException (message);
 		}
 			
-		String messageStorageKey = senderBean.getMessageContextRefKey();
-		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,configurationContext);
+		String messageStorageKey = matchingMessage.getMessageContextRefKey();
+		MessageContext returnMessage = storageManager.retrieveMessageContext(messageStorageKey,pollMessage.getConfigurationContext());
 		if (returnMessage==null) {
 			String message = "Cannot find the message stored with the key:" + messageStorageKey;
 			throw new SandeshaException (message);
 		}
 		
-		if(pending) addMessagePendingHeader(returnMessage, makeConnection.getNamespaceValue());
+		if(pending) addMessagePendingHeader(returnMessage, namespace);
 		
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
-		setTransportProperties (returnMessage, rmMsgCtx);
+		setTransportProperties (returnMessage, pollMessage);
 		
 		// Link the response to the request
-		OperationContext context = rmMsgCtx.getMessageContext().getOperationContext();
+		OperationContext context = pollMessage.getMessageContext().getOperationContext();
 		context.addMessageContext(returnMessage);
 		returnMessage.setOperationContext(context);
 		
@@ -135,15 +147,13 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//	1. A message being sent by the Sender thread.
 		//  2. A message being sent as a reply to an MakeConnection.
-		SenderWorker worker = new SenderWorker (configurationContext, senderBean);
+		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage);
 		worker.setMessage(returnRMMsg);
 
 		worker.run();
-		
-		return false;
 	}
 	
-	private void addMessagePendingHeader (MessageContext returnMessage, String namespace) throws SandeshaException {
+	private static void addMessagePendingHeader (MessageContext returnMessage, String namespace) throws SandeshaException {
 		MessagePending messagePending = new MessagePending(namespace);
 		messagePending.setPending(true);
 		messagePending.toSOAPEnvelope(returnMessage.getEnvelope());
@@ -153,7 +163,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		return false;
 	}
 
-	private void setTransportProperties (MessageContext returnMessage, RMMsgContext makeConnectionMessage) {
+	private static void setTransportProperties (MessageContext returnMessage, RMMsgContext makeConnectionMessage) {
         returnMessage.setProperty(MessageContext.TRANSPORT_OUT,makeConnectionMessage.getProperty(MessageContext.TRANSPORT_OUT));
         returnMessage.setProperty(Constants.OUT_TRANSPORT_INFO,makeConnectionMessage.getProperty(Constants.OUT_TRANSPORT_INFO));
         

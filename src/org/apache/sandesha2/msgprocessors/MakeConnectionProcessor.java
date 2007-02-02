@@ -119,10 +119,9 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			throw new SandeshaException (message);
 		}
 		
+		if(pending) addMessagePendingHeader(returnMessage, makeConnection.getNamespaceValue());
+		
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
-		
-		if(pending) addMessagePendingHeader (returnRMMsg,pending);
-		
 		setTransportProperties (returnMessage, rmMsgCtx);
 		
 		// Link the response to the request
@@ -144,13 +143,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		return false;
 	}
 	
-	private void addMessagePendingHeader (RMMsgContext returnMessage, boolean pending) throws SandeshaException {
-		String rmNamespace = returnMessage.getRMNamespaceValue();
-		MessagePending messagePending = new MessagePending (rmNamespace);
-		messagePending.setPending(pending);
-		
-		messagePending.toSOAPEnvelope(returnMessage.getSOAPEnvelope());
-		
+	private void addMessagePendingHeader (MessageContext returnMessage, String namespace) throws SandeshaException {
+		MessagePending messagePending = new MessagePending(namespace);
+		messagePending.setPending(true);
+		messagePending.toSOAPEnvelope(returnMessage.getEnvelope());
 	}
 
 	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {

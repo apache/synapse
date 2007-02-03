@@ -20,24 +20,29 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.OutputStreamWriter;
+import java.util.*;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.InetAddress;
 
 /**
  * Processes an incoming request through Axis2. An instance of this class would be created to
@@ -63,7 +68,11 @@ public class ServerWorker implements Runnable {
     private InputStream is = null;
     /** the output stream to write the response message body */
     private OutputStream os = null;
-    private static final String SOAPACTION = "SOAPAction";
+    private static final String SOAPACTION   = "SOAPAction";
+    private static final String LOCATION     = "Location";
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String TEXT_HTML    = "text/html";
+    private static final String TEXT_XML     = "text/xml";
 
     /**
      * Create a new server side worker to process an incoming message and optionally begin creating
@@ -138,7 +147,7 @@ public class ServerWorker implements Runnable {
 
         String method = request.getRequestLine().getMethod().toUpperCase();
         if ("GET".equals(method)) {
-            //processGet(response);
+            processGet();
         } else if ("POST".equals(method)) {
             processPost();
         } else {
@@ -165,35 +174,233 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /**
+     *
+     */
+    private void processGet() {
+
+        String uri = request.getRequestLine().getUri();
+
+        String contextPath = cfgCtx.getContextRoot();
+        if (!contextPath.startsWith("/")) {
+            contextPath = "/" + contextPath;
+        }
+        if (!contextPath.endsWith("/")) {
+            contextPath = contextPath + "/";
+        }
+
+        String servicePath = cfgCtx.getServiceContextPath();
+        if (!servicePath.startsWith("/")) {
+            servicePath = "/" + servicePath;
+        }
+
+        String serviceName = null;
+        if (uri.startsWith(servicePath)) {
+            serviceName = uri.substring(servicePath.length());
+            if (serviceName.startsWith("/")) {
+                serviceName = serviceName.substring(1);
+            }
+            if (serviceName.indexOf("?") != -1) {
+                serviceName = serviceName.substring(0, serviceName.indexOf("?"));
+            }
+        }
+
+        Map parameters = new HashMap();
+        int pos = uri.indexOf("?");
+        if (pos != -1) {
+            StringTokenizer st = new StringTokenizer(uri.substring(pos+1), "&");
+            while (st.hasMoreTokens()) {
+                String param = st.nextToken();
+                pos = param.indexOf("=");
+                if (pos != -1) {
+                    parameters.put(param.substring(0, pos), param.substring(pos+1));
+                } else {
+                    parameters.put(param, null);
+                }                
+            }
+        }
+
+        if (uri.equals("/favicon.ico")) {
+            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
+            response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
+            serverHandler.commitResponse(conn,  response);
+
+        } else if (!uri.startsWith(servicePath)) {
+            response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
+            response.addHeader(LOCATION, servicePath + "/");
+            serverHandler.commitResponse(conn, response);
+
+        } else if (serviceName != null && parameters.containsKey("wsdl")) {
+            AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+                getServices().get(serviceName);
+            if (service != null) {
+                try {
+                    response.addHeader(CONTENT_TYPE, TEXT_XML);
+                    serverHandler.commitResponse(conn, response);
+                    service.printWSDL(os, getIpAddress(), contextPath);
+
+                } catch (AxisFault e) {
+                    handleException("Axis2 fault writing ?wsdl output", e);
+                    return;
+                } catch (SocketException e) {
+                    handleException("Error getting ip address for ?wsdl output", e);
+                    return;
+                }
+            }
+
+        } else if (serviceName != null && parameters.containsKey("wsdl2")) {
+            AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+                getServices().get(serviceName);
+            if (service != null) {
+                try {
+                    response.addHeader(CONTENT_TYPE, TEXT_XML);
+                    serverHandler.commitResponse(conn, response);
+                    service.printWSDL2(os, getIpAddress(), contextPath);
+
+                } catch (AxisFault e) {
+                    handleException("Axis2 fault writing ?wsdl2 output", e);
+                    return;
+                } catch (SocketException e) {
+                    handleException("Error getting ip address for ?wsdl2 output", e);
+                    return;
+                }
+            }
+
+        } else if (serviceName != null && parameters.containsKey("xsd")) {
+            if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
+                AxisService service = (AxisService) cfgCtx.getAxisConfiguration()
+                    .getServices().get(serviceName);
+                if (service != null) {
+                    try {
+                        response.addHeader(CONTENT_TYPE, TEXT_XML);
+                        serverHandler.commitResponse(conn, response);
+                        service.printSchema(os);
+
+                    } catch (AxisFault axisFault) {
+                        handleException("Error writing ?xsd output to client", axisFault);
+                        return;
+                    } catch (IOException e) {
+                        handleException("Error writing ?xsd output to client", e);
+                        return;
+                    }
+                }
+
+            } else {
+                //cater for named xsds - check for the xsd name
+                String schemaName = (String) parameters.get("xsd");
+                AxisService service = (AxisService) cfgCtx.getAxisConfiguration()
+                    .getServices().get(serviceName);
+
+                if (service != null) {
+                    //run the population logic just to be sure
+                    service.populateSchemaMappings();
+                    //write out the correct schema
+                    Map schemaTable = service.getSchemaMappingTable();
+                    final XmlSchema schema = (XmlSchema)schemaTable.get(schemaName);
+                    //schema found - write it to the stream
+                    if (schema != null) {
+                        response.addHeader(CONTENT_TYPE, TEXT_XML);
+                        serverHandler.commitResponse(conn, response);
+                        schema.write(os);
+
+                    } else {
+                        // no schema available by that name  - send 404
+                        response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+                    }
+                }
+            }
+
+        } else if (serviceName == null || serviceName.length() == 0) {
+
+            try {
+                response.addHeader(CONTENT_TYPE, TEXT_HTML);
+                serverHandler.commitResponse(conn, response);
+                os.write(HTTPTransportReceiver.getServicesHTML(cfgCtx).getBytes());
+
+            } catch (IOException e) {
+                handleException("Error writing ? output to client", e);
+            }
+
+        } else {
+            if (parameters.isEmpty()) {
+                AxisService service = (AxisService) cfgCtx.getAxisConfiguration().
+                    getServices().get(serviceName);
+                if (service != null) {
+                    try {
+                        response.addHeader(CONTENT_TYPE, TEXT_HTML);
+                        serverHandler.commitResponse(conn, response);
+                        os.write(HTTPTransportReceiver.printServiceHTML(serviceName, cfgCtx).getBytes());
+
+                    } catch (IOException e) {
+                        handleException("Error writing service HTML to client", e);
+                        return;
+                    }
+                } else {
+                    handleException("Invalid service : " + serviceName, null);
+                    return;
+                }
+
+            } else {
+                try {
+                    serverHandler.commitResponse(conn, response);
+                    HTTPTransportUtils.processHTTPGetRequest(
+                            msgContext, os,
+                            (request.getFirstHeader(SOAPACTION) != null ?
+                                    request.getFirstHeader(SOAPACTION).getValue() : null),
+                            request.getRequestLine().getUri(),
+                            cfgCtx,
+                            parameters);
+
+                } catch (AxisFault axisFault) {
+                    handleException("Error processing GET request for: " +
+                            request.getRequestLine().getUri(), axisFault);
+                }
+            }
+        }
+
+        // make sure that the output stream is flushed and closed properly
+        try {
+            os.flush();
+            os.close();
+        } catch (IOException ignore) {}
+    }
+
+
     private void handleException(String msg, Exception e) {
 
-        log.error(msg, e);
-        if (conn != null) {
-            try {
-                conn.shutdown();
-            } catch (IOException ignore) {}
+        if (e == null) {
+            log.error(msg);
+        } else {
+            log.error(msg, e);
         }
-        /*try {
+
+        if (e == null) {
+            e = new Exception(msg);
+        }
+        
+        try {
             AxisEngine engine = new AxisEngine(cfgCtx);
-            msgContext.setProperty(MessageContext.TRANSPORT_OUT, response.getOutputStream());
-            msgContext.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO, response.getOutputStream());
             MessageContext faultContext = engine.createFaultMessageContext(msgContext, e);
             engine.sendFault(faultContext);
 
         } catch (Exception ex) {
-            response.addHeader(Constants.CONTENT_TYPE, Constants.TEXT_PLAIN);
-            OutputStreamWriter out = new OutputStreamWriter(
-                response.getOutputStream());
+            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            response.addHeader(CONTENT_TYPE, TEXT_XML);
+            serverHandler.commitResponse(conn, response);
+            
             try {
-                out.write(ex.getMessage());
-                out.close();
-            } catch (IOException ee) {
-            }
+                os.write(msg.getBytes());
+                if (ex != null) {
+                    os.write(ex.getMessage().getBytes());
+                }
+            } catch (IOException ignore) {}
 
-        } finally {
-            response.setStatus(ResponseStatus.INTERNAL_SERVER_ERROR);
-            response.commit();
-        }*/
+            if (conn != null) {
+                try {
+                    conn.shutdown();
+                } catch (IOException ignore) {}
+            }
+        }
     }
 
 
@@ -215,5 +422,44 @@ public class ServerWorker implements Runnable {
 
     public NHttpServerConnection getConn() {
         return conn;
+    }
+
+    /**
+     * Copied from transport.http of Axis2
+     *
+     * Returns the ip address to be used for the replyto epr
+     * CAUTION:
+     * This will go through all the available network interfaces and will try to return an ip address.
+     * First this will try to get the first IP which is not loopback address (127.0.0.1). If none is found
+     * then this will return this will return 127.0.0.1.
+     * This will <b>not<b> consider IPv6 addresses.
+     * <p/>
+     * TODO:
+     * - Improve this logic to genaralize it a bit more
+     * - Obtain the ip to be used here from the Call API
+     *
+     * @return Returns String.
+     * @throws java.net.SocketException
+     */
+    private static String getIpAddress() throws SocketException {
+        Enumeration e = NetworkInterface.getNetworkInterfaces();
+        String address = "127.0.0.1";
+
+        while (e.hasMoreElements()) {
+            NetworkInterface netface = (NetworkInterface) e.nextElement();
+            Enumeration addresses = netface.getInetAddresses();
+
+            while (addresses.hasMoreElements()) {
+                InetAddress ip = (InetAddress) addresses.nextElement();
+                if (!ip.isLoopbackAddress() && isIP(ip.getHostAddress())) {
+                    return ip.getHostAddress();
+                }
+            }
+        }
+        return address;
+    }
+
+    private static boolean isIP(String hostAddress) {
+        return hostAddress.split("[.]").length == 4;
     }
 }

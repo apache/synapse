@@ -124,7 +124,7 @@ public class HttpCoreNIOListener implements TransportListener {
         }
 
         serviceEPRPrefix = "http://" + host + (port == 80 ? "" : ":" + port) +
-            cfgCtx.getServiceContextPath() + "/";
+            "/" + cfgCtx.getServiceContextPath() + "/";
     }
 
     /**

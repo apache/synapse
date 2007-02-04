@@ -19,6 +19,7 @@ package org.apache.sandesha2;
 
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -31,21 +32,24 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
  */
 public class MessageValidator {
 
-	public static void validateMessage(RMMsgContext rmMsg, StorageManager storageManager) throws SandeshaException {
+	public static void validateMessage(RMMsgContext rmMsg,
+			StorageManager storageManager) throws SandeshaException {
 
-		if (rmMsg.getMessageType() != Sandesha2Constants.MessageTypes.CREATE_SEQ
-				&& rmMsg.getMessageType() != Sandesha2Constants.MessageTypes.UNKNOWN) {
+		int type = rmMsg.getMessageType();
+		if (type != Sandesha2Constants.MessageTypes.CREATE_SEQ	&& type != Sandesha2Constants.MessageTypes.UNKNOWN) {
 
 			String sequenceID = SandeshaUtil.getSequenceIDFromRMMessage(rmMsg);
 
 			if (sequenceID != null) {
 				String rmVersionOfSequence = null;
-				
-				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
+
+				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(
+						storageManager, sequenceID);
 				if (rmsBean != null)
 					rmVersionOfSequence = rmsBean.getRMVersion();
 				else {
-					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
+					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(
+							storageManager, sequenceID);
 					if (rmdBean != null)
 						rmVersionOfSequence = rmdBean.getRMVersion();
 				}
@@ -53,16 +57,38 @@ public class MessageValidator {
 				String rmNamespaceOfMsg = rmMsg.getRMNamespaceValue();
 				String rmNamespaceOfSequence = null;
 				if (rmVersionOfSequence != null)
-					rmNamespaceOfSequence = SpecSpecificConstants.getRMNamespaceValue(rmVersionOfSequence);
+					rmNamespaceOfSequence = SpecSpecificConstants
+							.getRMNamespaceValue(rmVersionOfSequence);
 
-				if (rmNamespaceOfSequence != null && !rmNamespaceOfSequence.equals(rmNamespaceOfMsg)) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rmNamespaceNotMatchSequence,
-							rmNamespaceOfMsg, rmNamespaceOfSequence, sequenceID);
+				if (rmNamespaceOfSequence != null
+						&& !rmNamespaceOfSequence.equals(rmNamespaceOfMsg)) {
+					String message = SandeshaMessageHelper
+							.getMessage(
+									SandeshaMessageKeys.rmNamespaceNotMatchSequence,
+									rmNamespaceOfMsg, rmNamespaceOfSequence,
+									sequenceID);
 					throw new SandeshaException(message);
 				}
 
-				// TODO do validation based on states
+			}
+		} else if (type == Sandesha2Constants.MessageTypes.UNKNOWN) {
+
+			// checking if policies hv been set to enforceRM.
+			// If this is set and this message is not an RM message, validation
+			// will fail here.
+
+			SandeshaPolicyBean propertyBean = SandeshaUtil
+					.getPropertyBean(rmMsg.getMessageContext()
+							.getAxisOperation());
+			if (propertyBean.isEnforceRM()) {
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.rmEnforceFailure, rmMsg
+								.getMessageId());
+				throw new SandeshaException(message);
 			}
 		}
+
+		// TODO do validation based on states
+		
 	}
 }

@@ -24,16 +24,22 @@
         <outputActionMapping>urn:wsrm:EchoStringResponse</outputActionMapping>
     </operation>
        
-<!--    <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />-->
+   <!--     
+   <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />
 
-<!--	<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
-		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-	    xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
-	        
-	    <!-#- Following policy value has been overrided from the default values.-#->> 
-	    <wsrm:AcknowledgementInterval>3500</wsrm:AcknowledgementInterval>
-	   
-	</wsp:Policy>-->
+	<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+			xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+			xmlns:sandesha2="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+			
+		<sandesha2:RMAssertion>
+			<wsp:Policy>
+				<sandesha2:AcknowledgementInterval>4000</sandesha2:AcknowledgementInterval>
+				<sandesha2:EnforceRM>true</sandesha2:EnforceRM>
+			</wsp:Policy>
+		</sandesha2:RMAssertion>
+		
+	</wsp:Policy>
+	 -->
     
     
 </service>

@@ -46,17 +46,17 @@ public class PropertyLoaderTest extends TestCase {
 		
 	}
 	
-	public void testRetransmissionInterval () {
+	public void testRetransmissionInterval () throws SandeshaException {
 		long value = propertyBean.getRetransmissionInterval();
 		assertEquals(value,20000);
 	}
 	
-	public void testExponentialBackOff () {
+	public void testExponentialBackOff () throws SandeshaException {
 		boolean value = propertyBean.isExponentialBackoff();
 		assertEquals(value,false);
 	}
 	
-	public void testAcknowledgementInterval () {
+	public void testAcknowledgementInterval () throws SandeshaException {
 		long value = propertyBean.getAcknowledgementInterval();
 		assertEquals(value,8000);
 	}

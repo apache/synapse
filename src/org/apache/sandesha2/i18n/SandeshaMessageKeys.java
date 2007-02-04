@@ -298,5 +298,6 @@ public class SandeshaMessageKeys {
 	public final static String cloneDoesNotMatchToOriginal = "cloneDoesNotMatchToOriginal";
 	public final static String exceptionInFlowCompletion = "exceptionInFlowCompletion";
 	public final static String rmdBeanNotFound = "rmdBeanNotFound";
-
+	public final static String rmEnforceFailure = "rmEnforceFailure";
+	public final static String policyHasNotBeenSet = "policyHasNotBeenSet";
 }

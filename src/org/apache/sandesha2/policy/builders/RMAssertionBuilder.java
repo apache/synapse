@@ -151,6 +151,9 @@ public class RMAssertionBuilder implements AssertionBuilder {
             } else if (Sandesha2Constants.Assertions.ELEM_USE_SERIALIZATION.equals(name)) {
             	String value = element.getText().trim();
             	propertyBean.setUseMessageSerialization(Boolean.valueOf(value).booleanValue());
+            } else if (Sandesha2Constants.Assertions.ELEM_ENFORCE_RM.equals(name)) {
+            	String value = element.getText().trim();
+            	propertyBean.setEnforceRM (Boolean.valueOf(value).booleanValue());
             }
         }
     }

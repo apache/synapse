@@ -117,6 +117,8 @@
 				</sandesha2:MakeConnection>
 				
 				<!-- <sandesha2:UseMessageSerialization>true</sandesha2:UseMessageSerialization> -->
+				
+				<sandesha2:EnforceRM>false</sandesha2:EnforceRM>
 			</wsp:Policy>
 		</sandesha2:RMAssertion>
 	</wsp:Policy>

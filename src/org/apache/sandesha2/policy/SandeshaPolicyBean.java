@@ -27,6 +27,9 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 /**
  * Used to hold peoperties loaded from sandesha2.properties file or
@@ -35,9 +38,12 @@ import org.apache.sandesha2.Sandesha2Constants;
 
 public class SandeshaPolicyBean implements Assertion {
 
+	private SandeshaPolicyBean parent = null;
+	
     // String storageManagerClass = null;
     boolean inOrder = true;
-
+    private boolean inOrderSet = false;
+    
     ArrayList msgTypesToDrop = null;
 
     private String inMemoryStorageManagerClass = null;
@@ -47,26 +53,38 @@ public class SandeshaPolicyBean implements Assertion {
     private String securityManagerClass = null;
 
     private long inactiveTimeoutValue;
-
+    private boolean inactiveTimeoutValueSet = false;
+    
     private String inactivityTimeoutMeasure;
 
     private long inactivityTimeoutInterval = -1;
-
+    private boolean inactivityTimeoutIntervalSet = false;
+    
     private long acknowledgementInterval;
-
+    private boolean acknowledgementIntervalSet = false;
+    
     private long retransmissionInterval;
-
+    private boolean retransmissionIntervalSet = false;
+    
     private boolean exponentialBackoff;
-
+    private boolean exponentialBackoffSet = false;
+    
     private int maximumRetransmissionCount;
+    private boolean maximumRetransmissionCountSet = false;
     
     private boolean enableMakeConnection;
+    private boolean enableMakeConnectionSet = false;
     
     private boolean enableRMAnonURI;
+    private boolean enableRMAnonURISet = false;
     
     private boolean useMessageSerialization;
-
-    public void setInactiveTimeoutInterval(long value, String measure) {
+    private boolean useMessageSerializationSet = false;
+    
+    private boolean enforceRM;
+    private boolean enforceRMSet = false;
+    
+	public void setInactiveTimeoutInterval(long value, String measure) {
         long timeOut = -1;
 
         if (measure == null) {
@@ -87,6 +105,7 @@ public class SandeshaPolicyBean implements Assertion {
 
     public void setAcknowledgementInterval(long acknowledgementInterval) {
         this.acknowledgementInterval = acknowledgementInterval;
+        setAcknowledgementIntervalSet(true);
     }
 
     public String getInMemoryStorageManagerClass() {
@@ -113,6 +132,7 @@ public class SandeshaPolicyBean implements Assertion {
 
     public void setInOrder(boolean inOrder) {
         this.inOrder = inOrder;
+        setInOrderSet(true);
     }
 
     public ArrayList getMsgTypesToDrop() {
@@ -133,12 +153,22 @@ public class SandeshaPolicyBean implements Assertion {
         }
     }
 
-    public int getMaximumRetransmissionCount() {
-        return maximumRetransmissionCount;
+    public int getMaximumRetransmissionCount() throws SandeshaException {
+    	
+    	if (isMaximumRetransmissionCountSet()) {
+    		return maximumRetransmissionCount;
+    	} else if (parent!=null) {
+    		return parent.getMaximumRetransmissionCount();
+    	} else {
+    		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyHasNotBeenSet, Sandesha2Constants.Assertions.ELEM_MAX_RETRANS_COUNT);
+    		throw new SandeshaException (message);
+    	}
+    	
     }
 
     public void setMaximumRetransmissionCount(int maximumRetransmissionCount) {
         this.maximumRetransmissionCount = maximumRetransmissionCount;
+        setMaximumRetransmissionCountSet(true);
     }
 
     public String getSecurityManagerClass() {
@@ -162,126 +192,133 @@ public class SandeshaPolicyBean implements Assertion {
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
-                .getLocalPart();
-        String namespaceURI = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
-                .getNamespaceURI();
+        try {
+			String localName = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
+			        .getLocalPart();
+			String namespaceURI = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
+			        .getNamespaceURI();
 
-        String prefix = writer.getPrefix(namespaceURI);
-        if (prefix == null) {
-            prefix = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
-                    .getPrefix();
-            writer.setPrefix(prefix, namespaceURI);
-        }
+			String prefix = writer.getPrefix(namespaceURI);
+			if (prefix == null) {
+			    prefix = Sandesha2Constants.Assertions.Q_ELEM_RMASSERTION
+			            .getPrefix();
+			    writer.setPrefix(prefix, namespaceURI);
+			}
 
-        // <wsrm:RMAssertion>
-        writer.writeStartElement(prefix, localName, namespaceURI);
-        // xmlns:wsrm=".."
-        writer.writeNamespace(prefix, namespaceURI);
+			// <wsrm:RMAssertion>
+			writer.writeStartElement(prefix, localName, namespaceURI);
+			// xmlns:wsrm=".."
+			writer.writeNamespace(prefix, namespaceURI);
 
-        String policyLocalName = Sandesha2Constants.Assertions.Q_ELEM_POLICY
-                .getLocalPart();
-        String policyNamespaceURI = Sandesha2Constants.Assertions.Q_ELEM_POLICY
-                .getNamespaceURI();
-        String wspPrefix = writer.getPrefix(policyNamespaceURI);
+			String policyLocalName = Sandesha2Constants.Assertions.Q_ELEM_POLICY
+			        .getLocalPart();
+			String policyNamespaceURI = Sandesha2Constants.Assertions.Q_ELEM_POLICY
+			        .getNamespaceURI();
+			String wspPrefix = writer.getPrefix(policyNamespaceURI);
 
-        if (wspPrefix == null) {
-            wspPrefix = Sandesha2Constants.Assertions.Q_ELEM_POLICY.getPrefix();
-            writer.writeNamespace(wspPrefix, policyNamespaceURI);
-        }
+			if (wspPrefix == null) {
+			    wspPrefix = Sandesha2Constants.Assertions.Q_ELEM_POLICY.getPrefix();
+			    writer.writeNamespace(wspPrefix, policyNamespaceURI);
+			}
 
-        // <wsp:Policy>
-        writer
-                .writeStartElement(wspPrefix, policyLocalName,
-                        policyNamespaceURI);
+			// <wsp:Policy>
+			writer.writeStartElement(wspPrefix, policyLocalName, policyNamespaceURI);
 
-        // <wsrm:AcknowledgementInterval />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_ACK_INTERVAL.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Long.toString(getAcknowledgementInterval()));
-        writer.writeEndElement();
-        
-        // <wsrm:RetransmissionInterval />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_RETRANS_INTERVAL.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Long.toString(getRetransmissionInterval()));
-        writer.writeEndElement();
+			// <wsrm:AcknowledgementInterval />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_ACK_INTERVAL.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Long.toString(getAcknowledgementInterval()));
+			writer.writeEndElement();
+			
+			// <wsrm:RetransmissionInterval />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_RETRANS_INTERVAL.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Long.toString(getRetransmissionInterval()));
+			writer.writeEndElement();
 
-        // <wsrm:MaximumRetransmissionCount />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MAX_RETRANS_COUNT.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Long.toString(getMaximumRetransmissionCount()));
-        writer.writeEndElement();
-        
-        // <wsrm:ExponentialBackoff />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_EXP_BACKOFF.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Boolean.toString(isExponentialBackoff()));
-        writer.writeEndElement();
-        
-        // <wsrm:InactivityTimeout />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Long.toString(getInactivityTimeoutInterval()));
-        writer.writeEndElement();
-        
-        // <wsrm:InactivityTimeoutMeasure />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT_MEASURES.getLocalPart(), namespaceURI);
-        writer.writeCharacters(inactivityTimeoutMeasure);
-        writer.writeEndElement();
-        
-        // <wsrm:InvokeInOrder />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INVOKE_INORDER.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Boolean.toString(isInOrder()));
-        writer.writeEndElement();
-        
-        // <wsrm:MessageTypesToDrop />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MSG_TYPES_TO_DROP.getLocalPart(), namespaceURI);
-        writer.writeCharacters("none"); // FIXME
-        writer.writeEndElement();
-        
-        // <wsrm:StorageManagers>
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_STORAGE_MGR.getLocalPart(), namespaceURI);
-        
-        // <wsrm:InMemoryStorageManager />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INMEMORY_STORAGE_MGR.getLocalPart(), namespaceURI);
-        writer.writeCharacters(getInMemoryStorageManagerClass());
-        writer.writeEndElement();
-        
-        // <wsrm:PermanentStorageManager />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_PERMANENT_STORAGE_MGR.getLocalPart(), namespaceURI);
-        writer.writeCharacters(getPermanentStorageManagerClass());
-        writer.writeEndElement();        
-        
-        // </wsrm:StorageManager>
-        writer.writeEndElement();
-        
-        // <wsrm:SecurityManager />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEC_MGR.getLocalPart(), namespaceURI);
-        writer.writeCharacters(getSecurityManagerClass());
-        writer.writeEndElement();
-        
-        // <wsrm:MakeConnection>
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MAKE_CONNECTION.getLocalPart(), namespaceURI);
-        
-        // <wsrm:Enabled />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_ENABLED.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Boolean.toString(isEnableMakeConnection()));
-        writer.writeEndElement();
-        
-        // <wsrm:UseRMAnonURI />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Boolean.toString(isEnableRMAnonURI()));
-        writer.writeEndElement();
-        
-        // </wsrm:MakeConnection>
-        writer.writeEndElement();
-        
-        // <wsrm:UseMessageSerialization />
-        writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_USE_SERIALIZATION.getLocalPart(), namespaceURI);
-        writer.writeCharacters(Boolean.toString(isUseMessageSerialization()));
-        writer.writeEndElement();
+			// <wsrm:MaximumRetransmissionCount />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MAX_RETRANS_COUNT.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Long.toString(getMaximumRetransmissionCount()));
+			writer.writeEndElement();
+			
+			// <wsrm:ExponentialBackoff />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_EXP_BACKOFF.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Boolean.toString(isExponentialBackoff()));
+			writer.writeEndElement();
+			
+			// <wsrm:InactivityTimeout />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Long.toString(getInactivityTimeoutInterval()));
+			writer.writeEndElement();
+			
+			// <wsrm:InactivityTimeoutMeasure />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT_MEASURES.getLocalPart(), namespaceURI);
+			writer.writeCharacters(inactivityTimeoutMeasure);
+			writer.writeEndElement();
+			
+			// <wsrm:InvokeInOrder />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INVOKE_INORDER.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Boolean.toString(isInOrder()));
+			writer.writeEndElement();
+			
+			// <wsrm:MessageTypesToDrop />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MSG_TYPES_TO_DROP.getLocalPart(), namespaceURI);
+			writer.writeCharacters("none"); // FIXME
+			writer.writeEndElement();
+			
+			// <wsrm:StorageManagers>
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_STORAGE_MGR.getLocalPart(), namespaceURI);
+			
+			// <wsrm:InMemoryStorageManager />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INMEMORY_STORAGE_MGR.getLocalPart(), namespaceURI);
+			writer.writeCharacters(getInMemoryStorageManagerClass());
+			writer.writeEndElement();
+			
+			// <wsrm:PermanentStorageManager />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_PERMANENT_STORAGE_MGR.getLocalPart(), namespaceURI);
+			writer.writeCharacters(getPermanentStorageManagerClass());
+			writer.writeEndElement();        
+			
+			// </wsrm:StorageManager>
+			writer.writeEndElement();
+			
+			// <wsrm:SecurityManager />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEC_MGR.getLocalPart(), namespaceURI);
+			writer.writeCharacters(getSecurityManagerClass());
+			writer.writeEndElement();
+			
+			// <wsrm:MakeConnection>
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MAKE_CONNECTION.getLocalPart(), namespaceURI);
+			
+			// <wsrm:Enabled />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_ENABLED.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Boolean.toString(isEnableMakeConnection()));
+			writer.writeEndElement();
+			
+			// <wsrm:UseRMAnonURI />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_USE_RM_ANON_URI.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Boolean.toString(isEnableRMAnonURI()));
+			writer.writeEndElement();
+			
+			// </wsrm:MakeConnection>
+			writer.writeEndElement();
+			
+			// <wsrm:UseMessageSerialization />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_USE_SERIALIZATION.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Boolean.toString(isUseMessageSerialization()));
+			writer.writeEndElement();
 
-        // </wsp:Policy>
-        writer.writeEndElement();
+			// <wsrm:EnforceRM />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_ENFORCE_RM.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Boolean.toString(isEnforceRM()));
+			writer.writeEndElement();
+			
+			// </wsp:Policy>
+			writer.writeEndElement();
 
-        // </wsrm:RMAssertion>
-        writer.writeEndElement();
+			// </wsrm:RMAssertion>
+			writer.writeEndElement();
+		} catch (SandeshaException e) {
+			throw new XMLStreamException (e);
+		}
 
     }
 
@@ -289,24 +326,47 @@ public class SandeshaPolicyBean implements Assertion {
         return Constants.TYPE_ASSERTION;
     }
 
-    public boolean isExponentialBackoff() {
-        return exponentialBackoff;
+    public boolean isExponentialBackoff() throws SandeshaException {
+    	if (isExponentialBackoffSet()) {
+    		return exponentialBackoff;
+    	} else if (parent!=null) {
+    		return parent.isExponentialBackoff ();
+    	} else {
+    		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyHasNotBeenSet, Sandesha2Constants.Assertions.ELEM_EXP_BACKOFF);
+    		throw new SandeshaException (message);
+    	}
     }
 
     public void setExponentialBackoff(boolean exponentialBackoff) {
         this.exponentialBackoff = exponentialBackoff;
+        setExponentialBackoffSet(true);
     }
 
-    public long getRetransmissionInterval() {
-        return retransmissionInterval;
+    public long getRetransmissionInterval() throws SandeshaException {
+    	if (isRetransmissionIntervalSet()) {
+    		return retransmissionInterval;
+    	} else if (parent!=null) {
+    		return parent.getRetransmissionInterval();
+    	} else {
+    		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyHasNotBeenSet, Sandesha2Constants.Assertions.ELEM_RETRANS_INTERVAL);
+    		throw new SandeshaException (message);
+    	}
     }
 
     public void setRetransmissionInterval(long retransmissionInterval) {
         this.retransmissionInterval = retransmissionInterval;
+        setRetransmissionIntervalSet(true);
     }
 
-    public long getAcknowledgementInterval() {
-        return acknowledgementInterval;
+    public long getAcknowledgementInterval() throws SandeshaException {
+    	if (isAcknowledgementIntervalSet()) {
+    		return acknowledgementInterval;
+    	} else if (parent!=null) {
+    		return parent.getAcknowledgementInterval();
+    	} else {
+    		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyHasNotBeenSet, Sandesha2Constants.Assertions.ELEM_ACK_INTERVAL);
+    		throw new SandeshaException (message);
+    	}
     }
 
     public long getInactivityTimeoutInterval() {
@@ -319,6 +379,7 @@ public class SandeshaPolicyBean implements Assertion {
 
     public void setInactiveTimeoutValue(long inactiveTimeoutValue) {
         this.inactiveTimeoutValue = inactiveTimeoutValue;
+        setInactiveTimeoutValueSet(true);
     }
 
     public void setInactivityTimeoutMeasure(String inactivityTimeoutMeasure) {
@@ -331,6 +392,7 @@ public class SandeshaPolicyBean implements Assertion {
 
 	public void setEnableMakeConnection(boolean enableMakeConnection) {
 		this.enableMakeConnection = enableMakeConnection;
+		setEnableMakeConnectionSet(true);
 	}
 
 	public boolean isEnableRMAnonURI() {
@@ -339,14 +401,23 @@ public class SandeshaPolicyBean implements Assertion {
 
 	public void setEnableRMAnonURI(boolean enableRMAnonURI) {
 		this.enableRMAnonURI = enableRMAnonURI;
+		setEnableRMAnonURISet(true);
 	}
 
-	public boolean isUseMessageSerialization() {
-		return useMessageSerialization;
+	public boolean isUseMessageSerialization() throws SandeshaException {
+    	if (isUseMessageSerializationSet ()) {
+    		return useMessageSerialization;
+    	} else if (parent!=null) {
+    		return parent.isUseMessageSerialization();
+    	} else {
+    		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyHasNotBeenSet, Sandesha2Constants.Assertions.ELEM_USE_SERIALIZATION);
+    		throw new SandeshaException (message);
+    	}
 	}
 
 	public void setUseMessageSerialization(boolean useMessageSerialization) {
 		this.useMessageSerialization = useMessageSerialization;
+		setUseMessageSerializationSet(true);
 	}    
 
 	public boolean equal(PolicyComponent policyComponent) {
@@ -354,4 +425,118 @@ public class SandeshaPolicyBean implements Assertion {
         return false;
     }
 
+    public boolean isEnforceRM() throws SandeshaException {
+    	if (isEnforceRMSet ()) {
+    		return enforceRM;
+    	} else if (parent!=null) {
+    		return parent.isEnforceRM();
+    	} else {
+    		String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyHasNotBeenSet, Sandesha2Constants.Assertions.ELEM_ENFORCE_RM);
+    		throw new SandeshaException (message);
+    	}
+	}
+
+	public void setEnforceRM(boolean enforceRM) {
+		this.enforceRM = enforceRM;
+		setEnforceRMSet(true);
+	}
+
+	protected boolean isAcknowledgementIntervalSet() {
+		return acknowledgementIntervalSet;
+	}
+
+	protected void setAcknowledgementIntervalSet(boolean acknowledgementIntervalSet) {
+		this.acknowledgementIntervalSet = acknowledgementIntervalSet;
+	}
+
+	protected boolean isEnableMakeConnectionSet() {
+		return enableMakeConnectionSet;
+	}
+
+	protected void setEnableMakeConnectionSet(boolean enableMakeConnectionSet) {
+		this.enableMakeConnectionSet = enableMakeConnectionSet;
+	}
+
+	protected boolean isEnableRMAnonURISet() {
+		return enableRMAnonURISet;
+	}
+
+	protected void setEnableRMAnonURISet(boolean enableRMAnonURISet) {
+		this.enableRMAnonURISet = enableRMAnonURISet;
+	}
+
+	protected boolean isEnforceRMSet() {
+		return enforceRMSet;
+	}
+
+	protected void setEnforceRMSet(boolean enforceRMSet) {
+		this.enforceRMSet = enforceRMSet;
+	}
+
+	protected boolean isExponentialBackoffSet() {
+		return exponentialBackoffSet;
+	}
+
+	protected void setExponentialBackoffSet(boolean exponentialBackoffSet) {
+		this.exponentialBackoffSet = exponentialBackoffSet;
+	}
+
+	protected boolean isInactiveTimeoutValueSet() {
+		return inactiveTimeoutValueSet;
+	}
+
+	protected void setInactiveTimeoutValueSet(boolean inactiveTimeoutValueSet) {
+		this.inactiveTimeoutValueSet = inactiveTimeoutValueSet;
+	}
+
+	protected boolean isInactivityTimeoutIntervalSet() {
+		return inactivityTimeoutIntervalSet;
+	}
+
+	protected void setInactivityTimeoutIntervalSet(
+			boolean inactivityTimeoutIntervalSet) {
+		this.inactivityTimeoutIntervalSet = inactivityTimeoutIntervalSet;
+	}
+
+	protected boolean isInOrderSet() {
+		return inOrderSet;
+	}
+
+	protected void setInOrderSet(boolean inOrderSet) {
+		this.inOrderSet = inOrderSet;
+	}
+
+	protected boolean isMaximumRetransmissionCountSet() {
+		return maximumRetransmissionCountSet;
+	}
+
+	protected void setMaximumRetransmissionCountSet(
+			boolean maximumRetransmissionCountSet) {
+		this.maximumRetransmissionCountSet = maximumRetransmissionCountSet;
+	}
+
+	protected boolean isRetransmissionIntervalSet() {
+		return retransmissionIntervalSet;
+	}
+
+	protected void setRetransmissionIntervalSet(boolean retransmissionIntervalSet) {
+		this.retransmissionIntervalSet = retransmissionIntervalSet;
+	}
+
+	protected boolean isUseMessageSerializationSet() {
+		return useMessageSerializationSet;
+	}
+
+	protected void setUseMessageSerializationSet(boolean useMessageSerializationSet) {
+		this.useMessageSerializationSet = useMessageSerializationSet;
+	}
+
+	public SandeshaPolicyBean getParent() {
+		return parent;
+	}
+
+	public void setParent(SandeshaPolicyBean parent) {
+		this.parent = parent;
+	}
+	
 }

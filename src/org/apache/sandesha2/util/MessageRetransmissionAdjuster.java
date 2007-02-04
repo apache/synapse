@@ -104,7 +104,7 @@ public class MessageRetransmissionAdjuster {
 	 * @param policyBean
 	 * @return
 	 */
-	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPolicyBean propertyBean) {
+	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPolicyBean propertyBean) throws SandeshaException {
 
 		// long lastSentTime = retransmitterBean.getTimeToSend();
 

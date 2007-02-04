@@ -45,6 +45,8 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
+import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
+import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
@@ -192,6 +194,8 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 					MessageContext message = storageManager
 							.retrieveMessageContext(messageKey, context);
 
+					RMMsgContext rmMessage = MsgInitializer.initializeMessage(message);
+					
 					// attaching the this outgoing terminate message as the
 					// response to the incoming terminate message.
 					message.setTransportOut(terminateSeqMsg.getTransportOut());
@@ -203,6 +207,8 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 							org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 					AxisEngine engine = new AxisEngine(context);
 					engine.send(message);
+					
+					MessageRetransmissionAdjuster.adjustRetransmittion(rmMessage, outgoingSideTerminateBean, context, storageManager);
 				}
 				
 			}

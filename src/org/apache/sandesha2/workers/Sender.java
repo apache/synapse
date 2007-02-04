@@ -95,6 +95,7 @@ public class Sender extends SandeshaThread {
 
 				SenderBeanMgr mgr = storageManager.getSenderBeanMgr();
 				SenderBean senderBean = mgr.getNextMsgToSend();
+				
 				if (senderBean == null) {
 					if (log.isDebugEnabled()) {
 						String message = SandeshaMessageHelper
@@ -110,7 +111,10 @@ public class Sender extends SandeshaThread {
 				// work Id is used to define the piece of work that will be
 				// assigned to the Worker thread,
 				// to handle this Sender bean.
-				String workId = senderBean.getMessageID();
+				
+				//workId contains a timeTiSend part to cater for retransmissions.
+				//This will cause retransmissions to be treated as new work.
+				String workId = senderBean.getMessageID() + senderBean.getTimeToSend();
 
 				// check weather the bean is already assigned to a worker.
 				if (getWorkerLock().isWorkPresent(workId)) {

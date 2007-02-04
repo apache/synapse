@@ -293,5 +293,10 @@ public class SandeshaMessageKeys {
 	public final static String createSequenceRefused = "createSequenceRefused";
 	public final static String referencedMessageNotFound = "referencedMessageNotFound";
 	public final static String messageNumberRollover = "messageNumberRollover";
+	
+	public final static String policyBeanNotFound = "policyBeanNotFound";
+	public final static String cloneDoesNotMatchToOriginal = "cloneDoesNotMatchToOriginal";
+	public final static String exceptionInFlowCompletion = "exceptionInFlowCompletion";
+	public final static String rmdBeanNotFound = "rmdBeanNotFound";
 
 }

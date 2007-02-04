@@ -66,6 +66,8 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return super.find(bean);
 	}
 
+	//TODO remove this method, and move this logic out of the StorageManager. We should not hv any RM logic inside the StorageManagers.
+	//Otherwise we will hv to repeat that logic inside every SM Impl.
 	public SenderBean getNextMsgToSend() throws SandeshaStorageException {
 		// Set up match criteria
 		SenderBean matcher = new SenderBean();
@@ -91,8 +93,11 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 					result = bean;
 				}
 			} else if(result == null) {
-				result = bean;
-				break;
+				//making sure that the bean passes the reSend test as well
+				if (bean.getSentCount()==0 || (bean.getSentCount()>0 && bean.isReSend())) { 
+					result = bean;
+					break;
+				}
 			}
 		}
 		

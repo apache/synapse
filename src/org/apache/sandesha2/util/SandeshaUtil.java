@@ -1167,7 +1167,7 @@ public class SandeshaUtil {
 						if (oldEnvHeaderBlock.isProcessed())
 							newEnvHeaderBlock.setProcessed();
 					} else {
-						String message = "The elements of the original and cloned SOAP Envelopes do not match";
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cloneDoesNotMatchToOriginal);
 						throw new SandeshaException(message);
 					}
 				}

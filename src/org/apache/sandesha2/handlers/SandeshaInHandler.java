@@ -191,19 +191,13 @@ public class SandeshaInHandler extends AbstractHandler {
 			
 			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
 			if (policyBean==null) {
-				String message = "Cant find a valid policy bean";
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyBeanNotFound);
 				throw new SandeshaException (message);
 			}
 
 			boolean inOrder= policyBean.isInOrder();
 			
 			if (msgContext.isServerSide() && !inOrder && rmMsgContext.getMessageType()==Sandesha2Constants.MessageTypes.APPLICATION) {
-				
-				String propertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgContext);
-				if (propertyKey==null) {
-					String message = "Cant find a sequencePropertyKey from the given message context";
-					throw new SandeshaException (message);
-				}
 				
 				Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 				String sequenceId = sequence.getIdentifier().getIdentifier();
@@ -215,7 +209,7 @@ public class SandeshaInHandler extends AbstractHandler {
 				RMDBean rmdBean = rmdBeanMgr.findUnique(findBean);
 
 				if (rmdBean==null) {
-					String message = "RMDBean not available for the sequence:" + sequenceId;
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rmdBeanNotFound,sequenceId);
 					throw new SandeshaException (message);
 				}
 				
@@ -235,7 +229,7 @@ public class SandeshaInHandler extends AbstractHandler {
 				}
 			}
 		} catch (AxisFault e) {
-			String message = "Got exception in flowCompletion of SandeshaInHandler";
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.exceptionInFlowCompletion);
 			log.error(message, e);
 			
 			if (transaction != null) {

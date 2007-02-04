@@ -301,7 +301,7 @@ public class SequenceProcessor {
 		} else { //Scenario 2 and Scenario 3
 			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
 			if (policyBean==null) {
-				String message = "Cant find the policy bean from the passed Axis2 description";
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyBeanNotFound);
 				throw new SandeshaException (message);
 			}
 			//		having a negative value for timeToSend will make this behave as having an infinite ack interval.

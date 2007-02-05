@@ -20,6 +20,7 @@ package org.apache.sandesha2.util;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -77,14 +78,23 @@ public class RangeString implements Serializable{
 	private Range getNextRangeBelow(long msgNumber){
 		//start at the specified index and work down the list of ranges
 		//util we find one
+		Iterator iterator = rangeMap.keySet().iterator();
 		
-		for(long i = msgNumber; i>=0; i--){
-			Range r = (Range)rangeMap.get(new Long(i));
-			if(r!=null){
-				//this is the next range below
-				return r;
+		long cachedKey = -1;
+		while (iterator.hasNext()) {
+			long key = ((Long)iterator.next()).longValue();
+			
+			if (key > cachedKey && key <= msgNumber) {
+				cachedKey = key;
 			}
 		}
+		
+		if (cachedKey != -1) {
+			//this is the next range below
+			Range r = (Range)rangeMap.get(new Long(cachedKey));
+			return r;
+		}
+		
 		//no range below this one
 		return null; 
 	}
@@ -101,12 +111,21 @@ public class RangeString implements Serializable{
 		//its end 
 		long startOfRangeLookup = envelopeRange.lowerValue + 1;
 		long endOfRangeLookup = envelopeRange.upperValue;
-		for(long i=startOfRangeLookup; i<=endOfRangeLookup; i++){
-			Range removedRange = (Range)rangeMap.remove(new Long(i)); //remove if there is anything present
-			if(removedRange!=null && removedRange.upperValue>envelopeRange.upperValue){
-				//this range started in our envelope but stretched out beyond it so we
-				//can absorb its upper value
-				envelopeRange.upperValue = removedRange.upperValue;
+		// Iterator over the available ranges.
+		Iterator ranges = rangeMap.keySet().iterator();
+		while (ranges.hasNext()) {
+			// Get the key
+			long key = ((Long)ranges.next()).longValue();
+			if (key >= startOfRangeLookup && key <= endOfRangeLookup) {
+				Range removedRange = (Range)rangeMap.get(new Long(key));
+				
+				if(removedRange!=null && removedRange.upperValue>envelopeRange.upperValue){
+					//this range started in our envelope but stretched out beyond it so we
+					//can absorb its upper value
+					envelopeRange.upperValue = removedRange.upperValue;
+				}
+				// Remove the current range from the HashMap.
+				ranges.remove();
 			}
 		}
 	}
@@ -126,9 +145,8 @@ public class RangeString implements Serializable{
 		if(getRangeForMessageNumber(messageNumber)!=null){
 			return true;
 		}
-		else{
-			return false;
-		}
+		
+		return false;
 	}
 	
 	public Range getRangeForMessageNumber(long messageNumber){

@@ -43,7 +43,11 @@ public class RMSampleService {
 	private final String EchoStringReturn = "EchoStringReturn";
 	private final String Attachment = "Attachment";
 	private final String DESTINATION_IMAGE_FILE = "mtom-image1.jpg";
-	
+
+  public void init(org.apache.axis2.context.ServiceContext serviceContext) {
+
+  }
+
 	public OMElement echoString(OMElement in) throws Exception {
 		
 		OMElement textElem = in.getFirstChildWithName(new QName (applicationNamespaceName,Text));

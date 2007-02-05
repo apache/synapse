@@ -135,6 +135,13 @@ public class SequenceProcessor {
 		sequence.setMustUnderstand(false);
 		rmMsgCtx.addSOAPEnvelope();
 
+		// throwing a fault if the sequence is terminated
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, bean)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, Sequence terminated");
+			return InvocationResponse.ABORT;
+		}
+		
 		// throwing a fault if the sequence is closed.
 		if (FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean)) {
 			if (log.isDebugEnabled())

@@ -98,6 +98,8 @@ public class SOAPFaultEnvelopeCreator {
 			sequenceFault = true;
 		else if (faultType == Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED)
 			sequenceFault = true;
+		else if (faultType == Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED)
+			sequenceFault = true;
 
 		return sequenceFault;
 

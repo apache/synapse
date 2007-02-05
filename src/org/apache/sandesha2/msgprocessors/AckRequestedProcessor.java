@@ -34,6 +34,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -130,6 +131,13 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, Unknown sequence ");
+			return false;
+		}
+
+		// throwing a fault if the sequence is terminated
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, Sequence terminated");
 			return false;
 		}
 

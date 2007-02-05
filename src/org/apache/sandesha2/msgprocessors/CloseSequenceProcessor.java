@@ -90,6 +90,13 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			return false;
 		}
 		
+		// throwing a fault if the sequence is terminated
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: CloseSequenceProcessor::processInMessage, Sequence terminated");
+			return false;
+		}
+
 		rmdBean.setClosed(true);
 		storageManager.getRMDBeanMgr().update(rmdBean);
 

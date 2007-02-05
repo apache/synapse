@@ -324,6 +324,8 @@ public interface Sandesha2Constants {
 			public static final int LAST_MESSAGE_NO_EXCEEDED = 5;
 
 			public static final int SEQUENCE_CLOSED = 6;
+
+			public static final int SEQUENCE_TERMINATED = 7;
 		}
 	}
 

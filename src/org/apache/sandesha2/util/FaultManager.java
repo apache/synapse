@@ -327,6 +327,52 @@ public class FaultManager {
 		getOrSendFault(rmMessageContext, data);
 	}
 	
+	/**
+	 * Checks if a sequence is terminated and returns a SequenceTerminated fault.
+	 * @param referenceRMMessage
+	 * @param sequenceID
+	 * @param rmdBean
+	 * @return
+	 * @throws AxisFault 
+	 */
+	public static boolean checkForSequenceTerminated(RMMsgContext referenceRMMessage, String sequenceID, RMDBean rmdBean) 
+	
+	throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
+
+		if (rmdBean.isTerminated()) {
+			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
+			FaultData data = new FaultData();
+			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
+			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
+				data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
+			else
+				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
+
+			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED);
+			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, sequenceID));
+			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED);
+			
+			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
+			String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
+			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
+					rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+			identifierElement.setText(sequenceID);
+			
+			data.setDetail(identifierElement);
+
+			if (log.isDebugEnabled())
+				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
+			getOrSendFault(referenceRMMessage, data);
+			return true;
+		}
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::checkForSequenceClosed");
+		return false;
+  }
+
 	public static boolean checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
 			RMDBean rmdBean) throws AxisFault {
 		if (log.isDebugEnabled())
@@ -580,5 +626,4 @@ public class FaultManager {
 		}
 	  return false;
   }
-
 }

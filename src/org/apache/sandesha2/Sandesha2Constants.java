@@ -322,6 +322,8 @@ public interface Sandesha2Constants {
 			public static final int CREATE_SEQUENCE_REFUSED = 4;
 			
 			public static final int LAST_MESSAGE_NO_EXCEEDED = 5;
+
+			public static final int SEQUENCE_CLOSED = 6;
 		}
 	}
 

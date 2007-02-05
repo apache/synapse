@@ -327,21 +327,13 @@ public class FaultManager {
 		getOrSendFault(rmMessageContext, data);
 	}
 	
-	public static void checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
+	public static boolean checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
 			RMDBean rmdBean) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
-		MessageContext referenceMessage = referenceRMMessage.getMessageContext();
-
-		boolean sequenceClosed = false;
-		String reason = null;
 		if (rmdBean.isClosed()) {
-			sequenceClosed = true;
-			reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosed, sequenceID);
-		}
-
-		if (sequenceClosed) {
+			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 			FaultData data = new FaultData();
 			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
 			if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
@@ -350,7 +342,8 @@ public class FaultManager {
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED);
-			data.setReason(reason);
+			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosed, sequenceID));
+			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED);
 			
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 			String rmNamespaceValue = referenceRMMessage.getRMNamespaceValue();
@@ -362,11 +355,13 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
-			getFault(referenceRMMessage, data);
+			getOrSendFault(referenceRMMessage, data);
+			return true;
 		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForSequenceClosed");
+		return false;
 	}
 	
 	/**

@@ -136,7 +136,11 @@ public class SequenceProcessor {
 		rmMsgCtx.addSOAPEnvelope();
 
 		// throwing a fault if the sequence is closed.
-		FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean);
+		if (FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, Sequence closed");
+			return InvocationResponse.ABORT;
+		}
 		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 		
 		long msgNo = sequence.getMessageNumber().getMessageNumber();

@@ -36,9 +36,9 @@
     <!--any operation -->
     <!--Note : You can ovride this for particular service by adding the same element with your requirement-->
     <messageReceivers>
-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
     </messageReceivers>
     <!-- ================================================= -->

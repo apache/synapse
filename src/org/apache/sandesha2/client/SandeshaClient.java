@@ -39,7 +39,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -1158,7 +1158,7 @@ public class SandeshaClient {
 			AxisOperation anonOutOnlyOperation = service.getOperation(ServiceClient.ANON_OUT_ONLY_OP);
 			
 			if (anonOutOnlyOperation==null) {
-				anonOutOnlyOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_ONLY);
+				anonOutOnlyOperation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_OUT_ONLY);
 				anonOutOnlyOperation.setName(ServiceClient.ANON_OUT_ONLY_OP);
 				
 				AxisOperation referenceOperation = service.getOperation(new QName (Sandesha2Constants.RM_IN_ONLY_OPERATION));
@@ -1179,7 +1179,7 @@ public class SandeshaClient {
 			AxisOperation anonOutInOperation = service.getOperation(ServiceClient.ANON_OUT_IN_OP);
 			
 			if (anonOutInOperation==null) {
-				anonOutInOperation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_OUT_IN);
+				anonOutInOperation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_OUT_IN);
 				anonOutInOperation.setName(ServiceClient.ANON_OUT_IN_OP);
 				
 				AxisOperation referenceOperation = service.getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));

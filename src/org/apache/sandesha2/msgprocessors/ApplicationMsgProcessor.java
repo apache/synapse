@@ -29,7 +29,6 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -99,7 +98,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			AxisOperation op = msgContext.getAxisOperation();
 			if(op != null) {
 				int mep = op.getAxisSpecifMEPConstant();
-				if(mep == WSDL20_2004Constants.MEP_CONSTANT_OUT_IN) {
+				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 					EndpointReference replyTo = rewriteEPR(msgContext.getReplyTo(), msgContext);
 					msgContext.setReplyTo(replyTo);
 				}

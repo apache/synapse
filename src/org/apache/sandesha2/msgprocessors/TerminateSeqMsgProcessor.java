@@ -28,7 +28,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -357,7 +357,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				getMsgContext().getAxisService());
 		OperationContext opcontext = OperationContextFactory
 				.createOperationContext(
-						WSDL20_2004Constants.MEP_CONSTANT_OUT_IN, terminateOp);
+						WSDLConstants.MEP_CONSTANT_OUT_IN, terminateOp);
 		opcontext.setParent(getMsgContext().getServiceContext());
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),	opcontext);
 

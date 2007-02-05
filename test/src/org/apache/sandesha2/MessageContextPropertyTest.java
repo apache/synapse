@@ -22,7 +22,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
@@ -49,7 +49,7 @@ public class MessageContextPropertyTest extends SandeshaTestCase {
 
 		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
 		AxisService axisService = axisConfiguration.getService("RMSampleService");
-		AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_IN_ONLY);
+		AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_IN_ONLY);
 		operation.setMessageReceiver(new TestMessageReceiver());
 		operation.setName(new QName(TEST_OPERATION_NAME));
 		axisService.addOperation(operation);

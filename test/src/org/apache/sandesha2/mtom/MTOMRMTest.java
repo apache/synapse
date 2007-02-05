@@ -47,7 +47,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.SandeshaException;
@@ -90,7 +90,7 @@ public class MTOMRMTest extends SandeshaTestCase {
 
 		AxisConfiguration axisConfiguration = configContext.getAxisConfiguration();
 		AxisService axisService = axisConfiguration.getService("RMSampleService");
-		AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDL20_2004Constants.MEP_CONSTANT_IN_ONLY);
+		AxisOperation operation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_IN_ONLY);
 		operation.setMessageReceiver(new MTOMTestMessageReceiver());
 		operation.setName(new QName(MTOMping));
 		axisService.addOperation(operation);

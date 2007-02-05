@@ -82,14 +82,10 @@ public class TerminateManager {
 
 				RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
 				List beans = rmdBeanMgr.find(findBean);
-				System.out.println("Checking replyTo" + replyToAddress);
 				if(beans.isEmpty()) {
-					System.out.println("No beans.");
 					rmsBean.setTerminationPauserForCS(true);
 					storageManager.getRMSBeanMgr().update(rmsBean);
 					complete = false;
-				} else {
-					System.out.println("Matcher:\n" + findBean + "\nFound beans:\n" + beans);
 				}
 			}
 			

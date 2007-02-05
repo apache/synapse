@@ -28,7 +28,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -264,7 +264,7 @@ public class SequenceProcessor {
 		// the reply messages that we were looking for. If so we can remove the matching sender bean.
 		int mep = msgCtx.getAxisOperation().getAxisSpecifMEPConstant();
 		if(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0) &&
-				mep == WSDL20_2004Constants.MEP_CONSTANT_OUT_IN) {
+				mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 			RelatesTo relatesTo = msgCtx.getRelatesTo();
 			if(relatesTo != null) {
 				String messageId = relatesTo.getValue();
@@ -300,7 +300,7 @@ public class SequenceProcessor {
 //			add an ack entry here
 		
 		boolean backchannelFree = (replyTo != null && !replyTo.hasAnonymousAddress()) ||
-									WSDL20_2004Constants.MEP_CONSTANT_IN_ONLY == mep;
+									WSDLConstants.MEP_CONSTANT_IN_ONLY == mep;
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 		if (acksTo.hasAnonymousAddress() && backchannelFree) {
 			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
@@ -329,9 +329,14 @@ public class SequenceProcessor {
 		}
 
 		if (inOrderInvocation) {
-
-			// Whatever the MEP, we suspend processing here and the invoker will do the real work
-			result = InvocationResponse.SUSPEND;
+			// Whatever the MEP, we stop processing here and the invoker will do the real work. We only
+			// SUSPEND if we need to keep the backchannel open for the response... we may as well ABORT
+			// to let other cases end more quickly.
+			if(backchannelFree) {
+				result = InvocationResponse.ABORT;
+			} else {
+				result = InvocationResponse.SUSPEND;
+			}
 			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
 			storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());

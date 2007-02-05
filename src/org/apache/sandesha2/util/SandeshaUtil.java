@@ -760,7 +760,6 @@ public class SandeshaUtil {
 	public static void printSOAPEnvelope(SOAPEnvelope envelope, OutputStream out) throws SandeshaException {
 		try {
 			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
-			System.out.println("\n");
 			envelope.serialize(writer);
 		} catch (XMLStreamException e) {
 			throw new SandeshaException(e.getMessage());

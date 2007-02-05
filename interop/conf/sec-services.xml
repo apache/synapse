@@ -7,10 +7,10 @@
 	<module ref="rahas"/>
 			
 	<messageReceivers>
-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+		<messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
 			class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
 		<messageReceiver
-			mep="http://www.w3.org/2004/08/wsdl/in-only"
+			mep="http://www.w3.org/2006/01/wsdl/in-only"
 			class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
 	</messageReceivers>
 	
@@ -19,7 +19,7 @@
 	</parameter>
 	
 	<operation name="EchoString"
-		mep="http://www.w3.org/2004/08/wsdl/in-out">
+		mep="http://www.w3.org/2006/01/wsdl/in-out">
 		<actionMapping>urn:wsrm:EchoString</actionMapping>
 		<outputActionMapping>
 			urn:wsrm:EchoStringResponse
@@ -27,7 +27,7 @@
 	</operation>
 	
 	<operation name="Ping"
-		mep="http://www.w3.org/2004/08/wsdl/in-only">
+		mep="http://www.w3.org/2006/01/wsdl/in-only">
 		<actionMapping>urn:wsrm:Ping</actionMapping>
 	</operation>
 	

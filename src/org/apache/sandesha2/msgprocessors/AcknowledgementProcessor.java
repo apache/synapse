@@ -18,7 +18,6 @@
 package org.apache.sandesha2.msgprocessors;
 
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -30,8 +29,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2004Constants;
-import org.apache.axis2.wsdl.WSDLConstants.WSDL20_2006Constants;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -41,14 +39,12 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
-import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
@@ -192,10 +188,10 @@ public class AcknowledgementProcessor {
 							if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && anonReplyTo) {
 								MessageContext applicationMessage = storageManager.retrieveMessageContext(storageKey, configCtx);
 								AxisOperation operation = applicationMessage.getAxisOperation();
-								if (operation!=null && 
-										(WSDL20_2004Constants.MEP_URI_OUT_IN.equals(operation.getMessageExchangePattern()) ||
-												WSDL20_2006Constants.MEP_URI_OUT_IN.equals(operation.getMessageExchangePattern()))) 
-									syncResponseNeeded = true;
+								if(operation!= null) {
+									int mep = operation.getAxisSpecifMEPConstant();
+									syncResponseNeeded = (mep == WSDLConstants.MEP_CONSTANT_OUT_IN);
+								}
 							}
 
 							if (!syncResponseNeeded) {

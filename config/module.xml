@@ -36,7 +36,7 @@
         </handler>   
     </OutFaultFlow>
 
-    <operation name="RMInOnlyOperation" mep="http://www.w3.org/2004/08/wsdl/in-only">
+    <operation name="RMInOnlyOperation" mep="http://www.w3.org/2006/01/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
@@ -50,7 +50,7 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested</actionMapping>
      </operation>
  
-     <operation name="RMInOutOperation" mep="http://www.w3.org/2004/08/wsdl/in-out">
+     <operation name="RMInOutOperation" mep="http://www.w3.org/2006/01/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
@@ -63,10 +63,10 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection</actionMapping>
     </operation>
 
-    <operation name="RMOutOnlyOperation" mep="http://www.w3.org/2004/08/wsdl/out-only">
+    <operation name="RMOutOnlyOperation" mep="http://www.w3.org/2006/01/wsdl/out-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
-    <operation name="RMOutInOperation" mep="http://www.w3.org/2004/08/wsdl/out-in">
+    <operation name="RMOutInOperation" mep="http://www.w3.org/2006/01/wsdl/out-in">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 

@@ -38,7 +38,17 @@
         <fileSet>
             <directory>src/main/bin</directory>
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
+            <includes>
+                <include>synapse.sh</include>
+            </includes>
             <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/bin</directory>
+            <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
+            <includes>
+                <include>synapse.bat</include>
+            </includes>
         </fileSet>
         <fileSet>
             <directory>repository</directory>
@@ -123,9 +133,15 @@
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
             <includes>
                 <include>axis2server.sh</include>
-                <include>axis2server.bat</include>
             </includes>
             <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>modules/samples/src/main/scripts</directory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server</outputDirectory>
+            <includes>
+                <include>axis2server.bat</include>
+            </includes>
         </fileSet>
 
         <!--<fileSet>-->

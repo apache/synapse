@@ -256,7 +256,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-rahas</artifactId>
-            <version>${axis2.version}</version>
+            <version>${axis2.security.version}</version>
         </dependency>
 
         <dependency>
@@ -280,7 +280,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-secpolicy</artifactId>
-            <version>${axis2.version}</version>
+            <version>${axis2.security.version}</version>
         </dependency>
         
         <dependency>
@@ -292,7 +292,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-security</artifactId>
-            <version>${axis2.version}</version>
+            <version>${axis2.security.version}</version>
         </dependency>
 
         <dependency>
@@ -596,7 +596,8 @@
 
     <properties>
         <synapse.version>SNAPSHOT</synapse.version>
-        <axis2.version>1.1.051</axis2.version>
+        <axis2.version>1.1.1</axis2.version>
+        <axis2.security.version>1.1</axis2.security.version>
         <rampart.version>1.1</rampart.version>
         <axiom.version>1.2.1</axiom.version>
         <xml_schema.version>1.064</xml_schema.version>

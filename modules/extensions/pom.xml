@@ -119,10 +119,10 @@
 
     <properties>
         <spring.version>1.2.6</spring.version>
-        <xerces.version>2.8.0</xerces.version>
+        <xerces.version>2.8.1</xerces.version>
         <xml_apis.version>1.3.03</xml_apis.version>
         <xalan.version>2.7.0</xalan.version>
-        <js.version>1.6R5</js.version>
+        <js.version>1.6R2</js.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>2.4.0</bsf.version>
         <groovy.version>1.0</groovy.version>

@@ -20,14 +20,11 @@ package org.apache.sandesha2.workers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * This is responsible for sending and re-sending messages of Sandesha2. This
@@ -39,152 +36,104 @@ public class Sender extends SandeshaThread {
 
 	private static final Log log = LogFactory.getLog(Sender.class);
 	    
-  public Sender () {
-  	super(Sandesha2Constants.SENDER_SLEEP_TIME);
-  }	
+	public Sender () {
+		super(Sandesha2Constants.SENDER_SLEEP_TIME);
+	}
 
-	protected void internalRun() {
-		if (log.isDebugEnabled())
-			log.debug("Enter: Sender::internalRun");
+	protected boolean internalRun() {
+		if (log.isDebugEnabled()) log.debug("Enter: Sender::internalRun");
 
-		if (context == null) {
-			String message = SandeshaMessageHelper
-					.getMessage(SandeshaMessageKeys.configContextNotSet);
-			message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotCointinueSender, message);
-			log.debug(message);
-			throw new RuntimeException(message);
-		}
-
-		StorageManager storageManager = null;
-		boolean sleep = false;
+		Transaction transaction = null;
 
 		try {
-			storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
-		} catch (SandeshaException e2) {
-			// TODO Auto-generated catch block
-			log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotCointinueSender, e2.toString()), e2);
-			e2.printStackTrace();
-			return;
-		}
+			transaction = storageManager.getTransaction();
 
-		while (isThreadStarted()) {
-
-			try {
-				synchronized (this) {		
-					if(sleep && !runMainLoop()) wait(Sandesha2Constants.SENDER_SLEEP_TIME);
-					// Indicate that we are running the main loop
-					setRanMainLoop();
+			SenderBeanMgr mgr = storageManager.getSenderBeanMgr();
+			SenderBean senderBean = mgr.getNextMsgToSend();
+			
+			if (senderBean == null) {
+				// As there was no work to do, we sleep for a while on the next loop.
+				if (log.isDebugEnabled()) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
+					log.debug("Exit: Sender::internalRun, " + message + ", sleeping");
 				}
-			} catch (InterruptedException e1) {
-				log.debug("Sender was interupted...");
-				log.debug(e1.getMessage());
-				log.debug("End printing Interrupt...");
-			} finally {
-				sleep = false;
+				return true;
 			}
 
-			//pause if we have to
-			doPauseIfNeeded();
+			// work Id is used to define the piece of work that will be
+			// assigned to the Worker thread,
+			// to handle this Sender bean.
+			
+			//workId contains a timeTiSend part to cater for retransmissions.
+			//This will cause retransmissions to be treated as new work.
+			String workId = senderBean.getMessageID() + senderBean.getTimeToSend();
 
-			Transaction transaction = null;
-
-			try {
-				
-				transaction = storageManager.getTransaction();
-
-				SenderBeanMgr mgr = storageManager.getSenderBeanMgr();
-				SenderBean senderBean = mgr.getNextMsgToSend();
-				
-				if (senderBean == null) {
-					if (log.isDebugEnabled()) {
-						String message = SandeshaMessageHelper
-								.getMessage(SandeshaMessageKeys.senderBeanNotFound);
-						log.debug(message);
-					}
-					
-					// As there was no work to do, we sleep for a while on the next loop.
-					sleep = true;
-					continue;
+			// check weather the bean is already assigned to a worker.
+			if (getWorkerLock().isWorkPresent(workId)) {
+				// As there is already a worker running we are probably looping
+				// too fast, so sleep on the next loop.
+				if (log.isDebugEnabled()) {
+					String message = SandeshaMessageHelper.getMessage(
+									SandeshaMessageKeys.workAlreadyAssigned,
+									workId);
+					log.debug("Exit: Sender::internalRun, " + message + ", sleeping");
 				}
+				return true;
+			}
 
-				// work Id is used to define the piece of work that will be
-				// assigned to the Worker thread,
-				// to handle this Sender bean.
-				
-				//workId contains a timeTiSend part to cater for retransmissions.
-				//This will cause retransmissions to be treated as new work.
-				String workId = senderBean.getMessageID() + senderBean.getTimeToSend();
+			if(transaction != null) {
+				transaction.commit();
+				transaction = null;
+			}
 
-				// check weather the bean is already assigned to a worker.
-				if (getWorkerLock().isWorkPresent(workId)) {
-					if (log.isDebugEnabled()) {
-						String message = SandeshaMessageHelper
-								.getMessage(
-										SandeshaMessageKeys.workAlreadyAssigned,
-										workId);
-						log.debug(message);
-					}
-					// As there is already a worker running we are probably looping
-					// too fast, so sleep on the next loop.
-					sleep = true;
-					continue;
+			// start a worker which will work on this messages.
+			SenderWorker worker = new SenderWorker(context, senderBean);
+			worker.setLock(getWorkerLock());
+			worker.setWorkId(workId);
+			threadPool.execute(worker);
+
+			// adding the workId to the lock after assigning it to a thread
+			// makes sure
+			// that all the workIds in the Lock are handled by threads.
+			getWorkerLock().addWork(workId);
+
+		} catch (Exception e) {
+
+			// TODO : when this is the client side throw the exception to
+			// the client when necessary.
+
+			
+			//TODO rollback only if a SandeshaStorageException.
+			//This allows the other Exceptions to be used within the Normal flow.
+			
+			if (transaction != null) {
+				try {
+					transaction.rollback();
+					transaction = null;
+				} catch (Exception e1) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1
+							.toString());
+					log.debug(message, e1);
 				}
+			}
 
-				if(transaction != null) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e.toString());
+
+			log.debug(message, e);
+		} finally {
+			if (transaction != null) {
+				try {
 					transaction.commit();
 					transaction = null;
-				}
-
-				// start a worker which will work on this messages.
-				SenderWorker worker = new SenderWorker(context, senderBean);
-				worker.setLock(getWorkerLock());
-				worker.setWorkId(workId);
-				threadPool.execute(worker);
-
-				// adding the workId to the lock after assigning it to a thread
-				// makes sure
-				// that all the workIds in the Lock are handled by threads.
-				getWorkerLock().addWork(workId);
-
-			} catch (Exception e) {
-
-				// TODO : when this is the client side throw the exception to
-				// the client when necessary.
-
-				
-				//TODO rollback only if a SandeshaStorageException.
-				//This allows the other Exceptions to be used within the Normal flow.
-				
-				if (transaction != null) {
-					try {
-						transaction.rollback();
-						transaction = null;
-					} catch (Exception e1) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1
-								.toString());
-						log.debug(message, e1);
-					}
-				}
-
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e.toString());
-
-				log.debug(message, e);
-			} finally {
-				if (transaction != null) {
-					try {
-						transaction.commit();
-						transaction = null;
-					} catch (Exception e) {
-						String message = SandeshaMessageHelper
-								.getMessage(SandeshaMessageKeys.commitError, e.toString());
-						log.debug(message, e);
-					}
+				} catch (Exception e) {
+					String message = SandeshaMessageHelper
+							.getMessage(SandeshaMessageKeys.commitError, e.toString());
+					log.debug(message, e);
 				}
 			}
 		}
-		if (log.isDebugEnabled())
-			log.debug("Exit: Sender::internalRun");
+		if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, not sleeping");
+		return false;
 	}
 
 }

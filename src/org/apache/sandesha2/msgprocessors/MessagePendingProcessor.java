@@ -1,12 +1,14 @@
 package org.apache.sandesha2.msgprocessors;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.polling.PollingManager;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.wsrm.MessagePending;
@@ -33,10 +35,10 @@ public class MessagePendingProcessor {
 			if (messagePending!=null) {
 				boolean pending = messagePending.isPending();
 				if (pending) {
-					PollingManager pollingManager = SandeshaUtil.getPollingManager(message.getConfigurationContext());
-					if (pollingManager!=null) {
-						pollingManager.shedulePollingRequest(sequenceId);
-					}
+					ConfigurationContext context = rmMsgContext.getConfigurationContext();
+					StorageManager storage = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+					PollingManager pollingManager = storage.getPollingManager();
+					pollingManager.schedulePollingRequest(sequenceId, false);
 				}
 			}
 		}

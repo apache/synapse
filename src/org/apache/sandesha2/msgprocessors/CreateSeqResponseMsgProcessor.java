@@ -133,10 +133,10 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		// the create must include an offer (or this client cannot be identified). If the reply-to
 		// is the RM anon URI template then the offer is not required.
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-			String replyToAddress = rmsBean.getReplyToEPR();
-			if(SandeshaUtil.isWSRMAnonymous(replyToAddress)) {
+			String acksTo = rmsBean.getAcksToEPR();
+			EndpointReference reference = new EndpointReference(acksTo);
+			if(acksTo == null || reference.hasAnonymousAddress()) {
 				rmsBean.setPollingMode(true);
-				SandeshaUtil.startPollingManager(configCtx);
 			}
 		}
 
@@ -181,11 +181,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			// rmdBean for polling too, so that it still gets serviced after the outbound
 			// sequence terminates.
 			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-				String replyToAddress = rmsBean.getReplyToEPR();
-				EndpointReference ref = new EndpointReference(replyToAddress);
-				if(rmsBean.isPollingMode() && (replyToAddress == null || ref.hasAnonymousAddress())) {
+				if(rmsBean.isPollingMode()) {
 					rMDBean.setPollingMode(true);
-					SandeshaUtil.startPollingManager(configCtx);
 				}
 			}
 			
@@ -213,10 +210,18 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
 			
 			rmdBeanMgr.insert(rMDBean);
+			
+			if(rMDBean.isPollingMode()) {
+				SandeshaUtil.startPollingForTheSequence(configCtx, rMDBean.getSequenceID(), false);
+			}
 		}
 		
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		rmsBeanMgr.update(rmsBean);
+		
+		if(rmsBean.isPollingMode()) {
+			SandeshaUtil.startPollingForTheSequence(configCtx, rmsBean.getSequenceID(), true);
+		}
 
 		// Locate and update all of the messages for this sequence, now that we know
 		// the sequence id.

@@ -37,6 +37,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -214,9 +215,10 @@ public class AcknowledgementProcessor {
 			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = rMDBeanMgr.retrieve(outSequenceId);
 			
-			if (rMDBean!=null && rMDBean.isPollingMode())
-				SandeshaUtil.shedulePollingRequest(rmsBean.getOfferedSequence(), configCtx);
-			
+			if (rMDBean!=null && rMDBean.isPollingMode()) {
+				PollingManager manager = storageManager.getPollingManager();
+				manager.schedulePollingRequest(rMDBean.getSequenceID(), false);
+			}
 		}
 
 		// We overwrite the previous client completed message ranges with the

@@ -154,7 +154,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					rMSBean.setCreateSeqMsgID(SandeshaUtil.getUUID()); 
 						
 					rMSBean.setToEPR(rmdBean.getToEPR());
-					rMSBean.setAcksToEPR(rmdBean.getAcksToEPR());
+					rMSBean.setAcksToEPR(rmdBean.getToEPR());  // The acks need to flow back into this endpoint
 					rMSBean.setReplyToEPR(rmdBean.getReplyToEPR());
 					rMSBean.setLastActivatedTime(System.currentTimeMillis());
 					rMSBean.setRMVersion(rmdBean.getRMVersion());
@@ -175,7 +175,22 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					// Store the inbound token (if any) with the new sequence
 					rMSBean.setSecurityTokenData(rmdBean.getSecurityTokenData());
 					
+					// If this new sequence has anonymous acksTo, then we must poll for the acks
+					// If the inbound sequence is targetted at the WSRM anonymous URI, we need to start
+					// polling for this sequence.
+					String acksTo = rMSBean.getAcksToEPR();
+					EndpointReference reference = new EndpointReference(acksTo);
+					if ((acksTo == null || reference.hasAnonymousAddress()) &&
+						Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqRMMsg.getRMSpecVersion())) {
+						rMSBean.setPollingMode(true);
+					}
+
 					rmsBeanMgr.insert(rMSBean);
+					
+					if(rMSBean.isPollingMode()) {
+						SandeshaUtil.startPollingForTheSequence(context, rmdBean.getSequenceID(), false);
+					}
+					
 				} else {
 					// removing the accept part.
 					createSeqResPart.setAccept(null);
@@ -188,8 +203,22 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			outMessage.setResponseWritten(true);
 	
 			rmdBean.setLastActivatedTime(System.currentTimeMillis());
+			
+			// If the inbound sequence is targetted at the anonymous URI, we need to start
+			// polling for this sequence.
+			EndpointReference toEPR = createSeqMsg.getTo();
+			if (toEPR.hasAnonymousAddress()) {
+				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqRMMsg.getRMSpecVersion())) {
+					rmdBean.setPollingMode(true);
+				}
+			}
+			
 			storageManager.getRMDBeanMgr().update(rmdBean);
 	
+			if(rmdBean.isPollingMode()) {
+				SandeshaUtil.startPollingForTheSequence(context, rmdBean.getSequenceID(), false);
+			}
+
 			AxisEngine engine = new AxisEngine(context);
 			try{
 				engine.send(outMessage);				
@@ -204,27 +233,22 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				return false;
 			}
 	
-			boolean anon = true;
-			if (rmdBean.getToEPR() != null) {
-				EndpointReference toEPR = new EndpointReference(rmdBean.getToEPR());
-				if (!toEPR.hasAnonymousAddress()) anon = false;
-			}
-			if(anon) {
+			EndpointReference replyTo = createSeqMsg.getReplyTo();
+			if(replyTo == null || replyTo.hasAnonymousAddress()) {
 				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 			} else {
-					createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
 			}
 			
 	//		SequencePropertyBean findBean = new SequencePropertyBean ();
 	//		findBean.setName (Sandesha2Constants.SequenceProperties.TERMINATE_ON_CREATE_SEQUENCE);
 	//		findBean.setValue(createSeqMsg.getTo().getAddress());
 			
-			String toAddress = createSeqMsg.getTo().getAddress();
 			//if toAddress is RMAnon we may need to terminate the request side sequence here.
-			if (toAddress!=null && SandeshaUtil.isWSRMAnonymous(toAddress)) {
+			if (toEPR.hasAnonymousAddress()) {
 	
 				RMSBean findBean = new RMSBean ();
-				findBean.setReplyToEPR(toAddress);
+				findBean.setReplyToEPR(toEPR.getAddress());
 				findBean.setTerminationPauserForCS(true);
 				
 				//TODO recheck

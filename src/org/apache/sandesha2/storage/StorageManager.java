@@ -20,6 +20,7 @@ package org.apache.sandesha2.storage;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
+import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -52,6 +53,7 @@ public abstract class StorageManager {
 		//shutdown the running threads
 		getSender().stopRunning();
 		getInvoker().stopRunning();
+		getPollingManager().stopRunning();
 	}
 	
 	public abstract void initStorage (AxisModule moduleDesc) throws SandeshaStorageException;
@@ -61,6 +63,8 @@ public abstract class StorageManager {
 	public abstract SandeshaThread getSender();
 	
 	public abstract SandeshaThread getInvoker();
+	
+	public abstract PollingManager getPollingManager();
 
 	public abstract RMSBeanMgr getRMSBeanMgr();
 

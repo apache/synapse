@@ -22,8 +22,11 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.util.SandeshaUtil;
 
 /**
  * Aggregates pause and stop logic between sender and invoker threads.
@@ -44,6 +47,7 @@ public abstract class SandeshaThread extends Thread{
 	
 	protected transient ThreadFactory threadPool;
 	protected ConfigurationContext context = null;
+	protected StorageManager storageManager = null;
 	private boolean reRunThread;
 
 	public SandeshaThread(int sleepTime) {
@@ -55,7 +59,7 @@ public abstract class SandeshaThread extends Thread{
 		return lock;
 	}
 	
-	public synchronized void stopThreadForSequence(String sequenceID){
+	public synchronized void stopThreadForSequence(String sequenceID, boolean rmSource){
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaThread::stopThreadForSequence, " + sequenceID);
 		
@@ -63,7 +67,7 @@ public abstract class SandeshaThread extends Thread{
 		// to sleep when there is no work to do. If we were to exit the thread then
 		// we wouldn't be able to start back up when the thread gets some more work
 		// to do.
-		workingSequences.remove(sequenceID);
+		workingSequences.remove(new SequenceEntry(sequenceID, rmSource));
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaThread::stopThreadForSequence");		
@@ -138,15 +142,17 @@ public abstract class SandeshaThread extends Thread{
 	}
 	
 
-	public synchronized void runThreadForSequence(ConfigurationContext context, String sequenceID){
+	public synchronized void runThreadForSequence(ConfigurationContext context, String sequenceID, boolean rmSource){
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaThread::runThreadForSequence, " + this);
 
-		if (!workingSequences.contains(sequenceID))	workingSequences.add(sequenceID);
+		SequenceEntry entry = new SequenceEntry(sequenceID, rmSource);
+		if (!workingSequences.contains(entry)) workingSequences.add(entry);
 		
 		if (!isThreadStarted()) {
 			if(log.isDebugEnabled()) log.debug("Starting thread");
 
 			this.context = context;
+			
 			// Get the axis2 thread pool
 			threadPool = context.getThreadPool();
 			
@@ -164,6 +170,10 @@ public abstract class SandeshaThread extends Thread{
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaThread::runThreadForSequence");
 	}
 	
+	/**
+	 * 
+	 * @return a List of SequenceEntry instances
+	 */
 	public synchronized ArrayList getSequences() {
 		return workingSequences;
 	}
@@ -223,13 +233,54 @@ public abstract class SandeshaThread extends Thread{
 	}
 	
 	/**
-	 * The main work loop, to be implemented by any child class.
+	 * The main work loop, to be implemented by any child class. If the child wants
+	 * to sleep before the next loop then they should return true.
 	 */
-	protected abstract void internalRun();
+	protected abstract boolean internalRun();
 	
 	public void run() {
 		try {
-			internalRun();
+			boolean sleep = false;
+
+			while (isThreadStarted()) {
+				try {
+					synchronized (this) {		
+						if(sleep && !runMainLoop()) wait(sleepTime);
+						// Indicate that we are running the main loop
+						setRanMainLoop();
+					}
+				} catch (InterruptedException e1) {
+					log.debug("Sender was interupted...");
+					log.debug(e1.getMessage());
+					log.debug("End printing Interrupt...");
+				}
+
+				//pause if we have to
+				doPauseIfNeeded();
+
+				// Ensure we have context and a storage manager
+				if (context == null) {
+					String message = SandeshaMessageHelper
+							.getMessage(SandeshaMessageKeys.configContextNotSet);
+					message = SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.cannotCointinueSender, message);
+					log.debug(message);
+					throw new RuntimeException(message);
+				}
+
+				if(storageManager == null) {
+					try {
+						storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
+					} catch (SandeshaException e2) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotCointinueSender, e2.toString());
+						log.debug(message);
+						throw new RuntimeException(message);
+					}
+				}
+
+				// Call into the real function
+				sleep = internalRun();
+			}
 		} finally {
 			// flag that we have exited the run loop and notify any waiting
 			// threads
@@ -238,6 +289,44 @@ public abstract class SandeshaThread extends Thread{
 				hasStoppedRunning = true;
 				notify();
 			}
+		}
+	}
+	
+	protected class SequenceEntry {
+		private String  sequenceId;
+		private boolean rmSource;
+		
+		public SequenceEntry(String sequenceId, boolean rmSource) {
+			this.sequenceId = sequenceId;
+			this.rmSource = rmSource;
+		}
+		public boolean isRmSource() {
+			return rmSource;
+		}
+		public String getSequenceId() {
+			return sequenceId;
+		}
+
+
+		public boolean equals(Object o) {
+			if(o == null) return false;
+			if(o == this) return true;
+			if(o.getClass() != getClass()) return false;
+			
+			SequenceEntry other = (SequenceEntry) o;
+			if(sequenceId != null) {
+				if(!sequenceId.equals(other.sequenceId)) return false;
+			} else {
+				if(other.sequenceId != null) return false;
+			}
+			
+			return rmSource == other.rmSource;
+		}
+		public int hashCode() {
+			int result = 1;
+			if(sequenceId != null) result = sequenceId.hashCode();
+			if(rmSource) result = -result;
+			return result;
 		}
 	}
 }

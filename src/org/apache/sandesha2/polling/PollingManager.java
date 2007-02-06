@@ -17,12 +17,11 @@
 
 package org.apache.sandesha2.polling;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +29,6 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.SandeshaStorageException;
-import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
@@ -42,118 +40,116 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.workers.SandeshaThread;
 
 /**
  * This class is responsible for sending MakeConnection requests. This is a seperate thread that
  * keeps running. Will do MakeConnection based on the request queue or randomly.
  */
-public class PollingManager extends Thread {
+public class PollingManager extends SandeshaThread {
 	private static final Log log = LogFactory.getLog(PollingManager.class);
 
-	private ConfigurationContext configurationContext = null;
-	private StorageManager storageManager = null;
-	private boolean poll = false;
-
 	// Variables used to help round-robin across the sequences that we can poll for 
-	private int rmsIndex = 0;
-	private int rmdIndex = 0;
+	private int nextIndex = 0;
 
 	/**
 	 * By adding an entry to this, the PollingManager will be asked to do a polling request on this sequence.
 	 */
-	private HashMap sheduledPollingRequests = null;
+	private LinkedList scheduledPollingRequests = new LinkedList();
 	
-	private final int POLLING_MANAGER_WAIT_TIME = 3000;
+	private static final int POLLING_MANAGER_WAIT_TIME = 3000;
 	
-	private void internalRun() {
-		while (isPoll()) {
-			Transaction t = null;
-			try {
-				t = storageManager.getTransaction();
-				pollRMDSide();
-				if(t != null) t.commit();
-				t = null;
-
-				t = storageManager.getTransaction();
-				pollRMSSide();
-				if(t != null) t.commit();
-				t = null;
-			} catch (Exception e) {
-				if(log.isDebugEnabled()) log.debug("Exception", e);
-				if(t != null) {
-					try {
-						t.rollback();
-					} catch(Exception e2) {
-						if(log.isDebugEnabled()) log.debug("Exception during rollback", e);
-					}
+	public PollingManager() {
+		super(POLLING_MANAGER_WAIT_TIME);
+	}
+	
+	protected boolean internalRun() {
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::internalRun");
+		Transaction t = null;
+		try {
+			// If we have request scheduled, handle them first, and then pick
+			// pick a sequence using a round-robin approach.
+			SequenceEntry entry = null;
+			synchronized (this) {
+				if(!scheduledPollingRequests.isEmpty()) {
+					entry = (SequenceEntry) scheduledPollingRequests.removeFirst();
 				}
 			}
-			try {
-				Thread.sleep(POLLING_MANAGER_WAIT_TIME);
-			} catch (InterruptedException e) {
-				if(log.isDebugEnabled()) log.debug("Sleep was interrupted", e);
+			if(entry == null) {
+				ArrayList allSequencesList = getSequences();
+				int size = allSequencesList.size();
+				if(log.isDebugEnabled()) log.debug("Choosing one from " + size + " sequences");
+				if(nextIndex >= size) {
+					nextIndex = 0;
+					// We just looped over the set of sequences, so sleep before we try
+					// polling them again.
+					if (log.isDebugEnabled()) log.debug("Exit: PollingManager::internalRun, looped over all sequences, sleeping");
+					return true;
+				}
+	
+				entry = (SequenceEntry) allSequencesList.get(nextIndex++);
+			}
+			if(log.isDebugEnabled()) log.debug("Chose sequence " + entry.getSequenceId());
+
+			t = storageManager.getTransaction();
+			if(entry.isRmSource()) {
+				pollRMSSide(entry);
+			} else {
+				pollRMDSide(entry);
+			}
+			if(t != null) t.commit();
+			t = null;
+
+		} catch (Exception e) {
+			if(log.isDebugEnabled()) log.debug("Exception", e);
+			if(t != null) {
+				try {
+					t.rollback();
+				} catch(Exception e2) {
+					if(log.isDebugEnabled()) log.debug("Exception during rollback", e);
+				}
 			}
 		}
+		
+		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::internalRun, not sleeping");
+		return false;
 	}
 	
-	public void run() {
-		try {
-			internalRun();
-		} catch(Exception e) {
-			if(log.isDebugEnabled()) log.debug("PollingManager thread ending", e);
-		}
-	}
-	
-	private void pollRMSSide() throws AxisFault {
+	private void pollRMSSide(SequenceEntry entry) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMSSide");
 		
 		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
 		RMSBean findRMS = new RMSBean();
+		findRMS.setSequenceID(entry.getSequenceId());
 		findRMS.setPollingMode(true);
 		findRMS.setTerminated(false);
-		List results = rmsBeanManager.find(findRMS);
+		RMSBean beanToPoll = rmsBeanManager.findUnique(findRMS);
 		
-		int size = results.size();
-		log.debug("Choosing one from " + size + " RMS sequences");
-		if(rmsIndex >= size) {
-			rmsIndex = 0;
-			if (size == 0) {
-				if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide, nothing to poll");
-				return;
-			}
+		if(beanToPoll == null) {
+			// This sequence must have been terminated, or deleted
+			stopThreadForSequence(entry.getSequenceId(), true);
+		} else {
+			pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll);
 		}
-		RMSBean beanToPoll = (RMSBean) results.get(rmsIndex++);
-		pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll);
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide");
 	}
 
-	private void pollRMDSide() throws AxisFault {
+	private void pollRMDSide(SequenceEntry entry) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMDSide");
-		//geting the sequences to be polled.
-		//if shedule contains any requests, do the earliest one.
-		//else pick one randomly.
 		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
-		String sequenceId = getNextSheduleEntry ();
-
 		RMDBean findBean = new RMDBean();
 		findBean.setPollingMode(true);
 		findBean.setTerminated(false);
-		findBean.setSequenceID(sequenceId); // Note that this may be null
-		List results = nextMsgMgr.find(findBean);
+		findBean.setSequenceID(entry.getSequenceId());
+		RMDBean nextMsgBean = nextMsgMgr.findUnique(findBean);
 		
-		int size = results.size();
-		
-		log.debug("Choosing one from " + size + " RMD sequences");
-		if(rmdIndex >= size) {
-			rmdIndex = 0;
-			if (size == 0) {
-				if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide, nothing to poll");
-				return;
-			}
+		if(nextMsgBean == null) {
+			// This sequence must have been terminated, or deleted
+			stopThreadForSequence(entry.getSequenceId(), false);
+		} else {
+			pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean);
 		}
-		RMDBean nextMsgBean = (RMDBean) results.get(rmdIndex++);
-		pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean);
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide");
 	}
@@ -176,7 +172,7 @@ public class PollingManager extends Thread {
 			WSRMAnonReplyToURI = replyTo;
 		}
 		
-		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,configurationContext);
+		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,context);
 		RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
 				rmBean, sequenceId, WSRMAnonReplyToURI, storageManager);
@@ -213,84 +209,18 @@ public class PollingManager extends Thread {
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollForSequence");
 	}
 	
-	private synchronized String getNextSheduleEntry () {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::getNextSheduleEntry");
-		String sequenceId = null;
-		
-		if (sheduledPollingRequests.size()>0) {
-			sequenceId = (String) sheduledPollingRequests.keySet().iterator().next();
-			Integer sequencEntryCount = (Integer) sheduledPollingRequests.remove(sequenceId);
-			
-			Integer leftCount = new Integer (sequencEntryCount.intValue() -1 );
-			if (leftCount.intValue() > 0) 
-				sheduledPollingRequests.put(sequenceId, leftCount);
-		}
-		
-		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::getNextSheduleEntry, " + sequenceId);
-		return sequenceId;
-	}
-	
-	/**
-	 * Starts the PollingManager.
-	 * 
-	 * @param configurationContext
-	 * @throws SandeshaException
-	 */
-	public synchronized void start (ConfigurationContext configurationContext) throws SandeshaException {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::start");
-
-		this.configurationContext = configurationContext;
-		this.sheduledPollingRequests = new HashMap ();
-		this.storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
-		setPoll(true);
-		super.start();
-		
-		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::start");
-	}
-	
-	/**
-	 * Asks the PollingManager to stop its work.
-	 *
-	 */
-	public synchronized void stopPolling () {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::stopPolling");
-		setPoll(false);
-		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::stopPolling");
-	}
-	
-	public synchronized void setPoll (boolean poll) {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::setPoll");
-		this.poll = poll;
-		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::setPoll");
-	}
-	
-	public synchronized boolean isPoll () {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::isPoll");
-		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::isPoll");
-		return poll;
-	}
-	
-	public void start () {
-		throw new UnsupportedOperationException ("You must use the oveerloaded start method");
-	}
-	
 	/**
 	 * Asking the polling manager to do a polling request on the sequence identified by the
 	 * given InternalSequenceId.
 	 * 
 	 * @param sequenceId
 	 */
-	public synchronized void shedulePollingRequest (String sequenceId) {
+	public synchronized void schedulePollingRequest(String sequenceId, boolean rmSource) {
 		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::shedulePollingRequest, " + sequenceId);
 		
-		if (sheduledPollingRequests.containsKey (sequenceId)) {
-			Integer sequenceEntryCount = (Integer) sheduledPollingRequests.get(sequenceId);
-			Integer newCount = new Integer (sequenceEntryCount.intValue()+1);
-			sheduledPollingRequests.put(sequenceId,newCount);
-		} else {
-			Integer sequenceEntryCount = new Integer (1);
-			sheduledPollingRequests.put(sequenceId, sequenceEntryCount);
-		}
+		SequenceEntry entry = new SequenceEntry(sequenceId, rmSource);
+		scheduledPollingRequests.add(entry);
+		this.wakeThread();
 		
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::shedulePollingRequest");
 	}

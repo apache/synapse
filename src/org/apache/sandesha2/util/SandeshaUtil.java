@@ -71,7 +71,6 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
-import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
@@ -148,7 +147,7 @@ public class SandeshaUtil {
 			log.debug("Enter: SandeshaUtil::startSenderForTheSequence , context " + context + ", sequenceID " + sequenceID);
 		
 		SandeshaThread sender = getSandeshaStorageManager(context, context.getAxisConfiguration()).getSender();		
-		sender.runThreadForSequence(context, sequenceID);
+		sender.runThreadForSequence(context, sequenceID, true);
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::startSenderForTheSequence");
@@ -159,13 +158,16 @@ public class SandeshaUtil {
 			log.debug("Enter: SandeshaUtil::startInvokerForTheSequence , context " + context + ", sequenceID " + sequenceID);
 		
 		SandeshaThread invoker = getSandeshaStorageManager(context, context.getAxisConfiguration()).getInvoker();
-		invoker.runThreadForSequence(context,sequenceID);
+		invoker.runThreadForSequence(context, sequenceID, false);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::startInvokerForTheSequence");			
 	}
 
-	public static void startPollingManager (ConfigurationContext configurationContext) throws SandeshaException {
+	public static void startPollingForTheSequence(ConfigurationContext configurationContext, String sequenceID, boolean rmSource) throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaUtil::startPollingForTheSequence , context " + configurationContext + ", sequenceID " + sequenceID + ", rmSource");
+
 		// Only start the polling manager if we are configured to use MakeConnection
 		SandeshaPolicyBean policy = getPropertyBean(configurationContext.getAxisConfiguration());
 		if(!policy.isEnableMakeConnection()) {
@@ -173,22 +175,11 @@ public class SandeshaUtil {
 			throw new SandeshaException(message);
 		}
 		
-		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
-				Sandesha2Constants.POLLING_MANAGER);
-		
-		//assums that if somebody hs set the PollingManager, he must hv already started it.
-		if (pollingManager==null) {
-			pollingManager = new PollingManager ();
-			configurationContext.setProperty(Sandesha2Constants.POLLING_MANAGER,pollingManager);
-			pollingManager.start(configurationContext);
-		}
-	}
-	
-	public static void stopPollingManager (ConfigurationContext configurationContext) {
-		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
-				Sandesha2Constants.POLLING_MANAGER);
-		if (pollingManager!=null) 
-			pollingManager.stopPolling ();
+		SandeshaThread polling = getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration()).getPollingManager();
+		polling.runThreadForSequence(configurationContext, sequenceID, rmSource);
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::startPollingForTheSequence");			
 	}
 	
 	public static String getMessageTypeString(int messageType) {
@@ -1079,18 +1070,6 @@ public class SandeshaUtil {
 		
 		return newMsg;
 		
-	}
-  
-	public static PollingManager getPollingManager (ConfigurationContext configurationContext) {
-		PollingManager pollingManager = (PollingManager) configurationContext.getProperty(
-				Sandesha2Constants.POLLING_MANAGER);
-		
-		return pollingManager;
-	}
-	
-	public static void shedulePollingRequest (String sequenceId, ConfigurationContext configurationContext) { 
-		PollingManager pollingManager = getPollingManager(configurationContext);
-		pollingManager.shedulePollingRequest(sequenceId);
 	}
 
 	public static EndpointReference cloneEPR (EndpointReference epr) {

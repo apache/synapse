@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -67,16 +68,15 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
 		msgContext.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,rmsBean.getInternalSequenceID());
 
-		ConfigurationContext configContext = msgContext.getConfigurationContext();
-
 		//shedulling a polling request for the response side.
-		
 		if (rmsBean.getOfferedSequence()!=null) {
 			RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
 			RMDBean rMDBean = rMDBeanMgr.retrieve(sequenceId);
 			
-			if (rMDBean!=null && rMDBean.isPollingMode())
-				SandeshaUtil.shedulePollingRequest(rmsBean.getOfferedSequence(), configContext);
+			if (rMDBean!=null && rMDBean.isPollingMode()) {
+				PollingManager manager = storageManager.getPollingManager();
+				manager.schedulePollingRequest(rMDBean.getSequenceID(), false);
+			}
 		}
 
 		TerminateManager.terminateSendingSide (rmsBean, msgContext.isServerSide(), storageManager);

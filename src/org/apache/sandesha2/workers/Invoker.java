@@ -47,7 +47,12 @@ import org.apache.sandesha2.util.SandeshaUtil;
 public class Invoker extends SandeshaThread {
 
 	private static final Log log = LogFactory.getLog(Invoker.class);
-	
+
+	// If this invoker is working for several sequences, we use round-robin to
+	// try and give them all a chance to invoke messages.
+	int nextIndex = 0;
+	boolean processedMessage = false;
+
 	public Invoker() {
 		super(Sandesha2Constants.INVOKER_SLEEP_TIME);
 	}
@@ -69,9 +74,6 @@ public class Invoker extends SandeshaThread {
 		blockForPause();
 		try{
 			//get all invoker beans for the sequence
-			StorageManager storageManager = 
-				SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
-	
 			InvokerBeanMgr storageMapMgr = storageManager
 					.getInvokerBeanMgr();
 			RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
@@ -201,185 +203,161 @@ public class Invoker extends SandeshaThread {
 			log.debug("Exit: InOrderInvoker::addOutOfOrderInvokerBeansToList");
 	}
 	
-	protected void internalRun() {
-		if (log.isDebugEnabled())
-			log.debug("Enter: InOrderInvoker::internalRun");
+	protected boolean internalRun() {
+		if (log.isDebugEnabled()) log.debug("Enter: Invoker::internalRun");
 		
-		// If this invoker is working for several sequences, we use round-robin to
-		// try and give them all a chance to invoke messages.
-		int nextIndex = 0;
 		boolean sleep = false;
-		boolean processedMessage = false;
+		Transaction transaction = null;
 
-		while (isThreadStarted()) {
+		try {
+			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 
-			try {
-				if(sleep && !runMainLoop()) Thread.sleep(Sandesha2Constants.INVOKER_SLEEP_TIME);
-				if (!isThreadStarted())
-					continue;
-				// Indicate that we are running the main loop
-				setRanMainLoop();
-			} catch (InterruptedException ex) {
-				log.debug("Invoker was Interrupted.", ex);
-			} finally {
-				sleep = false;
+			InvokerBeanMgr storageMapMgr = storageManager
+					.getInvokerBeanMgr();
+
+			transaction = storageManager.getTransaction();
+			
+			// Pick a sequence using a round-robin approach
+			ArrayList allSequencesList = getSequences();
+			int size = allSequencesList.size();
+			log.debug("Choosing one from " + size + " sequences");
+			if(nextIndex >= size) {
+				nextIndex = 0;
+
+				// We just looped over the set of sequences. If we didn't process any
+				// messages on this loop then we sleep before the next one
+				if(size == 0 || !processedMessage) {
+					sleep = true;
+				}
+				processedMessage = false;
+				
+				if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, looped over all sequences, sleep " + sleep);
+				return sleep;
 			}
 
-			//pause if we have to
-			doPauseIfNeeded();
+			SequenceEntry entry = (SequenceEntry) allSequencesList.get(nextIndex++);
+			String sequenceId = entry.getSequenceId();
+			log.debug("Chose sequence " + sequenceId);
 
-			Transaction transaction = null;
+			RMDBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
+			if (nextMsgBean == null) {
+				log.debug("Next message not set correctly. Removing invalid entry.");
 
-			try {
-				StorageManager storageManager = SandeshaUtil
-						.getSandeshaStorageManager(context, context
-								.getAxisConfiguration());
-				RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
-
-				InvokerBeanMgr storageMapMgr = storageManager
-						.getInvokerBeanMgr();
-
-				transaction = storageManager.getTransaction();
-				
-				// Pick a sequence using a round-robin approach
-				ArrayList allSequencesList = getSequences();
-				int size = allSequencesList.size();
-				log.debug("Choosing one from " + size + " sequences");
-				if(nextIndex >= size) {
-					nextIndex = 0;
-
-					// We just looped over the set of sequences. If we didn't process any
-					// messages on this loop then we sleep before the next one
-					if(size == 0 || !processedMessage) {
-						sleep = true;
-					}
-					processedMessage = false;
-					continue;
-				}
-				String sequenceId = (String) allSequencesList.get(nextIndex++);
-				log.debug("Chose sequence " + sequenceId);
-
-				RMDBean nextMsgBean = nextMsgMgr.retrieve(sequenceId);
-				if (nextMsgBean == null) {
-					String message = "Next message not set correctly. Removing invalid entry.";
-					log.debug(message);
-	
-					stopThreadForSequence(sequenceId);
-					allSequencesList = getSequences();
-					if (allSequencesList.size() == 0)
-						sleep = true;
-					continue;
-				}
-
-				long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
-				if (nextMsgno <= 0) {
-					// Make sure we sleep on the next loop, so that we don't spin in a tight loop
+				stopThreadForSequence(sequenceId, entry.isRmSource());
+				allSequencesList = getSequences();
+				if (allSequencesList.size() == 0)
 					sleep = true;
-					if (log.isDebugEnabled())
-						log.debug("Invalid Next Message Number " + nextMsgno);
+
+				if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, sleep " + sleep);
+				return sleep;
+			}
+
+			long nextMsgno = nextMsgBean.getNextMsgNoToProcess();
+			if (nextMsgno <= 0) {
+				// Make sure we sleep on the next loop, so that we don't spin in a tight loop
+				sleep = true;
+				if (log.isDebugEnabled())
+					log.debug("Invalid Next Message Number " + nextMsgno);
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.invalidMsgNumber, Long
+								.toString(nextMsgno));
+				throw new SandeshaException(message);
+			}
+
+			InvokerBean selector = new InvokerBean();
+			selector.setSequenceID(sequenceId);
+			selector.setMsgNo(nextMsgno);
+			List invokerBeans = storageMapMgr.find(selector);
+			
+			//add any msgs that belong to out of order windows
+			addOutOfOrderInvokerBeansToList(sequenceId, 
+					storageManager, invokerBeans);
+			
+			// If there aren't any beans to process then move on to the next sequence
+			if (invokerBeans.size() == 0) {
+				if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, no beans to invoke on sequence " + sequenceId + ", sleep " + sleep);
+				return sleep;
+			}
+			
+			Iterator stMapIt = invokerBeans.iterator();
+
+			//TODO correct the locking mechanism to have one lock per sequence.
+			//TODO should this be a while, not an if?
+			if (stMapIt.hasNext()) { //some invokation work is present
+				
+				InvokerBean bean = (InvokerBean) stMapIt.next();
+				//see if this is an out of order msg
+				boolean beanIsOutOfOrderMsg = bean.getMsgNo()!=nextMsgno;
+				
+				String workId = sequenceId + "::" + bean.getMsgNo(); 
+																	//creating a workId to uniquely identify the
+															   //piece of work that will be assigned to the Worker.
+									
+				//check whether the bean is already assigned to a worker.
+				if (getWorkerLock().isWorkPresent(workId)) {
+					// As there is already a worker assigned we are probably dispatching
+					// messages too quickly, so we sleep before trying the next sequence.
+					sleep = true;
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
+					if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, " + message + ", sleep " + sleep);
+					return sleep;
+				}
+
+				String messageContextKey = bean.getMessageContextRefKey();
+				
+				if(transaction != null) {
+					transaction.commit();
+					transaction = null;
+				}
+
+				// start a new worker thread and let it do the invocation.
+				InvokerWorker worker = new InvokerWorker(context,
+						messageContextKey, 
+						beanIsOutOfOrderMsg); //only ignore nextMsgNumber if the bean is an
+																	//out of order message
+				
+				worker.setLock(getWorkerLock());
+				worker.setWorkId(workId);
+				
+				threadPool.execute(worker);
+				
+				//adding the workId to the lock after assigning it to a thread makes sure 
+				//that all the workIds in the Lock are handled by threads.
+				getWorkerLock().addWork(workId);
+				
+				processedMessage = true;
+			}
+		} catch (Exception e) {
+			if (transaction != null) {
+				try {
+					transaction.rollback();
+					transaction = null;
+				} catch (Exception e1) {
 					String message = SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.invalidMsgNumber, Long
-									.toString(nextMsgno));
-					throw new SandeshaException(message);
+							SandeshaMessageKeys.rollbackError, e1
+									.toString());
+					log.debug(message, e1);
 				}
-
-				InvokerBean selector = new InvokerBean();
-				selector.setSequenceID(sequenceId);
-				selector.setMsgNo(nextMsgno);
-				List invokerBeans = storageMapMgr.find(selector);
-				
-				//add any msgs that belong to out of order windows
-				addOutOfOrderInvokerBeansToList(sequenceId, 
-						storageManager, invokerBeans);
-				
-				// If there aren't any beans to process then move on to the next sequence
-				if (invokerBeans.size() == 0) {
-					if (log.isDebugEnabled())
-						log.debug("No beans to invoke on sequence " + sequenceId);
-					continue;
-				}
-				
-				Iterator stMapIt = invokerBeans.iterator();
-
-				//TODO correct the locking mechanism to have one lock per sequence.
-				
-				if (stMapIt.hasNext()) { //some invokation work is present
-					if (!isThreadStarted())
-						continue;
-					
-					InvokerBean bean = (InvokerBean) stMapIt.next();
-					//see if this is an out of order msg
-					boolean beanIsOutOfOrderMsg = bean.getMsgNo()!=nextMsgno;
-					
-					String workId = sequenceId + "::" + bean.getMsgNo(); 
-																		//creating a workId to uniquely identify the
-																   //piece of work that will be assigned to the Worker.
-										
-					//check whether the bean is already assigned to a worker.
-					if (getWorkerLock().isWorkPresent(workId)) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
-						log.debug(message);
-						
-						// As there is already a worker assigned we are probably dispatching
-						// messages too quickly, so we sleep before trying the next sequence.
-						sleep = true;
-						continue;
-					}
-
-					String messageContextKey = bean.getMessageContextRefKey();
-					
-					if(transaction != null) {
-						transaction.commit();
-						transaction = null;
-					}
-
-					// start a new worker thread and let it do the invocation.
-					InvokerWorker worker = new InvokerWorker(context,
-							messageContextKey, 
-							beanIsOutOfOrderMsg); //only ignore nextMsgNumber if the bean is an
-																		//out of order message
-					
-					worker.setLock(getWorkerLock());
-					worker.setWorkId(workId);
-					
-					threadPool.execute(worker);
-					
-					//adding the workId to the lock after assigning it to a thread makes sure 
-					//that all the workIds in the Lock are handled by threads.
-					getWorkerLock().addWork(workId);
-					
-					processedMessage = true;
-				}
-			} catch (Exception e) {
-				if (transaction != null) {
-					try {
-						transaction.rollback();
-						transaction = null;
-					} catch (Exception e1) {
-						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.rollbackError, e1
-										.toString());
-						log.debug(message, e1);
-					}
-				}
-				String message = SandeshaMessageHelper
-						.getMessage(SandeshaMessageKeys.invokeMsgError);
-				log.debug(message, e);
-			} finally {
-				if (transaction != null) {
-					try {
-						transaction.commit();
-						transaction = null;
-					} catch (Exception e) {
-						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.commitError, e.toString());
-						log.debug(message, e);
-					}
+			}
+			String message = SandeshaMessageHelper
+					.getMessage(SandeshaMessageKeys.invokeMsgError);
+			log.debug(message, e);
+		} finally {
+			if (transaction != null) {
+				try {
+					transaction.commit();
+					transaction = null;
+				} catch (Exception e) {
+					String message = SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.commitError, e.toString());
+					log.debug(message, e);
 				}
 			}
 		}
+
 		if (log.isDebugEnabled())
 			log.debug("Exit: InOrderInvoker::internalRun");
+		return sleep;
 	}
 
 }

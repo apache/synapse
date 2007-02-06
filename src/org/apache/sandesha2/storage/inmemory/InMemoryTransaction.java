@@ -83,12 +83,13 @@ public class InMemoryTransaction implements Transaction {
 						set.add(this);
 						while(other != null) {
 							if(set.contains(other)) {
+								String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.deadlock, this.toString(), bean.toString());
+								SandeshaStorageException e = new SandeshaStorageException(message);
+								
 								// Do our best to get out of the way of the other work in the system
 								waitingForTran = null;
 								releaseLocks();
-
-								String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.deadlock, this.toString(), bean.toString());
-								SandeshaStorageException e = new SandeshaStorageException(message);
+								
 								if(log.isDebugEnabled()) log.debug(message, e);
 								throw e;
 							}

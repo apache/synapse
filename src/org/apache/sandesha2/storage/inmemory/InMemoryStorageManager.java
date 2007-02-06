@@ -38,6 +38,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
+import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -63,6 +64,7 @@ public class InMemoryStorageManager extends StorageManager {
     private InvokerBeanMgr invokerBeanMgr = null;
     private Sender sender = null;
     private Invoker invoker = null;
+    private PollingManager pollingManager = null;
     private HashMap transactions = new HashMap();
     private boolean useSerialization = false;
     
@@ -80,7 +82,7 @@ public class InMemoryStorageManager extends StorageManager {
 		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (this, context);
 		this.sender = new Sender();
 		this.invoker = new Invoker();
-		
+		this.pollingManager = new PollingManager();
 	}
 
 	public Transaction getTransaction() {
@@ -128,14 +130,21 @@ public class InMemoryStorageManager extends StorageManager {
 	 */
 	public SandeshaThread getInvoker() {
 	  return invoker;
-  }
+	}
 
 	/** 
 	 * Gets the Sender for this Storage manager
 	 */
 	public SandeshaThread getSender() {
 	  return sender;
-  }
+	}
+	
+	/** 
+	 * Gets the PollingManager for this Storage manager
+	 */
+	public PollingManager getPollingManager() {
+		return pollingManager;
+	}
 
 	void enlistBean(RMBean bean) throws SandeshaStorageException {
 		InMemoryTransaction t = null;

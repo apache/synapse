@@ -66,7 +66,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 		return new DynamicOperationClient(this, sc, options);
 	}
 
-	class DynamicOperationClient implements OperationClient {
+	class DynamicOperationClient extends OperationClient {
 
 		private AxisOperation axisOp;
 
@@ -86,7 +86,8 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 
 		DynamicOperationClient(OutInAxisOperation axisOp, ServiceContext sc,
 				Options options) {
-			this.axisOp = axisOp;
+            super(axisOp, sc, options);
+            this.axisOp = axisOp;
 			this.sc = sc;
 			this.options = options;
 			this.completed = false;
@@ -165,7 +166,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 		 * @param mc
 		 *            the message context whose id is to be set
 		 */
-		private void setMessageID(MessageContext mc) {
+        protected void setMessageID(MessageContext mc) {
 			// now its the time to put the parameters set by the user in to the
 			// correct places and to the
 			// if there is no message id still, set a new one.
@@ -231,12 +232,13 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 				mc.setTransportIn(options.getTransportIn());
 			}
 
+			/*TODO FIXME 
 			if (mc.getSoapAction() == null || "".equals(mc.getSoapAction())) {
-				String soapaction = axisOp.getSoapAction();
+				String soapaction = axisOp.getOutputAction();
 				if (soapaction != null) {
 					mc.setSoapAction(soapaction);
 				}
-			}
+			}*/
 			addReferenceParameters(mc);
 			if (options.isUseSeparateListener()) {
 
@@ -313,7 +315,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 			}
 		}
 
-		private void addReferenceParameters(MessageContext msgctx) {
+		protected void addReferenceParameters(MessageContext msgctx) {
 			EndpointReference to = msgctx.getTo();
 			if (options.isManageSession()) {
 				EndpointReference tepr = sc.getTargetEPR();

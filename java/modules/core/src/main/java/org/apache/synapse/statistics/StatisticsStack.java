@@ -29,19 +29,22 @@ public interface StatisticsStack {
      * @param initTime
      * @param isInFlow
      * @param isStatisticsEnable
+     * @param isFault
      */
-    public void put(String key,long initTime, boolean isInFlow, boolean isStatisticsEnable);
+    public void put(String key,long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault);
 
     /**
      * This method used to report the latest  statistics to the StatisticsCollector
      * @param statisticsCollector
+     * @param isFault
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector);
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault);
 
     /**
      * This method  used to unreported all statistics to the StatisticsCollector
      * @param statisticsCollector
+     * @param isFault
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector);     
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault);
 
 }

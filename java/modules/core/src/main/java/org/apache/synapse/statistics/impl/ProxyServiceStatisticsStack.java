@@ -33,7 +33,10 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
     private long inTimeForInFlow = -1;
     /** The time which starts to collect statistics for OUT flow */
     private long inTimeForOutFlow = -1;
-
+    /** To indicate whether IN Flow is fault or not*/
+    private boolean isINFault;
+    /** To indicate whether OUT Flow is fault or not*/
+    private boolean isOUTFault;
     /**
      * To put a statistics
      * @param key                   - The Name of the proxy service
@@ -41,12 +44,13 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
      * @param isInFlow
      * @param isStatisticsEnable
      */
-    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable) {
+    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault) {
 
         if (isInFlow) {
             this.proxyServiceName = key;
             this.isStatisticsEnable = isStatisticsEnable;
             this.inTimeForInFlow = initTime;
+            this.isINFault = isFault;
         }
     }
 
@@ -54,14 +58,15 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
      * This method used to report the latest  statistics to the StatisticsCollector
      * @param statisticsCollector
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector) {
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
 
         if (proxyServiceName != null && isStatisticsEnable && inTimeForInFlow != -1) {
             inTimeForOutFlow = System.currentTimeMillis();
-            statisticsCollector.reportForProxyService(proxyServiceName, false, inTimeForInFlow, inTimeForOutFlow, false);
+            isOUTFault = isFault;
+            statisticsCollector.reportForProxyService(proxyServiceName, false, inTimeForInFlow, inTimeForOutFlow, isINFault);
             inTimeForInFlow = -1;
         } else if (inTimeForOutFlow != -1) {
-            statisticsCollector.reportForProxyService(proxyServiceName, true, inTimeForOutFlow, System.currentTimeMillis(), false);
+            statisticsCollector.reportForProxyService(proxyServiceName, true, inTimeForOutFlow, System.currentTimeMillis(), isOUTFault);
             inTimeForOutFlow = -1;
         }
     }
@@ -69,8 +74,9 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
     /**
      * This method  used to unreported all statistics to the StatisticsCollector
      * @param statisticsCollector
+     * @param isFault
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector) {
-        reportToStatisticsCollector(statisticsCollector);
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
+        reportToStatisticsCollector(statisticsCollector,isFault);
     }
 }

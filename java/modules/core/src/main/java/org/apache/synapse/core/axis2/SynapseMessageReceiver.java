@@ -56,7 +56,8 @@ public class SynapseMessageReceiver implements MessageReceiver {
             synCtx.setCorrelationProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
         }
         String name = "SynapseService";
-        synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true);
+        boolean isFault =synCtx.getEnvelope().getBody().hasFault();
+        synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true,isFault);
         synCtx.getEnvironment().injectMessage(synCtx);
 
         // Response handling mechanism for 200/202 and 5XX

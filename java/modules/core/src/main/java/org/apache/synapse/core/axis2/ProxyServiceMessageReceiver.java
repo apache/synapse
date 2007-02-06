@@ -113,7 +113,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
                 if (endPointName != null && statisticsEnable) {
                     EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
-                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable);
+                    boolean isFault =synCtx.getEnvelope().getBody().hasFault();
+                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
                     synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
                 }
                 AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
@@ -152,7 +153,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == currentProxyService.getStatisticsEnable());
                 if (statisticsEnable) {
                     ProxyServiceStatisticsStack proxyServiceStatisticsStack = new ProxyServiceStatisticsStack();
-                    proxyServiceStatisticsStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable);
+                    boolean isFault =synCtx.getEnvelope().getBody().hasFault();
+                    proxyServiceStatisticsStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
                     synCtx.setCorrelationProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
                 }
             }

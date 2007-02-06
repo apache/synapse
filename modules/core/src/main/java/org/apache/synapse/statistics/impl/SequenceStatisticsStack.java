@@ -36,22 +36,25 @@ public class SequenceStatisticsStack implements StatisticsStack {
      * @param initTime
      * @param isInFlow
      * @param isStatisticsEnable
+     * @param isFault
      */
-    public void put(String sequenceName, long initTime, boolean isInFlow, boolean isStatisticsEnable) {
-        sequenceStatisticsList.add(new SequenceStatistics(sequenceName, initTime, isInFlow, isStatisticsEnable));
+    public void put(String sequenceName, long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault) {
+        sequenceStatisticsList.add(new SequenceStatistics(sequenceName, initTime, isInFlow, isStatisticsEnable,isFault));
     }
    /**
      * This method used to report the latest  statistics to the StatisticsCollector
      * @param statisticsCollector
+     * @param isFault
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector) {
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
         popSequenceStatistics(sequenceStatisticsList.size() - 1, statisticsCollector);
     }
     /**
      * This method  used to unreported all statistics to the StatisticsCollector
      * @param statisticsCollector
+     * @param isFault
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector) {
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
         for (int i = sequenceStatisticsList.size(); i < 0; i--) {
             popSequenceStatistics(i, statisticsCollector);
         }
@@ -66,7 +69,7 @@ public class SequenceStatisticsStack implements StatisticsStack {
         SequenceStatistics sequenceStatistics = (SequenceStatistics) sequenceStatisticsList.get(index);
         if (sequenceStatistics != null) {
             if (sequenceStatistics.isStatisticsEnable && sequenceStatistics.sequenceName != null) {
-                statisticsCollector.reportForSequence(sequenceStatistics.sequenceName, !sequenceStatistics.isInFlow, sequenceStatistics.initTime, System.currentTimeMillis(), false);
+                statisticsCollector.reportForSequence(sequenceStatistics.sequenceName, !sequenceStatistics.isInFlow, sequenceStatistics.initTime, System.currentTimeMillis(), sequenceStatistics.isFault);
             }
             sequenceStatisticsList.remove(index);
         }
@@ -85,12 +88,15 @@ public class SequenceStatisticsStack implements StatisticsStack {
         boolean isInFlow;
         /** To check whether statistics is enabled or not */
         boolean isStatisticsEnable;
+        /** To indicate whether this is fault or not*/
+        private boolean isFault;
 
-        public SequenceStatistics(String sequenceName, long initTime, boolean inFlow, boolean statisticsEnable) {
+        public SequenceStatistics(String sequenceName, long initTime, boolean inFlow, boolean statisticsEnable,boolean isFault) {
             this.sequenceName = sequenceName;
             this.initTime = initTime;
             isInFlow = inFlow;
             isStatisticsEnable = statisticsEnable;
+            this.isFault = isFault;
         }
     }
 

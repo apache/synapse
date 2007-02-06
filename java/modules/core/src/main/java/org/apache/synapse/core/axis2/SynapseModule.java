@@ -58,11 +58,15 @@ public class SynapseModule implements Module {
             if (addr != null) {
                 // Get IP Address
                 String ipAddr = addr.getHostAddress();
-                if (ipAddr != null)
+                if (ipAddr != null) {
                     MDC.put("ip", ipAddr);
+                }
 
                 // Get hostname
                 String hostname = addr.getHostName();
+                if (hostname == null) {
+                    hostname = ipAddr;
+                }
                 MDC.put("host", hostname);
             }
 

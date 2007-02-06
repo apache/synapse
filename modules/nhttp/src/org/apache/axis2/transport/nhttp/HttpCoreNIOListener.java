@@ -74,6 +74,7 @@ public class HttpCoreNIOListener implements TransportListener {
 
         try {
             ioReactor.listen(new InetSocketAddress(port));
+            log.info("Listener starting on port : " + port);
             ioReactor.execute(ioEventDispatch);
         } catch (InterruptedIOException ex) {
             log.fatal("Reactor Interrupted");

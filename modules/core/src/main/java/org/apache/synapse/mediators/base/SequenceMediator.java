@@ -75,7 +75,8 @@ public class SequenceMediator extends AbstractListMediator {
                     synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
                 }
                 String seqName = (name == null ? "anonymous" : name);
-                sequenceStack.put(seqName, System.currentTimeMillis(), !synCtx.isResponse(), isStatisticsEnable);
+                boolean isFault =synCtx.getEnvelope().getBody().hasFault();
+                sequenceStack.put(seqName, System.currentTimeMillis(), !synCtx.isResponse(), isStatisticsEnable,isFault);
             }
             try {
                 if (shouldTrace) {

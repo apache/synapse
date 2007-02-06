@@ -33,28 +33,32 @@ public class EndPointStatisticsStack implements StatisticsStack {
     private boolean isInFlow;
     /** To check whether statistics is enabled or not */
     private boolean isStatisticsEnable;
-
+    /** To indicate whether this is fault or not*/
+    private boolean isFault;
     /**
      * To put statistics
      * @param key                   - The name of the End Point
      * @param initTime
      * @param isInFlow
      * @param isStatisticsEnable
+     * @param isFault
      */
-    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable) {
+    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault) {
         this.endPointName = key;
         this.initTime = initTime;
         this.isInFlow = isInFlow;
         this.isStatisticsEnable = isStatisticsEnable;
+        this.isFault = isFault;
     }
 
     /**
      * This method used to report the latest  statistics to the StatisticsCollector
      * @param statisticsCollector
+     * @param isFault
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector) {
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
         if (isStatisticsEnable && endPointName!=null) {
-            statisticsCollector.reportForEndPoint(endPointName, !isInFlow, initTime, System.currentTimeMillis(), false);
+            statisticsCollector.reportForEndPoint(endPointName, !isInFlow, initTime, System.currentTimeMillis(), isFault);
             endPointName =null;
         }
     }
@@ -63,7 +67,7 @@ public class EndPointStatisticsStack implements StatisticsStack {
      * This method  used to unreported all statistics to the StatisticsCollector
      * @param statisticsCollector
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector) {
-        reportToStatisticsCollector(statisticsCollector);
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
+        reportToStatisticsCollector(statisticsCollector,isFault);
     }
 }

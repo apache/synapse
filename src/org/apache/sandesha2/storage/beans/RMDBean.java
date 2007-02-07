@@ -167,6 +167,7 @@ public class RMDBean extends RMSequenceBean {
 		result.append("\nHishestInMessageKey: "); result.append(highestInMessageId);
 		result.append("\nLastInMessageId: "); result.append(lastInMessageId);
 		result.append("\nOutOfOrderRanges   :"); result.append(outOfOrderRanges);
+		result.append("\nServerCompletedMsgs:"); result.append(serverCompletedMessages);
 		return result.toString();
 	}
 

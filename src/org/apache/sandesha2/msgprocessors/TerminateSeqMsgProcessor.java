@@ -141,9 +141,6 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
 		} else
 			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
-		
-
-		
 
 		rmdBean.setTerminated(true);		
 		rmdBean.setLastActivatedTime(System.currentTimeMillis());
@@ -161,8 +158,16 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 						
 			outMessage.setServerSide(true);
 						
-			engine.send(outMessage);
-
+			try {							
+				engine.send(outMessage);
+			} catch (AxisFault e) {
+				if (log.isDebugEnabled())
+					log.debug("Unable to send terminate sequence response", e);
+				
+				throw new SandeshaException(
+						SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendTerminateResponse), e);
+			}
+			
 			if (toEPR.hasAnonymousAddress()) {
 				terminateSeqMsg.getOperationContext().setProperty(
 						org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
@@ -204,7 +209,15 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 					terminateSeqMsg.getOperationContext().setProperty(
 							org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 					AxisEngine engine = new AxisEngine(context);
-					engine.send(message);
+					try {							
+						engine.send(message);
+					} catch (AxisFault e) {
+						if (log.isDebugEnabled())
+							log.debug("Unable to send terminate sequence response", e);
+						
+						throw new SandeshaException(
+								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendTerminateResponse), e);
+					}
 					
 					MessageRetransmissionAdjuster.adjustRetransmittion(rmMessage, outgoingSideTerminateBean, context, storageManager);
 				}

@@ -46,7 +46,7 @@ public class DropMediator extends AbstractMediator {
         // and if this sequence is a IN or OUT sequence of a proxy service
         StatisticsUtils.processProxyServiceStatistics(synCtx);
         //If this a sequence is not  a IN or OUT sequence of a proxy service
-        StatisticsUtils.processSequenceStatistics(synCtx);
+        StatisticsUtils.processAllSequenceStatistics(synCtx);
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Drop mediator");

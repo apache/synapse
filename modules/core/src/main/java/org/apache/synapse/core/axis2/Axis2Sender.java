@@ -146,7 +146,7 @@ public class Axis2Sender {
                 //Process statistics
                 StatisticsUtils.processEndPointStatistics(smc);
                 StatisticsUtils.processProxyServiceStatistics(smc);
-                StatisticsUtils.processSequenceStatistics(smc);
+                StatisticsUtils.processAllSequenceStatistics(smc);
             }
             ae.send(messageContext);
 

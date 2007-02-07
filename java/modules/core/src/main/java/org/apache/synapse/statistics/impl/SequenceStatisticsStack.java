@@ -55,7 +55,8 @@ public class SequenceStatisticsStack implements StatisticsStack {
      * @param isFault
      */
     public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-        for (int i = sequenceStatisticsList.size(); i < 0; i--) {
+        int i = sequenceStatisticsList.size()-1;
+        for (; i >=0; i--) {
             popSequenceStatistics(i, statisticsCollector);
         }
     }

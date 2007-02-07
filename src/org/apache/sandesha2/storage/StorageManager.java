@@ -52,8 +52,12 @@ public abstract class StorageManager {
 	public void shutdown(){
 		//shutdown the running threads
 		getSender().stopRunning();
-		getInvoker().stopRunning();
-		getPollingManager().stopRunning();
+		
+		SandeshaThread thread = getInvoker();
+		if(thread != null) thread.stopRunning();
+		
+		thread = getPollingManager();
+		if(thread != null) thread.stopRunning();
 	}
 	
 	public abstract void initStorage (AxisModule moduleDesc) throws SandeshaStorageException;
@@ -62,8 +66,20 @@ public abstract class StorageManager {
 	
 	public abstract SandeshaThread getSender();
 	
+	/**
+	 * Get the invoker that hands inbound messages over to the application. This
+	 * may be null, in which case the inbound messages will be dispatched directly
+	 * to the application without switching them over to the invoker.
+	 * @return null if messages should be delivered directly to the application,
+	 * otherwise return a SandeshaThread.
+	 */
 	public abstract SandeshaThread getInvoker();
 	
+	/**
+	 * Get the thread that generates polling requests to send to remote endpoints.
+	 * This may be null, in which case the storage manager does not support polling.
+	 * @return null if polling is diabled, otherwise return a PollingManager.
+	 */
 	public abstract PollingManager getPollingManager();
 
 	public abstract RMSBeanMgr getRMSBeanMgr();

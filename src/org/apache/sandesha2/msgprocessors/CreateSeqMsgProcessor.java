@@ -187,9 +187,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 					rmsBeanMgr.insert(rMSBean);
 					
-					if(rMSBean.isPollingMode()) {
-						SandeshaUtil.startPollingForTheSequence(context, rmdBean.getSequenceID(), false);
-					}
+					SandeshaUtil.startWorkersForSequence(context, rMSBean);
 					
 				} else {
 					// removing the accept part.
@@ -215,9 +213,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			
 			storageManager.getRMDBeanMgr().update(rmdBean);
 	
-			if(rmdBean.isPollingMode()) {
-				SandeshaUtil.startPollingForTheSequence(context, rmdBean.getSequenceID(), false);
-			}
+			SandeshaUtil.startWorkersForSequence(context, rmdBean);
 
 			AxisEngine engine = new AxisEngine(context);
 			try{

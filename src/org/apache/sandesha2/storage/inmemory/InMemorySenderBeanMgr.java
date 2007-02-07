@@ -66,20 +66,19 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		return super.find(bean);
 	}
 
-	//TODO remove this method, and move this logic out of the StorageManager. We should not hv any RM logic inside the StorageManagers.
-	//Otherwise we will hv to repeat that logic inside every SM Impl.
-	public SenderBean getNextMsgToSend() throws SandeshaStorageException {
+	public SenderBean getNextMsgToSend(String sequenceId) throws SandeshaStorageException {
+		if(log.isDebugEnabled()) log.debug("Entry: InMemorySenderBeanManager::getNextMessageToSend " + sequenceId);
+		
 		// Set up match criteria
 		SenderBean matcher = new SenderBean();
 		matcher.setSend(true);
+		matcher.setSequenceID(sequenceId);
 		matcher.setTimeToSend(System.currentTimeMillis());
 		
 		List matches = super.find(matcher);
+		if(log.isDebugEnabled()) log.debug("Found " + matches.size() + " messages");
 		
-		// We either return an application message or an RM message. If we find
-		// an application message first then we carry on through the list to be
-		// sure that we send the lowest app message avaliable. If we hit a RM
-		// message first then we are done.
+		// Look for the message with the lowest send time, and send that one.
 		SenderBean result = null;
 		Iterator i = matches.iterator();
 		while(i.hasNext()) {
@@ -87,20 +86,17 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 			if (bean.getTimeToSend()<0)
 				continue; //Beans with negative timeToSend values are not considered as candidates for sending.
 			
-			if(bean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-				long number = bean.getMessageNumber();
-				if(result == null || result.getMessageNumber() > number) {
-					result = bean;
-				}
-			} else if(result == null) {
-				//making sure that the bean passes the reSend test as well
-				if (bean.getSentCount()==0 || (bean.getSentCount()>0 && bean.isReSend())) { 
-					result = bean;
-					break;
-				}
+			if (bean.getSentCount() > 0 && !bean.isReSend())
+				continue; //Avoid re-sending messages that we should not resend
+			
+			if(result == null) {
+				result = bean;
+			} else if(result.getTimeToSend() > bean.getTimeToSend()) {
+				result = bean;
 			}
 		}
 		
+		if(log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanManager::getNextMessageToSend");
 		return result;
 	}
 	

@@ -53,6 +53,7 @@ import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
+import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -283,11 +284,6 @@ public class SequenceProcessor {
 			}
 		}
 
-		// inorder invocation is still a global property
-		boolean inOrderInvocation = SandeshaUtil.getPropertyBean(
-				msgCtx.getConfigurationContext().getAxisConfiguration()).isInOrder();
-
-
 		//setting properties for the messageContext
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceId);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
@@ -328,7 +324,10 @@ public class SequenceProcessor {
 			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
 		}
 
-		if (inOrderInvocation) {
+		// If the storage manager has an invoker, then they may be implementing inOrder, or
+		// transactional delivery. Either way, if they have one we should use it.
+		SandeshaThread invoker = storageManager.getInvoker();
+		if (invoker != null) {
 			// Whatever the MEP, we stop processing here and the invoker will do the real work. We only
 			// SUSPEND if we need to keep the backchannel open for the response... we may as well ABORT
 			// to let other cases end more quickly.
@@ -345,8 +344,6 @@ public class SequenceProcessor {
 			// This will avoid performing application processing more than once.
 			rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
-			// Starting the invoker if stopped.
-			SandeshaUtil.startInvokerForTheSequence(msgCtx.getConfigurationContext(), sequenceId);
 		}
 		
 		if (log.isDebugEnabled())

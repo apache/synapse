@@ -142,6 +142,11 @@ public abstract class SandeshaThread extends Thread{
 	}
 	
 
+	/**
+	 * Ensure that the worker thread is aware of the given sequence. As source sequences
+	 * do not have a proper sequence id at the time they are bootstrapped, the caller
+	 * must pass in the internal sequence id when rmSource is true.
+	 */
 	public synchronized void runThreadForSequence(ConfigurationContext context, String sequenceID, boolean rmSource){
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaThread::runThreadForSequence, " + this);
 
@@ -175,7 +180,10 @@ public abstract class SandeshaThread extends Thread{
 	 * @return a List of SequenceEntry instances
 	 */
 	public synchronized ArrayList getSequences() {
-		return workingSequences;
+		// Need to copy the list for thread safety
+		ArrayList result = new ArrayList();
+		result.addAll(workingSequences);
+		return result;
 	}
 
 	protected synchronized boolean hasStoppedRunning() {

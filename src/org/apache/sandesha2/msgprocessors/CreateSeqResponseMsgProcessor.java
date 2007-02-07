@@ -210,18 +210,12 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
 			
 			rmdBeanMgr.insert(rMDBean);
-			
-			if(rMDBean.isPollingMode()) {
-				SandeshaUtil.startPollingForTheSequence(configCtx, rMDBean.getSequenceID(), false);
-			}
+			SandeshaUtil.startWorkersForSequence(configCtx, rMDBean);
 		}
 		
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		rmsBeanMgr.update(rmsBean);
-		
-		if(rmsBean.isPollingMode()) {
-			SandeshaUtil.startPollingForTheSequence(configCtx, rmsBean.getSequenceID(), true);
-		}
+		SandeshaUtil.startWorkersForSequence(configCtx, rmsBean);
 
 		// Locate and update all of the messages for this sequence, now that we know
 		// the sequence id.

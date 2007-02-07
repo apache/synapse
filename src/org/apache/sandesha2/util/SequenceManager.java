@@ -87,7 +87,6 @@ public class SequenceManager {
 		}
 
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
-		ConfigurationContext configurationContext = createSeqContext.getConfigurationContext();
 
 		rmdBean.setServerCompletedMessages(new RangeString());
 		
@@ -121,10 +120,6 @@ public class SequenceManager {
 			storageManager.storeMessageContext(newKey, createSeqContext);
 		}
 
-		// message to invoke. This will apply for only in-order invocations.
-
-		SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
-
 		String messageRMNamespace = createSequence.getNamespaceValue();
 
 		String specVersion = null;
@@ -151,13 +146,12 @@ public class SequenceManager {
 
 	}
 
-	public static RMSBean setupNewClientSequence(MessageContext firstAplicationMsgCtx, String sequencePropertyKey,
+	public static RMSBean setupNewClientSequence(MessageContext firstAplicationMsgCtx,
 			String specVersion, StorageManager storageManager) throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: SequenceManager::setupNewClientSequence " + sequencePropertyKey);
+			log.debug("Enter: SequenceManager::setupNewClientSequence");
 		
 		RMSBean rmsBean = new RMSBean();
-		ConfigurationContext configurationContext = firstAplicationMsgCtx.getConfigurationContext();
 
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
 		String acksTo = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AcksTo);
@@ -255,8 +249,6 @@ public class SequenceManager {
 		// updating the last activated time.
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		
-		SandeshaUtil.startSenderForTheSequence(configurationContext, sequencePropertyKey);
-
 		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonAcks);
 		if (log.isDebugEnabled())
 			log.debug("Exit: SequenceManager::setupNewClientSequence " + rmsBean);

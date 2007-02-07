@@ -75,14 +75,20 @@ public class InMemoryStorageManager extends StorageManager {
 		
 		SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(context.getAxisConfiguration());
 		useSerialization = policy.isUseMessageSerialization();
-
+		
+		// Note that while inOrder is a global property we can decide if we need the
+		// invoker thread at this point. If we change this to be a sequence-level
+		// property then we'll need to revisit this.
+		boolean inOrder = policy.isInOrder();
+		boolean polling = policy.isEnableMakeConnection();
+		
 		this.rMSBeanMgr = new InMemoryRMSBeanMgr (this, context);
 		this.rMDBeanMgr = new InMemoryRMDBeanMgr (this, context);
 		this.senderBeanMgr = new InMemorySenderBeanMgr (this, context);
 		this.invokerBeanMgr = new InMemoryInvokerBeanMgr (this, context);
 		this.sender = new Sender();
-		this.invoker = new Invoker();
-		this.pollingManager = new PollingManager();
+		if(inOrder) this.invoker = new Invoker();
+		if(polling) this.pollingManager = new PollingManager();
 	}
 
 	public Transaction getTransaction() {

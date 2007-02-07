@@ -75,7 +75,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 			
 			if (rMDBean!=null && rMDBean.isPollingMode()) {
 				PollingManager manager = storageManager.getPollingManager();
-				manager.schedulePollingRequest(rMDBean.getSequenceID(), false);
+				if(manager != null) manager.schedulePollingRequest(rMDBean.getSequenceID(), false);
 			}
 		}
 

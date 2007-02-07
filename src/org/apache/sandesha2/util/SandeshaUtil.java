@@ -77,6 +77,7 @@ import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.transport.Sandesha2TransportOutDesc;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.wsrm.AckRequested;
@@ -142,46 +143,39 @@ public class SandeshaUtil {
 		return ackRanges;
 	}
 
-	public static void startSenderForTheSequence(ConfigurationContext context, String sequenceID) throws SandeshaException {
+	public static void startWorkersForSequence(ConfigurationContext context, RMSequenceBean sequence)
+	throws SandeshaException {
 		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaUtil::startSenderForTheSequence , context " + context + ", sequenceID " + sequenceID);
+			log.debug("Enter: SandeshaUtil::startWorkersForSequence, sequence " + sequence);
 		
-		SandeshaThread sender = getSandeshaStorageManager(context, context.getAxisConfiguration()).getSender();		
-		sender.runThreadForSequence(context, sequenceID, true);
+		StorageManager mgr = getSandeshaStorageManager(context, context.getAxisConfiguration());
+		boolean polling = sequence.isPollingMode();
 		
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaUtil::startSenderForTheSequence");
-	}
-
-	public static void startInvokerForTheSequence(ConfigurationContext context, String sequenceID) throws SandeshaException {
-		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaUtil::startInvokerForTheSequence , context " + context + ", sequenceID " + sequenceID);
+		SandeshaThread sender = mgr.getSender();
+		SandeshaThread invoker = mgr.getInvoker();
+		SandeshaThread pollMgr = mgr.getPollingManager();
 		
-		SandeshaThread invoker = getSandeshaStorageManager(context, context.getAxisConfiguration()).getInvoker();
-		invoker.runThreadForSequence(context, sequenceID, false);
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaUtil::startInvokerForTheSequence");			
-	}
-
-	public static void startPollingForTheSequence(ConfigurationContext configurationContext, String sequenceID, boolean rmSource) throws SandeshaException {
-		if (log.isDebugEnabled())
-			log.debug("Enter: SandeshaUtil::startPollingForTheSequence , context " + configurationContext + ", sequenceID " + sequenceID + ", rmSource");
-
 		// Only start the polling manager if we are configured to use MakeConnection
-		SandeshaPolicyBean policy = getPropertyBean(configurationContext.getAxisConfiguration());
-		if(!policy.isEnableMakeConnection()) {
+		if(polling && pollMgr == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionDisabled);
 			throw new SandeshaException(message);
 		}
-		
-		SandeshaThread polling = getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration()).getPollingManager();
-		polling.runThreadForSequence(configurationContext, sequenceID, rmSource);
 
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaUtil::startPollingForTheSequence");			
+		if(sequence instanceof RMSBean) {
+			// We pass in the internal sequence id for internal sequences.
+			String sequenceId = ((RMSBean)sequence).getInternalSequenceID();
+			sender.runThreadForSequence(context, sequenceId, true);
+			if(polling) pollMgr.runThreadForSequence(context, sequenceId, true);
+		} else {
+			String sequenceId = sequence.getSequenceID();
+			sender.runThreadForSequence(context, sequenceId, false);
+			if(invoker != null) invoker.runThreadForSequence(context, sequenceId, false);
+			if(polling) pollMgr.runThreadForSequence(context, sequenceId, false);
+		}
+		
+		if (log.isDebugEnabled()) log.debug("Exit: SandeshaUtil::startWorkersForSequence");
 	}
-	
+
 	public static String getMessageTypeString(int messageType) {
 		switch (messageType) {
 		case Sandesha2Constants.MessageTypes.CREATE_SEQ:
@@ -885,63 +879,6 @@ public class SandeshaUtil {
 		}
 	}
 	
-	/**This returns the Key used when store SequencePropertyBeans for the passed message.
-	 * For the sending side this will be the internal sequence ID.
-	 * For the receiving side this is the sequenceId.
-	 * 
-	 * @param rmMsgContext
-	 * @return
-	 */
-	
-	public static String getSequencePropertyKey (RMMsgContext rmMsgContext) throws AxisFault {
-		String propertyKey = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY);
-		if (propertyKey!=null)
-			return propertyKey;
-		
-		String sequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID);
-		String internalSequenceId = (String) rmMsgContext.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
-
-		int type = rmMsgContext.getMessageType();
-		int flow = rmMsgContext.getMessageContext().getFLOW();
-		
-		if (flow==MessageContext.OUT_FLOW) {
-			if (isSequenceResponseMessageType(type))
-				propertyKey = sequenceId;
-			else
-				propertyKey = internalSequenceId;
-		} else if (flow==MessageContext.IN_FLOW || 
-							 flow==MessageContext.IN_FAULT_FLOW) {
-			if (isSequenceResponseMessageType(type))
-				propertyKey = internalSequenceId;
-			else
-				propertyKey = sequenceId;
-		} else if (flow==MessageContext.OUT_FAULT_FLOW) {
-			propertyKey = internalSequenceId;
-		}
-		
-		//TODO handler cases not covered from above.
-		
-		if (propertyKey==null) {
-			String typeStr = SandeshaUtil.getMessageTypeString(rmMsgContext.getMessageType());
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotFindPropertyKey,typeStr);
-			throw new SandeshaException (message);
-		}
-		
-		return propertyKey;
-	}
-	
-	private static boolean isSequenceResponseMessageType (int messageType) {
-		if (messageType==Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE ||
-			messageType==Sandesha2Constants.MessageTypes.ACK ||
-			messageType==Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE_RESPONSE ||
-			messageType==Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE) {
-			
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public static boolean isWSRMAnonymous(String address) {
 		if (address!=null && address.startsWith(Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX))
 			return true;

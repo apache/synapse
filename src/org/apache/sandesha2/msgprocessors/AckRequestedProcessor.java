@@ -263,8 +263,6 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			// inserting the new ack.
 			retransmitterBeanMgr.insert(ackBean);
 
-			SandeshaUtil.startSenderForTheSequence(configurationContext, sequenceId);
-
 			msgContext.pause();
 
 			if (log.isDebugEnabled())

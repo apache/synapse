@@ -389,8 +389,6 @@ public class AcknowledgementManager {
 		// inserting the new ack.
 		retransmitterBeanMgr.insert(ackBean);
 
-		SandeshaUtil.startSenderForTheSequence(ackRMMsgContext.getConfigurationContext(), sequenceId);
-
 	}
 	
 	public static void sendAckNow (RMMsgContext ackRMMsgContext) throws AxisFault {

@@ -87,8 +87,6 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			throw new SandeshaException(message);
 		}
 		
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(terminateSeqRMMsg);
-
 		ConfigurationContext context = terminateSeqMsg.getConfigurationContext();
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context,context.getAxisConfiguration());
 		
@@ -110,9 +108,9 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		// add the terminate sequence response if required.
 		RMMsgContext terminateSequenceResponse = null;
 		if (SpecSpecificConstants.isTerminateSequenceResponseRequired(terminateSeqRMMsg.getRMSpecVersion()))
-			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, rmdBean, sequencePropertyKey, sequenceId, storageManager);
+			terminateSequenceResponse = getTerminateSequenceResponse(terminateSeqRMMsg, rmdBean, sequenceId, storageManager);
 
-		setUpHighestMsgNumbers(context, storageManager,sequencePropertyKey, sequenceId, terminateSeqRMMsg);
+		setUpHighestMsgNumbers(context, storageManager, sequenceId, terminateSeqRMMsg);
 		
 		
 		
@@ -139,10 +137,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		}
 		
 		if (doFullTermination) {
-			TerminateManager.cleanReceivingSideAfterInvocation(context, sequencePropertyKey, sequenceId, storageManager);
-			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequencePropertyKey, sequenceId, storageManager);
+			TerminateManager.cleanReceivingSideAfterInvocation(context, sequenceId, storageManager);
+			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
 		} else
-			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequencePropertyKey, sequenceId, storageManager);
+			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
 		
 
 		
@@ -223,7 +221,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 	}
 
 	private void setUpHighestMsgNumbers(ConfigurationContext configCtx, StorageManager storageManager,
-			String requestSidesequencePropertyKey, String sequenceId, RMMsgContext terminateRMMsg) throws SandeshaException {
+			String sequenceId, RMMsgContext terminateRMMsg) throws SandeshaException {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::setUpHighestMsgNumbers, " + sequenceId);
@@ -293,7 +291,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 			log.debug("Exit: TerminateSeqMsgProcessor::setUpHighestMsgNumbers");
 	}
 
-	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, RMDBean rmdBean, String sequencePropertyKey,String sequenceId,
+	private RMMsgContext getTerminateSequenceResponse(RMMsgContext terminateSeqRMMsg, RMDBean rmdBean, String sequenceId,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())

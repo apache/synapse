@@ -180,8 +180,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (internalSequenceId!=null)
 			rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
 
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
-
 		/*
 		 * checking weather the user has given the messageNumber (most of the
 		 * cases this will not be the case where the system will generate the
@@ -284,7 +282,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			// if first message - setup the sending side sequence - both for the
 			// server and the client sides
-			rmsBean = SequenceManager.setupNewClientSequence(msgContext, sequencePropertyKey, specVersion, storageManager);
+			rmsBean = SequenceManager.setupNewClientSequence(msgContext, specVersion, storageManager);
 			
 			EndpointReference acksToEPR = null;
 
@@ -331,32 +329,29 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				if (transportIn == null)
 					transportIn = org.apache.axis2.Constants.TRANSPORT_HTTP;
 			} else if (acksToEPR == null && serverSide) {
-//					String incomingSequencId = SandeshaUtil
-//							.getServerSideIncomingSeqIdFromInternalSeqId(internalSequenceId);
-					
 				try {
 					MessageContext requestMsgContext = operationContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 					RMMsgContext requestRMMsgContext = MsgInitializer.initializeMessage(requestMsgContext);
-											
-					String requestSideSequencePropertyKey = SandeshaUtil.getSequencePropertyKey(requestRMMsgContext);
-					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, requestSideSequencePropertyKey);
-						
-					if (rmdBean != null && rmdBean.getReplyToEPR() != null) {
-						String beanAcksToValue = rmdBean.getReplyToEPR();
-						if (beanAcksToValue != null)
-							acksToEPR = new EndpointReference(beanAcksToValue);
+					Sequence sequence = (Sequence) requestRMMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+					if(sequence != null) {
+						String id = sequence.getIdentifier().getIdentifier();
+						RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, id);
+							
+						if (rmdBean != null && rmdBean.getReplyToEPR() != null) {
+							String beanAcksToValue = rmdBean.getReplyToEPR();
+							if (beanAcksToValue != null)
+								acksToEPR = new EndpointReference(beanAcksToValue);
+						}
 					}
 				} catch (AxisFault e) {
 					throw new SandeshaException (e);
 				}
 			}
-			rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, sequencePropertyKey ,internalSequenceId, acksToEPR, storageManager);
+			rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, internalSequenceId, acksToEPR, storageManager);
 		}
 		
 		if (rmsBean == null) {
-			RMSBean findBean = new RMSBean();
-			findBean.setInternalSequenceID(internalSequenceId);
-			rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
+			rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		}
 		
 		// the message number that was last used.
@@ -396,11 +391,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		if (!dummyMessage)
 			rmsBean.setNextMessageNumber(messageNumber);
 		
-		if (messageNumber == 1 && !sendCreateSequence) {
-			// Start the sender for the service side.
-			SandeshaUtil.startSenderForTheSequence(configContext, outSequenceID);
-		}
-
 		RelatesTo relatesTo = msgContext.getRelatesTo();
 		if(relatesTo != null) {
 			rmsBean.setHighestOutRelatesTo(relatesTo.getValue());
@@ -465,7 +455,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	private RMSBean addCreateSequenceMessage(RMMsgContext applicationRMMsg, RMSBean rmsBean, String sequencePropertyKey, String internalSequenceId, EndpointReference acksTo,
+	private RMSBean addCreateSequenceMessage(RMMsgContext applicationRMMsg, RMSBean rmsBean, String internalSequenceId, EndpointReference acksTo,
 			StorageManager storageManager) throws AxisFault {
 
 		if (log.isDebugEnabled())
@@ -543,7 +533,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		createSeqEntry.setMessageContextRefKey(createSequenceMessageStoreKey);
 		createSeqEntry.setTimeToSend(System.currentTimeMillis());
 		createSeqEntry.setMessageID(createSeqRMMessage.getMessageId());
-		createSeqEntry.setInternalSequenceID(sequencePropertyKey);
+		createSeqEntry.setInternalSequenceID(rmsBean.getInternalSequenceID());
 		// this will be set to true in the sender
 		createSeqEntry.setSend(true);
 		// Indicate that this message is a create sequence
@@ -558,6 +548,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		retransmitterMgr.insert(createSeqEntry);
 
+		// Setup enough of the workers to get this create sequence off the box.
+		SandeshaUtil.startWorkersForSequence(configCtx, rmsBean);
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::addCreateSequenceMessage, " + rmsBean);
 		return rmsBean;

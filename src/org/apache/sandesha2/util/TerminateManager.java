@@ -121,7 +121,7 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void cleanReceivingSideOnTerminateMessage(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
+	public static void cleanReceivingSideOnTerminateMessage(ConfigurationContext configContext, String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 
 		// clean senderMap
@@ -148,14 +148,14 @@ public class TerminateManager {
 			// there is no invoking by Sandesha2. So clean invocations storages.
 			
 			receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
-			cleanReceivingSideAfterInvocation(configContext, sequencePropertyKey, sequenceId, storageManager);
+			cleanReceivingSideAfterInvocation(configContext, sequenceId, storageManager);
 		} else {
 
 			String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
 			if (cleanStatus != null
 					&& CLEANED_AFTER_INVOCATION.equals(cleanStatus))
 				completeTerminationOfReceivingSide(configContext,
-						sequencePropertyKey, sequenceId, storageManager);
+						sequenceId, storageManager);
 			else
 				receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
 		}
@@ -170,7 +170,7 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequencePropertyKey ,String sequenceId,
+	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		InvokerBeanMgr storageMapBeanMgr = storageManager.getInvokerBeanMgr();
 
@@ -195,7 +195,7 @@ public class TerminateManager {
 
 		String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
 		if (cleanStatus != null && CLEANED_ON_TERMINATE_MSG.equals(cleanStatus))
-			completeTerminationOfReceivingSide(configContext, sequencePropertyKey, sequenceId, storageManager);
+			completeTerminationOfReceivingSide(configContext, sequenceId, storageManager);
 		else {
 			receivingSideCleanMap.put(sequenceId, CLEANED_AFTER_INVOCATION);
 		}
@@ -206,7 +206,7 @@ public class TerminateManager {
 	 * methods.
 	 * 
 	 */
-	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext, String sequencePropertyKey,String sequenceId,
+	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext,String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		
 		// TODO We need to remove the RMDBean, but doing so quickly can stop
@@ -241,20 +241,20 @@ public class TerminateManager {
 		rmsBean.setTerminated(true);		
 		storageManager.getRMSBeanMgr().update(rmsBean);
 		
-		cleanSendingSideData (rmsBean.getSequenceID(), rmsBean.getInternalSequenceID(), serverSide, storageManager);
+		cleanSendingSideData (rmsBean.getInternalSequenceID(), serverSide, storageManager);
 	}
 
-	public static void timeOutSendingSideSequence(String sequencePropertyKey,String internalSequenceId,
+	public static void timeOutSendingSideSequence(String internalSequenceId,
 			boolean serverside, StorageManager storageManager) throws SandeshaException {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		rmsBean.setTimedOut(true);
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
-		cleanSendingSideData(sequencePropertyKey,internalSequenceId, serverside, storageManager);
+		cleanSendingSideData(internalSequenceId, serverside, storageManager);
 	}
 
-	private static void cleanSendingSideData(String sequencePropertyKey,String internalSequenceId,
+	private static void cleanSendingSideData(String internalSequenceId,
 			boolean serverSide, StorageManager storageManager) throws SandeshaException {
 
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();

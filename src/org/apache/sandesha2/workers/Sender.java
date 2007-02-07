@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.workers;
 
+import java.util.ArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
@@ -24,6 +26,8 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 
 /**
@@ -35,7 +39,12 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 public class Sender extends SandeshaThread {
 
 	private static final Log log = LogFactory.getLog(Sender.class);
-	    
+
+	// If this sender is working for several sequences, we use round-robin to
+	// try and give them all a chance to invoke messages.
+	int nextIndex = 0;
+	boolean processedMessage = false;
+	
 	public Sender () {
 		super(Sandesha2Constants.SENDER_SLEEP_TIME);
 	}
@@ -44,20 +53,63 @@ public class Sender extends SandeshaThread {
 		if (log.isDebugEnabled()) log.debug("Enter: Sender::internalRun");
 
 		Transaction transaction = null;
+		boolean sleep = false;
 
 		try {
+			// Pick a sequence using a round-robin approach
+			ArrayList allSequencesList = getSequences();
+			int size = allSequencesList.size();
+			log.debug("Choosing one from " + size + " sequences");
+			if(nextIndex >= size) {
+				nextIndex = 0;
+
+				// We just looped over the set of sequences. If we didn't process any
+				// messages on this loop then we sleep before the next one
+				if(size == 0 || !processedMessage) {
+					sleep = true;
+				}
+				processedMessage = false;
+				
+				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, looped over all sequences, sleep " + sleep);
+				return sleep;
+			}
+
+			SequenceEntry entry = (SequenceEntry) allSequencesList.get(nextIndex++);
+			String sequenceId = entry.getSequenceId();
+			log.debug("Chose sequence " + sequenceId);
+
 			transaction = storageManager.getTransaction();
 
+			// Check that the sequence is still valid
+			boolean found = false;
+			if(entry.isRmSource()) {
+				RMSBean matcher = new RMSBean();
+				matcher.setInternalSequenceID(sequenceId);
+				matcher.setTerminated(false);
+				RMSBean rms = storageManager.getRMSBeanMgr().findUnique(matcher);
+				if(rms != null) {
+					sequenceId = rms.getSequenceID();
+					found = true;
+				}
+			} else {
+				RMDBean matcher = new RMDBean();
+				matcher.setSequenceID(sequenceId);
+				matcher.setTerminated(false);
+				RMDBean rmd = storageManager.getRMDBeanMgr().findUnique(matcher);
+				if(rmd != null) found = true;
+			}
+			if (!found) {
+				stopThreadForSequence(sequenceId, entry.isRmSource());
+				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, sequence has ended");
+				return false;
+			}
+			
 			SenderBeanMgr mgr = storageManager.getSenderBeanMgr();
-			SenderBean senderBean = mgr.getNextMsgToSend();
+			SenderBean senderBean = mgr.getNextMsgToSend(sequenceId);
 			
 			if (senderBean == null) {
-				// As there was no work to do, we sleep for a while on the next loop.
-				if (log.isDebugEnabled()) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.senderBeanNotFound);
-					log.debug("Exit: Sender::internalRun, " + message + ", sleeping");
-				}
-				return true;
+				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, no message for this sequence");
+				return false; // Move on to the next sequence in the list
 			}
 
 			// work Id is used to define the piece of work that will be
@@ -96,6 +148,10 @@ public class Sender extends SandeshaThread {
 			// makes sure
 			// that all the workIds in the Lock are handled by threads.
 			getWorkerLock().addWork(workId);
+
+			// If we got to here then we found work to do on the sequence, so we should
+			// remember not to sleep at the end of the list of sequences.
+			processedMessage = true;
 
 		} catch (Exception e) {
 

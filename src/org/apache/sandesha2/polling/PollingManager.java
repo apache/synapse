@@ -120,7 +120,7 @@ public class PollingManager extends SandeshaThread {
 		
 		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
 		RMSBean findRMS = new RMSBean();
-		findRMS.setSequenceID(entry.getSequenceId());
+		findRMS.setInternalSequenceID(entry.getSequenceId());
 		findRMS.setPollingMode(true);
 		findRMS.setTerminated(false);
 		RMSBean beanToPoll = rmsBeanManager.findUnique(findRMS);
@@ -192,7 +192,7 @@ public class PollingManager extends SandeshaThread {
 		makeConnectionSenderBean.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
 		makeConnectionSenderBean.setReSend(false);
 		makeConnectionSenderBean.setSend(true);
-		makeConnectionSenderBean.setSequenceID(sequenceId);
+		makeConnectionSenderBean.setSequenceID(rmBean.getSequenceID());
 		EndpointReference to = makeConnectionRMMessage.getTo();
 		if (to!=null)
 			makeConnectionSenderBean.setToAddress(to.getAddress());

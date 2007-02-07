@@ -54,8 +54,6 @@ public class MessageRetransmissionAdjuster {
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceID);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID, sequenceID);
 		
-		String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsgCtx);
-		
 		// operation is the lowest level Sandesha2 could be attached.
 		SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext().getAxisOperation());
 
@@ -85,7 +83,7 @@ public class MessageRetransmissionAdjuster {
 				// Only messages of outgoing sequences get retransmitted. So named
 				// following method according to that.
 				
-				finalizeTimedOutSequence(sequencePropertyKey,internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
+				finalizeTimedOutSequence(internalSequenceID, sequenceID, rmMsgCtx.getMessageContext(), storageManager);
 				continueSending = false;
 			}
 		}
@@ -140,13 +138,13 @@ public class MessageRetransmissionAdjuster {
 		return interval;
 	}
 
-	private static void finalizeTimedOutSequence(String sequencePropertyKey ,String internalSequenceID, String sequenceID, MessageContext messageContext,
+	private static void finalizeTimedOutSequence(String internalSequenceID, String sequenceID, MessageContext messageContext,
 			StorageManager storageManager) throws SandeshaException {
 		ConfigurationContext configurationContext = messageContext.getConfigurationContext();
 
 		// Already an active transaction, so don't want a new one
 		SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configurationContext, false);
-		TerminateManager.timeOutSendingSideSequence(sequencePropertyKey ,internalSequenceID, false, storageManager);
+		TerminateManager.timeOutSendingSideSequence(internalSequenceID, false, storageManager);
 
 		SandeshaListener listener = (SandeshaListener) messageContext
 				.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);

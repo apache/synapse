@@ -38,7 +38,7 @@ public class MessagePendingProcessor {
 					ConfigurationContext context = rmMsgContext.getConfigurationContext();
 					StorageManager storage = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 					PollingManager pollingManager = storage.getPollingManager();
-					pollingManager.schedulePollingRequest(sequenceId, false);
+					if(pollingManager != null) pollingManager.schedulePollingRequest(sequenceId, false);
 				}
 			}
 		}

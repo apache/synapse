@@ -57,8 +57,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 
-			String sequencePropertyKey = SandeshaUtil.getSequencePropertyKey(rmMsg);
-			
 			// ending the transaction before invocation.
 			if(transaction != null) {
 				transaction.commit();
@@ -126,10 +124,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					//this will work for RM 1.0 only
 					highestMessage = true;
 				} else {
-
-					RMDBean findBean = new RMDBean ();
-					findBean.setSequenceID(sequenceId);
-					RMDBean rmdBean = storageManager.getRMDBeanMgr().findUnique(findBean);
+					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 					
 					if (rmdBean!=null && rmdBean.isTerminated()) {
 						long highestInMsgNo = rmdBean.getHighestInMessageNumber();
@@ -140,7 +135,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				
 				if (highestMessage) {
 					//do cleaning stuff that hs to be done after the invocation of the last message.
-					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequencePropertyKey, sequenceId, storageManager);
+					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequenceId, storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
 					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");					

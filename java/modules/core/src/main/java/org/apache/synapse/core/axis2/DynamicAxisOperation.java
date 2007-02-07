@@ -232,13 +232,6 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 				mc.setTransportIn(options.getTransportIn());
 			}
 
-			/*TODO FIXME 
-			if (mc.getSoapAction() == null || "".equals(mc.getSoapAction())) {
-				String soapaction = axisOp.getOutputAction();
-				if (soapaction != null) {
-					mc.setSoapAction(soapaction);
-				}
-			}*/
 			addReferenceParameters(mc);
 			if (options.isUseSeparateListener()) {
 

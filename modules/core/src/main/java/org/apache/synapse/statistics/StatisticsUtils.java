@@ -76,6 +76,19 @@ public class StatisticsUtils {
         }
     }
 
+     /**
+     * To process all statistics related to the sequence
+     *
+     * @param synCtx
+     */
+    public static void processAllSequenceStatistics(MessageContext synCtx) {
+        StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
+        boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+        SequenceStatisticsStack sequenceStatisticsStack = (SequenceStatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+        if (sequenceStatisticsStack != null) {
+            sequenceStatisticsStack.reportAllToStatisticsCollector(statisticsCollector,isFault);
+        }
+    }
     /**
      * A helper method to get StatisticsCollector from the Synapse Message Context
      *

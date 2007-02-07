@@ -23,6 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.statistics.StatisticsStack;
+import org.apache.synapse.statistics.StatisticsUtils;
+import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
 import org.apache.synapse.mediators.AbstractListMediator;
 
 /**
@@ -47,8 +50,19 @@ public class SynapseMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         log.debug("Synapse main mediator :: mediate()");
+        if(synCtx.isResponse()) {
+            StatisticsUtils.processAllSequenceStatistics(synCtx);
+        }
+        StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+        if (sequenceStack == null) {
+            sequenceStack = new SequenceStatisticsStack();
+            synCtx.setCorrelationProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
+        }
+        String seqName = "MainSequence";
+        boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+        sequenceStack.put(seqName, System.currentTimeMillis(), !synCtx.isResponse(), true, isFault);
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        try {
+         try {
             if (shouldTrace) {
                 trace.trace("Start : Synapse main mediator");
             }

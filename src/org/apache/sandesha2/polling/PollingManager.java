@@ -181,9 +181,6 @@ public class PollingManager extends SandeshaThread {
 		//storing the MakeConnection message.
 		String makeConnectionMsgStoreKey = SandeshaUtil.getUUID();
 		
-		makeConnectionRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY,
-				sequencePropertyKey);
-		
 		//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
 		SenderBean makeConnectionSenderBean = new SenderBean ();
 		makeConnectionSenderBean.setInternalSequenceID((rmBean instanceof RMSBean) ? sequencePropertyKey : null); // We only have internal ids for the RMS-side

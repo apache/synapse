@@ -52,6 +52,8 @@ public interface Sandesha2Constants {
 
 			String ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
 
+			String ACTION_LAST_MESSAGE = "http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage";
+
 			String SOAP_ACTION_CREATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence";
 
 			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse";
@@ -59,6 +61,8 @@ public interface Sandesha2Constants {
 			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement";
 
 			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence";
+			
+			String SOAP_ACTION_LAST_MESSAGE = "http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage";
 		}
 	}
 	
@@ -423,12 +427,6 @@ public interface Sandesha2Constants {
 
 	static final String TEMP_SEQUENCE_ID = "uuid:tempID";
 
-	static final String ACK_PROCSSED = "AckProcessed";
-
-	static final String RM_ENABLE_KEY = "RMEnabled";
-
-	int MAXIMUM_RETRANSMISSION_ATTEMPTS = 5;
-	
 	static final String PROPERTY_FILE = "sandesha2.properties";
 	
 	static final String VALUE_NONE = "none";
@@ -449,8 +447,6 @@ public interface Sandesha2Constants {
 	
 	static final String QUALIFIED_FOR_SENDING = "Sandesha2QualifiedForSending";  //Sender will send messages only if this property is null (not set) or true.
 
-	static final String QNAME_SEPERATOR = ",";
-	
 	static final String EXECUTIN_CHAIN_SEPERATOR = ".";
 	
 	static final String INTERNAL_SEQUENCE_PREFIX = "Sandesha2InternalSequence";
@@ -458,8 +454,6 @@ public interface Sandesha2Constants {
 	static final String SANDESHA_PROPERTY_BEAN = "Sandesha2PropertyBean";
 	
 	static final String LIST_SEPERATOR = ",";
-	
-	static final String LIST_PART_SEPERATOR = "-";
 	
 	static final String INMEMORY_STORAGE_MANAGER = "inmemory";
 	
@@ -495,11 +489,6 @@ public interface Sandesha2Constants {
 	
 	static final String MAKE_CONNECTION_RESPONSE = "MakeConnectionResponse";
 	
-	//In RM 1.1 AnonRMURI case we may not be terminating a request sequence unless the response side create sequence 
-	//msg hs been received through polling. This property will be used to track this.
-	String TERMINATE_ON_CREATE_SEQUENCE = "TerminateOnCS";
-	
-	
 	static final String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2006_08.NS_URI
@@ -509,7 +498,6 @@ public interface Sandesha2Constants {
 		static final String INTERNAL_SEQUENCE_ID = "Sandesha2InternalSequenceId";
 		static final String SEQUENCE_ID = "WSRMSequenceId";
 		static final String MESSAGE_NUMBER = "WSRMMessageNumber";
-		static final String SEQUENCE_PROPERTY_KEY = "SequencePropertyKey";
 		static final String SECURITY_TOKEN = "SecurityToken";
 	}
     

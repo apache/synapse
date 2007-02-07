@@ -323,7 +323,17 @@ public class SequenceProcessor {
 			AcknowledgementManager.removeAckBeanEntries(sequenceId, storageManager);
 			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
 		}
-
+		
+		// If this message matches the WSRM 1.0 pattern for an empty last message (e.g.
+		// the sender wanted to signal the last message, but didn't have an application
+		// message to send) then we do not need to send the message on to the application.
+		if(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_LAST_MESSAGE.equals(msgCtx.getWSAAction()) ||
+		   Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_LAST_MESSAGE.equals(msgCtx.getSoapAction())) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SequenceProcessor::processReliableMessage, got WSRM 1.0 lastmessage, aborting");
+			return InvocationResponse.ABORT;
+		}
+		
 		// If the storage manager has an invoker, then they may be implementing inOrder, or
 		// transactional delivery. Either way, if they have one we should use it.
 		SandeshaThread invoker = storageManager.getInvoker();

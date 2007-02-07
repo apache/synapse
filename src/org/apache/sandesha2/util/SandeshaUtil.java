@@ -19,7 +19,6 @@ package org.apache.sandesha2.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -27,12 +26,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -207,24 +203,6 @@ public class SandeshaUtil {
 		}
 	}
 
-	public static boolean isGloballyProcessableMessageType(int type) {
-		if (type == Sandesha2Constants.MessageTypes.ACK || type == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public static boolean isDuplicateDropRequiredMsgType(int rmMessageType) {
-		if (rmMessageType == Sandesha2Constants.MessageTypes.APPLICATION)
-			return true;
-
-		if (rmMessageType == Sandesha2Constants.MessageTypes.CREATE_SEQ_RESPONSE)
-			return true;
-
-		return false;
-	}
-
 	public static String getServerSideIncomingSeqIdFromInternalSeqId(String internalSequenceId)
 			throws SandeshaException {
 
@@ -339,72 +317,7 @@ public class SandeshaUtil {
 					namespaceName));
 	}
 
-	public static boolean isRMGlobalMessage(MessageContext msgCtx) {
-		boolean rmGlobalMsg = false;
 
-		String action = msgCtx.getWSAAction();
-		SOAPEnvelope env = msgCtx.getEnvelope();
-		SOAPHeader header = null;
-		if (env != null)
-			header = env.getHeader();
-		else {
-			log.error(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.soapEnvNotSet));
-			return false;
-		}
-
-		// TODO make this spec indipendent
-
-		OMElement sequenceElem = null;
-		if (header != null) {
-			sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2005_02.NS_URI,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-
-			if (sequenceElem == null)
-				sequenceElem = header.getFirstChildWithName(new QName(Sandesha2Constants.SPEC_2006_08.NS_URI,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-		}
-
-		if (sequenceElem != null)
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT.equals(action))
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE.equals(action))
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE_RESPONSE.equals(action))
-			rmGlobalMsg = true;
-
-		return rmGlobalMsg;
-	}
-
-	// RM will retry sending the message even if a fault arrive for following message types.
-	public static boolean isRetriableOnFaults(MessageContext msgCtx) {
-		boolean rmGlobalMsg = false;
-
-		String action = msgCtx.getWSAAction();
-
-
-		if (Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE.equals(action))
-			rmGlobalMsg = true;
-
-		if (Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE.equals(action))
-			rmGlobalMsg = true;
-
-		return rmGlobalMsg;
-	}
-	
 	public static MessageContext createNewRelatedMessageContext(RMMsgContext referenceRMMessage, AxisOperation operation)
 			throws SandeshaException {
 		try {
@@ -668,67 +581,6 @@ public class SandeshaUtil {
 		return sequeunceID;
 	}
 
-	public static QName getQNameFromString(String qnameStr) throws SandeshaException {
-		String[] parts = qnameStr.split(Sandesha2Constants.QNAME_SEPERATOR);
-		if (!(parts.length == 3))
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.invalidQName));
-
-		if (parts[0].equals(Sandesha2Constants.VALUE_NONE))
-			parts[0] = null;
-
-		if (parts[1].equals(Sandesha2Constants.VALUE_NONE))
-			parts[1] = null;
-
-		if (parts[2].equals(Sandesha2Constants.VALUE_NONE))
-			parts[2] = null;
-
-		if (parts[0].equals(Sandesha2Constants.VALUE_EMPTY))
-			parts[0] = "";
-
-		if (parts[1].equals(Sandesha2Constants.VALUE_EMPTY))
-			parts[1] = "";
-
-		if (parts[2].equals(Sandesha2Constants.VALUE_EMPTY))
-			parts[2] = "";
-
-		String namespace = parts[0];
-		String localPart = parts[1];
-		String prefix = parts[2];
-
-		QName name = new QName(namespace, localPart, prefix);
-		return name;
-	}
-
-	public static String getStringFromQName(QName name) {
-		String localPart = name.getLocalPart();
-		String namespace = name.getNamespaceURI();
-		String prefix = name.getPrefix();
-
-		if (localPart == null)
-			localPart = Sandesha2Constants.VALUE_NONE;
-
-		if (namespace == null)
-			namespace = Sandesha2Constants.VALUE_NONE;
-
-		if (prefix == null)
-			prefix = Sandesha2Constants.VALUE_NONE;
-
-		if ("".equals(localPart))
-			localPart = Sandesha2Constants.VALUE_EMPTY;
-
-		if ("".equals(namespace))
-			namespace = Sandesha2Constants.VALUE_EMPTY;
-
-		if ("".equals(prefix))
-			prefix = Sandesha2Constants.VALUE_EMPTY;
-
-		String QNameStr = namespace + Sandesha2Constants.QNAME_SEPERATOR + localPart
-				+ Sandesha2Constants.QNAME_SEPERATOR + prefix;
-
-		return QNameStr;
-	}
-
 	public static String getExecutionChainString(ArrayList executionChain) {
 		Iterator iter = executionChain.iterator();
 
@@ -740,17 +592,6 @@ public class SandeshaUtil {
 		}
 
 		return executionChainStr;
-	}
-
-	public static void printSOAPEnvelope(SOAPEnvelope envelope, OutputStream out) throws SandeshaException {
-		try {
-			XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
-			envelope.serialize(writer);
-		} catch (XMLStreamException e) {
-			throw new SandeshaException(e.getMessage());
-		} catch (FactoryConfigurationError e) {
-			throw new SandeshaException(e.getMessage());
-		}
 	}
 
 	public static boolean isAllMsgsAckedUpto(long highestInMsgNo, String internalSequenceId,

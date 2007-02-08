@@ -177,7 +177,7 @@ public class AcknowledgementProcessor {
 							// Check we haven't got an Ack for a message that hasn't been sent yet !
 							if (retransmitterBean.getSentCount() == 0) {
 								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
-										storageManager, SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalidNotSent));
+										storageManager);
 								if (log.isDebugEnabled())
 									log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack");
 								return;

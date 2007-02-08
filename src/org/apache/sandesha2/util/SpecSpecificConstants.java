@@ -295,7 +295,7 @@ public class SpecSpecificConstants {
 	
 	public static String getAddressingFaultAction (String addressingNSURI) throws SandeshaException {
 		if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNSURI))
-			return "http://schemas.xmlsoap.org/ws/2004/08/addressing/fault";  //this is not available in addressing constants )-:
+			return "http://docs.oasis-open.org/ws-rx/wsrm/200608/fault";  //this is not available in addressing constants )-:
 		else if (AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNSURI))
 			return AddressingConstants.Final.WSA_FAULT_ACTION;
 		else
@@ -324,15 +324,6 @@ public class SpecSpecificConstants {
 			return Sandesha2Constants.SPEC_2006_08.SEC_NS_URI;
 		}
 
-		return null;
-	}
-
-	public static String getFaultAction (String addressingNamespace) {
-		if (AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNamespace))
-			return AddressingConstants.Final.WSA_FAULT_ACTION;
-		else if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNamespace))
-			return AddressingConstants.Submission.WSA_FAULT_ACTION;
-		
 		return null;
 	}
 	

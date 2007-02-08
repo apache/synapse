@@ -174,7 +174,7 @@ public class FaultManager {
 			
 			data.setDetail(identifierElement);
 
-			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noSequenceEstablished, sequenceID));
+			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSequenceFault, sequenceID));
 			
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE);
 
@@ -210,7 +210,6 @@ public class FaultManager {
 		}
 
 		boolean invalidAck = false;
-		String reason = null;
 		
 		List sequenceAckList = sequenceAcknowledgement.getAcknowledgementRanges();
 		Iterator it = sequenceAckList.iterator();
@@ -221,22 +220,15 @@ public class FaultManager {
 			long lower = acknowledgementRange.getLowerValue();
 
 			if (lower > upper) {
-				invalidAck = true;
-				reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalid, Long.toString(lower), Long
-						.toString(upper));
-					
+				invalidAck = true;					
 				// check upper isn't bigger than the highest out msg number
 			} else if ( upper > rmsBean.getHighestOutMessageNumber() ) {
 				invalidAck = true;
-					
-				reason = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.ackInvalidHighMsg, 
-						Long.toString(upper),
-						Long.toString(rmsBean.getHighestOutMessageNumber()));
 			}
 				
 			if (invalidAck) {
 				makeInvalidAcknowledgementFault(ackRMMessageContext, sequenceAcknowledgement, 
-						acknowledgementRange, storageManager, reason);
+						acknowledgementRange, storageManager);
 				return true;
 			}
 		}		
@@ -255,7 +247,7 @@ public class FaultManager {
 	 */
 	public static void makeInvalidAcknowledgementFault(RMMsgContext rmMsgCtx, 
 			SequenceAcknowledgement sequenceAcknowledgement, AcknowledgementRange acknowledgementRange,
-			StorageManager storageManager, String reason) throws AxisFault {
+			StorageManager storageManager) throws AxisFault {
 		FaultData data = new FaultData();
 		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMsgCtx.getMessageContext().getEnvelope());
 		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
@@ -265,7 +257,7 @@ public class FaultManager {
 
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
 		data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
-		data.setReason(reason);
+		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckFault));
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 
@@ -351,7 +343,7 @@ public class FaultManager {
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED);
-			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTerminated, sequenceID));
+			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceTerminatedFault, sequenceID));
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED);
 			
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
@@ -388,7 +380,7 @@ public class FaultManager {
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
 			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED);
-			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosed, sequenceID));
+			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosedFault));
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED);
 			
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
@@ -456,7 +448,8 @@ public class FaultManager {
 			// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
 			MessageContext faultMessageContext = 
 				MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
-			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());
+
+			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
 			
 			referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
@@ -476,58 +469,7 @@ public class FaultManager {
 		throw fault;		
 		
 	}
-	
-	/**
-	 * Adds the necessary Fault elements as properties to the message context.
-	 * Returns a dummy Fault which will be throw by this method caller.
-	 * 
-	 * @param referenceRMMsgContext - Message in reference to which the fault will be generated.
-	 * @param data - data for the fault
-	 * @return - The dummy fault to be thrown out.
-	 * 
-	 * @throws AxisFault
-	 */
-	public static void getFault (RMMsgContext referenceRMMsgContext, FaultData data) throws AxisFault {
-		
-		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
-		
-		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
-		SOAPFaultSubCode faultSubCode = factory.createSOAPFaultSubCode(faultCode);
-		
-		SOAPFaultValue faultColdValue = factory.createSOAPFaultValue(faultCode);
-		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
-		
-		faultColdValue.setText(data.getCode());
-		faultSubcodeValue.setText(data.getSubcode());
 
-		faultCode.setSubCode(faultSubCode);
-		
-		SOAPFaultReason reason = factory.createSOAPFaultReason();
-		SOAPFaultText reasonText = factory.createSOAPFaultText();
-		reasonText.setText(data.getReason());
-		reason.addSOAPText(reasonText);
-		
-		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
-		detail.addDetailEntry(data.getDetail());
-		
-		String SOAPNamespaceValue = factory.getSoapVersionURI();
-		
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
-			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
-			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-		} else {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
-			throw new SandeshaException (message);
-		}
-		
-		SandeshaException fault = new SandeshaException("");
-		throw fault;
-	}
-	
 	public static boolean isRMFault (String faultSubcodeValue) {
 		if (faultSubcodeValue==null)
 			return false;

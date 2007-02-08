@@ -95,12 +95,9 @@ public class SandeshaMessageKeys {
 
 	public static final String toEPRNotValid="toEPRNotValid";
 	public static final String cannotFindSequence="cannotFindSequence";
-	public static final String cannotAcceptMsgAsSequenceClosed="cannotAcceptMsgAsSequenceClosed"; 
 	public static final String msgNumberMustBeLargerThanZero="msgNumberMustBeLargerThanZero";
 	public static final String msgNumberLargerThanLastMsg="msgNumberLargerThanLastMsg";
 	public static final String msgNumberNotLargerThanLastMsg="msgNumberNotLargerThanLastMsg";
-	public static final String ackInvalid="ackInvalid";
-	public static final String ackInvalidHighMsg="ackInvalidHighMsg";
 	public static final String ackInvalidNotSent="ackInvalidNotSent";
 	public static final String cannotHaveFinalWithNack="cannotHaveFinalWithNack";
 	public static final String accptButNoSequenceOffered="accptButNoSequenceOffered";
@@ -220,6 +217,10 @@ public class SandeshaMessageKeys {
 	public final static String createSequenceRefused = "createSequenceRefused";
 	public final static String referencedMessageNotFound = "referencedMessageNotFound";
 	public final static String messageNumberRollover = "messageNumberRollover";
+	public final static String sequenceTerminatedFault = "sequenceTerminatedFault";
+	public static final String unknownSequenceFault="unknownSequenceFault";
+	public static final String invalidAckFault="invalidAckFault";
+	public static final String cannotAcceptMsgAsSequenceClosedFault="cannotAcceptMsgAsSequenceClosedFault"; 
 	
 	public final static String policyBeanNotFound = "policyBeanNotFound";
 	public final static String cloneDoesNotMatchToOriginal = "cloneDoesNotMatchToOriginal";

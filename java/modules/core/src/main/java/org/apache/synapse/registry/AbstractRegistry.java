@@ -24,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -95,6 +97,15 @@ public abstract class AbstractRegistry implements Registry {
         if (dp.getMapper() != null) {
             dp.setValue(
                 dp.getMapper().getObjectFromOMNode(omNode));
+            if (dp.getValue() instanceof SequenceMediator) {
+                SequenceMediator seq = (SequenceMediator) dp.getValue();
+                seq.setDynamic(true);
+                seq.setRegistryKey(dp.getKey());
+            } else if (dp.getValue() instanceof Endpoint) {
+                Endpoint ep = (Endpoint) dp.getValue();
+                ep.setDynamic(true);
+                ep.setRegistryKey(dp.getKey());
+            }
         } else {
             // if the type of the object is known to have a mapper, create the
             // resultant Object using the known mapper, and cache this Object

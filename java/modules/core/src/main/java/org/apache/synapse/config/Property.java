@@ -57,7 +57,6 @@ public class Property {
     private Object value;
     /**
      * An XML to Object mapper - if one is available
-     * @deprecated
      */
     private XMLToObjectMapper mapper;
     /**
@@ -128,7 +127,6 @@ public class Property {
     /**
      *
      * @return mapper
-     * @deprecated
      */
     public XMLToObjectMapper getMapper() {
         return mapper;
@@ -137,7 +135,6 @@ public class Property {
     /**
      *
      * @param mapper
-     * @deprecated
      */
     public void setMapper(XMLToObjectMapper mapper) {
         this.mapper = mapper;

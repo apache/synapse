@@ -248,15 +248,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
                 <module>true</module>
             </properties>
         </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jms</artifactId>
-            <version>${geronimo.spec.jms.version}</version>
-            <properties>
-                <module>true</module>
-            </properties>
-        </dependency>
-    </dependencies>
+</dependencies>
 
     <!-- ======= -->
     <!-- Reports -->

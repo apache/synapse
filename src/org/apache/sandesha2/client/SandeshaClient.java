@@ -52,7 +52,6 @@ import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.workers.Invoker;
@@ -185,13 +184,10 @@ public class SandeshaClient {
 	}
 
 	private static void fillOutgoingSequenceInfo(SequenceReport report, RMSBean rmsBean,
-			StorageManager storageManager) throws SandeshaException {
+			StorageManager storageManager) {
 		report.setSequenceID(rmsBean.getSequenceID());
 
-		List completedMessageList = AcknowledgementManager.
-		getClientCompletedMessageRanges(rmsBean.getInternalSequenceID(), 
-				rmsBean.getSequenceID(),
-				storageManager).getContainedElementsAsNumbersList();
+		List completedMessageList = rmsBean.getClientCompletedMessages().getContainedElementsAsNumbersList();
 
 		Iterator iter = completedMessageList.iterator();
 		while (iter.hasNext()) {
@@ -987,10 +983,9 @@ public class SandeshaClient {
 
 			SequenceReport sequenceReport = new SequenceReport();
 
-			List completedMessageList = AcknowledgementManager.
-			getServerCompletedMessageRanges(
-				sequenceID,
-				storageManager).getContainedElementsAsNumbersList();
+			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
+
+			List completedMessageList = rmdBean.getServerCompletedMessages().getContainedElementsAsNumbersList();
 			
 			Iterator iter = completedMessageList.iterator();
 			while (iter.hasNext()) {
@@ -1005,7 +1000,6 @@ public class SandeshaClient {
 
 			sequenceReport.setSequenceStatus(getServerSequenceStatus(sequenceID, storageManager));
 
-			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
 			if(rmdBean.getSecurityTokenData() != null) sequenceReport.setSecureSequence(true);
 			
 			return sequenceReport;

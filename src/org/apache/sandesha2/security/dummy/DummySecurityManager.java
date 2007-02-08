@@ -23,6 +23,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisModule;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 
@@ -42,7 +43,7 @@ public class DummySecurityManager extends SecurityManager {
 	public void checkProofOfPossession(SecurityToken token, OMElement messagePart, MessageContext message)
 	throws SandeshaException
 	{
-		String msg = SandeshaMessageHelper.getMessage("secureDummyNoProof");
+		String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.secureDummyNoProof);
 		throw new SandeshaException(msg);
 	}
 
@@ -54,7 +55,7 @@ public class DummySecurityManager extends SecurityManager {
 	public String getTokenRecoveryData(SecurityToken token)
 	throws SandeshaException
 	{
-		String msg = SandeshaMessageHelper.getMessage("secureDummyNoToken");
+		String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.secureDummyNoToken);
 		throw new SandeshaException(msg);
 	}
 
@@ -69,17 +70,17 @@ public class DummySecurityManager extends SecurityManager {
 	public SecurityToken getSecurityToken(OMElement theSTR, MessageContext message)
 	throws SandeshaException
 	{
-		String msg = SandeshaMessageHelper.getMessage("secureDummyNoSTR");
+		String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.secureDummyNoSTR);
 		throw new SandeshaException(msg);
 	}
 
 	public OMElement createSecurityTokenReference(SecurityToken token, MessageContext message) throws SandeshaException {
-		String msg = SandeshaMessageHelper.getMessage("secureDummyNoSTR");
+		String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.secureDummyNoSTR);
 		throw new SandeshaException(msg);
 	}
 
 	public void applySecurityToken(SecurityToken token, MessageContext outboundMessage) throws SandeshaException {
-		String msg = SandeshaMessageHelper.getMessage("secureDummyNoSTR");
+		String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.secureDummyNoSTR);
 		throw new SandeshaException(msg);
 	}
 

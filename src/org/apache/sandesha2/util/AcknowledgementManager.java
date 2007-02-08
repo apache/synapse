@@ -160,56 +160,6 @@ public class AcknowledgementManager {
 	}
 
 	/**
-	 * this is used to get the acked messages of a sequence. If this is an
-	 * outgoing message the sequenceIdentifier should be the internal
-	 * sequenceID.
-	 * 
-	 * @param sequenceIdentifier
-	 * @param outGoingMessage
-	 * @return
-	 */
-	public static RangeString getClientCompletedMessageRanges(String internalSequenceID, String sequenceID, StorageManager storageManager)
-			throws SandeshaException {
-		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::getClientCompletedMessageRanges " + internalSequenceID + ", " + sequenceID);
-    
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
-
-		if (rmsBean == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.completedMsgBeanIsNull, sequenceID);
-			SandeshaException e = new SandeshaException(message);
-			if(log.isDebugEnabled()) log.debug("Throwing exception", e);
-			throw e;
-		}
-		
-		RangeString completedMsgRanges = rmsBean.getClientCompletedMessages();
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementManager::getClientCompletedMessageRanges");
-		return completedMsgRanges;
-	}
-
-	public static RangeString getServerCompletedMessageRanges(String sequenceID, StorageManager storageManager)
-			throws SandeshaException {
-		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::getServerCompletedMessageRanges " + sequenceID);
-
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
-		
-		if (rmdBean.getServerCompletedMessages() == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.completedMsgBeanIsNull, sequenceID);
-			SandeshaException e = new SandeshaException(message);
-			if(log.isDebugEnabled()) log.debug("Throwing exception", e);
-			throw e;
-		}
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: AcknowledgementManager::getServerCompletedMessageRanges");
-		return rmdBean.getServerCompletedMessages();
-	}
-
-
-	/**
 	 * 
 	 * @param referenceRMMessage
 	 * @param sequencePropertyKey

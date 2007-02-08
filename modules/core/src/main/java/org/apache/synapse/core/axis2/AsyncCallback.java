@@ -46,6 +46,8 @@ public class AsyncCallback extends Callback {
         MessageContext axisOutMsgCtx =
             ((Axis2MessageContext)synapseOutMsgCtx).getAxis2MessageContext();
 
+        response.setOperationContext(axisOutMsgCtx.getOperationContext());
+        
         // set properties on response
         response.setServerSide(true);
         response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);

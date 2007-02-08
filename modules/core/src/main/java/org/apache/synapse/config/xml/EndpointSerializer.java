@@ -62,67 +62,76 @@ public class EndpointSerializer {
 
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
 
-        // is this an endpoint ref or an actual endpoint
-        if (endpt.getName() == null && endpt.getRef() != null) {
+        if (endpt.isDynamic()) {
             endpoint.addAttribute(fac.createOMAttribute(
-                "ref", nullNS, endpt.getRef()));
-            
+                "name", nullNS, endpt.getName()));
+            endpoint.addAttribute(fac.createOMAttribute(
+                "key", nullNS, endpt.getRegistryKey()));
+
         } else {
-        	if (endpt.isForcePOX()) {
-        		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "pox"));
-        	} else if (endpt.isForceSOAP()) {
-        		endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "soap"));
-        	}
 
-            if (endpt.getName() != null) {
+            // is this an endpoint ref or an actual endpoint
+            if (endpt.getName() == null && endpt.getRef() != null) {
                 endpoint.addAttribute(fac.createOMAttribute(
-                       "name", nullNS, endpt.getName()));
-            }
-            if (endpt.getAddress() != null) {
-                endpoint.addAttribute(fac.createOMAttribute(
-                    "address", nullNS, endpt.getAddress()));
+                    "ref", nullNS, endpt.getRef()));
+
             } else {
-                handleException("Invalid Endpoint. Address is required");
-            }
-            int isEnableStatistics = endpt.getStatisticsEnable();
-            String statisticsValue = null;
-            if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
-                statisticsValue = Constants.STATISTICS_ENABLE;
-            } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
-                statisticsValue = Constants.STATISTICS_DISABLE;
-            }
-            if (statisticsValue != null) {
-                endpoint.addAttribute(fac.createOMAttribute(
-                        Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
-            }
-            if (endpt.isAddressingOn()) {
-            	OMElement addressing = fac.createOMElement("enableAddressing", synNS);
-            	if (endpt.isUseSeparateListener()) {
-            		addressing.addAttribute(fac.createOMAttribute(
-                            "separateListener", nullNS, "true"));
-            	}
-                endpoint.addChild(addressing);
-            }
-
-            if (endpt.isReliableMessagingOn()) {
-                OMElement rm = fac.createOMElement("enableRM", synNS);
-                if (endpt.getWsRMPolicyKey() != null) {
-                    rm.addAttribute(fac.createOMAttribute(
-                        "policy", nullNS, endpt.getWsRMPolicyKey()));
+                if (endpt.isForcePOX()) {
+                    endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "pox"));
+                } else if (endpt.isForceSOAP()) {
+                    endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "soap"));
                 }
-                endpoint.addChild(rm);
-            }
 
-            if (endpt.isSecurityOn()) {
-                OMElement sec = fac.createOMElement("enableSec", synNS);
-                if (endpt.getWsSecPolicyKey() != null) {
-                    sec.addAttribute(fac.createOMAttribute(
-                        "policy", nullNS, endpt.getWsSecPolicyKey()));
+                if (endpt.getName() != null) {
+                    endpoint.addAttribute(fac.createOMAttribute(
+                           "name", nullNS, endpt.getName()));
                 }
-                endpoint.addChild(sec);
+                if (endpt.getAddress() != null) {
+                    endpoint.addAttribute(fac.createOMAttribute(
+                        "address", nullNS, endpt.getAddress()));
+                } else {
+                    handleException("Invalid Endpoint. Address is required");
+                }
+                int isEnableStatistics = endpt.getStatisticsEnable();
+                String statisticsValue = null;
+                if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+                    statisticsValue = Constants.STATISTICS_ENABLE;
+                } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+                    statisticsValue = Constants.STATISTICS_DISABLE;
+                }
+                if (statisticsValue != null) {
+                    endpoint.addAttribute(fac.createOMAttribute(
+                            Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
+                }
+                if (endpt.isAddressingOn()) {
+                    OMElement addressing = fac.createOMElement("enableAddressing", synNS);
+                    if (endpt.isUseSeparateListener()) {
+                        addressing.addAttribute(fac.createOMAttribute(
+                                "separateListener", nullNS, "true"));
+                    }
+                    endpoint.addChild(addressing);
+                }
+
+                if (endpt.isReliableMessagingOn()) {
+                    OMElement rm = fac.createOMElement("enableRM", synNS);
+                    if (endpt.getWsRMPolicyKey() != null) {
+                        rm.addAttribute(fac.createOMAttribute(
+                            "policy", nullNS, endpt.getWsRMPolicyKey()));
+                    }
+                    endpoint.addChild(rm);
+                }
+
+                if (endpt.isSecurityOn()) {
+                    OMElement sec = fac.createOMElement("enableSec", synNS);
+                    if (endpt.getWsSecPolicyKey() != null) {
+                        sec.addAttribute(fac.createOMAttribute(
+                            "policy", nullNS, endpt.getWsSecPolicyKey()));
+                    }
+                    endpoint.addChild(sec);
+                }
             }
         }
-
+        
         if (parent != null) {
             parent.addChild(endpoint);
         }

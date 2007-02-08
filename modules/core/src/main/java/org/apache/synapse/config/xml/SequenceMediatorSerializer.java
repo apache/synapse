@@ -52,31 +52,43 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
 
         SequenceMediator mediator = (SequenceMediator) m;
         OMElement sequence = fac.createOMElement("sequence", synNS);
-        int isEnableStatistics = mediator.getStatisticsEnable();
-        String statisticsValue = null;
-        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
-            statisticsValue = Constants.STATISTICS_ENABLE;
-        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
-            statisticsValue = Constants.STATISTICS_DISABLE;
-        }
-        if (statisticsValue != null) {
-            sequence.addAttribute(fac.createOMAttribute(
-                    Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
-        }
 
-        if (mediator.getRef() != null) {
-            sequence.addAttribute(fac.createOMAttribute(
-                "ref", nullNS, mediator.getRef()));
-        } else if (mediator.getName() != null) {
+        // is this a dynamic sequence we loaded from a registry? if so we have no work to here
+        // except make sure that we refer back to the registry key used when we loaded ourself
+        if (mediator.isDynamic()) {
             sequence.addAttribute(fac.createOMAttribute(
                 "name", nullNS, mediator.getName()));
-
-            if (mediator.getErrorHandler() != null) {
-                sequence.addAttribute(fac.createOMAttribute(
-                    "onError", nullNS, mediator.getErrorHandler()));
+            sequence.addAttribute(fac.createOMAttribute(
+                "key", nullNS, mediator.getRegistryKey()));            
+            
+        } else {
+            
+            int isEnableStatistics = mediator.getStatisticsEnable();
+            String statisticsValue = null;
+            if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+                statisticsValue = Constants.STATISTICS_ENABLE;
+            } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+                statisticsValue = Constants.STATISTICS_DISABLE;
             }
-            finalizeSerialization(sequence,mediator);            
-            super.serializeChildren(sequence, mediator.getList());
+            if (statisticsValue != null) {
+                sequence.addAttribute(fac.createOMAttribute(
+                        Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
+            }
+
+            if (mediator.getRef() != null) {
+                sequence.addAttribute(fac.createOMAttribute(
+                    "ref", nullNS, mediator.getRef()));
+            } else if (mediator.getName() != null) {
+                sequence.addAttribute(fac.createOMAttribute(
+                    "name", nullNS, mediator.getName()));
+
+                if (mediator.getErrorHandler() != null) {
+                    sequence.addAttribute(fac.createOMAttribute(
+                        "onError", nullNS, mediator.getErrorHandler()));
+                }
+                finalizeSerialization(sequence,mediator);
+                super.serializeChildren(sequence, mediator.getList());
+            }
         }
 
         if (parent != null) {

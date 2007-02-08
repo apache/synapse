@@ -57,6 +57,11 @@ public class Endpoint {
     private boolean useMTOM = false;
     /** use SWA **/
     private boolean useSwa = false;
+    /** is this definition dynamic */
+    private boolean dynamic = false;
+    /** the registry key to load this definition if dynamic */
+    private String registryKey = null;
+    
 
     /** To decide to whether statistics should have collected or not */
     private int statisticsEnable = Constants.STATISTICS_UNSET;
@@ -244,5 +249,37 @@ public class Endpoint {
      */
     public void setStatisticsEnable(int statisticsEnable) {
         this.statisticsEnable = statisticsEnable;
+    }
+
+    /**
+     * Is this a dynamic endpoint?
+     * @return true if dynamic
+     */
+    public boolean isDynamic() {
+        return dynamic;
+    }
+
+    /**
+     * Mark this as a dynamic endpoint
+     * @param dynamic true if this is a dynamic endpoint
+     */
+    public void setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
+    }
+
+    /**
+     * Return the registry key used to load this endpoint dynamically
+     * @return
+     */
+    public String getRegistryKey() {
+        return registryKey;
+    }
+
+    /**
+     * get the registry key used to load this endpoint dynamically
+     * @param registryKey
+     */
+    public void setRegistryKey(String registryKey) {
+        this.registryKey = registryKey;
     }
 }

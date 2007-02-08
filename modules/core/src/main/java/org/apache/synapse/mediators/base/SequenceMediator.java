@@ -47,6 +47,10 @@ public class SequenceMediator extends AbstractListMediator {
     private String name = null;
     private String ref = null;
     private String errorHandler = null;
+    /** is this definition dynamic */
+    private boolean dynamic = false;
+    /** the registry key to load this definition if dynamic */
+    private String registryKey = null;
 
     /** To decide to whether statistics should have collected or not  */
     private int statisticsEnable = Constants.STATISTICS_UNSET;
@@ -191,5 +195,37 @@ public class SequenceMediator extends AbstractListMediator {
      */
     public void setStatisticsEnable(int statisticsEnable) {
         this.statisticsEnable = statisticsEnable;
+    }
+
+    /**
+     * Is this a dynamic sequence?
+     * @return true if dynamic
+     */
+    public boolean isDynamic() {
+        return dynamic;
+    }
+
+    /**
+     * Mark this as a dynamic sequence
+     * @param dynamic true if this is a dynamic sequence
+     */
+    public void setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
+    }
+
+    /**
+     * Return the registry key used to load this sequence dynamically
+     * @return
+     */
+    public String getRegistryKey() {
+        return registryKey;
+    }
+
+    /**
+     * get the registry key used to load this sequence dynamically
+     * @param registryKey
+     */
+    public void setRegistryKey(String registryKey) {
+        this.registryKey = registryKey;
     }
 }

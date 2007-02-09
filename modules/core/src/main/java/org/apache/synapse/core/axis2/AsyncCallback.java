@@ -99,6 +99,8 @@ public class AsyncCallback extends Callback {
     public void onError(Exception e) {
         // this will never be called as our custom SynapseCallbackReceiver will push
         // faults as well through the onComplete()
+        log.warn(e);
+        e.printStackTrace();
     }
 
     public void setSynapseOutMshCtx(org.apache.synapse.MessageContext synapseOutMsgCtx) {

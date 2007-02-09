@@ -99,7 +99,6 @@ public class ClientWorker implements Runnable {
                 outMsgCtx.getEnvelope().getNamespace().getNamespaceURI());
             responseMsgCtx.setEnvelope(envelope);
 
-            in.close();
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);
             return;

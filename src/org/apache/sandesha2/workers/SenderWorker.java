@@ -172,10 +172,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			// Although not actually sent yet, update the send count to indicate an attempt
 			if (senderBean.isReSend()) {
-				SenderBean bean2 = senderBeanMgr
-				.retrieve(senderBean.getMessageID());
-				bean2.setSentCount(senderBean.getSentCount());
-				senderBeanMgr.update(bean2);
+				SenderBean bean2 = senderBeanMgr.retrieve(senderBean.getMessageID());
+				if (bean2 != null) {
+					bean2.setSentCount(senderBean.getSentCount());
+					senderBeanMgr.update(bean2);
+				}
 			}
 			
 			// have to commit the transaction before sending. This may

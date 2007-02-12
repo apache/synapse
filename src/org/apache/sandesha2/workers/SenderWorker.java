@@ -482,7 +482,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			try {
 				// MessageContext is modified in TransportUtils.createSOAPMessage(). It might be used by axis.engine or handler.
 				// To catch the modification and pass it to engine or handler, resenvelope is created by responseMessageContext. 
-				resenvelope = TransportUtils.createSOAPMessage(responseMessageContext, msgCtx.getEnvelope().getNamespace().getNamespaceURI());
+				resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
 			} catch (AxisFault e) {
 				//Cannot find a valid SOAP envelope.
 				if (log.isErrorEnabled() ) {

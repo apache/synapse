@@ -153,6 +153,11 @@ public class MsgInitializer {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MESSAGE_PENDING,
 					elements.getMessagePending());
 		}
+		
+		if (elements.getSequenceFault() != null) {
+			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT,
+					elements.getSequenceFault());
+		}
 
 		rmMsgContext.setRMNamespaceValue(rmNamespace);
 

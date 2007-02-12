@@ -326,8 +326,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				String sequenceID = terminateSequence.getIdentifier().getIdentifier();
 
 				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
-				TerminateManager.terminateSendingSide(rmsBean, msgCtx.isServerSide(),
-						storageManager);
+				TerminateManager.terminateSendingSide(rmsBean, storageManager);
 				
 				transaction.commit();
 			}

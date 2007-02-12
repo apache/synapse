@@ -234,28 +234,27 @@ public class TerminateManager {
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void terminateSendingSide(RMSBean rmsBean,
-			boolean serverSide, StorageManager storageManager) throws SandeshaException {
+	public static void terminateSendingSide(RMSBean rmsBean, 
+			StorageManager storageManager) throws SandeshaException {
 
 		// Indicate that the sequence is terminated
 		rmsBean.setTerminated(true);		
 		storageManager.getRMSBeanMgr().update(rmsBean);
 		
-		cleanSendingSideData (rmsBean.getInternalSequenceID(), serverSide, storageManager);
+		cleanSendingSideData (rmsBean.getInternalSequenceID(), storageManager);
 	}
 
 	public static void timeOutSendingSideSequence(String internalSequenceId,
-			boolean serverside, StorageManager storageManager) throws SandeshaException {
+			StorageManager storageManager) throws SandeshaException {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		rmsBean.setTimedOut(true);
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
-		cleanSendingSideData(internalSequenceId, serverside, storageManager);
+		cleanSendingSideData(internalSequenceId, storageManager);
 	}
 
-	private static void cleanSendingSideData(String internalSequenceId,
-			boolean serverSide, StorageManager storageManager) throws SandeshaException {
+	private static void cleanSendingSideData(String internalSequenceId, StorageManager storageManager) throws SandeshaException {
 
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 

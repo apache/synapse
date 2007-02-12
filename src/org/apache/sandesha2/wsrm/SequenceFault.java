@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -33,7 +34,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
  * Adds the SequenceFault header block.
  */
 
-public class SequenceFault implements IOMRMElement {
+public class SequenceFault implements IOMRMPart {
 	
 	private FaultCode faultCode;
 	
@@ -52,20 +53,13 @@ public class SequenceFault implements IOMRMElement {
 		return namespaceValue;
 	}
 
-	public Object fromOMElement(OMElement body) throws OMException,SandeshaException {
+	public Object fromOMElement(OMElement sequenceFaultPart) throws OMException,SandeshaException {
 
-		if (body == null || !(body instanceof SOAPHeader))
-			throw new OMException(
-					SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
-
-		OMElement sequenceFaultPart = body.getFirstChildWithName(new QName(
-				namespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT));
 
 		if (sequenceFaultPart == null)
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.noSeqFaultInElement,
-					body.toString()));
+					null));
 
 		OMElement faultCodePart = sequenceFaultPart
 				.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSRM_COMMON.FAULT_CODE));
@@ -114,5 +108,17 @@ public class SequenceFault implements IOMRMElement {
 		
 		return false;
 	}
+
+	public void toSOAPEnvelope(SOAPEnvelope envelope) {
+		SOAPHeader header = envelope.getHeader();
+		
+		//detach if already exist.
+		OMElement elem = header.getFirstChildWithName(new QName(namespaceValue,
+				Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT));
+		if (elem!=null)
+			elem.detach();
+		
+		toOMElement(header);
+  }
 
 }

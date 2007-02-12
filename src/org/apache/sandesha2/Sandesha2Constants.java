@@ -249,8 +249,10 @@ public interface Sandesha2Constants {
 		int MAKE_CONNECTION = 17;
 		
 		int MESSAGE_PENDING = 18;
+		
+		int SEQUENCE_FAULT = 19;
 
-		int MAX_MSG_PART_ID = 18;
+		int MAX_MSG_PART_ID = 19;
 	}
 
 	public interface SOAPVersion {

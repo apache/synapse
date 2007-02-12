@@ -34,9 +34,17 @@ import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.RelatesTo;
+import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.util.MessageContextBuilder;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.FaultData;
@@ -47,11 +55,17 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
+import org.apache.sandesha2.wsrm.SequenceFault;
 
 /**
  * Has logic to check for possible RM related faults and create it.
@@ -295,7 +309,7 @@ public class FaultManager {
 
 		FaultData data = new FaultData();
 		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
-			data.setCode(SOAP11Constants.FAULT_CODE_RECEIVER);
+			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
 		else
 			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
@@ -489,20 +503,49 @@ public class FaultManager {
 		
 	}
 	
-	private static void manageIncomingFault (AxisFault fault, MessageContext msgContext) {
+	private static void manageIncomingFault (AxisFault fault, RMMsgContext rmMsgCtx, SOAPFault faultPart) throws AxisFault {
 	
 		if (log.isErrorEnabled())
 			log.error(fault);
 		
-		SandeshaListener listner = (SandeshaListener) msgContext.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
+		SandeshaListener listner = (SandeshaListener) rmMsgCtx.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
 		if (listner!=null)
 			listner.onError(fault);
 		
+		// Get the SOAPVersion
+		SOAPFactory factory = (SOAPFactory) rmMsgCtx.getSOAPEnvelope().getOMFactory();		
+		String SOAPNamespaceValue = factory.getSoapVersionURI();
+		
+		String soapFaultSubcode = null;
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+			// Log the fault
+			if (faultPart.getCode() != null && 
+					faultPart.getCode().getSubCode() != null &&
+					faultPart.getCode().getSubCode().getValue() != null)
+				soapFaultSubcode = faultPart.getCode().getSubCode().getValue().getText();
+		} else {
+			// Need to get the sequence part from the Header.
+			try {
+	      SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT);
+	      
+	      // If the sequence fault part is not null, then we have an RM specific fault.
+	      if (sequenceFault != null) {
+	      	soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode();
+	      }
+      } catch (SandeshaException e) {
+      	if (log.isDebugEnabled()) 
+      		log.debug("Unable to process SequenceFault");
+      }
+		}
+		
+		if (Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED.equals(soapFaultSubcode)) {
+			processCreateSequenceRefusedFault(rmMsgCtx, fault);
+		}
 	}
 	
-	public static void processMessagesForFaults (MessageContext msgContext) {
+	public static void processMessagesForFaults (RMMsgContext rmMsgCtx) throws AxisFault {
 		
-		SOAPEnvelope envelope = msgContext.getEnvelope();
+		SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
 		if (envelope==null) 
 			return;
 		
@@ -512,7 +555,7 @@ public class FaultManager {
 
 			// constructing the fault
 			AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
-			manageIncomingFault (axisFault, msgContext);
+			manageIncomingFault (axisFault, rmMsgCtx, faultPart);
 		}
 
 	}
@@ -568,4 +611,111 @@ public class FaultManager {
 		}
 	  return false;
   }
+	
+	/**
+	 * On receipt of a CreateSequenceRefused fault, terminate the sequence and notify any waiting
+	 * clients of the error.
+	 * @param fault 
+	 * @throws AxisFault 
+	 */
+	private static void processCreateSequenceRefusedFault(RMMsgContext rmMsgCtx, AxisFault fault) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::processCreateSequenceRefusedFault");
+
+		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
+
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
+				.getAxisConfiguration());
+
+		RelatesTo relatesTo = rmMsgCtx.getMessageContext().getRelatesTo();
+		String createSeqMsgId = null;
+		if (relatesTo != null) {
+			createSeqMsgId = relatesTo.getValue();
+		} else {
+			// Work out the related message from the operation context
+			OperationContext context = rmMsgCtx.getMessageContext().getOperationContext();
+			MessageContext createSeq = context.getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+			if(createSeq != null) createSeqMsgId = createSeq.getMessageID();
+		}
+		if(createSeqMsgId == null) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.relatesToNotAvailable);
+			log.error(message);
+			throw new SandeshaException(message);
+		}
+
+		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
+		RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
+
+		RMSBean rmsBean = rmsBeanMgr.retrieve(createSeqMsgId);
+		if (rmsBean == null) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound);
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+
+		// Check that the create sequence response message proves possession of the correct token
+		String tokenData = rmsBean.getSecurityTokenData();
+		if(tokenData != null) {
+			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
+			MessageContext crtSeqResponseCtx = rmMsgCtx.getMessageContext();
+			OMElement body = crtSeqResponseCtx.getEnvelope().getBody();
+			SecurityToken token = secManager.recoverSecurityToken(tokenData);
+			secManager.checkProofOfPossession(token, body, crtSeqResponseCtx);
+		}
+
+		String internalSequenceId = rmsBean.getInternalSequenceID();
+		if (internalSequenceId == null || "".equals(internalSequenceId)) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.tempSeqIdNotSet);
+			log.debug(message);
+			throw new SandeshaException(message);
+		}
+		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
+
+		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
+		if (createSequenceSenderBean == null)
+			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound));
+
+		// deleting the create sequence entry.
+		retransmitterMgr.delete(createSeqMsgId);
+						
+		// Locate and update all of the messages for this sequence, now that we know
+		// the sequence id.
+		SenderBean target = new SenderBean();
+		target.setInternalSequenceID(internalSequenceId);
+		target.setSend(false);
+		
+		Iterator iterator = retransmitterMgr.find(target).iterator();
+		while (iterator.hasNext()) {
+			SenderBean tempBean = (SenderBean) iterator.next();
+
+			String messageStoreKey = tempBean.getMessageContextRefKey();
+			
+			// Retrieve the message context.
+			MessageContext context = storageManager.retrieveMessageContext(messageStoreKey, configCtx);
+			
+      AxisOperation axisOperation = context.getAxisOperation();
+      if (axisOperation != null)
+      {
+        MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
+        if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver))
+        {
+          Callback callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
+          if (callback != null)
+          {
+            callback.onError(fault);
+          }
+        }
+      }
+		}
+		
+		rmMsgCtx.pause();
+		
+		// Cleanup sending side.
+		if (log.isDebugEnabled())
+			log.debug("Terminating sending sequence " + rmsBean);
+		TerminateManager.terminateSendingSide(rmsBean, storageManager);
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::processCreateSequenceRefusedFault");
+	}
 }

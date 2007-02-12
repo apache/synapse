@@ -59,6 +59,7 @@ public class RMElements {
 	private UsesSequenceSTR usesSequenceSTR = null;
 	private MessagePending messagePending = null;
 	private MakeConnection makeConnection = null;
+	private SequenceFault sequenceFault = null;
 	private String rmNamespaceValue = null;
 	
 	public RMElements () {
@@ -198,6 +199,15 @@ public class RMElements {
 			messagePending = new MessagePending (rmNamespaceValue);
 			messagePending.fromOMElement(messagePendingElement);
 		}
+		
+		OMElement sequenceFaultElement = envelope.getHeader().getFirstChildWithName(
+				new QName (rmNamespaceValue,
+						Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT));
+		if (sequenceFaultElement!=null) {
+			sequenceFault = new SequenceFault (rmNamespaceValue);
+			sequenceFault.fromOMElement(sequenceFaultElement);
+		}
+
 	}
 
 	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws AxisFault  {
@@ -391,5 +401,9 @@ public class RMElements {
 
 	public MessagePending getMessagePending() {
 		return messagePending;
+	}
+	
+	public SequenceFault getSequenceFault() {
+		return sequenceFault;
 	}
 }

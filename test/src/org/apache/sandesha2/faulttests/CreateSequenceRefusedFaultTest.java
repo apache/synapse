@@ -47,7 +47,7 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
 	    + "repos" + File.separator + "server" + File.separator
 	    + "server_axis2.xml";
 	
-	private ConfigurationContext serverConfigContext;
+	private static ConfigurationContext serverConfigContext;
 	
 	public CreateSequenceRefusedFaultTest() {
 		super("CreateSequenceProcessorTest");
@@ -63,7 +63,7 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
 	 * 
 	 * @throws Exception
 	 */
-	public void testInvalidAcksToSOAPFault() throws Exception {
+	public void testCreateSequenceSOAPFault() throws Exception {
 
     // Open a connection to the endpoint
 		HttpURLConnection connection = 
@@ -147,4 +147,5 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
 		return outputStream.toByteArray();
 	}
 }
+
 

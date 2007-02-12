@@ -284,6 +284,15 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 					log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
 				return false;
 			} 
+				
+			// If we are SOAP12 and we have already processed the fault - rethrow the exception
+			if (createSeqRMMsg.getMessageContext().getProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME) != null) {
+					// throw the original exception
+					if (e instanceof AxisFault)
+						throw (AxisFault)e;
+					 
+					throw new SandeshaException(e);
+			}
 		}
 
 		if (log.isDebugEnabled())

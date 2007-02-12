@@ -79,7 +79,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 		}
 
-		TerminateManager.terminateSendingSide (rmsBean, msgContext.isServerSide(), storageManager);
+		TerminateManager.terminateSendingSide (rmsBean, storageManager);
 		
 		// Stop this message travelling further through the Axis runtime
 		terminateResRMMsg.pause();

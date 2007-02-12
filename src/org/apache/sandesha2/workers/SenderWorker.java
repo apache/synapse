@@ -470,6 +470,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 							.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
 			responseMessageContext.setProperty(HTTPConstants.CHAR_SET_ENCODING, requestMsgOpCtx
 							.getProperty(HTTPConstants.CHAR_SET_ENCODING));
+			responseMessageContext.setProperty(HTTPConstants.CONTENT_TYPE, requestMsgOpCtx
+							.getProperty(HTTPConstants.CONTENT_TYPE));
 
 			
 			// If request is REST we assume the responseMessageContext is REST,

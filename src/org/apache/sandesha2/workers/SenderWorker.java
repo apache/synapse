@@ -11,6 +11,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -522,9 +523,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					OperationContext responseMsgOpCtx = requestMsgOpCtx;
 					if (requestMsgOpCtx.getAxisOperation().getMessageReceiver() == null) {
 						// Generate a new RM In Only operation
+
 						ServiceContext serviceCtx = responseMessageContext.getServiceContext();
 						AxisOperation op = msgCtx.getAxisService().getOperation(new QName("RMInOnlyOperation"));
-						responseMsgOpCtx = new OperationContext(op, serviceCtx);					
+						responseMsgOpCtx = ContextFactory.createOperationContext (op, serviceCtx);					
+
 					}
 					
 					responseMessageContext.setOperationContext(responseMsgOpCtx);

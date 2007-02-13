@@ -96,6 +96,7 @@
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
         <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
         <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
+        <!-- <parameter name="OmitSOAP12Action" locked="false">true</parameter> -->
     </transportSender>
     <transportSender name="https"
                      class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">

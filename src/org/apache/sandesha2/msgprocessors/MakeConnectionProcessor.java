@@ -7,8 +7,10 @@ import java.util.Random;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.logging.Log;
@@ -144,7 +146,9 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		OperationContext context = pollMessage.getMessageContext().getOperationContext();
 		if(context == null) {
 			AxisOperation oldOperation = returnMessage.getAxisOperation();
-			context = new OperationContext(oldOperation, returnMessage.getServiceContext());
+
+			context = ContextFactory.createOperationContext(oldOperation, returnMessage.getServiceContext()); //new OperationContext(oldOperation);
+
 			context.addMessageContext(pollMessage.getMessageContext());
 			pollMessage.getMessageContext().setOperationContext(context);
 		}

@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.OperationContextFactory;
@@ -366,9 +367,10 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				Sandesha2Constants.MessageTypes.TERMINATE_SEQ,
 				rmMsgCtx.getRMSpecVersion(),
 				getMsgContext().getAxisService());
-		OperationContext opcontext = OperationContextFactory
-				.createOperationContext(
-						WSDLConstants.MEP_CONSTANT_OUT_IN, terminateOp, getMsgContext().getServiceContext());
+	
+		OperationContext opcontext = ContextFactory.createOperationContext(terminateOp, getMsgContext().getServiceContext());
+		opcontext.setParent(getMsgContext().getServiceContext());
+
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),	opcontext);
 
 		getMsgContext().setOperationContext(opcontext);

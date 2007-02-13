@@ -24,6 +24,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
@@ -172,7 +173,10 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 				rmMsgCtx.getMessageContext().getAxisService());
 		getMsgContext().setAxisOperation(closeOperation);
 
-		OperationContext opcontext = new OperationContext(closeOperation, getMsgContext().getServiceContext());
+
+		OperationContext opcontext = ContextFactory.createOperationContext(closeOperation, getMsgContext().getServiceContext());
+		opcontext.setParent(getMsgContext().getServiceContext());
+
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		

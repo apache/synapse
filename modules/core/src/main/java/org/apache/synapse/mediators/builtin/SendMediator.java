@@ -74,7 +74,7 @@ public class SendMediator extends AbstractMediator {
                             synCtx.getWSAAction() : "null"));
                     log.debug("Body : \n" + synCtx.getEnvelope());
                 }
-                synCtx.getEnvironment().send(synCtx);
+                synCtx.getEnvironment().send(null, synCtx);
 
             } else if (endpoints.size() == 1) {
                 Endpoint singleEndpoint = (Endpoint) endpoints.get(0);
@@ -89,27 +89,6 @@ public class SendMediator extends AbstractMediator {
 
                 if (shouldTrace) {
                     trace.trace("Sending to Endpoint : " + eprAddress);
-                }
-                if (singleEndpoint.isForcePOX()) {
-                    synCtx.setDoingPOX(true);
-                } else if (singleEndpoint.isForceSOAP()) {
-                    synCtx.setDoingPOX(false);
-                }
-
-                if (singleEndpoint.isForcePOX()) {
-                    synCtx.setDoingPOX(true);
-                } else if (singleEndpoint.isForceSOAP()) {
-                    synCtx.setDoingPOX(false);
-                }
-
-                if (singleEndpoint.isUseMTOM()) {
-                    synCtx.setDoingMTOM(true);
-                } else if (singleEndpoint.isUseSwa()) {
-                    synCtx.setDoingSWA(true);
-                }
-
-                if (singleEndpoint.isUseSeparateListener()) {
-                    synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
                 }
                 String endPointName = singleEndpoint.getName();
 
@@ -133,31 +112,8 @@ public class SendMediator extends AbstractMediator {
                     log.debug("Body : \n" + synCtx.getEnvelope());
                 }
 
-                // if RM is turned on
-                if (singleEndpoint.isReliableMessagingOn()) {
-                    synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                    synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
-                    if (singleEndpoint.getWsRMPolicyKey() != null) {
-                        synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
-                                singleEndpoint.getWsRMPolicyKey());
-                    }
-                }
+                synCtx.getEnvironment().send(singleEndpoint, synCtx);
 
-                // if WS Security is specified
-                if (singleEndpoint.isSecurityOn()) {
-                    synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                    synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
-                    if (singleEndpoint.getWsSecPolicyKey() != null) {
-                        synCtx.setProperty(Constants.OUTFLOW_SEC_POLICY,
-                                singleEndpoint.getWsSecPolicyKey());
-                    }
-                }
-
-                // if WS Addressing is specified
-                if (singleEndpoint.isAddressingOn()) {
-                    synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                }
-                synCtx.getEnvironment().send(synCtx);
             } else {
                 String msg = "The send mediator currently supports only one endpoint";
                 synCtx.setProperty(Constants.SYNAPSE_ERROR, Boolean.TRUE);

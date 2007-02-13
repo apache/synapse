@@ -365,7 +365,7 @@ public class SandeshaUtil {
 
 			newMessageContext.setAxisOperation(operation);
 
-			OperationContext operationContext = new OperationContext(operation);
+			OperationContext operationContext = new OperationContext(operation, newMessageContext.getServiceContext());
 			newMessageContext.setOperationContext(operationContext);
 			operationContext.addMessageContext(newMessageContext);
 

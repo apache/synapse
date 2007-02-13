@@ -33,6 +33,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
@@ -353,7 +354,8 @@ public class AcknowledgementManager {
 			// operation context will be null when doing in a GLOBAL
 			// handler.
 			AxisOperation op = ackMsgContext.getAxisOperation();
-			OperationContext opCtx = new OperationContext(op);
+			ServiceContext serviceCtx = ackMsgContext.getServiceContext();
+			OperationContext opCtx = new OperationContext(op, serviceCtx);
 			ackRMMsgContext.getMessageContext().setOperationContext(opCtx);
 		}
 

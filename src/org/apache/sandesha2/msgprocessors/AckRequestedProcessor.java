@@ -32,6 +32,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
@@ -183,7 +184,8 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
 				// operation context will be null when doing in a GLOBAL
 				// handler.
-				OperationContext opCtx = new OperationContext(ackOperation);
+				ServiceContext serviceCtx = msgContext.getServiceContext();
+				OperationContext opCtx = new OperationContext(ackOperation, serviceCtx);
 				rmMsgCtx.getMessageContext().setOperationContext(opCtx);
 			}
 
@@ -290,9 +292,8 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 				getRMVersion(),
 				getMsgContext().getAxisService());
 		getMsgContext().setAxisOperation(ackOperation);
-
-		OperationContext opcontext = new OperationContext(ackOperation);
-		opcontext.setParent(getMsgContext().getServiceContext());
+		ServiceContext serviceCtx = getMsgContext().getServiceContext();
+		OperationContext opcontext = new OperationContext(ackOperation, serviceCtx);
 		getConfigurationContext().registerOperationContext(ackRequestRMMsg.getMessageId(), opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		

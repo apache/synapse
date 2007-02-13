@@ -368,8 +368,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				getMsgContext().getAxisService());
 		OperationContext opcontext = OperationContextFactory
 				.createOperationContext(
-						WSDLConstants.MEP_CONSTANT_OUT_IN, terminateOp);
-		opcontext.setParent(getMsgContext().getServiceContext());
+						WSDLConstants.MEP_CONSTANT_OUT_IN, terminateOp, getMsgContext().getServiceContext());
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),	opcontext);
 
 		getMsgContext().setOperationContext(opcontext);

@@ -144,7 +144,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		OperationContext context = pollMessage.getMessageContext().getOperationContext();
 		if(context == null) {
 			AxisOperation oldOperation = returnMessage.getAxisOperation();
-			context = new OperationContext(oldOperation);
+			context = new OperationContext(oldOperation, returnMessage.getServiceContext());
 			context.addMessageContext(pollMessage.getMessageContext());
 			pollMessage.getMessageContext().setOperationContext(context);
 		}

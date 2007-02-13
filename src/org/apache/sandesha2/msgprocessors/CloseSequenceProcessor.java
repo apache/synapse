@@ -172,8 +172,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 				rmMsgCtx.getMessageContext().getAxisService());
 		getMsgContext().setAxisOperation(closeOperation);
 
-		OperationContext opcontext = new OperationContext(closeOperation);
-		opcontext.setParent(getMsgContext().getServiceContext());
+		OperationContext opcontext = new OperationContext(closeOperation, getMsgContext().getServiceContext());
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),opcontext);
 		getMsgContext().setOperationContext(opcontext);
 		

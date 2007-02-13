@@ -76,18 +76,10 @@ public class SandeshaInHandler extends AbstractHandler {
 		}
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
-		if (null != DONE && "true".equals(DONE)) {
+		if (null != DONE && Sandesha2Constants.VALUE_TRUE.equals(DONE)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: SandeshaInHandler::invoke, Application processing done " + returnValue);
 			return returnValue;
-		}
-
-		String reinjectedMessage = (String) msgCtx.getProperty(Sandesha2Constants.REINJECTED_MESSAGE);
-		if (reinjectedMessage != null && Sandesha2Constants.VALUE_TRUE.equals(reinjectedMessage)) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: SandeshaInHandler::invoke, reinjectedMessage " + returnValue);
-			return returnValue; // Reinjected messages are not processed by Sandesha2 inflow
-					// handlers
 		}
 		
 		if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Continuing beyond basic checks");

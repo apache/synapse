@@ -469,8 +469,6 @@ public interface Sandesha2Constants {
 	
 	static final String POST_FAILURE_MESSAGE = "PostFailureMessage";
 	
-	static final String REINJECTED_MESSAGE = "ReinjectedMessage";
-	
 	static final String MODULE_CLASS_LOADER = "Sandesha2ModuleClassLoader";
 	
 	static final String SECURITY_MANAGER = "Sandesha2SecurityManager";

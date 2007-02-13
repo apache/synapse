@@ -1,9 +1,12 @@
 package org.apache.sandesha2.workers;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -35,7 +38,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 	}
 	
 	public void run() {
-		if(log.isDebugEnabled()) log.debug("Entry: InvokerWorker::run");
+		if(log.isDebugEnabled()) log.debug("Enter: InvokerWorker::run");
 		
 		Transaction transaction = null;
 		MessageContext msgToInvoke = null;
@@ -62,8 +65,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				transaction.commit();
 				transaction = null;
 			}
-				
-			boolean invoked = false;
 			
 			try {
 
@@ -78,7 +79,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 						&& Sandesha2Constants.VALUE_TRUE.equals(postFaulureProperty))
 					postFailureInvocation = true;
 
-				AxisEngine engine = new AxisEngine(configurationContext);
+				AxisEngine engine = new AxisEngine(msgToInvoke.getConfigurationContext());
 				if (postFailureInvocation) {
 					makeMessageReadyForReinjection(msgToInvoke);
 					if (log.isDebugEnabled())
@@ -92,16 +93,12 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					msgToInvoke.setPaused(false);
 					engine.resumeReceive(msgToInvoke);
 				}
-				
-				invoked = true;
 
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception :", e);
 
 				handleFault(msgToInvoke, e);
-
-				// throw new SandeshaException(e);
 			}
 				
 			//starting a transaction for the post-invocation work.
@@ -153,14 +150,13 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					throw new SandeshaException (message);
 				}
 				
-				if (invoked) {
-					nextMsgNo++;
-					rMDBean.setNextMsgNoToProcess(nextMsgNo);
-					nextMsgMgr.update(rMDBean);
-				}				
+				nextMsgNo++;
+				rMDBean.setNextMsgNoToProcess(nextMsgNo);
+				nextMsgMgr.update(rMDBean);
 			}
 		} catch (Exception e) {
-			log.error(e.toString(), e);
+			if (log.isErrorEnabled())
+				log.error(e.toString(), e);
 			if(transaction != null) {
 				transaction.rollback();
 				transaction = null;
@@ -181,14 +177,22 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		messageContext.getOptions().setMessageId(null);
 		messageContext.getOptions().setTo(null);
 		messageContext.getOptions().setAction(null);
-		messageContext.setProperty(Sandesha2Constants.REINJECTED_MESSAGE, Sandesha2Constants.VALUE_TRUE);
+		messageContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, Sandesha2Constants.VALUE_TRUE);
 	}
 
-	private void handleFault(MessageContext inMsgContext, Exception e) throws Exception {
-		// msgContext.setProperty(MessageContext.TRANSPORT_OUT, out);
+	private void handleFault(MessageContext inMsgContext, Exception e) {
 		AxisEngine engine = new AxisEngine(inMsgContext.getConfigurationContext());
-		MessageContext faultContext = engine.createFaultMessageContext(inMsgContext, e);
-		engine.sendFault(faultContext);
+		try {					
+			MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(inMsgContext, e);
+			// Copy some of the parameters to the new message context.
+			faultContext.setProperty(HTTPConstants.CONTENT_TYPE, inMsgContext
+					.getProperty(HTTPConstants.CONTENT_TYPE));
+
+			engine.sendFault(faultContext);
+		} catch (AxisFault e1) {
+			if (log.isErrorEnabled())
+				log.error("Unable to send fault message ", e1);
+		}
 	}
 	
 }

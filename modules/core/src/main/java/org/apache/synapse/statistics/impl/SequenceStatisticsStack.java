@@ -47,7 +47,10 @@ public class SequenceStatisticsStack implements StatisticsStack {
      * @param isFault
      */
     public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-        popSequenceStatistics(sequenceStatisticsList.size() - 1, statisticsCollector);
+       int top = sequenceStatisticsList.size();
+       if (top > 0) {
+           popSequenceStatistics(sequenceStatisticsList.size() - 1, statisticsCollector);
+       }
     }
     /**
      * This method  used to unreported all statistics to the StatisticsCollector
@@ -67,12 +70,15 @@ public class SequenceStatisticsStack implements StatisticsStack {
      * @param statisticsCollector
      */
     private void popSequenceStatistics(int index, StatisticsCollector statisticsCollector) {
-        SequenceStatistics sequenceStatistics = (SequenceStatistics) sequenceStatisticsList.get(index);
-        if (sequenceStatistics != null) {
-            if (sequenceStatistics.isStatisticsEnable && sequenceStatistics.sequenceName != null) {
-                statisticsCollector.reportForSequence(sequenceStatistics.sequenceName, !sequenceStatistics.isInFlow, sequenceStatistics.initTime, System.currentTimeMillis(), sequenceStatistics.isFault);
+        if (index >= 0) {
+            SequenceStatistics sequenceStatistics = (SequenceStatistics) sequenceStatisticsList.get(index);
+            if (sequenceStatistics != null) {
+                if (sequenceStatistics.isStatisticsEnable && sequenceStatistics.sequenceName != null)
+                {
+                    statisticsCollector.reportForSequence(sequenceStatistics.sequenceName, !sequenceStatistics.isInFlow, sequenceStatistics.initTime, System.currentTimeMillis(), sequenceStatistics.isFault);
+                }
+                sequenceStatisticsList.remove(index);
             }
-            sequenceStatisticsList.remove(index);
         }
     }
 

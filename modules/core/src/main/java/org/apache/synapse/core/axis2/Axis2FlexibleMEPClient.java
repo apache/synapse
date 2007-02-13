@@ -50,6 +50,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Endpoint;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -66,22 +67,30 @@ public class Axis2FlexibleMEPClient {
      * 500 internal server error as possible responses. Currently the code expects
      * Synchronus operation
      *
-     * @param wsAddressingEnabled
-     * @param wsSecurityEnabled
-     * @param wsSecPolicyKey
-     * @param wsRMEnabled
-     * @param wsRMPolicyKey
+     * @param endpoint
      * @param synapseOutMessageContext
      * @return The Axis2 reponse message context
      */
     public static MessageContext send(
-        boolean wsAddressingEnabled,
-        boolean wsSecurityEnabled,
-        String wsSecPolicyKey,
-        boolean wsRMEnabled,
-        String wsRMPolicyKey,
-        boolean separateListener,
+
+        Endpoint endpoint,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
+
+        boolean separateListener    = false;
+        boolean wsSecurityEnabled   = false;
+        String wsSecPolicyKey       = null;
+        boolean wsRMEnabled         = false;
+        String wsRMPolicyKey        = null;
+        boolean wsAddressingEnabled = false;
+
+        if (endpoint != null) {
+            separateListener    = endpoint.isUseSeparateListener();
+            wsSecurityEnabled   = endpoint.isSecurityOn();
+            wsSecPolicyKey      = endpoint.getWsSecPolicyKey();
+            wsRMEnabled         = endpoint.isReliableMessagingOn();
+            wsRMPolicyKey       = endpoint.getWsRMPolicyKey();
+            wsAddressingEnabled = endpoint.isAddressingOn() || wsSecurityEnabled || wsRMEnabled;
+        }
 
         log.debug("sending [add = "+wsAddressingEnabled+"] [sec = "+wsSecurityEnabled + "] [ rm = "+wsRMEnabled+"] [ to "+synapseOutMessageContext.getTo()+"]");
 
@@ -91,6 +100,24 @@ public class Axis2FlexibleMEPClient {
         // create a new MessageContext to be sent out as this should not corrupt the original
         // we need to create the response to the original message later on
         MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx);
+
+        if (endpoint != null) {
+            if (endpoint.isForcePOX()) {
+                axisOutMsgCtx.setDoingREST(true);
+            } else if (endpoint.isForceSOAP()) {
+                axisOutMsgCtx.setDoingREST(false);
+            }
+
+            if (endpoint.isUseMTOM()) {
+                axisOutMsgCtx.setDoingMTOM(true);
+            } else if (endpoint.isUseSwa()) {
+                axisOutMsgCtx.setDoingSwA(true);
+            }
+
+            if (endpoint.isUseSeparateListener()) {
+                axisOutMsgCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
+            }
+        }
 
         if (wsAddressingEnabled) {
             axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);

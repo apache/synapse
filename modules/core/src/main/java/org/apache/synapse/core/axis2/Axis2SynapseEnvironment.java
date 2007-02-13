@@ -27,6 +27,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
@@ -87,11 +88,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         }
     }
 
-    public void send(MessageContext synCtx) {
+    public void send(Endpoint endpoint, MessageContext synCtx) {
         if (synCtx.isResponse())
             Axis2Sender.sendBack(synCtx);
         else
-            Axis2Sender.sendOn(synCtx);
+            Axis2Sender.sendOn(endpoint, synCtx);
     }
 
     public MessageContext createMessageContext() {

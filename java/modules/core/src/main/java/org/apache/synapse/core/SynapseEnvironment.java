@@ -20,6 +20,7 @@
 package org.apache.synapse.core;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.statistics.StatisticsCollector;
 
 /**
@@ -40,7 +41,7 @@ public interface SynapseEnvironment {
      * <p/>
      * This will send request messages on (forward), and send the response messages back to the client
      */
-    public void send(MessageContext smc);
+    public void send(Endpoint endpoint, MessageContext smc);
 
     /**
      * Creates a new Synapse <code>MessageContext</code> instance.

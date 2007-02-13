@@ -65,8 +65,8 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
             isOUTFault = isFault;
             statisticsCollector.reportForProxyService(proxyServiceName, false, inTimeForInFlow, inTimeForOutFlow, isINFault);
             inTimeForInFlow = -1;
-        } else if (inTimeForOutFlow != -1) {
-            statisticsCollector.reportForProxyService(proxyServiceName, true, inTimeForOutFlow, System.currentTimeMillis(), isOUTFault);
+        } else if (inTimeForOutFlow != -1) {            
+            statisticsCollector.reportForProxyService(proxyServiceName, true, inTimeForOutFlow, System.currentTimeMillis(), isFault);
             inTimeForOutFlow = -1;
         }
     }

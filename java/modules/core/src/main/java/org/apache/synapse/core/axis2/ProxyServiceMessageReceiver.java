@@ -71,7 +71,19 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
         log.debug("Body : \n" + mc.getEnvelope());
 
         MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
-
+        
+        // Setting Required property to collect the proxy service statistics
+        boolean statisticsEnable;
+        ProxyService currentProxyService = synCtx.getConfiguration().getProxyService(name);
+        if (currentProxyService != null) {
+            statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == currentProxyService.getStatisticsEnable());
+            if (statisticsEnable) {
+                ProxyServiceStatisticsStack proxyServiceStatisticsStack = new ProxyServiceStatisticsStack();
+                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+                proxyServiceStatisticsStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable, isFault);
+                synCtx.setCorrelationProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
+            }
+        }
         // if a target endpoint is specified, directly forward to that
         if (targetEndpoint != null) {
             Endpoint endpoint = synCtx.getConfiguration().getNamedEndpoint(targetEndpoint);
@@ -109,12 +121,12 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
                 // Setting Required property to collect the proxy service statistics
                 String endPointName = endpoint.getName();
-                boolean statisticsEnable;
-                statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
-                if (endPointName != null && statisticsEnable) {
+                boolean endPointStatisticsEnable;
+                endPointStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
+                if (endPointName != null && endPointStatisticsEnable) {
                     EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
                     boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
+                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), endPointStatisticsEnable,isFault);
                     synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
                 }
                 AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
@@ -132,7 +144,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     log.error("Axis fault encountered while forwarding message to endpoint : "
                             + targetEndpoint, e);
                 } finally {
-                    if (statisticsEnable) {
+                    if (endPointStatisticsEnable) {
                         StatisticsUtils.processEndPointStatistics(synCtx);
                     }
                 }
@@ -145,18 +157,6 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 log.debug("OutSequence " + targetOutSequence
                         + " for the proxy set to the MessageContext");
                 synCtx.setProperty(org.apache.synapse.Constants.OUT_SEQUENCE, targetOutSequence);
-            }
-            // Setting Required property to collect the proxy service statistics
-            boolean statisticsEnable;
-            ProxyService currentProxyService = synCtx.getConfiguration().getProxyService(name);
-            if (currentProxyService != null) {
-                statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == currentProxyService.getStatisticsEnable());
-                if (statisticsEnable) {
-                    ProxyServiceStatisticsStack proxyServiceStatisticsStack = new ProxyServiceStatisticsStack();
-                    boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                    proxyServiceStatisticsStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
-                    synCtx.setCorrelationProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
-                }
             }
 
             // if a named inSequence is specified, use it for message mediation
@@ -184,7 +184,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
         // else, response will be 202 OK without an http body
         // if smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
 
-        if (synCtx.isResponse()) {
+        if (synCtx.isResponse()) {             
             mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
         }
         if (synCtx.isFaultResponse()) {

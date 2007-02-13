@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.neethi.Policy;
 import org.apache.axiom.soap.SOAPFault;
@@ -41,43 +42,17 @@ public class Axis2Sender {
     private static final Log log = LogFactory.getLog(Axis2Sender.class);
 
     public static void sendOn(
+            Endpoint endpoint,
             org.apache.synapse.MessageContext synapseInMessageContext) {
 
         try {
-            Boolean wsAOn = (Boolean) synapseInMessageContext.getProperty(
-                    Constants.OUTFLOW_ADDRESSING_ON);
-            Boolean wsRmOn = (Boolean) synapseInMessageContext.getProperty(
-                    Constants.OUTFLOW_RM_ON);
-            Boolean wsSecOn = (Boolean) synapseInMessageContext.getProperty(
-                    Constants.OUTFLOW_SECURITY_ON);
-            Boolean separateListener = (Boolean) synapseInMessageContext.getProperty(
-                    Constants.OUTFLOW_USE_SEPARATE_LISTENER);
-
             MessageContext axisOutMsgContext =
-                    Axis2FlexibleMEPClient.send(
-                            // WS-A default is off
-                            (wsAOn != null && wsAOn.booleanValue()),
+                Axis2FlexibleMEPClient.send(
+                    // The endpoint where we are sending to
+                    endpoint,
 
-                            // WS-Sec default is off
-                            (wsSecOn != null && wsSecOn.booleanValue()),
-
-                            // The Rampart security policy
-                            (String) synapseInMessageContext.getProperty(
-                                    Constants.OUTFLOW_SEC_POLICY),
-
-                            // WS-RM default is off
-                            (wsRmOn != null && wsRmOn.booleanValue()),
-
-                            // The Sandesha security policy
-                            (String) synapseInMessageContext.getProperty(
-                                    Constants.OUTFLOW_RM_POLICY),
-
-                            // use a separate listener
-                            (separateListener != null && separateListener.booleanValue()),
-
-                            // The Axis2 Message context of the Synapse MC
-                            synapseInMessageContext);
-
+                    // The Axis2 Message context of the Synapse MC
+                    synapseInMessageContext);
 
             if (axisOutMsgContext != null && axisOutMsgContext.getEnvelope() != null)
             { // if there is no response env will be null

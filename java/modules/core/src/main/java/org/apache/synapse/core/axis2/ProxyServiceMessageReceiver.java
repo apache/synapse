@@ -98,54 +98,50 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 org.apache.axis2.context.MessageContext axisInMsgContext =
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext();
                 org.apache.axis2.context.MessageContext axisOutMsgContext =
-                    Axis2FlexibleMEPClient.send(
-                        false, false,
-                        endpoint.getWsSecPolicyKey(),
-                        endpoint.isReliableMessagingOn(),
-                        endpoint.getWsRMPolicyKey(),
-                        endpoint.isUseSeparateListener(),
-                        synCtx);
+                    Axis2FlexibleMEPClient.send(endpoint, synCtx);
 
-                axisOutMsgContext.setServerSide(true);
-                axisOutMsgContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT,
-                    axisInMsgContext.getProperty(
-                            org.apache.axis2.context.MessageContext.TRANSPORT_OUT));
+                if (axisOutMsgContext == null) {
+                    return;
+                } else {
 
-                axisOutMsgContext.setTransportIn(axisInMsgContext.getTransportIn());
+                    axisOutMsgContext.setServerSide(true);
+                    axisOutMsgContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT,
+                        axisInMsgContext.getProperty(
+                                org.apache.axis2.context.MessageContext.TRANSPORT_OUT));
 
-                // TODO this may be really strange but true.. unless you call the below, sometimes
-                // it results in an unbound URI exception for no credible reason - needs more
-                // investigation seems like a woodstox issue. Use hack for now
-                //axisOutMsgContext.getEnvelope().build();
+                    axisOutMsgContext.setTransportIn(axisInMsgContext.getTransportIn());
 
-                log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
-                // Setting Required property to collect the proxy service statistics
-                String endPointName = endpoint.getName();
-                boolean endPointStatisticsEnable;
-                endPointStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
-                if (endPointName != null && endPointStatisticsEnable) {
-                    EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
-                    boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), endPointStatisticsEnable,isFault);
-                    synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
-                }
-                AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
-                try {
-                    axisOutMsgContext.setProperty(
-                            org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-                    mc.getOperationContext().setProperty(
-                            Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-                    // check for addressing is alredy engaged for this message.
-                    // if engage we should use the address enable Configuraion context.
-                    ae.send(axisOutMsgContext);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
+                    }
+                    // Setting Required property to collect the proxy service statistics
+                    String endPointName = endpoint.getName();
+                    boolean endPointStatisticsEnable;
+                    endPointStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
+                    if (endPointName != null && endPointStatisticsEnable) {
+                        EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
+                        boolean isFault =synCtx.getEnvelope().getBody().hasFault();
+                        endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), endPointStatisticsEnable,isFault);
+                        synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
+                    }
+                    AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
+                    try {
+                        axisOutMsgContext.setProperty(
+                                org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+                        mc.getOperationContext().setProperty(
+                                Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
+                        // check for addressing is alredy engaged for this message.
+                        // if engage we should use the address enable Configuraion context.
+                        ae.send(axisOutMsgContext);
 
-                } catch (AxisFault e) {
-                    synCtx.setProperty(org.apache.synapse.Constants.SYNAPSE_ERROR,Boolean.TRUE);
-                    log.error("Axis fault encountered while forwarding message to endpoint : "
-                            + targetEndpoint, e);
-                } finally {
-                    if (endPointStatisticsEnable) {
-                        StatisticsUtils.processEndPointStatistics(synCtx);
+                    } catch (AxisFault e) {
+                        synCtx.setProperty(org.apache.synapse.Constants.SYNAPSE_ERROR,Boolean.TRUE);
+                        log.error("Axis fault encountered while forwarding message to endpoint : "
+                                + targetEndpoint, e);
+                    } finally {
+                        if (endPointStatisticsEnable) {
+                            StatisticsUtils.processEndPointStatistics(synCtx);
+                        }
                     }
                 }
             }

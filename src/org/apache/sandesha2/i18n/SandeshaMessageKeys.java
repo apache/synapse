@@ -56,9 +56,10 @@ public class SandeshaMessageKeys {
 	public static final String unknownSoapVersion="unknownSoapVersion";
 	public static final String axisServiceIsNull="axisServiceIsNull";
 	public static final String msgContextNotSet="msgContextNotSet";
-	public static final String requestMsgContextNull="requestMsgContextNull";
 	public static final String transportOutNotPresent="transportOutNotPresent";
 	public static final String couldNotFindOperation="couldNotFindOperation";
+	public static final String cannotChooseAcksTo="cannotChooseAcksTo";
+	public static final String cannotChooseSpecLevel="cannotChooseSpecLevel";
 
 	public static final String setAValidMsgNumber="setAValidMsgNumber";
 	public static final String cannotStartTransportListenerDueToError="cannotStartTransportListener";
@@ -179,7 +180,6 @@ public class SandeshaMessageKeys {
 
 	public static final String outSeqIDIsNull="outSeqIDIsNull";
 	public static final String requestMsgNotPresent="requestMsgNotPresent";
-	public static final String requestSeqIsNull="requestSeqIsNull";
 	public static final String newSeqIdIsNull="newSeqIdIsNull";
 	public static final String terminateAddedPreviously="terminateAddedPreviously";
 	public static final String nullMsgId="nullMsgId";

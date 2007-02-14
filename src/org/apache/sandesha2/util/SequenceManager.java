@@ -6,21 +6,16 @@
  */
 package org.apache.sandesha2.util;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -147,14 +142,55 @@ public class SequenceManager {
 	}
 
 	public static RMSBean setupNewClientSequence(MessageContext firstAplicationMsgCtx,
-			String specVersion, StorageManager storageManager) throws SandeshaException {
+			String internalSequenceId, StorageManager storageManager) throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceManager::setupNewClientSequence");
 		
 		RMSBean rmsBean = new RMSBean();
+		rmsBean.setInternalSequenceID(internalSequenceId);
 
+		// If we are server-side, we use the details from the inbound sequence to help set
+		// up the reply sequence.
+		String inboundSequence = null;
+		RMDBean inboundBean = null;
+		if(firstAplicationMsgCtx.isServerSide()) {
+			inboundSequence = (String) firstAplicationMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
+			if(inboundSequence != null) {
+				inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
+			}
+		}
+		
+		// Finding the spec version
+		String specVersion = null;
+		if (firstAplicationMsgCtx.isServerSide()) {
+			// in the server side, get the RM version from the request sequence.
+			if(inboundBean == null || inboundBean.getRMVersion() == null) {
+				String beanInfo = (inboundBean == null) ? "null" : inboundBean.toString();
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.cannotChooseSpecLevel, inboundSequence, beanInfo );
+				SandeshaException e = new SandeshaException(message);
+				if(log.isDebugEnabled()) log.debug("Throwing", e);
+				throw e;
+			}
+
+			specVersion = inboundBean.getRMVersion();
+		} else {
+			// in the client side, user will set the RM version.
+			specVersion = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+			
+			// If the spec version is null, look in the axis operation to see value has been set
+			Parameter opLevel = firstAplicationMsgCtx.getAxisOperation().getParameter(SandeshaClientConstants.RM_SPEC_VERSION);
+			if (specVersion == null && opLevel != null)	specVersion = (String) opLevel.getValue();						
+		}
+
+		if (specVersion == null)
+			// TODO change the default to v1_1
+			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); 
+		
+		rmsBean.setRMVersion(specVersion);
+
+		// Set up the To EPR
 		EndpointReference toEPR = firstAplicationMsgCtx.getTo();
-		String acksTo = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AcksTo);
 
 		if (toEPR == null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
@@ -164,76 +200,70 @@ public class SequenceManager {
 
 		rmsBean.setToEPR(toEPR.getAddress());
 
+		// Discover the correct acksTo and replyTo EPR for this RMSBean
+		EndpointReference acksToEPR = null;
+		EndpointReference replyToEPR = null;
+
 		if (firstAplicationMsgCtx.isServerSide()) {
-			// setting replyTo value, if this is the server side.
-			OperationContext opContext = firstAplicationMsgCtx.getOperationContext();
-			try {
-				MessageContext requestMessage = opContext
-						.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-				if (requestMessage == null) {
-					String message = SandeshaMessageHelper
-							.getMessage(SandeshaMessageKeys.cannotFindReqMsgFromOpContext);
-					log.error(message);
-					throw new SandeshaException(message);
-				}
-
-				// replyTo of the response msg is the 'to' value of the req msg
-				EndpointReference replyToEPR = requestMessage.getTo(); 
-				
-				if (replyToEPR != null) {
-					rmsBean.setReplyToEPR(replyToEPR.getAddress());
-					rmsBean.setAcksToEPR(replyToEPR.getAddress());
-				} else {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-					log.error(message);
-					throw new SandeshaException(message);
-				}
-			} catch (AxisFault e) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotFindReqMsgFromOpContext);
-				log.error(message);
-				log.error(e.getStackTrace());
-				throw new SandeshaException(message);
+			// Server side, we want the replyTo and AcksTo EPRs to point into this server.
+			// We can work that out by looking at the RMD bean that pulled the message in,
+			// and copying its 'ReplyTo' address.
+			if(inboundBean != null && inboundBean.getReplyToEPR() != null) {
+				acksToEPR = new EndpointReference(inboundBean.getReplyToEPR());
+				replyToEPR = new EndpointReference(inboundBean.getReplyToEPR());
+			} else {
+				String beanInfo = (inboundBean == null) ? "null" : inboundBean.toString();
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.cannotChooseAcksTo, inboundSequence, beanInfo);
+				SandeshaException e = new SandeshaException(message);
+				if(log.isDebugEnabled()) log.debug("Throwing", e);
+				throw e;
 			}
+
 		} else {
-			EndpointReference replyToEPR = firstAplicationMsgCtx.getReplyTo();
-			if (replyToEPR!=null) {
-				rmsBean.setReplyToEPR(replyToEPR.getAddress());
+			replyToEPR = firstAplicationMsgCtx.getReplyTo();
+
+			// For client-side sequences there are 3 options:
+			// 1) An explict AcksTo, set via the client API
+			// 2) The replyTo from the app message
+			// 3) The anonymous URI (for which we can leave a null EPR)
+			String acksTo = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AcksTo);
+			if (acksTo != null) {
+				if (log.isDebugEnabled())
+					log.debug("Using explicit AcksTo, addr=" + acksTo);
+				acksToEPR = new EndpointReference(acksTo);
+			} else if(replyToEPR != null) {
+				if (log.isDebugEnabled())
+					log.debug("Using replyTo EPR as AcksTo, addr=" + replyToEPR.getAddress());
+				acksToEPR = replyToEPR;
 			}
 
-		}
-		
-		// Default value for acksTo is anonymous (this happens only for the client side)
-		boolean anonAcks = true;
-		if (acksTo != null) {
-			rmsBean.setAcksToEPR(acksTo);
-			EndpointReference epr = new EndpointReference(acksTo);
-			anonAcks = epr.hasAnonymousAddress();
-		}
-
-		// start the in listner for the client side, if acksTo is not anonymous.
-		if (!firstAplicationMsgCtx.isServerSide() && !anonAcks) {
-
-			String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
-			if (transportInProtocol == null) {
-				throw new SandeshaException(SandeshaMessageHelper
-						.getMessage(SandeshaMessageKeys.cannotStartListenerForIncommingMsgs));
-			}
-
-			try {
-				ListenerManager listenerManager = firstAplicationMsgCtx.getConfigurationContext().getListenerManager();
-				TransportInDescription transportIn = firstAplicationMsgCtx.getConfigurationContext()
-						.getAxisConfiguration().getTransportIn(new QName(transportInProtocol));
-				// if acksTo is not anonymous start the in-transport
-				if (!listenerManager.isListenerRunning(transportIn.getName().getLocalPart())) {
-					listenerManager.addListener(transportIn, false);
+			// start the in listner for the client side, if acksTo is not anonymous.
+			if (acksToEPR != null && acksToEPR.hasAnonymousAddress()) {
+				String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
+				if (transportInProtocol == null) {
+					throw new SandeshaException(SandeshaMessageHelper
+							.getMessage(SandeshaMessageKeys.cannotStartListenerForIncommingMsgs));
 				}
-			} catch (AxisFault e) {
-				throw new SandeshaException(SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.cannotStartTransportListenerDueToError, e.toString()), e);
+
+				try {
+					ListenerManager listenerManager = firstAplicationMsgCtx.getConfigurationContext().getListenerManager();
+					TransportInDescription transportIn = firstAplicationMsgCtx.getConfigurationContext()
+							.getAxisConfiguration().getTransportIn(new QName(transportInProtocol));
+					// if acksTo is not anonymous start the in-transport
+					if (!listenerManager.isListenerRunning(transportIn.getName().getLocalPart())) {
+						listenerManager.addListener(transportIn, false);
+					}
+				} catch (AxisFault e) {
+					throw new SandeshaException(SandeshaMessageHelper.getMessage(
+							SandeshaMessageKeys.cannotStartTransportListenerDueToError, e.toString()), e);
+				}
 			}
-
 		}
-
+		// Store both the acksTo and replyTo
+		if(replyToEPR != null) rmsBean.setReplyToEPR(replyToEPR.getAddress());
+		if(acksToEPR  != null) rmsBean.setAcksToEPR(acksToEPR.getAddress());
+		
 		// New up the client completed message ranges list
 		rmsBean.setClientCompletedMessages(new RangeString());
 
@@ -243,84 +273,12 @@ public class SequenceManager {
 			rmsBean.setTransportTo(transportTo);
 		}
 
-		// setting the spec version for the client side.
-		rmsBean.setRMVersion(specVersion);
-
 		// updating the last activated time.
 		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		
-		updateClientSideListnerIfNeeded(firstAplicationMsgCtx, anonAcks);
 		if (log.isDebugEnabled())
 			log.debug("Exit: SequenceManager::setupNewClientSequence " + rmsBean);
 		return rmsBean;
-	}
-
-	private static void updateClientSideListnerIfNeeded(MessageContext messageContext, boolean anonAcks)
-			throws SandeshaException {
-		if (messageContext.isServerSide())
-			return; // listners are updated only for the client side.
-
-		String transportInProtocol = messageContext.getOptions().getTransportInProtocol();
-
-		boolean startListnerForAsyncAcks = false;
-		boolean startListnerForAsyncControlMsgs = false; // For async
-															// createSerRes &
-															// terminateSeq.
-
-		if (!anonAcks) {
-			// starting listner for async acks.
-			startListnerForAsyncAcks = true;
-		}
-
-		try {
-			if ((startListnerForAsyncAcks || startListnerForAsyncControlMsgs) ) {
-				
-				if (transportInProtocol == null){
-					EndpointReference toEPR = messageContext.getOptions().getTo();
-					if (toEPR==null) {
-						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.toEPRNotSet);
-						throw new AxisFault (message);
-					}
-					
-					try {
-						URI uri = new URI (toEPR.getAddress());
-						String scheme = uri.getScheme();
-						
-						//this is a convention is Axis2. The name of the TransportInDescription has to be the
-						//scheme of a URI of that transport.
-						//Here we also assume that the Incoming transport will be same as the outgoing one.
-						transportInProtocol = scheme;
-					} catch (URISyntaxException e) {
-						throw new SandeshaException (e);
-					}
-					
-				}
-			
-				//TODO following code was taken from ServiceContext.gegMyEPR method.
-				//	   When a listner-starting method becomes available from Axis2, use that.
-				ConfigurationContext configctx = messageContext.getConfigurationContext();
-				ListenerManager lm = configctx.getListenerManager();
-				if (!lm.isListenerRunning(transportInProtocol)) {
-					TransportInDescription trsin = configctx.getAxisConfiguration().
-                        	getTransportIn(new QName(transportInProtocol));
-					if (trsin != null) {
-						lm.addListener(trsin, false);
-					} else {
-						String message = SandeshaMessageHelper.getMessage(
-								SandeshaMessageKeys.cannotFindTransportInDesc,transportInProtocol);
-						throw new AxisFault(message);
-					}
-				}
-			}
-
-		} catch (AxisFault e) {
-			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.cannotStartTransportListenerDueToError, e.toString());
-			log.error(e.getStackTrace());
-			throw new SandeshaException(message, e);
-		}
-
 	}
 
 	public static boolean hasSequenceTimedOut(String internalSequenceId, RMMsgContext rmMsgCtx, StorageManager storageManager)

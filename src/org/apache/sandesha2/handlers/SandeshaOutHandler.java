@@ -22,7 +22,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -37,7 +36,6 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.wsrm.Sequence;
 
 /**
  * This is invoked in the outFlow of an RM endpoint
@@ -111,17 +109,12 @@ public class SandeshaOutHandler extends AbstractHandler {
 			int messageType = rmMsgCtx.getMessageType();
 			if(log.isDebugEnabled()) log.debug("Message Type: " + messageType);
 			if (messageType == Sandesha2Constants.MessageTypes.UNKNOWN) {
-				MessageContext requestMsgCtx = msgCtx.getOperationContext().getMessageContext(
-						WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-
-                if (msgCtx.isServerSide()) { // for the server side
-                    RMMsgContext reqRMMsgCtx = MsgInitializer.initializeMessage(requestMsgCtx);
-                    Sequence sequencePart = (Sequence) reqRMMsgCtx
-                                    .getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-                    if (sequencePart != null) {
-            			String incomingSeqId = sequencePart.getIdentifier().getIdentifier();
-            			long incomingMessageNumber = sequencePart.getMessageNumber().getMessageNumber();
-            			msgProcessor = new ApplicationMsgProcessor(incomingSeqId, incomingMessageNumber);
+                if (msgCtx.isServerSide()) {
+                	String inboundSequence = (String) msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
+                	Long   msgNum = (Long) msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_MESSAGE_NUMBER);
+                	
+                    if (inboundSequence != null && msgNum != null) {
+            			msgProcessor = new ApplicationMsgProcessor(inboundSequence, msgNum.longValue());
                     }
                 } else // if client side.
                     msgProcessor = new ApplicationMsgProcessor();

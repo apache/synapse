@@ -499,6 +499,9 @@ public interface Sandesha2Constants {
 		static final String SEQUENCE_ID = "WSRMSequenceId";
 		static final String MESSAGE_NUMBER = "WSRMMessageNumber";
 		static final String SECURITY_TOKEN = "SecurityToken";
+		static final String INBOUND_SEQUENCE_ID    = "Sandesha2InboundSequenceId";
+		static final String INBOUND_MESSAGE_NUMBER = "Sandesha2InboundMessageNumber";
+		static final String INBOUND_LAST_MESSAGE   = "Sandesha2InboundLastMessage";
 	}
     
     public interface Assertions {

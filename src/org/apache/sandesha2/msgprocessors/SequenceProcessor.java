@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
@@ -97,6 +98,8 @@ public class SequenceProcessor {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(msgCtx.getConfigurationContext(),msgCtx.getConfigurationContext().getAxisConfiguration());
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		String sequenceId = sequence.getIdentifier().getIdentifier();
+		long msgNo = sequence.getMessageNumber().getMessageNumber();
+		boolean lastMessage = sequence.getLastMessage() != null;
 		
 		// Check that both the Sequence header and message body have been secured properly
 		RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
@@ -115,6 +118,14 @@ public class SequenceProcessor {
 			
 			secManager.checkProofOfPossession(token, seqHeader, msgCtx);
 			secManager.checkProofOfPossession(token, body, msgCtx);
+		}
+		
+		// Store the inbound sequence id, number and lastMessage onto the operation context
+		OperationContext opCtx = msgCtx.getOperationContext();
+		if(opCtx != null) {
+			opCtx.setProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID, sequenceId);
+			opCtx.setProperty(Sandesha2Constants.MessageContextProperties.INBOUND_MESSAGE_NUMBER, new Long(msgNo));
+			if(lastMessage) opCtx.setProperty(Sandesha2Constants.MessageContextProperties.INBOUND_LAST_MESSAGE, Boolean.TRUE);
 		}
 		
 		// setting acked msg no range
@@ -151,8 +162,6 @@ public class SequenceProcessor {
 		}
 		FaultManager.checkForLastMsgNumberExceeded(rmMsgCtx, storageManager);
 		
-		long msgNo = sequence.getMessageNumber().getMessageNumber();
-		
 		if (FaultManager.checkForMessageRolledOver(rmMsgCtx, sequenceId, msgNo)) {
 			
 			if (log.isDebugEnabled())
@@ -173,9 +182,7 @@ public class SequenceProcessor {
 		// updating the last activated time of the sequence.
 		bean.setLastActivatedTime(System.currentTimeMillis());
 		
-		
-		
-		if (sequence.getLastMessage()!=null) {
+		if (lastMessage) {
 			//setting this as the LastMessage number
 			bean.setLastInMessageId(msgCtx.getMessageID());
 		}

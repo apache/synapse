@@ -117,13 +117,11 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
 		RMSBean rmsBean = new RMSBean();
 		rmsBean.setRMVersion(Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		rmsBean.setToEPR(to);
-		
-		// Setup the acksTo 
-		EndpointReference acksTo = new EndpointReference(AddressingConstants.Final.WSA_NONE_URI);
+		rmsBean.setAcksToEPR(AddressingConstants.Final.WSA_NONE_URI);
 				
 		// Create a Create Sequence message
 		// generating a new create sequeuce message.
-		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg, acksTo);
+		RMMsgContext createSeqRMMessage = RMMsgCreator.createCreateSeqMsg(rmsBean, applicationRMMsg);
 		messageContext = createSeqRMMessage.getMessageContext();
 		messageContext.setWSAAction(SpecSpecificConstants.getCreateSequenceAction(Sandesha2Constants.SPEC_VERSIONS.v1_1));
 

@@ -79,8 +79,7 @@ public class RMMsgCreator {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg,
-			EndpointReference acksToEPR) throws AxisFault {
+	public static RMMsgContext createCreateSeqMsg(RMSBean rmsBean, RMMsgContext applicationRMMsg) throws AxisFault {
 
 		MessageContext applicationMsgContext = applicationRMMsg.getMessageContext();
 		if (applicationMsgContext == null)
@@ -122,9 +121,14 @@ public class RMMsgCreator {
 				addressingNamespace = AddressingConstants.Final.WSA_NAMESPACE;
 		}
 		
-		// If acksTo has not been set, then default to anonaymous, using the correct spec level
-		if(acksToEPR == null) acksToEPR = 
-			new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
+		// If acksTo has not been set, then default to anonymous, using the correct spec level
+		EndpointReference acksToEPR = null;
+		String acksToAddress = rmsBean.getAcksToEPR();
+		if(acksToAddress != null) {
+			acksToEPR = new EndpointReference(acksToAddress);
+		} else {
+			acksToEPR = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
+		}
 		
 		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue);
 

@@ -100,4 +100,12 @@ public class InlineScriptMediator extends ScriptMediator {
             throw new SynapseException(e);
         }
     }
+
+    public String getScriptName() {
+        return scriptName;
+    }
+
+    public String getScriptSrc() {
+        return scriptSrc;
+    }
 }

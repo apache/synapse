@@ -64,7 +64,7 @@ public class JsonMediatorSerializer extends AbstractMediatorSerializer
     }
 
     public String getMediatorClassName() {
-        return JsonMediatorSerializer.class.getName();
+        return JsonMediator.class.getName();
     }
 
     private void handleException(String msg) {

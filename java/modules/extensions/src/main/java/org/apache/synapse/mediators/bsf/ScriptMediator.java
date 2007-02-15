@@ -133,4 +133,11 @@ public class ScriptMediator extends AbstractMediator {
         return oc;
     }
 
+    public String getScriptKey() {
+        return scriptKey;
+    }
+
+    public String getFunctionName() {
+        return functionName;
+    }
 }

@@ -48,7 +48,8 @@ public class MediatorSerializerFinder {
         InMediatorSerializer.class,
         OutMediatorSerializer.class,
         // TODO RMMediatorSerializer.class,
-        TryMediatorSerializer.class
+        TryMediatorSerializer.class,
+        POXMediatorSerializer.class
     };
 
     private static MediatorSerializerFinder instance = null;

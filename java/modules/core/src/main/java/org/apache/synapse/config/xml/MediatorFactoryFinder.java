@@ -48,8 +48,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 	private static final Class[] mediatorFactories = {
         SequenceMediatorFactory.class,
         LogMediatorFactory.class,
-        SendMediatorFactory.class,
-        //RestMediatorFactory.class,
+        SendMediatorFactory.class,         
         FilterMediatorFactory.class,
         SynapseMediatorFactory.class,
         DropMediatorFactory.class,
@@ -64,7 +63,8 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
         RMMediatorFactory.class,
         RMSequenceMediatorFactory.class,
         TryMediatorFactory.class,
-        ClassMediatorFactory.class    
+        ClassMediatorFactory.class,
+        POXMediatorFactory.class
       };
 
     private static MediatorFactoryFinder instance = null;

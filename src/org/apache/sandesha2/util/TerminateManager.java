@@ -61,7 +61,7 @@ public class TerminateManager {
 
 	public static void checkAndTerminate(RMMsgContext relatedMessage, StorageManager storageManager, RMSBean rmsBean)
 	throws SandeshaStorageException, AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: TerminateManager::checkAndTerminate");
+		if(log.isDebugEnabled()) log.debug("Enter: TerminateManager::checkAndTerminate " +rmsBean);
 
 		long lastOutMessage = rmsBean.getLastOutMessage ();
 

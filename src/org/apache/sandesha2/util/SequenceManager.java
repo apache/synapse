@@ -239,7 +239,7 @@ public class SequenceManager {
 			}
 
 			// start the in listner for the client side, if acksTo is not anonymous.
-			if (acksToEPR != null && acksToEPR.hasAnonymousAddress()) {
+			if (acksToEPR != null && !acksToEPR.hasAnonymousAddress()) {
 				String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
 				if (transportInProtocol == null) {
 					throw new SandeshaException(SandeshaMessageHelper

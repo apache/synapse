@@ -135,6 +135,7 @@ public class RMSBean extends RMSequenceBean {
 	private static final int TIMED_OUT_FLAG            = 0x00100000;
 	private static final int SEQ_CLOSED_CLIENT_FLAG    = 0x01000000;
 	private static final int ACKED_MESSAGES_FLAG       = 0x10000000;
+	private static final int TERM_PAUSER_FOR_CS        = 0x00000002;
 
   /**
    * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
@@ -305,6 +306,7 @@ public class RMSBean extends RMSequenceBean {
 
 	public void setTerminationPauserForCS(boolean terminationPauserForCS) {
 		this.terminationPauserForCS = terminationPauserForCS;
+  	this.rmsFlags |= TERM_PAUSER_FOR_CS;
 	}
 
 
@@ -321,6 +323,7 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nHighestOutRelatesTo: ");result.append(highestOutRelatesTo);
 		result.append("\nNextMessageNumber: "); result.append(nextMessageNumber);
 		result.append("\nTerminateAdded   : "); result.append(terminateAdded);
+		result.append("\nTerminatePauser  : "); result.append(terminationPauserForCS);
 		result.append("\nTimedOut         : "); result.append(timedOut);
 		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
 		result.append("\nNumAckedMsgs     : "); result.append(numberOfMessagesAcked);
@@ -396,6 +399,9 @@ public class RMSBean extends RMSequenceBean {
 			match = false;
 		
 		else if((bean.rmsFlags & ACKED_MESSAGES_FLAG) != 0 && bean.getNumberOfMessagesAcked() != this.getNumberOfMessagesAcked())
+			match = false;
+		
+		else if((bean.rmsFlags & TERM_PAUSER_FOR_CS) != 0 && bean.isTerminationPauserForCS() != this.isTerminationPauserForCS())
 			match = false;
 		
 		return match;

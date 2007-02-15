@@ -502,6 +502,7 @@ public interface Sandesha2Constants {
 		static final String INBOUND_SEQUENCE_ID    = "Sandesha2InboundSequenceId";
 		static final String INBOUND_MESSAGE_NUMBER = "Sandesha2InboundMessageNumber";
 		static final String INBOUND_LAST_MESSAGE   = "Sandesha2InboundLastMessage";
+		static final String MAKECONNECTION_ENTRY   = "Sandesha2MakeConnectionEntry";
 	}
     
     public interface Assertions {

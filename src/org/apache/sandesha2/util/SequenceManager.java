@@ -31,6 +31,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.workers.SequenceEntry;
 import org.apache.sandesha2.wsrm.CreateSequence;
 
 /**
@@ -82,6 +83,13 @@ public class SequenceManager {
 		}
 
 		MessageContext createSeqContext = createSequenceMsg.getMessageContext();
+		
+		// If this create is the result of a MakeConnection, then we must have a related
+		// outbound sequence.
+		SequenceEntry entry = (SequenceEntry) createSeqContext.getProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY);
+		if(entry != null && entry.isRmSource()) {
+			rmdBean.setOutboundSequence(entry.getSequenceId());
+		}
 
 		rmdBean.setServerCompletedMessages(new RangeString());
 		
@@ -260,7 +268,11 @@ public class SequenceManager {
 				}
 			}
 		}
-		// Store both the acksTo and replyTo
+		// In case either of the replyTo or AcksTo is anonymous, rewrite them using the AnonURI template
+		replyToEPR = SandeshaUtil.rewriteEPR(replyToEPR, firstAplicationMsgCtx);
+		acksToEPR = SandeshaUtil.rewriteEPR(acksToEPR, firstAplicationMsgCtx);
+		
+		// Store both the acksTo and replyTo 
 		if(replyToEPR != null) rmsBean.setReplyToEPR(replyToEPR.getAddress());
 		if(acksToEPR  != null) rmsBean.setAcksToEPR(acksToEPR.getAddress());
 		

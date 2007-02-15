@@ -299,42 +299,4 @@ public abstract class SandeshaThread extends Thread{
 			}
 		}
 	}
-	
-	protected class SequenceEntry {
-		private String  sequenceId;
-		private boolean rmSource;
-		
-		public SequenceEntry(String sequenceId, boolean rmSource) {
-			this.sequenceId = sequenceId;
-			this.rmSource = rmSource;
-		}
-		public boolean isRmSource() {
-			return rmSource;
-		}
-		public String getSequenceId() {
-			return sequenceId;
-		}
-
-
-		public boolean equals(Object o) {
-			if(o == null) return false;
-			if(o == this) return true;
-			if(o.getClass() != getClass()) return false;
-			
-			SequenceEntry other = (SequenceEntry) o;
-			if(sequenceId != null) {
-				if(!sequenceId.equals(other.sequenceId)) return false;
-			} else {
-				if(other.sequenceId != null) return false;
-			}
-			
-			return rmSource == other.rmSource;
-		}
-		public int hashCode() {
-			int result = 1;
-			if(sequenceId != null) result = sequenceId.hashCode();
-			if(rmSource) result = -result;
-			return result;
-		}
-	}
 }

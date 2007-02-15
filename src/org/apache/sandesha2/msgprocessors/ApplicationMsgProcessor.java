@@ -20,13 +20,11 @@ package org.apache.sandesha2.msgprocessors;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
@@ -38,7 +36,6 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -90,15 +87,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// Re-write the WS-A anonymous URI, if we support the RM anonymous URI. We only
 		// need to rewrite the replyTo EPR if we have an out-in MEP.
-		SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration());
-		if(policy.isEnableRMAnonURI()) {
-			AxisOperation op = msgContext.getAxisOperation();
-			if(op != null) {
-				int mep = op.getAxisSpecifMEPConstant();
-				if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
-					EndpointReference replyTo = rewriteEPR(msgContext.getReplyTo(), msgContext);
-					msgContext.setReplyTo(replyTo);
-				}
+		AxisOperation op = msgContext.getAxisOperation();
+		int mep = WSDLConstants.MEP_CONSTANT_INVALID;
+		if(op != null) {
+			mep = op.getAxisSpecifMEPConstant();
+			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				EndpointReference replyTo = SandeshaUtil.rewriteEPR(msgContext.getReplyTo(), msgContext);
+				msgContext.setReplyTo(replyTo);
 			}
 		}
 		
@@ -279,9 +274,14 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		// set this as the response highest message.
 		rmsBean.setHighestOutMessageNumber(messageNumber);
 		
-		// saving the used message number
-		if (!dummyMessage)
+		// saving the used message number, and the expected reply count
+		if (!dummyMessage) {
 			rmsBean.setNextMessageNumber(messageNumber);
+			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				long expectedReplies = rmsBean.getExpectedReplies();
+				rmsBean.setExpectedReplies(expectedReplies + 1);
+			}
+		}
 		
 		RelatesTo relatesTo = msgContext.getRelatesTo();
 		if(relatesTo != null) {
@@ -491,45 +491,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processResponseMessage");
-	}
-
-	private EndpointReference rewriteEPR(EndpointReference epr, MessageContext mc)
-	throws SandeshaException
-	{
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaOutHandler::rewriteEPR " + epr);
-
-		// Handle EPRs that have not yet been set. These are effectively WS-A anon, and therefore
-		// we can rewrite them.
-		if(epr == null) epr = new EndpointReference(null);
-		
-		String address = epr.getAddress();
-		if(address == null ||
-		   AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address) ||
-		   AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address)) {
-			// We use the service context to co-ordinate the RM anon uuid, so that several
-			// invocations of the same target will yield stable replyTo addresses.
-			String uuid = null;
-			ServiceContext sc = mc.getServiceContext();
-			if(sc == null) {
-				String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.serviceContextNotSet);
-				throw new SandeshaException(msg);
-			}
-			synchronized (sc) {
-				uuid = (String) sc.getProperty(Sandesha2Constants.RM_ANON_UUID);
-				if(uuid == null) {
-					uuid = SandeshaUtil.getUUID();
-					sc.setProperty(Sandesha2Constants.RM_ANON_UUID, uuid);
-				}
-			}
-			
-			if(log.isDebugEnabled()) log.debug("Rewriting EPR with UUID " + uuid);
-			epr.setAddress(Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX + uuid);
-		}
-		
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaOutHandler::rewriteEPR " + epr);
-		return epr;
 	}
 
 }

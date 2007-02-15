@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -37,10 +38,12 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.workers.SandeshaThread;
+import org.apache.sandesha2.workers.SequenceEntry;
 
 /**
  * This class is responsible for sending MakeConnection requests. This is a seperate thread that
@@ -68,11 +71,14 @@ public class PollingManager extends SandeshaThread {
 		Transaction t = null;
 		try {
 			// If we have request scheduled, handle them first, and then pick
-			// pick a sequence using a round-robin approach.
+			// pick a sequence using a round-robin approach. Scheduled polls
+			// bypass the normal polling checks, to make sure that they happen
+			boolean forcePoll = false;
 			SequenceEntry entry = null;
 			synchronized (this) {
 				if(!scheduledPollingRequests.isEmpty()) {
 					entry = (SequenceEntry) scheduledPollingRequests.removeFirst();
+					forcePoll = true;
 				}
 			}
 			if(entry == null) {
@@ -93,9 +99,9 @@ public class PollingManager extends SandeshaThread {
 
 			t = storageManager.getTransaction();
 			if(entry.isRmSource()) {
-				pollRMSSide(entry);
+				pollRMSSide(entry, forcePoll);
 			} else {
-				pollRMDSide(entry);
+				pollRMDSide(entry, forcePoll);
 			}
 			if(t != null) t.commit();
 			t = null;
@@ -115,8 +121,8 @@ public class PollingManager extends SandeshaThread {
 		return false;
 	}
 	
-	private void pollRMSSide(SequenceEntry entry) throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMSSide");
+	private void pollRMSSide(SequenceEntry entry, boolean force) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMSSide, force: " + force);
 		
 		RMSBeanMgr rmsBeanManager = storageManager.getRMSBeanMgr();
 		RMSBean findRMS = new RMSBean();
@@ -129,14 +135,19 @@ public class PollingManager extends SandeshaThread {
 			// This sequence must have been terminated, or deleted
 			stopThreadForSequence(entry.getSequenceId(), true);
 		} else {
-			pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll);
+			// The sequence is there, but we still only poll if we are expecting reply messages,
+			// or if we don't have clean ack state.
+			boolean cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
+			long  repliesExpected = beanToPoll.getExpectedReplies();
+			if(force ||	!cleanAcks || repliesExpected > 0)
+				pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
 		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide");
 	}
 
-	private void pollRMDSide(SequenceEntry entry) throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMDSide");
+	private void pollRMDSide(SequenceEntry entry, boolean force) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollRMDSide, force: " + force);
 		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 		RMDBean findBean = new RMDBean();
 		findBean.setPollingMode(true);
@@ -148,7 +159,22 @@ public class PollingManager extends SandeshaThread {
 			// This sequence must have been terminated, or deleted
 			stopThreadForSequence(entry.getSequenceId(), false);
 		} else {
-			pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean);
+			// The sequence is still there, but if we have a running related sequence
+			// that is not expecting replies then there is no need to poll.
+			boolean doPoll = true;
+			String outboundSequence = nextMsgBean.getOutboundSequence();
+			if(outboundSequence != null) {
+				RMSBean findRMS = new RMSBean();
+				findRMS.setSequenceID(outboundSequence);
+				findRMS.setTerminated(false);
+				RMSBeanMgr mgr = storageManager.getRMSBeanMgr();
+				RMSBean outbound = mgr.findUnique(findRMS);
+				if(outbound != null && outbound.getExpectedReplies() == 0) {
+					doPoll = false;
+				}
+			}
+			if(force || doPoll)
+				pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean, entry);
 		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide");
@@ -157,25 +183,34 @@ public class PollingManager extends SandeshaThread {
 	private void pollForSequence(String sequenceId,
 								 String sequencePropertyKey,
 								 String referenceMsgKey,
-								 RMSequenceBean rmBean)
+								 RMSequenceBean rmBean,
+								 SequenceEntry entry)
 	throws SandeshaException, SandeshaStorageException, AxisFault
 	{
 		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey + ", " + rmBean);
 		
 		//create a MakeConnection message  
 		String replyTo = rmBean.getReplyToEPR();
-		String WSRMAnonReplyToURI = null;
+		String wireSeqId = null;
+		String wireAddress = null;
 		if (SandeshaUtil.isWSRMAnonymous(replyTo)) {
 			// If we are polling on a RM anon URI then we don't want to include the sequence id
 			// in the MakeConnection message.
-			sequenceId = null;
-			WSRMAnonReplyToURI = replyTo;
+			wireAddress = replyTo;
+		} else {
+			wireSeqId = sequenceId;
 		}
 		
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,context);
 		RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
 		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
-				rmBean, sequenceId, WSRMAnonReplyToURI, storageManager);
+				rmBean, wireSeqId, wireAddress, storageManager);
+		
+		// Store properties so that we know which sequence we are polling for. This can be used
+		// to match reply sequences up to requests, as well as to help process messagePending
+		// headers.
+		OperationContext ctx = makeConnectionRMMessage.getMessageContext().getOperationContext();
+		ctx.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY, entry);
 		
 		makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
 		//storing the MakeConnection message.

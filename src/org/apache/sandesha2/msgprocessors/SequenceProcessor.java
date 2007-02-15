@@ -43,6 +43,7 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
@@ -263,6 +264,18 @@ public class SequenceProcessor {
 		if (!msgNoPresentInList)
 		{
 			serverCompletedMessageRanges.addRange(new Range(msgNo));
+		}
+		
+		// If the message is a reply to an outbound message then we can update the RMSBean that
+		// matches.
+		String outboundSequence = bean.getOutboundSequence();
+		if(outboundSequence != null) {
+			RMSBean outBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outboundSequence);
+			if(outBean != null && outBean.getExpectedReplies() > 0 ) {
+				outBean.setExpectedReplies(outBean.getExpectedReplies() - 1);
+				RMSBeanMgr outMgr = storageManager.getRMSBeanMgr();
+				outMgr.update(outBean);
+			}
 		}
 		
 		// Update the RMD bean

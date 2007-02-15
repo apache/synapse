@@ -122,6 +122,11 @@ public class RMSBean extends RMSequenceBean {
 	private long numberOfMessagesAcked = 0;
 
 	/**
+	 * The number of reply messages that we expect
+	 */
+	private long expectedReplies = 0;
+	
+	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
 	 * be ignored within the match method.
@@ -136,6 +141,7 @@ public class RMSBean extends RMSequenceBean {
 	private static final int SEQ_CLOSED_CLIENT_FLAG    = 0x01000000;
 	private static final int ACKED_MESSAGES_FLAG       = 0x10000000;
 	private static final int TERM_PAUSER_FOR_CS        = 0x00000002;
+	private static final int EXPECTED_REPLIES          = 0x00000020;
 
   /**
    * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
@@ -310,6 +316,15 @@ public class RMSBean extends RMSequenceBean {
 	}
 
 
+	public long getExpectedReplies() {
+		return expectedReplies;
+	}
+
+	public void setExpectedReplies(long expectedReplies) {
+		this.expectedReplies = expectedReplies;
+		this.rmsFlags |= EXPECTED_REPLIES;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -327,6 +342,7 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nTimedOut         : "); result.append(timedOut);
 		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
 		result.append("\nNumAckedMsgs     : "); result.append(numberOfMessagesAcked);
+		result.append("\nExpectedReplies  : "); result.append(expectedReplies);
 		result.append("\nTransportTo      : "); result.append(transportTo);
 		result.append("\nOfferedEndPoint  : "); result.append(offeredEndPoint);
 		result.append("\nOfferedSequence  : "); result.append(offeredSequence);
@@ -403,7 +419,11 @@ public class RMSBean extends RMSequenceBean {
 		
 		else if((bean.rmsFlags & TERM_PAUSER_FOR_CS) != 0 && bean.isTerminationPauserForCS() != this.isTerminationPauserForCS())
 			match = false;
-		
+
+		else if((bean.rmsFlags & EXPECTED_REPLIES) != 0 && bean.getExpectedReplies() != this.getExpectedReplies())
+			match = false;
+
 		return match;
 	}
+
 }

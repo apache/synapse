@@ -941,4 +941,53 @@ public class SandeshaUtil {
     String stackTrace = baos.toString();
     return stackTrace;
 	}
+
+	public static EndpointReference rewriteEPR(EndpointReference epr, MessageContext mc)
+	throws SandeshaException
+	{
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaUtil::rewriteEPR " + epr);
+
+		ConfigurationContext configContext = mc.getConfigurationContext();
+		SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration());
+		if(!policy.isEnableRMAnonURI()) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaUtil::rewriteEPR, anon uri is disabled");
+			return epr;
+		}
+
+		// Handle EPRs that have not yet been set. These are effectively WS-A anon, and therefore
+		// we can rewrite them.
+		if(epr == null) epr = new EndpointReference(null);
+		
+		String address = epr.getAddress();
+		if(address == null ||
+		   AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address) ||
+		   AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address)) {
+			// We use the service context to co-ordinate the RM anon uuid, so that several
+			// invocations of the same target will yield stable replyTo addresses.
+			String uuid = null;
+			ServiceContext sc = mc.getServiceContext();
+			if(sc == null) {
+				String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.serviceContextNotSet);
+				throw new SandeshaException(msg);
+			}
+			synchronized (sc) {
+				uuid = (String) sc.getProperty(Sandesha2Constants.RM_ANON_UUID);
+				if(uuid == null) {
+					uuid = SandeshaUtil.getUUID();
+					sc.setProperty(Sandesha2Constants.RM_ANON_UUID, uuid);
+				}
+			}
+			
+			if(log.isDebugEnabled()) log.debug("Rewriting EPR with UUID " + uuid);
+			epr.setAddress(Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX + uuid);
+		}
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaUtil::rewriteEPR " + epr);
+		return epr;
+	}
+
+
 }

@@ -58,6 +58,12 @@ public class RMDBean extends RMSequenceBean {
 	 * To Address of the messages that will be received for this sequence.
 	 */
 	private String toAddress;
+	
+	/**
+	 * Client side, we keep track of inbound and outbound sequence pairs. Each
+	 * inbound sequence has the identifier of the associated outbound sequence.
+	 */
+	private String outboundSequence;
 
 	/**
 	 * Comment for <code>nextMsgNoToProcess</code>
@@ -157,6 +163,15 @@ public class RMDBean extends RMSequenceBean {
 		this.toAddress = toAddress;
 	}
 
+	public String getOutboundSequence() {
+		return outboundSequence;
+	}
+
+	public void setOutboundSequence(String outboundSequence) {
+		this.outboundSequence = outboundSequence;
+	}
+
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -195,6 +210,9 @@ public class RMDBean extends RMSequenceBean {
 			equal = false;
 
 		else if(bean.getToAddress() != null && !bean.getToAddress().equals(this.getToAddress()))
+			equal = false;
+		
+		else if(bean.getOutboundSequence() != null && !bean.getOutboundSequence().equals(this.getOutboundSequence()))
 			equal = false;
 		
 		else if ((bean.rmdFlags & NEXT_MSG_NO_FLAG) != 0 && bean.getNextMsgNoToProcess() != this.getNextMsgNoToProcess())

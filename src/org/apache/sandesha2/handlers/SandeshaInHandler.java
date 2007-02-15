@@ -34,6 +34,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
 import org.apache.sandesha2.msgprocessors.AcknowledgementProcessor;
+import org.apache.sandesha2.msgprocessors.MessagePendingProcessor;
 import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
@@ -115,6 +116,10 @@ public class SandeshaInHandler extends AbstractHandler {
 			if(reqProcessor.processAckRequestedHeaders(rmMsgCtx)){
 				returnValue = InvocationResponse.SUSPEND;
 			}
+			
+			// Process MessagePending headers
+			MessagePendingProcessor pendingProcessor = new MessagePendingProcessor();
+			pendingProcessor.processMessagePendingHeaders(rmMsgCtx);
 
 			// Process the Sequence header, if there is one
 			SequenceProcessor seqProcessor = new SequenceProcessor();

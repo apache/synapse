@@ -58,7 +58,7 @@ public class SpringMediatorSerializer extends AbstractMediatorSerializer
 
         if (mediator.getConfigKey() != null) {
             spring.addAttribute(fac.createOMAttribute(
-                "config", nullNS, mediator.getConfigKey()));
+                "key", nullNS, mediator.getConfigKey()));
         }
 
         // TODO add support for src attribute - or replace with a reg key!

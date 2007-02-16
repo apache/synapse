@@ -37,7 +37,7 @@ public class SpecSpecificConstants {
 	public static String getSpecVersionString (String namespaceValue) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue))
 			return Sandesha2Constants.SPEC_VERSIONS.v1_0;
-		else if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceValue))
+		else if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceValue))
 			return Sandesha2Constants.SPEC_VERSIONS.v1_1;
 		else
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -49,7 +49,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.NS_URI;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.NS_URI;
+			return Sandesha2Constants.SPEC_2007_02.NS_URI;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -60,7 +60,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_CREATE_SEQUENCE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -71,7 +71,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.ACTION_CREATE_SEQUENCE_RESPONSE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CREATE_SEQUENCE_RESPONSE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_CREATE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -82,7 +82,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.ACTION_TERMINATE_SEQUENCE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_TERMINATE_SEQUENCE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -91,7 +91,7 @@ public class SpecSpecificConstants {
 	
 	public static String getTerminateSequenceResponseAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_TERMINATE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec));
@@ -103,7 +103,7 @@ public class SpecSpecificConstants {
 					SandeshaMessageKeys.closeSequenceSpecLevel,
 					specVersion));
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_CLOSE_SEQUENCE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -116,7 +116,7 @@ public class SpecSpecificConstants {
 					SandeshaMessageKeys.closeSequenceSpecLevel,
 					specVersion));
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_CLOSE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -127,7 +127,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return null;  //No action defined for ackRequests
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_ACK_REQUEST;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_ACK_REQUEST;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -138,7 +138,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_SEQUENCE_ACKNOWLEDGEMENT;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -151,7 +151,7 @@ public class SpecSpecificConstants {
 			throw new SandeshaException (message);
 		}
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.ACTION_MAKE_CONNECTION;
+			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_MAKE_CONNECTION;
 		else {
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -163,7 +163,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_CREATE_SEQUENCE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.SOAP_ACTION_CREATE_SEQUENCE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_CREATE_SEQUENCE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -174,7 +174,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_CREATE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -185,7 +185,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_TERMINATE_SEQUENCE;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.SOAP_ACTION_TERMINATE_SEQUENCE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_TERMINATE_SEQUENCE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -194,7 +194,7 @@ public class SpecSpecificConstants {
 	
 	public static String getTerminateSequenceResponseSOAPAction (String specVersion) throws SandeshaException {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE;
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -205,7 +205,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			throw new SandeshaException ("this spec version does not define a ackRequest SOAP action");
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.SOAP_ACTION_ACK_REQUEST;
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_ACK_REQUEST;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -216,7 +216,7 @@ public class SpecSpecificConstants {
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT;
 		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2006_08.Actions.SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT;
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT;
 		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.unknownSpec,
@@ -305,8 +305,8 @@ public class SpecSpecificConstants {
 	}
 	
 	public static String getAddressingNamespace(String rmNamespace) throws SandeshaException {
-		if(Sandesha2Constants.SPEC_2006_08.NS_URI.equals(rmNamespace)) {
-			return Sandesha2Constants.SPEC_2006_08.ADDRESSING_NS_URI;
+		if(Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespace)) {
+			return Sandesha2Constants.SPEC_2007_02.ADDRESSING_NS_URI;
 		} else if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespace)) {
 			return Sandesha2Constants.SPEC_2005_02.ADDRESSING_NS_URI;
 		}
@@ -320,8 +320,8 @@ public class SpecSpecificConstants {
 			return Sandesha2Constants.SPEC_2005_02.SEC_NS_URI;
 		}
 
-		if(rmNamespace.equals(Sandesha2Constants.SPEC_2006_08.NS_URI)) {
-			return Sandesha2Constants.SPEC_2006_08.SEC_NS_URI;
+		if(rmNamespace.equals(Sandesha2Constants.SPEC_2007_02.NS_URI)) {
+			return Sandesha2Constants.SPEC_2007_02.SEC_NS_URI;
 		}
 
 		return null;

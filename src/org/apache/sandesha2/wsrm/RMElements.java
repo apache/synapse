@@ -24,12 +24,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAP11Constants;
-import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -60,7 +57,6 @@ public class RMElements {
 	private MessagePending messagePending = null;
 	private MakeConnection makeConnection = null;
 	private SequenceFault sequenceFault = null;
-	private String rmNamespaceValue = null;
 	
 	public RMElements () {
 		sequenceAcknowledgements = new ArrayList ();
@@ -84,128 +80,124 @@ public class RMElements {
 			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_1);
 		else
 			factory = SOAPAbstractFactory.getSOAPFactory(Sandesha2Constants.SOAPVersion.v1_2);
-			
 		
-		//finding out the rm version.
-		rmNamespaceValue = getRMNamespaceValue (envelope,action);
-		if (rmNamespaceValue==null) {
-			return;
+		// Check for RM defined elements, using either spec version
+		OMElement header = envelope.getHeader();
+		OMElement body = envelope.getBody();
+
+		// The sequence header
+		OMElement element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.Sequence);
+		if(element == null) {
+			element = envelope.getHeader().getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence);
 		}
-		
-		OMElement sequenceElement = envelope.getHeader().getFirstChildWithName(
-				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.SEQUENCE));
-		if (sequenceElement != null) {
-			sequence = new Sequence(rmNamespaceValue);
+		if (element != null) {
+			sequence = new Sequence(element.getNamespace().getNamespaceURI());
 			sequence.fromOMElement(envelope.getHeader());
 		}
 
-		OMElement createSeqElement = envelope.getBody().getFirstChildWithName(
-				new QName(rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE));
-		
-		if (createSeqElement != null) {
-			createSequence = new CreateSequence(rmNamespaceValue);
-			createSequence.fromOMElement(envelope.getBody());
-		}
-
-		OMElement createSeqResElement = envelope.getBody()
-				.getFirstChildWithName(
-						new QName(rmNamespaceValue,
-								Sandesha2Constants.WSRM_COMMON.CREATE_SEQUENCE_RESPONSE));
-		if (createSeqResElement != null) {
-			createSequenceResponse = new CreateSequenceResponse(rmNamespaceValue);
-			createSequenceResponse.fromOMElement(envelope.getBody());
-		}
-
-		OMElement terminateSeqElement = envelope.getBody()
-				.getFirstChildWithName(
-						new QName(rmNamespaceValue,
-								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
-		if (terminateSeqElement != null) {
-			terminateSequence = new TerminateSequence(rmNamespaceValue);
-			terminateSequence.fromOMElement(envelope.getBody());
-		}
-		
-		OMElement terminateSeqResponseElement = envelope.getBody()
-				.getFirstChildWithName(
-						new QName(rmNamespaceValue,
-								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE_RESPONSE));
-		if (terminateSeqResponseElement != null) {
-				terminateSequenceResponse = new TerminateSequenceResponse (rmNamespaceValue);
-				terminateSequenceResponse.fromOMElement(envelope.getBody());
-		}
-
-		OMElement closeSequenceElement = envelope.getBody()
-			.getFirstChildWithName(
-				new QName(rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE));
-		if (closeSequenceElement != null) {
-			closeSequence = new CloseSequence (rmNamespaceValue);
-			closeSequence.fromOMElement(envelope.getBody());
-		}
-
-		OMElement closeSequenceResponseElement = envelope.getBody()
-			.getFirstChildWithName(
-					new QName(rmNamespaceValue,
-							Sandesha2Constants.WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE));
-		if (closeSequenceResponseElement != null) {
-			closeSequenceResponse = new CloseSequenceResponse  (rmNamespaceValue);
-			closeSequenceResponse.fromOMElement(envelope.getBody());
-		}
-		
-		Iterator sequenceAcknowledgementIter = envelope.getHeader()
-				.getChildrenWithName (new QName(rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK));
-		while (sequenceAcknowledgementIter.hasNext()) {
-			OMElement sequenceAckElement = (OMElement) sequenceAcknowledgementIter.next();
-			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement  (rmNamespaceValue);
-			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
+		// The body messages
+		OMElement firstBodyElement = body.getFirstElement();
+		if(firstBodyElement != null) {
+			QName firstBodyQName = firstBodyElement.getQName();
 			
+			if(Sandesha2Constants.SPEC_2007_02.QNames.CreateSequence.equals(firstBodyQName)) {
+				createSequence = new CreateSequence(firstBodyQName.getNamespaceURI());
+				createSequence.fromOMElement(body);
+			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CreateSequence.equals(firstBodyQName)) {
+				createSequence = new CreateSequence(firstBodyQName.getNamespaceURI());
+				createSequence.fromOMElement(body);
+
+			} else if(Sandesha2Constants.SPEC_2007_02.QNames.CreateSequenceResponse.equals(firstBodyQName)) {
+				createSequenceResponse = new CreateSequenceResponse(firstBodyQName.getNamespaceURI());
+				createSequenceResponse.fromOMElement(body);
+			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CreateSequenceResponse.equals(firstBodyQName)) {
+				createSequenceResponse = new CreateSequenceResponse(firstBodyQName.getNamespaceURI());
+				createSequenceResponse.fromOMElement(body);
+
+			} else if(Sandesha2Constants.SPEC_2007_02.QNames.CloseSequence.equals(firstBodyQName)) {
+				closeSequence = new CloseSequence(firstBodyQName.getNamespaceURI());
+				closeSequence.fromOMElement(body);
+			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CloseSequence.equals(firstBodyQName)) {
+				closeSequence = new CloseSequence(firstBodyQName.getNamespaceURI());
+				closeSequence.fromOMElement(body);
+
+			} else if(Sandesha2Constants.SPEC_2007_02.QNames.CloseSequenceResponse.equals(firstBodyQName)) {
+				closeSequenceResponse = new CloseSequenceResponse(firstBodyQName.getNamespaceURI());
+				closeSequenceResponse.fromOMElement(body);
+			} else if(Sandesha2Constants.SPEC_2005_02.QNames.CloseSequenceResponse.equals(firstBodyQName)) {
+				closeSequenceResponse = new CloseSequenceResponse(firstBodyQName.getNamespaceURI());
+				closeSequenceResponse.fromOMElement(body);
+
+			} else if(Sandesha2Constants.SPEC_2007_02.QNames.TerminateSequence.equals(firstBodyQName)) {
+				terminateSequence = new TerminateSequence(firstBodyQName.getNamespaceURI());
+				terminateSequence.fromOMElement(body);
+			} else if(Sandesha2Constants.SPEC_2005_02.QNames.TerminateSequence.equals(firstBodyQName)) {
+				terminateSequence = new TerminateSequence(firstBodyQName.getNamespaceURI());
+				terminateSequence.fromOMElement(body);
+
+			} else if(Sandesha2Constants.SPEC_2007_02.QNames.TerminateSequenceResponse.equals(firstBodyQName)) {
+				terminateSequenceResponse = new TerminateSequenceResponse(firstBodyQName.getNamespaceURI());
+				terminateSequenceResponse.fromOMElement(body);
+			} else if(Sandesha2Constants.SPEC_2005_02.QNames.TerminateSequenceResponse.equals(firstBodyQName)) {
+				terminateSequenceResponse = new TerminateSequenceResponse(firstBodyQName.getNamespaceURI());
+				terminateSequenceResponse.fromOMElement(body);
+
+			} else if(Sandesha2Constants.SPEC_2007_02.QNames.MakeConnection.equals(firstBodyQName)) {
+				makeConnection = new MakeConnection(firstBodyQName.getNamespaceURI());
+				makeConnection.fromOMElement(firstBodyElement);
+			}
+		}
+		
+		// The other headers
+		Iterator headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceAck);
+		while (headers.hasNext()) {
+			OMElement sequenceAckElement = (OMElement) headers.next();
+			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2007_02.NS_URI);
+			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
+			sequenceAcknowledgements.add(sequenceAcknowledgement);
+		}
+		headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceAck);
+		while (headers.hasNext()) {
+			OMElement sequenceAckElement = (OMElement) headers.next();
+			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2005_02.NS_URI);
+			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
 			sequenceAcknowledgements.add(sequenceAcknowledgement);
 		}
 
-		Iterator ackRequestIter = envelope.getHeader()
-				.getChildrenWithName (new QName(rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.ACK_REQUESTED));
-		while (ackRequestIter.hasNext()) {
-			OMElement ackRequestElement = (OMElement) ackRequestIter.next();
-			AckRequested ackRequest = new AckRequested(rmNamespaceValue);
+		headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.AckRequest);
+		while (headers.hasNext()) {
+			OMElement ackRequestElement = (OMElement) headers.next();
+			AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2007_02.NS_URI);
 			ackRequest.fromOMElement(ackRequestElement);
-			
+			ackRequests.add(ackRequest);
+		}
+		headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.AckRequest);
+		while (headers.hasNext()) {
+			OMElement ackRequestElement = (OMElement) headers.next();
+			AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2005_02.NS_URI);
+			ackRequest.fromOMElement(ackRequestElement);
 			ackRequests.add(ackRequest);
 		}
 
-		OMElement usesSequenceSTRElement = envelope.getHeader()
-		.getFirstChildWithName(
-				new QName(rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.USES_SEQUENCE_STR));
-		if (usesSequenceSTRElement != null) {
-			usesSequenceSTR = new UsesSequenceSTR(factory, rmNamespaceValue);
+		element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.UsesSequenceSTR);
+		if (element != null) {
+			usesSequenceSTR = new UsesSequenceSTR(factory, Sandesha2Constants.SPEC_2007_02.NS_URI);
 			usesSequenceSTR.fromOMElement(envelope.getHeader());
 		}
 		
-		OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(
-				new QName (rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
-		if (makeConnectionElement!=null) {
-			makeConnection = new MakeConnection (rmNamespaceValue);
-			makeConnection.fromOMElement(makeConnectionElement);
+		element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.MessagePending);
+		if (element != null) {
+			messagePending = new MessagePending(Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
+			messagePending.fromOMElement(element);
 		}
 		
-		OMElement messagePendingElement = envelope.getHeader().getFirstChildWithName(
-				new QName (rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
-		if (messagePendingElement!=null) {
-			messagePending = new MessagePending (rmNamespaceValue);
-			messagePending.fromOMElement(messagePendingElement);
+		element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceFault);
+		if(element == null) {
+			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceFault);
 		}
-		
-		OMElement sequenceFaultElement = envelope.getHeader().getFirstChildWithName(
-				new QName (rmNamespaceValue,
-						Sandesha2Constants.WSRM_COMMON.SEQUENCE_FAULT));
-		if (sequenceFaultElement!=null) {
-			sequenceFault = new SequenceFault (rmNamespaceValue);
-			sequenceFault.fromOMElement(sequenceFaultElement);
+		if (element !=null) {
+			sequenceFault = new SequenceFault(element.getNamespace().getNamespaceURI());
+			sequenceFault.fromOMElement(element);
 		}
 
 	}
@@ -326,49 +318,6 @@ public class RMElements {
 	
 	public void setMessagePending(MessagePending messagePending) {
 		this.messagePending = messagePending;
-	}
-	
-	private String getRMNamespaceValue (SOAPEnvelope envelope, String action) {
-		
-		SOAPHeader header = envelope.getHeader();
-		if (header!=null) {
-			ArrayList headers = header.getHeaderBlocksWithNSURI(Sandesha2Constants.SPEC_2005_02.NS_URI);
-			if (headers!=null && headers.size()>0)
-				return Sandesha2Constants.SPEC_2005_02.NS_URI;
-			
-			headers = header.getHeaderBlocksWithNSURI(Sandesha2Constants.SPEC_2006_08.NS_URI);
-			if (headers!=null && headers.size()>0)
-				return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		}
-		
-		//rm control messages with parts in the body will be identified by the wsa:action,
-		//except when ws-addressing headers are turned off
-		if (action!=null) {
-			if(action.startsWith(Sandesha2Constants.SPEC_2005_02.NS_URI)) {
-				return Sandesha2Constants.SPEC_2005_02.NS_URI;
-			}
-			
-			if (action.startsWith(Sandesha2Constants.SPEC_2006_08.NS_URI))
-				return Sandesha2Constants.SPEC_2006_08.NS_URI;
-		}
-		
-		// As a final resort check the body namespace
-		SOAPBody body = envelope.getBody();
-		if(body != null) {
-			OMElement element = body.getFirstElement();
-			if(element != null) {
-				OMNamespace namespace = element.getNamespace();
-				if(namespace != null) {
-					String uri = namespace.getNamespaceURI();
-					if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(uri) ||
-					   Sandesha2Constants.SPEC_2006_08.NS_URI.equals(uri)  ) {
-						return uri;
-					}
-				}
-			}
-		}
-		
-		return null;   //a version could not be found
 	}
 	
 	public CloseSequence getCloseSequence() {

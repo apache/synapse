@@ -148,7 +148,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
     // Open a connection to the endpoint
 		HttpURLConnection connection = 
 			FaultTestUtils.getHttpURLConnection("http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService",
-					Sandesha2Constants.SPEC_2006_08.Actions.ACTION_CLOSE_SEQUENCE);
+					Sandesha2Constants.SPEC_2007_02.Actions.ACTION_CLOSE_SEQUENCE);
 
 		StorageManager storageManager = 
 			SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());
@@ -210,7 +210,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
     // Open a connection to the endpoint
 		HttpURLConnection connection = 
 			FaultTestUtils.getHttpURLConnection("http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService",
-					Sandesha2Constants.SPEC_2006_08.Actions.ACTION_ACK_REQUEST);
+					Sandesha2Constants.SPEC_2007_02.Actions.ACTION_ACK_REQUEST);
 
 		StorageManager storageManager = 
 			SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());

@@ -30,7 +30,7 @@ import org.apache.sandesha2.SandeshaTestCase;
 public class MessagePendingTest extends SandeshaTestCase  {
 
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
-	String rmNamespace = Sandesha2Constants.SPEC_2006_08.NS_URI;
+	String mcNamespace = Sandesha2Constants.SPEC_2007_02.MC_NS_URI;
 	
     public MessagePendingTest() {
         super("MessagePendingTest");
@@ -38,11 +38,11 @@ public class MessagePendingTest extends SandeshaTestCase  {
 
     public void testFromOMElement()  throws SandeshaException {
     	
-    	MessagePending messagePending = new MessagePending (rmNamespace);
+    	MessagePending messagePending = new MessagePending (mcNamespace);
     	SOAPEnvelope env = getSOAPEnvelope("", "MessagePending.xml");
     	
     	OMElement messagePendingElement = env.getHeader().getFirstChildWithName( 
-    			new QName (rmNamespace,Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
+    			new QName (mcNamespace,Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
     	messagePending.fromOMElement(messagePendingElement);
  
     	assertTrue(messagePending.isPending());
@@ -50,7 +50,7 @@ public class MessagePendingTest extends SandeshaTestCase  {
 
     public void testToOMElement()  throws SandeshaException {
     	
-    	MessagePending messagePending = new MessagePending (rmNamespace);
+    	MessagePending messagePending = new MessagePending (mcNamespace);
     	messagePending.setPending(true);
     	
     	
@@ -58,7 +58,7 @@ public class MessagePendingTest extends SandeshaTestCase  {
         messagePending.toSOAPEnvelope(env);
 
         OMElement messagePendingElement = env.getHeader().getFirstChildWithName(
-        		new QName (rmNamespace,Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
+        		new QName (mcNamespace,Sandesha2Constants.WSRM_COMMON.MESSAGE_PENDING));
         assertNotNull(messagePendingElement);
         OMAttribute attribute = messagePendingElement.getAttribute(
         		new QName (Sandesha2Constants.WSRM_COMMON.PENDING));

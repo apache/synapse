@@ -73,7 +73,7 @@ public class Address implements IOMRMElement {
 
 		OMFactory factory = element.getOMFactory();
 		
-		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
+		OMNamespace rmNamespace = factory.createOMNamespace(rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_MC);
 		OMElement addressElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.ADDRESS, rmNamespace);
 		
 		addressElement.setText(address);
@@ -91,7 +91,7 @@ public class Address implements IOMRMElement {
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

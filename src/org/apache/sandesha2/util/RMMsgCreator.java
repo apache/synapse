@@ -158,7 +158,7 @@ public class RMMsgCreator {
 				offerPart.setIdentifier(identifier);
 				createSequencePart.setSequenceOffer(offerPart);
 				
-				if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(rmNamespaceValue)) {
+				if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespaceValue)) {
 					Endpoint endpoint = new Endpoint (offeredEndpoint, rmNamespaceValue, addressingNamespace);
 					offerPart.setEndpoint(endpoint);
 				}
@@ -200,8 +200,8 @@ public class RMMsgCreator {
 			
 			// If we are using token based security, and the 1.1 spec level, then we
 			// should introduce a UsesSequenceSTR header into the message.
-			if(createSequencePart.getNamespaceValue().equals(Sandesha2Constants.SPEC_2006_08.NS_URI)) {
-				UsesSequenceSTR header = new UsesSequenceSTR(null, Sandesha2Constants.SPEC_2006_08.NS_URI);
+			if(createSequencePart.getNamespaceValue().equals(Sandesha2Constants.SPEC_2007_02.NS_URI)) {
+				UsesSequenceSTR header = new UsesSequenceSTR(null, Sandesha2Constants.SPEC_2007_02.NS_URI);
 				header.toSOAPEnvelope(createSeqmsgContext.getEnvelope());
 			}
 
@@ -472,7 +472,7 @@ public class RMMsgCreator {
 		MessageContext makeConnectionMessageCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage,makeConnectionOperation);
 		RMMsgContext makeConnectionRMMessageCtx = MsgInitializer.initializeMessage(makeConnectionMessageCtx);
 		
-		MakeConnection makeConnection = new MakeConnection (rmNamespaceValue);
+		MakeConnection makeConnection = new MakeConnection (Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
 		if (makeConnectionSeqId!=null) {
 			Identifier identifier = new Identifier (rmNamespaceValue);
 			identifier.setIndentifer(makeConnectionSeqId);
@@ -480,7 +480,7 @@ public class RMMsgCreator {
 		}
 		
 		if (makeConnectionAnonURI!=null) {
-			Address address = new Address (rmNamespaceValue);
+			Address address = new Address (Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
 			address.setAddress (makeConnectionAnonURI);
 			makeConnection.setAddress(address);
 		}

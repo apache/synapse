@@ -42,8 +42,8 @@
         <!-- namespaces for the 2005-02 spec -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</actionMapping>
 
-        <!-- namespaces for the 2006-08 spec -->
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement</actionMapping>
+        <!-- namespaces for the 2007-02 spec -->
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/SequenceAcknowledgement</actionMapping>
      </operation>
  
      <operation name="RMInOutOperation" mep="http://www.w3.org/2006/01/wsdl/in-out">
@@ -56,17 +56,17 @@
         <!--  For interoparability perposes. Some WSRM implementations tend to send this as the LastMessage, 
         	  replied with an ack -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/AckRequested</actionMapping>
         
         <!--  TerminateSequence works as a InOut in RM 1.0 anonymous scenario -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
         
         
-        <!-- namespaces for the 2006-08 spec -->
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequence</actionMapping>
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection</actionMapping>
+        <!-- namespaces for the 2007-02 spec -->
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/CreateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/CloseSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/TerminateSequence</actionMapping>
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsmc/200702/MakeConnection</actionMapping>
     </operation>
 
     <operation name="RMOutOnlyOperation" mep="http://www.w3.org/2006/01/wsdl/out-only">

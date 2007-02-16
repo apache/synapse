@@ -64,57 +64,89 @@ public interface Sandesha2Constants {
 			
 			String SOAP_ACTION_LAST_MESSAGE = "http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage";
 		}
+		
+		public interface QNames {
+			// Headers
+			QName Sequence = new QName(NS_URI, WSRM_COMMON.SEQUENCE);
+			QName SequenceAck = new QName(NS_URI, WSRM_COMMON.SEQUENCE_ACK);
+			QName AckRequest = new QName(NS_URI, WSRM_COMMON.ACK_REQUESTED);
+			QName SequenceFault = new QName(NS_URI, WSRM_COMMON.SEQUENCE_FAULT);
+			
+			// Body elements
+			QName CreateSequence = new QName(NS_URI, WSRM_COMMON.CREATE_SEQUENCE);
+			QName CreateSequenceResponse = new QName(NS_URI, WSRM_COMMON.CREATE_SEQUENCE_RESPONSE);
+			QName CloseSequence = new QName(NS_URI, WSRM_COMMON.CLOSE_SEQUENCE);
+			QName CloseSequenceResponse = new QName(NS_URI, WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE);
+			QName TerminateSequence = new QName(NS_URI, WSRM_COMMON.TERMINATE_SEQUENCE);
+			QName TerminateSequenceResponse = new QName(NS_URI, WSRM_COMMON.TERMINATE_SEQUENCE_RESPONSE);
+			
+			// Other elements
+			QName Identifier = new QName(NS_URI, WSRM_COMMON.IDENTIFIER);
+		}
 	}
 	
-	public interface SPEC_2006_08 {
+	public interface SPEC_2007_02 {
 		
-		String NS_URI               = "http://docs.oasis-open.org/ws-rx/wsrm/200608";
-		String ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsrm/200608/anonymous?id=";
+		String NS_URI               = "http://docs.oasis-open.org/ws-rx/wsrm/200702";
+		String MC_NS_URI            = "http://docs.oasis-open.org/ws-rx/wsmc/200702";
+		String ANONYMOUS_URI_PREFIX = "http://docs.oasis-open.org/ws-rx/wsmc/200702/anonymous?id=";
 		String SEC_NS_URI           = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 		String ADDRESSING_NS_URI    = AddressingConstants.Final.WSA_NAMESPACE;
 
 		public interface Actions {
 			
-			String ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
+			// WS-RM actions
+			String ACTION_CREATE_SEQUENCE             = SPEC_2007_02.NS_URI + "/CreateSequence";
+			String ACTION_CREATE_SEQUENCE_RESPONSE    = SPEC_2007_02.NS_URI + "/CreateSequenceResponse";
+			String ACTION_CLOSE_SEQUENCE              = SPEC_2007_02.NS_URI + "/CloseSequence";
+			String ACTION_CLOSE_SEQUENCE_RESPONSE     = SPEC_2007_02.NS_URI + "/CloseSequenceResponse";
+			String ACTION_TERMINATE_SEQUENCE          = SPEC_2007_02.NS_URI + "/TerminateSequence";
+			String ACTION_TERMINATE_SEQUENCE_RESPONSE = SPEC_2007_02.NS_URI + "/TerminateSequenceResponse";
+			String ACTION_SEQUENCE_ACKNOWLEDGEMENT    = SPEC_2007_02.NS_URI + "/SequenceAcknowledgement";
+			String ACTION_ACK_REQUEST                 = SPEC_2007_02.NS_URI + "/AckRequested";
+			
+			// WS-MC actions
+			String ACTION_MAKE_CONNECTION             = SPEC_2007_02.MC_NS_URI + "/MakeConnection";
 
-			String ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequenceResponse";
-
-			String ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement";
-
-			String ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequence";
+			String SOAP_ACTION_CREATE_SEQUENCE             = ACTION_CREATE_SEQUENCE;
+			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE    = ACTION_CREATE_SEQUENCE_RESPONSE;
+			String SOAP_ACTION_CLOSE_SEQUENCE              = ACTION_CLOSE_SEQUENCE;
+			String SOAP_ACTION_CLOSE_SEQUENCE_RESPONSE     = ACTION_CLOSE_SEQUENCE_RESPONSE;
+			String SOAP_ACTION_TERMINATE_SEQUENCE          = ACTION_TERMINATE_SEQUENCE;
+			String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = ACTION_TERMINATE_SEQUENCE_RESPONSE;
+			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT    = ACTION_SEQUENCE_ACKNOWLEDGEMENT;
+			String SOAP_ACTION_ACK_REQUEST                 = ACTION_ACK_REQUEST;
+			String SOAP_ACTION_MAKE_CONNECTION             = ACTION_MAKE_CONNECTION;
+		}
+		
+		public interface QNames {
+			// Headers
+			QName Sequence = new QName(NS_URI, WSRM_COMMON.SEQUENCE);
+			QName SequenceAck = new QName(NS_URI, WSRM_COMMON.SEQUENCE_ACK);
+			QName AckRequest = new QName(NS_URI, WSRM_COMMON.ACK_REQUESTED);
+			QName SequenceFault = new QName(NS_URI, WSRM_COMMON.SEQUENCE_FAULT);
+			QName UsesSequenceSTR = new QName(NS_URI, WSRM_COMMON.USES_SEQUENCE_STR);
+			QName MessagePending = new QName(MC_NS_URI, WSRM_COMMON.MESSAGE_PENDING);
 			
-			String ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequenceResponse";
+			// Body elements
+			QName CreateSequence = new QName(NS_URI, WSRM_COMMON.CREATE_SEQUENCE);
+			QName CreateSequenceResponse = new QName(NS_URI, WSRM_COMMON.CREATE_SEQUENCE_RESPONSE);
+			QName CloseSequence = new QName(NS_URI, WSRM_COMMON.CLOSE_SEQUENCE);
+			QName CloseSequenceResponse = new QName(NS_URI, WSRM_COMMON.CLOSE_SEQUENCE_RESPONSE);
+			QName TerminateSequence = new QName(NS_URI, WSRM_COMMON.TERMINATE_SEQUENCE);
+			QName TerminateSequenceResponse = new QName(NS_URI, WSRM_COMMON.TERMINATE_SEQUENCE_RESPONSE);
+			QName MakeConnection = new QName(MC_NS_URI, WSRM_COMMON.MAKE_CONNECTION);
 			
-			String ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested";
-			
-			String ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence";
-			
-			String ACTION_CLOSE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequenceResponse";
-			
-			String ACTION_MAKE_CONNECTION = "http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection";
-			
-			String SOAP_ACTION_CREATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence";
-
-			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequenceResponse";
-
-			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT = "http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement";
-
-			String SOAP_ACTION_TERMINATE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequence";
-			
-			String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/TerminateSequenceResponse";
-			
-			String SOAP_ACTION_ACK_REQUEST = "http://docs.oasis-open.org/ws-rx/wsrm/200608/AckRequested";
-			
-			String SOAP_ACTION_CLOSE_SEQUENCE = "http://docs.oasis-open.org/ws-rx/wsrm/200608/CloseSequence";
-			
-			String SOAP_ACTION_MAKE_CONNECTION = "http://docs.oasis-open.org/ws-rx/wsrm/200608/MakeConnection";
-			                                      
+			// Other elements
+			QName Identifier = new QName(NS_URI, WSRM_COMMON.IDENTIFIER);
 		}
 	}
 	
 	public interface WSRM_COMMON {
 		
 		String NS_PREFIX_RM = "wsrm";
+
+		String NS_PREFIX_MC = "wsmc";
 
 		String MSG_NUMBER = "MessageNumber";
 
@@ -491,7 +523,7 @@ public interface Sandesha2Constants {
 	
 	static final String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
-			SPEC_2006_08.NS_URI
+			SPEC_2007_02.NS_URI
 	};
 	
 	public interface MessageContextProperties{

@@ -1,5 +1,6 @@
 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope"
-xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200608"
+xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"
+xmlns:wsmc="http://docs.oasis-open.org/ws-rx/wsmc/200702"
 xmlns:wsa="http://www.w3.org/2005/08/addressing">
 <S:Header>
 <wsa:Action> http://example.org/eventType1 </wsa:Action>
@@ -8,7 +9,7 @@ wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000</wsa:To>
 <wsrm:Sequence>
 <wsrm:Identifier> http://example.org/rmid-456 </wsrm:Identifier>
 </wsrm:Sequence>
-<wsrm:MessagePending pending="true"/>
+<wsmc:MessagePending pending="true"/>
 </S:Header>
 <S:Body>
 </S:Body>

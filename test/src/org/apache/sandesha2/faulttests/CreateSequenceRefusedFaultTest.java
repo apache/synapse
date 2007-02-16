@@ -68,7 +68,7 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
     // Open a connection to the endpoint
 		HttpURLConnection connection = 
 			FaultTestUtils.getHttpURLConnection("http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService",
-					"http://docs.oasis-open.org/ws-rx/wsrm/200608/CreateSequence");
+					"http://docs.oasis-open.org/ws-rx/wsrm/200702/CreateSequence");
 
 		OutputStream tmpOut2 = connection.getOutputStream();
 

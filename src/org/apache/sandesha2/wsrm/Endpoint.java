@@ -77,7 +77,7 @@ public class Endpoint implements IOMRMElement {
 	}
 
 	public boolean isNamespaceSupported (String namespaceName) {
-		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

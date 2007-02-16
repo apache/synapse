@@ -104,10 +104,10 @@ public class SequenceOffer implements IOMRMElement {
 		if (endpoint!=null) {
 			endpoint.toOMElement(sequenceOfferElement);
 		} else {
-			if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceValue)) {
+			if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceValue)) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.elementMustForSpec,
 						Sandesha2Constants.WSRM_COMMON.ENDPOINT,
-						Sandesha2Constants.SPEC_2006_08.NS_URI);
+						Sandesha2Constants.SPEC_2007_02.NS_URI);
 				throw new SandeshaException (message);
 			}
 		}
@@ -141,7 +141,7 @@ public class SequenceOffer implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

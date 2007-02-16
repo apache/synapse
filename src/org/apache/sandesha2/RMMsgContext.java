@@ -300,7 +300,7 @@ public class RMMsgContext {
 		
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) { 
 			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.v1_0;
-		} else if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(rmNamespaceValue)) {
+		} else if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespaceValue)) {
 			rmSpecVersion = Sandesha2Constants.SPEC_VERSIONS.v1_1;
 		}
 	}

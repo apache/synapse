@@ -31,7 +31,8 @@ import org.apache.sandesha2.SandeshaTestCase;
 public class MakeConnectionTest extends SandeshaTestCase {
 	
 	SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
-	String rmNamespaceValue = Sandesha2Constants.SPEC_2006_08.NS_URI;
+	String rmNamespaceValue = Sandesha2Constants.SPEC_2007_02.NS_URI;
+	String mcNamespaceValue = Sandesha2Constants.SPEC_2007_02.MC_NS_URI;
 	String addressingNamespaceValue = AddressingConstants.Final.WSA_NAMESPACE;
 	
     public MakeConnectionTest() {
@@ -39,9 +40,9 @@ public class MakeConnectionTest extends SandeshaTestCase {
     }
     
     public void testfromOMElement()  throws AxisFault {
-        MakeConnection makeConnection = new MakeConnection(rmNamespaceValue);
+        MakeConnection makeConnection = new MakeConnection(mcNamespaceValue);
         SOAPEnvelope envelope = getSOAPEnvelope("", "MakeConnection.xml");
-        OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
+        OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(new QName (mcNamespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
         makeConnection.fromOMElement(makeConnectionElement);
 
         Identifier identifier = makeConnection.getIdentifier();
@@ -50,15 +51,15 @@ public class MakeConnectionTest extends SandeshaTestCase {
         
         Address address = makeConnection.getAddress();
         assertNotNull(address);
-        assertEquals(address.getAddress(),"http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
+        assertEquals(address.getAddress(),"http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
 
     }
 
     public void testToSOAPEnvelope()  throws SandeshaException {
-        MakeConnection makeConnection = new MakeConnection (rmNamespaceValue);
+        MakeConnection makeConnection = new MakeConnection (mcNamespaceValue);
 
-        Address address = new Address (rmNamespaceValue);
-        address.setAddress("http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
+        Address address = new Address (mcNamespaceValue);
+        address.setAddress("http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
         Identifier identifier = new Identifier (rmNamespaceValue);
         identifier.setIndentifer("uuid:c3671020-15e0-11da-9b3b-f0439d4867bd");
         
@@ -69,15 +70,14 @@ public class MakeConnectionTest extends SandeshaTestCase {
         makeConnection.toSOAPEnvelope(envelope);
 
         OMElement makeConnectionElement = envelope.getBody().getFirstChildWithName(
-        		new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
+        		new QName (mcNamespaceValue,Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION));
         assertNotNull(makeConnectionElement);
         
         OMElement addressElement = makeConnectionElement.getFirstChildWithName(
-        		new QName (rmNamespaceValue,Sandesha2Constants.WSA.ADDRESS));
+        		new QName (mcNamespaceValue,Sandesha2Constants.WSA.ADDRESS));
         assertNotNull(addressElement);
         String addressValue = addressElement.getText();
-        assertEquals(addressValue,"http://docs.oasis-open.org/wsrx/wsrm/200608/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
-        
+        assertEquals(addressValue,"http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000");
         
         OMElement identifierElement = makeConnectionElement.getFirstChildWithName(
         		new QName (rmNamespaceValue,Sandesha2Constants.WSRM_COMMON.IDENTIFIER));

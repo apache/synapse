@@ -61,7 +61,10 @@ public class MakeConnection implements IOMRMPart {
 
 	public Object fromOMElement(OMElement makeConnectionElement) throws OMException, AxisFault {
 
-		OMElement identifierElement = makeConnectionElement.getFirstChildWithName(new QName(namespaceValue, Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+		OMElement identifierElement = makeConnectionElement.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.Identifier);
+		if(identifierElement == null) {
+			identifierElement = makeConnectionElement.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Identifier);
+		}
 		OMElement addressElement = makeConnectionElement.getFirstChildWithName(new QName(namespaceValue,Sandesha2Constants.WSA.ADDRESS));
 		
 		if (identifierElement==null && addressElement==null) {
@@ -70,7 +73,7 @@ public class MakeConnection implements IOMRMPart {
 		}
 		
 		if (identifierElement!=null) {
-			identifier = new Identifier (namespaceValue);
+			identifier = new Identifier (identifierElement.getNamespace().getNamespaceURI());
 			identifier.fromOMElement(makeConnectionElement);
 		}
 		
@@ -87,10 +90,7 @@ public class MakeConnection implements IOMRMPart {
 	}
 
 	public boolean isNamespaceSupported(String namespaceName) {
-		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
-			return false;
-		
-		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;
@@ -109,8 +109,7 @@ public class MakeConnection implements IOMRMPart {
 		}
 		*/
 		OMFactory factory = body.getOMFactory();
-		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
-
+		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_MC);
 		OMElement makeConnectionElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.MAKE_CONNECTION,rmNamespace);
 		
 		if (identifier!=null)

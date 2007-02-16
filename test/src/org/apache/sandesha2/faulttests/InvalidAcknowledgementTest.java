@@ -103,7 +103,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
     // Open a connection to the endpoint, using the sequence ack as the action
 		HttpURLConnection connection = 
 			FaultTestUtils.getHttpURLConnection("http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService",
-					"http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement");
+					"http://docs.oasis-open.org/ws-rx/wsrm/200702/SequenceAcknowledgement");
 
 		OutputStream tmpOut2 = connection.getOutputStream();
 		byte ar[] = getAppMessageAsBytes(seqID);
@@ -182,7 +182,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
     // Open a connection to the endpoint, using the sequence ack as the action
 		HttpURLConnection connection = 
 			FaultTestUtils.getHttpURLConnection("http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService",
-					"http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement");
+					"http://docs.oasis-open.org/ws-rx/wsrm/200702/SequenceAcknowledgement");
 
 		OutputStream tmpOut2 = connection.getOutputStream();
 		byte ar[] = getAppMessageAsBytes(seqID);
@@ -250,7 +250,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		// Finished generating SequenceAck part
 		
 		// Create an RMSBean so the create sequence message can be created
-		messageContext.setWSAAction("http://docs.oasis-open.org/ws-rx/wsrm/200608/SequenceAcknowledgement");
+		messageContext.setWSAAction("http://docs.oasis-open.org/ws-rx/wsrm/200702/SequenceAcknowledgement");
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		

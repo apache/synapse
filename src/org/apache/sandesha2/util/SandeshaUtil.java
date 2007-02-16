@@ -721,7 +721,7 @@ public class SandeshaUtil {
 	}
 	
 	public static boolean isWSRMAnonymous(String address) {
-		if (address!=null && address.startsWith(Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX))
+		if (address!=null && address.startsWith(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX))
 			return true;
 		else 
 			return false;
@@ -981,7 +981,7 @@ public class SandeshaUtil {
 			}
 			
 			if(log.isDebugEnabled()) log.debug("Rewriting EPR with UUID " + uuid);
-			epr.setAddress(Sandesha2Constants.SPEC_2006_08.ANONYMOUS_URI_PREFIX + uuid);
+			epr.setAddress(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX + uuid);
 		}
 		
 		if (log.isDebugEnabled())

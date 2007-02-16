@@ -160,7 +160,7 @@ public class FaultCode implements IOMRMElement {
 		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceName))
 			return true;
 		
-		if (Sandesha2Constants.SPEC_2006_08.NS_URI.equals(namespaceName))
+		if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceName))
 			return true;
 		
 		return false;

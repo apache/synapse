@@ -134,7 +134,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			RequestResponseTransport t = null;
 			Boolean makeConnection = (Boolean) msgCtx.getProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE);
 			EndpointReference toEPR = msgCtx.getTo();
-			if(toEPR.hasAnonymousAddress() &&
+			if((toEPR!=null && toEPR.hasAnonymousAddress()) &&
 				(makeConnection == null || !makeConnection.booleanValue())) {
 
 				MessageContext inMsg = null;

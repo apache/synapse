@@ -148,7 +148,8 @@ public abstract class SandeshaThread extends Thread{
 	 * must pass in the internal sequence id when rmSource is true.
 	 */
 	public synchronized void runThreadForSequence(ConfigurationContext context, String sequenceID, boolean rmSource){
-		if(log.isDebugEnabled()) log.debug("Entry: SandeshaThread::runThreadForSequence, " + this);
+		if(log.isDebugEnabled()) 
+			log.debug("Entry: SandeshaThread::runThreadForSequence, " + this + ", " + sequenceID + ", " + rmSource);
 
 		SequenceEntry entry = new SequenceEntry(sequenceID, rmSource);
 		if (!workingSequences.contains(entry)) workingSequences.add(entry);
@@ -258,7 +259,7 @@ public abstract class SandeshaThread extends Thread{
 						setRanMainLoop();
 					}
 				} catch (InterruptedException e1) {
-					log.debug("Sender was interupted...");
+					log.debug("SandeshaThread was interupted...");
 					log.debug(e1.getMessage());
 					log.debug("End printing Interrupt...");
 				}

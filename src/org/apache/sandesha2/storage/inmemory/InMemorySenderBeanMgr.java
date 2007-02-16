@@ -96,7 +96,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 			}
 		}
 		
-		if(log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanManager::getNextMessageToSend");
+		if(log.isDebugEnabled()) log.debug("Exit: InMemorySenderBeanManager::getNextMessageToSend " + result);
 		return result;
 	}
 	

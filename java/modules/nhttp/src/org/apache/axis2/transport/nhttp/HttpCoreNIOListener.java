@@ -26,12 +26,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.ListeningIOReactor;
-import org.apache.http.nio.impl.DefaultServerIOEventDispatch;
-import org.apache.http.nio.impl.reactor.DefaultListeningIOReactor;
 import org.apache.http.nio.NHttpServiceHandler;
-import org.apache.http.impl.DefaultHttpParams;
+import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
+import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
 
 import java.io.InterruptedIOException;
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class HttpCoreNIOListener implements TransportListener {
      * @return the applicable HTTP protocol parameters
      */
     private HttpParams getServerParameters() {
-        HttpParams params = new DefaultHttpParams(null);
+        HttpParams params = new BasicHttpParams();
         params
             .setIntParameter(HttpConnectionParams.SO_TIMEOUT, 30000)
             .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024)

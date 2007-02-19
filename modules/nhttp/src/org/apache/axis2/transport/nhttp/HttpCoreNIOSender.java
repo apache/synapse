@@ -28,17 +28,17 @@ import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.nio.impl.reactor.DefaultConnectingIOReactor;
-import org.apache.http.nio.impl.DefaultClientIOEventDispatch;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.SessionRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpHost;
-import org.apache.http.impl.DefaultHttpParams;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.DefaultClientIOEventDispatch;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -114,7 +114,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return the applicable HTTP protocol parameters
      */
     private HttpParams getClientParameters() {
-        HttpParams params = new DefaultHttpParams(null);
+        HttpParams params = new BasicHttpParams();
         params
             .setIntParameter(HttpConnectionParams.SO_TIMEOUT, 30000)
             .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, 10000)

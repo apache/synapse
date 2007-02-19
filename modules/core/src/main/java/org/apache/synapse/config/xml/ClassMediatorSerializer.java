@@ -64,7 +64,7 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
     }
 
     public String getMediatorClassName() {
-        return FilterMediator.class.getName();
+        return ClassMediator.class.getName();
     }
 
     private void handleException(String msg) {

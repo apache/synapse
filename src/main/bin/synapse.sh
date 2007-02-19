@@ -100,7 +100,7 @@ if $cygwin; then
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 # endorsed dir
-SYNAPSE_ENDORSED=$JAVA_HOME/lib/endorsed
+SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 
 # synapse.xml
 SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/synapse.xml

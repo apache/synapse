@@ -1,20 +1,20 @@
 <!--
-~  Licensed to the Apache Software Foundation (ASF) under one
-~  or more contributor license agreements.  See the NOTICE file
-~  distributed with this work for additional information
-~  regarding copyright ownership.  The ASF licenses this file
-~  to you under the Apache License, Version 2.0 (the
-~  "License"); you may not use this file except in compliance
-~  with the License.  You may obtain a copy of the License at
+~ Licensed to the Apache Software Foundation (ASF) under one
+~ or more contributor license agreements. See the NOTICE file
+~ distributed with this work for additional information
+~ regarding copyright ownership. The ASF licenses this file
+~ to you under the Apache License, Version 2.0 (the
+~ "License"); you may not use this file except in compliance
+~ with the License. You may obtain a copy of the License at
 ~
-~   http://www.apache.org/licenses/LICENSE-2.0
+~ http://www.apache.org/licenses/LICENSE-2.0
 ~
-~  Unless required by applicable law or agreed to in writing,
-~  software distributed under the License is distributed on an
-~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~  KIND, either express or implied.  See the License for the
-~  specific language governing permissions and limitations
-~  under the License.
+~ Unless required by applicable law or agreed to in writing,
+~ software distributed under the License is distributed on an
+~ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~ KIND, either express or implied. See the License for the
+~ specific language governing permissions and limitations
+~ under the License.
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -36,7 +36,7 @@ mechanism for mediators (see below for details).</p>
 
 <p>A Synapse configuration looks like the following at the top level:</p>
 <pre> &lt;synapse&gt;
-   registrydef
+   registrydef+
    &lt;definitions&gt;
      (sequencedef | endpointdef | literalpropertydef)+
    &lt;definitions&gt;?
@@ -56,10 +56,10 @@ define a Registry which is referenced within the configuration.</p>
    &lt;property name="string" value="string"/&gt;*
  &lt;/registry&gt;</pre>
 
-<p>The registry definition without a name becomes the 'default' registry
-instance for the Synapse instance, and any reference to a registry which does
-not specify a registry name defaults to this instance. Optionally, a number
-of configuration properties may be specified to configure an instance of a
+<p>The registry definition without a name becomes the 'default' registry for
+the Synapse instance, and any reference to a registry which does not specify
+a registry name defaults to this instance. Optionally, a number of
+configuration properties may be specified to configure an instance of a
 registry.</p>
 
 <h3>Definitions</h3>
@@ -116,25 +116,16 @@ updated accordingly.</p>
 to give a logical name to an endpoint address. If the address is not just a
 simple URL, then extensibility elements may be used to indicate the address
 (i.e. to compute the address at runtime).</p>
-<pre> &lt;endpoint name="string" [address="url"] [key="string"]&gt;
+<pre> &lt;endpoint name="string" [address="url"] [key="string"] [force="soap|pox"] [optimize="mtom|swa"]&gt;
    &lt;enableRM/&gt;?
    &lt;enableSec [policy="key"]/&gt;?
-   &lt;enableAddressing/&gt;?
+   &lt;enableAddressing separateListener="true|false"/&gt;?
    .. extensibility ..
  &lt;/endpoint&gt;</pre>
 
-<p>An Axis2 Parameter element within an endpoint definition with the name "
-OutflowSecurity" describes the Apache Rampart security configuration to be
-used for messages flowing to this endpoint. Please see Rampart/Axis2
-documentation for more details.</p>
-
-<p>A Policy element within an endpoint definition with an Id of "RMPolicy"
-describes the Apache Sandesha2 RM configuration (or any overrides against the
-default) to be used for messages flowing to this endpoint. Please see
-Sandesha2/Axis2 documentation for more details.</p>
-
 <p>The enableRM/enableSec options turns on WS-Security or WS-RM on outgoing
-messages to this endpoint.</p>
+messages to this endpoint and specific policies may be specified for
+configuration</p>
 
 <p>A Dynamic Endpoint may be defined by specifying a Dynamic Property as its
 definition. As the dynamic property changes, the endpoint will dynamically be

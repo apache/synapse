@@ -95,6 +95,9 @@ if $cygwin; then
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 
+# endorsed dir
+AXIS2_ENDORSED=$AXIS2_HOME/../../lib/endorsed
+
 echo " Using JAVA_HOME:   $JAVA_HOME"
 echo " Using AXIS2 Repository :   $AXIS2_HOME/repository"
 echo " Using AXIS2 Configuration :   $AXIS2_HOME/repository/conf/axis2.xml"
@@ -104,5 +107,5 @@ if [ "$1" = "-port" ]; then
   PORT="-Dport=$2"
 fi
 
-java $PORT -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
+java $PORT -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
 -repo $AXIS2_HOME/repository -conf $AXIS2_HOME/repository/conf/axis2.xml

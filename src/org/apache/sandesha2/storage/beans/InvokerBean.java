@@ -46,20 +46,12 @@ public class InvokerBean extends RMBean {
 	private long msgNo;
 
 	/**
-	 * Comment for <code>invoked</code>
-	 * Weather the message has been invoked by the invoker.
-	 */
-	private boolean invoked = false;
-	
-	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
 	 * be ignored within the match method.
 	 */
 	private int flags = 0;
-	private static final int MSG_NO_FLAG  = 0x00000001;
-	private static final int INVOKED_FLAG = 0x00000010;
-	
+	private static final int MSG_NO_FLAG  = 0x00000001;	
 	
 	public InvokerBean() {
 
@@ -116,22 +108,12 @@ public class InvokerBean extends RMBean {
 	public void setSequenceID(String sequenceId) {
 		this.sequenceID = sequenceId;
 	}
-	
-	public boolean isInvoked() {
-		return invoked;
-	}
-	
-	public void setInvoked(boolean invoked) {
-		this.invoked = invoked;
-		this.flags |= INVOKED_FLAG;
-	}
-	
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
 		result.append("\nSequence Id: "); result.append(sequenceID);
 		result.append("\nMsg Number : "); result.append(msgNo);
-		result.append("\nInvoked    : "); result.append(invoked);
 		result.append("\nMessage Key: "); result.append(messageContextRefKey);
 		return result.toString();
 	}
@@ -147,9 +129,6 @@ public class InvokerBean extends RMBean {
 			select = false;
 
 		else if ((bean.flags & MSG_NO_FLAG) != 0 && bean.getMsgNo() != this.getMsgNo())
-			select = false;
-		
-		else if ((bean.flags & INVOKED_FLAG) != 0 && bean.isInvoked() != this.isInvoked())
 			select = false;
 		
 		return select;

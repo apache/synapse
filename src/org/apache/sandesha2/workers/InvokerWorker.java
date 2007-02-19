@@ -15,7 +15,6 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
-import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -47,15 +46,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			
 			StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 			InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
-			RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 			
 			//starting a transaction
 			transaction = storageManager.getTransaction();
 			
 			InvokerBean invokerBean = invokerBeanMgr.retrieve(messageContextKey);
-			
-			String sequenceId = invokerBean.getSequenceID();
-			long messageNo = invokerBean.getMsgNo();
 			
 			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
@@ -103,15 +98,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				
 			//starting a transaction for the post-invocation work.
 			transaction = storageManager.getTransaction();
-			
-			// Service will be invoked only once. I.e. even if an
-			// exception get thrown in invocation
-			// the service will not be invoked again.
-			invokerBeanMgr.delete(messageContextKey);
-
-			// removing the corresponding message context as well.
-			storageManager.removeMessageContext(messageContextKey);
-			
+						
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -121,18 +108,18 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					//this will work for RM 1.0 only
 					highestMessage = true;
 				} else {
-					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+					RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, invokerBean.getSequenceID());
 					
 					if (rmdBean!=null && rmdBean.isTerminated()) {
 						long highestInMsgNo = rmdBean.getHighestInMessageNumber();
-						if (messageNo==highestInMsgNo)
+						if (invokerBean.getMsgNo()==highestInMsgNo)
 							highestMessage = true;
 					}
 				}
 				
 				if (highestMessage) {
 					//do cleaning stuff that hs to be done after the invocation of the last message.
-					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, sequenceId, storageManager);
+					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, invokerBean.getSequenceID(), storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
 					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");					
@@ -140,19 +127,27 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				}
 			}
 			
+			// Service will be invoked only once. I.e. even if an
+			// exception get thrown in invocation
+			// the service will not be invoked again.
+			invokerBeanMgr.delete(messageContextKey);
+
+			// removing the corresponding message context as well.
+			storageManager.removeMessageContext(messageContextKey);
+			
 			if(!ignoreNextMsg){
 				// updating the next msg to invoke
-				RMDBean rMDBean = nextMsgMgr.retrieve(sequenceId);
+				RMDBean rMDBean = storageManager.getRMDBeanMgr().retrieve(invokerBean.getSequenceID());
 				long nextMsgNo = rMDBean.getNextMsgNoToProcess();
 				
-				if (!(messageNo==nextMsgNo)) {
+				if (!(invokerBean.getMsgNo()==nextMsgNo)) {
 					String message = "Operated message number is different from the Next Message Number to invoke";
 					throw new SandeshaException (message);
 				}
 				
 				nextMsgNo++;
 				rMDBean.setNextMsgNoToProcess(nextMsgNo);
-				nextMsgMgr.update(rMDBean);
+				storageManager.getRMDBeanMgr().update(rMDBean);
 			}
 		} catch (Exception e) {
 			if (log.isErrorEnabled())

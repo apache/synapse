@@ -172,25 +172,22 @@ public class TerminateManager {
 	 */
 	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
-		InvokerBeanMgr storageMapBeanMgr = storageManager.getInvokerBeanMgr();
+		if(log.isDebugEnabled()) log.debug("Enter: TerminateManager::cleanReceivingSideAfterInvocation " +sequenceId);
+		
+		InvokerBeanMgr invokerBeanMgr = storageManager.getInvokerBeanMgr();
 
-		// removing storageMap entries
-		InvokerBean findStorageMapBean = new InvokerBean();
-		findStorageMapBean.setSequenceID(sequenceId);
-		findStorageMapBean.setInvoked(true);
-		Collection collection = storageMapBeanMgr.find(findStorageMapBean);
+		// removing InvokerBean entries
+		InvokerBean invokerFindBean = new InvokerBean();
+		invokerFindBean.setSequenceID(sequenceId);
+		Collection collection = invokerBeanMgr.find(invokerFindBean);
 		Iterator iterator = collection.iterator();
 		while (iterator.hasNext()) {
-			InvokerBean storageMapBean = (InvokerBean) iterator.next();
-			storageMapBeanMgr.delete(storageMapBean.getMessageContextRefKey());
+			InvokerBean invokerBean = (InvokerBean) iterator.next();
+			String messageStoreKey = invokerBean.getMessageContextRefKey();
+			invokerBeanMgr.delete(messageStoreKey);
 
 			// removing the respective message context from the message store.
-			// If this is an in-only message.
-			// In-out message will be deleted when a ack is retrieved for the
-			// out message.
-			String messageStoreKey = storageMapBean.getMessageContextRefKey();
 			storageManager.removeMessageContext(messageStoreKey);
-
 		}
 
 		String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
@@ -199,6 +196,8 @@ public class TerminateManager {
 		else {
 			receivingSideCleanMap.put(sequenceId, CLEANED_AFTER_INVOCATION);
 		}
+		
+		if(log.isDebugEnabled()) log.debug("Exit: TerminateManager::cleanReceivingSideAfterInvocation");
 	}
 
 	/**

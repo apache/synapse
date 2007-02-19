@@ -55,8 +55,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.security.SecurityManager;
-import org.apache.sandesha2.security.SecurityToken;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -648,43 +647,51 @@ public class FaultManager {
 
 		RMSBean rmsBean = rmsBeanMgr.retrieve(createSeqMsgId);
 		if (rmsBean == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound);
-			log.debug(message);
-			throw new SandeshaException(message);
+			if (log.isDebugEnabled())
+				log.debug("Exit: FaultManager::processCreateSequenceRefusedFault Unable to find RMSBean");
+			return;
 		}
-
-		// Check that the create sequence response message proves possession of the correct token
-		String tokenData = rmsBean.getSecurityTokenData();
-		if(tokenData != null) {
-			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);
-			MessageContext crtSeqResponseCtx = rmMsgCtx.getMessageContext();
-			OMElement body = crtSeqResponseCtx.getEnvelope().getBody();
-			SecurityToken token = secManager.recoverSecurityToken(tokenData);
-			secManager.checkProofOfPossession(token, body, crtSeqResponseCtx);
+		
+	/*	if (rmsBean.getLastSendError() == null) {
+			// Indicate that there was an error when sending the Create Sequence.
+			rmsBean.setLastSendError(fault);
+			
+			// Update the RMSBean
+			rmsBeanMgr.update(rmsBean);
+			if (log.isDebugEnabled())
+				log.debug("Exit: FaultManager::processCreateSequenceRefusedFault Allowing another CreateSequence attempt");
+			return;
 		}
-
-		String internalSequenceId = rmsBean.getInternalSequenceID();
-		if (internalSequenceId == null || "".equals(internalSequenceId)) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.tempSeqIdNotSet);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
-
+*/
 		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
 		if (createSequenceSenderBean == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound));
 
 		// deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
-						
+			
+		// Notify the clients of a failure
+		notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
+		
+		rmMsgCtx.pause();
+		
+		// Cleanup sending side.
+		if (log.isDebugEnabled())
+			log.debug("Terminating sending sequence " + rmsBean);
+		TerminateManager.terminateSendingSide(rmsBean, storageManager);
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::processCreateSequenceRefusedFault");
+	}
+	
+	static void notifyClientsOfFault(String internalSequenceId, 
+			StorageManager storageManager, ConfigurationContext configCtx, AxisFault fault) throws SandeshaStorageException {
 		// Locate and update all of the messages for this sequence, now that we know
 		// the sequence id.
 		SenderBean target = new SenderBean();
 		target.setInternalSequenceID(internalSequenceId);
-		target.setSend(false);
 		
-		Iterator iterator = retransmitterMgr.find(target).iterator();
+		Iterator iterator = storageManager.getSenderBeanMgr().find(target).iterator();
 		while (iterator.hasNext()) {
 			SenderBean tempBean = (SenderBean) iterator.next();
 
@@ -707,15 +714,6 @@ public class FaultManager {
         }
       }
 		}
-		
-		rmMsgCtx.pause();
-		
-		// Cleanup sending side.
-		if (log.isDebugEnabled())
-			log.debug("Terminating sending sequence " + rmsBean);
-		TerminateManager.terminateSendingSide(rmsBean, storageManager);
 
-		if (log.isDebugEnabled())
-			log.debug("Exit: FaultManager::processCreateSequenceRefusedFault");
 	}
 }

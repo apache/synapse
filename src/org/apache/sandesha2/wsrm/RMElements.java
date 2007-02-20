@@ -86,14 +86,19 @@ public class RMElements {
 		OMElement body = envelope.getBody();
 
 		// The sequence header
-		OMElement element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.Sequence);
-		if(element == null) {
-			element = envelope.getHeader().getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence);
+		OMElement element = null;
+		if(header!=null)
+		{
+			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.Sequence);
+			if(element == null) {
+				element = envelope.getHeader().getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.Sequence);
+			}
+			if (element != null) {
+				sequence = new Sequence(element.getNamespace().getNamespaceURI());
+				sequence.fromOMElement(envelope.getHeader());
+			}			
 		}
-		if (element != null) {
-			sequence = new Sequence(element.getNamespace().getNamespaceURI());
-			sequence.fromOMElement(envelope.getHeader());
-		}
+
 
 		// The body messages
 		OMElement firstBodyElement = body.getFirstElement();
@@ -149,57 +154,59 @@ public class RMElements {
 		}
 		
 		// The other headers
-		Iterator headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceAck);
-		while (headers.hasNext()) {
-			OMElement sequenceAckElement = (OMElement) headers.next();
-			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2007_02.NS_URI);
-			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
-			sequenceAcknowledgements.add(sequenceAcknowledgement);
-		}
-		headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceAck);
-		while (headers.hasNext()) {
-			OMElement sequenceAckElement = (OMElement) headers.next();
-			SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2005_02.NS_URI);
-			sequenceAcknowledgement.fromOMElement(sequenceAckElement);
-			sequenceAcknowledgements.add(sequenceAcknowledgement);
-		}
+		if(header!=null)
+		{
+			Iterator headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceAck);
+			while (headers.hasNext()) {
+				OMElement sequenceAckElement = (OMElement) headers.next();
+				SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2007_02.NS_URI);
+				sequenceAcknowledgement.fromOMElement(sequenceAckElement);
+				sequenceAcknowledgements.add(sequenceAcknowledgement);
+			}
+			headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceAck);
+			while (headers.hasNext()) {
+				OMElement sequenceAckElement = (OMElement) headers.next();
+				SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement(Sandesha2Constants.SPEC_2005_02.NS_URI);
+				sequenceAcknowledgement.fromOMElement(sequenceAckElement);
+				sequenceAcknowledgements.add(sequenceAcknowledgement);
+			}
 
-		headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.AckRequest);
-		while (headers.hasNext()) {
-			OMElement ackRequestElement = (OMElement) headers.next();
-			AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2007_02.NS_URI);
-			ackRequest.fromOMElement(ackRequestElement);
-			ackRequests.add(ackRequest);
+			headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2007_02.QNames.AckRequest);
+			while (headers.hasNext()) {
+				OMElement ackRequestElement = (OMElement) headers.next();
+				AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2007_02.NS_URI);
+				ackRequest.fromOMElement(ackRequestElement);
+				ackRequests.add(ackRequest);
+			}
+			headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.AckRequest);
+			while (headers.hasNext()) {
+				OMElement ackRequestElement = (OMElement) headers.next();
+				AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2005_02.NS_URI);
+				ackRequest.fromOMElement(ackRequestElement);
+				ackRequests.add(ackRequest);
+			}
+			
+			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.UsesSequenceSTR);
+			if (element != null) {
+				usesSequenceSTR = new UsesSequenceSTR(factory, Sandesha2Constants.SPEC_2007_02.NS_URI);
+				usesSequenceSTR.fromOMElement(envelope.getHeader());
+			}
+			
+			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.MessagePending);
+			if (element != null) {
+				messagePending = new MessagePending(Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
+				messagePending.fromOMElement(element);
+			}
+			
+			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceFault);
+			if(element == null) {
+				element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceFault);
+			}
+			if (element !=null) {
+				sequenceFault = new SequenceFault(element.getNamespace().getNamespaceURI());
+				sequenceFault.fromOMElement(element);
+			}
 		}
-		headers = header.getChildrenWithName(Sandesha2Constants.SPEC_2005_02.QNames.AckRequest);
-		while (headers.hasNext()) {
-			OMElement ackRequestElement = (OMElement) headers.next();
-			AckRequested ackRequest = new AckRequested(Sandesha2Constants.SPEC_2005_02.NS_URI);
-			ackRequest.fromOMElement(ackRequestElement);
-			ackRequests.add(ackRequest);
-		}
-
-		element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.UsesSequenceSTR);
-		if (element != null) {
-			usesSequenceSTR = new UsesSequenceSTR(factory, Sandesha2Constants.SPEC_2007_02.NS_URI);
-			usesSequenceSTR.fromOMElement(envelope.getHeader());
-		}
-		
-		element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.MessagePending);
-		if (element != null) {
-			messagePending = new MessagePending(Sandesha2Constants.SPEC_2007_02.MC_NS_URI);
-			messagePending.fromOMElement(element);
-		}
-		
-		element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.SequenceFault);
-		if(element == null) {
-			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2005_02.QNames.SequenceFault);
-		}
-		if (element !=null) {
-			sequenceFault = new SequenceFault(element.getNamespace().getNamespaceURI());
-			sequenceFault.fromOMElement(element);
-		}
-
 	}
 
 	public SOAPEnvelope toSOAPEnvelope(SOAPEnvelope envelope) throws AxisFault  {

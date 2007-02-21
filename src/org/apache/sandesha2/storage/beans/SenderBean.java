@@ -268,6 +268,7 @@ public class SenderBean extends RMBean {
 		result.append(this.getClass().getName());
 		result.append("\nSequence Id    : "); result.append(sequenceID);
 		result.append("\nInternal Seq Id: "); result.append(internalSequenceID);
+		result.append("\nTo             : "); result.append(toAddress);
 		result.append("\nMessage Number : "); result.append(messageNumber);
 		result.append("\nMessage Type   : "); result.append(messageType);
 		result.append("\nMessage Key    : "); result.append(messageContextRefKey);

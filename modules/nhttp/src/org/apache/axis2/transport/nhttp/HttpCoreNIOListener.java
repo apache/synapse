@@ -33,6 +33,7 @@ import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
 
+import javax.net.ssl.SSLContext;
 import java.io.InterruptedIOException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -56,6 +57,8 @@ public class HttpCoreNIOListener implements TransportListener {
     private int port = 8080;
     /** The hostname to use, defaults to localhost */
     private String host = "localhost";
+    /** SSLContext if this listener is a SSL listener */
+    private SSLContext sslContext = null;
 
     /**
      * configure and start the IO reactor on the specified port
@@ -70,7 +73,7 @@ public class HttpCoreNIOListener implements TransportListener {
         }
 
         NHttpServiceHandler handler = new ServerHandler(cfgCtx, params);
-        IOEventDispatch ioEventDispatch = new DefaultServerIOEventDispatch(handler, params);
+        IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext, params);
 
         try {
             ioReactor.listen(new InetSocketAddress(port));
@@ -81,6 +84,11 @@ public class HttpCoreNIOListener implements TransportListener {
             log.fatal("Encountered an I/O error: " + e.getMessage(), e);
         }
         log.info("Listener Shutdown");
+    }
+
+    protected IOEventDispatch getEventDispatch(
+        NHttpServiceHandler handler, SSLContext sslContext, HttpParams params) {
+        return new DefaultServerIOEventDispatch(handler, params);
     }
 
     /**
@@ -123,8 +131,25 @@ public class HttpCoreNIOListener implements TransportListener {
             }
         }
 
+        // is this an SSL listener?
+        Parameter keystore = transprtIn.getParameter("keystore");
+        if (keystore != null) {
+            sslContext = getSSLContext(keystore);
+        }
+
         serviceEPRPrefix = "http://" + host + (port == 80 ? "" : ":" + port) +
-            "/" + cfgCtx.getServiceContextPath() + "/";
+            (!cfgCtx.getServiceContextPath().startsWith("/") ? "/" : "") +
+            cfgCtx.getServiceContextPath() +
+            (!cfgCtx.getServiceContextPath().endsWith("/") ? "/" : "");
+    }
+
+    /**
+     * Create the SSLContext to be used by this listener
+     * @param ksParam
+     * @return always null
+     */
+    protected SSLContext getSSLContext(Parameter ksParam) throws AxisFault {
+        return null;
     }
 
     /**

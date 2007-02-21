@@ -84,7 +84,7 @@ if $os400; then
 fi
 
 # update classpath
-SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib"
+SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib":"$SYNAPSE_HOME/repository/conf"
 for f in $SYNAPSE_HOME/lib/*.jar
 do
   SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f
@@ -126,4 +126,4 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java $PORT $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseHTTPServer $SYNAPSE_HOME/repository
+$JAVA_HOME/bin/java $PORT $SYNAPSE_XML -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseServer $SYNAPSE_HOME/repository

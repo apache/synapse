@@ -36,12 +36,12 @@ import java.net.Socket;
 /**
  * Starts all transports as specified on the axis2.xml
  */
-public class SynapseHTTPServer {
+public class SynapseServer {
 
-    private static final Log log = LogFactory.getLog(SynapseHTTPServer.class);
+    private static final Log log = LogFactory.getLog(SynapseServer.class);
 
     public static void printUsage() {
-        System.out.println("Usage: SynapseHTTPServer <repository>");
+        System.out.println("Usage: SynapseServer <repository>");
         System.out.println(" Opts: -? this message");
         System.exit(1);
     }
@@ -53,7 +53,7 @@ public class SynapseHTTPServer {
             printUsage();
         }
 
-        System.out.println("[SynapseHTTPServer] Using the Axis2 Repository "
+        System.out.println("[SynapseServer] Using the Axis2 Repository "
                 + new File(args[0]).getAbsolutePath());
 
         try {
@@ -76,17 +76,17 @@ public class SynapseHTTPServer {
                 TransportInDescription trsIn = (TransportInDescription)
                     configctx.getAxisConfiguration().getTransportsIn().get(trp);
                 listenerManager.addListener(trsIn, false);
-                if (new QName("http").equals(trsIn.getName())) {
-                	
-                    System.out.println("[SynapseHTTPServer] Started HTTP on port : " +
-                        trsIn.getParameter("port").getValue());
+                String msg = "[SynapseServer] Starting transport " + trsIn.getName();
+                if (trsIn.getParameter("port") != null) {
+                    msg += " on port " + trsIn.getParameter("port").getValue();
                 }
+                System.out.println(msg);
             }
-            System.out.println("[SynapseHTTPServer] Ready");
+            System.out.println("[SynapseServer] Ready");
 
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("[SynapseHTTPServer] Startup failed...");
+            System.out.println("[SynapseServer] Startup failed...");
         }
     }
 
@@ -121,7 +121,7 @@ public class SynapseHTTPServer {
                     trsIn.getParameter("port").setValue(Integer.toString(port));
                     break;
                 } catch (Exception e) {
-                	System.out.println("[SynapseHTTPServer] Port "+port+" already in use. Trying alternate");
+                	System.out.println("[SynapseServer] Port "+port+" already in use. Trying alternate");
                     if (port == 8080) {
                         port = 8008;
                     } else {

@@ -117,7 +117,7 @@ set SYNAPSE_ENDORSED="%SYNAPSE_HOME%\lib\endorsed";"%JAVA_ENDORSED_DIRS%";"%JAVA
 
 @rem @echo on
 cd %SYNAPSE_HOME%
-"%_JAVACMD%" %_PORT% %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseHTTPServer %SYNAPSE_CMD_LINE_ARGS%
+"%_JAVACMD%" %_PORT% %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 
 :end

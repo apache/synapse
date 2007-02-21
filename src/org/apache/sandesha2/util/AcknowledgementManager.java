@@ -34,7 +34,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
@@ -124,6 +123,12 @@ public class AcknowledgementManager {
 				MessageContext messageContext = rmMessageContext.getMessageContext();
 				SOAPHeader appMsgHeaders = messageContext.getEnvelope().getHeader();
 				
+				// If the App message doesn't have a SOAP Header, create one here.
+				if (appMsgHeaders == null) {
+					SOAPFactory factory = (SOAPFactory) messageContext.getEnvelope().getOMFactory();
+					appMsgHeaders = factory.createSOAPHeader(messageContext.getEnvelope());
+				}
+									
 				SOAPHeader headers = ackMsgContext.getEnvelope().getHeader();
 				if(headers != null) {
 					for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
@@ -356,7 +361,6 @@ public class AcknowledgementManager {
 			// handler.
 			AxisOperation op = ackMsgContext.getAxisOperation();
 
-			ServiceContext serviceCtx = ackMsgContext.getServiceContext();
 			OperationContext opCtx = ContextFactory.createOperationContext(op, ackRMMsgContext.getMessageContext().getServiceContext());
 			ackRMMsgContext.getMessageContext().setOperationContext(opCtx);
 		}

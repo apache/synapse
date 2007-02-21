@@ -134,7 +134,25 @@
     	<parameter name="port" locked="false">8080</parameter>
     	<parameter name="non-blocking" locked="false">true</parameter>
     </transportReceiver>
-    
+
+    <!-- the experimental non blocking https transport based on HttpCore + SSL-NIO extensions -->
+    <transportReceiver name="https" class="org.apache.axis2.transport.nhttp.HttpCoreNIOSSLListener">
+    	<parameter name="port" locked="false">8443</parameter>
+    	<parameter name="non-blocking" locked="false">true</parameter>
+        <parameter name="keystore" locked="false">
+            <syn:KeyStore xmlns:syn="http://ws.apache.org/ns/synapse">
+                <!-- Key store file location-->
+                <syn:Location>keystore.jks</syn:Location>
+                <!-- Key store type (JKS/PKCS12 etc.)-->
+                <syn:Type>JKS</syn:Type>
+                <!-- Key store password-->
+                <syn:Password>password</syn:Password>
+                <!-- Private Key password-->
+                <syn:KeyPassword>password</syn:KeyPassword>
+            </syn:KeyStore>
+        </parameter>
+    </transportReceiver>
+
     <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
     <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
         <parameter name="myTopicConnectionFactory" locked="false">        	        	

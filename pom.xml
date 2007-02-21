@@ -426,6 +426,11 @@
             <artifactId>jakarta-httpcore-nio</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>jakarta-httpcore-niossl</artifactId>
+            <version>${jakarta.httpcore.nio.version}</version>
+        </dependency>
 
     </dependencies>
 

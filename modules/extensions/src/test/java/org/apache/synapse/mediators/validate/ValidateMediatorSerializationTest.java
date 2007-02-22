@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse;
+package org.apache.synapse.mediators.validate;
 
 import org.apache.axiom.om.impl.exception.XMLComparisonException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
@@ -27,6 +27,7 @@ import org.apache.synapse.mediators.validate.ValidateMediatorSerializer;
 import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
 import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.config.xml.MediatorSerializer;
+import org.apache.synapse.Mediator;
 import org.apache.xmlbeans.xml.stream.XMLStreamException;
 import junit.framework.TestCase;
 

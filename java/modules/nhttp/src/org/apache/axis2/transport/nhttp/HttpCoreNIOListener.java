@@ -20,6 +20,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -132,12 +133,17 @@ public class HttpCoreNIOListener implements TransportListener {
         }
 
         // is this an SSL listener?
-        Parameter keystore = transprtIn.getParameter("keystore");
-        if (keystore != null) {
-            sslContext = getSSLContext(keystore);
-        }
+        sslContext = getSSLContext(transprtIn);
 
-        serviceEPRPrefix = "http://" + host + (port == 80 ? "" : ":" + port) +
+        serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, host, port);
+    }
+
+    /**
+     * Return the EPR prefix for services made available over this transport
+     * @return
+     */
+    protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String host, int port) {
+        return "http://" + host + (port == 80 ? "" : ":" + port) +
             (!cfgCtx.getServiceContextPath().startsWith("/") ? "/" : "") +
             cfgCtx.getServiceContextPath() +
             (!cfgCtx.getServiceContextPath().endsWith("/") ? "/" : "");
@@ -145,10 +151,10 @@ public class HttpCoreNIOListener implements TransportListener {
 
     /**
      * Create the SSLContext to be used by this listener
-     * @param ksParam
+     * @param transportIn
      * @return always null
      */
-    protected SSLContext getSSLContext(Parameter ksParam) throws AxisFault {
+    protected SSLContext getSSLContext(TransportInDescription transportIn) throws AxisFault {
         return null;
     }
 

@@ -16,16 +16,12 @@
  */
 package org.apache.sandesha2.util;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.engine.ListenerManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -254,28 +250,6 @@ public class SequenceManager {
 				if (log.isDebugEnabled())
 					log.debug("Using replyTo EPR as AcksTo, addr=" + replyToEPR.getAddress());
 				acksToEPR = replyToEPR;
-			}
-
-			// start the in listner for the client side, if acksTo is not anonymous.
-			if (acksToEPR != null && !acksToEPR.hasAnonymousAddress()) {
-				String transportInProtocol = firstAplicationMsgCtx.getOptions().getTransportInProtocol();
-				if (transportInProtocol == null) {
-					throw new SandeshaException(SandeshaMessageHelper
-							.getMessage(SandeshaMessageKeys.cannotStartListenerForIncommingMsgs));
-				}
-
-				try {
-					ListenerManager listenerManager = firstAplicationMsgCtx.getConfigurationContext().getListenerManager();
-					TransportInDescription transportIn = firstAplicationMsgCtx.getConfigurationContext()
-							.getAxisConfiguration().getTransportIn(new QName(transportInProtocol));
-					// if acksTo is not anonymous start the in-transport
-					if (!listenerManager.isListenerRunning(transportIn.getName().getLocalPart())) {
-						listenerManager.addListener(transportIn, false);
-					}
-				} catch (AxisFault e) {
-					throw new SandeshaException(SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.cannotStartTransportListenerDueToError, e.toString()), e);
-				}
 			}
 		}
 		// In case either of the replyTo or AcksTo is anonymous, rewrite them using the AnonURI template

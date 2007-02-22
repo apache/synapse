@@ -62,7 +62,6 @@ public class SandeshaMessageKeys {
 	public static final String cannotChooseSpecLevel="cannotChooseSpecLevel";
 
 	public static final String setAValidMsgNumber="setAValidMsgNumber";
-	public static final String cannotStartTransportListenerDueToError="cannotStartTransportListener";
 	public static final String cannotStartListenerForIncommingMsgs="cannotStartListenerForIncommingMsgs";
 	public static final String nonUniqueResult="nonUniqueResult";
 	public static final String invalidStringArray="invalidStringArray";

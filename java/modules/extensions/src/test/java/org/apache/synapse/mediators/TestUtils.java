@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
@@ -75,6 +76,39 @@ public class TestUtils {
         return synCtx;
     }
 
+    public static TestMessageContext getTestContextForXSLTMediator(String bodyText, Map props) throws Exception {
+
+        // create a test synapse context
+        TestMessageContext synCtx = new TestMessageContext();
+        SynapseConfiguration testConfig = new SynapseConfiguration();
+        testConfig.addRegistry(null, new SimpleURLRegistry());
+
+        if (props != null) {
+            Iterator iter = props.keySet().iterator();
+            while (iter.hasNext()) {
+                String key = (String) iter.next();
+                testConfig.addProperty(key, (Property) props.get(key));
+            }
+        }
+        synCtx.setConfiguration(testConfig);
+
+        SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();
+        omDoc.addChild(envelope);
+
+        XMLStreamReader parser = XMLInputFactory.newInstance().
+                createXMLStreamReader(new StringReader(bodyText));
+        StAXOMBuilder builder = new StAXOMBuilder(parser);
+
+        // set a dummy static message
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        envelope.getBody().addChild(fac.createOMText("first text child "));
+        envelope.getBody().addChild(builder.getDocumentElement());
+        envelope.getBody().addChild(fac.createOMText("second text child "));
+
+        synCtx.setEnvelope(envelope);
+        return synCtx;
+    }
     public static TestMessageContext getTestContext(String bodyText) throws Exception {
         return getTestContext(bodyText, null);
     }

@@ -68,14 +68,14 @@ public class XSLTMediatorTest extends TestCase {
         props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext(SOURCE, props);
+        MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
         transformMediator.mediate(synCtx);
 
         // validate result
         OMContainer body = synCtx.getEnvelope().getBody();
-        if (body.getFirstOMChild() instanceof OMElement) {
+        if (body.getFirstOMChild().getNextOMSibling() instanceof OMElement) {
 
-            OMElement getQuoteElem = (OMElement) body.getFirstOMChild();
+            OMElement getQuoteElem = (OMElement) body.getFirstOMChild().getNextOMSibling();
             assertTrue("GetQuote".equals(getQuoteElem.getLocalName()));
             assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getName()));
 
@@ -108,14 +108,14 @@ public class XSLTMediatorTest extends TestCase {
         props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext(SOURCE, props);
+        MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(SOURCE, props);
         transformMediator.mediate(synCtx);
 
         // validate result
         OMContainer body = synCtx.getEnvelope().getBody();
-        if (body.getFirstOMChild() instanceof OMElement) {
+        if (body.getFirstOMChild().getNextOMSibling() instanceof OMElement) {
 
-            OMElement getQuoteElem = (OMElement) body.getFirstOMChild();
+            OMElement getQuoteElem = (OMElement) body.getFirstOMChild().getNextOMSibling();
             assertTrue("GetQuote".equals(getQuoteElem.getLocalName()));
             assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getName()));
 
@@ -149,14 +149,14 @@ public class XSLTMediatorTest extends TestCase {
         props.put("xslt-key", prop);
         
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext(ENCLOSING_SOURCE, props);
+        MessageContext synCtx = TestUtils.getTestContextForXSLTMediator(ENCLOSING_SOURCE, props);
         transformMediator.mediate(synCtx);
 
         // validate result
         OMContainer body = synCtx.getEnvelope().getBody();
-        if (body.getFirstOMChild() instanceof OMElement) {
+        if (body.getFirstOMChild().getNextOMSibling() instanceof OMElement) {
 
-            OMElement someOtherElem = (OMElement) body.getFirstOMChild();
+            OMElement someOtherElem = (OMElement) body.getFirstOMChild().getNextOMSibling();
             assertTrue("someOtherElement".equals(someOtherElem.getLocalName()));
             assertTrue("http://someother".equals(someOtherElem.getNamespace().getName()));
 

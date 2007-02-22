@@ -22,6 +22,7 @@ import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -44,6 +45,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLStreamException;
+import javax.net.ssl.SSLContext;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -64,6 +66,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private ConnectingIOReactor ioReactor = null;
     /** The client handler */
     private NHttpClientHandler handler = null;
+    /** The SSL Context to be used */
+    SSLContext sslContext = null;
 
     /**
      * Initialize the transport sender, and execute reactor in new seperate thread
@@ -73,6 +77,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut) throws AxisFault {
         this.cfgCtx = cfgCtx;
+
+        // is this an SSL Sender?
+        sslContext = getSSLContext(transportOut);
 
         // start the Sender in a new seperate thread
         Thread t = new Thread(new Runnable() {
@@ -97,7 +104,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         handler = new ClientHandler(cfgCtx, params);
-        IOEventDispatch ioEventDispatch = new DefaultClientIOEventDispatch(handler, params);
+        IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext, params);
 
         try {
             ioReactor.execute(ioEventDispatch);
@@ -107,6 +114,29 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             log.fatal("Encountered an I/O error: " + e.getMessage(), e);
         }
         log.info("Sender Shutdown");
+    }
+
+    /**
+     * Return the IOEventDispatch implementation to be used. This is overridden by the
+     * SSL sender
+     * @param handler
+     * @param sslContext
+     * @param params
+     * @return
+     */
+    protected IOEventDispatch getEventDispatch(
+        NHttpClientHandler handler, SSLContext sslContext, HttpParams params) {
+        return new DefaultClientIOEventDispatch(handler, params);
+    }
+
+    /**
+     * Always return null, as this implementation does not support outgoing SSL
+     * @param transportOut
+     * @return null
+     * @throws AxisFault
+     */
+    protected SSLContext getSSLContext(TransportOutDescription transportOut) throws AxisFault {
+        return null;
     }
 
     /**

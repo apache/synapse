@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse;
+package org.apache.synapse.mediators.transform;
 
 import junit.framework.TestCase;
 import org.apache.axiom.om.OMContainer;
@@ -26,6 +26,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.config.Property;
+import org.apache.synapse.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

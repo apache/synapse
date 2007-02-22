@@ -45,11 +45,11 @@ public class MediatorSerializerFinder {
         PropertyMediatorSerializer.class,
         SwitchMediatorSerializer.class,
         SwitchCaseMediatorSerializer.class,
+        //?SwitchCaseDefaultMediatorSerializer.class,
         InMediatorSerializer.class,
         OutMediatorSerializer.class,
-        // TODO RMMediatorSerializer.class,
+        RMSequenceMediatorSerializer.class,
         TryMediatorSerializer.class,
-        POXMediatorSerializer.class,
         ClassMediatorSerializer.class
     };
 

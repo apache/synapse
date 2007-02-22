@@ -190,14 +190,9 @@ public class XSLTMediator extends AbstractMediator {
                 log.debug("Transformation result : " + result);
             }
 
-            OMContainer parent = sourceNode.getParent();
-            if (parent instanceof SOAPEnvelope) {
-                ((SOAPEnvelope) parent).getBody().getFirstOMChild().detach();
-                ((SOAPEnvelope) parent).getBody().setFirstChild(result);
-            } else {
-                parent.getFirstOMChild().detach();
-                parent.addChild(result);
-            }
+            // replace the sourceNode with the result.
+            sourceNode.insertSiblingAfter( result );
+            sourceNode.detach();
 
         } catch (TransformerException e) {
             handleException("Error performing XSLT transformation " + xsltKey, e);

@@ -1,57 +1,44 @@
 package org.apache.axis2.transport.nhttp;
 
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axiom.om.OMElement;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.impl.nio.reactor.SSLServerIOEventDispatch;
+import org.apache.commons.logging.Log;
 import org.apache.http.nio.reactor.IOEventDispatch;
-import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.NHttpClientHandler;
+import org.apache.http.impl.nio.reactor.SSLClientIOEventDispatch;
 import org.apache.http.params.HttpParams;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axiom.om.OMElement;
 
 import javax.net.ssl.*;
 import javax.xml.namespace.QName;
-import java.security.KeyStore;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.net.URL;
 import java.io.IOException;
 
-public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
+public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
 
-    private static final Log log = LogFactory.getLog(HttpCoreNIOSSLListener.class);
+    private static final Log log = LogFactory.getLog(HttpCoreNIOSSLSender.class);
 
     protected IOEventDispatch getEventDispatch(
-        NHttpServiceHandler handler, SSLContext sslContext, HttpParams params) {
-        return new SSLServerIOEventDispatch(handler,  sslContext, params);
+        NHttpClientHandler handler, SSLContext sslContext, HttpParams params) {
+        return new SSLClientIOEventDispatch(handler, sslContext, params);
     }
-
-    /**
-     * Return the EPR prefix for services made available over this transport
-     * @return
-     */
-    protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String host, int port) {
-        return "https://" + host + (port == 443 ? "" : ":" + port) +
-            (!cfgCtx.getServiceContextPath().startsWith("/") ? "/" : "") +
-            cfgCtx.getServiceContextPath() +
-            (!cfgCtx.getServiceContextPath().endsWith("/") ? "/" : "");
-    }
-
 
     /**
      * Create the SSLContext to be used by this listener
-     * @param transportIn the Axis2 transport description
+     * @param transportOut the Axis2 transport configuration
      * @return the SSLContext to be used
      */
-    protected SSLContext getSSLContext(TransportInDescription transportIn) throws AxisFault {
+    protected SSLContext getSSLContext(TransportOutDescription transportOut) throws AxisFault {
 
         KeyManager[] keymanagers  = null;
         TrustManager[] trustManagers = null;
 
-        Parameter keyParam    = transportIn.getParameter("keystore");
-        Parameter trustParam  = transportIn.getParameter("truststore");
+        Parameter keyParam    = transportOut.getParameter("keystore");
+        Parameter trustParam  = transportOut.getParameter("truststore");
 
         if (keyParam != null) {
             OMElement ksEle      = keyParam.getParameterElement().getFirstElement();
@@ -110,7 +97,7 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
             SSLContext sslcontext = SSLContext.getInstance("TLS");
             sslcontext.init(keymanagers, trustManagers, null);
             return sslcontext;
-
+            
         } catch (GeneralSecurityException gse) {
             log.error("Unable to create SSL context with the given configuration", gse);
             throw new AxisFault("Unable to create SSL context with the given configuration", gse);

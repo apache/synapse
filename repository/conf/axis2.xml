@@ -140,17 +140,20 @@
     	<parameter name="port" locked="false">8443</parameter>
     	<parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="keystore" locked="false">
-            <syn:KeyStore xmlns:syn="http://ws.apache.org/ns/synapse">
-                <!-- Key store file location-->
-                <syn:Location>keystore.jks</syn:Location>
-                <!-- Key store type (JKS/PKCS12 etc.)-->
-                <syn:Type>JKS</syn:Type>
-                <!-- Key store password-->
-                <syn:Password>password</syn:Password>
-                <!-- Private Key password-->
-                <syn:KeyPassword>password</syn:KeyPassword>
-            </syn:KeyStore>
+            <KeyStore>
+                <Location>keystore.jks</Location>
+                <Type>JKS</Type>
+                <Password>password</Password>
+                <KeyPassword>password</KeyPassword>
+            </KeyStore>
         </parameter>
+        <parameter name="truststore" locked="false">
+            <TrustStore>
+                <Location>keystore.jks</Location>
+                <Type>JKS</Type>
+                <Password>password</Password>
+            </TrustStore>
+        </parameter>                        
     </transportReceiver>
 
     <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
@@ -195,24 +198,31 @@
     <!-- Transport Outs -->
     <!-- ================================================= -->
 
-    <transportSender name="tcp"
-                     class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
-    <transportSender name="local"
-                     class="org.apache.axis2.transport.local.LocalTransportSender"/>
-    <!--<transportSender name="http"
-                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender"/>-->
+    <transportSender name="tcp"   class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
+    <transportSender name="local" class="org.apache.axis2.transport.local.LocalTransportSender"/>
+    <transportSender name="jms"   class="org.apache.axis2.transport.jms.JMSSender"/>    
     <!-- the experimental non-blocking http transport based on HttpCore + NIO extensions -->
-    <transportSender name="http"
-                 class="org.apache.axis2.transport.nhttp.HttpCoreNIOSender">
+    <transportSender name="http"  class="org.apache.axis2.transport.nhttp.HttpCoreNIOSender">
         <parameter name="non-blocking" locked="false">true</parameter>
     </transportSender>
-    <transportSender name="https"
-                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
-        <parameter name="PROTOCOL" locked="false">HTTP/1.1</parameter>
-        <parameter name="Transfer-Encoding" locked="false">chunked</parameter>
+    <transportSender name="https" class="org.apache.axis2.transport.nhttp.HttpCoreNIOSSLSender">
+        <parameter name="non-blocking" locked="false">true</parameter>
+        <parameter name="keystore" locked="false">
+            <KeyStore>
+                <Location>keystore.jks</Location>
+                <Type>JKS</Type>
+                <Password>password</Password>
+                <KeyPassword>password</KeyPassword>
+            </KeyStore>
+        </parameter>
+        <parameter name="truststore" locked="false">
+            <TrustStore>
+                <Location>keystore.jks</Location>
+                <Type>JKS</Type>
+                <Password>password</Password>
+            </TrustStore>
+        </parameter>                
     </transportSender>
-    <transportSender name="jms"
-                     class="org.apache.axis2.transport.jms.JMSSender"/>
 
     <!-- Uncomment this one with the appropriate papameters to enable the SMTP transport Receiver
    <transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender">

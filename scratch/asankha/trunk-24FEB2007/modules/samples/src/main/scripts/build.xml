@@ -1,0 +1,192 @@
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<project name="samples" default="help" basedir=".">
+ <target name="help">
+  <echo>
+  This script requires Ant 1.5 or higher
+
+  usage:
+    ant -help
+  		display ant help screen
+    ant help
+  		display this message
+    ant clean
+  		delete the build directory
+    ant compile
+  		build the samples
+
+  	These client samples are able to send stock quote and order placement messages
+
+  	ant stockquote
+  	  This client could be used to act as a 'smart client', by specifying a
+      WS-Addressing EPR directed to the real endpoint, and the transport endpoint
+      set differently
+
+      examples:
+  	  ant stockquote
+  	  ant stockquote [-Dsymbol=IBM]
+  	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
+  	  	[-Dtransporturl=http://localhost:8080] [-Drepository=client_repo]
+        [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
+
+    ant proxystockquote
+      A client that could act as a HTTP proxy client
+
+  	  examples:
+  	  ant proxystockquote
+  	  ant proxystockquote [-Dsymbol=IBM]
+  	  	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
+  	  	[-Dtransporturl=http://localhost:8080]
+
+    ant dumbstockquote
+      A client that could directly invoke the service on a given endpoint. i.e. as a 'gateway'
+
+  	  examples:
+	  ant dumbstockquote
+	  ant dumbstockquote [-Dsymbol=IBM]
+        [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
+        [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
+
+    ant customquote
+      A client which could send out a stock quote request in a custom format. It is
+      expected to transform this message to a standard request, and the response back as
+      a custom response as expected by this client
+
+  	  examples:
+	  	ant customquote
+	    ant customquote [-Dsymbol=IBM]
+	    	[-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
+	    	[-Dtransporturl=http://localhost:8080]
+
+    ant placeorder
+      A client which could send out a one way message using the Axis2 ServiceClient's
+      fireAndForget() API
+
+      examples:
+	  	ant placeorder
+	    ant placeorder
+        [-Dsymbol=IBM] [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
+
+    ant jmsclient
+      A client which could post a JMS text or binary message to a given destination.
+
+      examples
+        ant jmsclient
+        [-Ddest=dynamicQueues/JMSTextProxy] [-Dtype=text|binary|xml]
+        [-Dpayload="24.34 100 IBM | MSFT" | "repository\conf\sample\resources\mtom\asf-logo.gif"]
+        </echo>
+    </target>
+
+    <property name="symbol" value="IBM"/>
+    <property name="url" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    <property name="transporturl" value="http://localhost:8080"/>
+    <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
+    <property name="repository" value="client_repo"/>
+    <property name="secpolicy" value=""/>
+    <property name="dest" value="dynamicQueues/JMSTextProxy"/>
+    <property name="type" value="text"/> <!-- or "binary" -->
+    <property name="payload" value=""/>
+
+    <property name="class.dir" value="target/classes"/>
+
+    <path id="axis.classpath">
+        <fileset dir="../../lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="target" quiet="true"/>
+        <delete dir="${class.dir}" quiet="true"/>
+    </target>
+
+    <target name="stockquote" depends="compile">
+        <java classname="samples.userguide.StockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${url}"/>
+            <arg value="${transporturl}"/>
+            <arg value="${repository}"/>
+            <arg value="${secpolicy}"/>
+        </java>
+    </target>
+
+    <target name="proxystockquote" depends="compile">
+        <java classname="samples.userguide.ProxyStockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${url}"/>
+            <arg value="${transporturl}"/>
+        </java>
+    </target>
+
+    <target name="dumbstockquote" depends="compile">
+        <java classname="samples.userguide.DumbStockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${gatewayurl}"/>
+            <arg value="${repository}"/>
+            <arg value="${secpolicy}"/>
+        </java>
+    </target>
+
+    <target name="customquote" depends="compile">
+        <java classname="samples.userguide.CustomStockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${url}"/>
+            <arg value="${transporturl}"/>
+        </java>
+    </target>
+
+    <target name="placeorder" depends="compile">
+        <java classname="samples.userguide.PlaceOrderClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${symbol}"/>
+            <arg value="${gatewayurl}"/>
+        </java>
+    </target>
+
+    <target name="jmsclient" depends="compile">
+        <java classname="samples.userguide.GenericJMSClient"
+              classpathref="javac.classpath" fork="true">
+           	<arg value="${dest}"/>
+            <arg value="${type}"/>
+            <arg value="${payload}"/>
+        </java>
+    </target>
+
+    <target name="init">
+        <mkdir dir="${class.dir}"/>
+        <path id="javac.classpath">
+            <pathelement path="${class.dir}"/>
+            <fileset dir="../../lib">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+    </target>
+
+    <target name="compile" depends="init" description="Compile all Java">
+        <javac srcdir="src" destdir="${class.dir}">
+            <classpath refid="javac.classpath"/>
+        </javac>
+    </target>
+
+</project>

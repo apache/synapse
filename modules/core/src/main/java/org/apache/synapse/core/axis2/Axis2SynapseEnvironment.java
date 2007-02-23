@@ -40,9 +40,6 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
 
-    private ConfigurationContext cfgCtx = null;
-    private ThreadFactory threadFactory = null;
-
     private SynapseConfiguration synapseConfig;
     /** The StatisticsCollector object  */
     private StatisticsCollector statisticsCollector;
@@ -51,18 +48,11 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
                                    SynapseConfiguration synapseConfig) {
-        this.cfgCtx = cfgCtx;
         this.synapseConfig = synapseConfig;
-        threadFactory = cfgCtx.getThreadPool();
     }
 
     public void injectMessage(final MessageContext synCtx) {
         synCtx.setEnvironment(this);
-        /*threadFactory.execute(new Runnable() {
-            public void run() {
-                synCtx.getConfiguration().getMainMediator().mediate(synCtx);
-            }
-        });*/
         if (synCtx.isResponse()) {
             //Process statistics related to a sequence which has send mediator as a child,end point
             StatisticsUtils.processEndPointStatistics(synCtx);

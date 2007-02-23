@@ -40,8 +40,16 @@ public class AsyncCallback extends Callback {
 
     public void onComplete(AsyncResult result) {
 
-        log.debug("Synapse received an Async response to a callback");
         MessageContext response = result.getResponseMessageContext();
+
+        log.debug("Synapse received an asynchronous response message");
+        log.debug("Received To: " +
+            (response.getTo() != null ? response.getTo().getAddress() : "null"));
+        log.debug("SOAPAction: " +
+            (response.getSoapAction() != null ? response.getSoapAction() : "null"));
+        if (log.isDebugEnabled()) {
+            log.debug("Body : \n" + response.getEnvelope());
+        }
 
         MessageContext axisOutMsgCtx =
             ((Axis2MessageContext)synapseOutMsgCtx).getAxis2MessageContext();
@@ -56,10 +64,6 @@ public class AsyncCallback extends Callback {
             axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
         response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
             axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-        response.setProperty(
-                org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND,
-                axisOutMsgCtx.getProperty(
-                        org.apache.synapse.Constants.PROCESSED_MUST_UNDERSTAND));
         response.setTransportIn(axisOutMsgCtx.getTransportIn());
         response.setTransportOut(axisOutMsgCtx.getTransportOut());
 

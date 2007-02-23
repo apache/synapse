@@ -64,13 +64,13 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         log.debug("Proxy Service " + name + " received a new message...");
-        log.debug("Message To: " + (mc.getTo() != null ?
-            mc.getTo().getAddress() : "null"));
-        log.debug("SOAPAction: " + (mc.getWSAAction() != null ?
-            mc.getWSAAction() : "null"));
-        log.debug("Body : \n" + mc.getEnvelope());
+        log.debug("Message To: " + (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
+        log.debug("SOAPAction: " + (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
+        if (log.isDebugEnabled()) {
+            log.debug("Body : \n" + mc.getEnvelope());
+        }
 
-        MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
+        MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
         
         // Setting Required property to collect the proxy service statistics
         boolean statisticsEnable;
@@ -84,6 +84,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 synCtx.setCorrelationProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
             }
         }
+
         // if a target endpoint is specified, directly forward to that
         if (targetEndpoint != null) {
             Endpoint endpoint = synCtx.getConfiguration().getNamedEndpoint(targetEndpoint);
@@ -97,53 +98,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                 org.apache.axis2.context.MessageContext axisInMsgContext =
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-                org.apache.axis2.context.MessageContext axisOutMsgContext =
-                    Axis2FlexibleMEPClient.send(endpoint, synCtx);
-
-                if (axisOutMsgContext == null) {
-                    return;
-                } else {
-
-                    axisOutMsgContext.setServerSide(true);
-                    axisOutMsgContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_OUT,
-                        axisInMsgContext.getProperty(
-                                org.apache.axis2.context.MessageContext.TRANSPORT_OUT));
-
-                    axisOutMsgContext.setTransportIn(axisInMsgContext.getTransportIn());
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Reply Body : \n" + axisOutMsgContext.getEnvelope());
-                    }
-                    // Setting Required property to collect the proxy service statistics
-                    String endPointName = endpoint.getName();
-                    boolean endPointStatisticsEnable;
-                    endPointStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
-                    if (endPointName != null && endPointStatisticsEnable) {
-                        EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
-                        boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                        endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), endPointStatisticsEnable,isFault);
-                        synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
-                    }
-                    AxisEngine ae = new AxisEngine(axisOutMsgContext.getConfigurationContext());
-                    try {
-                        axisOutMsgContext.setProperty(
-                                org.apache.synapse.Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-                        mc.getOperationContext().setProperty(
-                                Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-                        // check for addressing is alredy engaged for this message.
-                        // if engage we should use the address enable Configuraion context.
-                        ae.send(axisOutMsgContext);
-
-                    } catch (AxisFault e) {
-                        synCtx.setProperty(org.apache.synapse.Constants.SYNAPSE_ERROR,Boolean.TRUE);
-                        log.error("Axis fault encountered while forwarding message to endpoint : "
-                                + targetEndpoint, e);
-                    } finally {
-                        if (endPointStatisticsEnable) {
-                            StatisticsUtils.processEndPointStatistics(synCtx);
-                        }
-                    }
-                }
+                Axis2FlexibleMEPClient.send(endpoint, synCtx);
             }
 
         } else {
@@ -173,19 +128,6 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 log.debug("Using default 'main' mediator for message mediation");
                 synCtx.getEnvironment().injectMessage(synCtx);
             }
-        }
-
-        // Response handling mechanism for 200/202 and 5XX
-        // if smc.isResponse = true then the response will be handled with 200 OK
-        // else, response will be 202 OK without an http body
-        // if smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
-
-        if (synCtx.isResponse()) {             
-            mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-        }
-        if (synCtx.isFaultResponse()) {
-            // todo: is there a better way to inject faultSoapEnv to the Axis2 Transport
-            throw new AxisFault("Synapse Encountered an Error - See Log for More Details");
         }
     }
 

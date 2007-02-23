@@ -46,7 +46,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	 * This is processed using a SenderWorker. 
 	 */
 	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: MakeConnectionProcessor::processInMessage");
+		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
 
 		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION);
 		Address address = makeConnection.getAddress();
@@ -109,6 +109,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		replyToPoll(rmMsgCtx, senderBean, storageManager, pending, makeConnection.getNamespaceValue());
 		
+		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage");
 		return false;
 	}
 	
@@ -119,7 +120,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			String namespace)
 	throws AxisFault
 	{
-		if(log.isDebugEnabled()) log.debug("Entry: MakeConnectionProcessor::replyToPoll");
+		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::replyToPoll");
 		TransportOutDescription transportOut = pollMessage.getMessageContext().getTransportOut();
 		if (transportOut==null) {
 			String message = SandeshaMessageHelper.getMessage(
@@ -173,7 +174,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		messagePending.toSOAPEnvelope(returnMessage.getEnvelope());
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
 		return false;
 	}
 

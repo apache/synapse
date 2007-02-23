@@ -39,6 +39,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -217,28 +218,25 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		String outSequenceID = null;
 
-		boolean sendCreateSequence = false;
-		if (rmsBean == null) { // out sequence will be set for the
-										// server side, in the case of an offer.
-			sendCreateSequence = true; // message number being one and not
-											// having an out sequence, implies
-											// that a create sequence has to be
-											// send.
+		if (rmsBean == null) { 
+			// SENDING THE CREATE SEQUENCE.
+			synchronized (RMSBeanMgr.class) {
+				// There is a timing window where 2 sending threads can hit this point
+				// at the same time and both will create an RMSBean to the same endpoint
+				// with the same internal sequenceid
+				// Check that someone hasn't created the bean
+				rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+				
+				// if first message - setup the sending side sequence - both for the
+				// server and the client sides.
+				if (rmsBean == null) {
+					rmsBean = SequenceManager.setupNewClientSequence(msgContext, internalSequenceId, storageManager);
+					rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, storageManager);
+				}
+			}
+		
 		} else {
 			outSequenceID = rmsBean.getSequenceID();
-		}
-
-		// SENDING THE CREATE SEQUENCE.
-		if (sendCreateSequence) {
-
-			// if first message - setup the sending side sequence - both for the
-			// server and the client sides.
-			rmsBean = SequenceManager.setupNewClientSequence(msgContext, internalSequenceId, storageManager);
-			rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, storageManager);
-		}
-		
-		if (rmsBean == null) {
-			rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		}
 		
 		// the message number that was last used.

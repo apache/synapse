@@ -46,61 +46,12 @@ public class Axis2Sender {
             org.apache.synapse.MessageContext synapseInMessageContext) {
 
         try {
-            MessageContext axisOutMsgContext =
                 Axis2FlexibleMEPClient.send(
                     // The endpoint where we are sending to
                     endpoint,
 
                     // The Axis2 Message context of the Synapse MC
                     synapseInMessageContext);
-
-            if (axisOutMsgContext != null && axisOutMsgContext.getEnvelope() != null)
-            { // if there is no response env will be null
-                //set the response Envelop as a property in Original axisMsgCtx
-                synapseInMessageContext.setProperty(
-                        org.apache.synapse.Constants.RESPONSE_SOAP_ENVELOPE,
-                        axisOutMsgContext.getEnvelope());
-
-                // create the synapse message context for the response
-                org.apache.synapse.MessageContext synapseOutMessageContext =
-                        new Axis2MessageContext(
-                                axisOutMsgContext,
-                                synapseInMessageContext.getConfiguration(),
-                                synapseInMessageContext.getEnvironment());
-                synapseOutMessageContext.setResponse(true);
-
-                // now set properties to co-relate to the request i.e. copy over
-                // correlation messgae properties from original message to response received
-                Iterator iter = synapseInMessageContext.getCorrelationPropertyKeySet().iterator();
-
-                while (iter.hasNext()) {
-                    Object key = iter.next();
-                    synapseOutMessageContext.setProperty(
-                            (String) key, synapseInMessageContext.getCorrelationProperty((String) key));
-                }
-
-                // if we have a SOAP Fault, log it - irrespective of the mediation logic
-                // http://issues.apache.org/jira/browse/SYNAPSE-42
-                if (synapseOutMessageContext.getEnvelope().getBody().hasFault()) {
-                    SOAPFault fault = synapseOutMessageContext.getEnvelope().getBody().getFault();
-                    log.warn("Synapse received a SOAP fault from : " + synapseInMessageContext.getTo() +
-                            (fault.getNode() != null ? " Node : " + fault.getNode().getNodeValue() : "") +
-                            (fault.getReason() != null ? " Reason : " + fault.getReason().getFirstSOAPText() : "") +
-                            (fault.getCode() != null ? " Code : " + fault.getCode().getValue() : ""));
-                }
-
-                log.debug("Processing incoming message");
-
-                // sets the out sequence if present to the out MC to mediate the response
-                if (synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE) != null) {
-                    synapseOutMessageContext.setProperty(Constants.OUT_SEQUENCE,
-                            synapseInMessageContext.getProperty(Constants.OUT_SEQUENCE));
-                }
-
-                // send the response message through the synapse mediation flow
-                synapseInMessageContext.getEnvironment().
-                        injectMessage(synapseOutMessageContext);
-            }
 
         } catch (Exception e) {
             handleException("Unexpected error during Sending message onwards", e);

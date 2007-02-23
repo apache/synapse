@@ -48,11 +48,13 @@ import java.util.Iterator;
 public class SynapseModule implements Module {
 
     private static final Log log = LogFactory.getLog(SynapseModule.class);
+
     private static final String SYNAPSE_SERVICE_NAME = "synapse";
     private static final QName MEDIATE_OPERATION_Q_NAME = new QName("mediate");
 
     public void init(ConfigurationContext configurationContext,
         AxisModule axisModule) throws AxisFault {
+
         try {
             InetAddress addr = InetAddress.getLocalHost();
             if (addr != null) {
@@ -69,11 +71,13 @@ public class SynapseModule implements Module {
                 }
                 MDC.put("host", hostname);
             }
-
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             log.warn("Unable to report hostname or IP address for tracing", e);
         }
+
+        // Initializing the SynapseEnvironment and SynapseConfiguration
+        log.info("Initializing the Synapse configuration ...");
+        SynapseConfiguration synCfg = initializeSynapse(configurationContext);
 
         log.info("Deploying the Synapse service..");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
@@ -84,15 +88,12 @@ public class SynapseModule implements Module {
         synapseService.addOperation(mediateOperation);
         axisCfg.addService(synapseService);
 
-        // Initializing the SynapseEnvironment and SynapseConfiguration
-        log.info("Initializing the Synapse configuration ...");
-        SynapseConfiguration synCfg = initializeSynapse(configurationContext);
-
         log.info("Deploying Proxy services...");
         Iterator iter = synCfg.getProxyServices().iterator();
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
             proxy.buildAxisService(synCfg, axisCfg);
+            log.debug("Deployed Proxy service : " + proxy.getName());
             if (!proxy.isStartOnLoad()) {
                 proxy.stop(synCfg);
             }
@@ -105,34 +106,18 @@ public class SynapseModule implements Module {
         ConfigurationContext cfgCtx) {
 
         AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
-
-        /*
-        First check, if synapse.xml URL is provided as a system property, if so use it..
-        else check if synapse.xml location is available from the axis2.xml
-        "SynapseConfiguration" else use the default config
-        */
         SynapseConfiguration synapseConfiguration;
-        Parameter configParam = axisConfiguration.getParameter(Constants.SYNAPSE_CONFIGURATION);
 
         String config = System.getProperty(Constants.SYNAPSE_XML);
 
         if (config != null) {
             log.info("System property '" + Constants.SYNAPSE_XML +
                 "' specifies synapse configuration as " + config);
-            synapseConfiguration =
-                SynapseConfigurationBuilder.getConfiguration(config);
-        } else if (configParam != null) {
-            log.info(
-                "Synapse configuration is available via the " +
-                    "'SynapseConfiguration' parameter in axis2.xml");
-            synapseConfiguration = SynapseConfigurationBuilder
-                .getConfiguration(configParam.getValue().toString().trim());
+            synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
             log.warn("System property '" + Constants.SYNAPSE_XML +
-                "' is not specified or 'SynapseConfiguration' Parameter " +
-                "is not available via axis2.xml.  Using default configuration..");
-            synapseConfiguration =
-                SynapseConfigurationBuilder.getDefaultConfiguration();
+                "' is not specified. Using default configuration..");
+            synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
 
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
@@ -141,30 +126,12 @@ public class SynapseModule implements Module {
         // set the Synapse configuration and environment into the Axis2 configuration
         Parameter synapseCtxParam = new Parameter(Constants.SYNAPSE_CONFIG, null);
         synapseCtxParam.setValue(synapseConfiguration);
+        MessageContextCreatorForAxis2.setSynConfig(synapseConfiguration);
 
         Parameter synapseEnvParam = new Parameter(Constants.SYNAPSE_ENV, null);
-
-        Parameter synEnvImpl = axisConfiguration.getParameter(Constants.SYNAPSE_ENV_IMPL);
-        if (synEnvImpl != null && synEnvImpl.getValue() != null) {
-            String clazz = (String) synEnvImpl.getValue();
-            try {
-                Constructor constr = Class.forName(clazz).getDeclaredConstructor(
-                    new Class[]{ConfigurationContext.class});
-                synapseEnvParam.setValue(constr.newInstance(new Object[]{cfgCtx}));
-            } catch (ClassNotFoundException e) {
-                handleException("Cannot find Synapse environment implementation : " + clazz, e);
-            } catch (NoSuchMethodException e) {
-                handleException("Cannot find Synapse environment constructor : " + clazz, e);
-            } catch (IllegalAccessException e) {
-                handleException("Error instantiating Synapse environment with : " + clazz, e);
-            } catch (InvocationTargetException e) {
-                handleException("Error invoking constructor of Synapse environment : " + clazz, e);
-            } catch (InstantiationException e) {
-                handleException("Error instantiating Synapse environment with : " + clazz, e);
-            }
-        } else {
-            synapseEnvParam.setValue(new Axis2SynapseEnvironment(cfgCtx, synapseConfiguration));
-        }
+        Axis2SynapseEnvironment synEnv = new Axis2SynapseEnvironment(cfgCtx, synapseConfiguration);
+        synapseEnvParam.setValue(synEnv);
+        MessageContextCreatorForAxis2.setSynEnv(synEnv);
 
         try {
             axisConfiguration.addParameter(synapseCtxParam);
@@ -178,12 +145,12 @@ public class SynapseModule implements Module {
             log.fatal(msg, e);
             throw new SynapseException(msg, e);
         }
+        
         return synapseConfiguration;
-
     }
 
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {
-        // FixMe
+        // ignore
     }
 
     public boolean canSupportAssertion(Assertion assertion) {
@@ -196,11 +163,6 @@ public class SynapseModule implements Module {
 
     public void shutdown(ConfigurationContext configurationContext)
         throws AxisFault {
-        // FixMe
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
+        // ignore
     }
 }

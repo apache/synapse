@@ -24,6 +24,7 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
 import org.apache.axis2.util.UUIDGenerator;
@@ -152,6 +153,22 @@ public class ServerWorker implements Runnable {
             processPost();
         } else {
             handleException("Unsupported method : " + method, null);
+        }
+
+        if (msgContext != null && msgContext.getOperationContext() != null &&
+            !Constants.VALUE_TRUE.equals(
+                msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN)) &&
+            !"SKIP".equals(
+                msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN))) {
+
+            response.setStatusCode(HttpStatus.SC_ACCEPTED);
+            serverHandler.commitResponse(conn, response);
+
+            // make sure that the output stream is flushed and closed properly
+            try {
+                os.flush();
+                os.close();
+            } catch (IOException ignore) {}
         }
     }
 

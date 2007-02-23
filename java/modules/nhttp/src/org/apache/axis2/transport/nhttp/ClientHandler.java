@@ -32,6 +32,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAP12Constants;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -71,6 +73,8 @@ public class ClientHandler implements NHttpClientHandler {
     private static final String OUTGOING_MESSAGE_CONTEXT = "axis2_message_context";
     private static final String REQUEST_SOURCE_CHANNEL = "request-source-channel";
     private static final String RESPONSE_SINK_CHANNEL = "request-sink-channel";
+
+    private static final String CONTENT_TYPE = "Content-Type";
 
     /**
      * Create an instance of this client connection handler using the Axis2 configuration
@@ -212,7 +216,7 @@ public class ClientHandler implements NHttpClientHandler {
             }
 
             if (decoder.isCompleted()) {
-                sink.close();
+                if (sink != null) sink.close();
                 if (!connStrategy.keepAlive(response, context)) {
                     conn.close();
                 } else {
@@ -263,6 +267,38 @@ public class ClientHandler implements NHttpClientHandler {
     public void responseReceived(final NHttpClientConnection conn) {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
+
+        switch (response.getStatusLine().getStatusCode()) {
+            case HttpStatus.SC_ACCEPTED : {
+                log.debug("Received a 202 Accepted response");
+                return;
+            }
+            case HttpStatus.SC_INTERNAL_SERVER_ERROR : {
+                Header contentType = response.getFirstHeader(CONTENT_TYPE);
+                if (contentType != null &&
+                    (contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0) ||
+                     contentType.getValue().indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
+                    log.debug("Received an internal server error with a SOAP payload");
+                    processResponse(conn, context, response);
+                    return;
+                }
+                log.error("Received an internal server error : " +
+                    response.getStatusLine().getReasonPhrase());
+                return;
+            }
+            case HttpStatus.SC_OK : {
+                processResponse(conn, context, response);
+            }
+        }
+    }
+
+    /**
+     * Perform processing of the received response though Axis2
+     * @param conn
+     * @param context
+     * @param response
+     */
+    private void processResponse(final NHttpClientConnection conn, HttpContext context, HttpResponse response) {
 
         try {
             Pipe responsePipe = Pipe.open();

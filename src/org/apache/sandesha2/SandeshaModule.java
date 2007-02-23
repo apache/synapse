@@ -136,9 +136,6 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::engageNotify, " + axisDescription);
 		
 		SandeshaPolicyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription.getParent());
-		if (parentPropertyBean==null) 
-			throw new AxisFault (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.defaultPropertyBeanNotSet));
 		
 		SandeshaPolicyBean axisDescPropertyBean = PropertyManager.loadPropertiesFromAxisDescription(axisDescription,parentPropertyBean);
 		

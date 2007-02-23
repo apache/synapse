@@ -174,7 +174,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
-		RMMsgCreator.addAckMessage(ackRMMsgCtx,rmdBean, sequenceId, storageManager);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx,rmdBean, sequenceId, rmdBean);
 		ackRMMsgCtx.getMessageContext().setServerSide(true);
 
 		if (acksTo.hasAnonymousAddress()) {

@@ -617,6 +617,11 @@ public class SandeshaUtil {
 					SandeshaMessageKeys.propertyBeanNotSet));
 		
 		SandeshaPolicyBean propertyBean = (SandeshaPolicyBean) parameter.getValue();
+		if (propertyBean==null) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyBeanNotFound);
+			throw new SandeshaException (message);
+		}
+
 		return propertyBean;
 	}
 

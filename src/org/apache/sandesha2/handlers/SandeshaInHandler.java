@@ -187,10 +187,6 @@ public class SandeshaInHandler extends AbstractHandler {
 			RMMsgContext rmMsgContext = MsgInitializer.initializeMessage(msgContext);
 			
 			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
-			if (policyBean==null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyBeanNotFound);
-				throw new SandeshaException (message);
-			}
 
 			boolean inOrder= policyBean.isInOrder();
 			
@@ -218,7 +214,7 @@ public class SandeshaInHandler extends AbstractHandler {
 					
 					Object responseWritten = msgContext.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
 					if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
-						RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgContext , sequenceId, storageManager, false, true);
+						RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgContext, rmdBean, sequenceId, storageManager, true);
 						msgContext.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 						AcknowledgementManager.sendAckNow(ackRMMsgContext);
 					}

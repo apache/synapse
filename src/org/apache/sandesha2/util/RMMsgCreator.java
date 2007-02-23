@@ -399,7 +399,7 @@ public class RMMsgCreator {
 	 * @throws SandeshaException
 	 */
 	public static void addAckMessage(RMMsgContext applicationMsg, RMSequenceBean rmBean,
-			String sequenceId, StorageManager storageManager)
+			String sequenceId, RMDBean rmdBean)
 			throws SandeshaException {
 		if(log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
@@ -412,8 +412,6 @@ public class RMMsgCreator {
 		Identifier id = new Identifier(rmNamespaceValue);
 		id.setIndentifer(sequenceId);
 		sequenceAck.setIdentifier(id);
-
-		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
 		ArrayList ackRangeArrayList = SandeshaUtil.getAckRangeArrayList(rmdBean.getServerCompletedMessages(), rmNamespaceValue);
 		sequenceAck.setAckRanges(ackRangeArrayList);

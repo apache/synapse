@@ -248,7 +248,7 @@ public class SequenceProcessor {
 			EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 			
 			// Send an Ack if needed.
-			sendAckIfNeeded(sequenceId, rmMsgCtx, storageManager, true, acksTo.hasAnonymousAddress());			
+			sendAckIfNeeded(bean, sequenceId, rmMsgCtx, storageManager, true, acksTo.hasAnonymousAddress());			
 			
 			result = InvocationResponse.ABORT;
 			if (log.isDebugEnabled())
@@ -316,24 +316,20 @@ public class SequenceProcessor {
 		if (acksTo.hasAnonymousAddress() && backchannelFree) {
 			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
 			if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
-				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx , sequenceId, storageManager,false,true);
+				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
 				msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 				AcknowledgementManager.sendAckNow(ackRMMsgContext);
 			}
 		} else { //Scenario 2 and Scenario 3
-			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
-			if (policyBean==null) {
-				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.policyBeanNotFound);
-				throw new SandeshaException (message);
-			}
 			//		having a negative value for timeToSend will make this behave as having an infinite ack interval.
 			long timeToSend = -1;   
 			if (!acksTo.hasAnonymousAddress()) {
+				SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
 				long ackInterval = policyBean.getAcknowledgementInterval();
 				timeToSend = System.currentTimeMillis() + ackInterval;
 			}
 			
-			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, sequenceId, storageManager,false,true);
+			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
 
 			AcknowledgementManager.removeAckBeanEntries(sequenceId, storageManager);
 			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
@@ -378,7 +374,7 @@ public class SequenceProcessor {
 	}
 
 
-	private static void sendAckIfNeeded(String sequenceId, RMMsgContext rmMsgCtx, 
+	private void sendAckIfNeeded(RMDBean rmdBean, String sequenceId, RMMsgContext rmMsgCtx, 
 			StorageManager storageManager, boolean serverSide, boolean anonymousAcksTo)
 					throws AxisFault {
 
@@ -386,8 +382,7 @@ public class SequenceProcessor {
 			log.debug("Enter: SequenceProcessor::sendAckIfNeeded " + sequenceId);
 
 			RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(
-					rmMsgCtx , sequenceId, storageManager,
-					false, serverSide);
+					rmMsgCtx, rmdBean, sequenceId, storageManager, serverSide);
 
 			if (anonymousAcksTo) {
 				rmMsgCtx.getMessageContext().getOperationContext().

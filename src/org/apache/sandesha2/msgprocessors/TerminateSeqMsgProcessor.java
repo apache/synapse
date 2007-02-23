@@ -312,8 +312,8 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		RMMsgContext terminateSeqResponseRMMsg = RMMsgCreator.createTerminateSeqResponseMsg(terminateSeqRMMsg, rmdBean);
 		MessageContext outMessage = terminateSeqResponseRMMsg.getMessageContext();
 
-		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, 
-				sequenceId,	storageManager, false, true);
+		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, rmdBean, 
+				sequenceId,	storageManager, true);
 		
 		Iterator iter = ackRMMessage.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 		

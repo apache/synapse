@@ -25,6 +25,8 @@ import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -32,7 +34,9 @@ import java.util.Collections;
 
 public class SynapseCallbackReceiver implements MessageReceiver {
 
-    private Map callbackStore;  // this will be made thread safe
+    private static final Log log = LogFactory.getLog(SynapseCallbackReceiver.class);
+
+    private Map callbackStore;  // this will be made thread safe within the constructor
 
     public SynapseCallbackReceiver() {
         callbackStore = Collections.synchronizedMap(new HashMap());
@@ -44,13 +48,22 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
     public void receive(MessageContext messageCtx) throws AxisFault {
 
-        RelatesTo relatesTO = messageCtx.getOptions().getRelatesTo();
-        String messageID    = relatesTO.getValue();
-        Callback callback   = (Callback) callbackStore.get(messageID);
+        if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
+            String messageID  = messageCtx.getOptions().getRelatesTo().getValue();
+            Callback callback = (Callback) callbackStore.get(messageID);
 
-        if (callback != null) {
-            callbackStore.remove(messageID);
-            callback.onComplete(new AsyncResult(messageCtx));
+            if (callback != null) {
+                callbackStore.remove(messageID);
+                callback.onComplete(new AsyncResult(messageCtx));
+            } else {
+                // TODO invoke a generic synapse error handler for this message
+                log.warn("Synapse received a response for the request with message Id : " +
+                    messageID + " But a callback has not been registered to process this response");
+            }
+
+        } else {
+            // TODO invoke a generic synapse error handler for this message
+            log.warn("Synapse received a response message without a message Id");
         }
     }
 }

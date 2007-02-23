@@ -71,7 +71,7 @@ public class Axis2FlexibleMEPClient {
      * @param synapseOutMessageContext
      * @return The Axis2 reponse message context
      */
-    public static MessageContext send(
+    public static void send(
 
         Endpoint endpoint,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
@@ -171,34 +171,14 @@ public class Axis2FlexibleMEPClient {
         // object with a reference to the outgoing synapse message context synapseOutMessageContext
         mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
         
-        if (clientOptions.isUseSeparateListener()) {
-            mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
-            axisOutMsgCtx.getOperationContext().setProperty(
-                org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
-            mepClient.execute(false);
-            return null;
+        mepClient.execute(false);
 
-        } else {
-
-            // default behaviour changed to non-blocking
-            mepClient.execute(false);
-
-            /*MessageContext responseReceived =
-                mepClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-
-            if (responseReceived != null && responseReceived.getEnvelope() != null) {
-                MessageContext response = Utils.createOutMessageContext(originalInMsgCtx);
-                response.setEnvelope(removeAddressingHeaders(responseReceived));
-                response.setServerSide(true);
-                response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-                return response;
-
-            } else {
-                return null;
-            }*/
-            return null;
-        }
-    }
+        // with the nio transport, this causes the listener not to write a 202
+        // Accepted response, as this implies that Synapse does not yet know if
+        // a 202 or 200 response would be written back.
+        originalInMsgCtx.getOperationContext().setProperty(
+            org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
+   }
 
     private static MessageContext cloneForSend(MessageContext ori) throws AxisFault {
         MessageContext newMC = new MessageContext();

@@ -77,11 +77,17 @@ public class SynapseCommodityServiceTest extends TestCase {
         TransportInDescription synTrsIn = (TransportInDescription)
             synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
         synTrsIn.getParameter("port").setValue("10000");
+        synTrsIn = (TransportInDescription)
+            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
+        synTrsIn.getParameter("port").setValue("12000");
         startServer(synapseConfigCtx);
 
         TransportInDescription busTrsIn = (TransportInDescription)
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
         busTrsIn.getParameter("port").setValue("10001");
+        busTrsIn = (TransportInDescription)
+            businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
+        busTrsIn.getParameter("port").setValue("12001");
         startServer(businessConfigCtx);
         System.out.println("");
     }

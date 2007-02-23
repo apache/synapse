@@ -29,20 +29,12 @@ public interface Constants {
     /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
 
-	
-
     // -- keys related to Axis2 configuration and Synapse initialization --
     /** The key name used to store the Synapse configuration into the Axis2 config */
     String SYNAPSE_CONFIG = "synapse.config";
 
     /** The key name used to store the Synapse environment into the Axis2 config */
     String SYNAPSE_ENV = "synapse.env";
-
-    /** The name used to denote the Axis2 Parameter specifying the Synapse configuration */
-    String SYNAPSE_CONFIGURATION = "SynapseConfiguration";
-
-    /** The name used to denote the SynapseEnvironment implementation class */
-    String SYNAPSE_ENV_IMPL = "SynapseEnvironmentImpl";
 
     /** The system property used to specify/override the synapse configuration XML location */
     String SYNAPSE_XML = "synapse.xml";
@@ -104,8 +96,6 @@ public interface Constants {
     QName RAMPART_MODULE_NAME = new QName("rampart");
     /** Sandesha2 engaged service being process*/
     String MESSAGE_RECEIVED_RM_ENGAGED = "__MESSAGE_RECEIVED_RM_ENGAGED__";
-
-    String PROCESSED_MUST_UNDERSTAND = "__PROCESSED_MUST_UNDERSTAND__";
 
     String RESPONSE_SOAP_ENVELOPE = "_RESPONSE_SOAP_ENVELOPE_";
 

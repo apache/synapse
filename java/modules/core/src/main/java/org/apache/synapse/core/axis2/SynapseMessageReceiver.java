@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.statistics.StatisticsStack;
-import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 
 /**
@@ -40,16 +39,14 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
-        log.debug("Synapse received a new message...");
-        log.debug("Received To: " + (mc.getTo() != null ?
-            mc.getTo().getAddress() : "null"));
-        log.debug("SOAPAction: " + (mc.getWSAAction() != null ?
-            mc.getWSAAction() : "null"));
+        log.debug("Synapse received a new message for message mediation...");
+        log.debug("Received To: " + (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
+        log.debug("SOAPAction: " + (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
         if (log.isDebugEnabled()) {
             log.debug("Body : \n" + mc.getEnvelope());
         }
 
-        MessageContext synCtx = Axis2MessageContextFinder.getSynapseMessageContext(mc);
+        MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
         StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
         if (synapseServiceStack== null) {
             synapseServiceStack= new ProxyServiceStatisticsStack();
@@ -58,19 +55,8 @@ public class SynapseMessageReceiver implements MessageReceiver {
         String name = "SynapseService";
         boolean isFault =synCtx.getEnvelope().getBody().hasFault();
         synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true,isFault);
+
+        // invoke synapse message mediation
         synCtx.getEnvironment().injectMessage(synCtx);
-
-        // Response handling mechanism for 200/202 and 5XX
-        // if smc.isResponse = true then the response will be handled with 200 OK
-        // else, response will be 202 OK without an http body
-        // if smc.isFaultRespose = true then the response is a fault with 500 Internal Server Error
-
-        if (synCtx.isResponse()) {
-            mc.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-        }
-        if (synCtx.isFaultResponse()) {
-            // todo: is there a better way to inject faultSoapEnv to the Axis2 Transport
-            throw new AxisFault("Synapse Encountered an Error - See Log for More Details");
-        }
     }
 }

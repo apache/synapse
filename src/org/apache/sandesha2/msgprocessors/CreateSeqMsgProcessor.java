@@ -112,6 +112,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				
 			RMMsgContext createSeqResponse = RMMsgCreator.createCreateSeqResponseMsg(createSeqRMMsg, rmdBean);
 			outMessage = createSeqResponse.getMessageContext();
+			// Set a message ID for this Create Sequence Response message
+			outMessage.setMessageID(SandeshaUtil.getUUID());
 				
 			createSeqResponse.setFlow(MessageContext.OUT_FLOW);
 	

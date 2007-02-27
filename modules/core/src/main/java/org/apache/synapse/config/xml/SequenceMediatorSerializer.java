@@ -32,17 +32,41 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  *   mediator+
  * &lt;/sequence&gt;
  * </pre>
- *
+ * <p/>
  * OR
- *
+ * <p/>
  * <pre>
  * &lt;sequence ref="name"/&gt;
  * </pre>
  */
-public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
-     {
+public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(SequenceMediatorSerializer.class);
+
+    public OMElement serializeAnonymousSequence(OMElement parent, SequenceMediator mediator) {
+        OMElement sequence = fac.createOMElement("sequence", synNS);
+        int isEnableStatistics = mediator.getStatisticsEnable();
+        String statisticsValue = null;
+        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+            statisticsValue = Constants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+            statisticsValue = Constants.STATISTICS_DISABLE;
+        }
+        if (statisticsValue != null) {
+            sequence.addAttribute(fac.createOMAttribute(
+                    Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
+        }
+        if (mediator.getErrorHandler() != null) {
+            sequence.addAttribute(fac.createOMAttribute(
+                    "onError", nullNS, mediator.getErrorHandler()));
+        }
+        finalizeSerialization(sequence, mediator);
+        super.serializeChildren(sequence, mediator.getList());
+        if (parent != null) {
+            parent.addChild(sequence);
+        }
+        return sequence;
+    }
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
@@ -57,12 +81,12 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
         // except make sure that we refer back to the registry key used when we loaded ourself
         if (mediator.isDynamic()) {
             sequence.addAttribute(fac.createOMAttribute(
-                "name", nullNS, mediator.getName()));
+                    "name", nullNS, mediator.getName()));
             sequence.addAttribute(fac.createOMAttribute(
-                "key", nullNS, mediator.getRegistryKey()));            
-            
+                    "key", nullNS, mediator.getRegistryKey()));
+
         } else {
-            
+
             int isEnableStatistics = mediator.getStatisticsEnable();
             String statisticsValue = null;
             if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
@@ -77,16 +101,16 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer
 
             if (mediator.getRef() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
-                    "ref", nullNS, mediator.getRef()));
+                        "ref", nullNS, mediator.getRef()));
             } else if (mediator.getName() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
-                    "name", nullNS, mediator.getName()));
+                        "name", nullNS, mediator.getName()));
 
                 if (mediator.getErrorHandler() != null) {
                     sequence.addAttribute(fac.createOMAttribute(
-                        "onError", nullNS, mediator.getErrorHandler()));
+                            "onError", nullNS, mediator.getErrorHandler()));
                 }
-                finalizeSerialization(sequence,mediator);
+                finalizeSerialization(sequence, mediator);
                 super.serializeChildren(sequence, mediator.getList());
             }
         }

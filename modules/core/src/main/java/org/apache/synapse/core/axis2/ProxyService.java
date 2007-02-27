@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.*;
@@ -31,127 +32,232 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Util;
+import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.XMLToObjectMapper;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLInputFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.util.*;
+import java.net.URI;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
- *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
- *   <wsdl key="string">?
- *   <schema key="string">*
- *   <policy key="string">*
- *   <property name="string" value="string"/>*
- *   <enableRM/>+
- *   <enableSec/>+
+ * <target sequence="name" | endpoint="name"/>?   // default is main sequence
+ * <wsdl key="string">?
+ * <schema key="string">*
+ * <policy key="string">*
+ * <property name="string" value="string"/>*
+ * <enableRM/>+
+ * <enableSec/>+
  * </proxy>
  */
 public class ProxyService {
 
     private static final Log log = LogFactory.getLog(ProxyService.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
-    /** The proxy service name */
+    /**
+     * The proxy service name
+     */
     private String name;
-    /** The proxy service description */
+    /**
+     * The proxy service description
+     */
     private String description;
-    /** The transport/s over which this service should be exposed */
+    /**
+     * The transport/s over which this service should be exposed
+     */
     //private String transports;
     private ArrayList transports;
-    /** The target endpoint, if assigned */
+    /**
+     * The target endpoint, if assigned
+     */
     private String targetEndpoint = null;
-    /** The target inSequence, if assigned */
+    /**
+     * The target inSequence, if assigned
+     */
     private String targetInSequence = null;
-    /** The target outSequence, if assigned */
+    /**
+     * The target outSequence, if assigned
+     */
     private String targetOutSequence = null;
+    /**
+     * The target faultSequence, if assigned
+     */
+    private String targetFaultSequence = null;
+    /**
+     * The target endpoint, if assigned
+     */
+    private Endpoint targetInLineEndpoint = null;
+    /**
+     * The target inSequence, if assigned
+     */
+    private SequenceMediator targetInLineInSequence = null;
+    /**
+     * The target outSequence, if assigned
+     */
+    private SequenceMediator targetInLineOutSequence = null;
+    /**
+     * The target faultSequence, if assigned
+     */
+    private SequenceMediator targetInLineFaultSequence = null;
     // if a target endpoint or sequence is not specified,
     // the default Synapse main mediator will be used
-    /** A list properties */
+    /**
+     * A list properties
+     */
     private Map properties = new HashMap();
 
-    /** The key for the base WSDL, if specified */
+    /**
+     * The key for the base WSDL, if specified
+     */
     private String wsdlKey;
-    /** The keys for any supplied schemas */
+    /**
+     * The URI for the base WSDL, if specified
+     */
+    private URI wsdlURI;
+    /**
+     * Inline XML representation of wsdl
+     */
+    private Object inLineWSDL;
+    /**
+     * The keys for any supplied schemas
+     */
     private List schemaKeys = new ArrayList();
-    /** The keys for any supplied policies that would apply at the service level */
+    /**
+     * The keys for any supplied policies that would apply at the service level
+     */
     private List serviceLevelPolicies = new ArrayList();
-    /** Should WS RM (default configuration) be engaged on this service */
+    /**
+     * Should WS RM (default configuration) be engaged on this service
+     */
     private boolean wsRMEnabled = false;
-    /** Should WS Sec (default configuration) be engaged on this service */
+    /**
+     * Should WS Sec (default configuration) be engaged on this service
+     */
     private boolean wsSecEnabled = false;
-    /** This will say weather need to start the service at the load or not */
+    /**
+     * This will say weather need to start the service at the load or not
+     */
     private boolean startOnLoad = true;
-    /** This will hold the status of the proxy weather it is running or not */
+    /**
+     * This will hold the status of the proxy weather it is running or not
+     */
     private boolean running = false;
 
     public static final String ALL_TRANSPORTS = "all";
 
-    /**  To decide to whether statistics should have collected or not */
+    /**
+     * To decide to whether statistics should have collected or not
+     */
     private int statisticsEnable = Constants.STATISTICS_UNSET;
-
-
-    /** The variable that indicate tracing on or off for the current mediator */
+    /**
+     * The variable that indicate tracing on or off for the current mediator
+     */
     protected int traceState = Constants.TRACING_UNSET;
 
-    public ProxyService() {}
+    public ProxyService() {
+    }
 
     public AxisService buildAxisService(SynapseConfiguration synCfg, AxisConfiguration axisCfg) {
 
         AxisService proxyService = null;
+        InputStream wsdlInputStream = null;
+        OMElement wsdlElement = null;
         if (wsdlKey != null) {
+            Object keyObject = synCfg.getProperty(wsdlKey);
+            if (keyObject instanceof OMElement) {
+                wsdlElement = (OMElement) keyObject;
+            }
+        } else if (inLineWSDL != null) {
+            wsdlElement = (OMElement) inLineWSDL;
+        } else if (wsdlURI != null) {
             try {
-                InputStream wsdlInputStream = Util.getInputStream(synCfg.getProperty(wsdlKey));
-                // detect version of the WSDL 1.1 or 2.0
-                OMNamespace documentElementNS = new StAXOMBuilder(
-                        wsdlInputStream).getDocumentElement().getNamespace();
+                URL url = wsdlURI.toURL();
+                if (url != null) {
+                    URLConnection urlc = url.openConnection();
+                    try {
+                        if (urlc != null) {
+                            XMLStreamReader parser = XMLInputFactory.newInstance().
+                                    createXMLStreamReader(urlc.getInputStream());
+                            StAXOMBuilder builder = new StAXOMBuilder(parser);
+                            wsdlElement = builder.getDocumentElement();
+                            // detach from URL connection and keep in memory
+                            // TODO remove this
+                            wsdlElement.build();
+                        }
+                    } catch (XMLStreamException e) {
+                        log.warn("Content at URL : " + url + " is non XML..");
+                    }
 
-                wsdlInputStream = Util.getInputStream(synCfg.getProperty(wsdlKey));
+                }
+            } catch (MalformedURLException e) {
+                handleException("Malformed URI for wsdl", e);
+            } catch (IOException e) {
+                handleException("Error reading from wsdl URI", e);
+            }
+        }
+        if (wsdlElement != null) {
+            OMNamespace wsdlNamespace = wsdlElement.getNamespace();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                wsdlElement.serialize(baos);
+                wsdlInputStream = new ByteArrayInputStream(baos.toByteArray());
+            } catch (XMLStreamException e) {
+                handleException("Error converting to a StreamSource", e);
+            }
+            if (wsdlInputStream != null) {
+                try {
+                    // detect version of the WSDL 1.1 or 2.0
+                    if (wsdlNamespace != null) {
+                        WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
+                        if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.
+                                equals(wsdlNamespace.getNamespaceURI())) {
+                            wsdlToAxisServiceBuilder =
+                                    new WSDL20ToAxisServiceBuilder(wsdlInputStream, null, null);
 
-                if (documentElementNS != null) {
-                    WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
-                    if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.
-                        equals(documentElementNS.getNamespaceURI())) {
-                        wsdlToAxisServiceBuilder =
-                            new WSDL20ToAxisServiceBuilder(wsdlInputStream, null, null);
+                        } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
+                                equals(wsdlNamespace.getNamespaceURI())) {
+                            wsdlToAxisServiceBuilder =
+                                    new WSDL11ToAxisServiceBuilder(wsdlInputStream, null, null);
+                        } else {
+                            handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
+                        }
 
-                    } else if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.
-                        equals(documentElementNS.getNamespaceURI())) {
-                        wsdlToAxisServiceBuilder =
-                            new WSDL11ToAxisServiceBuilder(wsdlInputStream, null, null);
+                        if (wsdlToAxisServiceBuilder == null) {
+                            throw new SynapseException(
+                                    "Could not get the WSDL to Axis Service Builder");
+                        }
+                        proxyService = wsdlToAxisServiceBuilder.populateService();
+                        proxyService.setWsdlFound(true);
+
                     } else {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                     }
 
-                    if (wsdlToAxisServiceBuilder == null) {
-                        throw new SynapseException(
-                                "Could not get the WSDL to Axis Service Builder");
-                    }
-                    proxyService = wsdlToAxisServiceBuilder.populateService();
-                    proxyService.setWsdlFound(true);
-
-                } else {
-                    handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
+                } catch (AxisFault af) {
+                    handleException("Error building service from WSDL", af);
+                } catch (IOException ioe) {
+                    handleException("Error reading WSDL", ioe);
                 }
-
-            } catch (XMLStreamException e) {
-                handleException("Error reading WSDL defined by registry key : " + wsdlKey, e);
-            } catch (AxisFault af) {
-                handleException("Error building service from WSDL defined by registry key : "
-                        + wsdlKey, af);
-            } catch (IOException ioe) {
-                handleException("Error reading WSDL from WSDL defined by registry key : "
-                        + wsdlKey, ioe);
             }
         } else {
             // this is for POX... create a dummy service and an operation for which
             // our SynapseDispatcher will properly dispatch to
             proxyService = new AxisService();
             AxisOperation mediateOperation =
-                new InOutAxisOperation(new QName("mediate"));
+                    new InOutAxisOperation(new QName("mediate"));
             proxyService.addOperation(mediateOperation);
         }
 
@@ -177,8 +283,8 @@ public class ProxyService {
         // process parameters
         Iterator iter = properties.keySet().iterator();
         while (iter.hasNext()) {
-            String name  = (String) iter.next();
-            String value = (String) properties.get(name);
+            String name = (String) iter.next();
+            Object value = properties.get(name);
 
             Parameter p = new Parameter();
             p.setName(name);
@@ -188,29 +294,33 @@ public class ProxyService {
                 proxyService.addParameter(p);
             } catch (AxisFault af) {
                 handleException("Error setting property : " + name + "" +
-                    "to proxy service as a Parameter", af);
+                        "to proxy service as a Parameter", af);
             }
         }
 
         // if service level policies are specified, apply them
         if (!serviceLevelPolicies.isEmpty()) {
-
             Policy svcEffectivePolicy = null;
-
             iter = serviceLevelPolicies.iterator();
             while (iter.hasNext()) {
                 String policyKey = (String) iter.next();
-                if (svcEffectivePolicy == null) {
-                    svcEffectivePolicy = PolicyEngine.getPolicy(
-                        Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream());
-                } else {
-                    svcEffectivePolicy = (Policy) svcEffectivePolicy.merge(
-                        PolicyEngine.getPolicy(
-                            Util.getStreamSource(synCfg.getProperty(policyKey)).getInputStream()));
+                Object policyProp = synCfg.getProperty(policyKey);
+                if (policyProp != null) {
+                    if (svcEffectivePolicy == null) {
+
+                        svcEffectivePolicy = PolicyEngine.getPolicy(
+                                Util.getStreamSource(policyProp).getInputStream());
+                    } else {
+                        svcEffectivePolicy = (Policy) svcEffectivePolicy.merge(
+                                PolicyEngine.getPolicy(
+                                        Util.getStreamSource(policyProp).getInputStream()));
+                    }
                 }
             }
             PolicyInclude pi = proxyService.getPolicyInclude();
-            pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
+            if (pi != null && svcEffectivePolicy != null) {
+                pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
+            }
         }
 
         // create a custom message receiver for this proxy service to use a given named
@@ -225,6 +335,9 @@ public class ProxyService {
             }
             if (targetOutSequence != null) {
                 msgRcvr.setTargetOutSequence(targetOutSequence);
+            }
+            if (targetFaultSequence != null) {
+                msgRcvr.setTargetFaultSequence(targetFaultSequence);
             }
         }
 
@@ -300,7 +413,7 @@ public class ProxyService {
         return transports;
     }
 
-    public void addProperty(String name, String value) {
+    public void addProperty(String name, Object value) {
         properties.put(name, value);
     }
 
@@ -436,5 +549,61 @@ public class ProxyService {
      */
     public void setTraceState(int traceState) {
         this.traceState = traceState;
+    }
+
+    public String getTargetFaultSequence() {
+        return targetFaultSequence;
+    }
+
+    public void setTargetFaultSequence(String targetFaultSequence) {
+        this.targetFaultSequence = targetFaultSequence;
+    }
+
+    public Object getInLineWSDL() {
+        return inLineWSDL;
+    }
+
+    public void setInLineWSDL(Object inLineWSDL) {
+        this.inLineWSDL = inLineWSDL;
+    }
+
+    public URI getWsdlURI() {
+        return wsdlURI;
+    }
+
+    public void setWsdlURI(URI wsdlURI) {
+        this.wsdlURI = wsdlURI;
+    }
+
+    public Endpoint getTargetInLineEndpoint() {
+        return targetInLineEndpoint;
+    }
+
+    public void setTargetInLineEndpoint(Endpoint targetInLineEndpoint) {
+        this.targetInLineEndpoint = targetInLineEndpoint;
+    }
+
+    public SequenceMediator getTargetInLineInSequence() {
+        return targetInLineInSequence;
+    }
+
+    public void setTargetInLineInSequence(SequenceMediator targetInLineInSequence) {
+        this.targetInLineInSequence = targetInLineInSequence;
+    }
+
+    public SequenceMediator getTargetInLineOutSequence() {
+        return targetInLineOutSequence;
+    }
+
+    public void setTargetInLineOutSequence(SequenceMediator targetInLineOutSequence) {
+        this.targetInLineOutSequence = targetInLineOutSequence;
+    }
+
+    public SequenceMediator getTargetInLineFaultSequence() {
+        return targetInLineFaultSequence;
+    }
+
+    public void setTargetInLineFaultSequence(SequenceMediator targetInLineFaultSequence) {
+        this.targetInLineFaultSequence = targetInLineFaultSequence;
     }
 }

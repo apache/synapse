@@ -25,23 +25,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.axis2.wsdl.WSDLConstants;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Creates a ProxyService instance using the XML fragment specification
- *
+ * <p/>
  * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
- *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
- *   <wsdl key="string">?
- *   <schema key="string">*
- *   <policy key="string">*
- *   <property name="string" value="string"/>*
- *   <enableRM/>+
- *   <enableSec/>+
+ * <target sequence="name" | endpoint="name"/>?   // default is main sequence
+ * <wsdl key="string">?
+ * <schema key="string">*
+ * <policy key="string">*
+ * <property name="string" value="string"/>*
+ * <enableRM/>+
+ * <enableSec/>+
  * </proxy>
  */
 public class ProxyServiceFactory {
@@ -60,7 +63,7 @@ public class ProxyServiceFactory {
         }
 
         OMAttribute statistics = elem.getAttribute(
-                    new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
+                new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
@@ -76,13 +79,13 @@ public class ProxyServiceFactory {
         if (trans != null) {
             String transports = trans.getAttributeValue();
             if (transports == null || ProxyService.ALL_TRANSPORTS.equals(transports)) {
-                        // default to all transports using service name as destination
+                // default to all transports using service name as destination
             } else {
                 StringTokenizer st = new StringTokenizer(transports, " ,");
                 ArrayList transportList = new ArrayList();
-                while(st.hasMoreTokens()) {
+                while (st.hasMoreTokens()) {
                     String token = st.nextToken();
-                    if(token.length() != 0) {
+                    if (token.length() != 0) {
                         transportList.add(token);
                     }
                 }
@@ -102,43 +105,91 @@ public class ProxyServiceFactory {
         }
         OMAttribute startOnLoad = elem.getAttribute(
                 new QName(Constants.NULL_NAMESPACE, "startOnLoad"));
-        if(startOnLoad != null) {
+        if (startOnLoad != null) {
             proxy.setStartOnLoad(Boolean.valueOf(startOnLoad.getAttributeValue()).booleanValue());
         } else {
             proxy.setStartOnLoad(true);
         }
 
+        // setting the description of the proxy service
+        OMElement descriptionElement = elem.getFirstChildWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "description"));
+        if (descriptionElement != null) {
+            proxy.setDescription(descriptionElement.getText().trim());
+        }
+
         // read definition of the target of this proxy service. The target could be an 'endpoint'
         // or a named sequence. If none of these are specified, the messages would be mediated
         // by the Synapse main mediator
-        OMElement target  = elem.getFirstChildWithName(
+        OMElement target = elem.getFirstChildWithName(
                 new QName(Constants.SYNAPSE_NAMESPACE, "target"));
         if (target != null) {
-            OMAttribute inSequence = target.getAttribute(
-                    new QName(Constants.NULL_NAMESPACE, "inSequence"));
+            SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
+            OMAttribute inSequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "inSequence"));
             if (inSequence != null) {
                 proxy.setTargetInSequence(inSequence.getAttributeValue());
+            } else {
+                OMElement inSequenceElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "inSequence"));
+                if (inSequenceElement != null) {
+                    proxy.setTargetInLineInSequence(mediatorFactory.createAnonymousSequence(inSequenceElement));
+                }
             }
-            OMAttribute outSequence = target.getAttribute(
-                    new QName(Constants.NULL_NAMESPACE, "outSequence"));
+            OMAttribute outSequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "outSequence"));
             if (outSequence != null) {
                 proxy.setTargetOutSequence(outSequence.getAttributeValue());
+            } else {
+                OMElement outSequenceElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "outSequence"));
+                if (outSequenceElement != null) {
+                    proxy.setTargetInLineOutSequence(mediatorFactory.createAnonymousSequence(outSequenceElement));
+                }
             }
-            OMAttribute tgtEndpt = target.getAttribute(
-                    new QName(Constants.NULL_NAMESPACE, "endpoint"));
+            OMAttribute faultSequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "faultSequence"));
+            if (faultSequence != null) {
+                proxy.setTargetFaultSequence(faultSequence.getAttributeValue());
+            } else {
+                OMElement faultSequenceElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "faultSequence"));
+                if (faultSequenceElement != null) {
+                    proxy.setTargetInLineOutSequence(mediatorFactory.createAnonymousSequence(faultSequenceElement));
+                }
+            }
+            OMAttribute tgtEndpt = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "endpoint"));
             if (tgtEndpt != null) {
                 proxy.setTargetEndpoint(tgtEndpt.getAttributeValue());
+            } else {
+                OMElement endpointElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
+                if (endpointElement != null) {
+                    proxy.setTargetInLineEndpoint(EndpointFactory.createEndpoint(endpointElement, true));
+                }
             }
         }
 
         // read the WSDL, Schemas and Policies and set to the proxy service
-        OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
+        OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "publish-wsdl"));
         if (wsdl != null) {
             OMAttribute wsdlkey = wsdl.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-            if (wsdlkey == null) {
-                handleException("The 'key' attribute is required for the base WSDL definition");
-            } else {
+            if (wsdlkey != null) {
                 proxy.setWSDLKey(wsdlkey.getAttributeValue());
+            } else {
+                OMAttribute wsdlURI = wsdl.getAttribute(new QName(Constants.NULL_NAMESPACE, "uri"));
+                if (wsdlURI != null) {
+                    try {
+                        proxy.setWsdlURI(new URI(wsdlURI.getAttributeValue()));
+                    } catch (URISyntaxException e) {
+                        String msg = "Error creating uri for proxy service wsdl";
+                        log.error(msg);
+                        handleException(msg, e);
+                    }
+                } else {
+                    OMElement wsdl11 = wsdl.getFirstChildWithName(new QName(WSDLConstants.WSDL1_1_NAMESPACE, "definitions"));
+                    if (wsdl11 != null) {
+                        proxy.setInLineWSDL(wsdl11);
+                    } else {
+                        OMElement wsdl20 = wsdl.getFirstChildWithName(new QName(WSDLConstants.WSDL2_0_NAMESPACE, "descriptions"));
+                        if (wsdl20 != null) {
+                            proxy.setInLineWSDL(wsdl20);
+                        }
+                    }
+                }
             }
         }
 
@@ -162,15 +213,19 @@ public class ProxyServiceFactory {
         }
 
         Iterator props = elem.getChildrenWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "property"));
+                new QName(Constants.SYNAPSE_NAMESPACE, "parameter"));
         while (props.hasNext()) {
             Object o = props.next();
             if (o instanceof OMElement) {
                 OMElement prop = (OMElement) o;
                 OMAttribute pname = prop.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-                OMAttribute value = prop.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-                if (pname != null && value != null) {
-                    proxy.addProperty(pname.getAttributeValue(), value.getAttributeValue());
+                OMElement propertyValue = prop.getFirstElement();
+                if (pname != null) {
+                    if (propertyValue != null) {
+                        proxy.addProperty(pname.getAttributeValue(), propertyValue);
+                    } else {
+                        proxy.addProperty(pname.getAttributeValue(), prop.getText().trim());
+                    }
                 } else {
                     handleException("Invalid property specified for proxy service : " + name);
                 }
@@ -179,15 +234,15 @@ public class ProxyServiceFactory {
             }
         }
 
-        if (elem.getFirstChildWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
-            proxy.setWsRMEnabled(true);
-        }
-
-        if (elem.getFirstChildWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
-            proxy.setWsSecEnabled(true);
-        }
+//        if (elem.getFirstChildWithName(
+//                new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
+//            proxy.setWsRMEnabled(true);
+//        }
+//
+//        if (elem.getFirstChildWithName(
+//                new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
+//            proxy.setWsSecEnabled(true);
+//        }
 
         return proxy;
     }

@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URI;
 
 public class Util {
 
@@ -60,7 +61,7 @@ public class Util {
             } catch (XMLStreamException e) {
                 handleException("Error converting to a StreamSource", e);
             }
-            
+
         } else {
             handleException("Cannot convert object to a StreamSource");
         }
@@ -82,7 +83,14 @@ public class Util {
                 handleException("Error converting to a StreamSource", e);
             }
 
-        } else {
+        } else if (o instanceof URI){
+            try {
+                return ((URI)(o)).toURL().openStream();                   
+            } catch (IOException e) {
+                handleException("Error opening stream form URI",e);
+            }
+        }
+        else {
             handleException("Cannot convert object to a StreamSource");
         }
         return null;

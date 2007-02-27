@@ -54,6 +54,28 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return SEQUENCE_Q;
     }
 
+    public SequenceMediator createAnonymousSequence(OMElement elem) {
+        SequenceMediator seqMediator = new SequenceMediator();
+        OMAttribute e = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "onError"));
+        if (e != null) {
+            seqMediator.setErrorHandler(e.getAttributeValue());
+        }
+        initMediator(seqMediator, elem);
+        super.addChildren(elem, seqMediator);
+        OMAttribute statistics = elem.getAttribute(
+                new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
+        if (statistics != null) {
+            String statisticsValue = statistics.getAttributeValue();
+            if (statisticsValue != null) {
+                if (Constants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                    seqMediator.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
+                } else if (Constants.STATISTICS_DISABLE.equals(statisticsValue)) {
+                    seqMediator.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                }
+            }
+        }
+        return seqMediator;
+    }
     public Mediator createMediator(OMElement elem) {
 
         SequenceMediator seqMediator = new SequenceMediator();

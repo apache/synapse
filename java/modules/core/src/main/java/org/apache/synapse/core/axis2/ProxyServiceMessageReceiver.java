@@ -27,10 +27,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 import org.apache.synapse.config.Endpoint;
+import org.apache.axiom.om.OMNode;
 
 /**
  * This is the MessageReceiver set to act on behalf of Proxy services.
@@ -39,7 +41,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     private static final Log log = LogFactory.getLog(ProxyServiceMessageReceiver.class);
 
-    /** The name of the Proxy Service */
+    /**
+     * The name of the Proxy Service
+     */
     private String name = null;
 
     /**
@@ -61,6 +65,16 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
      */
     private String targetOutSequence = null;
 
+    private String targetFaultSequence = null;
+       /** The target endpoint, if assigned   */
+    private Endpoint targetInLineEndpoint = null;
+    /** The target inSequence, if assigned */
+    private SequenceMediator targetInLineInSequence = null;
+    /** The target outSequence, if assigned  */
+    private SequenceMediator targetInLineOutSequence = null;
+    /** The target faultSequence, if assigned  */
+    private SequenceMediator targetInLineFaultSequence = null;
+
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
         log.debug("Proxy Service " + name + " received a new message...");
@@ -71,7 +85,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
         }
 
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
-        
+
         // Setting Required property to collect the proxy service statistics
         boolean statisticsEnable;
         ProxyService currentProxyService = synCtx.getConfiguration().getProxyService(name);
@@ -97,7 +111,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 log.debug("Forwarding message directly to the endpoint named : " + targetEndpoint);
 
                 org.apache.axis2.context.MessageContext axisInMsgContext =
-                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();
                 Axis2FlexibleMEPClient.send(endpoint, synCtx);
             }
 
@@ -123,7 +137,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     mediator.mediate(synCtx);
                 }
 
-            // else default to the Synapse main mediator
+                // else default to the Synapse main mediator
             } else {
                 log.debug("Using default 'main' mediator for message mediation");
                 synCtx.getEnvironment().injectMessage(synCtx);
@@ -133,6 +147,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     /**
      * Specify a named target endpoint for direct message forwarding
+     *
      * @param targetEndpoint the name of the target endpoint to be used
      */
     public void setTargetEndpoint(String targetEndpoint) {
@@ -141,6 +156,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     /**
      * Specify a named target sequence to be used for message mediation for incoming messages
+     *
      * @param targetInSequence the name of the target sequence to be used for incoming messages
      */
     public void setTargetInSequence(String targetInSequence) {
@@ -149,6 +165,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     /**
      * Specify a named target sequence to be used for message mediation for outgoing messages
+     *
      * @param targetOutSequence the name of the target sequence to be used for outgoing messages
      */
     public void setTargetOutSequence(String targetOutSequence) {
@@ -157,9 +174,30 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     /**
      * Set the name of the corresponding proxy service
+     *
      * @param name the proxy service name
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setTargetFaultSequence(String targetFaultSequence) {
+        this.targetFaultSequence = targetFaultSequence;
+    }
+
+    public void setTargetInLineEndpoint(Endpoint targetInLineEndpoint) {
+        this.targetInLineEndpoint = targetInLineEndpoint;
+    }
+
+    public void setTargetInLineInSequence(SequenceMediator targetInLineInSequence) {
+        this.targetInLineInSequence = targetInLineInSequence;
+    }
+
+    public void setTargetInLineOutSequence(SequenceMediator targetInLineOutSequence) {
+        this.targetInLineOutSequence = targetInLineOutSequence;
+    }
+
+    public void setTargetInLineFaultSequence(SequenceMediator targetInLineFaultSequence) {
+        this.targetInLineFaultSequence = targetInLineFaultSequence;
     }
 }

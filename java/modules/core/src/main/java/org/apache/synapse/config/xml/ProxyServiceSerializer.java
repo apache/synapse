@@ -19,27 +19,27 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.net.URI;
 
 /**
  * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
- *   <target sequence="name" | endpoint="name"/>?   // default is main sequence
- *   <wsdl key="string">?
- *   <schema key="string">*
- *   <policy key="string">*
- *   <property name="string" value="string"/>*
- *   <enableRM/>+
- *   <enableSec/>+
+ * <target sequence="name" | endpoint="name"/>?   // default is main sequence
+ * <wsdl key="string">?
+ * <schema key="string">*
+ * <policy key="string">*
+ * <property name="string" value="string"/>*
+ * <enableRM/>+
+ * <enableSec/>+
  * </proxy>
  */
 public class ProxyServiceSerializer {
@@ -55,28 +55,20 @@ public class ProxyServiceSerializer {
         OMElement proxy = fac.createOMElement("proxy", synNS);
         if (service.getName() != null) {
             proxy.addAttribute(fac.createOMAttribute(
-                "name", nullNS, service.getName()));
+                    "name", nullNS, service.getName()));
         } else {
             handleException("Invalid proxy service. Service name is required");
         }
-
-        if (service.getDescription() != null) {
-            proxy.addAttribute(fac.createOMAttribute(
-                "description", nullNS, service.getDescription()));
+        String descriptionStr = service.getDescription();
+        if (descriptionStr != null) {
+            OMElement description = fac.createOMElement("description", synNS);
+            description.addChild(fac.createOMText(descriptionStr));
+            proxy.addChild(description);
         }
-
-        String wsdlKey = service.getWSDLKey();
-        if(wsdlKey != null) {
-            OMElement wsdl = fac.createOMElement("wsdl", synNS);
-            wsdl.addAttribute(fac.createOMAttribute(
-                "key", nullNS, wsdlKey));
-            proxy.addChild(wsdl);
-        }
-
-        if (service.getTransports() != null && service.getTransports().size() != 0) {
-            ArrayList transports = service.getTransports();
+        ArrayList transports = service.getTransports();
+        if (transports != null && !transports.isEmpty()) {
             String transportStr = "" + transports.get(0);
-            for(int i = 1; i < transports.size(); i++) {
+            for (int i = 1; i < transports.size(); i++) {
                 transportStr = transportStr + " " + transports.get(i);
             }
             proxy.addAttribute(fac.createOMAttribute("transports", nullNS, transportStr));
@@ -84,26 +76,81 @@ public class ProxyServiceSerializer {
 
         if (service.isStartOnLoad()) {
             proxy.addAttribute(fac.createOMAttribute(
-                "startOnLoad", nullNS, "true"));
+                    "startOnLoad", nullNS, "true"));
         } else {
             proxy.addAttribute(fac.createOMAttribute(
-                "startOnLoad", nullNS, "false"));
+                    "startOnLoad", nullNS, "false"));
+        }
+        String endpoint = service.getTargetEndpoint();
+
+        OMElement target = fac.createOMElement("target", synNS);
+        Endpoint inLineEndpoint = service.getTargetInLineEndpoint();
+        if (endpoint != null) {
+            target.addAttribute(fac.createOMAttribute(
+                    "endpoint", nullNS, endpoint));
+            proxy.addChild(target);
+        } else if (inLineEndpoint != null) {
+            EndpointSerializer.serializeEndpoint(inLineEndpoint, target);
+            proxy.addChild(target);
+        } else {
+            String inSeq = service.getTargetInSequence();
+            String outSeq = service.getTargetOutSequence();
+            String faultSeq = service.getTargetFaultSequence();
+            SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
+            if (inSeq != null) {
+                target.addAttribute(fac.createOMAttribute("inSequence", nullNS, inSeq));
+                proxy.addChild(target);
+            } else {
+                SequenceMediator inLineInSeq = service.getTargetInLineInSequence();
+                if (inLineInSeq != null) {
+                    OMElement inSeqElement = serializer.serializeAnonymousSequence(null, inLineInSeq);
+                    inSeqElement.setLocalName("inSequence");
+                    target.addChild(inSeqElement);
+                    proxy.addChild(target);
+                }
+            }
+            if (outSeq != null) {
+                target.addAttribute(fac.createOMAttribute("outSequence", nullNS, outSeq));
+                proxy.addChild(target);
+            } else {
+                SequenceMediator inLineOutSeq = service.getTargetInLineOutSequence();
+                if (inLineOutSeq != null) {
+                    OMElement outSeqElement = serializer.serializeAnonymousSequence(null, inLineOutSeq);
+                    outSeqElement.setLocalName("outSequence");
+                    target.addChild(outSeqElement);
+                    proxy.addChild(target);
+                }
+            }
+            if (faultSeq != null) {
+                target.addAttribute(fac.createOMAttribute("faultSequence", nullNS, faultSeq));
+                proxy.addChild(target);
+            } else {
+                SequenceMediator inLineFaultSeq = service.getTargetInLineFaultSequence();
+                if (inLineFaultSeq != null) {
+                    OMElement faultSeqElement = serializer.serializeAnonymousSequence(null, inLineFaultSeq);
+                    faultSeqElement.setLocalName("faultSequence");
+                    target.addChild(faultSeqElement);
+                    proxy.addChild(target);
+                }
+            }
+
         }
 
-        if (service.getTargetEndpoint() != null) {
-            OMElement target = fac.createOMElement("target", synNS);
-            target.addAttribute(fac.createOMAttribute(
-                "endpoint", nullNS, service.getTargetEndpoint()));
-            proxy.addChild(target);
-        } else if (service.getTargetInSequence() != null || service.getTargetOutSequence() != null) {
-            OMElement target = fac.createOMElement("target", synNS);
-            if (service.getTargetInSequence() != null) {
-                target.addAttribute(fac.createOMAttribute("inSequence", nullNS, service.getTargetInSequence()));
-            }
-            if (service.getTargetOutSequence() != null) {
-                target.addAttribute(fac.createOMAttribute("outSequence", nullNS, service.getTargetOutSequence()));
-            }
-            proxy.addChild(target);
+        String wsdlKey = service.getWSDLKey();
+        URI wsdlUri = service.getWsdlURI();
+        Object inLineWSDL = service.getInLineWSDL();
+        OMElement wsdl = fac.createOMElement("publish-wsdl", synNS);
+        if (wsdlKey != null) {
+            wsdl.addAttribute(fac.createOMAttribute(
+                    "key", nullNS, wsdlKey));
+            proxy.addChild(wsdl);
+        } else if (inLineWSDL != null) {
+            wsdl.addChild((OMNode) inLineWSDL);
+            proxy.addChild(wsdl);
+        } else if (wsdlUri != null) {
+            wsdl.addAttribute(fac.createOMAttribute(
+                    "uri", nullNS, wsdlUri.toString()));
+            proxy.addChild(wsdl);
         }
 
         // TODO still schemas are not used
@@ -115,27 +162,34 @@ public class ProxyServiceSerializer {
             String policyKey = (String) iter.next();
             OMElement policy = fac.createOMElement("policy", synNS);
             policy.addAttribute(fac.createOMAttribute(
-                "key", nullNS, policyKey));
+                    "key", nullNS, policyKey));
             proxy.addChild(policy);
         }
 
         iter = service.getPropertyMap().keySet().iterator();
         while (iter.hasNext()) {
             String propertyName = (String) iter.next();
-            OMElement property = fac.createOMElement("property", synNS);
+            OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
-                "name", nullNS, propertyName));
-            property.addAttribute(fac.createOMAttribute(
-                "value", nullNS, (String) service.getPropertyMap().get(propertyName)));
-            proxy.addChild(property);
+                    "name", nullNS, propertyName));
+            Object value = service.getPropertyMap().get(propertyName);
+            if (value != null) {
+                if (value instanceof String) {
+                    property.setText(((String) value).trim());
+                    proxy.addChild(property);
+                } else if (value instanceof OMNode) {
+                    property.addChild((OMNode) value);
+                    proxy.addChild(property);
+                }
+            }
         }
 
-        if (service.isWsRMEnabled()) {
-            proxy.addChild(fac.createOMElement("enableRM", synNS));
-        }
-        if (service.isWsSecEnabled()) {
-            proxy.addChild(fac.createOMElement("enableSec", synNS));
-        }
+//        if (service.isWsRMEnabled()) {
+//            proxy.addChild(fac.createOMElement("enableRM", synNS));
+//        }
+//        if (service.isWsSecEnabled()) {
+//            proxy.addChild(fac.createOMElement("enableSec", synNS));
+//        }
 
         int isEnableStatistics = service.getStatisticsEnable();
         String statisticsValue = null;

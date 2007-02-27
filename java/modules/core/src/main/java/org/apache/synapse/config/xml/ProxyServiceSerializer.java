@@ -166,13 +166,13 @@ public class ProxyServiceSerializer {
             proxy.addChild(policy);
         }
 
-        iter = service.getPropertyMap().keySet().iterator();
+        iter = service.getParameterMap().keySet().iterator();
         while (iter.hasNext()) {
             String propertyName = (String) iter.next();
             OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
                     "name", nullNS, propertyName));
-            Object value = service.getPropertyMap().get(propertyName);
+            Object value = service.getParameterMap().get(propertyName);
             if (value != null) {
                 if (value instanceof String) {
                     property.setText(((String) value).trim());

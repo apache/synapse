@@ -222,9 +222,9 @@ public class ProxyServiceFactory {
                 OMElement propertyValue = prop.getFirstElement();
                 if (pname != null) {
                     if (propertyValue != null) {
-                        proxy.addProperty(pname.getAttributeValue(), propertyValue);
+                        proxy.addParameter(pname.getAttributeValue(), propertyValue);
                     } else {
-                        proxy.addProperty(pname.getAttributeValue(), prop.getText().trim());
+                        proxy.addParameter(pname.getAttributeValue(), prop.getText().trim());
                     }
                 } else {
                     handleException("Invalid property specified for proxy service : " + name);

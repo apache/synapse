@@ -36,7 +36,6 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Util;
 import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.config.XMLToObjectMapper;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -115,9 +114,9 @@ public class ProxyService {
     // if a target endpoint or sequence is not specified,
     // the default Synapse main mediator will be used
     /**
-     * A list properties
+     * A list parameters
      */
-    private Map properties = new HashMap();
+    private Map parameters = new HashMap();
 
     /**
      * The key for the base WSDL, if specified
@@ -281,10 +280,10 @@ public class ProxyService {
         }
 
         // process parameters
-        Iterator iter = properties.keySet().iterator();
+        Iterator iter = parameters.keySet().iterator();
         while (iter.hasNext()) {
             String name = (String) iter.next();
-            Object value = properties.get(name);
+            Object value = parameters.get(name);
 
             Parameter p = new Parameter();
             p.setName(name);
@@ -413,12 +412,12 @@ public class ProxyService {
         return transports;
     }
 
-    public void addProperty(String name, Object value) {
-        properties.put(name, value);
+    public void addParameter(String name, Object value) {
+        parameters.put(name, value);
     }
 
-    public Map getPropertyMap() {
-        return this.properties;
+    public Map getParameterMap() {
+        return this.parameters;
     }
 
     public void setTransports(ArrayList transports) {

@@ -19,7 +19,6 @@
 
 package org.apache.synapse;
 
-import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**

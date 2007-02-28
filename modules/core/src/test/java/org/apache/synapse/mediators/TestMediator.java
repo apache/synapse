@@ -20,7 +20,6 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.Mediator;
 
 /**
  * Test mediator class.

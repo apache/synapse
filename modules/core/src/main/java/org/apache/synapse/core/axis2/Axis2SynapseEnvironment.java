@@ -41,10 +41,13 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
 
     private SynapseConfiguration synapseConfig;
-    /** The StatisticsCollector object  */
+    /**
+     * The StatisticsCollector object
+     */
     private StatisticsCollector statisticsCollector;
 
-    public Axis2SynapseEnvironment() {}
+    public Axis2SynapseEnvironment() {
+    }
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
                                    SynapseConfiguration synapseConfig) {
@@ -59,20 +62,40 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             StatisticsUtils.processProxyServiceStatistics(synCtx);
             StatisticsUtils.processSequenceStatistics(synCtx);
         }
-        // if the outSequence property is present use that for the message mediation
-        // if not use the main mediator to mediate the outgoing message
-        if (synCtx.getProperty(Constants.OUT_SEQUENCE) != null) {
-            Mediator mediator = synCtx.getConfiguration().getNamedSequence(
-                    (String)synCtx.getProperty(Constants.OUT_SEQUENCE));
-            // check weather the sequence specified with the property outSequence is availabel
-            if(mediator != null) {
-                log.debug("Using the outSequence " + synCtx.getProperty(Constants.OUT_SEQUENCE)
-                        + " for the out message mediation");
-                mediator.mediate(synCtx);
+        
+        // if this is a response to a proxy service 
+        if (synCtx.getProperty(Constants.PROXY_SERVICE) != null) {
+
+            if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(Constants.PROXY_SERVICE))
+                    .getTargetOutSequence() != null) {
+
+                String sequenceName = synCtx.getConfiguration().getProxyService(
+                        (String) synCtx.getProperty(Constants.PROXY_SERVICE)).getTargetOutSequence();
+                Mediator outSequence = synCtx.getConfiguration().getNamedSequence(sequenceName);
+
+                if (outSequence != null) {
+                    log.debug("Using the sequence named " + sequenceName + " for the outgoing message mediation of " +
+                            "the proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE));
+                    outSequence.mediate(synCtx);
+                } else {
+                    log.error("Unable to find the sequence specified by the name " + sequenceName
+                            + " - [Message dropped]");
+                }
+
+            } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
+                    Constants.PROXY_SERVICE)).getTargetInLineOutSequence() != null) {
+
+                log.debug("Using the anonymous out sequence specified in the proxy service "
+                        + synCtx.getProperty(Constants.PROXY_SERVICE) + " for out going message mediation");
+                synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
+                        Constants.PROXY_SERVICE)).getTargetInLineOutSequence().mediate(synCtx);
             } else {
-                log.error("Sequence named " + synCtx.getProperty(Constants.OUT_SEQUENCE)
-                        + " doesn't exists in synapse");
+
+                log.debug("Proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE) + " does not specifies " +
+                        "an out sequence - sending the response back");
+                Axis2Sender.sendBack(synCtx);
             }
+
         } else {
             synCtx.getConfiguration().getMainMediator().mediate(synCtx);
         }

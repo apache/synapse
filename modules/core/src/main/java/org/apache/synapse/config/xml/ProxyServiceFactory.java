@@ -41,14 +41,14 @@ import java.net.URISyntaxException;
  *    <description>..</description>?
  *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
- *       <in-sequence>...</inSequence>
- *       <out-sequence>...</outSequence>
- *       <fault-sequence>...</faultSequence>
+ *       <inSequence>...</inSequence>
+ *       <outSequence>...</outSequence>
+ *       <faultSequence>...</faultSequence>
  *    </target>?
- *    <publish-wsdl uri=".." key="string">
+ *    <publishWSDL uri=".." key="string">
  *       <wsdl:definition>...</wsdl:definition>?
  *       <wsdl20:description>...</wsdl20:description>?
- *    </publish-wsdl>?
+ *    </publishWSDL>?
  *    <policy key="string">
  *       // optional service parameters
  *    <parameter name="string">
@@ -173,7 +173,7 @@ public class ProxyServiceFactory {
         }
 
         // read the WSDL, Schemas and Policies and set to the proxy service
-        OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "publish-wsdl"));
+        OMElement wsdl = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "publishWSDL"));
         if (wsdl != null) {
             OMAttribute wsdlkey = wsdl.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
             if (wsdlkey != null) {

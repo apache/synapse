@@ -37,15 +37,24 @@ import java.net.URISyntaxException;
 /**
  * Creates a ProxyService instance using the XML fragment specification
  * <p/>
- * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
- * <target sequence="name" | endpoint="name"/>?   // default is main sequence
- * <wsdl key="string">?
- * <schema key="string">*
- * <policy key="string">*
- * <property name="string" value="string"/>*
- * <enableRM/>+
- * <enableSec/>+
- * </proxy>
+ * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
+ *    <description>..</description>?
+ *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
+ *       <endpoint>...</endpoint>
+ *       <in-sequence>...</inSequence>
+ *       <out-sequence>...</outSequence>
+ *       <fault-sequence>...</faultSequence>
+ *    </target>?
+ *    <publish-wsdl uri=".." key="string">
+ *       <wsdl:definition>...</wsdl:definition>?
+ *       <wsdl20:description>...</wsdl20:description>?
+ *    </publish-wsdl>?
+ *    <policy key="string">
+ *       // optional service parameters
+ *    <parameter name="string">
+ *       text | xml
+ *    </parameter>?
+ * </proxy-service>
  */
 public class ProxyServiceFactory {
 
@@ -149,7 +158,7 @@ public class ProxyServiceFactory {
             } else {
                 OMElement faultSequenceElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "faultSequence"));
                 if (faultSequenceElement != null) {
-                    proxy.setTargetInLineOutSequence(mediatorFactory.createAnonymousSequence(faultSequenceElement));
+                    proxy.setTargetInLineFaultSequence(mediatorFactory.createAnonymousSequence(faultSequenceElement));
                 }
             }
             OMAttribute tgtEndpt = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "endpoint"));

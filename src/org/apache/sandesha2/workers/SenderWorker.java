@@ -134,21 +134,21 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			RequestResponseTransport t = null;
 			Boolean makeConnection = (Boolean) msgCtx.getProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE);
 			EndpointReference toEPR = msgCtx.getTo();
-			if((toEPR!=null && toEPR.hasAnonymousAddress()) &&
-				(makeConnection == null || !makeConnection.booleanValue())) {
 
-				MessageContext inMsg = null;
-				OperationContext op = msgCtx.getOperationContext();
-				if (op != null)
-					inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-				if (inMsg != null)
-					t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+			MessageContext inMsg = null;
+			OperationContext op = msgCtx.getOperationContext();
+			if (op != null)
+				inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+			if (inMsg != null)
+				t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 
-				if (t == null || !t.getStatus().equals(RequestResponseTransportStatus.WAITING)) {
-					if (log.isDebugEnabled())
-						log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
-					return;
-				}
+			// If we are anonymous, and this is not a makeConnection, then we must have a transport waiting
+			if((toEPR==null || toEPR.hasAnonymousAddress()) &&
+			   (makeConnection == null || !makeConnection.booleanValue()) &&
+			   (t == null || !t.getStatus().equals(RequestResponseTransportStatus.WAITING))) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
+				return;
 			}
 			
 			boolean continueSending = updateMessage(rmMsgCtx,senderBean,storageManager);
@@ -235,7 +235,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				if(response != InvocationResponse.SUSPEND) {
 					if(t != null) {
 						if(log.isDebugEnabled()) log.debug("Signalling transport in " + t);
-						if(t != null) t.signalResponseReady();
+						t.signalResponseReady();
 					}
 				}
 				

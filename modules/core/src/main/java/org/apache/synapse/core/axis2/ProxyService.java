@@ -132,7 +132,7 @@ public class ProxyService {
     private Object inLineWSDL;
     /**
      * The keys for any supplied schemas
-     */
+     */   // todo: do we need this
     private List schemaKeys = new ArrayList();
     /**
      * The keys for any supplied policies that would apply at the service level
@@ -292,7 +292,7 @@ public class ProxyService {
             try {
                 proxyService.addParameter(p);
             } catch (AxisFault af) {
-                handleException("Error setting property : " + name + "" +
+                handleException("Error setting parameter : " + name + "" +
                         "to proxy service as a Parameter", af);
             }
         }
@@ -322,23 +322,9 @@ public class ProxyService {
             }
         }
 
-        // create a custom message receiver for this proxy service to use a given named
-        // endpoint or sequence for forwarding/message mediation
+        // create a custom message receiver for this proxy service 
         ProxyServiceMessageReceiver msgRcvr = new ProxyServiceMessageReceiver();
         msgRcvr.setName(name);
-        if (targetEndpoint != null) {
-            msgRcvr.setTargetEndpoint(targetEndpoint);
-        } else {
-            if (targetInSequence != null) {
-                msgRcvr.setTargetInSequence(targetInSequence);
-            }
-            if (targetOutSequence != null) {
-                msgRcvr.setTargetOutSequence(targetOutSequence);
-            }
-            if (targetFaultSequence != null) {
-                msgRcvr.setTargetFaultSequence(targetFaultSequence);
-            }
-        }
 
         iter = proxyService.getOperations();
         while (iter.hasNext()) {

@@ -139,7 +139,7 @@ public class ProxyServiceSerializer {
         String wsdlKey = service.getWSDLKey();
         URI wsdlUri = service.getWsdlURI();
         Object inLineWSDL = service.getInLineWSDL();
-        OMElement wsdl = fac.createOMElement("publish-wsdl", synNS);
+        OMElement wsdl = fac.createOMElement("publishWSDL", synNS);
         if (wsdlKey != null) {
             wsdl.addAttribute(fac.createOMAttribute(
                     "key", nullNS, wsdlKey));

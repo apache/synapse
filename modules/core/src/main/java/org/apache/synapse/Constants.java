@@ -53,7 +53,7 @@ public interface Constants {
     String SCOPE_AXIS2 = "axis2";
 
     /** An string name which holds the out sequence property in the MessageContext */
-    String OUT_SEQUENCE = "outSequence";
+    String PROXY_SERVICE = "proxy.name";
 
     /** A key with this name on the message context set to Boolean.TRUE, indicates that this is a response */
     String ISRESPONSE_PROPERTY = "synapse.isresponse";

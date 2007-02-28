@@ -86,18 +86,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 
-		// Re-write the WS-A anonymous URI, if we support the RM anonymous URI. We only
-		// need to rewrite the replyTo EPR if we have an out-in MEP.
-		AxisOperation op = msgContext.getAxisOperation();
-		int mep = WSDLConstants.MEP_CONSTANT_INVALID;
-		if(op != null) {
-			mep = op.getAxisSpecifMEPConstant();
-			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
-				EndpointReference replyTo = SandeshaUtil.rewriteEPR(msgContext.getReplyTo(), msgContext);
-				msgContext.setReplyTo(replyTo);
-			}
-		}
-		
 		// setting the Fault callback
 		SandeshaListener faultCallback = (SandeshaListener) msgContext.getOptions().getProperty(
 				SandeshaClientConstants.SANDESHA_LISTENER);
@@ -273,11 +261,36 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		rmsBean.setHighestOutMessageNumber(messageNumber);
 		
 		// saving the used message number, and the expected reply count
+		boolean startPolling = false;
 		if (!dummyMessage) {
 			rmsBean.setNextMessageNumber(messageNumber);
+
+			// Identify the MEP associated with the message.
+			AxisOperation op = msgContext.getAxisOperation();
+			int mep = WSDLConstants.MEP_CONSTANT_INVALID;
+			if(op != null) {
+				mep = op.getAxisSpecifMEPConstant();
+			}
+
 			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 				long expectedReplies = rmsBean.getExpectedReplies();
 				rmsBean.setExpectedReplies(expectedReplies + 1);
+
+				// If we support the RM anonymous URI then rewrite the ws-a anon to use the RM equivalent.
+				EndpointReference oldEndpoint = msgContext.getReplyTo();
+				String oldAddress = (oldEndpoint == null) ? null : oldEndpoint.getAddress(); 
+				EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext.getReplyTo(), configContext);
+				String newAddress = (newReplyTo == null) ? null : newReplyTo.getAddress();
+				if(newAddress != null && !newAddress.equals(oldAddress)) {
+					// We have rewritten the replyTo. If this is the first message that we have needed to
+					// rewrite then we should set the sequence up for polling, and once we have saved the
+					// changes to the sequence then we can start the polling thread.
+					msgContext.setReplyTo(newReplyTo);
+					if(!rmsBean.isPollingMode()) {
+						rmsBean.setPollingMode(true);
+						startPolling = true;
+					}
+				}
 			}
 		}
 		
@@ -295,6 +308,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		// Update the rmsBean
 		storageManager.getRMSBeanMgr().update(rmsBean);
+		
+		if(startPolling) {
+			SandeshaUtil.startWorkersForSequence(msgContext.getConfigurationContext(), rmsBean);
+		}
 		
 		SOAPEnvelope env = rmMsgCtx.getSOAPEnvelope();
 		if (env == null) {

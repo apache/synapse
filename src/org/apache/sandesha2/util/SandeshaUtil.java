@@ -947,13 +947,12 @@ public class SandeshaUtil {
     return stackTrace;
 	}
 
-	public static EndpointReference rewriteEPR(EndpointReference epr, MessageContext mc)
+	public static EndpointReference rewriteEPR(RMSBean sourceBean, EndpointReference epr, ConfigurationContext configContext)
 	throws SandeshaException
 	{
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::rewriteEPR " + epr);
 
-		ConfigurationContext configContext = mc.getConfigurationContext();
 		SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration());
 		if(!policy.isEnableRMAnonURI()) {
 			if (log.isDebugEnabled())
@@ -969,24 +968,16 @@ public class SandeshaUtil {
 		if(address == null ||
 		   AddressingConstants.Final.WSA_ANONYMOUS_URL.equals(address) ||
 		   AddressingConstants.Submission.WSA_ANONYMOUS_URL.equals(address)) {
-			// We use the service context to co-ordinate the RM anon uuid, so that several
-			// invocations of the same target will yield stable replyTo addresses.
-			String uuid = null;
-			ServiceContext sc = mc.getServiceContext();
-			if(sc == null) {
-				String msg = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.serviceContextNotSet);
-				throw new SandeshaException(msg);
-			}
-			synchronized (sc) {
-				uuid = (String) sc.getProperty(Sandesha2Constants.RM_ANON_UUID);
-				if(uuid == null) {
-					uuid = SandeshaUtil.getUUID();
-					sc.setProperty(Sandesha2Constants.RM_ANON_UUID, uuid);
-				}
+			// We use the sequence to hold the anonymous uuid, so that messages assigned to the
+			// sequence will use the same UUID to identify themselves
+			String uuid = sourceBean.getAnonymousUUID();
+			if(uuid == null) {
+				uuid = Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX + SandeshaUtil.getUUID();
+				sourceBean.setAnonymousUUID(uuid);
 			}
 			
-			if(log.isDebugEnabled()) log.debug("Rewriting EPR with UUID " + uuid);
-			epr.setAddress(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX + uuid);
+			if(log.isDebugEnabled()) log.debug("Rewriting EPR with anon URI " + uuid);
+			epr.setAddress(uuid);
 		}
 		
 		if (log.isDebugEnabled())

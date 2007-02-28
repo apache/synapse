@@ -20,6 +20,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
@@ -253,8 +254,9 @@ public class SequenceManager {
 			}
 		}
 		// In case either of the replyTo or AcksTo is anonymous, rewrite them using the AnonURI template
-		replyToEPR = SandeshaUtil.rewriteEPR(replyToEPR, firstAplicationMsgCtx);
-		acksToEPR = SandeshaUtil.rewriteEPR(acksToEPR, firstAplicationMsgCtx);
+		ConfigurationContext config = firstAplicationMsgCtx.getConfigurationContext();
+		replyToEPR = SandeshaUtil.rewriteEPR(rmsBean, replyToEPR, config);
+		acksToEPR = SandeshaUtil.rewriteEPR(rmsBean, acksToEPR, config);
 		
 		// Store both the acksTo and replyTo 
 		if(replyToEPR != null) rmsBean.setReplyToEPR(replyToEPR.getAddress());

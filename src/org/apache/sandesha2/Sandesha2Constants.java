@@ -511,8 +511,6 @@ public interface Sandesha2Constants {
 	
 	static final String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
 	
-	static final String RM_ANON_UUID = "RMAnonymousUUID";
-	
 	static final String propertiesToCopyFromReferenceMessage = "propertiesToCopyFromReferenceMessage";
 	
 	static final String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";

@@ -140,7 +140,7 @@ public class PollingManager extends SandeshaThread {
 			boolean cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
 			long  repliesExpected = beanToPoll.getExpectedReplies();
 			if(force ||	!cleanAcks || repliesExpected > 0)
-				pollForSequence(beanToPoll.getSequenceID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+				pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
 		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide");
@@ -174,31 +174,35 @@ public class PollingManager extends SandeshaThread {
 				}
 			}
 			if(force || doPoll)
-				pollForSequence(nextMsgBean.getSequenceID(), nextMsgBean.getSequenceID(), nextMsgBean.getReferenceMessageKey(), nextMsgBean, entry);
+				pollForSequence(null, null, nextMsgBean.getReferenceMessageKey(), nextMsgBean, entry);
 		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMDSide");
 	}
 
-	private void pollForSequence(String sequenceId,
-								 String sequencePropertyKey,
+	private void pollForSequence(String anonUUID,       // Only set for RMS polling
+								 String internalSeqId,  // Only set for RMS polling
 								 String referenceMsgKey,
 								 RMSequenceBean rmBean,
 								 SequenceEntry entry)
 	throws SandeshaException, SandeshaStorageException, AxisFault
 	{
-		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollForSequence, " + sequenceId + ", " + sequencePropertyKey + ", " + referenceMsgKey + ", " + rmBean);
+		if(log.isDebugEnabled()) log.debug("Enter: PollingManager::pollForSequence, rmBean: " + rmBean);
 		
 		//create a MakeConnection message  
 		String replyTo = rmBean.getReplyToEPR();
 		String wireSeqId = null;
 		String wireAddress = null;
-		if (SandeshaUtil.isWSRMAnonymous(replyTo)) {
+		if(anonUUID != null) {
+			// If we are polling on a RM anon URI then we don't want to include the sequence id
+			// in the MakeConnection message.
+			wireAddress = anonUUID;
+		} else if(SandeshaUtil.isWSRMAnonymous(replyTo)) {
 			// If we are polling on a RM anon URI then we don't want to include the sequence id
 			// in the MakeConnection message.
 			wireAddress = replyTo;
 		} else {
-			wireSeqId = sequenceId;
+			wireSeqId = rmBean.getSequenceID();
 		}
 		
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,context);
@@ -218,7 +222,7 @@ public class PollingManager extends SandeshaThread {
 		
 		//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
 		SenderBean makeConnectionSenderBean = new SenderBean ();
-		makeConnectionSenderBean.setInternalSequenceID((rmBean instanceof RMSBean) ? sequencePropertyKey : null); // We only have internal ids for the RMS-side
+		makeConnectionSenderBean.setInternalSequenceID(internalSeqId);
 		makeConnectionSenderBean.setMessageContextRefKey(makeConnectionMsgStoreKey);
 		makeConnectionSenderBean.setMessageID(makeConnectionRMMessage.getMessageId());
 		makeConnectionSenderBean.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);

@@ -80,6 +80,8 @@ public class RMSBean extends RMSequenceBean {
 
 	private String offeredSequence = null;
 	
+	private String anonymousUUID = null;
+	
 	/**
 	 * This is the timestamp of when the last error occured when sending
 	 */
@@ -325,6 +327,14 @@ public class RMSBean extends RMSequenceBean {
 		this.rmsFlags |= EXPECTED_REPLIES;
 	}
 
+	public String getAnonymousUUID() {
+		return anonymousUUID;
+	}
+
+	public void setAnonymousUUID(String anonymousUUID) {
+		this.anonymousUUID = anonymousUUID;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -351,6 +361,7 @@ public class RMSBean extends RMSequenceBean {
 			result.append("\nLastErrorTime    : "); result.append(lastSendErrorTimestamp);
 		}
 		result.append("\nClientCompletedMsgs: "); result.append(clientCompletedMessages);
+		result.append("\nAnonymous UUID     : "); result.append(anonymousUUID);
 		return result.toString();
 	}
 	
@@ -392,6 +403,9 @@ public class RMSBean extends RMSequenceBean {
 		else if(bean.getOfferedSequence() != null && !bean.getOfferedSequence().equals(this.getOfferedSequence()))
 			match = false;
 
+		else if(bean.getAnonymousUUID() != null && !bean.getAnonymousUUID().equals(this.getAnonymousUUID()))
+			match = false;
+		
 // Avoid matching on the error information
 //		else if((bean.rmsFlags & LAST_SEND_ERROR_TIME_FLAG) != 0 && bean.getLastSendErrorTimestamp() != this.getLastSendErrorTimestamp())
 //			match = false;

@@ -91,9 +91,9 @@ public class AsyncCallback extends Callback {
         }
 
         // sets the out sequence if present to the in MC to mediate the response
-        if(synapseOutMsgCtx.getProperty(Constants.OUT_SEQUENCE) != null) {
-            synapseInMessageContext.setProperty(Constants.OUT_SEQUENCE,
-                    synapseOutMsgCtx.getProperty(Constants.OUT_SEQUENCE));
+        if(synapseOutMsgCtx.getProperty(Constants.PROXY_SERVICE) != null) {
+            synapseInMessageContext.setProperty(Constants.PROXY_SERVICE,
+                    synapseOutMsgCtx.getProperty(Constants.PROXY_SERVICE));
         }
 
         // send the response message through the synapse mediation flow

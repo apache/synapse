@@ -303,13 +303,9 @@ public class SequenceProcessor {
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_ID,sequenceId);
 		rmMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.MESSAGE_NUMBER,new Long (msgNo));
 		
-//		adding of acks
-		
-//		if acksTo anonymous 
-//			add an ack entry with an infinite ack interval so that it will be piggybacked by any possible response message
-//		else 
-//			add an ack entry here
-		
+		// We only create an ack message if:
+		// - We have anonymous acks, and the backchannel is free
+		// - We have async acks
 		boolean backchannelFree = (replyTo != null && !replyTo.hasAnonymousAddress()) ||
 									WSDLConstants.MEP_CONSTANT_IN_ONLY == mep;
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
@@ -320,18 +316,13 @@ public class SequenceProcessor {
 				msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 				AcknowledgementManager.sendAckNow(ackRMMsgContext);
 			}
-		} else { //Scenario 2 and Scenario 3
-			//		having a negative value for timeToSend will make this behave as having an infinite ack interval.
-			long timeToSend = -1;   
-			if (!acksTo.hasAnonymousAddress()) {
-				SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
-				long ackInterval = policyBean.getAcknowledgementInterval();
-				timeToSend = System.currentTimeMillis() + ackInterval;
-			}
+		} else if (!acksTo.hasAnonymousAddress()) {
+			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
+			long ackInterval = policyBean.getAcknowledgementInterval();
+			long timeToSend = System.currentTimeMillis() + ackInterval;
 			
 			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
 
-			AcknowledgementManager.removeAckBeanEntries(sequenceId, storageManager);
 			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
 		}
 		

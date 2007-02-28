@@ -19,14 +19,9 @@ package org.apache.sandesha2.util;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -46,10 +41,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
-import org.apache.sandesha2.wsrm.Sequence;
-import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 
 /**
  * Contains logic for managing acknowledgements.
@@ -71,29 +63,31 @@ public class AcknowledgementManager {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
 		
-		ConfigurationContext configurationContext = rmMessageContext.getConfigurationContext();
 		SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
 
-		// If this message is going to an anonymous address then we add in an ack for the
-		// sequence that was used on the inbound side.
+		// If this message is going to an anonymous address, and the inbound sequence has
+		// anonymous acksTo, then we add in an ack for the inbound sequence.
 		EndpointReference target = rmMessageContext.getTo();
 		if(target.hasAnonymousAddress()) {
-			Sequence sequence = (Sequence) rmMessageContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-			if(sequence != null) {
-				String outboundSequenceId = sequence.getIdentifier().getIdentifier();
-				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outboundSequenceId);
-				String outboundInternalSeq = rmsBean.getInternalSequenceID();
-				String inboundSequenceId = SandeshaUtil.getServerSideIncomingSeqIdFromInternalSeqId(outboundInternalSeq);
-				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId);
-				if (rmdBean != null) {
-					if(log.isDebugEnabled()) log.debug("Piggybacking ack for " + inboundSequenceId);
-					RMMsgCreator.addAckMessage(rmMessageContext, rmsBean, inboundSequenceId, rmdBean);
+			String inboundSequence = (String) rmMessageContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
+			if(inboundSequence != null) {
+				RMDBean inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
+				if(inboundBean != null) {
+					String acksTo = inboundBean.getAcksToEPR();
+					EndpointReference acksToEPR = new EndpointReference(acksTo);
+					
+					if(acksTo == null || acksToEPR.hasAnonymousAddress()) {
+						if(log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
+						RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean);
+					}
 				}
 			}
 			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
 			return;
 		}
 		
+		// From here on, we must be dealing with a real address. Piggyback all sequences that have an
+		// acksTo that matches the To address, and that have an ackMessage queued up for sending.
 		SenderBean findBean = new SenderBean();
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
@@ -101,67 +95,26 @@ public class AcknowledgementManager {
 
 		Collection collection = retransmitterBeanMgr.find(findBean);
 		Iterator it = collection.iterator();
-
 		while (it.hasNext()) {
 			SenderBean ackBean = (SenderBean) it.next();
 
+			// Piggybacking will happen only if the end of ack interval (timeToSend) is not reached.
 			long timeNow = System.currentTimeMillis();
 			if (ackBean.getTimeToSend() > timeNow) {
-				// //Piggybacking will happen only if the end of ack interval
-				// (timeToSend) is not reached.
-
-				MessageContext ackMsgContext = storageManager.retrieveMessageContext(ackBean.getMessageContextRefKey(),
-						configurationContext);
-
-				if (log.isDebugEnabled()) log.debug("Adding ack headers");
-
-				// deleting the ack entry.
+				// Delete the beans that would have sent the ack
 				retransmitterBeanMgr.delete(ackBean.getMessageID());
+				storageManager.removeMessageContext(ackBean.getMessageContextRefKey());
 
-				// Adding the ack(s) to the application message
-				boolean acks = false;
-				MessageContext messageContext = rmMessageContext.getMessageContext();
-				SOAPHeader appMsgHeaders = messageContext.getEnvelope().getHeader();
-				
-				// If the App message doesn't have a SOAP Header, create one here.
-				if (appMsgHeaders == null) {
-					SOAPFactory factory = (SOAPFactory) messageContext.getEnvelope().getOMFactory();
-					appMsgHeaders = factory.createSOAPHeader(messageContext.getEnvelope());
-				}
-									
-				SOAPHeader headers = ackMsgContext.getEnvelope().getHeader();
-				if(headers != null) {
-					for(int i = 0; i < Sandesha2Constants.SPEC_NS_URIS.length; i++) {
+				String sequenceId = ackBean.getSequenceID();
+				if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
 
-						QName name = new QName(Sandesha2Constants.SPEC_NS_URIS[i], Sandesha2Constants.WSRM_COMMON.SEQUENCE_ACK);
-						Iterator iter = headers.getChildrenWithName(name);
-						while(iter.hasNext()) {
-							OMElement ackElement = (OMElement) iter.next();
-
-							SequenceAcknowledgement sequenceAcknowledgement = new SequenceAcknowledgement (Sandesha2Constants.SPEC_NS_URIS[i]);
-							sequenceAcknowledgement.fromOMElement(ackElement);
-							
-							sequenceAcknowledgement.toOMElement(appMsgHeaders);
-							acks = true;
-							
-							// Make sure that the outbound message is secured with the token that
-							// matches the ack.
-							String seqId = sequenceAcknowledgement.getIdentifier().getIdentifier();
-							RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, seqId);
-							RMMsgCreator.secureOutboundMessage(rmdBean, messageContext);
-						}
-					}
-				}
-				
-				if (!acks) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckMessageEntry,
-							ackMsgContext.getEnvelope().toString());
-					log.debug(message);
-					throw new SandeshaException(message);
+				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
+				if(rmdBean != null) {
+					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, rmdBean);
 				}
 			}
 		}
-
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent");
 	}
@@ -224,7 +177,7 @@ public class AcknowledgementManager {
 		ackMsgCtx.setServerSide(serverSide);
 
 		// adding the SequenceAcknowledgement part.
-		RMMsgCreator.addAckMessage(ackRMMsgCtx, rmdBean ,sequenceId, rmdBean);
+		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::generateAckMessage");
@@ -245,27 +198,8 @@ public class AcknowledgementManager {
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Enter: AcknowledgementManager::verifySequenceCompletion " + result);
+			log.debug("Exit: AcknowledgementManager::verifySequenceCompletion " + result);
 		return result;
-	}
-	
-	public static void addFinalAcknowledgement () {
-		
-	}
-	
-	public static void removeAckBeanEntries (String sequenceId, StorageManager storageManager) throws SandeshaException {
-		SenderBean findBean = new SenderBean ();
-		findBean.setSequenceID(sequenceId);
-		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-		
-		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
-		List senderBeans = senderBeanMgr.find(findBean);
-		
-		for (Iterator it = senderBeans.iterator();it.hasNext();) {
-			SenderBean bean = (SenderBean) it.next();
-			senderBeanMgr.delete(bean.getMessageID());
-		}
-		
 	}
 	
 	public static void addAckBeanEntry (
@@ -273,9 +207,10 @@ public class AcknowledgementManager {
 			String sequenceId, 
 			long timeToSend,
 			StorageManager storageManager) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Enter: AcknowledgementManager::addAckBeanEntry");
 
-		// / Transaction asyncAckTransaction =
-		// storageManager.getTransaction();
+		// Write the acks into the envelope
+		ackRMMsgContext.addSOAPEnvelope();
 		
 		MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
 
@@ -297,28 +232,19 @@ public class AcknowledgementManager {
 
 		ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 
-
-		// Ack will be sent as stand alone, only after the retransmitter
-		// interval.
-//		long timeToSend = System.currentTimeMillis() + ackInterval;
-
 		// removing old acks.
 		SenderBean findBean = new SenderBean();
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-
-		// this will be set to true in the sandesha2TransportSender.
 		findBean.setSend(true);
 		findBean.setReSend(false);
+		findBean.setSequenceID(sequenceId);
 		Collection coll = retransmitterBeanMgr.find(findBean);
 		Iterator it = coll.iterator();
 
-		if (it.hasNext()) {
+		while(it.hasNext()) {
 			SenderBean oldAckBean = (SenderBean) it.next();
-			timeToSend = oldAckBean.getTimeToSend(); // If there is an
-														// old ack. This ack
-														// will be sent in
-														// the old
-														// timeToSend.
+			if(oldAckBean.getTimeToSend() < timeToSend)
+				timeToSend = oldAckBean.getTimeToSend();
 
 			// removing the retransmitted entry for the oldAck
 			retransmitterBeanMgr.delete(oldAckBean.getMessageID());
@@ -331,8 +257,6 @@ public class AcknowledgementManager {
 
 		ackMsgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 		
-		//asyncAckTransaction.commit();
-
 		// passing the message through sandesha2sender
 		ackMsgContext.setProperty(Sandesha2Constants.SET_SEND_TO_TRUE, Sandesha2Constants.VALUE_TRUE);
 		
@@ -341,12 +265,16 @@ public class AcknowledgementManager {
 		// inserting the new ack.
 		retransmitterBeanMgr.insert(ackBean);
 
+		if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::addAckBeanEntry");
 	}
 	
 	public static void sendAckNow (RMMsgContext ackRMMsgContext) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::sendAckNow");
 
+		// Write the acks into the envelope
+		ackRMMsgContext.addSOAPEnvelope();
+		
 		MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
 		ConfigurationContext configContext = ackMsgContext.getConfigurationContext();
 		

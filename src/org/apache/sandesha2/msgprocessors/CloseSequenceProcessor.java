@@ -20,8 +20,6 @@ package org.apache.sandesha2.msgprocessors;
 import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ContextFactory;
@@ -43,7 +41,6 @@ import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.RMMsgCreator;
-import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.WSRMMessageSender;
@@ -102,24 +99,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		storageManager.getRMDBeanMgr().update(rmdBean);
 
 		RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(rmMsgCtx, rmdBean, sequenceId, storageManager, true);
-
-		MessageContext ackMsgCtx = ackRMMsgCtx.getMessageContext();
-
-		String rmNamespaceValue = rmMsgCtx.getRMNamespaceValue();
-		ackRMMsgCtx.setRMNamespaceValue(rmNamespaceValue);
-
-		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil
-				.getSOAPVersion(rmMsgCtx.getSOAPEnvelope()));
-
-		// Setting new envelope
-		SOAPEnvelope envelope = factory.getDefaultEnvelope();
-		try {
-			ackMsgCtx.setEnvelope(envelope);
-		} catch (AxisFault e3) {
-			throw new SandeshaException(e3.getMessage());
-		}
-
-		// adding the ack part to the envelope.
+		// adding the ack part(s) to the envelope.
 		Iterator sequenceAckIter = ackRMMsgCtx
 				.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 

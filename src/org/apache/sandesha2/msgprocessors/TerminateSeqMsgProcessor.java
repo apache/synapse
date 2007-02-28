@@ -315,18 +315,11 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		RMMsgContext ackRMMessage = AcknowledgementManager.generateAckMessage(terminateSeqRMMsg, rmdBean, 
 				sequenceId,	storageManager, true);
 		
+		// copy over the ack parts
 		Iterator iter = ackRMMessage.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
-		
-		if (iter.hasNext()) {
+		while (iter.hasNext()) {
 			SequenceAcknowledgement seqAck = (SequenceAcknowledgement) iter.next();
-			if (seqAck==null) {
-				String message = "No SequenceAcknowledgement part is present";
-				throw new SandeshaException (message);
-			}
-		
 			terminateSeqResponseRMMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, seqAck);
-		} else {
-			//TODO 
 		}
 		
 		terminateSeqResponseRMMsg.addSOAPEnvelope();

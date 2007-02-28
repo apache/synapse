@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -398,15 +399,13 @@ public class RMMsgCreator {
 	 * @param sequenceId
 	 * @throws SandeshaException
 	 */
-	public static void addAckMessage(RMMsgContext applicationMsg, RMSequenceBean rmBean,
-			String sequenceId, RMDBean rmdBean)
+	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean)
 			throws SandeshaException {
 		if(log.isDebugEnabled())
 			log.debug("Entry: RMMsgCreator::addAckMessage " + sequenceId);
 		
-		SOAPEnvelope envelope = applicationMsg.getSOAPEnvelope();
-
-		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmBean.getRMVersion());
+		String rmVersion = rmdBean.getRMVersion();
+		String rmNamespaceValue = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 
 		SequenceAcknowledgement sequenceAck = new SequenceAcknowledgement(rmNamespaceValue);
 		Identifier id = new Identifier(rmNamespaceValue);
@@ -418,7 +417,7 @@ public class RMMsgCreator {
 
 		if (rmdBean.isClosed()) {
 			// sequence is closed. so add the 'Final' part.
-			if (SpecSpecificConstants.isAckFinalAllowed(rmBean.getRMVersion())) {
+			if (SpecSpecificConstants.isAckFinalAllowed(rmVersion)) {
 				AckFinal ackFinal = new AckFinal(rmNamespaceValue);
 				sequenceAck.setAckFinal(ackFinal);
 			}
@@ -426,20 +425,20 @@ public class RMMsgCreator {
 
 		applicationMsg.setMessagePart(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT, sequenceAck);
 
-		sequenceAck.toOMElement(envelope.getHeader());
-		
 		if (applicationMsg.getWSAAction()==null) {
-			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(rmBean.getRMVersion()));
-			applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(rmBean.getRMVersion()));
+			applicationMsg.setAction(SpecSpecificConstants.getSequenceAcknowledgementAction(rmVersion));
+			applicationMsg.setSOAPAction(SpecSpecificConstants.getSequenceAcknowledgementSOAPAction(rmVersion));
+		}
+		if(applicationMsg.getMessageId() == null) {
+			applicationMsg.setMessageId(SandeshaUtil.getUUID());
 		}
 		
-		applicationMsg.setMessageId(SandeshaUtil.getUUID());
-		
-		//generating the SOAP envelope.
+		// Write the ack into the soap envelope
 		try {
 			applicationMsg.addSOAPEnvelope();
 		} catch(AxisFault e) {
-			throw new SandeshaException(e);
+			if(log.isDebugEnabled()) log.debug("Caught AxisFault", e);
+			throw new SandeshaException(e.getMessage(), e);
 		}
 		
 		// Ensure the message also contains the token that needs to be used

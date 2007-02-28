@@ -146,7 +146,6 @@ public class SandeshaMessageKeys {
 	public static final String cannotFindAddressElement="cannotFindAddressElement";
 	public static final String cannotFindAddressText="cannotFindAddressText";
 	public static final String nullPassedElement="nullPassedElement";
-	public static final String invalidAckMessageEntry="invalidAckMessageEntry";
 	public static final String seqPartIsNull="seqPartIsNull";
 	public static final String incomingSequenceNotValidID="incomingSequenceNotValidID";
 

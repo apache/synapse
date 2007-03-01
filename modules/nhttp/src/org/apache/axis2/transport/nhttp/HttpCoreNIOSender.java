@@ -199,15 +199,24 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private void sendAsyncRequest(EndpointReference epr, MessageContext msgContext) throws AxisFault {
         try {
             URL url = new URL(epr.getAddress());
-            HttpHost httpHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+            int port = url.getPort();
+            if (port == -1) {
+                // use default
+                if ("http".equals(url.getProtocol())) {
+                    port = 80;
+                } else if ("https".equals(url.getProtocol())) {
+                    port = 443;
+                }
+            }
+            HttpHost httpHost = new HttpHost(url.getHost(), port, url.getProtocol());
 
             Axis2HttpRequest axis2Req = new Axis2HttpRequest(epr, httpHost, msgContext);
 
-            NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), url.getPort());
+            NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), port);
 
             if (conn == null) {
                 SessionRequest req = ioReactor.connect(
-                    new InetSocketAddress(url.getHost(), url.getPort()), null, axis2Req);
+                    new InetSocketAddress(url.getHost(), port), null, axis2Req);
                 log.debug("A new connection established");
             } else {
                 ((ClientHandler) handler).submitRequest(conn, axis2Req);

@@ -107,11 +107,7 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     public Object getProperty(String key) {
-        return mc.getConfiguration();
-    }
-
-    public Object getCorrelationProperty(String key) {
-        return mc.getCorrelationProperty(key);
+        return mc.getProperty(key);
     }
 
     public void setProperty(String key, Object value) {
@@ -120,14 +116,6 @@ public class ScriptMessageContext implements MessageContext {
 
     public Set getPropertyKeySet() {
         return mc.getPropertyKeySet();
-    }
-
-    public void setCorrelationProperty(String key, Object value) {
-        mc.setCorrelationProperty(key, value);
-    }
-
-    public Set getCorrelationPropertyKeySet() {
-        return mc.getCorrelationPropertyKeySet();
     }
 
     public SOAPEnvelope getEnvelope() {

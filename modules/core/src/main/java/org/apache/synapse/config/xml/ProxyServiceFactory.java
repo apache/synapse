@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
  * <p/>
  * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
  *    <description>..</description>?
- *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
+ *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]> // todo: do we realy need this
  *       <endpoint>...</endpoint>
  *       <inSequence>...</inSequence>
  *       <outSequence>...</outSequence>

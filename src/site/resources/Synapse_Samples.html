@@ -1161,19 +1161,16 @@ and the response is delivered back to the client as it expects.</p>
 
     &lt;proxies&gt;
         &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
+            &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+            &lt;publishWSDL key="proxy_wsdl"/&gt;
         &lt;/proxy&gt;
     &lt;/proxies&gt;
 
     &lt;rules&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
+        &lt;send/&gt;
+        &lt;log&gt;
+            &lt;property name="position" value="Inside Main Mediator"/&gt;
+        &lt;/log&gt;
     &lt;/rules&gt;
 
 &lt;/synapse&gt;</pre>
@@ -1189,21 +1186,19 @@ above)</p>
 http://localhost:8080/axis2/services/StockQuoteProxy?wsdl and view the WSDL
 for the proxy service defined in the configuration. This WSDL is based on the
 source WSDL supplied in the proxy service definition, and is updated to
-reflect the proxy service EPR. If a proxy service definition does not specify
-a target for its messages, the Synapse mediation rules are applied to route
-messages.</p>
+reflect the proxy service EPR.</p>
 
 <p>Execute the stock quote client by requesting for a stock quote on the
 proxy service as follows:</p>
 <pre>ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy</pre>
 
-<p>You will now notice that the Synapse mediation rules were applied and the
-request was routed to the SimpleStockQuoteService service on the local Axis2
-instance. The response message is mediated using the same rules, as an
-outgoing sequence is not specified in this example either. The client should
-receive a stock quote reply from the proxy service. Also the client could get
-the WSDL for the proxy service by requesting for
-http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
+<p>You will now notice that the message is forwarded to the specified target
+endpoint and the request was routed to the SimpleStockQuoteService service on
+the local Axis2 instance. The response message is forwarded to the client with
+the help of the implicit parameters, as an outgoing sequence is not specified
+in this example either. The client should receive a stock quote reply from the
+proxy service. Also the client could get the WSDL for the proxy service by
+requesting for http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
 
 <h2><a name="Sample101">Sample 101:</a></h2>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -1224,12 +1219,12 @@ http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
 
     &lt;proxies&gt;
         &lt;proxy name="StockQuoteProxy1"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
+            &lt;publishWSDL key="proxy_wsdl"/&gt;
             &lt;target inSequence="proxy_1"/&gt;
         &lt;/proxy&gt;
 
         &lt;proxy name="StockQuoteProxy2"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
+            &lt;publishWSDL key="proxy_wsdl"/&gt;
             &lt;target endpoint="proxy_2_endpoint"/&gt;
         &lt;/proxy&gt;
     &lt;/proxies&gt;
@@ -1272,9 +1267,17 @@ example 100, to request on the two proxy services.</p>
 
     &lt;proxies&gt;
         &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
+            &lt;target&gt;
+                &lt;inSequence&gt;
+                    &lt;header name="wsse:Security" action="remove"
+                            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
+                    &lt;send&gt;
+                        &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+                    &lt;/send&gt;
+                &lt;/inSequence&gt;
+            &lt;/target&gt;
+            &lt;publishWSDL key="proxy_wsdl"/&gt;
             &lt;policy key="sec_policy"/&gt;
-            &lt;enableSec/&gt;
         &lt;/proxy&gt;
     &lt;/proxies&gt;
 
@@ -1337,11 +1340,6 @@ SimpleStockQuoteService. Hence the message sent to the stock quote service
 EPR is without any WS-Security headers as can be seen from the log
 messages.</p>
 
-<p>Note: If you wish to engage the default WS-Security policy of Rampart on a
-proxy service, you could use the &lt;enableSec/&gt; option on a proxy service
-alone. This will be similar in function to 'engaging' Rampart on an Axis2
-service.</p>
-
 <h2><a name="Sample103">Sample 103:</a></h2>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -1355,9 +1353,17 @@ service.</p>
 
     &lt;proxies&gt;
         &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
+            &lt;target&gt;
+                &lt;inSequence&gt;
+                    &lt;header name="wsse:Security" action="remove"
+                            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
+                    &lt;send&gt;
+                        &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+                    &lt;/send&gt;
+                &lt;/inSequence&gt;
+            &lt;/target&gt;
+            &lt;publishWSDL key="proxy_wsdl"/&gt;
             &lt;policy key="sec_policy"/&gt;
-            &lt;enableSec/&gt;
         &lt;/proxy&gt;
     &lt;/proxies&gt;
 
@@ -1380,9 +1386,9 @@ service.</p>
 services through WS-Policy</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Download and copy the BouncyCastle JAR file into your Synapse lib directory.
-(Note: the exact JAR you need to install depends on your JDK - for JDK 1.4 I
-have used bcprov-jdk13-132.jar)<br>
+Download and copy the BouncyCastle JAR and the Xalan JAR file into your Synapse lib directory.
+(Note: the exact BouncyCastle JAR you need to install depends on your JDK - for JDK 1.4 I
+have used bcprov-jdk13-132.jar and the xalan-2.7.0.jar)<br>
 Start the Synapse configuration numbered 103: i.e. synapse -sample 103<br>
 Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
 modules directory of the sample Axis2 client
@@ -1416,12 +1422,12 @@ before sending it back to the client.</p>
 
 <p>Using TCPMon, a sample request sent from the client to the WS-Security
 enabled proxy service has been captured as follows: <a
-href="sample_103_1.txt">sample_103_1.txt</a></p>
+href="sample_103_1.txt?content-type=text&view=co">sample_103_1.txt</a></p>
 
 <p>Synapse removes the wsse:Security header from this message and forwards it
 to the endpoint. The response received is now signed and encrypted and sent
 back to the client as follows: <a
-href="sample_103_2.txt">sample_103_2.txt</a></p>
+href="sample_103_2.txt?content-type=text&view=co">sample_103_2.txt</a></p>
 
 <h2><a name="Sample104">Sample 104:</a></h2>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -1447,7 +1453,7 @@ href="sample_103_2.txt">sample_103_2.txt</a></p>
 
     &lt;proxies&gt;
         &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
+            &lt;publishWSDL key="proxy_wsdl"/&gt;
             &lt;target inSequence="proxy_in" outSequence="proxy_out"/&gt;
         &lt;/proxy&gt;
     &lt;/proxies&gt;
@@ -1469,10 +1475,7 @@ above)</p>
 <p>This configuration creates a proxy service with the name StockQuoteProxy.
 This proxy service specifies both inSequence and the outSequence for that
 service. This will add a proxy level out sequence to be used for the response
-message mediation of that particular proxy service. You could leave the whole
-target element not specified or one of the sequences of in and out
-unspecified, so that the corresponding message will be mediated using main
-mediator.</p>
+message mediation of that particular proxy service.</p>
 
 <p>You could send a stock quote request to this proxy services and receive
 the reply generated by the actual service hosted on the Axis2 instance. Use
@@ -1528,11 +1531,11 @@ INFO  LogMediator - message = Executing inside the out sequence</pre>
     &lt;proxies&gt;
         &lt;proxy name="JMSFileUploadProxy" transports="jms"&gt;
             &lt;target inSequence="mtom_proxy"/&gt;
-            &lt;property name="transport.jms.Wrapper" value="{http://services.samples/xsd}element"/&gt;
+            &lt;parameter name="transport.jms.Wrapper"&gt;{http://services.samples/xsd}element&lt;/parameter&gt;
         &lt;/proxy&gt;
         &lt;proxy name="JMSTextProxy" transports="jms"&gt;
             &lt;target inSequence="text_proxy"/&gt;
-            &lt;property name="transport.jms.Wrapper" value="{http://services.samples/xsd}text"/&gt;
+            &lt;parameter name="transport.jms.Wrapper"&gt;{http://services.samples/xsd}text&lt;/parameter&gt;
         &lt;/proxy&gt;
         &lt;proxy name="JMSPoxProxy" transports="jms"&gt;
             &lt;target inSequence="pox_proxy"/&gt;

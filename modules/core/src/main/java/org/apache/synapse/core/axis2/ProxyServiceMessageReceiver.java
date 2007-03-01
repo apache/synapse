@@ -108,16 +108,6 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 Axis2FlexibleMEPClient.send(proxy.getTargetInLineEndpoint(), synCtx);
             }
 
-            // if neither the in sequence nor endpoint is specified send the message using the implicit parameters
-            if (proxy.getTargetInSequence() == null && proxy.getTargetInLineInSequence() == null
-                    && proxy.getTargetEndpoint() == null && proxy.getTargetInLineEndpoint() == null) {
-
-                org.apache.axis2.context.MessageContext messageContext
-                        = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-                AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
-                ae.send(messageContext);
-
-            }
         } else {
             log.error("Proxy Service with the name " + name + " does not exists - [Message dropped]");
             throw new AxisFault("Proxy Service with the name " + name + " does not exists");

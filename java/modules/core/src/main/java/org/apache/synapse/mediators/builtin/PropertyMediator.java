@@ -69,7 +69,7 @@ public class PropertyMediator extends AbstractMediator {
             smc.setProperty(getName(), value);
 
         } else if(Constants.SCOPE_CORRELATE.equals(getScope())) {
-            smc.setCorrelationProperty(getName(), value);
+            smc.setProperty(getName(), value);
 
         } else if (Constants.SCOPE_AXIS2.equals(getScope()) && smc instanceof Axis2MessageContext) {
             Axis2MessageContext axis2smc = (Axis2MessageContext) smc;

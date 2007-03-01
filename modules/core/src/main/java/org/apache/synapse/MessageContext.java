@@ -74,13 +74,6 @@ public interface MessageContext {
     public Object getProperty(String key);
 
     /**
-     * Get the value of a correlation property set on the message instance
-     * @param key key to look up property
-     * @return value for the given key
-     */
-    public Object getCorrelationProperty(String key);
-
-    /**
      * Set a custom (local) property with the given name on the message instance
      * @param key key to be used
      * @param value value to be saved
@@ -88,24 +81,10 @@ public interface MessageContext {
     public void setProperty(String key, Object value);
 
     /**
-     * Set a local message property with the given name and value, and copy it over
-     * to any corresponding response messages for correlation
-     * @param key key to be used
-     * @param value value to be saved
-     */
-    public void setCorrelationProperty(String key, Object value);
-
-    /**
      * Returns the Set of keys over the properties on this message context
      * @return a Set of keys over message properties
      */
     public Set getPropertyKeySet();
-
-    /**
-     * Returns the Set of keys that should be correlated to a response
-     * @return a Set of keys that should be correlated with the response
-     */
-    public Set getCorrelationPropertyKeySet();
 
     /**
      * Get the SOAP envelope of this message

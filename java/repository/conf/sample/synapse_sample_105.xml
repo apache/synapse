@@ -57,11 +57,11 @@
     <proxies>
         <proxy name="JMSFileUploadProxy" transports="jms">
             <target inSequence="mtom_proxy"/>
-            <property name="transport.jms.Wrapper" value="{http://services.samples/xsd}element"/>
+            <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}element</parameter>
         </proxy>
         <proxy name="JMSTextProxy" transports="jms">
             <target inSequence="text_proxy"/>
-            <property name="transport.jms.Wrapper" value="{http://services.samples/xsd}text"/>
+            <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}text</parameter>
         </proxy>
         <proxy name="JMSPoxProxy" transports="jms">
             <target inSequence="pox_proxy"/>

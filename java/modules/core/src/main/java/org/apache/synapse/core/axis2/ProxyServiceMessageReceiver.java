@@ -68,7 +68,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                 proxyServiceStatisticsStack.put(
                         name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable, isFault);
-                synCtx.setCorrelationProperty(
+                synCtx.setProperty(
                         org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
             }
 
@@ -80,7 +80,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     log.debug("Using the sequence named " + proxy.getTargetInSequence() + " for message mediation");
                     inSequence.mediate(synCtx);
                 } else {
-                    // todo: what can we do ?????? throw an AxisFault
+                    // todo: what can we do ?????? throw an AxisFault / mediate using the fault sequence
                     log.error("Unable to find the in sequence for the proxy service " +
                             "specified by the name " + proxy.getTargetInSequence() + " - [Message dropped]");
                 }

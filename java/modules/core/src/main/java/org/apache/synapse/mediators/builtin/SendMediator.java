@@ -98,7 +98,7 @@ public class SendMediator extends AbstractMediator {
                     EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
                     boolean isFault =synCtx.getEnvelope().getBody().hasFault();
                     endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
-                    synCtx.setCorrelationProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
+                    synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
                 }
                 synCtx.setTo(new EndpointReference(eprAddress));
 

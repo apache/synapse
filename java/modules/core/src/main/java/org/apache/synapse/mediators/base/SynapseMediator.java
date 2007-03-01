@@ -56,7 +56,7 @@ public class SynapseMediator extends AbstractListMediator {
         StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
         if (sequenceStack == null) {
             sequenceStack = new SequenceStatisticsStack();
-            synCtx.setCorrelationProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
+            synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
         }
         String seqName = "MainSequence";
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();

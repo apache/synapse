@@ -41,16 +41,6 @@ public class TestMessageContext implements MessageContext {
     SOAPEnvelope envelope = null;
 
     private EndpointReference to = null;
-
-    private Map correlationProperties = new HashMap();
-
-    public void setCorrelationProperty(String key, Object value) {
-        correlationProperties.put(key, value);
-    }
-
-    public Set getCorrelationPropertyKeySet() {
-        return correlationProperties.keySet();
-    }
     
     public SynapseConfiguration getConfiguration() {
         return synCfg;
@@ -76,10 +66,6 @@ public class TestMessageContext implements MessageContext {
         } else {
             return null;
         }
-    }
-
-    public Object getCorrelationProperty(String key) {
-        return correlationProperties.get(key);
     }
 
     public void setProperty(String key, Object value) {

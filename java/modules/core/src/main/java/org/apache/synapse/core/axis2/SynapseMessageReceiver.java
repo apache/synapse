@@ -50,7 +50,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
         StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
         if (synapseServiceStack== null) {
             synapseServiceStack= new ProxyServiceStatisticsStack();
-            synCtx.setCorrelationProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
+            synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
         }
         String name = "SynapseService";
         boolean isFault =synCtx.getEnvelope().getBody().hasFault();

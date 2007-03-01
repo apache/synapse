@@ -119,7 +119,7 @@ simple URL, then extensibility elements may be used to indicate the address
 <pre> &lt;endpoint name="string" [address="url"] [key="string"] [force="soap|pox"] [optimize="mtom|swa"]&gt;
    &lt;enableRM/&gt;?
    &lt;enableSec [policy="key"]/&gt;?
-   &lt;enableAddressing separateListener="true|false"/&gt;?
+   &lt;enableAddressingï¿½separateListener="true|false"/&gt;?
    .. extensibility ..
  &lt;/endpoint&gt;</pre>
 
@@ -145,15 +145,23 @@ semantics, such as WS-Security, WS-RM and Transport switching etc.</p>
 
 <p>A proxyservice token represents a &lt;proxy&gt; element which is used to
 define a Synapse Proxy service.</p>
-<pre> &lt;proxy name="string" [description="string"] [transports="(http |https |jms )+|all"]&gt;
-   &lt;target (inSequence="name" outSequence="name") | endpoint="name"/&gt;? // defaults to the synapse main sequence
-   &lt;wsdl key="string"&gt;?
-   &lt;enableRM/&gt;?
-   &lt;enableSec/&gt;?
-   &lt;policy key="string"&gt;*                       // optional service level policies
-                                                // (e.g. WS-Security and/or WS-RM policies)
-   &lt;property name="string" value="string"/&gt;*    // optional service parameters 
-                                                // (e.g. transport.jms.ConnectionFactory)
+<pre> &lt;proxy name="string" [transports="(http |https |jms )+|all"]&gt;
+   &lt;description&gt;...&lt;/description&gt;?
+   &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
+      &lt;inSequence&gt;...&lt;/inSequence&gt;?
+      &lt;outSequence&gt;...&lt;/outSequence&gt;?
+      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?
+      &lt;endpoint&gt;...&lt;/endpoint&gt;?
+   &lt;/target&gt;?
+   &lt;publishWSDL key="string"&gt;
+      &lt;endpoint&gt;...&lt;/endpoint&gt;?
+      &lt;endpoint&gt;...&lt;/endpoint&gt;?
+   &lt;publishWSDL&gt;?
+   &lt;policy key="string"&gt;...&lt;/policy&gt;?       // optional service level policies
+                                                        // (e.g. WS-Security and/or WS-RM policies)
+   &lt;parameter name="string"&gt;    // optional service parameters
+      string | xml                    // (e.g. transport.jms.ConnectionFactory)
+   &lt;/parameter&gt;
  &lt;/proxy&gt;</pre>
 
 <p>A proxy service is created and exposed on the specified transports through

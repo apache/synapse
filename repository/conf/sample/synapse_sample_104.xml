@@ -40,7 +40,7 @@
 
     <proxies>
         <proxy name="StockQuoteProxy">
-            <wsdl key="proxy_wsdl"/>
+            <publishWSDL key="proxy_wsdl"/>
             <target inSequence="proxy_in" outSequence="proxy_out"/>
         </proxy>
     </proxies>

@@ -133,14 +133,17 @@ public class ProxyServiceFactory {
         OMElement target = elem.getFirstChildWithName(
                 new QName(Constants.SYNAPSE_NAMESPACE, "target"));
         if (target != null) {
+            boolean isTargetOk = false;
             SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
             OMAttribute inSequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "inSequence"));
             if (inSequence != null) {
                 proxy.setTargetInSequence(inSequence.getAttributeValue());
+                isTargetOk = true;
             } else {
                 OMElement inSequenceElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "inSequence"));
                 if (inSequenceElement != null) {
                     proxy.setTargetInLineInSequence(mediatorFactory.createAnonymousSequence(inSequenceElement));
+                    isTargetOk = true;
                 }
             }
             OMAttribute outSequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "outSequence"));
@@ -164,12 +167,19 @@ public class ProxyServiceFactory {
             OMAttribute tgtEndpt = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "endpoint"));
             if (tgtEndpt != null) {
                 proxy.setTargetEndpoint(tgtEndpt.getAttributeValue());
+                isTargetOk = true;
             } else {
                 OMElement endpointElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
                 if (endpointElement != null) {
                     proxy.setTargetInLineEndpoint(EndpointFactory.createEndpoint(endpointElement, true));
+                    isTargetOk = true;
                 }
             }
+            if(!isTargetOk) {
+                handleException("Target of the proxy service must declare either an inSequence or endpoint or both");
+            }
+        } else {
+            handleException("Target is required for a Proxy service definition");
         }
 
         // read the WSDL, Schemas and Policies and set to the proxy service

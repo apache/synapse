@@ -78,8 +78,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                             "the proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE));
                     outSequence.mediate(synCtx);
                 } else {
-                    log.error("Unable to find the sequence specified by the name " + sequenceName
-                            + " - [Message dropped]");
+                    log.error("Unable to find the sequence specified by the name " + sequenceName);
+                    // TODO invoke a generic synapse error handler for this message
                 }
 
             } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(

@@ -31,6 +31,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 public class TestMessageContext implements MessageContext {
 
@@ -204,6 +205,13 @@ public class TestMessageContext implements MessageContext {
     }
 
     public void setTracingState(int tracingState) {
+    }
+
+    public Stack getFaultStack() {
+        return null;
+    }
+
+    public void pushFault(FaultHandler fault) {
     }
 
     public MessageContext getSynapseContext() {

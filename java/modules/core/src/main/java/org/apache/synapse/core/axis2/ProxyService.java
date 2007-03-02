@@ -319,6 +319,7 @@ public class ProxyService {
             PolicyInclude pi = proxyService.getPolicyInclude();
             if (pi != null && svcEffectivePolicy != null) {
                 pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
+                // todo: check whether the rm or sec is enabled
             }
         }
 
@@ -339,6 +340,7 @@ public class ProxyService {
             handleException("Unable to start the Proxy Service");
         }
 
+        // todo: need to remove this and engage modules by looking at policies
         // should RM be engaged on this service?
         if (wsRMEnabled) {
             try {

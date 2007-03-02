@@ -28,6 +28,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.Set;
+import java.util.Stack;
 
 
 /**
@@ -257,5 +258,9 @@ public interface MessageContext {
      * @param tracingState Set whether the tracing is enabled or not
      */
     public void setTracingState(int tracingState);
+
+    public Stack getFaultStack();
+
+    public void pushFault(FaultHandler fault);
 
 }

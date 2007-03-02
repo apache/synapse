@@ -369,71 +369,79 @@ public interface Sandesha2Constants {
 
 	public interface Properties {
 		
-		String RetransmissionInterval = "RetransmissionInterval";
+		public static final String RetransmissionInterval = "RetransmissionInterval";
 		
-		String AcknowledgementInterval = "AcknowledgementInterval";
+		public static final String AcknowledgementInterval = "AcknowledgementInterval";
 		
-		String ExponentialBackoff = "ExponentialBackoff";
+		public static final String ExponentialBackoff = "ExponentialBackoff";
 		
-		String InactivityTimeout = "InactivityTimeout";
+		public static final String InactivityTimeout = "InactivityTimeout";
 		
-		String InactivityTimeoutMeasure = "InactivityTimeoutMeasure";
+		public static final String InactivityTimeoutMeasure = "InactivityTimeoutMeasure";
+
+		public static final String SequenceRemovalTimeout = "SequenceRemovalTimeout";
 		
+		public static final String SequenceRemovalTimeoutMeasure = "SequenceRemovalTimeoutMeasure";
+
 //		String StorageManager = "StorageManager";
 		
-		String InMemoryStorageManager = "InMemoryStorageManager";
+		public static final String InMemoryStorageManager = "InMemoryStorageManager";
 		
-		String PermanentStorageManager = "PermanentStorageManager";
+		public static final String PermanentStorageManager = "PermanentStorageManager";
 		
-		String InOrderInvocation = "InvokeInOrder";
+		public static final String InOrderInvocation = "InvokeInOrder";
 		
-		String MessageTypesToDrop = "MessageTypesToDrop";
+		public static final String MessageTypesToDrop = "MessageTypesToDrop";
 		
-		String RetransmissionCount = "RetransmissionCount";
+		public static final String RetransmissionCount = "RetransmissionCount";
 
-		String SecurityManager = "SecurityManager";
+		public static final String SecurityManager = "SecurityManager";
 
-		String EnableMakeConnection = "EnableMakeConnection";
+		public static final String EnableMakeConnection = "EnableMakeConnection";
 		
-		String EnableRMAnonURI = "EnableRMAnonURI";
+		public static final String EnableRMAnonURI = "EnableRMAnonURI";
 		
-		String UseMessageSerialization = "UseMessageSerialization";
+		public static final String UseMessageSerialization = "UseMessageSerialization";
 		
 		public interface DefaultValues {
 			
-			int RetransmissionInterval = 6000;
+			public static final int RetransmissionInterval = 6000;
 			
-			int AcknowledgementInterval = 3000;
+			public static final int AcknowledgementInterval = 3000;
 			
-			boolean ExponentialBackoff = true;
+			public static final boolean ExponentialBackoff = true;
 			
-			int InactivityTimeout = -1;
+			public static final int InactivityTimeout = -1;
 			
-			String InactivityTimeoutMeasure = "seconds";   //this can be - seconds,minutes,hours,days
+			public static final String InactivityTimeoutMeasure = "seconds";   //this can be - seconds,minutes,hours,days
 			
+			public static final int sequenceRemovalTimeout = -1;
+			
+			public static final String sequenceRemovalTimeoutMeasure = "seconds";   //this can be - seconds,minutes,hours,days
+
 //			String StorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 		
-			String InMemoryStorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+			public static final String InMemoryStorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 			
-			String PermanentStorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
+			public static final String PermanentStorageManager = "org.apache.sandesha2.storage.inmemory.InMemoryStorageManager";
 			
-			boolean InvokeInOrder = true;
+			public static final boolean InvokeInOrder = true;
 			
-			String MessageTypesToDrop=VALUE_NONE;
+			public static final String MessageTypesToDrop=VALUE_NONE;
 			
-			int RetransmissionCount = 8;
+			public static final int RetransmissionCount = 8;
 			
-			int MaximumRetransmissionCount = 10;
+			public static final int MaximumRetransmissionCount = 10;
 			
-			String SecurityManager = "org.apache.sandesha2.security.dummy.DummySecurityManager";
+			public static final String SecurityManager = "org.apache.sandesha2.security.dummy.DummySecurityManager";
 
-			boolean EnableMakeConnection = true;
+			public static final boolean EnableMakeConnection = true;
 			
-			boolean EnableRMAnonURI = true;
+			public static final boolean EnableRMAnonURI = true;
 			
-			boolean UseMessageSerialization = false;
+			public static final boolean UseMessageSerialization = false;
 			
-			boolean enforceRM = false;
+			public static final boolean enforceRM = false;
 		}
 	}
 	
@@ -551,6 +559,8 @@ public interface Sandesha2Constants {
         public static final String ELEM_EXP_BACKOFF = "ExponentialBackoff";
         public static final String ELEM_INACTIVITY_TIMEOUT = "InactivityTimeout";
         public static final String ELEM_INACTIVITY_TIMEOUT_MEASURES = "InactivityTimeoutMeasure";
+        public static final String ELEM_DELETION_TIMEOUT = "SequenceRemovalTimeout";
+        public static final String ELEM_DELETION_TIMEOUT_MEASURES = "SequenceRemovalTimeoutMeasure";
         public static final String ELEM_INVOKE_INORDER = "InvokeInOrder";
         public static final String ELEM_MSG_TYPES_TO_DROP = "MessageTypesToDrop";
         public static final String ELEM_STORAGE_MGR = "StorageManagers";
@@ -572,6 +582,8 @@ public interface Sandesha2Constants {
         public static final QName Q_ELEM_EXP_BACKOFF = new QName(URI_RM_POLICY_NS, ELEM_EXP_BACKOFF, ATTR_WSRM);
         public static final QName Q_ELEM_INACTIVITY_TIMEOUT = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT, ATTR_WSRM);
         public static final QName Q_ELEM_INACTIVITY_TIMEOUT_MEASURES = new QName(URI_RM_POLICY_NS, ELEM_INACTIVITY_TIMEOUT_MEASURES, ATTR_WSRM);
+        public static final QName Q_ELEM_SEQUENCE_REMOVAL_TIMEOUT = new QName(URI_RM_POLICY_NS, ELEM_DELETION_TIMEOUT, ATTR_WSRM);
+        public static final QName Q_ELEM_SEQUENCE_REMOVAL_TIMEOUT_MEASURES = new QName(URI_RM_POLICY_NS, ELEM_DELETION_TIMEOUT_MEASURES, ATTR_WSRM);
         public static final QName Q_ELEM_INVOKE_INORDER = new QName(URI_RM_POLICY_NS, ELEM_INVOKE_INORDER, ATTR_WSRM);
         public static final QName Q_ELEM_MSG_TYPES_TO_DROP = new QName(URI_RM_POLICY_NS, ELEM_MSG_TYPES_TO_DROP, ATTR_WSRM);
         public static final QName Q_ELEM_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_STORAGE_MGR, ATTR_WSRM);

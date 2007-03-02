@@ -49,6 +49,9 @@ public class PropertyManager {
 		propertyBean.setInactiveTimeoutInterval(Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,
 				Sandesha2Constants.Properties.DefaultValues.InactivityTimeoutMeasure);
 
+		propertyBean.setSequenceRemovalTimeoutInterval(Sandesha2Constants.Properties.DefaultValues.sequenceRemovalTimeout,
+				Sandesha2Constants.Properties.DefaultValues.sequenceRemovalTimeoutMeasure);
+		
 		propertyBean.setInOrder(Sandesha2Constants.Properties.DefaultValues.InvokeInOrder);
 		propertyBean.setMsgTypesToDrop(null);
 		propertyBean.setRetransmissionInterval(Sandesha2Constants.Properties.DefaultValues.RetransmissionInterval);
@@ -98,6 +101,11 @@ public class PropertyManager {
 			String inactivityTimeoutMeasure = properties
 					.getProperty(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
 			loadInactivityTimeout(inactivityTimeoutStr, inactivityTimeoutMeasure, propertyBean);
+
+			String sequenceRemovalTimeoutStr = properties.getProperty(Sandesha2Constants.Properties.SequenceRemovalTimeout);
+			String sequenceRemovalTimeoutMeasure = properties
+					.getProperty(Sandesha2Constants.Properties.SequenceRemovalTimeoutMeasure);
+			loadSequenceRemovalTimeout(sequenceRemovalTimeoutStr, sequenceRemovalTimeoutMeasure, propertyBean);
 
 			// String storageMgrClassStr = properties
 			// .getProperty(Sandesha2Constants.Properties.StorageManager);
@@ -154,6 +162,13 @@ public class PropertyManager {
 				.getParameter(Sandesha2Constants.Properties.InactivityTimeoutMeasure);
 		String inactivityTimeoutMeasure = (String) inactivityTimeoutMeasureParam.getValue();
 		loadInactivityTimeout(inactivityTimeoutStr, inactivityTimeoutMeasure, propertyBean);
+
+		Parameter sequenceRemovalTimeoutParam = desc.getParameter(Sandesha2Constants.Properties.SequenceRemovalTimeout);
+		String sequenceRemovalTimeoutStr = (String) sequenceRemovalTimeoutParam.getValue();
+		Parameter sequenceRemovalTimeoutMeasureParam = desc
+				.getParameter(Sandesha2Constants.Properties.SequenceRemovalTimeoutMeasure);
+		String sequenceRemovalTimeoutMeasure = (String) sequenceRemovalTimeoutMeasureParam.getValue();
+		loadSequenceRemovalTimeout(sequenceRemovalTimeoutStr, sequenceRemovalTimeoutMeasure, propertyBean);
 
 		// Parameter storageMgrClassParam =
 		// desc.getParameter(Sandesha2Constants.Properties.StorageManager);
@@ -291,8 +306,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private static void loadExponentialBackoff(String expoBackoffStr, SandeshaPolicyBean propertyBean)
-			throws SandeshaException {
+	private static void loadExponentialBackoff(String expoBackoffStr, SandeshaPolicyBean propertyBean) {
 
 		if (expoBackoffStr != null) {
 			expoBackoffStr = expoBackoffStr.trim();
@@ -373,12 +387,36 @@ public class PropertyManager {
 	}
 
 	/**
+	 * Loads wsp:inactivityInterval.
+	 * 
+	 * @param properties
+	 */
+	private static void loadSequenceRemovalTimeout(String sequenceRemovalTimeoutStr, String sequenceRemovalTimeoutMeasure,
+			SandeshaPolicyBean propertyBean) throws SandeshaException {
+
+		if (sequenceRemovalTimeoutStr != null && sequenceRemovalTimeoutMeasure != null) {
+			try {
+				sequenceRemovalTimeoutStr = sequenceRemovalTimeoutStr.trim();
+				sequenceRemovalTimeoutMeasure = sequenceRemovalTimeoutMeasure.trim();
+
+				int sequenceRemovalTimeoutVal = Integer.parseInt(sequenceRemovalTimeoutStr);
+				if (sequenceRemovalTimeoutVal > 0) {
+					propertyBean.setSequenceRemovalTimeoutInterval(sequenceRemovalTimeoutVal, sequenceRemovalTimeoutMeasure);
+				}
+			} catch (NumberFormatException e) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotDerriveInactivityTimeout);
+				throw new SandeshaException(message, e);
+			}
+		}
+	}
+
+	/**
 	 * Loads the InMemoryStorageManager class name.
 	 * 
 	 * @param properties
 	 */
 	private static void loadInMemoryStoragemanagerClass(String inMemoryStorageMgrClassStr,
-			SandeshaPolicyBean propertyBean) throws SandeshaException {
+			SandeshaPolicyBean propertyBean){
 		if (inMemoryStorageMgrClassStr != null) {
 			inMemoryStorageMgrClassStr = inMemoryStorageMgrClassStr.trim();
 			propertyBean.setInMemoryStorageManagerClass(inMemoryStorageMgrClassStr);
@@ -391,15 +429,14 @@ public class PropertyManager {
 	 * @param properties
 	 */
 	private static void loadPermanentStoragemanagerClass(String permanentStorageMgrClassStr,
-			SandeshaPolicyBean propertyBean) throws SandeshaException {
+			SandeshaPolicyBean propertyBean) {
 		if (permanentStorageMgrClassStr != null) {
 			permanentStorageMgrClassStr = permanentStorageMgrClassStr.trim();
 			propertyBean.setPermanentStorageManagerClass(permanentStorageMgrClassStr);
 		}
 	}
 
-	private static void loadInOrderInvocation(String inOrderInvocation, SandeshaPolicyBean propertyBean)
-			throws SandeshaException {
+	private static void loadInOrderInvocation(String inOrderInvocation, SandeshaPolicyBean propertyBean) {
 
 		if (inOrderInvocation != null) {
 			inOrderInvocation = inOrderInvocation.trim();
@@ -411,8 +448,7 @@ public class PropertyManager {
 		}
 	}
 	
-	private static void loadEnableMakeConnection(String enableMakeConnection, SandeshaPolicyBean propertyBean)
-	throws SandeshaException {
+	private static void loadEnableMakeConnection(String enableMakeConnection, SandeshaPolicyBean propertyBean) {
 
 		if (enableMakeConnection != null) {
 			enableMakeConnection = enableMakeConnection.trim();
@@ -424,8 +460,7 @@ public class PropertyManager {
 		}
 	}
 
-	private static void loadUseSerialization(String useSerialization, SandeshaPolicyBean propertyBean)
-	throws SandeshaException {
+	private static void loadUseSerialization(String useSerialization, SandeshaPolicyBean propertyBean) {
 
 		if (useSerialization != null) {
 			useSerialization = useSerialization.trim();
@@ -465,7 +500,7 @@ public class PropertyManager {
 	 * 
 	 * @param properties
 	 */
-	private static void loadSecurityManagerClass(String securityManagerClassStr, SandeshaPolicyBean propertyBean) throws SandeshaException  {
+	private static void loadSecurityManagerClass(String securityManagerClassStr, SandeshaPolicyBean propertyBean) {
 		if (securityManagerClassStr != null) {
 			securityManagerClassStr = securityManagerClassStr.trim();
 			propertyBean.setSecurityManagerClass(securityManagerClassStr);

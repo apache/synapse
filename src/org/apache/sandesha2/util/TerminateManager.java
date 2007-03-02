@@ -248,6 +248,7 @@ public class TerminateManager {
 
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		rmsBean.setTimedOut(true);
+		rmsBean.setLastActivatedTime(System.currentTimeMillis());
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
 		cleanSendingSideData(internalSequenceId, storageManager);

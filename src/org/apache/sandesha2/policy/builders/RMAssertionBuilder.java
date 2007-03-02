@@ -77,8 +77,19 @@ public class RMAssertionBuilder implements AssertionBuilder {
 
             } else if (Sandesha2Constants.Assertions.ELEM_INACTIVITY_TIMEOUT_MEASURES
                     .equals(name)) {
-            	//using the previously set Inavtivity Timeout
+            	//using the previously set Inactivity Timeout
                 propertyBean.setInactivityTimeoutMeasure (element.getText().trim());
+
+            } else if (Sandesha2Constants.Assertions.ELEM_DELETION_TIMEOUT
+                .equals(name)) {
+
+	        		propertyBean.setSequenceRemovalTimeoutValue (Long.parseLong(element
+	        				.getText().trim()));
+
+		        } else if (Sandesha2Constants.Assertions.ELEM_DELETION_TIMEOUT_MEASURES
+		                .equals(name)) {
+		        	//using the previously set Inavtivity Timeout
+		            propertyBean.setSequenceRemovalTimeoutMeasure (element.getText().trim());
 
             }  else if (Sandesha2Constants.Assertions.ELEM_INVOKE_INORDER
                     .equals(name)) {

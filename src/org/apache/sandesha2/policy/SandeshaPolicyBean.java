@@ -59,6 +59,12 @@ public class SandeshaPolicyBean implements Assertion {
 
     private long inactivityTimeoutInterval = -1;
     private boolean inactivityTimeoutIntervalSet = false;
+ 
+    private long sequenceRemovalTimeoutValue;
+    private String sequenceRemovalTimeoutMeasure;
+
+    private long sequenceRemovalTimeoutInterval = -1;
+    private boolean sequenceRemovalTimeoutIntervalSet = false;
     
     private long acknowledgementInterval;
     private boolean acknowledgementIntervalSet = false;
@@ -103,6 +109,25 @@ public class SandeshaPolicyBean implements Assertion {
 
     }
 
+	public void setSequenceRemovalTimeoutInterval(long value, String measure) {
+    long timeOut = 0;
+
+    if (measure == null) {
+        this.sequenceRemovalTimeoutInterval = value;
+    } else if ("seconds".equals(measure)) {
+        timeOut = value * 1000;
+    } else if ("minutes".equals(measure)) {
+        timeOut = value * 60 * 1000;
+    } else if ("hours".equals(measure)) {
+        timeOut = value * 60 * 60 * 1000;
+    } else if ("days".equals(measure)) {
+        timeOut = value * 24 * 60 * 60 * 1000;
+    }
+
+    this.sequenceRemovalTimeoutInterval = timeOut;
+
+	}
+	
     public void setAcknowledgementInterval(long acknowledgementInterval) {
         this.acknowledgementInterval = acknowledgementInterval;
         setAcknowledgementIntervalSet(true);
@@ -243,7 +268,7 @@ public class SandeshaPolicyBean implements Assertion {
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_EXP_BACKOFF.getLocalPart(), namespaceURI);
 			writer.writeCharacters(Boolean.toString(isExponentialBackoff()));
 			writer.writeEndElement();
-			
+				
 			// <wsrm:InactivityTimeout />
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT.getLocalPart(), namespaceURI);
 			writer.writeCharacters(Long.toString(getInactivityTimeoutInterval()));
@@ -253,7 +278,17 @@ public class SandeshaPolicyBean implements Assertion {
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INACTIVITY_TIMEOUT_MEASURES.getLocalPart(), namespaceURI);
 			writer.writeCharacters(inactivityTimeoutMeasure);
 			writer.writeEndElement();
+
+			// <wsrm:SequenceRemovalTimeout />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEQUENCE_REMOVAL_TIMEOUT.getLocalPart(), namespaceURI);
+			writer.writeCharacters(Long.toString(getSequenceRemovalTimeoutInterval()));
+			writer.writeEndElement();
 			
+			// <wsrm:SequenceRemovalTimeoutMeasure />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEQUENCE_REMOVAL_TIMEOUT_MEASURES.getLocalPart(), namespaceURI);
+			writer.writeCharacters(sequenceRemovalTimeoutMeasure);
+			writer.writeEndElement();
+
 			// <wsrm:InvokeInOrder />
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_INVOKE_INORDER.getLocalPart(), namespaceURI);
 			writer.writeCharacters(Boolean.toString(isInOrder()));
@@ -377,6 +412,14 @@ public class SandeshaPolicyBean implements Assertion {
         return inactivityTimeoutInterval;
     }
 
+    public long getSequenceRemovalTimeoutInterval() {
+      if (sequenceRemovalTimeoutInterval < 0)
+          setSequenceRemovalTimeoutInterval(sequenceRemovalTimeoutValue,
+                  sequenceRemovalTimeoutMeasure);
+
+      return sequenceRemovalTimeoutInterval;
+  }
+
     public void setInactiveTimeoutValue(long inactiveTimeoutValue) {
         this.inactiveTimeoutValue = inactiveTimeoutValue;
         setInactiveTimeoutValueSet(true);
@@ -384,6 +427,15 @@ public class SandeshaPolicyBean implements Assertion {
 
     public void setInactivityTimeoutMeasure(String inactivityTimeoutMeasure) {
         this.inactivityTimeoutMeasure = inactivityTimeoutMeasure;
+    }
+    
+  	public void setSequenceRemovalTimeoutValue(long sequenceRemovalTimeoutValue) {
+  	  this.sequenceRemovalTimeoutValue = sequenceRemovalTimeoutValue;
+  	  setSequenceRemovalTimeoutValueSet(true);  	  
+    }
+
+		public void setSequenceRemovalTimeoutMeasure(String sequenceRemovalTimeoutMeasure) {
+  	  this.sequenceRemovalTimeoutMeasure = sequenceRemovalTimeoutMeasure; 	  
     }
 
     public boolean isEnableMakeConnection() {
@@ -487,6 +539,14 @@ public class SandeshaPolicyBean implements Assertion {
 
 	protected void setInactiveTimeoutValueSet(boolean inactiveTimeoutValueSet) {
 		this.inactiveTimeoutValueSet = inactiveTimeoutValueSet;
+	}
+
+	protected void setSequenceRemovalTimeoutValueSet(boolean sequenceRemovalTimeoutIntervalSet) {
+		this.sequenceRemovalTimeoutIntervalSet = sequenceRemovalTimeoutIntervalSet;
+  }
+
+	protected boolean isSequenceRemovalTimeoutValueSet() {
+		return sequenceRemovalTimeoutIntervalSet;
 	}
 
 	protected boolean isInactivityTimeoutIntervalSet() {

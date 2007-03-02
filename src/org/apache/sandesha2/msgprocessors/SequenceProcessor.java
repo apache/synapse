@@ -273,6 +273,9 @@ public class SequenceProcessor {
 			}
 		}
 		
+		// Set the last activated time
+		bean.setLastActivatedTime(System.currentTimeMillis());
+		
 		// Update the RMD bean
 		mgr.update(bean);
 		

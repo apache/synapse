@@ -19,18 +19,11 @@ package org.apache.sandesha2.util;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
-import org.apache.sandesha2.client.SandeshaClient;
-import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.sandesha2.client.SandeshaListener;
-import org.apache.sandesha2.client.SequenceReport;
-import org.apache.sandesha2.i18n.SandeshaMessageHelper;
-import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -72,9 +65,6 @@ public class MessageRetransmissionAdjuster {
 			if (maxRetransmissionAttempts >= 0 && retransmitterBean.getSentCount() > maxRetransmissionAttempts)
 				timeOutSequence = true;
 
-			if (!timeOutSequence)
-				timeOutSequence = SequenceManager.hasSequenceTimedOut(internalSequenceID, rmMsgCtx, storageManager);
-
 			if (timeOutSequence) {
 	
 				retransmitterBean.setSend(false);
@@ -86,7 +76,7 @@ public class MessageRetransmissionAdjuster {
 				// Only messages of outgoing sequences get retransmitted. So named
 				// following method according to that.
 				
-				finalizeTimedOutSequence(internalSequenceID, rmMsgCtx.getMessageContext(), storageManager);
+				SequenceManager.finalizeTimedOutSequence(internalSequenceID, rmMsgCtx.getMessageContext(), storageManager);
 				continueSending = false;
 			}
 		}
@@ -106,8 +96,6 @@ public class MessageRetransmissionAdjuster {
 	 * @return
 	 */
 	private static SenderBean adjustNextRetransmissionTime(SenderBean retransmitterBean, SandeshaPolicyBean propertyBean) throws SandeshaException {
-
-		// long lastSentTime = retransmitterBean.getTimeToSend();
 
 		int count = retransmitterBean.getSentCount();
 
@@ -135,27 +123,6 @@ public class MessageRetransmissionAdjuster {
 		}
 
 		return interval;
-	}
-
-	private static void finalizeTimedOutSequence(String internalSequenceID, MessageContext messageContext,
-			StorageManager storageManager) throws SandeshaException {
-		ConfigurationContext configurationContext = messageContext.getConfigurationContext();
-
-		// Notify the clients of a timeout
-		AxisFault fault = new AxisFault(
-				SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceID));
-		// Notify any waiting clients that the sequence has timeed out.
-		FaultManager.notifyClientsOfFault(internalSequenceID, storageManager, configurationContext, fault);
-		
-		// Already an active transaction, so don't want a new one
-		TerminateManager.timeOutSendingSideSequence(internalSequenceID, storageManager);
-
-		SandeshaListener listener = (SandeshaListener) messageContext
-				.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
-		if (listener != null) {
-			SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configurationContext, false);
-			listener.onTimeOut(report);
-		}
 	}
 
 }

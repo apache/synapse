@@ -93,9 +93,15 @@
 				<sandesha2:ExponentialBackoff>false</sandesha2:ExponentialBackoff>
 	
 				<sandesha2:InactivityTimeout>60</sandesha2:InactivityTimeout>
-	
+
 				<sandesha2:InactivityTimeoutMeasure>seconds</sandesha2:InactivityTimeoutMeasure>
-	
+
+          <!-- Once a sequence has been marked as deleted, or timed out, this is the length of time that the
+               sequence will remain before all sequence state is totally removed -->
+                <sandesha2:SequenceRemovalTimeout>600</sandesha2:SequenceRemovalTimeout>
+
+                <sandesha2:SequenceRemovalTimeoutMeasure>seconds</sandesha2:SequenceRemovalTimeoutMeasure>
+
 				<sandesha2:InvokeInOrder>true</sandesha2:InvokeInOrder>
 	      
 	      <!-- These will not be overriden by service level policies -->

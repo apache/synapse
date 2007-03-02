@@ -28,14 +28,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaListener;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.workers.SequenceEntry;
@@ -112,8 +114,6 @@ public class SequenceManager {
 			String tokenData = securityManager.getTokenRecoveryData(token);
 			rmdBean.setSecurityTokenData(tokenData);
 		}		
-
-		RMDBeanMgr nextMsgMgr = storageManager.getRMDBeanMgr();
 		
 		rmdBean.setSequenceID(sequenceId);
 		rmdBean.setNextMsgNoToProcess(1);
@@ -142,8 +142,9 @@ public class SequenceManager {
 		}
 
 		rmdBean.setRMVersion(specVersion);
+		rmdBean.setLastActivatedTime(System.currentTimeMillis());
 
-		nextMsgMgr.insert(rmdBean);
+		storageManager.getRMDBeanMgr().insert(rmdBean);
 
 		// TODO get the SOAP version from the create seq message.
 
@@ -279,26 +280,50 @@ public class SequenceManager {
 		return rmsBean;
 	}
 
-	public static boolean hasSequenceTimedOut(String internalSequenceId, RMMsgContext rmMsgCtx, StorageManager storageManager)
+	public static boolean hasSequenceTimedOut(RMSBean rmsBean, String internalSequenceId, StorageManager storageManager)
 			throws SandeshaException {
 
-		// operation is the lowest level, Sandesha2 could be engaged.
-		SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(rmMsgCtx.getMessageContext()
-				.getAxisOperation());
+		SandeshaPolicyBean propertyBean = 
+			SandeshaUtil.getPropertyBean(storageManager.getContext().getAxisConfiguration());
 
 		if (propertyBean.getInactivityTimeoutInterval() <= 0)
 			return false;
 
 		boolean sequenceTimedOut = false;
-
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 		
-		if (rmsBean != null) {
-			long lastActivatedTime = rmsBean.getLastActivatedTime();
-			long timeNow = System.currentTimeMillis();
-			if (lastActivatedTime > 0 && (lastActivatedTime + propertyBean.getInactivityTimeoutInterval() < timeNow))
-				sequenceTimedOut = true;
-		}
+		long lastActivatedTime = rmsBean.getLastActivatedTime();
+		long timeNow = System.currentTimeMillis();
+		if (lastActivatedTime > 0 && (lastActivatedTime + propertyBean.getInactivityTimeoutInterval() < timeNow))
+			sequenceTimedOut = true;
+
 		return sequenceTimedOut;
 	}
+	
+	public static void finalizeTimedOutSequence(String internalSequenceID, MessageContext messageContext,
+			StorageManager storageManager) throws SandeshaException {
+		ConfigurationContext configurationContext = null;
+		if (messageContext == null)
+			configurationContext = storageManager.getContext();
+		else 
+			configurationContext = messageContext.getConfigurationContext();			
+
+		// Notify the clients of a timeout
+		AxisFault fault = new AxisFault(
+				SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceID));
+		// Notify any waiting clients that the sequence has timeed out.
+		FaultManager.notifyClientsOfFault(internalSequenceID, storageManager, configurationContext, fault);
+		
+		// Already an active transaction, so don't want a new one
+		TerminateManager.timeOutSendingSideSequence(internalSequenceID, storageManager);
+
+		if (messageContext != null) {
+			SandeshaListener listener = (SandeshaListener) messageContext
+					.getProperty(SandeshaClientConstants.SANDESHA_LISTENER);
+			if (listener != null) {
+				SequenceReport report = SandeshaClient.getOutgoingSequenceReport(internalSequenceID, configurationContext, false);
+				listener.onTimeOut(report);
+			}
+		}
+	}
+
 }

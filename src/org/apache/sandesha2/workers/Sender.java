@@ -18,17 +18,25 @@
 package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
+import org.apache.sandesha2.storage.SandeshaStorageException;
+import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SequenceManager;
 
 /**
  * This is responsible for sending and re-sending messages of Sandesha2. This
@@ -59,7 +67,8 @@ public class Sender extends SandeshaThread {
 			// Pick a sequence using a round-robin approach
 			ArrayList allSequencesList = getSequences();
 			int size = allSequencesList.size();
-			log.debug("Choosing one from " + size + " sequences");
+			if (log.isDebugEnabled())
+				log.debug("Choosing one from " + size + " sequences");
 			if(nextIndex >= size) {
 				nextIndex = 0;
 
@@ -70,13 +79,17 @@ public class Sender extends SandeshaThread {
 				}
 				processedMessage = false;
 				
+				// At this point - delete any sequences that have timed out, or been terminated.
+				deleteTerminatedSequences(storageManager);
+				
 				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, looped over all sequences, sleep " + sleep);
 				return sleep;
 			}
 
 			SequenceEntry entry = (SequenceEntry) allSequencesList.get(nextIndex++);
 			String sequenceId = entry.getSequenceId();
-			log.debug("Chose sequence " + sequenceId);
+			if (log.isDebugEnabled())
+				log.debug("Chose sequence " + sequenceId);
 
 			transaction = storageManager.getTransaction();
 
@@ -87,9 +100,12 @@ public class Sender extends SandeshaThread {
 				matcher.setInternalSequenceID(sequenceId);
 				matcher.setTerminated(false);
 				RMSBean rms = storageManager.getRMSBeanMgr().findUnique(matcher);
-				if(rms != null) {
-					sequenceId = rms.getSequenceID();
-					found = true;
+				if(rms != null && !rms.isTerminated() && !rms.isTimedOut()) {
+					sequenceId = rms.getSequenceID();					
+					if (SequenceManager.hasSequenceTimedOut(rms, sequenceId, storageManager))					
+						SequenceManager.finalizeTimedOutSequence(sequenceId, null, storageManager);
+					else
+						found = true;
 				}
 			} else {
 				RMDBean matcher = new RMDBean();
@@ -192,4 +208,128 @@ public class Sender extends SandeshaThread {
 		return false;
 	}
 
+	/**
+	 * Finds any RMDBeans that have not been used inside the set InnactivityTimeoutInterval
+	 * 
+	 * Iterates through RMSBeans and RMDBeans that have been terminated or timed out and 
+	 * deletes them.
+	 *
+	 */
+	private void deleteTerminatedSequences(StorageManager storageManager) {
+		if (log.isDebugEnabled()) 
+			log.debug("Enter: Sender::deleteTerminatedSequences");
+
+		RMSBean finderBean = new RMSBean();
+		finderBean.setTerminated(true);
+		
+		Transaction transaction = storageManager.getTransaction();
+		
+		try {
+			
+			SandeshaPolicyBean propertyBean = 
+				SandeshaUtil.getPropertyBean(storageManager.getContext().getAxisConfiguration());			
+
+			// Find terminated sequences.
+	    List rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
+	    
+	    deleteRMSBeans(rmsBeans, propertyBean);
+	    
+	    finderBean.setTerminated(false);
+	    finderBean.setTimedOut(true);
+	    
+	    // Find timed out sequences
+	    rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
+	    	    
+	    deleteRMSBeans(rmsBeans, propertyBean);
+	    
+	    // Remove any terminated RMDBeans.
+	    RMDBean finderRMDBean = new RMDBean();
+	    finderRMDBean.setTerminated(true);
+	    
+	    List rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+
+	    Iterator beans = rmdBeans.iterator();
+	    while (beans.hasNext()) {
+	    	RMDBean rmdBean = (RMDBean)beans.next();
+	    	
+	    	long timeNow = System.currentTimeMillis();
+	    	long lastActivated = rmdBean.getLastActivatedTime();
+	    	long deleteTime = propertyBean.getSequenceRemovalTimeoutInterval();
+	    	
+	    	if (deleteTime < 0)
+	    		deleteTime = 0;
+
+	    	// delete sequences that have been timedout or deleted for more than 
+	    	// the SequenceRemovalTimeoutInterval
+	    	if ((lastActivated + deleteTime) < timeNow) {
+	    		if (log.isDebugEnabled())
+	    			log.debug("Deleting RMDBean " + deleteTime + " : " + rmdBean);
+	    		storageManager.getRMDBeanMgr().delete(rmdBean.getSequenceID());
+	    	}	    		    	
+	    }
+
+	    // Terminate RMD Sequences that have been inactive.			
+			if (propertyBean.getInactivityTimeoutInterval() > 0) {
+				finderRMDBean.setTerminated(false);
+				
+				rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+			
+		    beans = rmdBeans.iterator();
+		    while (beans.hasNext()) {
+		    	RMDBean rmdBean = (RMDBean)beans.next();
+		    	
+		    	long timeNow = System.currentTimeMillis();
+		    	long lastActivated = rmdBean.getLastActivatedTime();
+		    	
+		    	if ((lastActivated + propertyBean.getInactivityTimeoutInterval()) < timeNow) {
+		    		// Terminate
+		    		rmdBean.setTerminated(true);
+		    		rmdBean.setLastActivatedTime(timeNow);
+		    		if (log.isDebugEnabled())
+		    			log.debug(System.currentTimeMillis() + "Marking RMDBean as terminated " + rmdBean);
+		    		storageManager.getRMDBeanMgr().update(rmdBean);
+		    	}	    		    	
+		    }
+			} 	    
+	    
+    } catch (SandeshaException e) {
+    	if (log.isErrorEnabled())
+    		log.error(e);
+    } finally {
+			transaction.commit();
+		}
+		
+		if (log.isDebugEnabled()) 
+			log.debug("Exit: Sender::deleteTerminatedSequences");
+	}
+	
+	private void deleteRMSBeans(List rmsBeans, SandeshaPolicyBean propertyBean) 
+
+	throws SandeshaStorageException {		
+		if (log.isDebugEnabled()) 
+			log.debug("Enter: Sender::deleteRMSBeans");
+
+    Iterator beans = rmsBeans.iterator();
+    
+    while (beans.hasNext())
+    {
+    	RMSBean rmsBean = (RMSBean)beans.next();
+    	long timeNow = System.currentTimeMillis();
+    	long lastActivated = rmsBean.getLastActivatedTime();
+    	// delete sequences that have been timedout or deleted for more than 
+    	// the SequenceRemovalTimeoutInterval
+    	long deleteTime = propertyBean.getSequenceRemovalTimeoutInterval();
+    	if (deleteTime < 0)
+    		deleteTime = 0;
+   	
+    	if ((lastActivated + deleteTime) < timeNow) {
+    		if (log.isDebugEnabled())
+    			log.debug("Removing RMSBean " + rmsBean);
+    		storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
+    	}	    	
+    }
+
+		if (log.isDebugEnabled()) 
+			log.debug("Exit: Sender::deleteRMSBeans");
+	}
 }

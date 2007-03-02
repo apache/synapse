@@ -75,4 +75,10 @@ public class PropertyLoaderTest extends TestCase {
 		String secMgr = propertyBean.getSecurityManagerClass();
 		assertEquals(secMgr,"org.apache.sandesha2.security.SecurityManager1");
 	}
+	
+	public void testSequenceRemovalTimeout() {
+		long value = propertyBean.getSequenceRemovalTimeoutInterval();
+		assertEquals((60*60*1*1000), value);
+	}
+	
 }

@@ -210,6 +210,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			// Store the security token for the offered sequence
 			rMDBean.setSecurityTokenData(rmsBean.getSecurityTokenData());
 			
+			rMDBean.setLastActivatedTime(System.currentTimeMillis());
+			
 			rmdBeanMgr.insert(rMDBean);
 			SandeshaUtil.startWorkersForSequence(configCtx, rMDBean);
 		}

@@ -20,12 +20,14 @@
 package org.apache.synapse.mediators.bsf;
 
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.FaultHandler;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
@@ -171,6 +173,14 @@ public class ThreadLocalMessageContext implements MessageContext {
 
     public void setTracingState(int tracingState) {
         getMC().setTracingState(tracingState);
+    }
+
+    public Stack getFaultStack() {
+        return getMC().getFaultStack();
+    }
+
+    public void pushFault(FaultHandler fault) {
+        getMC().pushFault(fault);
     }
 
     public void setDoingMTOM(boolean b) {

@@ -30,6 +30,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.FaultHandler;
 import org.apache.synapse.mediators.GetPropertyFunction;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -48,6 +49,7 @@ public class Axis2MessageContext implements MessageContext {
     private SynapseConfiguration cfg = null;
     private SynapseEnvironment   env = null;
     private Map properties = new HashMap();
+    private Stack faultStack = new Stack();
 
     /** The Axis2 MessageContext reference */
     private org.apache.axis2.context.MessageContext axis2MessageContext = null;
@@ -99,6 +101,7 @@ public class Axis2MessageContext implements MessageContext {
         setAxis2MessageContext(axisMsgCtx);
         cfg = synCfg;
         env = synEnv;
+        // todo: set the default fault sequence from the configuration to context
     }
 
     public EndpointReference getFaultTo() {
@@ -232,6 +235,14 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setTracingState(int tracingState) {
         this.tracingState= tracingState;
+    }
+
+    public Stack getFaultStack() {
+        return this.faultStack;
+    }
+
+    public void pushFault(FaultHandler fault) {
+        this.faultStack.push(fault);
     }
 
     public org.apache.axis2.context.MessageContext getAxis2MessageContext() {

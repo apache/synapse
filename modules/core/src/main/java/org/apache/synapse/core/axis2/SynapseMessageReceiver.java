@@ -25,6 +25,8 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.FaultHandler;
 import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 
@@ -47,16 +49,26 @@ public class SynapseMessageReceiver implements MessageReceiver {
         }
 
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
-        StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
-        if (synapseServiceStack== null) {
-            synapseServiceStack= new ProxyServiceStatisticsStack();
-            synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
-        }
-        String name = "SynapseService";
-        boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-        synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true,isFault);
 
-        // invoke synapse message mediation
-        synCtx.getEnvironment().injectMessage(synCtx);
+        try {
+            StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
+            if (synapseServiceStack == null) {
+                synapseServiceStack = new ProxyServiceStatisticsStack();
+                synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
+            }
+            String name = "SynapseService";
+            boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+            synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true, isFault);
+
+            // invoke synapse message mediation
+            synCtx.getEnvironment().injectMessage(synCtx);
+        } catch (SynapseException syne) {
+            if(!synCtx.getFaultStack().empty()) {
+                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx);
+            } else {
+                log.error("Synapse encountered an exception, " +
+                        "No error handlers found - [Message Dropped]\n" + syne.getMessage());
+            }
+        }
     }
 }

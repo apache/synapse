@@ -27,6 +27,8 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.FaultHandler;
 
 import java.util.Map;
 import java.util.HashMap;

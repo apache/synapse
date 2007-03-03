@@ -215,7 +215,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo3",sequenceKey),callback3);
 		
 		if (explicitTermination) {
-			Thread.sleep(6000);
+			Thread.sleep(10000);
 			SandeshaClient.terminateSequence(serviceClient);
 		}
 		

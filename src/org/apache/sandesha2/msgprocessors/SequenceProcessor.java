@@ -297,7 +297,7 @@ public class SequenceProcessor {
 					
 					// Try and terminate the corresponding outbound sequence
 					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sender.getSequenceID());
-					TerminateManager.checkAndTerminate(rmMsgCtx, storageManager, rmsBean);
+					TerminateManager.checkAndTerminate(rmMsgCtx.getConfigurationContext(), storageManager, rmsBean);
 				}
 			}
 		}

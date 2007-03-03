@@ -377,8 +377,6 @@ public class SandeshaUtil {
 			newMessageContext.setTransportIn(referenceMessage.getTransportIn());
 			newMessageContext.setTransportOut(referenceMessage.getTransportOut());
 
-			copyNecessaryPropertiesFromRelatedContext(referenceMessage, newMessageContext);
-
 			// copying transport info.
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
@@ -392,48 +390,10 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			
-			//copying properties as configured in the module.xml properties. Module xml has several
-			//properties which gives comma seperated lists of property names that have to be copited
-			//from various places when creating related messages.
-			
-			AxisModule axisModule = SandeshaUtil.getAxisModule();
+			copyConfiguredProperties (referenceMessage,newMessageContext);
 
-			Parameter propertiesFromRefMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceMessage);
-			if (propertiesFromRefMsg!=null) {
-				String value = (String) propertiesFromRefMsg.getValue();
-				if (value!=null) {
-					value = value.trim();
-					String[] propertyNames = value.split(",");
-					for (int i=0;i<propertyNames.length;i++) {
-						String propertyName = propertyNames[i];
-						Object val = referenceMessage.getProperty(propertyName);
-						if (val!=null) {
-							newMessageContext.setProperty(propertyName,val);
-						}
-					}
-				}
-			}
-			
-			Parameter propertiesFromRefReqMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessage);
-			OperationContext referenceOpCtx = referenceMessage.getOperationContext();
-			MessageContext referenceRequestMessage = null;
-			if (referenceOpCtx!=null) 
-				referenceRequestMessage=referenceOpCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-			
-			if (propertiesFromRefReqMsg!=null && referenceRequestMessage!=null) {
-				String value = (String) propertiesFromRefReqMsg.getValue();
-				if (value!=null) {
-					value = value.trim();
-					String[] propertyNames = value.split(",");
-					for (int i=0;i<propertyNames.length;i++) {
-						String propertyName = propertyNames[i];
-						Object val = referenceRequestMessage.getProperty(propertyName);
-						if (val!=null) {
-							newMessageContext.setProperty(propertyName,val);
-						}
-					}
-				}
-			}
+			//copying the serverSide property
+			newMessageContext.setServerSide(referenceMessage.isServerSide());
 
 			return newMessageContext;
 
@@ -445,6 +405,68 @@ public class SandeshaUtil {
 	}
 	
 
+	private static void copyConfiguredProperties (MessageContext fromMessage, MessageContext toMessage) throws AxisFault {
+
+//		copying properties as configured in the module.xml properties. Module xml has several
+		//properties which gives comma seperated lists of property names that have to be copited
+		//from various places when creating related messages.
+		
+		if (axisModule==null) {
+			String message = SandeshaMessageKeys.moduleNotSet;
+			throw new SandeshaException (message);
+		}
+		
+		Parameter propertiesFromRefMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceMessage);
+		if (propertiesFromRefMsg!=null) {
+			String value = (String) propertiesFromRefMsg.getValue();
+			if (value!=null) {
+				value = value.trim();
+				String[] propertyNames = value.split(",");
+				for (int i=0;i<propertyNames.length;i++) {
+					String tmp = propertyNames[i];
+					String propertyName = null;
+					String targetPropertyName = null;
+					if (tmp.indexOf (":")>=0) {
+						//if the property name is given as two values seperated by a colon, this gives the key of the from msg
+						//and the key for the To Msg respsctively.
+						String[] vals = tmp.split(":");
+						propertyName = vals[0].trim();
+						targetPropertyName = vals[1].trim();
+					} else {
+						propertyName = targetPropertyName = tmp;
+					}
+					
+					Object val = fromMessage.getProperty(propertyName);
+					if (val!=null) {
+						toMessage.setProperty(targetPropertyName,val);
+					}
+				}
+			}
+		}
+		
+		Parameter propertiesFromRefReqMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessage);
+		OperationContext referenceOpCtx = fromMessage.getOperationContext();
+		MessageContext referenceRequestMessage = null;
+		if (referenceOpCtx!=null) 
+			referenceRequestMessage=referenceOpCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+		
+		if (propertiesFromRefReqMsg!=null && referenceRequestMessage!=null) {
+			String value = (String) propertiesFromRefReqMsg.getValue();
+			if (value!=null) {
+				value = value.trim();
+				String[] propertyNames = value.split(",");
+				for (int i=0;i<propertyNames.length;i++) {
+					String propertyName = propertyNames[i];
+					Object val = referenceRequestMessage.getProperty(propertyName);
+					if (val!=null) {
+						toMessage.setProperty(propertyName,val);
+					}
+				}
+			}
+		}
+
+		
+	}
 	
 	public static SandeshaPolicyBean getDefaultPropertyBean (AxisConfiguration axisConfiguration) throws SandeshaException {
 		Parameter parameter = axisConfiguration.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
@@ -454,29 +476,6 @@ public class SandeshaUtil {
 		
 		SandeshaPolicyBean sandeshaPropertyBean = (SandeshaPolicyBean) parameter.getValue();
 		return sandeshaPropertyBean;
-	}
-
-	private static void copyNecessaryPropertiesFromRelatedContext(MessageContext fromMessage, MessageContext toMessage) throws SandeshaException {
-		toMessage.setProperty(Constants.Configuration.TRANSPORT_URL, fromMessage
-				.getProperty(Constants.Configuration.TRANSPORT_URL));
-		
-		String addressingVersion = (String) fromMessage.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-		if (addressingVersion==null) {
-			OperationContext opCtx = fromMessage.getOperationContext();
-			if (opCtx!=null) {
-				try {
-					MessageContext requestMsg = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-					if (requestMsg!=null)
-						addressingVersion = (String) requestMsg.getProperty(AddressingConstants.WS_ADDRESSING_VERSION);
-				} catch (AxisFault e) {
-					throw new SandeshaException (e);
-				}
-			}
-		}
-		toMessage.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,addressingVersion);
-		
-		toMessage.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, fromMessage
-				.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES));
 	}
 
 	//TODO change this method.

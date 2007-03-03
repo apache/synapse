@@ -292,8 +292,24 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 				if (allAcked)
 				{
 					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outgoingSequnceID);
-					if (!rmsBean.isTerminateAdded())
+					if (!rmsBean.isTerminateAdded()) {
 						TerminateManager.addTerminateSequenceMessage(terminateRMMsg, rmsBean.getInternalSequenceID(), outgoingSequnceID , storageManager);
+						String referenceMsgKey = rmsBean.getReferenceMessageStoreKey();
+						if (referenceMsgKey==null) {
+							String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referenceMessageNotSetForSequence,rmsBean.getSequenceID());
+							throw new SandeshaException (message);
+						}
+						
+						MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey, configCtx);
+						
+						if (referenceMessage==null) {
+							String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getSequenceID());
+							throw new SandeshaException (message);
+						}
+						
+						RMMsgContext referenceRMMsg = MsgInitializer.initializeMessage(referenceMessage);
+									
+					}
 				}
 			}
 		} catch (AxisFault e) {

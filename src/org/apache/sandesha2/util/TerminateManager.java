@@ -59,7 +59,7 @@ public class TerminateManager {
 
 	public static HashMap receivingSideCleanMap = new HashMap();
 
-	public static void checkAndTerminate(RMMsgContext relatedMessage, StorageManager storageManager, RMSBean rmsBean)
+	public static void checkAndTerminate(ConfigurationContext configurationContext, StorageManager storageManager, RMSBean rmsBean)
 	throws SandeshaStorageException, AxisFault {
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateManager::checkAndTerminate " +rmsBean);
 
@@ -93,7 +93,7 @@ public class TerminateManager {
 			// so check to see if all the senders have been removed
 			EndpointReference replyTo = new EndpointReference (replyToAddress);
 			if (complete &&
-					Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && replyTo.hasAnonymousAddress()) {
+					Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmVersion) && (replyToAddress==null || replyTo.hasAnonymousAddress())) {
 				SenderBean matcher = new SenderBean();
 				matcher.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
 				matcher.setSequenceID(rmsBean.getSequenceID());
@@ -103,7 +103,22 @@ public class TerminateManager {
 			}
 			
 			if (complete) {
-				addTerminateSequenceMessage(relatedMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+				
+				String referenceMsgKey = rmsBean.getReferenceMessageStoreKey();
+				if (referenceMsgKey==null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referenceMessageNotSetForSequence,rmsBean.getSequenceID());
+					throw new SandeshaException (message);
+				}
+				
+				MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey, configurationContext);
+				
+				if (referenceMessage==null) {
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getSequenceID());
+					throw new SandeshaException (message);
+				}
+				
+				RMMsgContext referenceRMMsg = MsgInitializer.initializeMessage(referenceMessage);
+				addTerminateSequenceMessage(referenceRMMsg, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
 			}
 			
 		}

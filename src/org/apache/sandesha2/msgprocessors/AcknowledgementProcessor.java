@@ -235,7 +235,8 @@ public class AcknowledgementProcessor {
 		storageManager.getRMSBeanMgr().update(rmsBean);
 
 		// Try and terminate the sequence
-		TerminateManager.checkAndTerminate(rmMsgCtx, storageManager, rmsBean);
+		if (!rmsBean.isAvoidAutoTermination()) 
+			TerminateManager.checkAndTerminate(rmMsgCtx.getConfigurationContext(), storageManager, rmsBean);
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementProcessor::processAckHeader");

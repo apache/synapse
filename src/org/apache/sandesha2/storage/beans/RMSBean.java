@@ -152,6 +152,12 @@ public class RMSBean extends RMSequenceBean {
    */
   private boolean terminationPauserForCS = false;
   
+	/**
+	 * If this is set, the current sequence is not expected to auto terminate when all the acks are received.
+	 * I.e. the user explicitly have to call for termination (using SandeshaClient).  
+	 */
+	private boolean avoidAutoTermination = false;
+	
 	public RMSBean() {
 	}
 
@@ -335,6 +341,14 @@ public class RMSBean extends RMSequenceBean {
 		this.anonymousUUID = anonymousUUID;
 	}
 
+	public boolean isAvoidAutoTermination() {
+		return avoidAutoTermination;
+	}
+
+	public void setAvoidAutoTermination(boolean avoidAutoTermination) {
+		this.avoidAutoTermination = avoidAutoTermination;
+	}
+	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());

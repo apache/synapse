@@ -332,7 +332,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			}
 
 		} catch (Exception e) {
-			if (log.isDebugEnabled()) log.debug("Caught exception", e);
+			if (log.isErrorEnabled()) log.error("Caught exception", e);
 			if (transaction!=null) {
 				transaction.rollback();
 				transaction = null;

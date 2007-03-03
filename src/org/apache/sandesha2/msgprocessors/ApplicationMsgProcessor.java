@@ -204,6 +204,15 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
 		}
 
+		//setting the reference msg store key.
+		if (rmsBean!=null && rmsBean.getReferenceMessageStoreKey()==null) {
+			//setting this application message as the reference, if it hsnt already been set.
+			
+			String referenceMsgKey = SandeshaUtil.getUUID();
+			storageManager.storeMessageContext(referenceMsgKey, msgContext);
+			rmsBean.setReferenceMessageStoreKey(referenceMsgKey);
+		}
+		
 		String outSequenceID = null;
 
 		if (rmsBean == null) { 

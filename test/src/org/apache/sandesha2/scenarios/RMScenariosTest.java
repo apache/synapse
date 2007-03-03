@@ -86,16 +86,16 @@ public class RMScenariosTest extends SandeshaTestCase {
 	public void testAsyncEcho() throws Exception {
 		// Test async echo with sync acks
 		Options clientOptions = new Options();
-		runEcho(clientOptions, true, false);
+		runEcho(clientOptions, true, false, false);
 		
 		// Test async echo with async acks
 		clientOptions = new Options();
-		runEcho(clientOptions, true, true);
+		runEcho(clientOptions, true, true, false);
 		
 		// Test async echo with async acks and offer
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
-		runEcho(clientOptions, true, true);
+		runEcho(clientOptions, true, true, false);
 	}
 		
 	public void testSyncEcho() throws Exception {
@@ -103,18 +103,18 @@ public class RMScenariosTest extends SandeshaTestCase {
 		Options clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		runEcho(clientOptions, false, false);
+		runEcho(clientOptions, false, false, false);
 		
 		// Test sync echo with an offer, and the 1.0 spec
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
-		runEcho(clientOptions, false, false);
+		runEcho(clientOptions, false, false, true);
 		
 		// Test sync echo with no offer, and the 1.1 spec
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		runEcho(clientOptions, false, false);
+		runEcho(clientOptions, false, false, false);
 	}
 
 	public void runPing(boolean asyncAcks) throws Exception {
@@ -163,7 +163,7 @@ public class RMScenariosTest extends SandeshaTestCase {
 		serviceClient.cleanup();
 	}
 
-	public void runEcho(Options clientOptions, boolean asyncReply, boolean asyncAcks) throws Exception {
+	public void runEcho(Options clientOptions, boolean asyncReply, boolean asyncAcks, boolean explicitTermination) throws Exception {
 		
 		String sequenceKey = SandeshaUtil.getUUID();
 
@@ -186,7 +186,21 @@ public class RMScenariosTest extends SandeshaTestCase {
 				clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
 			}
 		}
+		
+		if(asyncAcks) {
+			String acksTo = serviceClient.getMyEPR(Constants.TRANSPORT_HTTP).getAddress();
+			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+		} else {
+			String acksTo = AddressingConstants.Final.WSA_ANONYMOUS_URL;
+			clientOptions.setProperty(SandeshaClientConstants.AcksTo,acksTo);
+		}
 
+		if (explicitTermination) {
+			clientOptions.setProperty(SandeshaClientConstants.AVOID_AUTO_TERMINATION, Boolean.TRUE);
+		} else {
+			clientOptions.setProperty(SandeshaClientConstants.AVOID_AUTO_TERMINATION, Boolean.FALSE);
+		}
+		
 		// Establish a baseline count for inbound sequences
 		ArrayList oldIncomingReports = SandeshaClient.getIncomingSequenceReports(configContext);
 		
@@ -200,12 +214,18 @@ public class RMScenariosTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.LAST_MESSAGE, "true");
 		serviceClient.sendReceiveNonBlocking (getEchoOMBlock("echo3",sequenceKey),callback3);
 		
+		if (explicitTermination) {
+			Thread.sleep(6000);
+			SandeshaClient.terminateSequence(serviceClient);
+		}
+		
 		long limit = System.currentTimeMillis() + waitTime;
 		Error lastError = null;
 		while(System.currentTimeMillis() < limit) {
 			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
 			
 			try {
+				
 		        //assertions for the out sequence.
 				SequenceReport outgoingSequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
 				System.out.println("Checking Outbound Sequence: " + outgoingSequenceReport.getSequenceID());

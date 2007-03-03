@@ -33,4 +33,5 @@ public class SandeshaClientConstants {
 	public static String SANDESHA_LISTENER = "Sandesha2Listener";
 	public static String USE_REPLY_TO_AS_ACKS_TO = "UseReplyToAsAcksTo";
 	public static String OFFERED_ENDPOINT = "OfferedEndpoint";
+	public static String AVOID_AUTO_TERMINATION = "AviodAutoTermination";
 }

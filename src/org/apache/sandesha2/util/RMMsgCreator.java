@@ -490,7 +490,6 @@ public class RMMsgCreator {
 		makeConnectionMessageCtx.setTo(epr);
 		makeConnectionMessageCtx.setWSAAction(SpecSpecificConstants.getMakeConnectionAction(rmVersion));
 		makeConnectionMessageCtx.setMessageID(SandeshaUtil.getUUID());
-		
 		makeConnectionRMMessageCtx.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
 				makeConnection);
 		

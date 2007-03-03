@@ -210,6 +210,11 @@ public class PollingManager extends SandeshaThread {
 		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
 				rmBean, wireSeqId, wireAddress, storageManager);
 		
+		
+		//we must set serverSide to false. Having serverSide as true (I.e. when polling for RMD) will cause the SenderWorker to ignore
+		//the sync response message.
+		makeConnectionRMMessage.getMessageContext().setServerSide(false);
+		
 		// Store properties so that we know which sequence we are polling for. This can be used
 		// to match reply sequences up to requests, as well as to help process messagePending
 		// headers.

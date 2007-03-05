@@ -47,7 +47,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
      * @param mediatorOmElement the OMElement being created
      * @param mediator          the Mediator instance being serialized
      */
-    public void finalizeSerialization(OMElement mediatorOmElement, Mediator mediator) {
+    protected static void finalizeSerialization(OMElement mediatorOmElement, Mediator mediator) {
         int traceState = mediator.getTraceState();
         String traceValue = null;
         if (traceState == org.apache.synapse.Constants.TRACING_ON) {

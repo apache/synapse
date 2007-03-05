@@ -79,15 +79,17 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory  {
         }
 
         if (scope != null) {
-        	if (!Constants.SCOPE_CORRELATE.equals(scope.getAttributeValue()) && 
-                    !Constants.SCOPE_AXIS2.equals(scope.getAttributeValue())) {
+            String valueStr = scope.getAttributeValue();
+            if (!Constants.SCOPE_CORRELATE.equals(valueStr) &&
+                    !Constants.SCOPE_AXIS2.equals(valueStr) && !Constants.SCOPE_TRANSPORT.equals(valueStr)) {
         		String msg = "Only '" + Constants.SCOPE_CORRELATE + "' or '" + Constants.SCOPE_AXIS2
-        		        + "' values are allowed for attribute scope for a property mediator"
+                         + "' or '" + Constants.SCOPE_TRANSPORT
+                        + "' values are allowed for attribute scope for a property mediator"
                         + ", Unsupported scope " + scope.getAttributeValue();
                 log.error(msg);
                 throw new SynapseException(msg);
         	}
-            propMediator.setScope(scope.getAttributeValue());
+            propMediator.setScope(valueStr);
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc

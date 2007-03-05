@@ -19,7 +19,6 @@
 
 package org.apache.synapse.mediators.builtin;
 
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

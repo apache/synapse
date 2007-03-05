@@ -215,7 +215,7 @@ public class SequenceMediator extends AbstractListMediator {
 
     /**
      * Return the registry key used to load this sequence dynamically
-     * @return
+     * @return  registry key
      */
     public String getRegistryKey() {
         return registryKey;

@@ -59,7 +59,12 @@ public interface Constants {
     public static final String SCOPE_CORRELATE = org.apache.synapse.Constants.SCOPE_CORRELATE;
     /** The String value for an Axis2 messagecontext property */
     public static final String SCOPE_AXIS2 = org.apache.synapse.Constants.SCOPE_AXIS2;
-    
+    /**
+     * The scope for a set-property mediator, when the property should be set
+     * on the underlying transport
+     */
+    String SCOPE_TRANSPORT = "transport";
+
     //  -- Synapse property values for WS-RM sequence handling --
     /** The String value for a WS-RM version 1.0*/
     public static final String SEQUENCE_VERSION_1_0 = org.apache.synapse.Constants.SEQUENCE_VERSION_1_0;

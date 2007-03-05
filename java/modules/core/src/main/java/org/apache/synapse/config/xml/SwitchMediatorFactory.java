@@ -26,16 +26,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.filters.SwitchCaseMediator;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Constructs a Switch mediator instance from the given XML configuration
- *
+ * <p/>
  * <pre>
  * &lt;switch source="xpath"&gt;
  *   &lt;case regex="string"&gt;
@@ -47,18 +48,17 @@ import java.util.Iterator;
  * &lt;/switch&gt;
  * </pre>
  */
-public class SwitchMediatorFactory extends AbstractMediatorFactory  {
+public class SwitchMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(SwitchMediatorFactory.class);
 
-    private static final QName SWITCH_Q  = new QName(Constants.SYNAPSE_NAMESPACE, "switch");
-    private static final QName CASE_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "case");
+    private static final QName SWITCH_Q = new QName(Constants.SYNAPSE_NAMESPACE, "switch");
+    private static final QName CASE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "case");
     private static final QName DEFAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "default");
 
     public Mediator createMediator(OMElement elem) {
 
         SwitchMediator switchMediator = new SwitchMediator();
-
         OMAttribute source = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
         if (source == null) {
             String msg = "A 'source' XPath attribute is required for a switch mediator";
@@ -78,21 +78,34 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory  {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(switchMediator,elem);
-
+        initMediator(switchMediator, elem);
         Iterator iter = elem.getChildrenWithName(CASE_Q);
         while (iter.hasNext()) {
-            switchMediator.addCase((SwitchCaseMediator)
-                MediatorFactoryFinder.getInstance().getMediator((OMElement) iter.next()));
+            OMElement caseElem = (OMElement) iter.next();
+            SwitchCase aCase = new SwitchCase();
+            OMAttribute regex = caseElem.getAttribute(new QName(Constants.NULL_NAMESPACE, "regex"));
+            if (regex == null) {
+                String msg = "The 'regex' attribute is required for a switch case definition";
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+            try {
+                aCase.setRegex(Pattern.compile(regex.getAttributeValue()));
+            } catch (PatternSyntaxException pse) {
+                String msg = "Invalid Regular Expression for attribute 'regex' : " + regex.getAttributeValue();
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+            aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator(caseElem));
+            switchMediator.addCase(aCase);
         }
-
         iter = elem.getChildrenWithName(DEFAULT_Q);
         while (iter.hasNext()) {
-            switchMediator.addCase((SwitchCaseMediator)
-                MediatorFactoryFinder.getInstance().getMediator((OMElement) iter.next()));
+            SwitchCase aCase = new SwitchCase();
+            aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator((OMElement) iter.next()));
+            switchMediator.setDefaultCase(aCase);
             break; // add only the *first* default if multiple are specified, ignore rest if any
         }
-
         return switchMediator;
     }
 

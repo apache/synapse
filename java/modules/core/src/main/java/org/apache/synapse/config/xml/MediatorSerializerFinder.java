@@ -44,12 +44,9 @@ public class MediatorSerializerFinder {
         FaultMediatorSerializer.class,
         PropertyMediatorSerializer.class,
         SwitchMediatorSerializer.class,
-        SwitchCaseMediatorSerializer.class,
-        //?SwitchCaseDefaultMediatorSerializer.class,
         InMediatorSerializer.class,
         OutMediatorSerializer.class,
-        RMSequenceMediatorSerializer.class,
-        TryMediatorSerializer.class,
+        RMSequenceMediatorSerializer.class,     
         ClassMediatorSerializer.class
     };
 

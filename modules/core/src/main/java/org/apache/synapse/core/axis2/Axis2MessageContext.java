@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
@@ -361,7 +362,7 @@ public class Axis2MessageContext implements MessageContext {
         if (iter.hasNext()) {
             sb.append(separator + "Headers : ");
             while (iter.hasNext()) {
-                SOAPHeader header = (SOAPHeader) iter.next();
+                SOAPHeaderBlock header = (SOAPHeaderBlock) iter.next();
                 sb.append(separator + header.getLocalName() + " : " + header.getText());
             }
         }

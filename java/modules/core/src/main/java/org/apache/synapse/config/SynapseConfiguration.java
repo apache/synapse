@@ -126,7 +126,6 @@ public class SynapseConfiguration {
                 handleException("Invalid DynamicSequence for name : " + name + " from registry");
             }
         }
-        // todo: do we need to check weather the o is a Mediator (DynamicProperty)
         return (Mediator) o;
     }
 
@@ -171,6 +170,32 @@ public class SynapseConfiguration {
 
     public void setMainMediator(Property dp) {
         this.mainMediator = dp;
+    }
+
+    /**
+     * Return the "fault" sequence of synapse. The fault sequence mediates messages which
+     * brings synapse to an inconsistance state. In an XML based configuration, this is specified
+     * as a sequence with the name "fault" of the configuration
+     * @return the fault sequence to be used
+     */
+    public Mediator getFaultSequence() {
+        return getNamedSequence(org.apache.synapse.config.xml.Constants.FAULT_SEQUENCE);
+    }
+
+    /**
+     * Sets the fault sequence for this instance
+     * @param faulSequence the sequence to be used as the fault sequence
+     */
+    public void setFaultSequence(Mediator faulSequence) {
+        namedSequences.put(org.apache.synapse.config.xml.Constants.FAULT_SEQUENCE, faulSequence);
+    }
+
+    /**
+     * Sets the fault sequence for this instance as a property
+     * @param property the property to be used as the fault sequence
+     */
+    public void setFaultSequence(Property property) {
+        namedSequences.put(org.apache.synapse.config.xml.Constants.FAULT_SEQUENCE, property);
     }
 
     /**

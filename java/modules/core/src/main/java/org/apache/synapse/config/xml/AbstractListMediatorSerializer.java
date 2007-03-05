@@ -32,7 +32,7 @@ public abstract class AbstractListMediatorSerializer extends AbstractMediatorSer
 
     private static final Log log = LogFactory.getLog(AbstractListMediatorSerializer.class);
 
-    public void serializeChildren(OMElement parent, List list)
+    protected static void serializeChildren(OMElement parent, List list)
     {
         Iterator iter = list.iterator();
         while (iter.hasNext()) {
@@ -46,7 +46,7 @@ public abstract class AbstractListMediatorSerializer extends AbstractMediatorSer
         }
     }
 
-    private void handleException(String msg) {
+    private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
     }

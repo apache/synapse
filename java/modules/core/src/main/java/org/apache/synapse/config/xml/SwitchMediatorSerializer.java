@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.filters.SwitchCaseMediator;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 
 import java.util.Iterator;
@@ -41,8 +40,7 @@ import java.util.Iterator;
  * &lt;/switch&gt;
  * </pre>
  */
-public class SwitchMediatorSerializer extends AbstractMediatorSerializer
-     {
+public class SwitchMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(SwitchMediatorSerializer.class);
 
@@ -54,11 +52,11 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer
 
         SwitchMediator mediator = (SwitchMediator) m;
         OMElement switchMed = fac.createOMElement("switch", synNS);
-        finalizeSerialization(switchMed,mediator);
+        finalizeSerialization(switchMed, mediator);
 
         if (mediator.getSource() != null) {
             switchMed.addAttribute(fac.createOMAttribute(
-                "source", nullNS, mediator.getSource().toString()));
+                    "source", nullNS, mediator.getSource().toString()));
             super.serializeNamespaces(switchMed, mediator.getSource());
 
         } else {
@@ -66,11 +64,32 @@ public class SwitchMediatorSerializer extends AbstractMediatorSerializer
         }
 
         Iterator iter = mediator.getCases().iterator();
-        SwitchCaseMediatorSerializer swcms = new SwitchCaseMediatorSerializer();
         while (iter.hasNext()) {
-            swcms.serializeMediator(switchMed, (SwitchCaseMediator) iter.next());
+            OMElement caseElem = fac.createOMElement("case", synNS);
+            SwitchCase aCase = ((SwitchCase) iter.next());
+            if (aCase.getRegex() != null) {
+                caseElem.addAttribute(fac.createOMAttribute(
+                        "regex", nullNS, aCase.getRegex().pattern()));
+            } else {
+                handleException("Invalid switch case. Regex required");
+            }
+            AnonymousListMediator caseMediator = aCase.getCaseMediator();
+            if (caseMediator != null) {
+                AnonymousListMediatorSerializer.serializeAnonymousListMediator(
+                        caseElem, caseMediator);
+                switchMed.addChild(caseElem);
+            }
         }
-
+        SwitchCase defaultCase = mediator.getDefaultCase();
+        if (defaultCase != null) {
+            OMElement caseDefaultElem = fac.createOMElement("default", synNS);
+            AnonymousListMediator caseDefaultMediator = defaultCase.getCaseMediator();
+            if (caseDefaultMediator != null) {
+                AnonymousListMediatorSerializer.serializeAnonymousListMediator(
+                        caseDefaultElem, caseDefaultMediator);
+                switchMed.addChild(caseDefaultElem);
+            }
+        }
         if (parent != null) {
             parent.addChild(switchMed);
         }

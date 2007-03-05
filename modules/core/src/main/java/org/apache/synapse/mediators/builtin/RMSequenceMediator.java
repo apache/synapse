@@ -25,7 +25,7 @@ public class RMSequenceMediator extends AbstractMediator {
 
     private AXIOMXPath correlation = null;
     private AXIOMXPath lastMessage = null;
-    private Boolean single;
+    private Boolean single = null;
     private String version = null;
 
     private static final String WSRM_SpecVersion_1_0 = "Spec_2005_02";

@@ -52,6 +52,8 @@ import java.io.InterruptedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.Iterator;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -246,6 +248,18 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         response.setHeader(HTTP.CONTENT_TYPE, Util.getContentType(msgContext) + "; charset=" + format.getCharSetEncoding());
 
+        // set any transport headers
+        Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (transportHeaders != null && !transportHeaders.values().isEmpty()) {
+            Iterator iter = transportHeaders.keySet().iterator();
+            while (iter.hasNext()) {
+                Object header = iter.next();
+                Object value = transportHeaders.get(header);
+                if (value != null && header instanceof String && value instanceof String) {
+                    response.setHeader((String) header, (String) value);
+                }
+            }
+        }
         worker.getServiceHandler().commitResponse(worker.getConn(), response);
 
         OutputStream out = worker.getOutputStream();

@@ -312,7 +312,7 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(HttpContext.HTTP_RESPONSE, response);
 
             workerPool.execute(
-                new ClientWorker(cfgCtx, Channels.newInputStream(responsePipe.source()),
+                new ClientWorker(cfgCtx, Channels.newInputStream(responsePipe.source()), response,
                     (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT)));
 
         } catch (IOException e) {

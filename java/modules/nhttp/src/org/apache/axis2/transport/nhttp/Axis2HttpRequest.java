@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *  http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Pipe;
 import java.nio.channels.Channels;
+import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Represents an outgoing Axis2 HTTP/s request. It holds the EPR of the destination, the
@@ -82,6 +84,21 @@ public class Axis2HttpRequest {
     public HttpRequest getRequest() {
         HttpPost httpRequest = new HttpPost(epr.getAddress());
         httpRequest.setEntity(new BasicHttpEntity());
+
+        // set any transport headers
+        Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (o != null && o instanceof Map) {
+            Map headers = (Map) o;
+            Iterator iter = headers.keySet().iterator();
+            while (iter.hasNext()) {
+                Object header = iter.next();
+                Object value = headers.get(header);
+                if (header instanceof String && value != null && value instanceof String) {
+                    httpRequest.setHeader((String) header, (String) value);
+                }
+            }
+        }
+
         return httpRequest;
     }
 
@@ -102,7 +119,7 @@ public class Axis2HttpRequest {
     public void streamMessageContents() throws AxisFault {
 
         log.debug("start streaming outgoing http request");
-        OutputStream out = Channels.newOutputStream(pipe.sink());        
+        OutputStream out = Channels.newOutputStream(pipe.sink());
         OMOutputFormat format = Util.getOMOutputFormat(msgContext);
 
         try {

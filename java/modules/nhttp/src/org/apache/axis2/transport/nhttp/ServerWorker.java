@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *  http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -127,6 +127,11 @@ public class ServerWorker implements Runnable {
             headers.put(headerArr[i].getName(), headerArr[i].getValue());
         }
         msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
+        // find the remote party IP address and set it to the message context
+        if (conn instanceof HttpInetConnection) {
+            HttpInetConnection inetConn = (HttpInetConnection) conn;
+            msgContext.setProperty(MessageContext.REMOTE_ADDR, inetConn.getRemoteAddress());
+        }
 
         try {
             msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
@@ -137,7 +142,7 @@ public class ServerWorker implements Runnable {
             handleException("Unable to get out/in http transport configurations from Axis2", af);
             return null;
         }
-        
+
         return msgContext;
     }
 
@@ -233,7 +238,7 @@ public class ServerWorker implements Runnable {
                     parameters.put(param.substring(0, pos), param.substring(pos+1));
                 } else {
                     parameters.put(param, null);
-                }                
+                }
             }
         }
 
@@ -394,7 +399,7 @@ public class ServerWorker implements Runnable {
         if (e == null) {
             e = new Exception(msg);
         }
-        
+
         try {
             AxisEngine engine = new AxisEngine(cfgCtx);
             MessageContext faultContext = engine.createFaultMessageContext(msgContext, e);
@@ -404,7 +409,7 @@ public class ServerWorker implements Runnable {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             response.addHeader(CONTENT_TYPE, TEXT_XML);
             serverHandler.commitResponse(conn, response);
-            
+
             try {
                 os.write(msg.getBytes());
                 if (ex != null) {

@@ -28,6 +28,9 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * The property mediator would save a named property as a local property
  * of the Synapse Message Context. Properties set this way could be
@@ -45,6 +48,7 @@ public class PropertyMediator extends AbstractMediator {
 
     /**
      * Sets a property into the current (local) Synapse Context
+     *
      * @param smc the message context
      * @return true always
      */
@@ -54,39 +58,63 @@ public class PropertyMediator extends AbstractMediator {
         if (shouldTrace) {
             trace.trace("Start : Property mediator");
         }
-
-        String value = (getValue() != null ? getValue() : Axis2MessageContext.getStringValue(getExpression(), smc));
-        log.debug("Setting property : " + getName() +
-            " (scope:" + (scope == null ? "default" : scope) + ") = " + value);
+        String value = (this.value != null ? this.value : Axis2MessageContext.getStringValue(
+                getExpression(), smc));
+        log.debug("Setting property : " + name +
+                " (scope:" + (scope == null ? "default" : scope) + ") = " + value);
         if (shouldTrace) {
-            trace.trace("Property Name : " + getName() +
-                " (scope:" + (scope == null ? "default" : scope) + ") set to " +
-                (getValue() != null ? " value = " + getValue() :
-                    " result of expression " + getExpression() + " = " + value));
+            trace.trace("Property Name : " + name +
+                    " (scope:" + (scope == null ? "default" : scope) + ") set to " +
+                    (this.value != null ? " value = " + this.value :
+                            " result of expression " + expression + " = " + value));
         }
-
         if (scope == null) {
-            smc.setProperty(getName(), value);
+            smc.setProperty(name, value);
 
-        } else if(Constants.SCOPE_CORRELATE.equals(getScope())) {
-            smc.setProperty(getName(), value);
+        } else if (Constants.SCOPE_CORRELATE.equals(scope)) {
+            smc.setProperty(name, value);
 
-        } else if (Constants.SCOPE_AXIS2.equals(getScope()) && smc instanceof Axis2MessageContext) {
+        } else if (Constants.SCOPE_AXIS2.equals(scope)
+                && smc instanceof Axis2MessageContext) {
             Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
             org.apache.axis2.context.MessageContext axis2MessageCtx =
-                axis2smc.getAxis2MessageContext();
-            axis2MessageCtx.getConfigurationContext().setProperty(getName(), value);
+                    axis2smc.getAxis2MessageContext();
+            axis2MessageCtx.getConfigurationContext().setProperty(name, value);
+
+        } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+                && smc instanceof Axis2MessageContext) {
+            Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+            org.apache.axis2.context.MessageContext axis2MessageCtx =
+                    axis2smc.getAxis2MessageContext();
+            Object headers = axis2MessageCtx.getProperty(
+                    org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+            if (headers != null && headers instanceof Map) {
+                Map headersMap = (HashMap) headers;
+                headersMap.put(name, value);
+            }
+            if (headers == null) {
+                Map headersMap = new HashMap();
+                headersMap.put(name, value);
+                axis2MessageCtx.setProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+                        headersMap);
+            }
 
         } else {
             String msg = "Unsupported scope : " + scope + " for set-property mediator";
-            log.error(msg);
-            throw new SynapseException(msg);
+            handleException(msg);
         }
 
         if (shouldTrace) {
             trace.trace("End : Property mediator");
         }
         return true;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
     public String getName() {
@@ -112,12 +140,12 @@ public class PropertyMediator extends AbstractMediator {
     public void setExpression(AXIOMXPath expression) {
         this.expression = expression;
     }
-    
+
     public String getScope() {
-    	return scope;
+        return scope;
     }
-    
+
     public void setScope(String scope) {
-    	this.scope = scope;
+        this.scope = scope;
     }
 }

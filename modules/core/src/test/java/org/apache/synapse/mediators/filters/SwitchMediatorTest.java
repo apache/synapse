@@ -23,6 +23,8 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.SwitchCase;
+import org.apache.synapse.config.xml.AnonymousListMediator;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
@@ -84,14 +86,25 @@ public class SwitchMediatorTest extends TestCase {
         AXIOMXPath xpath = new AXIOMXPath("//wsx:symbol");
         xpath.addNamespace("wsx", "http://www.webserviceX.NET/");
         switchMediator.setSource(xpath);
+        SwitchCase caseOne = new SwitchCase();
+        caseOne.setRegex(Pattern.compile("IBM"));
+        AnonymousListMediator mediatorOne = new AnonymousListMediator();
+        mediatorOne.addAll(Arrays.asList(new Mediator[] {ibmMediator}));
+        caseOne.setCaseMediator(mediatorOne);
+        SwitchCase caseTwo = new SwitchCase();
+        caseTwo.setRegex(Pattern.compile("MSFT"));
+        AnonymousListMediator mediatorTwo = new AnonymousListMediator();
+        mediatorTwo.addAll(Arrays.asList(new Mediator[] {msftMediator}));
+        caseTwo.setCaseMediator(mediatorTwo);
 
+        SwitchCase caseDefault = new SwitchCase();
+        AnonymousListMediator mediatorDefault = new AnonymousListMediator();
+        mediatorDefault.addAll(Arrays.asList(new Mediator[] {defaultMediator}));
+        caseDefault.setCaseMediator(mediatorDefault); 
         // set ibm mediator to be called for IBM, msft for MSFT and default for others..
-        switchMediator.addCase(new SwitchCaseMediator(Pattern.compile("IBM"), false,
-            Arrays.asList(new Mediator[] {ibmMediator})));
-        switchMediator.addCase(new SwitchCaseMediator(Pattern.compile("MSFT"), false,
-            Arrays.asList(new Mediator[] {msftMediator})));
-        switchMediator.addCase(new SwitchCaseMediator(null, true,
-            Arrays.asList(new Mediator[] {defaultMediator})));
+        switchMediator.addCase(caseOne);
+        switchMediator.addCase(caseTwo);
+        switchMediator.setDefaultCase(caseDefault);       
     }
 
     public void testSwitchConditionCaseOne() throws Exception {

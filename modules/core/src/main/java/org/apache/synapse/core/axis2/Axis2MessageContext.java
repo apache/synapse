@@ -300,11 +300,9 @@ public class Axis2MessageContext implements MessageContext {
                 handleException("Error setting up the Synapse XPath " +
                     "extension function for XPath : " + xpath, je);
             }
-
             try {
                 Object result = xpath.evaluate(synCtx.getEnvelope());
                 StringBuffer textValue = new StringBuffer();
-
                 if (result instanceof List) {
                     Iterator iter = ((List) result).iterator();
                     while (iter.hasNext()) {

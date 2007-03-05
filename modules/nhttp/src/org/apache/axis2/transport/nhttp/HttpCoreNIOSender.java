@@ -165,6 +165,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
 
+        // remove unwanted HTTP headers (if any from the current message)
+        removeUnwantedHeaders(msgContext);
+
         EndpointReference epr = Util.getDestinationEPR(msgContext);
         if (epr != null) {
             if (!AddressingConstants.Final.WSA_NONE_URI.equals(epr.getAddress())) {
@@ -190,6 +193,24 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         return InvocationResponse.CONTINUE;
+    }
+
+    /**
+     * Remove unwanted headers from the http response of outgoing request. These are headers which
+     * should be dictated by the transport and not the user. We remove these as these may get
+     * copied from the request messages
+     * @param msgContext the Axis2 Message context from which these headers should be removed
+     */
+    private void removeUnwantedHeaders(MessageContext msgContext) {
+        Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (headers != null && !headers.isEmpty()) {
+            headers.remove(HTTP.CONN_DIRECTIVE);
+            headers.remove(HTTP.TRANSFER_ENCODING);
+            headers.remove(HTTP.DATE_DIRECTIVE);
+            headers.remove(HTTP.SERVER_DIRECTIVE);
+            headers.remove(HTTP.CONTENT_TYPE);
+            headers.remove(HTTP.CONTENT_LEN);
+        }
     }
 
     /**
@@ -224,7 +245,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                 ((ClientHandler) handler).submitRequest(conn, axis2Req);
                 log.debug("An existing connection reused");
             }
-            
+
             axis2Req.streamMessageContents();
 
         } catch (MalformedURLException e) {

@@ -127,6 +127,11 @@ public class ServerWorker implements Runnable {
             headers.put(headerArr[i].getName(), headerArr[i].getValue());
         }
         msgContext.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
+        // find the remote party IP address and set it to the message context
+        if (conn instanceof HttpInetConnection) {
+            HttpInetConnection inetConn = (HttpInetConnection) conn;
+            msgContext.setProperty(MessageContext.REMOTE_ADDR, inetConn.getRemoteAddress());
+        }
 
         try {
             msgContext.setTransportOut(cfgCtx.getAxisConfiguration()

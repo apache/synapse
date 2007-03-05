@@ -162,6 +162,10 @@ public class ServerHandler implements NHttpServiceHandler {
         }
     }
 
+    public void responseReady(NHttpServerConnection conn) {
+        // New API method - should not require
+    }
+
     /**
      * Process ready output by writing into the channel
      * @param conn the connection being processed

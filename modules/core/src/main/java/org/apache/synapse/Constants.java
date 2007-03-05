@@ -52,6 +52,12 @@ public interface Constants {
      */
     String SCOPE_AXIS2 = "axis2";
 
+    /**
+     * The scope for a set-property mediator, when the property should be set
+     *  on the underlying transport 
+     */
+    String SCOPE_TRANSPORT = "transport";
+
     /** An string name which holds the out sequence property in the MessageContext */
     String PROXY_SERVICE = "proxy.name";
 

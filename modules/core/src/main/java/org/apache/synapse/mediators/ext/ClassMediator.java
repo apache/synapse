@@ -61,7 +61,7 @@ public class ClassMediator extends AbstractMediator {
         if (shouldTrace) {
             trace.trace("Start : Class mediator");
         }
-        Mediator m = null;
+        Mediator m ;
         try {
             try {
                 m = (Mediator) clazz.newInstance();

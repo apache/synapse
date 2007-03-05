@@ -32,12 +32,11 @@ import java.util.Iterator;
  * This implements the basic logic to build a list mediator from a given XML
  * configuration. It recursively builds the child mediators of the list.
  */
-public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory  {
+public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(AbstractListMediatorFactory.class);
 
-    public void addChildren(OMElement el, ListMediator m)
-    {
+    protected static void addChildren(OMElement el, ListMediator m) {
         Iterator it = el.getChildElements();
         while (it.hasNext()) {
             OMElement child = (OMElement) it.next();

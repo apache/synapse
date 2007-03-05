@@ -77,20 +77,23 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                             org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
                 }
 
-                if (proxy.getTargetInSequence() != null) {
+                if (proxy.getTargetFaultSequence() != null) {
 
-                    Mediator faultSequence = synCtx.getConfiguration().getNamedSequence(proxy.getTargetInSequence());
+                    Mediator faultSequence = synCtx.getConfiguration().getNamedSequence(proxy.getTargetFaultSequence());
                     if (faultSequence != null) {
                         log.debug("setting the fault sequence of the proxy to context");
                         synCtx.pushFault(new MediatorFaultHandler(
                                 synCtx.getConfiguration().getNamedSequence(proxy.getTargetFaultSequence())));
                     } else {
+                        // when we can not find the reference to the fault sequence of the proxy service we should not
+                        // throw an exception because still we have the global fault sequence and the message mediation
+                        // can still continue
                         log.warn("Unable to find the fault sequence for the proxy service " +
-                                "specified by the name " + proxy.getTargetInSequence());
+                                "specified by the name " + proxy.getTargetFaultSequence());
                     }
-                } else if (proxy.getTargetInLineInSequence() != null) {
-                    log.debug("Using the anonymous in sequence of the proxy service for message mediation");
-                    synCtx.pushFault(new MediatorFaultHandler(proxy.getTargetInLineInSequence()));
+                } else if (proxy.getTargetInLineFaultSequence() != null) {
+                    log.debug("Setting the anonymous fault sequence of the proxy to context");
+                    synCtx.pushFault(new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
                 }
                 
                 // Using inSequence for the incoming message mediation
@@ -104,7 +107,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                         log.error("Unable to find the in sequence for the proxy service " +
                                 "specified by the name " + proxy.getTargetInSequence());
-                        // TODO invoke a generic synapse error handler for this message
+                        throw new SynapseException("Unable to find the in sequence for the proxy service " +
+                                "specified by the name " + proxy.getTargetInSequence());
                     }
                 } else if (proxy.getTargetInLineInSequence() != null) {
                     log.debug("Using the anonymous in sequence of the proxy service for message mediation");

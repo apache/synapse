@@ -31,6 +31,7 @@ import org.apache.synapse.config.Util;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
+import org.apache.synapse.mediators.builtin.LogMediator;
 import org.apache.synapse.registry.Registry;
 
 import javax.xml.namespace.QName;
@@ -147,6 +148,15 @@ public class XMLConfigurationBuilder {
                 is.close();
             } catch (IOException e) {
             }
+        }
+
+        if (config.getFaultSequence() == null) {
+            SequenceMediator faultSequence = new SequenceMediator();
+            faultSequence.setName(Constants.FAULT_SEQUENCE);
+            LogMediator logMediator = new LogMediator();
+            logMediator.setLogLevel(LogMediator.FULL);
+            faultSequence.addChild(logMediator);
+            config.setFaultSequence(faultSequence);
         }
 
         return config;

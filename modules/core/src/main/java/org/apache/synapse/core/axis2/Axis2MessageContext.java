@@ -32,6 +32,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.mediators.GetPropertyFunction;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.commons.logging.Log;
@@ -101,7 +102,7 @@ public class Axis2MessageContext implements MessageContext {
         setAxis2MessageContext(axisMsgCtx);
         cfg = synCfg;
         env = synEnv;
-        // todo: set the default fault sequence from the configuration to context
+        this.pushFault(new MediatorFaultHandler(synCfg.getFaultSequence()));
     }
 
     public EndpointReference getFaultTo() {

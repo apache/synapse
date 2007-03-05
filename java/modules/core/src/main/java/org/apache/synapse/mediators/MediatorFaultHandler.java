@@ -35,4 +35,12 @@ public class MediatorFaultHandler implements FaultHandler {
     public void handleFault(MessageContext synCtx) throws SynapseException {
         this.faultMediator.mediate(synCtx);
     }
+
+    public Mediator getFaultMediator() {
+        return faultMediator;
+    }
+
+    public void setFaultMediator(Mediator faultMediator) {
+        this.faultMediator = faultMediator;
+    }
 }

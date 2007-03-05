@@ -27,9 +27,13 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.Header;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Performs processing of the HTTP response received for our outgoing request. An instance of this
@@ -47,6 +51,8 @@ public class ClientWorker implements Runnable {
     private InputStream in = null;
     /** the original request message context */
     private MessageContext outMsgCtx = null;
+    /** the HttpResponse received */
+    private HttpResponse response = null;
 
     /**
      * Create the thread that would process the response message received for the outgoing message
@@ -55,11 +61,13 @@ public class ClientWorker implements Runnable {
      * @param in the InputStream to read the body of the response message received
      * @param outMsgCtx the original outgoing message context (i.e. corresponding request)
      */
-    public ClientWorker(ConfigurationContext cfgCtx, InputStream in, MessageContext outMsgCtx) {
+    public ClientWorker(ConfigurationContext cfgCtx, InputStream in,
+        HttpResponse response, MessageContext outMsgCtx) {
 
         this.cfgCtx = cfgCtx;
         this.in = in;
         this.outMsgCtx = outMsgCtx;
+        this.response = response;
 
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().
@@ -78,6 +86,17 @@ public class ClientWorker implements Runnable {
                 .getProperty(MessageContext.TRANSPORT_IN));
             responseMsgCtx.setTransportIn(outMsgCtx.getTransportIn());
             responseMsgCtx.setTransportOut(outMsgCtx.getTransportOut());
+
+            // set any transport headers received
+            Header[] headers = response.getAllHeaders();
+            if (headers != null && headers.length > 0) {
+                Map headerMap = new HashMap();
+                for (int i=0; i<headers.length; i++) {
+                    Header header = headers[i];
+                    headerMap.put(header.getName(), header.getValue());
+                }
+                responseMsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
+            }
 
             responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
             responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());

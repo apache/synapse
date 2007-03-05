@@ -32,7 +32,7 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * @param mediator
      * @param mediatorOmElement
      */
-    public void initMediator(Mediator mediator, OMElement mediatorOmElement) {
+    protected void initMediator(Mediator mediator, OMElement mediatorOmElement) {
 
         OMAttribute trace = mediatorOmElement.getAttribute(
             new QName(Constants.NULL_NAMESPACE, Constants.TRACE_ATTRIB_NAME));

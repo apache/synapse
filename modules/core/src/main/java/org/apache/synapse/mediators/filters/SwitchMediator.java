@@ -24,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.xml.SwitchCase;
+import org.apache.synapse.config.xml.AnonymousListMediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -42,18 +44,12 @@ public class SwitchMediator extends AbstractMediator {
     private static final Log log = LogFactory.getLog(SwitchMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
-    /**
-     * The XPath expression specifying the source element to apply the switch case expressions against
-     */
+    /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private AXIOMXPath source = null;
-    /**
-     * The list of switch cases
-     */
+    /** The list of switch cases    */
     private List cases = new ArrayList();
-    /**
-     * The default switch case, if any
-     */
-    private SwitchCaseMediator defaultCase = null;
+    /** The default switch case, if any */
+    private SwitchCase defaultCase = null;
 
     /**
      * Iterate over switch cases and find match and execute selected sequence
@@ -77,18 +73,19 @@ public class SwitchMediator extends AbstractMediator {
                 trace.trace("Start Case mediator list");
             }
             Iterator iter = cases.iterator();
-
             while (iter.hasNext()) {
-                SwitchCaseMediator swCase = (SwitchCaseMediator) iter.next();
-                if (swCase.matches(sourceText)) {
-                    if (shouldTrace) {
-                        trace.trace("Executing case for : " + swCase.getRegex());
+                SwitchCase swCase = (SwitchCase) iter.next();
+                if (swCase != null) {
+                    if (swCase.matches(sourceText)) {
+                        if (shouldTrace) {
+                            trace.trace("Executing case for : " + swCase.getRegex());
+                        }
+                        return swCase.mediate(synCtx);
                     }
-                    return swCase.mediate(synCtx);
                 }
             }
             if (shouldTrace) {
-                trace.trace("End Case mediator lis");
+                trace.trace("End Case mediator list");
             }
             if (defaultCase != null) {
                 log.debug("Executing default case");
@@ -112,7 +109,7 @@ public class SwitchMediator extends AbstractMediator {
      *
      * @param m the SwitchCaseMediator instance to be added
      */
-    public void addCase(SwitchCaseMediator m) {
+    public void addCase(SwitchCase m) {
         cases.add(m);
     }
 
@@ -148,7 +145,11 @@ public class SwitchMediator extends AbstractMediator {
      *
      * @return the default csae
      */
-    public SwitchCaseMediator getDefaultCase() {
+    public SwitchCase getDefaultCase() {
         return defaultCase;
+    }
+
+    public void setDefaultCase(SwitchCase defaultCase) {
+        this.defaultCase = defaultCase;
     }
 }

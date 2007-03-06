@@ -19,6 +19,36 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
+  <meta content="text/html; charset=iso-8859-1">
   <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
   <title>Synapse Configuration Language</title>
 </head>
@@ -35,116 +65,129 @@ mechanism for mediators (see below for details).</p>
 <h2>Overall Structure</h2>
 
 <p>A Synapse configuration looks like the following at the top level:</p>
-<pre> &lt;synapse&gt;
-   registrydef+
-   &lt;definitions&gt;
-     (sequencedef | endpointdef | literalpropertydef)+
-   &lt;definitions&gt;?
-   &lt;proxies&gt;
-     proxyservice+
-   &lt;/proxies&gt;?
-   &lt;rules [key="string"]&gt;
-     mediator*
-   &lt;/rules&gt;
- &lt;/synapse&gt;</pre>
+<pre> &lt;definitions&gt;
+   &lt;registry provider="string"&gt;...&lt;/registry&gt;?
+   &lt;localEntry key="string"&gt;...&lt;/localEntry&gt;?
+   &lt;sequence name="string"&gt;...&lt;/sequence&gt;?
+   &lt;endpoint name="string"&gt;...&lt;/endpoint&gt;?
+   &lt;proxy name="string" ...&gt;...&lt;/proxy&gt;?
+   mediator*
+ &lt;/definitions&gt;</pre>
 
-<h3>Registries</h3>
+<h3>Registry</h3>
 
-<p>A registrydef token represents a &lt;registry&gt; element which is used to
-define a Registry which is referenced within the configuration.</p>
-<pre> &lt;registry [name="string"] provider="string"/&gt;
-   &lt;property name="string" value="string"/&gt;*
+<p>The &lt;registry&gt; element is used to define the remote registry which
+are referenced from within the configuration. The registry provider specifies
+the implementation class for the registry used, and optionally a number of
+configuration parameters may be specified to configure the registry.</p>
+<pre> &lt;registry provider="string"/&gt;
+   &lt;parameter name="string"&gt;text | xml&lt;/parameter&gt;*
  &lt;/registry&gt;</pre>
 
-<p>The registry definition without a name becomes the 'default' registry for
-the Synapse instance, and any reference to a registry which does not specify
-a registry name defaults to this instance. Optionally, a number of
-configuration properties may be specified to configure an instance of a
-registry.</p>
-
-<h3>Definitions</h3>
-
-<p>The &lt;definitions&gt; section defines reusable elements that can be used
-from within the rules, and the &lt;rules&gt; section contains the sequence of
-mediators that every message passes through during mediation.</p>
-
-<h4>Properties</h4>
-
-<p>The token literalpropertydef refers to a &lt;set-property&gt; element as
-follows:</p>
-<pre>  &lt;set-property name="string" [value="string"] [src="url"] [key="string"]&gt;
-        &lt;inline-xml/&gt;?
-  &lt;set-property/&gt;</pre>
-
-<p>These properties are top level properties which are set globally for the
-entire system. Values of these properties can be retrieved via the extension
-XPath function called "synapse:get-property(prop-name)".</p>
-
-<p>A property can be static literal text (specified with the value attribute)
-or static XML specified as an inline XML fragment or specified as a URL
-(using the src attribute). A property can alternatively be a DynamicProperty
-which will reference a key on a Registry. If a property is a DynamicProperty,
-it will be fetched from the Registry and cached locally as per meta
-information provided by the Registry for caching. DynamicProperties are
-automatically refreshed when expired, and thus can be used to specify dynamic
-behaviour in Synapse.</p>
-
-<p>Dynamic properties allows the creation of Dynamic Sequences, Endpoints and
-Proxies whose definition would change accordingly with any changes on the
-property.</p>
-
-<h4>Sequences</h4>
-
-<p>A sequencedef token represents a &lt;sequence&gt; element which is used to
-define a named sequence of mediators that can be invoked later by name as a
-sequence of mediators.</p>
-<pre> &lt;sequence name="string" [onError="string"] [key="string"]&gt;
-   mediator*
- &lt;/sequence&gt;</pre>
-
-<p>If an optional error handler sequence name is specified through the
-attribute 'onError', an exception on this sequence will invoke the sequence
-specified by this name.</p>
-
-<p>A Dynamic Sequence may be defined by specifying a Dynamic Property as its
-definition. As the dynamic property changes, the sequence will dynamically be
-updated accordingly.</p>
-
-<h4>Endpoints</h4>
-
-<p>An endpointdef token represents an &lt;endpoint&gt; element which is used
-to give a logical name to an endpoint address. If the address is not just a
-simple URL, then extensibility elements may be used to indicate the address
-(i.e. to compute the address at runtime).</p>
-<pre> &lt;endpoint name="string" [address="url"] [key="string"] [force="soap|pox"] [optimize="mtom|swa"]&gt;
-   &lt;enableRM/&gt;?
-   &lt;enableSec [policy="key"]/&gt;?
-   &lt;enableAddressing�separateListener="true|false"/&gt;?
-   .. extensibility ..
- &lt;/endpoint&gt;</pre>
-
-<p>The enableRM/enableSec options turns on WS-Security or WS-RM on outgoing
-messages to this endpoint and specific policies may be specified for
-configuration</p>
-
-<p>A Dynamic Endpoint may be defined by specifying a Dynamic Property as its
-definition. As the dynamic property changes, the endpoint will dynamically be
-updated accordingly.</p>
-
-<p>NOTE: The Rampart and/or Sandesha configuration options may change with
-Axis2 changes currently in progress</p>
+<p>Registry entries loaded from a remote registry are cached within Synapase
+as dictated by the registry, and reloaded after the cache periods expires.
+Hence it is possible to define configuration elements such as (dynamic)
+sequences and endpoints, as well as resources such as XSLT's or XSDs off the
+registry, and update the configuration as these change dynamically over
+time.</p>
 
 <p></p>
 
-<h3>Proxy services</h3>
+<h3>Local Entry</h3>
 
-<p>The &lt;proxies&gt; section defines Synapse Proxy services, which are real
-Axis2 services hosted on Synapse, which allows WSDL mediation as well as the
-ability to expose existing services on Synapse, with possibly different
-semantics, such as WS-Security, WS-RM and Transport switching etc.</p>
+<p>The &lt;localEntry&gt; element is used to declare registry entries that
+are local to the Synapse instance, as shown below</p>
+<pre>  &lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;
+</pre>
 
-<p>A proxyservice token represents a &lt;proxy&gt; element which is used to
-define a Synapse Proxy service.</p>
+<p>These entries are top level entries which are set globally for the entire
+system. Values of these entries can be retrieved via the extension XPath
+function "synapse:get-property(prop-name)".</p>
+
+<p>An entry can be static text specified as inline text or static XML
+specified as an inline XML fragment or specified as a URL (using the src
+attribute). These local entries can overide any existing entries with the
+same keys of the remote registry. </p>
+
+<p></p>
+
+<h3>Sequences</h3>
+
+<p>A &lt;sequence&gt; element is used to define a sequence of mediators that
+can be invoked later by name as a sequence of mediators.</p>
+<pre> &lt;sequence name="string" [onError="string"] [key="string"]&gt;
+   mediator*
+ &lt;/sequence&gt;
+</pre>
+
+<p>If the configuration defines a sequence named "main" then it is considered
+as the main mediation sequence of Synapse. If such a sequence is not defined
+locally, and a registry has been specified, the registry is looked up for a
+key named "main" to find the main mediator sequence. Synapse also supports
+the specification of mediators directly within the &lt;definitions&gt; tag,
+and if any mediators are present, will constitute the main sequence. In the
+absence of a main sequence, the Synapse runtime will create a default main
+sequence that consists of an implicit send mediator.</p>
+
+<p>Synapse considers a sequence named "fault", or in its absence a registry
+entry with a key "fault" as its general fault handler sequence. If Synapse
+encounters an erroneous situation, it executes the defined error handling
+sequence for the current context - which may be specified as the 'onError'
+sequence for a sequence mediator. If a fault sequence is not specified or
+cannot be found through the registry, Synapse will create a defualt fault
+sequence that will perform a log of the message at the log level 'full'.</p>
+
+<p>If an optional error handler sequence name is specified on any sequence
+through the attribute 'onError', an exception on this sequence will invoke
+the sequence specified by this key.</p>
+
+<p>A Dynamic Sequence may be defined by specifying a key reference to a
+registry entry. As the remote registry entry changes, the sequence will
+dynamically be updated accordingly. </p>
+
+<p></p>
+
+<h3>Endpoints</h3>
+
+<p>An &lt;endpoint&gt; element defines a destination for an outgoing message.
+An endpoint may be specified as an address endpoint, WSDL based endpoint, a
+load balanced endpoint or a fail-over endpoint as follows:</p>
+<pre>&lt;endpoint [name="string"] [key="string"]&gt;
+   address-endpoint   |   wsdl-endpoint   |   load-balanced-endpoint   |   fail-over-endpoint
+&lt;/endpoint&gt;</pre>
+
+<p>An address-endpoint token refers to an endpoint address definition as follows:</p>
+<pre>&lt;address uri="endpoint-address" format="soap|soap11|soap12|pox"&gt;
+  &lt;enableRM [policy="key"]/&gt;?
+  &lt;enableSec [policy="key"]/&gt;?
+  &lt;enableAddressing/&gt;?
+&lt;/address&gt;</pre>
+
+<p>A wsdl-endpoint token refers to a WSDL endpoint definition as follows:</p>
+<pre>&lt;wsdl [uri="wsdl-uri"] [service="qname"] [port/endpoint="qname"]&gt;
+  &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+  &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+  &lt;enableRM [policy="key"]/&gt;?
+  &lt;enableSec [policy="key"]/&gt;?
+  &lt;enableAddressing/&gt;?
+&lt;/wsdl&gt;</pre>
+<p>The WSDL could be defined in-line within the endpoint definition or as a uri reference and the service &amp; port/endpoint specified if multiple options are present.</p>
+
+<p>A load-balanced-endpoint token refers to a load balancing configuration from which the destination endpoint would be selected depending on the evaluation of the current message against the load balacing algorithm</p>
+<pre>&lt;loadBalance policy="string"&gt;
+  &lt;endpoint .../&gt;+
+&lt;/loadBalance&gt;</pre>
+
+<p>A fail-over-endpoint token refers to a fail-over configuration definition from which an endpoint is selected if the sending of a message to the endpoint results in a failure</p>
+<pre>&lt;failOver policy="string"&gt;
+  &lt;endpoint .../&gt;+
+&lt;/failover&gt;</pre>
+
+<p>An endpoint definition must name the endpoint, and a dynamic endpoint lookup must specify the key for a definition.</p>
+
+<h3>Proxy service</h3>
+
+<p>A &lt;proxy&gt; element is used to define a Synapse Proxy service.</p>
 <pre> &lt;proxy name="string" [transports="(http |https |jms )+|all"]&gt;
    &lt;description&gt;...&lt;/description&gt;?
    &lt;target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]&gt;
@@ -155,12 +198,11 @@ define a Synapse Proxy service.</p>
    &lt;/target&gt;?
    &lt;publishWSDL key="string"&gt;
       &lt;endpoint&gt;...&lt;/endpoint&gt;?
-      &lt;endpoint&gt;...&lt;/endpoint&gt;?
    &lt;publishWSDL&gt;?
    &lt;policy key="string"&gt;...&lt;/policy&gt;?       // optional service level policies
-                                                        // (e.g. WS-Security and/or WS-RM policies)
-   &lt;parameter name="string"&gt;    // optional service parameters
-      string | xml                    // (e.g. transport.jms.ConnectionFactory)
+                                            // (e.g. WS-Security and/or WS-RM policies)
+   &lt;parameter name="string"&gt;                // optional service parameters
+      string | xml                          // (e.g. transport.jms.ConnectionFactory)
    &lt;/parameter&gt;
  &lt;/proxy&gt;</pre>
 
@@ -170,41 +212,42 @@ Axis2 conventions - based on the service name. (Note: that currently Axis2
 does not allow custom URI's to be set for services on some transports.) The
 Proxy service could be exposed over all enabled Axis2 transports such as
 http, https, JMS etc. or on a subset of these. Each service could define the
-target for received messages as a named sequence or a direct endpoint. If a
-target is not supplied, the default Synapse rules will apply for incoming
-message mediation. Any supplied policies would apply as service level
-policies, and any properties could be passed into the proxy services'
-AxisService instance (e.g. the JMS destination etc). If the proxy service
-should enable WS-Reliable Messaging or Security, the appropriate modules
-could be engaged.</p>
+target for received messages as a named sequence or a direct endpoint. Target
+inSequence or endpoint is required for the proxy configuration. Any supplied
+policies would apply as service level policies, and any properties could be
+passed into the proxy services' AxisService instance (e.g. the JMS
+destination etc). If the proxy service should enable WS-Reliable Messaging or
+Security, the appropriate modules could be engaged.</p>
 
-<p>A Dynamic Proxy may be defined by specifying a Dynamic Property as its
-definition. As the dynamic property changes, the proxy will dynamically be
-updated accordingly.</p>
+<p>A Dynamic Proxy may be defined by specifying a proxy with the key as its
+definition. As the remote registry entry changes, the proxy will dynamically
+be updated accordingly.</p>
 
 <p></p>
 
 <h3>Mediators</h3>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre> send | drop | log | makefault | transform | header | filter | 
- switch | class | validate | setproperty | sequenceref | in | out | rm | try</pre>
+<pre> send | drop | log | makefault | transform | header | filter |
+ switch | class | validate | property | sequenceref | in | out </pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
 MediatorFactory interface, similarly to the configuration extensions
 mentioned previously.</p>
 
+<p></p>
+
 <h4>Send</h4>
 
 <p>The send token represents a &lt;send&gt; element. The &lt;send&gt; element
 is used to send messages out of Synapse to some endpoint, and stop further
-mediation of the message. The send mediator also copies any correlation
-message context properties from the current message context to the reply
-message received on the execution of the send operation. This allows the
-reply messages to be correlated to the original messages in a flexible
-manner. Messages may be correlated by WS-A MessageID, or even simple custom
-text labels. Also see the set-property mediator.</p>
+mediation of the message. The send mediator also copies any message context
+properties from the current message context to the reply message received on
+the execution of the send operation. This allows the reply messages to be
+correlated to the original messages in a flexible manner. Messages may be
+correlated by WS-A MessageID, or even simple custom text labels. Also see the
+property mediator.</p>
 
 <p>In the simplest case, the place to send the message to is implicit in the
 message (via a property of the message itself)- that is indicated by the
@@ -218,32 +261,11 @@ is used:</p>
  &lt;/send&gt;</pre>
 
 <p>where the endpointref token refers to the following:</p>
-<pre> &lt;endpoint ref="name"/&gt;</pre>
+<pre> &lt;endpoint key="name"/&gt;</pre>
 
-<p>and the endpoint token refers to an anonymous endpoint defined inline:</p>
-<pre> &lt;endpoint address="url"/&gt;</pre>
+<p>and the endpoint token refers to an anonymous endpoint defined.</p>
 
-<p>If the message is to be sent to an endpoint selected by load balancing
-across a set of endpoints, then it is indicated by the following:</p>
-<pre> &lt;send&gt;
-   &lt;load-balance algorithm="uri"&gt;
-     (endpointref | endpoint)+
-   &lt;/load-balance&gt;
- &lt;/send&gt;</pre>
-
-<p>Similarly, if the message is to be sent to an endpoint with failover
-semantics, then it is indicated by the following:</p>
-<pre> &lt;send&gt;
-   &lt;failover&gt;
-     (endpointref | endpoint)+
-   &lt;/failover&gt;
- &lt;/send&gt;</pre>
-
-<p>Once the &lt;send&gt; mediator executes, further processing of the current
-message stops.</p>
-
-<p>Note: Synapse does not yet support the load balancing or failover
-semantics, and supports only a single endpoint reference.</p>
+<p></p>
 
 <h4>Drop</h4>
 
@@ -254,12 +276,14 @@ message:</p>
 <p>Once the &lt;drop&gt; mediator executes, further processing of the current
 message stops.</p>
 
+<p></p>
+
 <h4>Log</h4>
 
 <p>The log token refers to a &lt;log&gt; element which may be used to log
 messages being mediated:</p>
 <pre> &lt;log [level="string"] [separator="string"]&gt;
-   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+   &lt;parameter name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/log&gt;</pre>
 
 <p>The optional level attribute selects a pre-defined subset of properties to
@@ -278,6 +302,8 @@ be logged.</p>
 <p>A separator if defined will be used to seperate the attributes being
 logged. The default separator is the ',' comma.</p>
 
+<p></p>
+
 <h4>Transforms</h4>
 
 <h5>Faults</h5>
@@ -293,18 +319,21 @@ logged. The default separator is the ',' comma.</p>
 message, but does NOT send it. The &lt;send&gt; mediator needs to be invoked
 to send a fault message created this way. The fault message "to" header is
 set to the "faultTo" of the original message if such a header existed on the
-original message, else it is set it to the "replyTo" of the original
-message.</p>
+original message.</p>
+
+<p></p>
 
 <h5>XSLT</h5>
 <pre> &lt;xslt key="string" [source="xpath"]&gt;
-   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
+   &lt;parameter name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/transform&gt;</pre>
 
 <p>The &lt;xslt&gt; mediator applies the specified XSLT transformation to the
 given element. If the source element is not specified, it defaults to the
 first child of the soap body. Optionally parameters (XSLT) could be passed
 into the transformations through the &lt;property&gt; elements.</p>
+
+<p></p>
 
 <h5>Headers</h5>
 <pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
@@ -317,6 +346,8 @@ embedding the XML content within the element itself. The optional action
 attribute specifies whether the mediator should set or remove the header. If
 omitted, it defaults to a set-header.</p>
 
+<p></p>
+
 <h4>Selection</h4>
 
 <h5>Filters</h5>
@@ -328,6 +359,8 @@ omitted, it defaults to a set-header.</p>
 boolean expression, or match the evaluation result of a source xpath
 expression against the given regular expression. If the test succeeds, the
 filter mediator will execute the enclosed mediators in sequence.</p>
+
+<p></p>
 
 <h5>Switch</h5>
 <pre> &lt;switch source="xpath"&gt;
@@ -344,8 +377,11 @@ expression into its string value, and match it against the given regular
 expressions. If the specified cases does not match and a default case exists,
 it will be executed.</p>
 
+<p></p>
+
 <h4>Validation</h4>
 <pre> &lt;validate [source="xpath"]&gt;
+   &lt;parameter name="validation-feature-id" value="true|false"/&gt;*
    &lt;schema key="string"/&gt;+
    &lt;on-fail&gt;
      mediator+
@@ -356,41 +392,29 @@ it will be executed.</p>
 the source xpath expression, against the schema specified. If the source
 attribute is not specified, the validation is performed against the first
 child of the SOAP body of the current message. If the validation fails, the
-on-fail sequence of mediators is executed.</p>
+on-fail sequence of mediators is executed. Parameters could be used to turn
+on/off some of the underlying features of the validator.</p>
 
 <p>Note: As the validation mediator is strongly dependent on the Xerces2-J
 2.8.0 parser, it is bundled with the Synapse extensions, so that the Synapse
 core will remain simple and lightweight.</p>
 
+<p></p>
+
 <h4>Properties</h4>
-<pre> &lt;set-property name="string" (value="literal" | expression="xpath") [scope=correlate|axis2]/&gt;</pre>
+<pre> &lt;property name="string" [action=set|remove] (value="literal" | expression="xpath") [scope=transport|axis2]/&gt;</pre>
 
-<p>The setproperty token refers to a &lt;set-property&gt; element which is a
+<p>The setproperty token refers to a &lt;property&gt; element which is a
 mediator that has no direct impact on the message but rather on the message
-context flowing through Synapse. The properties thus set on the message
-context applies only to the current message and can be later retrieved
-through the synapse:get-property(prop-name) extension function. If a scope is
-specified for a property, the property could be set as a correlation property
-or an (underlying) Axis2 message context property.</p>
+context flowing through Synapse. The properties which does not specify the
+action thus set on the message context applies only to the current message
+and can be later retrieved through the synapse:get-property(prop-name)
+extension function. If a scope is specified for a property, the property
+could be set as a transport header property or an (underlying) Axis2 message
+context property. Using the property element with action specified as
+"remove" you can remove the message context properties if availabel.</p>
 
-<h4>Try</h4>
-<pre> &lt;try&gt;
-   &lt;sequence&gt;
-     mediator+
-   &lt;/sequence&gt;
-   &lt;onError&gt;
-     mediator+
-   &lt;/onError&gt;
-   &lt;finally&gt;
-     mediator+
-   &lt;/finally&gt;
-  &lt;/try&gt;</pre>
-
-<p>The try token refers to a &lt;try&gt; element which is a mediator that has
-a set of child mediators. If an exception is encountered during the execution
-of these child mediators, the list of mediators specified as the 'onError'
-sequence is executed. The 'finally' list of mediators is then executed
-irrespective of whether an exception was encountered or not.</p>
+<p></p>
 
 <h4>Class Mediators</h4>
 <pre> &lt;class name="class-name"&gt;
@@ -403,8 +427,10 @@ interface. If any properties are specified, the corresponding setter methods
 are invoked on the class. However, Synapse will only support String
 properties.</p>
 
+<p></p>
+
 <h4>Reusing Sequences</h4>
-<pre> &lt;sequence ref="name"/&gt;</pre>
+<pre> &lt;sequence key="name"/&gt;</pre>
 
 <p>A sequenceref token refers to a &lt;sequence&gt; element which is used to
 invoke a named sequence of mediators.</p>
@@ -419,15 +445,17 @@ is such an example.</p>
 
 <h4>Spring Configuration</h4>
 
-<p>A Spring configuration could be created as a property or DynamicProperty
-providing a URL or a reference to a Registry. The configuration is then
-created on first use or as necessary (as per DynamicProperty semantics) by
-the mediators which reference this configuration.</p>
-<pre> &lt;set-property name="string" key="string"/&gt;
- &lt;set-property name="string" src="url"/&gt;</pre>
+<p>A Spring configuration could be created as a localEntry or remote registry
+entry providing a URL or a key reference to a Registry. The configuration is
+then created on first use or as necessary (as per registry lookup semantics)
+by the mediators which reference this configuration.</p>
+<pre> &lt;localEntry key="string"/&gt;
+ &lt;localEntry key="string" src="url"/&gt;</pre>
 
 <p>The name attribute specifies a unique name for the configuration, and the
 src, key or inlined XML references to the Spring configuration</p>
+
+<p></p>
 
 <h4>Spring mediator</h4>
 <pre> &lt;spring:spring bean="exampleBean1" key="string"/&gt;</pre>
@@ -437,6 +465,8 @@ managed by Spring. This Spring bean must implement the Mediator interface for
 it to act as a Mediator. The key will reference the Spring
 ApplicationContext/Configuration used for the bean</p>
 
+<p></p>
+
 <h4>Script Language Mediators</h4>
 
 <p>Synapse supports Mediators implemented in a variety of scripting languages
@@ -444,37 +474,41 @@ such as JavaScript, Python or Ruby.</p>
 
 <p>There are two ways of defining script mediators, either with the script
 program statements stored in a separate file which is referenced via a
-Synapse property, or with the script program statements embedded in-line
-within the Synapse configuration.</p>
+localEntry or registry entry, or with the script program statements embedded
+in-line within the Synapse configuration.</p>
 
-<p>A script mediator using a registry property is defined as follows:</p>
-
-<p></p>
-<pre> &lt;script key="property-key" [function="script-function-name"]/&gt;</pre>
+<p>A script mediator using a entry (registry or local) is defined as
+follows:</p>
+<pre> &lt;script key="string" language="string" [function="script-function-name"]/&gt;
+</pre>
 
 <p>The property-key is a Synapse registry property containing a URL to the
-script source. The function is an optional attribute defining the name of the
-script function to call, if not specified it defaults to a function named
-'mediate'. The function is passed a single parameter which is the Synapse
-MessageContext. The function may return a boolean, if it does not then true
-is assumed. The language the script is written in is determined from the file
-name suffix of the property key value.</p>
+script source. Optional language attribute specifies the scripting language
+on which this script runs and if not specified the language will be
+determined by the file extension. The function is an optional attribute
+defining the name of the script function to call, if not specified it
+defaults to a function named 'mediate'. The function is passed a single
+parameter which is the Synapse MessageContext. The function may return a
+boolean, if it does not then true is assumed. The language the script is
+written in is determined from the file name suffix of the property key
+value.</p>
 
 <p>An inline script mediator has the script source embedded in the config
 XML:</p>
-<pre> &lt;script.LL&gt;...script source code...&lt;script.LL/&gt;</pre>
+<pre> &lt;script language="string"&gt;...script source code...&lt;script/&gt;
+</pre>
 
-<p>where LL is the script language name extension. For example, script.js
-indicates a JavaScript program, script.rb a Ruby program, or script.py a
-Python program. The environment of the script has the Synapse MessageContext
+<p>where language is the script language name extension. For example,
+&lt;script language="js"&gt; indicates a JavaScript program, &lt;script
+language="rb"&gt; a Ruby program, or &lt;script language="py"&gt; a Python
+program. The environment of the script has the Synapse MessageContext
 predefined in a script variable named 'mc'.</p>
 
 <p>An example of an inline mediator using JavaScript/E4X which returns false
 if the SOAP message body contains an element named 'symbol' which has a value
 of 'IBM' would be:</p>
-
-<p></p>
-<pre> &lt;script.js&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script.js/&gt;</pre>
+<pre> &lt;script language="js"&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script/&gt;
+</pre>
 
 <p>The boolean response from the inlined mediator is either the response from
 the evaluation of the script statements or if that result is not a boolean

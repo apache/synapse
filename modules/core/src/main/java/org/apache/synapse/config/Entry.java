@@ -22,77 +22,64 @@ package org.apache.synapse.config;
 import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axiom.om.OMElement;
 
 import java.net.URL;
 
-public class Property {
+/**
+ * Represents an Entry contained in the local registry used by Synapse
+ *
+ * @see org.apache.synapse.config.SynapseConfiguration#localRegistry
+ */
+public class Entry {
 
-    private static final Log log = LogFactory.getLog(Property.class);
+    private static final Log log = LogFactory.getLog(Entry.class);
 
-    /**
-     * The name of the registry to which this key applies
-     */
-    private String registryName;
-    /**
-     * Name of the property
-     */
-    private String name;
-    /**
-     * The type of the static proprerty
-     */
-    private int type;
-    /**
-     * Source URL of the property if it is a SRC_TYPE
-     */
-    private URL src;
-    /**
-     * The registry key
-     */
+    /** The key of the entry */
     private String key;
-    /**
-     * The value of the property
-     * This can be either an OMElement or an String
-     */
+    /** The type of the entry */
+    private int type;
+    /** Source URL of the entry if it is a URL_SRC */
+    private URL src;
+    /** The value of the entry. This can be either an OMElement or an String */
     private Object value;
-    /**
-     * An XML to Object mapper - if one is available
-     */
+    /** An XML to Object mapper - if one is available */
     private XMLToObjectMapper mapper;
-    /**
-     * The version of the cached resource
-     */
+    /** The version of the cached resource */
     private long version;
-    /**
-     * The local expiry time for the cached resource
-     */
+    /** The local expiry time for the cached resource */
     private long expiryTime;
 
-    public String getRegistryName() {
-        return this.registryName;
-    }
-
-    public void setRegistryName(String registryName) {
-        this.registryName = registryName;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public Entry() {}
+    
+    public Entry(String key) {
+        this.key = key;
     }
 
     public int getType() {
         return type;
     }
 
+    public boolean isRemote() {
+        return type == REMOTE_ENTRY;
+    }
+
+    public boolean isURLSource() {
+        return type == URL_SRC;
+    }
+
+    public boolean isInlineXML() {
+        return type == INLINE_XML;
+    }
+
+    public boolean isInlineText() {
+        return type == INLINE_TEXT;
+    }
+
     public void setType(int type) {
         if (type <= 4 && type >= 0)
             this.type = type;
         else
-            handleException("Invalid property type for the static property");
+            handleException("Invalid entry type for the static entry");
     }
 
     public URL getSrc() {
@@ -112,7 +99,7 @@ public class Property {
     }
 
     /**
-     * Gets the value of the property. String if the type is INLINE_STRING_TYPE or VALUE_TYPE,
+     * Gets the value of the entry. String if the type is INLINE_TEXT or VALUE_TYPE,
      * OMElement otherwise.
      * @return Either an OMElement or a String
      */
@@ -157,7 +144,7 @@ public class Property {
     }
 
     public boolean isExpired() {
-        if(getType() == DYNAMIC_TYPE) {
+        if(getType() == REMOTE_ENTRY) {
             return System.currentTimeMillis() > expiryTime;
         } else {
             return false;
@@ -169,7 +156,7 @@ public class Property {
     }
 
     public boolean isDynamic() {
-        return type == DYNAMIC_TYPE;
+        return type == REMOTE_ENTRY;
     }
 
     private void handleException(String msg) {
@@ -177,9 +164,8 @@ public class Property {
         throw new SynapseException(msg);
     }
 
-    public static final int INLINE_STRING_TYPE = 0;
-    public static final int INLINE_XML_TYPE = 1;
-    public static final int VALUE_TYPE = 2;
-    public static final int SRC_TYPE = 3;
-    public static final int DYNAMIC_TYPE = 4;
+    public static final int INLINE_TEXT = 0;
+    public static final int INLINE_XML = 1;
+    public static final int URL_SRC = 2;
+    public static final int REMOTE_ENTRY = 3;
 }

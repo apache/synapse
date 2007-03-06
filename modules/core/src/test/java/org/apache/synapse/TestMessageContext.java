@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +38,14 @@ public class TestMessageContext implements MessageContext {
 
     private Map properties = new HashMap();
 
+    private Map localEntries = new HashMap();
+
     private SynapseConfiguration synCfg = null;
 
     SOAPEnvelope envelope = null;
 
     private EndpointReference to = null;
-    
+   
     public SynapseConfiguration getConfiguration() {
         return synCfg;
     }
@@ -58,12 +61,16 @@ public class TestMessageContext implements MessageContext {
     public void setEnvironment(SynapseEnvironment se) {
     }
 
+    public Object getLocalProperty(String key) {
+        return properties.get(key);
+    }
+
     public Object getProperty(String key) {
         Object ret = properties.get(key);
         if (ret != null) {
             return ret;
         } else if (getConfiguration() != null) {
-            return getConfiguration().getProperty(key);
+            return getConfiguration().getEntry(key);
         } else {
             return null;
         }
@@ -75,6 +82,50 @@ public class TestMessageContext implements MessageContext {
 
     public Set getPropertyKeySet() {
         return properties.keySet();
+    }
+
+    public Mediator getMainSequence() {
+        Object o = localEntries.get(Constants.MAIN_SEQUENCE_KEY);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator main = getConfiguration().getMainSequence();
+            localEntries.put(Constants.MAIN_SEQUENCE_KEY, main);
+            return main;
+        }
+    }
+
+    public Mediator getFaultSequence() {
+        Object o = localEntries.get(Constants.FAULT_SEQUENCE_KEY);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator fault = getConfiguration().getFaultSequence();
+            localEntries.put(Constants.FAULT_SEQUENCE_KEY, fault);
+            return fault;
+        }
+    }
+
+    public Mediator getSequence(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator m = getConfiguration().getSequence(key);
+            localEntries.put(key, m);
+            return m;
+        }
+    }
+
+    public Endpoint getEndpoint(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Endpoint) {
+            return (Endpoint) o;
+        } else {
+            Endpoint e = getConfiguration().getEndpoint(key);
+            localEntries.put(key, e);
+            return e;
+        }
     }
 
     //---------
@@ -175,7 +226,8 @@ public class TestMessageContext implements MessageContext {
     }
 
     public boolean isSOAP11() {
-        return envelope.getNamespace().getName().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+        return envelope.getNamespace().getNamespaceURI().equals(
+            SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
     }
 
     public void setResponse(boolean b) {

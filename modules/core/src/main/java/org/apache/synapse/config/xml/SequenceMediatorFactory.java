@@ -41,7 +41,7 @@ import javax.xml.namespace.QName;
  * OR
  *
  * <pre>
- * &lt;sequence ref="name"/&gt;
+ * &lt;sequence key="name"/&gt;
  * </pre>
  */
 public class SequenceMediatorFactory extends AbstractListMediatorFactory {
@@ -92,7 +92,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             super.addChildren(elem, seqMediator);
 
         } else {
-            n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "ref"));
+            n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
             if (n != null) {
                 seqMediator.setRef(n.getAttributeValue());
                 if (e != null) {
@@ -102,7 +102,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 }
             } else {
                 String msg = "A sequence mediator should be a named sequence or a reference to another sequence " +
-                    "(i.e. a name attribute or ref attribute is required.";
+                    "(i.e. a name attribute or key attribute is required.";
                 log.error(msg);
                 throw new SynapseException(msg);
             }

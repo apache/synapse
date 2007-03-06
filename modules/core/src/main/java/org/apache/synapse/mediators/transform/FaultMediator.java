@@ -87,7 +87,8 @@ public class FaultMediator extends AbstractMediator {
                 return makeSOAPFault(synCtx, SOAP12,shouldTrace);
             default : {
                 if (envelop != null) {
-                    if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(envelop.getNamespace().getName())) {
+                    if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
+                        envelop.getNamespace().getNamespaceURI())) {
                         return makeSOAPFault(synCtx, SOAP12,shouldTrace);
                     } else {
                         return makeSOAPFault(synCtx, SOAP11,shouldTrace);

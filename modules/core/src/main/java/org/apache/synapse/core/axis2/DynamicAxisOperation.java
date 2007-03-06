@@ -20,35 +20,23 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.i18n.Messages;
-import org.apache.axis2.util.UUIDGenerator;
-import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.util.TargetResolver;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.Callback;
-import org.apache.axis2.client.async.AsyncResult;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFault;
-import org.apache.axiom.soap.SOAPBody;
-import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
 
 /**
  * DynamicAxisOperation which switch dynamically between MEPs
@@ -155,9 +143,9 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 				callbackReceiver.addCallback(outMsgCtx.getMessageID(), callback);
 				EndpointReference replyToFromTransport = outMsgCtx
 						.getConfigurationContext().getListenerManager()
-						.getEPRforService(sc.getAxisService().getName(),
-								axisOp.getName().getLocalPart(),
-								outMsgCtx.getTransportOut().getName().getLocalPart());
+						.getEPRforService(sc.getAxisService().getKey(),
+								axisOp.getKey().getLocalPart(),
+								outMsgCtx.getTransportOut().getKey().getLocalPart());
 
 				if (outMsgCtx.getReplyTo() == null) {
 					outMsgCtx.setReplyTo(replyToFromTransport);

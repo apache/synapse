@@ -19,21 +19,19 @@
 
 package org.apache.synapse.mediators.transform;
 
-import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 import org.apache.synapse.config.Util;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
@@ -143,7 +141,7 @@ public class XSLTMediator extends AbstractMediator {
         }
 
         // build transformer - if necessary
-        Property dp = msgCtx.getConfiguration().getPropertyObject(xsltKey);
+        Entry dp = msgCtx.getConfiguration().getEntryDefinition(xsltKey);
 
         // if the xsltKey refers to a dynamic property
         if (dp != null && dp.isDynamic()) {
@@ -152,7 +150,7 @@ public class XSLTMediator extends AbstractMediator {
                     try {
                         transformer = TransformerFactory.newInstance().
                             newTransformer(Util.getStreamSource(
-                                msgCtx.getConfiguration().getProperty(xsltKey)
+                                msgCtx.getConfiguration().getEntry(xsltKey)
                             ));
                     } catch (TransformerConfigurationException e) {
                         handleException("Error creating XSLT transformer using : " + xsltKey, e);
@@ -168,7 +166,7 @@ public class XSLTMediator extends AbstractMediator {
                         transformer = TransformerFactory.newInstance().
                             newTransformer(
                                 Util.getStreamSource(
-                                msgCtx.getConfiguration().getProperty(xsltKey)));
+                                msgCtx.getConfiguration().getEntry(xsltKey)));
                     } catch (TransformerConfigurationException e) {
                         handleException("Error creating XSLT transformer using : " + xsltKey, e);
                     }

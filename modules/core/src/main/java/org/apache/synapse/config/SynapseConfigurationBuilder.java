@@ -48,7 +48,7 @@ public class SynapseConfigurationBuilder implements Constants {
         SynapseConfiguration config = new SynapseConfiguration();
         SynapseMediator mainmediator = new SynapseMediator();
         mainmediator.addChild(new SendMediator());
-        config.setMainMediator(mainmediator);
+        config.addSequence("main", mainmediator);
         return config;
     }
 

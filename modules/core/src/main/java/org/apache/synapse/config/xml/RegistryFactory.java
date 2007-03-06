@@ -53,11 +53,6 @@ public class RegistryFactory {
                 Class provider = Class.forName(prov.getAttributeValue());
                 Registry registry = (Registry) provider.newInstance();
                 setProperties(registry, elem);
-
-                OMAttribute name = elem.getAttribute(NAME_Q);
-                if (name != null) {
-                    registry.setRegistryName(name.getAttributeValue());
-                }
                 return registry;
 
             } catch (ClassNotFoundException e) {

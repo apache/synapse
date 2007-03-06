@@ -50,10 +50,15 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     public OMNode lookup(String key) {
 
         log.info("==> Repository fetch of resource with key : " + key);
+        URLConnection urlc = null;
         try {
             URL url = new URL(getRoot() + key);
-            URLConnection urlc = url.openConnection();
+            urlc = url.openConnection();
+        } catch (IOException e) {
+            return null;
+        }
 
+        try {
             XMLStreamReader parser = XMLInputFactory.newInstance().
                 createXMLStreamReader(urlc.getInputStream());
             StAXOMBuilder builder = new StAXOMBuilder(parser);
@@ -61,6 +66,8 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
 
         } catch (MalformedURLException e) {
             handleException("Invalid URL reference " + getRoot() + key, e);
+        } catch (FileNotFoundException fnf) {
+            return null;
         } catch (IOException e) {
             handleException("IO Error reading from URL " + getRoot() + key, e);
         } catch (XMLStreamException e) {

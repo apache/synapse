@@ -23,13 +23,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.OMNode;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
@@ -37,327 +38,234 @@ import javax.xml.stream.XMLStreamException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 import java.net.URLConnection;
 import java.io.IOException;
 
 /**
  * The SynapseConfiguration holds the global configuration for a Synapse
- * instance. It:
- *  - contains the model of the definitions & rules to execute
- *	- contains named global properties and their values
- *  - contains named endpoint definitions
+ * instance.
  */
 public class SynapseConfiguration {
 
     private static final Log log = LogFactory.getLog(SynapseConfiguration.class);
 
-    /** Holds named sequences of mediators for reuse */
-    private Map namedSequences = new HashMap();
+    /** The remote registry made available to the Synapse configuration. Only one is supported */
+    Registry registry = null;
 
-    /** Holds named endpoints (which results into absolute EPRs) for reuse */
-    private Map namedEndpoints = new HashMap();
-
-    /** Holds names Proxy services deployed through Synapse */
+    /** Holds Proxy services defined through Synapse */
     private Map proxyServices = new HashMap();
 
-    /** Holds global (system-wide) properties that apply to the synapse instance and every message */
-    private Map globalProps = new HashMap();
-
-    /** Hold referenced to the declared registries */
-    private Map registryMap = new HashMap();
-
     /**
-     * This is the "main" (or default) synapse mediator which mediates each and every message
-     * It could/would hold a Mediator object or a Property (if loaded from a registry)
+     * The local registry is a simple HashMap and provides the ability to override definitions
+     * of a remote registry for entries defined locally with the same key
      */
-    private Object mainMediator = null;
+    private Map localRegistry = new HashMap();
 
     /** Hold reference to the Axis2 ConfigurationContext */
-    private AxisConfiguration axisConfig = null;
+    private AxisConfiguration axisConfiguration = null;
 
-    /** Save the path to the configuration file loaded, to save it later */
+    /** Save the path to the configuration file loaded, to save it later if required */
     private String pathToConfigFile = null;
 
     /**
-     * The path to the currently loaded configuration file
-     * @return file path to synapse.xml
+     * Add a named sequence into the local registry
+     * @param key the name for the sequence
+     * @param mediator a Sequence mediator
      */
-    public String getPathToConfigFile() {
-        return pathToConfigFile;
+    public void addSequence(String key, Mediator mediator) {
+        localRegistry.put(key, mediator);
     }
 
     /**
-     * Set the path to the loaded synapse.xml
-     * @param pathToConfigFile path to the synapse.xml loaded
+     * Allow a dynamic sequence to be cached and made available through the local registry
+     * @param key the key to lookup the sequence from the remote registry
+     * @param entry the Entry object which holds meta information and the cached resource
      */
-    public void setPathToConfigFile(String pathToConfigFile) {
-        this.pathToConfigFile = pathToConfigFile;
+    public void addSequence(String key, Entry entry) {
+        localRegistry.put(key, entry);
     }
 
     /**
-     * Add a named mediator into this configuration
-     * @param name the name for the sequence
-     * @param m the mediator to be reffered to by the name
+     * Return the sequence specified with the given key
+     * @param key the key being referenced
+     * @return the sequence referenced by the key
      */
-    public void addNamedSequence(String name, Mediator m) {
-        namedSequences.put(name, m);
-    }
-
-    /**
-     * Allow a DynamicProperty to be added as a named sequence, this will become
-     * a DynamicSequence
-     * @param name the name of the sequence
-     * @param dp a DynamicProperty reflecting the dynamic sequence
-     */
-    public void addNamedSequence(String name, Property dp) {
-        namedSequences.put(name, dp);
-    }
-
-    /**
-     * Return the mediator named with the given name
-     * @param name the name being looked up
-     * @return the mediator referenced by the name
-     */
-    public Mediator getNamedSequence(String name) {
-        Object o = namedSequences.get(name);
-        if (o != null && o instanceof Property) {
-            Property dp = (Property) o;
-            o = getProperty(dp);
-            if (o == null) {
-                handleException("Invalid DynamicSequence for name : " + name + " from registry");
-            }
+    public Mediator getSequence(String key) {
+        Object o = localRegistry.get(key);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
         }
-        return (Mediator) o;
-    }
 
-    /**
-     * Deletes the mediator named with the given name
-     * @param name of the mediator to be deleted
-     */
-    public void deleteNamedSequence(String name) {
-        Object o = namedSequences.get(name);
-        if(o == null) {
-            handleException("Non existent sequence : " + name);
+        Entry entry = null;
+        if (o != null && o instanceof Entry) {
+            entry = (Entry) o;
         } else {
-            namedSequences.remove(name);
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+            entry.setMapper(MediatorFactoryFinder.getInstance());
         }
-    }
 
-    /**
-     * Return the "main" (or default) mediator of synapse. The main mediator mediates each and every
-     * message flowing through the system. In an XML based configuration, this is specified within the
-     * <rules> section of the configuration
-     * @return the main mediator to be used
-     */
-    public Mediator getMainMediator() {
-        Object o = mainMediator;
-        if (o != null && o instanceof Property) {
-            Property dp = (Property) o;
-            o = getProperty(dp);
-            if (o == null) {
-                handleException("Invalid Synapse Mainmediator from registry");
+        if (registry != null) {
+            o = registry.getResource(entry);
+            if (o != null && o instanceof Mediator) {
+                localRegistry.put(key, entry);
+                return (Mediator) o;
             }
         }
-        return (Mediator) o;
+
+        return null;
     }
 
     /**
-     * Sets the main mediator for this instance
-     * @param mainMediator the mediator to be used as the main mediator
+     * Removes a sequence from the local registry
+     * @param key of the sequence to be removed
      */
-    public void setMainMediator(Mediator mainMediator) {
-        this.mainMediator = mainMediator;
-    }
-
-    public void setMainMediator(Property dp) {
-        this.mainMediator = dp;
+    public void removeSequence(String key) {
+        localRegistry.remove(key);
     }
 
     /**
-     * Return the "fault" sequence of synapse. The fault sequence mediates messages which
-     * brings synapse to an inconsistance state. In an XML based configuration, this is specified
-     * as a sequence with the name "fault" of the configuration
-     * @return the fault sequence to be used
+     * Return the main/default sequence to be executed. This is the sequence which
+     * will execute for all messages when message mediation takes place
+     * @return the main mediator sequence
+     */
+    public Mediator getMainSequence() {
+        return getSequence(Constants.MAIN_SEQUENCE_KEY);
+    }
+
+    /**
+     * Return the fault sequence to be executed when Synapse encounters a fault scenario
+     * during processing
+     * @return the fault sequence
      */
     public Mediator getFaultSequence() {
-        return getNamedSequence(org.apache.synapse.config.xml.Constants.FAULT_SEQUENCE);
+        return getSequence(Constants.FAULT_SEQUENCE_KEY);
     }
 
     /**
-     * Sets the fault sequence for this instance
-     * @param faulSequence the sequence to be used as the fault sequence
+     * Define a resource to the local registry. All static resources (e.g. URL source)
+     * are loaded during this definition phase, and the inability to load such a resource
+     * will not allow the definition of the resource to the local registry
+     *
+     * @param key the key associated with the resource
+     * @param entry the Entry that holds meta information about the resource and its
+     * contents (or cached contents if the Entry refers to a dynamic resource off a
+     * remote registry)
      */
-    public void setFaultSequence(Mediator faulSequence) {
-        namedSequences.put(org.apache.synapse.config.xml.Constants.FAULT_SEQUENCE, faulSequence);
-    }
+    public void addResource(String key, Entry entry) {
 
-    /**
-     * Sets the fault sequence for this instance as a property
-     * @param property the property to be used as the fault sequence
-     */
-    public void setFaultSequence(Property property) {
-        namedSequences.put(org.apache.synapse.config.xml.Constants.FAULT_SEQUENCE, property);
-    }
+        if (entry.getType() == Entry.URL_SRC) {
+            try {
+                URLConnection urlc = entry.getSrc().openConnection();
+                XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(
+                    urlc.getInputStream());
+                StAXOMBuilder builder = new StAXOMBuilder(parser);
+                entry.setValue(builder.getDocumentElement());
+                localRegistry.put(key, entry);
 
-    /**
-     * Add a global (system-wide) property.
-     * @param name the name of the property
-     * @param value its value
-     */
-    public void addProperty(String name, Property value) {
-        if(name != null && value != null) {
-            if(globalProps.containsKey(name)) {
-                log.warn("Overiding the global property with name : " + name);
+            } catch (IOException e) {
+                handleException("Can not read from source URL : " + entry.getSrc());
+            } catch (XMLStreamException e) {
+                handleException("Source URL : " + entry.getSrc() + " refers to an invalid XML");
             }
-            if(value.getType() == Property.SRC_TYPE) {
-                try {
-                    URLConnection urlc = value.getSrc().openConnection();
-                    XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(urlc.getInputStream());
-                    StAXOMBuilder builder = new StAXOMBuilder(parser);
-                    value.setValue(builder.getDocumentElement());
-                } catch (IOException e) {
-                    handleException("Can not read from the source : " + value.getSrc());
-                } catch (XMLStreamException e) {
-                    handleException("Can not load the source property : " + value.getName());
-                }
-            }
-
-            if (value.getType() == Property.DYNAMIC_TYPE) {
-
-                Registry registry = getRegistry(value.getRegistryName());
-
-                if (registry == null) {
-                    handleException("Registry not available.");
-                }
-
-                OMNode node = null;
-                try {
-                    node = registry.lookup(value.getKey());
-                    if (node == null) {
-                        handleException("Registry key should map to a XML resource.");
-                    }
-                } catch (Exception e) {
-                    handleException("Registry key should map to a XML resource.");
-                }
-            }
-
-            globalProps.put(name, value);
         } else {
-            log.error("Name and the value of the property cannot be null");
+            localRegistry.put(key, entry);
         }
     }
 
     /**
-     * Get the value of the named property
-     * @param name key of the property being looked up
-     * @return its value
-     */
-    public Object getProperty(String name) {
-        Object o = globalProps.get(name);
-        Object obj = null;
-        if(o != null && o instanceof Property) {
-            Property prop = (Property) o;
-            if(prop.getType() == Property.DYNAMIC_TYPE) {
-                obj = getRegistry(prop.getRegistryName()).getProperty(prop);
+    * Get the resource with the given key
+    * @param key the key of the resource required
+    * @return its value
+    */
+    public Object getEntry(String key) {
+        Object o = localRegistry.get(key);
+        if (o != null && o instanceof Entry) {
+            Entry entry = (Entry) o;
+            if (entry.isDynamic()) {
+                if (entry.isCached() && !entry.isExpired()) {
+                    return entry.getValue();
+                }
             } else {
-                obj = prop.getValue();
+                return entry.getValue();
             }
         }
-        return obj;
+        if (registry != null) {
+            o = registry.getResource(new Entry(key));
+        }
+        return o;
     }
 
     /**
-     * Get the Property object of the named property
-     * @param name key of the property being looked up
+     * Get the Entry object mapped to the given key
+     * @param key the key for which the Entry is required
      * @return its value
      */
-    public Property getPropertyObject(String name) {
-        Object o = globalProps.get(name);
-        Property prop = null;
-        if(o != null && o instanceof Property) {
-            prop = (Property) o;
+    public Entry getEntryDefinition(String key) {
+        Object o = localRegistry.get(key);
+        Entry entry = null;
+        if (o != null && o instanceof Entry) {
+            entry = (Entry) o;
         } else {
-            handleException("Property with name " + name + " doesnt exists in the registry");
+            handleException("Entry with key : " + key + " is undefined");
         }
-        return prop;
+        return entry;
     }
 
     /**
-     * Get the value of the named property
-     * @param prop key of the property being looked up
-     * @return its value
+     * Deletes any reference mapped to the given key from the local registry
+     * @param key the key of the reference to be removed
      */
-    public Object getProperty(Property prop) {
-        Object obj = null;
-        if(prop != null) {
-            if(prop.getType() == Property.DYNAMIC_TYPE) {
-                obj = getRegistry(prop.getRegistryName()).getProperty(prop);
-            } else {
-                obj = prop.getValue();
-            }
-        }
-        return obj;
+    public void deleteEntry(String key) {
+        localRegistry.remove(key);
     }
 
     /**
-     * Deletes the mediator named with the given name
-     * @param name of the property to be deleted
-     */
-    public void deleteProperty(String name) {
-        Object o = globalProps.get(name);
-        if(o == null) {
-            handleException("Invalid property reference for key : " + name);
-        } else {
-            globalProps.remove(name);
-        }
-    }
-
-    /**
-     * Define a named endpoint with the given name
-     * @param name the name of the endpoint
+     * Define a named endpoint with the given key
+     * @param key the key for the endpoint
      * @param endpoint the endpoint definition
      */
-    public void addNamedEndpoint(String name, Endpoint endpoint) {
-        namedEndpoints.put(name, endpoint);
+    public void addEndpoint(String key, Endpoint endpoint) {
+        localRegistry.put(key, endpoint);
     }
 
     /**
-     * Support DynamicEndpoints
-     * @param name name of Dynamic Endpoint
-     * @param dp the DynamicProperty referencing the endpoint
+     * Add a dynamic endpoint definition to the local registry
+     * @param key the key for the endpoint definition
+     * @param entry the actual endpoint definition to be added
      */
-    public void addNamedEndpoint(String name, Property dp) {
-        namedEndpoints.put(name, dp);
+    public void addEndpoint(String key, Entry entry) {
+        localRegistry.put(key, entry);
     }
 
     /**
-     * Get the definition of a named endpoint
-     * @param name the name being looked up
-     * @return the endpoint definition which will resolve into an absolute address
+     * Get the definition of the endpoint with the given key
+     * @param key the key of the endpoint
+     * @return the endpoint definition
      */
-    public Endpoint getNamedEndpoint(String name) {
-        Object o = namedEndpoints.get(name);
-        if (o != null && o instanceof Property) {
-            Property dp = (Property) o;
-            o = getProperty(dp);
-            if (o == null) {
-                handleException("Invalid DynamicEndpoint for name : " + name + " from registry");
+    public Endpoint getEndpoint(String key) {
+        Object o = localRegistry.get(key);
+        if (o != null && o instanceof Endpoint) {
+            return (Endpoint) o;
+        } else if (registry != null) {
+            Entry entry = new Entry(key);
+            //entry.setMapper(EndpointFactory.getInstance());
+            // TODO chathura
+            o = registry.getResource(entry);
+            if (o != null && o instanceof Endpoint) {
+                return (Endpoint) o;
             }
         }
-        return (Endpoint) o;
+        return null;
     }
 
     /**
-     * Deletes the endpoint named with the given name
-     * @param name of the endpoint to be deleted
+     * Deletes the endpoint with the given key
+     * @param key of the endpoint to be deleted
      */
-    public void deleteNamedEndpoint(String name) {
-        Object o = namedEndpoints.get(name);
-        if(o == null) {
-            handleException("Invalid Endpoint for name : " + name + " from registry");
-        } else {
-            namedEndpoints.remove(name);
-        }
+    public void deleteEndpoint(String key) {
+        localRegistry.remove(key);
     }
 
     /**
@@ -375,15 +283,7 @@ public class SynapseConfiguration {
      * @return the Proxy service
      */
     public ProxyService getProxyService(String name) {
-        Object o = proxyServices.get(name);
-        if (o != null && o instanceof Property) {
-            Property dp = (Property) o;
-            o = getProperty(dp);
-            if (o == null) {
-                handleException("Invalid DynamicEndpoint for name : " + name + " from registry");
-            }
-        }
-        return (ProxyService) o;
+        return (ProxyService) proxyServices.get(name);
     }
 
     /**
@@ -392,8 +292,8 @@ public class SynapseConfiguration {
      */
     public void deleteProxyService(String name) {
         Object o = proxyServices.get(name);
-        if(o == null) {
-            handleException("Invalid proxyService for name : " + name + " from registry");
+        if (o == null) {
+            handleException("Unknown proxy service for name : " + name);
         } else {
             try {
                 if(getAxisConfiguration().getServiceForActivation(name).isActive()) {
@@ -407,79 +307,36 @@ public class SynapseConfiguration {
         }
     }
 
+    /**
+     * Return the list of defined proxy services
+     * @return the proxy services defined
+     */
     public Collection getProxyServices() {
         return proxyServices.values();
     }
 
     /**
-     * Get the whole list of named sequences
-     * as a Map
+     * Return an unmodifiable copy of the local registry
+     * @return an unmodifiable copy of the local registry
      */
-    public Map getNamedSequences() {
-        return namedSequences;
-    }
-    /**
-     * Get the whole list of named endpoints
-     * as a Map
-     */
-    public Map getNamedEndpoints() {
-        return namedEndpoints;
-    }
-    /**
-     * Get the whole list of global properties
-     * as a Map
-     */
-    public Map getGlobalProps() {
-        return globalProps;
+    public Map getLocalRegistry() {
+        return Collections.unmodifiableMap(localRegistry);
     }
 
     /**
-     * Add a registry into this configuration with the given name
-     * @param name a name for the registry or null for default registry
-     * @param reg the actual registry implementation
+     * Get the remote registry defined (if any)
+     * @return the currently defined remote registry
      */
-    public void addRegistry(String name, Registry reg) {
-        if (name == null) {
-            name = "DEFAULT";
-        }
-        registryMap.put(name, reg);
+    public Registry getRegistry() {
+        return registry;
     }
 
     /**
-     * Get the named registry, or the default if name is null
-     * @param name registry name or null - for default registry
-     * @return actual registry for the given name or the default registry
+     * Set the remote registry for the configuration
+     * @param registry the remote registry for the configuration
      */
-    public Registry getRegistry(String name) {
-        if (name == null) {
-            name = "DEFAULT";
-        }
-        Registry reg = (Registry) registryMap.get(name);
-        if (reg == null) {
-            handleException("Reference to non-existing registry named : " + name);
-        }
-        return reg;
-    }
-
-    /**
-     * Deletes the registry named with the given name
-     * @param name of the registry to be deleted
-     */
-    public void deleteRegistry(String name) {
-        Object o = registryMap.get(name);
-        if(o == null) {
-            handleException("Reference to non-existing registry named : " + name);
-        } else {
-            registryMap.remove(name);
-        }
-    }
-
-    /**
-     * Get the map of registered registries
-     * @return a map of registry name to registry instance
-     */
-    public Map getRegistries() {
-        return registryMap;
+    public void setRegistry(Registry registry) {
+        this.registry = registry;
     }
 
     /**
@@ -487,7 +344,7 @@ public class SynapseConfiguration {
      * @param axisConfig
      */
     public void setAxisConfiguration(AxisConfiguration axisConfig) {
-        this.axisConfig = axisConfig;
+        this.axisConfiguration = axisConfig;
     }
 
     /**
@@ -495,7 +352,23 @@ public class SynapseConfiguration {
      * @return AxisConfiguration of the Axis2
      */
     public AxisConfiguration getAxisConfiguration() {
-        return axisConfig;
+        return axisConfiguration;
+    }
+
+    /**
+     * The path to the currently loaded configuration file
+     * @return file path to synapse.xml
+     */
+    public String getPathToConfigFile() {
+        return pathToConfigFile;
+    }
+
+    /**
+     * Set the path to the loaded synapse.xml
+     * @param pathToConfigFile path to the synapse.xml loaded
+     */
+    public void setPathToConfigFile(String pathToConfigFile) {
+        this.pathToConfigFile = pathToConfigFile;
     }
 
     private void handleException(String msg) {

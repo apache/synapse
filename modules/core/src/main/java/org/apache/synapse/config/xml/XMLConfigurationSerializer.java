@@ -26,102 +26,109 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
 
+/**
+ * Serialize a SynapseConfiguration into an OutputStream
+ */
 public class XMLConfigurationSerializer {
 
     private static final Log log = LogFactory.getLog(XMLConfigurationSerializer.class);
 
-    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    private static final OMFactory fac = OMAbstractFactory.getOMFactory();
+    private static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
+    private static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
 
-
-    public static void serializeConfiguration(SynapseConfiguration synCfg, OutputStream outputStream)
-        throws XMLStreamException {
-
-        OMElement synapse = fac.createOMElement("synapse", synNS);
-
-        // process registries
-        Iterator iter = synCfg.getRegistries().keySet().iterator();
-        while (iter.hasNext()) {
-            RegistrySerializer.serializeRegistry(synapse, synCfg.getRegistry((String) iter.next()));
-        }
+    /**
+     * order of entries is irrelavant, however its nice to have some order
+     * @param synCfg
+     * @param outputStream
+     * @throws XMLStreamException
+     */
+    public static void serializeConfiguration(SynapseConfiguration synCfg,
+        OutputStream outputStream) throws XMLStreamException {
 
         OMElement definitions = fac.createOMElement("definitions", synNS);
 
-        // process properties
-        serializeProperties(definitions, synCfg);
-
-        // process endpoints
-        serializeEndpoints(definitions, synCfg);
-
-        // process sequences
-        iter = synCfg.getNamedSequences().keySet().iterator();
-        while (iter.hasNext()) {
-            String name = (String) iter.next();
-            definitions.addChild(
-                MediatorSerializerFinder.getInstance().getSerializer(synCfg.getNamedSequence(name))
-                    .serializeMediator(null, synCfg.getNamedSequence(name)));
+        // first process a remote registry if present
+        if (synCfg.getRegistry() != null) {
+            RegistrySerializer.serializeRegistry(definitions, synCfg.getRegistry());
         }
-
-        // add definitions
-        synapse.addChild(definitions);
 
         // add proxy services
-        OMElement proxies = fac.createOMElement("proxies", synNS);
-        iter = synCfg.getProxyServices().iterator();
+        Iterator iter = synCfg.getProxyServices().iterator();
         while (iter.hasNext()) {
             ProxyService service = (ProxyService) iter.next();
-            ProxyServiceSerializer.serializeProxy(proxies, service);
+            ProxyServiceSerializer.serializeProxy(definitions, service);
         }
-        synapse.addChild(proxies);
 
-        // process main mediator
-        synapse.addChild(
-            MediatorSerializerFinder.getInstance().getSerializer(synCfg.getMainMediator())
-                .serializeMediator(null, synCfg.getMainMediator()));
+        Map entries   = new HashMap();
+        Map endpoints = new HashMap();
+        Map sequences = new HashMap();
 
-        synapse.serialize(outputStream);
-    }
-
-    private static void serializeProperties(OMElement definitions, SynapseConfiguration synCfg) {
-        Iterator iter = synCfg.getGlobalProps().keySet().iterator();
+        iter = synCfg.getLocalRegistry().keySet().iterator();
         while (iter.hasNext()) {
-            String propertyName = (String) iter.next();
-            PropertySerializer.serializeProperty(
-                    synCfg.getPropertyObject(propertyName), definitions);
-        }
-    }
-
-    private static void serializeEndpoints(OMElement definitions, SynapseConfiguration synCfg) {
-
-        Iterator iter = synCfg.getNamedEndpoints().keySet().iterator();
-        while (iter.hasNext()) {
-            String endpointName = (String) iter.next();
-            Object endpt = synCfg.getNamedEndpoint(endpointName);
-
-            if (endpt instanceof Property) {
-                OMElement endpoint = fac.createOMElement("endpoint", synNS);
-                Property dp = (Property) endpt;
-                endpoint.addAttribute(fac.createOMAttribute(
-                        "name", nullNS, endpointName));
-                endpoint.addAttribute(fac.createOMAttribute(
-                        "key", nullNS, dp.getKey()));
-                definitions.addChild(endpoint);
-
-            } else if (endpt instanceof EndpointDefinition) {
-                EndpointDefinitionSerializer.serializeEndpoint((EndpointDefinition) endpt, definitions);
+            Object key = iter.next();
+            Object o = synCfg.getLocalRegistry().get(key);
+            if (o instanceof Mediator) {
+                sequences.put(key, o);
+            } else if (o instanceof Endpoint) {
+                endpoints.put(key, o);
+            } else if (o instanceof Entry) {
+                entries.put(key, o);
             } else {
-                handleException("Invalid endpoint. Type : " + endpt.getClass());
+                handleException("Unknown object : " + o.getClass()
+                    + " for serialization into Synapse configuration");
             }
+        }
+
+        // process entries
+        serializeEntries(definitions, entries);
+
+        // process endpoints
+        serializeEndpoints(definitions, endpoints);
+
+        // process sequences
+        serializeSequences(definitions, sequences);
+
+        definitions.serialize(outputStream);
+    }
+
+    private static void serializeEntries(OMElement definitions, Map entries) {
+        Iterator iter = entries.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            EntrySerializer.serializeEntry((Entry) entries.get(key), definitions);
+        }
+    }
+
+    private static void serializeEndpoints(OMElement definitions, Map endpoints) {
+        Iterator iter = endpoints.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            //EndpointSerializer.serializeEndpoint((Endpoint) endpoints.get(key), definitions);
+            // TODO chathura
+        }
+    }
+
+    private static void serializeSequences(OMElement definitions, Map sequences) {
+        Iterator iter = sequences.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            Mediator mediator = (Mediator) sequences.get(key);
+            MediatorSerializerFinder.getInstance().getSerializer(mediator)
+                .serializeMediator(definitions, mediator);
         }
     }
 

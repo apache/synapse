@@ -24,29 +24,24 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Property;
-import org.apache.synapse.config.Util;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.base.SynapseMediator;
+import org.apache.synapse.mediators.builtin.send.SendMediator;
 import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.LogMediator;
-import org.apache.synapse.registry.Registry;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Iterator;
 
 
 /**
- * Builds a Synapse Configuration model from an XML input stream.
+ * Builds a Synapse Configuration from an XML input stream
  */
 public class XMLConfigurationBuilder {
 
@@ -57,31 +52,13 @@ public class XMLConfigurationBuilder {
         log.info("Generating the Synapse configuration model by parsing the XML configuration");
         SynapseConfiguration config = new SynapseConfiguration();
 
-        OMElement root = null;
+        OMElement definitions = null;
         try {
-            root = new StAXOMBuilder(is).getDocumentElement();
-        } catch (XMLStreamException e) {
-            handleException("Error parsing Synapse configuration : " + e.getMessage(), e);
-        }
-        root.build();
-
-        Iterator regs = root.getChildrenWithName(Constants.REGISTRY_ELT);
-        if (regs != null) {
-            while (regs.hasNext()) {
-                Object o = regs.next();
-                if (o instanceof OMElement) {
-                    Registry reg = RegistryFactory.createRegistry((OMElement) o);
-                    config.addRegistry(reg.getRegistryName(), reg);
-                } else {
-                    handleException("Invalid registry declaration in configuration");
-                }
-            }
-        }
-
-        OMContainer definitions = root.getFirstChildWithName(Constants.DEFINITIONS_ELT);
-        if (definitions != null) {
+            definitions = new StAXOMBuilder(is).getDocumentElement();
+            definitions.build();
 
             Iterator iter = definitions.getChildren();
+
             while (iter.hasNext()) {
                 Object o = iter.next();
                 if (o instanceof OMElement) {
@@ -90,156 +67,112 @@ public class XMLConfigurationBuilder {
                         defineSequence(config, elt);
                     } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
                         defineEndpoint(config, elt);
-                    } else if (Constants.PROPERTY_ELT.equals(elt.getQName())) {
-                        defineProperty(config, elt);
+                    } else if (Constants.ENTRY_ELT.equals(elt.getQName())) {
+                        defineEntry(config, elt);
+                    } else if (Constants.PROXY_ELT.equals(elt.getQName())) {
+                        defineProxy(config, elt);
+                    } else if (Constants.REGISTRY_ELT.equals(elt.getQName())) {
+                        defineRegistry(config, elt);
                     } else {
-                        handleException("Unexpected element : " + elt);
+                        handleException("Unexpected element : " + elt.getQName());
                     }
                 }
             }
-        }
 
-        OMElement proxies = root.getFirstChildWithName(Constants.PROXIES_ELT);
-        if (proxies != null) {
-            Iterator iter = proxies.getChildren();
-            while (iter.hasNext()) {
-                Object o = iter.next();
-                if (o instanceof OMElement) {
-                    OMElement elt = (OMElement) o;
-                    if (Constants.PROXY_ELT.equals(elt.getQName())) {
-                        ProxyService proxy = ProxyServiceFactory.createProxy(elt);
-                        config.addProxyService(proxy.getName(), proxy);
-                    }
-                }
-            }
-        }
-
-        OMElement rules = root.getFirstChildWithName(Constants.RULES_ELT);
-
-        if (rules == null) {
-            if (regs == null) {
-                handleException("A valid Synapse configuration MUST specify the main mediator using the <rules> element");
-            } else {
-                // this is a fully dynamic configuration. look for synapse.xml at thr registry root
-                OMNode cfg = config.getRegistry(null).lookup("synapse.xml");
-                return getConfiguration(Util.getStreamSource(cfg).getInputStream());
-            }
-
-        } else {
-            OMAttribute key = rules.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-            if (key != null) {
-                Property dp = new Property();
-                dp.setName("namespace");
-                dp.setType(Property.DYNAMIC_TYPE);
-                dp.setKey(key.getAttributeValue());
-                dp.setMapper(MediatorFactoryFinder.getInstance());
-                config.setMainMediator(dp);
-            } else {
-                SynapseMediator sm = (SynapseMediator)
-                        MediatorFactoryFinder.getInstance().getMediator(rules);
-                if (sm.getList().isEmpty()) {
-                    handleException("Invalid configuration, the main mediator specified by the <rules> element is empty");
-                } else {
-                    config.setMainMediator(sm);
-                }
-            }
+        } catch (XMLStreamException e) {
+            handleException("Error parsing Synapse configuration : " + e.getMessage(), e);
         }
 
         if (is != null) {
             try {
                 is.close();
-            } catch (IOException e) {
-            }
+            } catch (IOException ignore) {}
+        }
+
+        if (config.getMainSequence() == null) {
+            setDefaultMainSequence(config);
         }
 
         if (config.getFaultSequence() == null) {
-            SequenceMediator faultSequence = new SequenceMediator();
-            faultSequence.setName(Constants.FAULT_SEQUENCE);
-            LogMediator logMediator = new LogMediator();
-            logMediator.setLogLevel(LogMediator.FULL);
-            faultSequence.addChild(logMediator);
-            config.setFaultSequence(faultSequence);
+            setDefaultFaultSequence(config);
         }
 
         return config;
     }
 
-    /**
-     * <pre>
-     * &lt;set-property name="string" value="string"/&gt;
-     * </pre>
-     *
-     * @param elem
-     */
-    public static void defineProperty(SynapseConfiguration config, OMElement elem) {
-        Property prop = PropertyFactory.createProperty(elem);
-        if(prop.getType() == Property.SRC_TYPE) {
-            try {
-                prop.setValue(org.apache.synapse.config.Util.getObject(
-                        new URL(prop.getSrc().toString())));
-            } catch (MalformedURLException e) {
-                handleException("Source URL is not valid");
+    private static void defineRegistry(SynapseConfiguration config, OMElement elem) {
+        if (config.getRegistry() != null) {
+            handleException("Only one remote registry can be defined within a configuration");
+        }
+        config.setRegistry(RegistryFactory.createRegistry(elem));
+    }
+
+    private static void defineProxy(SynapseConfiguration config, OMElement elem) {
+        ProxyService proxy = ProxyServiceFactory.createProxy(elem);
+        if (config.getProxyService(proxy.getName()) != null) {
+            handleException("Duplicate proxy service with name : " + proxy.getName());
+        }
+        config.addProxyService(proxy.getName(), proxy);
+    }
+
+    private static void defineEntry(SynapseConfiguration config, OMElement elem) {
+        Entry entry = EntryFactory.createEntry(elem);
+        if (config.getLocalRegistry().get(entry.getKey()) != null) {
+            handleException("Duplicate registry entry definition for key : " + entry.getKey());
+        }
+        config.addResource(entry.getKey(), entry);
+    }
+
+    private static void defineSequence(SynapseConfiguration config, OMElement ele) {
+
+        String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
+        if (name != null) {
+            if (config.getLocalRegistry().get(name) != null) {
+                handleException("Duplicate sequence definition : " + name);
             }
-        }
-        config.addProperty(prop.getName(), prop);
-    }
-
-    /**
-     * <pre>
-     * &lt;sequence name="string" [key="string"]&gt;
-     *    Mediator*
-     * &lt;/sequence&gt;
-     * </pre>
-     *
-     * @param ele
-     */
-    public static void defineSequence(SynapseConfiguration config, OMElement ele) {
-        OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute key = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-        if (name != null && key != null) {
-            Property dp = new Property();
-            dp.setType(Property.DYNAMIC_TYPE);
-            dp.setKey(key.getAttributeValue());
-            dp.setMapper(MediatorFactoryFinder.getInstance());
-            config.addNamedSequence(name.getAttributeValue(), dp);
+            config.addSequence(name, MediatorFactoryFinder.getInstance().getMediator(ele));
         } else {
-            SequenceMediator seq = (SequenceMediator)
-                    MediatorFactoryFinder.getInstance().getMediator(ele);
-            config.addNamedSequence(seq.getName(), seq);
+            handleException("Invalid sequence definition without a name");
         }
     }
 
-    /**
-     * Create an endpoint definition digesting an XML fragment
-     * <p/>
-     * <pre>
-     * &lt;endpoint name="string" [key="string"] [address="url"]&gt;
-     *    .. extensibility ..
-     * &lt;/endpoint&gt;
-     * </pre>
-     *
-     * @param ele the &lt;endpoint&gt; element
-     */
     public static void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
-        OMAttribute name = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute key = ele.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-        if (name != null && key != null) {
-            Property dp = new Property();
-            dp.setType(Property.DYNAMIC_TYPE);
-            dp.setKey(key.getAttributeValue());
-            //dp.setMapper(EndpointDefinitionFactory.getInstance());
-            dp.setMapper(EndpointAbstractFactory.getEndpointFactroy(ele));
-            config.addNamedEndpoint(name.getAttributeValue(), dp);
+        String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "nane"));
+        if (name != null) {
+            if (config.getLocalRegistry().get(name) != null) {
+                handleException("Duplicate endpoint definition : " + name);
+            }
+            Endpoint endpoint =
+                EndpointAbstractFactory.getEndpointFactroy(ele).createEndpoint(ele, false);
+            config.addEndpoint(name, endpoint);
         } else {
-            Endpoint endpoint = EndpointAbstractFactory.getEndpointFactroy(ele).
-                    createEndpoint(ele, false);
-            config.addNamedEndpoint(endpoint.getName(), endpoint);
-
-            //EndpointDefinition endpoint = EndpointDefinitionFactory.createEndpoint(ele, false);
-            //// add this endpoint to the configuration
-            //config.addNamedEndpoint(endpoint.getName(), endpoint);
+            handleException("Invalid endpoint definition without a name");
         }
+    }
+
+    /**
+     * Return the main sequence if one is not defined. This implementation defaults to
+     * a simple sequence with a <send/>
+     * @param config the configuration to be updated
+     */
+    private static void setDefaultMainSequence(SynapseConfiguration config) {
+        SequenceMediator main = new SequenceMediator();
+        main.setName(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY);
+        main.addChild(new SendMediator());
+    }
+
+    /**
+     * Return the fault sequence if one is not defined. This implementation defaults to
+     * a simple sequence with a <log level="full"/>
+     * @param config the configuration to be updated
+     */
+    private static void setDefaultFaultSequence(SynapseConfiguration config) {
+        SequenceMediator fault = new SequenceMediator();
+        fault.setName(org.apache.synapse.Constants.FAULT_SEQUENCE_KEY);
+        LogMediator log = new LogMediator();
+        log.setLogLevel(LogMediator.FULL);
+        fault.addChild(log);
     }
 
     private static void handleException(String msg) {
@@ -251,5 +184,4 @@ public class XMLConfigurationBuilder {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
-
 }

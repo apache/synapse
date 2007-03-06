@@ -36,7 +36,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  * OR
  * <p/>
  * <pre>
- * &lt;sequence ref="name"/&gt;
+ * &lt;sequence key="name"/&gt;
  * </pre>
  */
 public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
@@ -101,7 +101,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 
             if (mediator.getRef() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
-                        "ref", nullNS, mediator.getRef()));
+                        "key", nullNS, mediator.getRef()));
             } else if (mediator.getName() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
                         "name", nullNS, mediator.getName()));

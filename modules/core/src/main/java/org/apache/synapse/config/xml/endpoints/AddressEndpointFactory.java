@@ -22,22 +22,15 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.send.endpoints.AddressEndpoint;
 import org.apache.synapse.config.EndpointDefinition;
-import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
-import org.apache.synapse.config.xml.endpoints.utils.WSDL20EndpointBuilder;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.wsdl.WSDLConstants;
 
 import javax.xml.namespace.QName;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.IOException;
 
 public class AddressEndpointFactory implements EndpointFactory {
 

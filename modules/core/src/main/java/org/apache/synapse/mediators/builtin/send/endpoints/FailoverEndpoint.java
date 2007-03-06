@@ -73,6 +73,14 @@ public class FailoverEndpoint implements Endpoint {
         this.active = active;
     }
 
+    public void setDynamic(boolean dynamic) {
+        // TODO chathura
+    }
+
+    public void setRegistryKey(String registryKey) {
+        // TODO chathura
+    }
+
     public ArrayList getEndpoints() {
         return endpoints;
     }

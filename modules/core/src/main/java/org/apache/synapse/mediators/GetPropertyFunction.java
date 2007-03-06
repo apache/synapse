@@ -58,7 +58,7 @@ public class GetPropertyFunction implements Function {
             log.warn("Property key value for lookup was not specified");
             return null;
         } else if (size == 1) {
-            return evaluate(Constants.SCOPE_CORRELATE, args.get(0), context.getNavigator());
+            return evaluate(Constants.SCOPE_DEFAULT, args.get(0), context.getNavigator());
         } else if (size == 2) {
             return evaluate(args.get(0), args.get(1), context.getNavigator());
         } else {
@@ -84,7 +84,7 @@ public class GetPropertyFunction implements Function {
                     " or synapse:get-property(prop-name) Xpath function");
             return null;
         }
-        if (Constants.SCOPE_CORRELATE.equals(scope)) {
+        if (Constants.SCOPE_DEFAULT.equals(scope)) {
             Object result = synCtx.getProperty(key);
             if (result != null) {
                 return result;

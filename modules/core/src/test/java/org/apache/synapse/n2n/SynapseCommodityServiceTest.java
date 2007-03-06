@@ -32,8 +32,6 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.transport.nhttp.HttpCoreNIOListener;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.AxisFault;

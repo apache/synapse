@@ -23,9 +23,9 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
-import org.apache.synapse.config.Property;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -38,74 +38,78 @@ public abstract class AbstractRegistry implements Registry {
 
     private static final Log log = LogFactory.getLog(AbstractRegistry.class);
 
-    /** The name of the registry */
-    protected String name = null;
-
     /** The list of configuration properties */
     protected Map properties = new HashMap();
 
     /**
-     * Get the object for the given key from this registry
-     * @param dp the DynamicProperty for the registry lookup
+     * Get the resource for the given key from this registry
+     * @param entry
      * @return the matching resultant object
      */
-    public Object getProperty(Property dp) {
+    public Object getResource(Entry entry) {
 
         OMNode omNode = null;
         RegistryEntry re = null;
 
-        // we are dealing with a DynamicProperty. Have we seen this before and processed
-        // it at least once and have it cached?
+        // we are dealing with a dynamic resource. Have we seen this before and processed
+        // it at least once and have it cached already?
 
         // if we have an unexpired cached copy, return the cached object
-        if (dp.isCached() && !dp.isExpired()) {
-            return dp.getValue();
+        if (entry.isCached() && !entry.isExpired()) {
+            return entry.getValue();
 
         // if we have not cached the referenced object, fetch it and its RegistryEntry
-        } else if (!dp.isCached()) {
-            omNode = lookup(dp.getKey());
-            re = getRegistryEntry(dp.getKey());
+        } else if (!entry.isCached()) {
+            omNode = lookup(entry.getKey());
+            if (omNode == null) {
+                return null;
+            } else {
+                re = getRegistryEntry(entry.getKey());
+            }
 
         // if we have cached it before, and now the cache has expired
         // get its *new* registry entry and compare versions and pick new cache duration
-        } else if (dp.isExpired()) {
+        } else if (entry.isExpired()) {
 
-            log.debug("Cached object has expired for key : " + dp.getKey());
-            re = getRegistryEntry(dp.getKey());
+            log.debug("Cached object has expired for key : " + entry.getKey());
+            re = getRegistryEntry(entry.getKey());
 
             if (re.getVersion() != Long.MIN_VALUE &&
-                re.getVersion() == dp.getVersion()) {
+                re.getVersion() == entry.getVersion()) {
                 log.debug("Expired version number is same as current version in registry");
 
                 // renew cache lease for another cachable duration (as returned by the
                 // new getRegistryEntry() call
-                dp.setExpiryTime(
+                entry.setExpiryTime(
                     System.currentTimeMillis() + re.getCachableDuration());
                 log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
 
                 // return cached object
-                return dp.getValue();
+                return entry.getValue();
 
             } else {
-                omNode = lookup(dp.getKey());
+                omNode = lookup(entry.getKey());
             }
         }
 
         // if we get here, we have received the raw omNode from the
         // registry and our previous copy (if we had one) has expired or is not valid
 
-        if (dp.getMapper() != null) {
-            dp.setValue(
-                dp.getMapper().getObjectFromOMNode(omNode));
-            if (dp.getValue() instanceof SequenceMediator) {
-                SequenceMediator seq = (SequenceMediator) dp.getValue();
+        // if we have a XMLToObjectMapper for this entry, use it to convert this
+        // resource into the appropriate object - e.g. sequence or endpoint
+        if (entry.getMapper() != null) {
+            entry.setValue(entry.getMapper().getObjectFromOMNode(omNode));
+
+            if (entry.getValue() instanceof SequenceMediator) {
+                SequenceMediator seq = (SequenceMediator) entry.getValue();
                 seq.setDynamic(true);
-                seq.setRegistryKey(dp.getKey());
-            } else if (dp.getValue() instanceof EndpointDefinition) {
-                EndpointDefinition ep = (EndpointDefinition) dp.getValue();
+                seq.setRegistryKey(entry.getKey());
+            } else if (entry.getValue() instanceof Endpoint) {
+                Endpoint ep = (Endpoint) entry.getValue();
                 ep.setDynamic(true);
-                ep.setRegistryKey(dp.getKey());
+                ep.setRegistryKey(entry.getKey());
             }
+
         } else {
             // if the type of the object is known to have a mapper, create the
             // resultant Object using the known mapper, and cache this Object
@@ -114,33 +118,24 @@ public abstract class AbstractRegistry implements Registry {
 
                 XMLToObjectMapper mapper = getMapper(re.getType());
                 if (mapper != null) {
-                    dp.setMapper(mapper);
-                    dp.setValue(mapper.getObjectFromOMNode(omNode));
+                    entry.setMapper(mapper);
+                    entry.setValue(mapper.getObjectFromOMNode(omNode));
 
                 } else {
-                    dp.setValue(omNode);
+                    entry.setValue(omNode);
                 }
             }
         }
 
         // increment cache expiry time as specified by the last getRegistryEntry() call
-        dp.setExpiryTime(
-            System.currentTimeMillis() + re.getCachableDuration());
-        dp.setVersion(re.getVersion());
+        entry.setExpiryTime(System.currentTimeMillis() + re.getCachableDuration());
+        entry.setVersion(re.getVersion());
 
-        return dp.getValue();
+        return entry.getValue();
     }
 
     private XMLToObjectMapper getMapper(URI type) {
         return null;
-    }
-
-    public void setRegistryName(String name) {
-        this.name = name;
-    }
-
-    public String getRegistryName() {
-        return name;
     }
 
     public String getProviderClass() {

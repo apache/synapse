@@ -20,7 +20,7 @@
 package org.apache.synapse.registry;
 
 import org.apache.axiom.om.OMNode;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 
 import java.util.Map;
 
@@ -41,10 +41,10 @@ public interface Registry {
      * the content from the registry and cache if required.
      * @see AbstractRegistry
      *
-     * @param dp the DynamicProperty
+     * @param entry the registry Entry
      * @return the value from the registry or local cache
      */
-    public Object getProperty(Property dp);
+    public Object getResource(Entry entry);
 
     /**
      * Get the registry entry for the given key
@@ -72,18 +72,6 @@ public interface Registry {
      * @return Array of decendant registry entries of the given registry entry
      */
     public RegistryEntry[] getDescendants(RegistryEntry entry);
-
-    /**
-     * Get the name of this registry
-     * @return name of the registry
-     */
-    public String getRegistryName();
-
-    /**
-     * Set the name of this registry
-     * @param name of this registry
-     */
-    public void setRegistryName(String name);
 
     /**
      * Return the name of the implementation class

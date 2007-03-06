@@ -119,7 +119,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
      */
     private void registerExtensions() {
 
-        //log.debug("Registering mediator extensions found in the classpath : " + System.getProperty("java.class.path"));
+        //log.debug("Registering mediator extensions found in the classpath : " + System.getResource("java.class.path"));
 
         // register MediatorFactory extensions
         Iterator it = Service.providers(MediatorFactory.class);
@@ -144,7 +144,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         String localName = element.getLocalName();
         QName qName = null;
         if (element.getNamespace() != null) {
-            qName = new QName(element.getNamespace().getName(), localName);
+            qName = new QName(element.getNamespace().getNamespaceURI(), localName);
         } else {
             qName = new QName(localName);
         }
@@ -153,7 +153,7 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
 
         if (cls == null && localName.indexOf('.') > -1) {
             String newLocalName = localName.substring(0, localName.indexOf('.'));
-            qName = new QName(element.getNamespace().getName(), newLocalName);
+            qName = new QName(element.getNamespace().getNamespaceURI(), newLocalName);
             log.debug("getMediator.2(" + qName + ")");
             cls = (Class) factoryMap.get(qName);
         }

@@ -27,7 +27,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.config.Util;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -65,7 +65,7 @@ public class SpringMediator extends AbstractMediator {
         if (shouldTrace) {
             trace.trace("Start : Spring mediator");
         }
-        Property dp = synCtx.getConfiguration().getPropertyObject(configKey);
+        Entry dp = synCtx.getConfiguration().getEntryDefinition(configKey);
 
         // if the configKey refers to a dynamic property
         if (dp != null && dp.isDynamic()) {
@@ -112,7 +112,7 @@ public class SpringMediator extends AbstractMediator {
         xbdr.setValidating(false);
         xbdr.loadBeanDefinitions(new InputStreamResource(
             Util.getStreamSource(
-                    synCtx.getConfiguration().getProperty(configKey)).getInputStream()));
+                    synCtx.getConfiguration().getEntry(configKey)).getInputStream()));
         appContext.refresh();
         this.appContext = appContext;
     }

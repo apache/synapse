@@ -26,6 +26,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 
 import java.util.Set;
 import java.util.Stack;
@@ -68,7 +69,57 @@ public interface MessageContext {
     public void setEnvironment(SynapseEnvironment se);
 
     /**
+     * Return the main sequence from the configuration, or the local message context
+     * This method looks up for the sequence named Constants.MAIN_SEQUENCE_KEY from
+     * the local message context to make this look up transactional - i.e. a request and
+     * response message pair will not see a difference in the main sequence if the main
+     * sequence was dynamic and changed in between at the registry
+     * @return the main sequence to be used for mediation
+     */
+    public Mediator getMainSequence();
+
+    /**
+     * Return the fault sequence from the configuration, or the local message context
+     * This method looks up for the sequence named Constants.FAULT_SEQUENCE_KEY from
+     * the local message context to make this look up transactional - i.e. a request and
+     * response message pair will not see a difference in the fault sequence if the fault
+     * sequence was dynamic and changed in between at the registry
+     * @return the fault sequence to be used for mediation
+     */
+    public Mediator getFaultSequence();
+
+    /**
+     * Return the sequence with the given key from the configuration, or the local message
+     * context. This method looks up for the sequence with the given key from the local
+     * message context to make this look up transactional - i.e. a request and response
+     * message pair will not see a difference in the said sequence if it was dynamic and
+     * changed in between at the registry
+     * @param key the sequence key to be looked up
+     * @return the sequence mediator mapped to the key
+     */
+    public Mediator getSequence(String key);
+
+    /**
+     * Return the endpoint with the given key from the configuration, or the local message
+     * context. This method looks up for the endpoint with the given key from the local
+     * message context to make this look up transactional - i.e. a request and response
+     * message pair will not see a difference in the said endpoint if it was dynamic and
+     * changed in between at the registry
+     * @param key the endpoint key to be looked up
+     * @return the endpoint mapped to the key
+     */
+    public Endpoint getEndpoint(String key);
+
+    /**
      * Get the value of a custom (local) property set on the message instance
+     * @param key key to look up property
+     * @return value for the given key
+     */
+    public Object getLocalProperty(String key);
+
+    /**
+     * Get the value of a property set on the message instance, from the local registry
+     * or the remote registry - by cascading through
      * @param key key to look up property
      * @return value for the given key
      */

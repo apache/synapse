@@ -25,7 +25,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.config.XMLToObjectMapper;
 
 import javax.xml.namespace.QName;
@@ -42,16 +42,16 @@ import javax.xml.namespace.QName;
  * 
  * </endpoint>
  */
-public class EndpointFactory implements XMLToObjectMapper {
+public class EndpointDefinitionFactory implements XMLToObjectMapper {
 
-	private static Log log = LogFactory.getLog(EndpointFactory.class);
+	private static Log log = LogFactory.getLog(EndpointDefinitionFactory.class);
 
-	private static final EndpointFactory instance = new EndpointFactory();
+	private static final EndpointDefinitionFactory instance = new EndpointDefinitionFactory();
 
-	private EndpointFactory() {
+	private EndpointDefinitionFactory() {
 	}
 
-	public static Endpoint createEndpoint(OMElement elem,
+	public static EndpointDefinition createEndpoint(OMElement elem,
 			boolean anonymousEndpoint) {
 
 		OMAttribute name = elem.getAttribute(new QName(
@@ -63,7 +63,7 @@ public class EndpointFactory implements XMLToObjectMapper {
         OMAttribute optimize = elem.getAttribute(new QName(
 					Constants.NULL_NAMESPACE, "optimize"));
 
-        Endpoint endpoint = new Endpoint();
+        EndpointDefinition endpoint = new EndpointDefinition();
 		if (!anonymousEndpoint) {
 			if (name == null) {
 				handleException("The 'name' attribute is required for a named endpoint definition");
@@ -181,7 +181,7 @@ public class EndpointFactory implements XMLToObjectMapper {
 		return null;
 	}
 
-	public static EndpointFactory getInstance() {
+	public static EndpointDefinitionFactory getInstance() {
 		return instance;
 	}
 }

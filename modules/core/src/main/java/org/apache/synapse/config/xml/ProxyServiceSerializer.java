@@ -24,7 +24,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import java.util.Iterator;
@@ -99,7 +102,10 @@ public class ProxyServiceSerializer {
                     "endpoint", nullNS, endpoint));
             proxy.addChild(target);
         } else if (inLineEndpoint != null) {
-            EndpointSerializer.serializeEndpoint(inLineEndpoint, target);
+            EndpointSerializer serializer
+                    = EndpointAbstractSerializer.getEndpointSerializer(inLineEndpoint);
+            OMElement epElement = serializer.serializeEndpoint(inLineEndpoint);
+            target.addChild(epElement);            
             proxy.addChild(target);
         } else {
             String inSeq = service.getTargetInSequence();

@@ -27,7 +27,9 @@
         <set-property name="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/>
 
         <!-- define a reuseable endpoint definition and use it within config -->
-        <endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+        <endpoint name="stockquote">
+            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+        </endpoint>
 
     </definitions>
 

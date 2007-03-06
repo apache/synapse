@@ -24,6 +24,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
@@ -52,6 +53,9 @@ public class XMLConfigurationBuilder {
         log.info("Generating the Synapse configuration model by parsing the XML configuration");
         SynapseConfiguration config = new SynapseConfiguration();
 
+        SequenceMediator rootSequence = new SequenceMediator();
+        rootSequence.setName(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY);
+
         OMElement definitions = null;
         try {
             definitions = new StAXOMBuilder(is).getDocumentElement();
@@ -74,7 +78,8 @@ public class XMLConfigurationBuilder {
                     } else if (Constants.REGISTRY_ELT.equals(elt.getQName())) {
                         defineRegistry(config, elt);
                     } else {
-                        handleException("Unexpected element : " + elt.getQName());
+                        Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
+                        rootSequence.addChild(m);
                     }
                 }
             }
@@ -90,7 +95,11 @@ public class XMLConfigurationBuilder {
         }
 
         if (config.getMainSequence() == null) {
-            setDefaultMainSequence(config);
+            if (rootSequence.getList().isEmpty()) {
+                setDefaultMainSequence(config);
+            } else {
+                config.addSequence(rootSequence.getName(), rootSequence);
+            }
         }
 
         if (config.getFaultSequence() == null) {
@@ -160,6 +169,7 @@ public class XMLConfigurationBuilder {
         SequenceMediator main = new SequenceMediator();
         main.setName(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY);
         main.addChild(new SendMediator());
+        config.addSequence(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY, main);
     }
 
     /**
@@ -173,6 +183,7 @@ public class XMLConfigurationBuilder {
         LogMediator log = new LogMediator();
         log.setLogLevel(LogMediator.FULL);
         fault.addChild(log);
+        config.addSequence(org.apache.synapse.Constants.FAULT_SEQUENCE_KEY, fault);
     }
 
     private static void handleException(String msg) {

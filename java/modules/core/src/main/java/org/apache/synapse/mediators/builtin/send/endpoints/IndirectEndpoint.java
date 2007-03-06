@@ -30,8 +30,7 @@ public class IndirectEndpoint implements Endpoint {
 
     public void send(MessageContext synMessageContext) {
         // get the actual endpoint and send
-        Endpoint endpoint = synMessageContext.getConfiguration().
-                getNamedEndpoint(ref);
+        Endpoint endpoint = synMessageContext.getEndpoint(ref);
 
         if (endpoint.isActive()) {
             endpoint.send(synMessageContext);
@@ -62,6 +61,14 @@ public class IndirectEndpoint implements Endpoint {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public void setDynamic(boolean dynamic) {
+        // TODO chathura
+    }
+
+    public void setRegistryKey(String registryKey) {
+        // TODO chathura
     }
 
     public void setParentEndpoint(Endpoint parentEndpoint) {

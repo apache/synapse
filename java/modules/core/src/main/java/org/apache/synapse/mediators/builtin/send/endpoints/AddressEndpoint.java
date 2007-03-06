@@ -68,6 +68,14 @@ public class AddressEndpoint implements Endpoint, FaultHandler {
         this.active = active;
     }
 
+    public void setDynamic(boolean dynamic) {
+        // TODO chathura
+    }
+
+    public void setRegistryKey(String registryKey) {
+        // TODO chathura
+    }
+
     public void send(MessageContext synCtx) {
 
         String eprAddress = null;

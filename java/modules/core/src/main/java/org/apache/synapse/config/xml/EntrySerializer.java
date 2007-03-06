@@ -25,14 +25,14 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import javax.xml.stream.XMLStreamConstants;
 
-public class PropertySerializer {
+public class EntrySerializer {
 
-    private static Log log = LogFactory.getLog(PropertySerializer.class);
+    private static Log log = LogFactory.getLog(EntrySerializer.class);
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS = fac.createOMNamespace(
@@ -40,36 +40,36 @@ public class PropertySerializer {
     protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
 
     /**
-     * Serialize the Property object to an OMElement representing the property
-     * @param property
+     * Serialize the Entry object to an OMElement representing the entry
+     * @param entry
      * @param parent
-     * @return OMElement representing the property
+     * @return OMElement representing the entry
      */
-    public static OMElement serializeProperty(Property property, OMElement parent) {
+    public static OMElement serializeEntry(Entry entry, OMElement parent) {
 
-        OMElement propertyElement = fac.createOMElement("set-property", synNS);
+        OMElement propertyElement = fac.createOMElement("set-entry", synNS);
         propertyElement.addAttribute(fac.createOMAttribute(
-                "name", nullNS, property.getName()));
+                "key", nullNS, entry.getKey()));
 //	    propertyElement.addAttribute(fac.createOMAttribute(
-//                "type", nullNS, "" + property.getType()));
+//                "type", nullNS, "" + entry.getType()));
 
-        if (property.getType() == Property.DYNAMIC_TYPE) {
+        if (entry.getType() == Entry.REMOTE_ENTRY) {
             propertyElement.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, property.getKey()));
-        } else if (property.getType() == Property.SRC_TYPE) {
+                    "key", nullNS, entry.getKey()));
+        } else if (entry.getType() == Entry.URL_SRC) {
             propertyElement.addAttribute(fac.createOMAttribute(
-                    "src", nullNS, property.getSrc().toString()));
-        } else if (property.getType() == Property.VALUE_TYPE) {
-            propertyElement.addAttribute(fac.createOMAttribute(
-                    "value", nullNS, (String) property.getValue()));
-        } else if (property.getType() == Property.INLINE_XML_TYPE) {
-            propertyElement.addChild((OMElement) property.getValue());
-        } else if (property.getType() == Property.INLINE_STRING_TYPE) {
-            OMTextImpl textData = (OMTextImpl) fac.createOMText((String)property.getValue());
+                    "src", nullNS, entry.getSrc().toString()));
+//        } else if (entry.getType() == Entry.VALUE_TYPE) {
+//            propertyElement.addAttribute(fac.createOMAttribute(
+//                    "value", nullNS, (String) entry.getValue()));
+        } else if (entry.getType() == Entry.INLINE_XML) {
+            propertyElement.addChild((OMElement) entry.getValue());
+        } else if (entry.getType() == Entry.INLINE_TEXT) {
+            OMTextImpl textData = (OMTextImpl) fac.createOMText((String) entry.getValue());
             textData.setType(XMLStreamConstants.CDATA);
             propertyElement.addChild(textData);
         } else {
-            handleException("Property type undefined");
+            handleException("Entry type undefined");
         }
         if(parent != null) {
             parent.addChild(propertyElement);

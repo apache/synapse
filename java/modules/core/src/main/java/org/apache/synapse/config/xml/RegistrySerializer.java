@@ -46,10 +46,6 @@ public class RegistrySerializer {
     public static OMElement serializeRegistry(OMElement parent, Registry registry) {
 
         OMElement reg = fac.createOMElement("registry", synNS);
-        if (registry.getRegistryName() != null) {
-            reg.addAttribute(fac.createOMAttribute(
-                "name", nullNS, registry.getRegistryName()));
-        }
 
         if (registry.getProviderClass() != null) {
             reg.addAttribute(fac.createOMAttribute(

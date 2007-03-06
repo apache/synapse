@@ -63,7 +63,7 @@ public class MediatorPropertyFactory {
 
             if (attName == null || attName.getAttributeValue() == null ||
                 attName.getAttributeValue().trim().length() == 0) {
-                String msg = "Property name is a required attribute for a Log property";
+                String msg = "Entry name is a required attribute for a Log property";
                 log.error(msg);
                 throw new SynapseException(msg);
             } else {
@@ -73,7 +73,7 @@ public class MediatorPropertyFactory {
             // if a value is specified, use it, else look for an expression
             if (attValue != null) {
                 if (attValue.getAttributeValue() == null || attValue.getAttributeValue().trim().length() == 0) {
-                    String msg = "Property attribute value (if specified) is required for a Log property";
+                    String msg = "Entry attribute value (if specified) is required for a Log property";
                     log.error(msg);
                     throw new SynapseException(msg);
                 } else {
@@ -83,7 +83,7 @@ public class MediatorPropertyFactory {
             } else if (attExpr != null) {
 
                 if (attExpr.getAttributeValue() == null || attExpr.getAttributeValue().trim().length() == 0) {
-                    String msg = "Property attribute expression (if specified) is required for a mediator property";
+                    String msg = "Entry attribute expression (if specified) is required for a mediator property";
                     log.error(msg);
                     throw new SynapseException(msg);
 
@@ -101,7 +101,7 @@ public class MediatorPropertyFactory {
                 }
 
             } else {
-                String msg = "Property attribute value OR expression must be specified for a mediator property";
+                String msg = "Entry attribute value OR expression must be specified for a mediator property";
                 log.error(msg);
                 throw new SynapseException(msg);
             }

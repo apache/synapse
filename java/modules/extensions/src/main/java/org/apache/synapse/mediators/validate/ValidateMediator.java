@@ -29,7 +29,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 import org.apache.synapse.config.Util;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
@@ -224,7 +224,7 @@ public class ValidateMediator extends AbstractListMediator {
         Iterator iter = schemaKeys.iterator();
         while (iter.hasNext()) {
             String propKey = (String) iter.next();
-            Property dp = msgCtx.getConfiguration().getPropertyObject(propKey);
+            Entry dp = msgCtx.getConfiguration().getEntryDefinition(propKey);
             if (dp != null && dp.isDynamic()) {
                 if (!dp.isCached() || dp.isExpired()) {
                     reCreate = true;       // request re-initialization of Validator
@@ -259,7 +259,7 @@ public class ValidateMediator extends AbstractListMediator {
             while (iter.hasNext()) {
                 String propName = (String) iter.next();
                 sources[i++] = Util.getStreamSource(
-                    msgCtx.getConfiguration().getProperty(propName));
+                    msgCtx.getConfiguration().getEntry(propName));
             }
             schema = factory.newSchema(sources);
 

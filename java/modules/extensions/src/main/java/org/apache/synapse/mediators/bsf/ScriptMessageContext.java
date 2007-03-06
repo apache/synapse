@@ -21,18 +21,17 @@ package org.apache.synapse.mediators.bsf;
 
 import java.util.Set;
 import java.util.Stack;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 
 /**
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the message payload XML in a way natural to the scripting language.
@@ -108,6 +107,10 @@ public class ScriptMessageContext implements MessageContext {
         mc.setEnvironment(se);
     }
 
+    public Object getLocalProperty(String key) {
+        return mc.getLocalProperty(key);
+    }
+
     public Object getProperty(String key) {
         return mc.getProperty(key);
     }
@@ -118,6 +121,22 @@ public class ScriptMessageContext implements MessageContext {
 
     public Set getPropertyKeySet() {
         return mc.getPropertyKeySet();
+    }
+
+    public Mediator getMainSequence() {
+        return mc.getMainSequence();
+    }
+
+    public Mediator getFaultSequence() {
+        return mc.getFaultSequence();
+    }
+
+    public Mediator getSequence(String key) {
+        return mc.getSequence(key);
+    }
+
+    public Endpoint getEndpoint(String key) {
+        return mc.getEndpoint(key);
     }
 
     public SOAPEnvelope getEnvelope() {

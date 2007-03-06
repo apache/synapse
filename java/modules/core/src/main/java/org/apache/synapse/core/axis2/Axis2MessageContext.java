@@ -20,7 +20,6 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
@@ -28,12 +27,10 @@ import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.synapse.Constants;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.FaultHandler;
+import org.apache.synapse.*;
 import org.apache.synapse.mediators.GetPropertyFunction;
 import org.apache.synapse.mediators.MediatorFaultHandler;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.commons.logging.Log;
@@ -51,6 +48,7 @@ public class Axis2MessageContext implements MessageContext {
     private SynapseConfiguration cfg = null;
     private SynapseEnvironment   env = null;
     private Map properties = new HashMap();
+    private Map localEntries = new HashMap();
     private Stack faultStack = new Stack();
 
     /** The Axis2 MessageContext reference */
@@ -78,12 +76,60 @@ public class Axis2MessageContext implements MessageContext {
         this.env = env;
     }
 
+    public Mediator getMainSequence() {
+        Object o = localEntries.get(Constants.MAIN_SEQUENCE_KEY);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator main = getConfiguration().getMainSequence();
+            localEntries.put(Constants.MAIN_SEQUENCE_KEY, main);
+            return main;
+        }
+    }
+
+    public Mediator getFaultSequence() {
+        Object o = localEntries.get(Constants.FAULT_SEQUENCE_KEY);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator fault = getConfiguration().getFaultSequence();
+            localEntries.put(Constants.FAULT_SEQUENCE_KEY, fault);
+            return fault;
+        }
+    }
+
+    public Mediator getSequence(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Mediator) {
+            return (Mediator) o;
+        } else {
+            Mediator m = getConfiguration().getSequence(key);
+            localEntries.put(key, m);
+            return m;
+        }
+    }
+
+    public Endpoint getEndpoint(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Endpoint) {
+            return (Endpoint) o;
+        } else {
+            Endpoint e = getConfiguration().getEndpoint(key);
+            localEntries.put(key, e);
+            return e;
+        }
+    }
+
+    public Object getLocalProperty(String key) {
+        return properties.get(key);
+    }
+
     public Object getProperty(String key) {
         Object ret = properties.get(key);
         if (ret != null) {
             return ret;
         } else if (getConfiguration() != null) {
-            return getConfiguration().getProperty(key);
+            return getConfiguration().getEntry(key);
         } else {
             return null;
         }

@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.bsf.convertors.DefaultOMElementConvertor;
 import org.apache.synapse.mediators.bsf.convertors.JSOMElementConvertor;
@@ -47,7 +47,7 @@ public class ScriptMediatorTest extends TestCase {
 
     public void testTrueMediator() throws Exception {
 
-        Property prop = new Property();
+        Entry prop = new Entry();
         prop.setValue(TRUE_MEDIATOR);
         prop.setSrc(new URL("http://MyMediator.js"));
         Map props = new HashMap();
@@ -59,7 +59,7 @@ public class ScriptMediatorTest extends TestCase {
     }
 
     public void testFalseMediator() throws Exception {
-        Property prop = new Property();
+        Entry prop = new Entry();
         prop.setValue(FALSE_MEDIATOR);
         prop.setSrc(new URL("http://MyFooMediator.js"));
         Map props = new HashMap();
@@ -72,7 +72,7 @@ public class ScriptMediatorTest extends TestCase {
 
     public void testXMLMediator() throws Exception {
 
-        Property prop = new Property();
+        Entry prop = new Entry();
         prop.setValue(XML_MEDIATOR);
         prop.setSrc(new URL("http://MyFooMediator.js"));
         Map props = new HashMap();

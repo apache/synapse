@@ -28,10 +28,8 @@ public interface Constants {
     public static final QName DEFINITIONS_ELT   = new QName(Constants.SYNAPSE_NAMESPACE, "definitions");
     public static final QName SEQUENCE_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
     public static final QName ENDPOINT_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "endpoint");
-    public static final QName PROPERTY_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "set-property");
-    public static final QName RULES_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
+    public static final QName ENTRY_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "localEntry");
     public static final QName REGISTRY_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "registry");
-    public static final QName PROXIES_ELT       = new QName(Constants.SYNAPSE_NAMESPACE, "proxies");
     public static final QName PROXY_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "proxy");
 
     public static final String FAULT_SEQUENCE   = "fault";
@@ -55,8 +53,6 @@ public interface Constants {
     public static final  String STATISTICS_DISABLE ="disable";
     
     // -- variables for the scoping of a property mediator --
-    /** The String value for a Synapse messagecontext property */
-    public static final String SCOPE_CORRELATE = org.apache.synapse.Constants.SCOPE_CORRELATE;
     /** The String value for an Axis2 messagecontext property */
     public static final String SCOPE_AXIS2 = org.apache.synapse.Constants.SCOPE_AXIS2;
     /**

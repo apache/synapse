@@ -19,7 +19,6 @@
 
 package org.apache.synapse.mediators;
 
-import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,7 +35,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.TestMessageContext;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -50,13 +49,13 @@ public class TestUtils {
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
-        testConfig.addRegistry(null, new SimpleURLRegistry());
+        testConfig.setRegistry(new SimpleURLRegistry());
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
             while (iter.hasNext()) {
                 String key = (String) iter.next();
-                testConfig.addProperty(key, (Property)props.get(key));
+                testConfig.addResource(key, (Entry)props.get(key));
             }
         }
         synCtx.setConfiguration(testConfig);
@@ -81,13 +80,13 @@ public class TestUtils {
         // create a test synapse context
         TestMessageContext synCtx = new TestMessageContext();
         SynapseConfiguration testConfig = new SynapseConfiguration();
-        testConfig.addRegistry(null, new SimpleURLRegistry());
+        testConfig.setRegistry(new SimpleURLRegistry());
 
         if (props != null) {
             Iterator iter = props.keySet().iterator();
             while (iter.hasNext()) {
                 String key = (String) iter.next();
-                testConfig.addProperty(key, (Property) props.get(key));
+                testConfig.addResource(key, (Entry) props.get(key));
             }
         }
         synCtx.setConfiguration(testConfig);

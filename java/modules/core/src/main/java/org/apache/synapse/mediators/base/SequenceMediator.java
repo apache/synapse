@@ -73,7 +73,7 @@ public class SequenceMediator extends AbstractListMediator {
             // Setting Required property to collect the sequence statistics
             boolean isStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
             if (isStatisticsEnable) {
-                StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                StatisticsStack sequenceStack = (StatisticsStack) synCtx.getLocalProperty(Constants.SEQUENCE_STATISTICS_STACK);
                 if (sequenceStack == null) {
                     sequenceStack = new SequenceStatisticsStack();
                     synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
@@ -97,7 +97,7 @@ public class SequenceMediator extends AbstractListMediator {
                     }
                     // set exception information to message context
                     Axis2MessageContext.setErrorInformation(synCtx, e);
-                    Mediator errHandler = synCtx.getConfiguration().getNamedSequence(errorHandler);
+                    Mediator errHandler = synCtx.getSequence(errorHandler);
                     if (errHandler == null) {
                         if (shouldTrace) {
                             trace.trace("Sequence " + name + "; error handler sequence named '" +
@@ -134,7 +134,7 @@ public class SequenceMediator extends AbstractListMediator {
             }
 
         } else {
-            Mediator m = synCtx.getConfiguration().getNamedSequence(ref);
+            Mediator m = synCtx.getSequence(ref);
             if (m == null) {
                 if (shouldTrace) {
                     trace.trace("Sequence named " + ref + " cannot be found.");

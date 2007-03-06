@@ -26,7 +26,7 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.validate.ValidateMediator;
 import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.TestMediator;
 import org.apache.synapse.TestMediateHandler;
 import org.apache.synapse.MessageContext;
@@ -156,8 +156,8 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key", prop);
 
@@ -186,12 +186,12 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
-        Property prop2 = new Property();
-        prop2.setType(Property.DYNAMIC_TYPE);
+        Entry prop2 = new Entry();
+        prop2.setType(Entry.REMOTE_ENTRY);
         prop2.setKey("file:./../../repository/conf/sample/resources/validate/validate2.xsd");
         props.put("xsd-key-2", prop2);
 
@@ -220,12 +220,12 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
-        Property prop2 = new Property();
-        prop2.setType(Property.DYNAMIC_TYPE);
+        Entry prop2 = new Entry();
+        prop2.setType(Entry.REMOTE_ENTRY);
         prop2.setKey("file:./../../repository/conf/sample/resources/validate/validate2.xsd");
         props.put("xsd-key-2", prop2);
 
@@ -253,8 +253,8 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
@@ -282,8 +282,8 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
@@ -311,8 +311,8 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 
@@ -365,8 +365,8 @@ public class ValidateMediatorTest extends TestCase {
         validate.addChild(testMediator);
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
         props.put("xsd-key-1", prop);
 

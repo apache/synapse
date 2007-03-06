@@ -156,6 +156,7 @@ load balanced endpoint or a fail-over endpoint as follows:</p>
    address-endpoint   |   wsdl-endpoint   |   load-balanced-endpoint   |   fail-over-endpoint
 &lt;/endpoint&gt;</pre>
 
+<h4>Address Endpoint</h4>
 <p>An address-endpoint token refers to an endpoint address definition as follows:</p>
 <pre>&lt;address uri="endpoint-address" format="soap|soap11|soap12|pox"&gt;
   &lt;enableRM [policy="key"]/&gt;?
@@ -163,6 +164,7 @@ load balanced endpoint or a fail-over endpoint as follows:</p>
   &lt;enableAddressing/&gt;?
 &lt;/address&gt;</pre>
 
+<h4>WSDL Endpoint</h4>
 <p>A wsdl-endpoint token refers to a WSDL endpoint definition as follows:</p>
 <pre>&lt;wsdl [uri="wsdl-uri"] [service="qname"] [port/endpoint="qname"]&gt;
   &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
@@ -173,11 +175,13 @@ load balanced endpoint or a fail-over endpoint as follows:</p>
 &lt;/wsdl&gt;</pre>
 <p>The WSDL could be defined in-line within the endpoint definition or as a uri reference and the service &amp; port/endpoint specified if multiple options are present.</p>
 
+<h4>Load balanced Endpoint</h4>
 <p>A load-balanced-endpoint token refers to a load balancing configuration from which the destination endpoint would be selected depending on the evaluation of the current message against the load balacing algorithm</p>
 <pre>&lt;loadBalance policy="string"&gt;
   &lt;endpoint .../&gt;+
 &lt;/loadBalance&gt;</pre>
 
+<h4>Failover Endpoint</h4>
 <p>A fail-over-endpoint token refers to a fail-over configuration definition from which an endpoint is selected if the sending of a message to the endpoint results in a failure</p>
 <pre>&lt;failOver policy="string"&gt;
   &lt;endpoint .../&gt;+

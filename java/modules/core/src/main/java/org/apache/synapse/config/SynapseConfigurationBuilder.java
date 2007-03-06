@@ -25,7 +25,8 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SynapseMediator;
-import org.apache.synapse.mediators.builtin.SendMediator;
+import org.apache.synapse.mediators.builtin.send.SendMediator;
+
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

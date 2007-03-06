@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Property;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import java.net.URI;
@@ -101,8 +101,8 @@ public abstract class AbstractRegistry implements Registry {
                 SequenceMediator seq = (SequenceMediator) dp.getValue();
                 seq.setDynamic(true);
                 seq.setRegistryKey(dp.getKey());
-            } else if (dp.getValue() instanceof Endpoint) {
-                Endpoint ep = (Endpoint) dp.getValue();
+            } else if (dp.getValue() instanceof EndpointDefinition) {
+                EndpointDefinition ep = (EndpointDefinition) dp.getValue();
                 ep.setDynamic(true);
                 ep.setRegistryKey(dp.getKey());
             }

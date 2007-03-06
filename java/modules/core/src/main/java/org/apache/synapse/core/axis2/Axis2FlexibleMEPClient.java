@@ -42,15 +42,13 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.util.UUIDGenerator;
-import org.apache.axis2.util.Utils;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -73,7 +71,7 @@ public class Axis2FlexibleMEPClient {
      */
     public static void send(
 
-        Endpoint endpoint,
+        EndpointDefinition endpoint,
         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {
 
         boolean separateListener    = false;

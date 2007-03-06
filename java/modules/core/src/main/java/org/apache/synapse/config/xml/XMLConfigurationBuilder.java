@@ -24,13 +24,15 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.config.Util;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.base.SynapseMediator;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.LogMediator;
 import org.apache.synapse.registry.Registry;
 
@@ -226,12 +228,17 @@ public class XMLConfigurationBuilder {
             Property dp = new Property();
             dp.setType(Property.DYNAMIC_TYPE);
             dp.setKey(key.getAttributeValue());
-            dp.setMapper(EndpointFactory.getInstance());
+            //dp.setMapper(EndpointDefinitionFactory.getInstance());
+            dp.setMapper(EndpointAbstractFactory.getEndpointFactroy(ele));
             config.addNamedEndpoint(name.getAttributeValue(), dp);
         } else {
-            Endpoint endpoint = EndpointFactory.createEndpoint(ele, false);
-            // add this endpoint to the configuration
+            Endpoint endpoint = EndpointAbstractFactory.getEndpointFactroy(ele).
+                    createEndpoint(ele, false);
             config.addNamedEndpoint(endpoint.getName(), endpoint);
+
+            //EndpointDefinition endpoint = EndpointDefinitionFactory.createEndpoint(ele, false);
+            //// add this endpoint to the configuration
+            //config.addNamedEndpoint(endpoint.getName(), endpoint);
         }
     }
 

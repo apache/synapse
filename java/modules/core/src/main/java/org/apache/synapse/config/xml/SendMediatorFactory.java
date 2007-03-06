@@ -19,14 +19,16 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.mediators.builtin.SendMediator;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
+import org.apache.synapse.mediators.builtin.send.SendMediator;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 
 import javax.xml.namespace.QName;
 import java.net.MalformedURLException;
@@ -91,12 +93,20 @@ public class SendMediatorFactory extends AbstractMediatorFactory  {
         // set its common attributes such as tracing etc
         initMediator(sm,elem);
 
-        Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
-        while (iter.hasNext()) {
+        OMElement epElement = elem.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
+        if (epElement != null) {
+            // get the factory for the element
+            // create the endpoint and set it in the send medaitor
 
-            OMElement endptElem = (OMElement) iter.next();
-            Endpoint endpt = EndpointFactory.createEndpoint(endptElem, true);
-            sm.addEndpoint(endpt);
+            EndpointFactory fac = EndpointAbstractFactory.getEndpointFactroy(epElement);
+            if (fac != null) {
+                Endpoint endpoint = fac.createEndpoint(epElement, true);
+                if (endpoint != null) {
+                    sm.setEndpoint(endpoint);
+                }
+            } else {
+                throw new SynapseException("Invalid endpoint fromat.");
+            }
         }
 
         return sm;

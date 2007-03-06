@@ -203,14 +203,7 @@ public class SynapseConfiguration {
      * @return its value
      */
     public Entry getEntryDefinition(String key) {
-        Object o = localRegistry.get(key);
-        Entry entry = null;
-        if (o != null && o instanceof Entry) {
-            entry = (Entry) o;
-        } else {
-            handleException("Entry with key : " + key + " is undefined");
-        }
-        return entry;
+        return (Entry) localRegistry.get(key);
     }
 
     /**

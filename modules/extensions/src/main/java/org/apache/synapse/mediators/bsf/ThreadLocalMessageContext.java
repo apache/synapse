@@ -117,12 +117,12 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().getLocalProperty(key);
     }
 
-    public Object getProperty(String key) {
-        return getMC().getProperty(key);
+    public Object getEntry(String key) {
+        return getMC().getEntry(key);
     }
 
-    public Set getPropertyKeySet() {
-        return getMC().getPropertyKeySet();
+    public Set getLocalPropertyKeySet() {
+        return getMC().getLocalPropertyKeySet();
     }
 
     public Mediator getMainSequence() {

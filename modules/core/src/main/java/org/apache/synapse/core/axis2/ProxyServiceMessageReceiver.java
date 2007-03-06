@@ -74,11 +74,11 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                 if (proxy.getTargetFaultSequence() != null) {
 
-                    Mediator faultSequence = synCtx.getConfiguration().getNamedSequence(proxy.getTargetFaultSequence());
+                    Mediator faultSequence = synCtx.getSequence(proxy.getTargetFaultSequence());
                     if (faultSequence != null) {
                         log.debug("setting the fault sequence of the proxy to context");
                         synCtx.pushFault(new MediatorFaultHandler(
-                                synCtx.getConfiguration().getNamedSequence(proxy.getTargetFaultSequence())));
+                                synCtx.getSequence(proxy.getTargetFaultSequence())));
                     } else {
                         // when we can not find the reference to the fault sequence of the proxy service we should not
                         // throw an exception because still we have the global fault sequence and the message mediation
@@ -94,7 +94,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 // Using inSequence for the incoming message mediation
                 if (proxy.getTargetInSequence() != null) {
 
-                    Mediator inSequence = synCtx.getConfiguration().getNamedSequence(proxy.getTargetInSequence());
+                    Mediator inSequence = synCtx.getSequence(proxy.getTargetInSequence());
                     if (inSequence != null) {
                         log.debug("Using the sequence named " + proxy.getTargetInSequence() + " for message mediation");
                         inSequence.mediate(synCtx);
@@ -111,7 +111,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 }
 
                 if (proxy.getTargetEndpoint() != null) {
-                    Endpoint endpoint = synCtx.getConfiguration().getNamedEndpoint(proxy.getTargetEndpoint());
+                    Endpoint endpoint = synCtx.getEndpoint(proxy.getTargetEndpoint());
                     if (endpoint != null) {
                         log.debug("Forwarding message to the endpoint named "
                                 + proxy.getTargetEndpoint() + " after message mediation");

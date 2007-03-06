@@ -69,7 +69,7 @@ public class OMElementUtils {
             Iterator it = elem.getAllDeclaredNamespaces();
             while (it.hasNext()) {
                 OMNamespace n = (OMNamespace) it.next();
-                xpath.addNamespace(n.getPrefix(), n.getName());
+                xpath.addNamespace(n.getPrefix(), n.getNamespaceURI());
             }
         } catch (JaxenException je) {
             String msg = "Error adding declared name spaces of " + elem + " to the XPath : " + xpath;

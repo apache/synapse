@@ -36,4 +36,8 @@ public interface Endpoint {
     public boolean isActive();
 
     public void setActive(boolean active);
+
+    public void setDynamic(boolean dynamic);
+
+    public void setRegistryKey(String registryKey);
 }

@@ -53,25 +53,25 @@ public class PropertyMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext smc) {
-        log.debug("Set-Property mediator :: mediate()");
+        log.debug("Set-Entry mediator :: mediate()");
         boolean shouldTrace = shouldTrace(smc.getTracingState());
         if (shouldTrace) {
-            trace.trace("Start : Property mediator");
+            trace.trace("Start : Entry mediator");
         }
         String value = (this.value != null ? this.value : Axis2MessageContext.getStringValue(
                 getExpression(), smc));
         log.debug("Setting property : " + name +
                 " (scope:" + (scope == null ? "default" : scope) + ") = " + value);
         if (shouldTrace) {
-            trace.trace("Property Name : " + name +
-                    " (scope:" + (scope == null ? "default" : scope) + ") set to " +
-                    (this.value != null ? " value = " + this.value :
-                            " result of expression " + expression + " = " + value));
+            trace.trace("Entry Name : " + getName() +
+                " (scope:" + (scope == null ? "default" : scope) + ") set to " +
+                (getValue() != null ? " value = " + getValue() :
+                    " result of expression " + getExpression() + " = " + value));
         }
         if (scope == null) {
             smc.setProperty(name, value);
 
-        } else if (Constants.SCOPE_CORRELATE.equals(scope)) {
+        } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
             smc.setProperty(name, value);
 
         } else if (Constants.SCOPE_AXIS2.equals(scope)
@@ -107,7 +107,7 @@ public class PropertyMediator extends AbstractMediator {
         }
 
         if (shouldTrace) {
-            trace.trace("End : Property mediator");
+            trace.trace("End : Entry mediator");
         }
         return true;
     }

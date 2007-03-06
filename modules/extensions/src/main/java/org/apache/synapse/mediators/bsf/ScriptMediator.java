@@ -25,7 +25,7 @@ import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.bsf.convertors.DefaultOMElementConvertor;
@@ -83,11 +83,11 @@ public class ScriptMediator extends AbstractMediator {
 
     public synchronized BSFEngine getBSFEngine(SynapseConfiguration synapseConfig) {
 
-        Property dp = synapseConfig.getPropertyObject(scriptKey);
+        Entry dp = synapseConfig.getEntryDefinition(scriptKey);
         // boolean requiresRefresh = (dp != null) && (!dp.isCached() || dp.isExpired());
         // if (bsfEngine == null || requiresRefresh) { TODO: sort out caching
         if (bsfEngine == null) {
-            OMElement el = (OMElement) synapseConfig.getProperty(scriptKey);
+            OMElement el = (OMElement) synapseConfig.getEntry(scriptKey);
             String scriptSrc = el.getText();
             String scriptName = dp.getSrc().toString();
             this.bsfEngine = createBSFEngine(scriptName, scriptSrc);

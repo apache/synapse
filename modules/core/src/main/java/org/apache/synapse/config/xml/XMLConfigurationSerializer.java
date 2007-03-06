@@ -26,7 +26,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.core.axis2.ProxyService;
@@ -117,8 +117,8 @@ public class XMLConfigurationSerializer {
                         "key", nullNS, dp.getKey()));
                 definitions.addChild(endpoint);
 
-            } else if (endpt instanceof Endpoint) {
-                EndpointSerializer.serializeEndpoint((Endpoint) endpt, definitions);
+            } else if (endpt instanceof EndpointDefinition) {
+                EndpointDefinitionSerializer.serializeEndpoint((EndpointDefinition) endpt, definitions);
             } else {
                 handleException("Invalid endpoint. Type : " + endpt.getClass());
             }

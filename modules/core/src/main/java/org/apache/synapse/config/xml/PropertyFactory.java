@@ -20,7 +20,6 @@
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.config.XMLToObjectMapper;
-import org.apache.synapse.config.Endpoint;
 import org.apache.synapse.config.Property;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMNode;

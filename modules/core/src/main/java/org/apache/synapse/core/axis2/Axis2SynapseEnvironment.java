@@ -20,14 +20,13 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.util.threadpool.ThreadFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
@@ -101,7 +100,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         }
     }
 
-    public void send(Endpoint endpoint, MessageContext synCtx) {
+    public void send(EndpointDefinition endpoint, MessageContext synCtx) {
         if (synCtx.isResponse())
             Axis2Sender.sendBack(synCtx);
         else

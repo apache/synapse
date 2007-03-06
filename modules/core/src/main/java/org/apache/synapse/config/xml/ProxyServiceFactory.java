@@ -24,6 +24,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
+import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.axis2.wsdl.WSDLConstants;
 
@@ -171,7 +173,8 @@ public class ProxyServiceFactory {
             } else {
                 OMElement endpointElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
                 if (endpointElement != null) {
-                    proxy.setTargetInLineEndpoint(EndpointFactory.createEndpoint(endpointElement, true));
+                    EndpointFactory fac = EndpointAbstractFactory.getEndpointFactroy(endpointElement);
+                    proxy.setTargetInLineEndpoint(fac.createEndpoint(endpointElement, true));
                     isTargetOk = true;
                 }
             }

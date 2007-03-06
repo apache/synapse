@@ -25,7 +25,9 @@
 
         <sequence name="proxy_1">
             <send>
-                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                </endpoint>
             </send>
         </sequence>
 

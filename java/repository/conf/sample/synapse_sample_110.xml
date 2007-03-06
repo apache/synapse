@@ -34,7 +34,9 @@
     <rules>
         <in>
             <send>
-                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                </endpoint>
             </send>
         </in>
         <out>

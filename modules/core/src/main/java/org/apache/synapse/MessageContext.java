@@ -123,7 +123,7 @@ public interface MessageContext {
      * @param key key to look up property
      * @return value for the given key
      */
-    public Object getProperty(String key);
+    public Object getEntry(String key);
 
     /**
      * Set a custom (local) property with the given name on the message instance
@@ -136,7 +136,7 @@ public interface MessageContext {
      * Returns the Set of keys over the properties on this message context
      * @return a Set of keys over message properties
      */
-    public Set getPropertyKeySet();
+    public Set getLocalPropertyKeySet();
 
     /**
      * Get the SOAP envelope of this message

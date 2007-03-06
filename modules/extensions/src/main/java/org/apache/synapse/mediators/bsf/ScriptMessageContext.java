@@ -111,16 +111,16 @@ public class ScriptMessageContext implements MessageContext {
         return mc.getLocalProperty(key);
     }
 
-    public Object getProperty(String key) {
-        return mc.getProperty(key);
+    public Object getEntry(String key) {
+        return mc.getEntry(key);
     }
 
     public void setProperty(String key, Object value) {
         mc.setProperty(key, value);
     }
 
-    public Set getPropertyKeySet() {
-        return mc.getPropertyKeySet();
+    public Set getLocalPropertyKeySet() {
+        return mc.getLocalPropertyKeySet();
     }
 
     public Mediator getMainSequence() {

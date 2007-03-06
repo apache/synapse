@@ -50,7 +50,7 @@ public class SynapseMessageReceiver implements MessageReceiver {
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
 
         try {
-            StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
+            StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getLocalProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
             if (synapseServiceStack == null) {
                 synapseServiceStack = new ProxyServiceStatisticsStack();
                 synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);

@@ -65,11 +65,11 @@ public class SpringMediator extends AbstractMediator {
         if (shouldTrace) {
             trace.trace("Start : Spring mediator");
         }
-        Entry dp = synCtx.getConfiguration().getEntryDefinition(configKey);
+        Entry entry = synCtx.getConfiguration().getEntryDefinition(configKey);
 
         // if the configKey refers to a dynamic property
-        if (dp != null && dp.isDynamic()) {
-            if (!dp.isCached() || dp.isExpired()) {
+        if (entry != null && entry.isDynamic()) {
+            if (!entry.isCached() || entry.isExpired()) {
                 buildAppContext(synCtx);
             }
         // if the property is not a DynamicProperty, we will create an ApplicationContext only once

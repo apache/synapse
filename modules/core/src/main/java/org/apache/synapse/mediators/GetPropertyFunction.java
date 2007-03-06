@@ -85,7 +85,7 @@ public class GetPropertyFunction implements Function {
             return null;
         }
         if (Constants.SCOPE_DEFAULT.equals(scope)) {
-            Object result = synCtx.getProperty(key);
+            Object result = synCtx.getLocalProperty(key);
             if (result != null) {
                 return result;
             } else {

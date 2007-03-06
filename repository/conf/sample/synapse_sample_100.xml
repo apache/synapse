@@ -27,7 +27,9 @@
     <proxies>
         <proxy name="StockQuoteProxy">
             <target>
-                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                </endpoint>
             </target>
             <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
         </proxy>

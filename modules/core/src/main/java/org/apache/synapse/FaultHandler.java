@@ -19,7 +19,18 @@
 
 package org.apache.synapse;
 
+/**
+ * This is the generic interface for the fault handlers in synapse. In the synapse message context
+ * it has a stck of fault handlers and when ever a Synapse (Runtime) Exception has thrown this stack
+ * will be examined by one of the SynapseMR, ProxyServiceMR, or CallbackReceiver and faultStack
+ * will be poped to get the most relevant FaultHandler and execute the handleFault method.
+ */
 public interface FaultHandler {
 
+    /**
+     * This will be executed to handle any Exceptions occured within the Synapse environment.
+     * @param synCtx SynapseMessageContext of which the fault occured message comprises
+     * @throws SynapseException in case there is a failure in the fault execution
+     */
     public void handleFault(MessageContext synCtx) throws SynapseException;
 }

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.URL;
 
 public class ValidateMediatorTest extends TestCase {
 
@@ -157,8 +158,8 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key", prop);
 
         // test validate mediator, with static enveope
@@ -187,12 +188,12 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key-1", prop);
         Entry prop2 = new Entry();
-        prop2.setType(Entry.REMOTE_ENTRY);
-        prop2.setKey("file:./../../repository/conf/sample/resources/validate/validate2.xsd");
+        prop2.setType(Entry.URL_SRC);
+        prop2.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate2.xsd"));
         props.put("xsd-key-2", prop2);
 
         // test validate mediator, with static enveope
@@ -221,12 +222,12 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key-1", prop);
         Entry prop2 = new Entry();
-        prop2.setType(Entry.REMOTE_ENTRY);
-        prop2.setKey("file:./../../repository/conf/sample/resources/validate/validate2.xsd");
+        prop2.setType(Entry.URL_SRC);
+        prop2.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate2.xsd"));
         props.put("xsd-key-2", prop2);
 
         // test validate mediator, with static enveope
@@ -254,8 +255,8 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
@@ -283,8 +284,8 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
@@ -312,8 +313,8 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key-1", prop);
 
         // test validate mediator, with static enveope
@@ -366,8 +367,8 @@ public class ValidateMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/validate/validate.xsd");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/validate/validate.xsd"));
         props.put("xsd-key-1", prop);
 
 

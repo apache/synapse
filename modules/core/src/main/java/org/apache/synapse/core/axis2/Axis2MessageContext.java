@@ -124,7 +124,7 @@ public class Axis2MessageContext implements MessageContext {
         return properties.get(key);
     }
 
-    public Object getProperty(String key) {
+    public Object getEntry(String key) {
         Object ret = properties.get(key);
         if (ret != null) {
             return ret;
@@ -139,7 +139,7 @@ public class Axis2MessageContext implements MessageContext {
         properties.put(key, value);
     }
 
-    public Set getPropertyKeySet() {
+    public Set getLocalPropertyKeySet() {
         return properties.keySet();
     }
 

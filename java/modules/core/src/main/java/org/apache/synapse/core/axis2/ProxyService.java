@@ -33,9 +33,10 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Util;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;

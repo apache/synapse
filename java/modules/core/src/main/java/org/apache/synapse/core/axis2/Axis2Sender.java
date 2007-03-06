@@ -21,16 +21,13 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
-import org.apache.neethi.Policy;
-import org.apache.axiom.soap.SOAPFault;
 
 import java.util.Iterator;
 
@@ -42,7 +39,7 @@ public class Axis2Sender {
     private static final Log log = LogFactory.getLog(Axis2Sender.class);
 
     public static void sendOn(
-            Endpoint endpoint,
+            EndpointDefinition endpoint,
             org.apache.synapse.MessageContext synapseInMessageContext) {
 
         try {

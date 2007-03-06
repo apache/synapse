@@ -19,6 +19,9 @@
 
 package org.apache.synapse;
 
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMAbstractFactory;
+
 import javax.xml.namespace.QName;
 
 /**
@@ -28,6 +31,9 @@ public interface Constants {
 
     /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+
+    public static final OMNamespace SYNAPSE_OMNAMESPACE =
+            OMAbstractFactory.getOMFactory().createOMNamespace(SYNAPSE_NAMESPACE, "syn");
 
     // -- keys related to Axis2 configuration and Synapse initialization --
     /** The key name used to store the Synapse configuration into the Axis2 config */

@@ -24,8 +24,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.Endpoint;
-import org.apache.synapse.mediators.builtin.SendMediator;
+import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
+import org.apache.synapse.mediators.builtin.send.SendMediator;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 
 import java.util.Iterator;
 
@@ -85,12 +88,14 @@ public class SendMediatorSerializer extends AbstractMediatorSerializer
         SendMediator mediator = (SendMediator) m;
         OMElement send = fac.createOMElement("send", synNS);
         finalizeSerialization(send, mediator);
-        if (mediator.getEndpoints() != null) {
-            Iterator iter = mediator.getEndpoints().iterator();
-            while (iter.hasNext()) {
-                Endpoint endpt = (Endpoint) iter.next();
-                EndpointSerializer.serializeEndpoint(endpt, send);
-            }
+
+        Endpoint activeEndpoint = mediator.getEndpoint();
+        if (activeEndpoint != null) {
+            EndpointSerializer serializer = EndpointAbstractSerializer.
+                    getEndpointSerializer(activeEndpoint);
+
+            OMElement endpointElement = serializer.serializeEndpoint(activeEndpoint);
+            send.addChild(endpointElement);
         }
 
         if (parent != null) {

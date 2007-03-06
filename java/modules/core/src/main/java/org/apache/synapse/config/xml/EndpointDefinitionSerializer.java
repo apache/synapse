@@ -26,7 +26,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Endpoint;
+import org.apache.synapse.config.EndpointDefinition;
 
 /**
  * <endpoint name="string" address="url">
@@ -50,15 +50,15 @@ import org.apache.synapse.config.Endpoint;
  *
  * </endpoint>
  */
-public class EndpointSerializer {
+public class EndpointDefinitionSerializer {
 
-    private static Log log = LogFactory.getLog(EndpointSerializer.class);
+    private static Log log = LogFactory.getLog(EndpointDefinitionSerializer.class);
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
     protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
 
-    public static OMElement serializeEndpoint(Endpoint endpt, OMElement parent) {
+    public static OMElement serializeEndpoint(EndpointDefinition endpt, OMElement parent) {
 
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
 

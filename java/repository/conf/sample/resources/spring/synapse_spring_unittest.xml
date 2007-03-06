@@ -24,14 +24,9 @@
 		<property name="cachableDuration" value="15000"/>
 	</registry>
   
-  <definitions>
-		<set-property name="springconfig1" key="conf/sample/resources/spring/springsample.xml"/>
-		<set-property name="springconfig2" src="file:./../../repository/conf/sample/resources/spring/springsample.xml"/>
-  </definitions>
+    <localEntry key="springconfig2" src="file:./../../repository/conf/sample/resources/spring/springsample.xml"/>
 
-  <rules>
-  	<spring:spring bean="springtest" key="springconfig1"/>
+  	<spring:spring bean="springtest" key="conf/sample/resources/spring/springsample.xml"/>
   	<spring:spring bean="springtest" key="springconfig2"/>
-  </rules>
 
 </synapse> 

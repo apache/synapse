@@ -32,8 +32,6 @@ public interface Constants {
     public static final QName REGISTRY_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "registry");
     public static final QName PROXY_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "proxy");
 
-    public static final String FAULT_SEQUENCE   = "fault";
-
     public static final String SYNAPSE_NAMESPACE = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
     public static final String NULL_NAMESPACE    = "";
     public static final String RAMPART_POLICY    = "rampartPolicy";

@@ -27,7 +27,9 @@
 
             <!-- route the message to the SimpleStockQuoteService1 service EPR -->
             <send>
-                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                </endpoint>
             </send>
         </filter>
 

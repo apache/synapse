@@ -35,21 +35,27 @@
                 </m:placeOrder>);
             ]]></script.js>
             <send>
-                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                </endpoint>
             </send>
         </sequence>
 
         <sequence name="mtom_proxy">
             <header name="Action" value="urn:uploadFileUsingMTOM"/>
             <send>
-                <endpoint address="http://localhost:9000/axis2/services/MTOMSampleService" optimize="mtom"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/MTOMSampleService" optimize="mtom"/>
+                </endpoint>
             </send>
         </sequence>
 
         <sequence name="pox_proxy">
             <header name="Action" value="urn:placeOrder"/>
             <send>
-                <endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/>
+                </endpoint>
             </send>
         </sequence>
     </definitions>

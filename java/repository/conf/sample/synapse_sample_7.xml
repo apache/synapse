@@ -44,8 +44,9 @@
             </xs:schema>
         </set-property>
 
-        <endpoint name="stockquote"
-                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+        <endpoint name="stockquote">
+            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+        </endpoint>
 
         <sequence name="customrequest">
             <!-- is this a valid custom request ? -->

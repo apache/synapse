@@ -29,7 +29,7 @@ import org.apache.synapse.Constants;
  *
  * In future registry lookups etc may be used to resolve a named endpoint into its absolute address
  */
-public class Endpoint {
+public class EndpointDefinition {
 
     /** The name of this endpoint instance */
     private String name = null;

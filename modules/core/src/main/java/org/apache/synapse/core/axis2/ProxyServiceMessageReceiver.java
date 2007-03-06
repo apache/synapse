@@ -20,22 +20,17 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.statistics.StatisticsUtils;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
-import org.apache.synapse.config.Endpoint;
-import org.apache.axiom.om.OMNode;
+import org.apache.synapse.config.EndpointDefinition;
 
 /**
  * This is the MessageReceiver set to act on behalf of Proxy services.
@@ -95,7 +90,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     log.debug("Setting the anonymous fault sequence of the proxy to context");
                     synCtx.pushFault(new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
                 }
-                
+
                 // Using inSequence for the incoming message mediation
                 if (proxy.getTargetInSequence() != null) {
 
@@ -120,8 +115,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     if (endpoint != null) {
                         log.debug("Forwarding message to the endpoint named "
                                 + proxy.getTargetEndpoint() + " after message mediation");
-                        synCtx.setTo(new EndpointReference(endpoint.getAddress()));
-                        Axis2FlexibleMEPClient.send(endpoint, synCtx);
+                        endpoint.send(synCtx);
+                        //synCtx.setTo(new EndpointReference(endpoint.getAddress()));
+                        //Axis2FlexibleMEPClient.send(endpoint, synCtx);
                     } else {
 
                         log.error("Unable to find the endpoint for the proxy service " +
@@ -132,8 +128,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 } else if (proxy.getTargetInLineEndpoint() != null) {
                     log.debug("Forwarding the message to the anonymous " +
                             "endpoint of the proxy service after message mediation");
-                    synCtx.setTo(new EndpointReference(proxy.getTargetInLineEndpoint().getAddress()));
-                    Axis2FlexibleMEPClient.send(proxy.getTargetInLineEndpoint(), synCtx);
+                    proxy.getTargetInLineEndpoint().send(synCtx);
+                    //synCtx.setTo(new EndpointReference(proxy.getTargetInLineEndpoint().getAddress()));
+                    //Axis2FlexibleMEPClient.send(proxy.getTargetInLineEndpoint(), synCtx);
                 }
 
             } else {

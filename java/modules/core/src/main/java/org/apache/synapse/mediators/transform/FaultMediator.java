@@ -35,6 +35,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 
 import javax.xml.namespace.QName;
 import java.net.URI;
+import java.util.Iterator;
 
 /**
  * This transforms the current message instance into a SOAP Fault message. The
@@ -48,7 +49,7 @@ public class FaultMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(FaultMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
-
+    public static final String WSA_ACTION = "Action";
     /** Make a SOAP 1.1 fault */
     public static final int SOAP11 = 1;
     /** Make a SOAP 1.2 fault */
@@ -110,8 +111,11 @@ public class FaultMediator extends AbstractMediator {
         SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
         soapFaultDocument.addChild(faultEnvelope);
 
-        // create the fault element
-        SOAPFault fault = factory.createSOAPFault();
+        // create the fault element  if it is need 
+        SOAPFault fault = faultEnvelope.getBody().getFault();
+        if(fault == null){
+            fault = factory.createSOAPFault();
+        }
 
         // populate it
         setFaultCode(synCtx, factory, fault);
@@ -120,29 +124,15 @@ public class FaultMediator extends AbstractMediator {
         setFaultRole(factory, fault);
         setFaultDetail(factory, fault);
 
-        // set the fault element
-        faultEnvelope.getBody().setFirstChild(fault);
-        log.debug("Setting the fault message as : " + fault);
-
-        // set the fault message "to" header to the "faultTo" of the original message if
-        // such a header existed on the original message, else set it to the "replyTo" of the original
-
-        EndpointReference toEPR = synCtx.getTo();
-        EndpointReference faultToEPR = synCtx.getFaultTo();
-        if (faultToEPR != null) {
-            log.debug("Setting fault message To : " + faultToEPR);
-            log.debug("Setting fault message ReplyTo : " + toEPR);
-            synCtx.setTo(faultToEPR);
-            synCtx.setReplyTo(toEPR);
-        } else {
-            EndpointReference replyToEPR = synCtx.getReplyTo();
-            log.debug("Setting fault message To : " + replyToEPR);
-            log.debug("Setting fault message ReplyTo : " + toEPR);
-            synCtx.setTo(replyToEPR);
-            synCtx.setReplyTo(toEPR);
+        // set the all headers of griginal SOAP Envelope to the Fault Envelope
+        Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
+        if (iter.hasNext()) {
+            while (iter.hasNext()) {
+                SOAPHeaderBlock header = (SOAPHeaderBlock) iter.next();
+                faultEnvelope.getHeader().addChild(header);
+            }
         }
-        synCtx.setResponse(true);
-
+        log.debug("The fault message as : " + fault);
         // overwrite current message envelope with new fault envelope
         try {
             if (shouldTrace) {

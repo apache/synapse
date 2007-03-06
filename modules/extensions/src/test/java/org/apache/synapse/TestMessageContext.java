@@ -259,13 +259,6 @@ public class TestMessageContext implements MessageContext {
     public void setTracingState(int tracingState) {
     }
 
-    public Stack getFaultStack() {
-        return null;
-    }
-
-    public void pushFault(FaultHandler fault) {
-    }
-
     public MessageContext getSynapseContext() {
         return null;
     }

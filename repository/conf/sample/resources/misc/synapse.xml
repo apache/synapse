@@ -17,27 +17,19 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-  <definitions>
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="commodityQuote">
-    	<!-- set the To address to the real endpoint -->
-    	<header name="To" value="http://127.0.0.1:10001/axis2/services/Services"/>
-    	<header name="Action" value="urn:commodity"/>
-
+        <!-- set the To address to the real endpoint -->
+        <header name="To" value="http://127.0.0.1:10001/axis2/services/Services"/>
+        <header name="Action" value="urn:commodity"/>    
     </sequence>
-
-  </definitions>
-
-  <rules>
 
   	<!-- Check if the URL matches the stockquote gateway/dumb case -->
   	<filter source="get-property('To')" regex=".*/CommodityQuote.*">
-  		<sequence ref="commodityQuote"/>
+  		<sequence key="commodityQuote"/>
   	</filter>
 
   	<send/>
-  </rules>
 
-</synapse>
+</definitions>

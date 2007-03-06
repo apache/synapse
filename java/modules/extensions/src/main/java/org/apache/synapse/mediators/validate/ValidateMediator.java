@@ -258,8 +258,7 @@ public class ValidateMediator extends AbstractListMediator {
             int i = 0;
             while (iter.hasNext()) {
                 String propName = (String) iter.next();
-                sources[i++] = Util.getStreamSource(
-                    msgCtx.getConfiguration().getEntry(propName));
+                sources[i++] = Util.getStreamSource(msgCtx.getEntry(propName));
             }
             schema = factory.newSchema(sources);
 

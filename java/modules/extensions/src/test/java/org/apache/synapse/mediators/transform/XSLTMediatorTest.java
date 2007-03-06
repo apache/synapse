@@ -30,6 +30,7 @@ import org.apache.synapse.MessageContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.net.URL;
 
 public class XSLTMediatorTest extends TestCase {
 
@@ -62,8 +63,8 @@ public class XSLTMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt"));
         props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
@@ -102,8 +103,8 @@ public class XSLTMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt"));
         props.put("xslt-key", prop);
 
         // invoke transformation, with static enveope
@@ -143,8 +144,8 @@ public class XSLTMediatorTest extends TestCase {
 
         Map props = new HashMap();
         Entry prop = new Entry();
-        prop.setType(Entry.REMOTE_ENTRY);
-        prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
+        prop.setType(Entry.URL_SRC);
+        prop.setSrc(new URL("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt"));
         props.put("xslt-key", prop);
         
         // invoke transformation, with static enveope

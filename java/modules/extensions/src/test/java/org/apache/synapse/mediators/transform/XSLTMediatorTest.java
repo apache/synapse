@@ -25,10 +25,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.mediators.TestUtils;
 import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.MessageContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,8 +61,8 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
         props.put("xslt-key", prop);
 
@@ -78,11 +76,11 @@ public class XSLTMediatorTest extends TestCase {
 
             OMElement getQuoteElem = (OMElement) body.getFirstOMChild().getNextOMSibling();
             assertTrue("GetQuote".equals(getQuoteElem.getLocalName()));
-            assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getName()));
+            assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getNamespaceURI()));
 
             OMElement symbolElem = getQuoteElem.getFirstElement();
             assertTrue("symbol".equals(symbolElem.getLocalName()));
-            assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getName()));
+            assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getNamespaceURI()));
 
             assertTrue("String".equals(symbolElem.getText()));
         } else {
@@ -103,8 +101,8 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
         props.put("xslt-key", prop);
 
@@ -118,11 +116,11 @@ public class XSLTMediatorTest extends TestCase {
 
             OMElement getQuoteElem = (OMElement) body.getFirstOMChild().getNextOMSibling();
             assertTrue("GetQuote".equals(getQuoteElem.getLocalName()));
-            assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getName()));
+            assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getNamespaceURI()));
 
             OMElement symbolElem = getQuoteElem.getFirstElement();
             assertTrue("symbol".equals(symbolElem.getLocalName()));
-            assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getName()));
+            assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getNamespaceURI()));
 
             assertTrue("String".equals(symbolElem.getText()));
         } else {
@@ -144,8 +142,8 @@ public class XSLTMediatorTest extends TestCase {
         transformMediator.setXsltKey("xslt-key");
 
         Map props = new HashMap();
-        Property prop = new Property();
-        prop.setType(Property.DYNAMIC_TYPE);
+        Entry prop = new Entry();
+        prop.setType(Entry.REMOTE_ENTRY);
         prop.setKey("file:./../../repository/conf/sample/resources/transform/transform_unittest.xslt");
         props.put("xslt-key", prop);
         
@@ -159,15 +157,15 @@ public class XSLTMediatorTest extends TestCase {
 
             OMElement someOtherElem = (OMElement) body.getFirstOMChild().getNextOMSibling();
             assertTrue("someOtherElement".equals(someOtherElem.getLocalName()));
-            assertTrue("http://someother".equals(someOtherElem.getNamespace().getName()));
+            assertTrue("http://someother".equals(someOtherElem.getNamespace().getNamespaceURI()));
 
             OMElement getQuoteElem = (OMElement) someOtherElem.getFirstOMChild();
             assertTrue("GetQuote".equals(getQuoteElem.getLocalName()));
-            assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getName()));
+            assertTrue("http://www.webserviceX.NET/".equals(getQuoteElem.getNamespace().getNamespaceURI()));
 
             OMElement symbolElem = getQuoteElem.getFirstElement();
             assertTrue("symbol".equals(symbolElem.getLocalName()));
-            assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getName()));
+            assertTrue("http://www.webserviceX.NET/".equals(symbolElem.getNamespace().getNamespaceURI()));
 
             assertTrue("String".equals(symbolElem.getText()));
         } else {

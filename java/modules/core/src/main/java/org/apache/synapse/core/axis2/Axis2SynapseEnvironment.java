@@ -63,40 +63,40 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         }
         
         // if this is a response to a proxy service 
-        if (synCtx.getProperty(Constants.PROXY_SERVICE) != null) {
+        if (synCtx.getLocalProperty(Constants.PROXY_SERVICE) != null) {
 
-            if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(Constants.PROXY_SERVICE))
+            if (synCtx.getConfiguration().getProxyService((String) synCtx.getLocalProperty(Constants.PROXY_SERVICE))
                     .getTargetOutSequence() != null) {
 
                 String sequenceName = synCtx.getConfiguration().getProxyService(
-                        (String) synCtx.getProperty(Constants.PROXY_SERVICE)).getTargetOutSequence();
-                Mediator outSequence = synCtx.getConfiguration().getNamedSequence(sequenceName);
+                        (String) synCtx.getLocalProperty(Constants.PROXY_SERVICE)).getTargetOutSequence();
+                Mediator outSequence = synCtx.getSequence(sequenceName);
 
                 if (outSequence != null) {
                     log.debug("Using the sequence named " + sequenceName + " for the outgoing message mediation of " +
-                            "the proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE));
+                            "the proxy service " + synCtx.getLocalProperty(Constants.PROXY_SERVICE));
                     outSequence.mediate(synCtx);
                 } else {
                     log.error("Unable to find the sequence specified by the name " + sequenceName);
                     // TODO invoke a generic synapse error handler for this message
                 }
 
-            } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
+            } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getLocalProperty(
                     Constants.PROXY_SERVICE)).getTargetInLineOutSequence() != null) {
 
                 log.debug("Using the anonymous out sequence specified in the proxy service "
-                        + synCtx.getProperty(Constants.PROXY_SERVICE) + " for out going message mediation");
-                synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
+                        + synCtx.getLocalProperty(Constants.PROXY_SERVICE) + " for out going message mediation");
+                synCtx.getConfiguration().getProxyService((String) synCtx.getLocalProperty(
                         Constants.PROXY_SERVICE)).getTargetInLineOutSequence().mediate(synCtx);
             } else {
 
-                log.debug("Proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE) + " does not specifies " +
+                log.debug("Proxy service " + synCtx.getLocalProperty(Constants.PROXY_SERVICE) + " does not specifies " +
                         "an out sequence - sending the response back");
                 Axis2Sender.sendBack(synCtx);
             }
 
         } else {
-            synCtx.getConfiguration().getMainMediator().mediate(synCtx);
+            synCtx.getMainSequence().mediate(synCtx);
         }
     }
 

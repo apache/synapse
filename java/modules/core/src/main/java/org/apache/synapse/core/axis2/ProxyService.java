@@ -176,7 +176,7 @@ public class ProxyService {
         InputStream wsdlInputStream = null;
         OMElement wsdlElement = null;
         if (wsdlKey != null) {
-            Object keyObject = synCfg.getProperty(wsdlKey);
+            Object keyObject = synCfg.getEntry(wsdlKey);
             if (keyObject instanceof OMElement) {
                 wsdlElement = (OMElement) keyObject;
             }
@@ -304,7 +304,7 @@ public class ProxyService {
             iter = serviceLevelPolicies.iterator();
             while (iter.hasNext()) {
                 String policyKey = (String) iter.next();
-                Object policyProp = synCfg.getProperty(policyKey);
+                Object policyProp = synCfg.getEntry(policyKey);
                 if (policyProp != null) {
                     if (svcEffectivePolicy == null) {
 

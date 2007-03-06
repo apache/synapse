@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.jaxen.JaxenException;
@@ -106,12 +106,12 @@ public class RMSequenceMediator extends AbstractMediator {
             if (log.isDebugEnabled()) {
                 log.debug("setting sequenceID " + sequenceID + " for correlation " + correlationValue);
             }
-            Property sequenceProperty = new Property();
-            sequenceProperty.setValue(sequenceID);
-            sequenceProperty.setExpiryTime(System.currentTimeMillis() + SEQUENCE_EXPIRY_TIME);
-            sequenceMap.put(correlationValue, sequenceProperty);
+            Entry sequenceEntry = new Entry();
+            sequenceEntry.setValue(sequenceID);
+            sequenceEntry.setExpiryTime(System.currentTimeMillis() + SEQUENCE_EXPIRY_TIME);
+            sequenceMap.put(correlationValue, sequenceEntry);
         } else {
-            sequenceID = (String) ((Property) sequenceMap.get(correlationValue)).getValue();
+            sequenceID = (String) ((Entry) sequenceMap.get(correlationValue)).getValue();
             if (log.isDebugEnabled()) {
                 log.debug("got sequenceID " + sequenceID + " for correlation " + correlationValue);
             }
@@ -158,8 +158,8 @@ public class RMSequenceMediator extends AbstractMediator {
         Iterator itKey = sequenceMap.keySet().iterator();
         while (itKey.hasNext()) {
             Object key = itKey.next();
-            Property sequenceProperty = (Property) sequenceMap.get(key);
-            if (sequenceProperty.isExpired()) {
+            Entry sequenceEntry = (Entry) sequenceMap.get(key);
+            if (sequenceEntry.isExpired()) {
                 sequenceMap.remove(key);
             }
         }

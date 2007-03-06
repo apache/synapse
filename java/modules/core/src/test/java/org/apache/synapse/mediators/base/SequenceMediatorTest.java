@@ -111,12 +111,12 @@ public class SequenceMediatorTest extends TestCase {
 
         // invoke transformation, with static enveope
         MessageContext synCtx = TestUtils.getTestContext("<empty/>");
-        synCtx.getConfiguration().addNamedSequence("myErrorHandler", seqErr);
+        synCtx.getConfiguration().addSequence("myErrorHandler", seqErr);
 
         seq.mediate(synCtx);
 
         assertTrue("T1.T2.T4".equals(result.toString()));
 
-        assertEquals("test", synCtx.getProperty(Constants.ERROR_MESSAGE));
+        assertEquals("test", synCtx.getLocalProperty(Constants.ERROR_MESSAGE));
     }
 }

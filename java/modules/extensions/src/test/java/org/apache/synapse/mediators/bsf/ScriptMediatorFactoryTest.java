@@ -30,7 +30,7 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.config.Property;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.TestUtils;
 
 public class ScriptMediatorFactoryTest extends TestCase {
@@ -57,7 +57,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
     }
 
     public void testRegPropMediatorFactory() throws Exception {
-        Property prop = new Property();
+        Entry prop = new Entry();
         prop.setValue(MY_MEDIATOR);
         prop.setSrc(new URL("http://MyMediator.js"));
         Map props = new HashMap();
@@ -70,7 +70,7 @@ public class ScriptMediatorFactoryTest extends TestCase {
     }
 
     public void testRegPropWithFunctionMediatorFactory() throws Exception {
-        Property prop = new Property();
+        Entry prop = new Entry();
         prop.setValue(MY_MEDIATOR_FOO_FUNC);
         prop.setSrc(new URL("http://MyFooMediator.js"));
         Map props = new HashMap();

@@ -27,13 +27,15 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
 /**
  * This delegates all method calls to thread specific MessageContext.
- * 
+ *
  * This is required for the InlineScriptMediator to enable concurrent requests to run against the same inline script. As there is a single BSFEngine
  * holding the inline script fragment and the MessageContext is pre-registered in that BSFEngine means there is a single MessageContext instance
  * shared over all requests. Using this class as the single pre-registered MessageContext enables delegating all the method calls to a thread specific
@@ -111,12 +113,32 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().getWSAMessageID();
     }
 
+    public Object getLocalProperty(String key) {
+        return getMC().getLocalProperty(key);
+    }
+
     public Object getProperty(String key) {
         return getMC().getProperty(key);
     }
 
     public Set getPropertyKeySet() {
         return getMC().getPropertyKeySet();
+    }
+
+    public Mediator getMainSequence() {
+        return getMC().getMainSequence();
+    }
+
+    public Mediator getFaultSequence() {
+        return getMC().getFaultSequence();
+    }
+
+    public Mediator getSequence(String key) {
+        return getMC().getSequence(key);
+    }
+
+    public Endpoint getEndpoint(String key) {
+        return getMC().getEndpoint(key);
     }
 
     public RelatesTo getRelatesTo() {
@@ -173,14 +195,6 @@ public class ThreadLocalMessageContext implements MessageContext {
 
     public void setTracingState(int tracingState) {
         getMC().setTracingState(tracingState);
-    }
-
-    public Stack getFaultStack() {
-        return getMC().getFaultStack();
-    }
-
-    public void pushFault(FaultHandler fault) {
-        getMC().pushFault(fault);
     }
 
     public void setDoingMTOM(boolean b) {
@@ -251,4 +265,11 @@ public class ThreadLocalMessageContext implements MessageContext {
         getMC().setWSAAction(actionURI);
     }
 
+    public Stack getFaultStack() {
+        return getMC().getFaultStack();
+    }
+
+    public void pushFault(FaultHandler fault) {
+        getMC().pushFault(fault);
+    }
 }

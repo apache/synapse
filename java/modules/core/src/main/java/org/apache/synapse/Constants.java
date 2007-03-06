@@ -32,6 +32,9 @@ public interface Constants {
     /** The Synapse namespace */
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
 
+    public static final String MAIN_SEQUENCE_KEY  = "main";
+    public static final String FAULT_SEQUENCE_KEY = "fault";
+
     public static final OMNamespace SYNAPSE_OMNAMESPACE =
             OMAbstractFactory.getOMFactory().createOMNamespace(SYNAPSE_NAMESPACE, "syn");
 
@@ -45,13 +48,26 @@ public interface Constants {
     /** The system property used to specify/override the synapse configuration XML location */
     String SYNAPSE_XML = "synapse.xml";
 
-    // -- Synapse message context property keys --
-    /**
-     * The scope for a set-property mediator, when the property should be copied over
-     * to the response message - if any, for correlation
-     */
-    String SCOPE_CORRELATE = "correlate";
+    /** If the message context contains a Boolean.TRUE with this key, WS-A would be turned on send */
+    String OUTFLOW_ADDRESSING_ON = "OUTFLOW_ADDRESSING_ON";
 
+    /** If the message context contains a Boolean.TRUE with this key, RM would be turned on send */
+    String OUTFLOW_RM_ON = "OUTFLOW_RM_ON";
+
+    /** The message context property name which holds the RM 'Policy' object for outgoing messages */
+    String OUTFLOW_RM_POLICY = "OUTFLOW_RM_POLICY";
+
+    /** If the message context contains a Boolean.TRUE with this key, Rampart would be engaged on send */
+    String OUTFLOW_SECURITY_ON = "OUTFLOW_SECURITY_ON";
+
+    /** The message context property name which holds the Security 'Policy' object for outgoing messages */
+    String OUTFLOW_SEC_POLICY = "OUTFLOW_SEC_POLICY";
+    
+
+    // -- Synapse message context property keys --
+    /** The scope for the synapse message context properties */
+    String SCOPE_DEFAULT = "default";
+    
     /**
      * The scope for a set-property mediator, when the property should be set
      *  on the underlying Axis2 message context
@@ -69,21 +85,6 @@ public interface Constants {
 
     /** A key with this name on the message context set to Boolean.TRUE, indicates that this is a response */
     String ISRESPONSE_PROPERTY = "synapse.isresponse";
-
-    /** If the message context contains a Boolean.TRUE with this key, WS-A would be turned on send */
-    String OUTFLOW_ADDRESSING_ON = "OUTFLOW_ADDRESSING_ON";
-
-    /** If the message context contains a Boolean.TRUE with this key, RM would be turned on send */
-    String OUTFLOW_RM_ON = "OUTFLOW_RM_ON";
-
-    /** The message context property name which holds the RM 'Policy' object for outgoing messages */
-    String OUTFLOW_RM_POLICY = "OUTFLOW_RM_POLICY";
-
-    /** If the message context contains a Boolean.TRUE with this key, Rampart would be engaged on send */
-    String OUTFLOW_SECURITY_ON = "OUTFLOW_SECURITY_ON";
-
-    /** The message context property name which holds the Security 'Policy' object for outgoing messages */
-    String OUTFLOW_SEC_POLICY = "OUTFLOW_SEC_POLICY";
 
     /** If message context property contains Boolean.TRUE then Axis2 will send this with a separate listener engaged **/
     public static final String OUTFLOW_USE_SEPARATE_LISTENER = "OUTFLOW_USE_SEPARATE_LISTENER";
@@ -106,10 +107,6 @@ public interface Constants {
 
     /** The QName of the WS-Security Rampart module */
     QName RAMPART_MODULE_NAME = new QName("rampart");
-    /** Sandesha2 engaged service being process*/
-    String MESSAGE_RECEIVED_RM_ENGAGED = "__MESSAGE_RECEIVED_RM_ENGAGED__";
-
-    String RESPONSE_SOAP_ENVELOPE = "_RESPONSE_SOAP_ENVELOPE_";
 
     /** Refers the To header */
     String HEADER_TO = "To";

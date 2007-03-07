@@ -27,27 +27,38 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
- * The property mediator would save a named property as a local property
- * of the Synapse Message Context. Properties set this way could be
- * extracted through the XPath extension function "synapse:get-property(prop-name)"
+ * The property mediator would save(or remove) a named property as a local property of the Synapse Message Context
+ * or as a property of the Axis2 Configuration Context or as a Transport Header.
+ * Properties set this way could be extracted through the XPath extension function "synapse:get-property(scope,prop-name)"
  */
+
 public class PropertyMediator extends AbstractMediator {
 
+    /** The Name of the property  */
     private String name = null;
+    /** The Value to be set*/
     private String value = null;
+    /** The XPath expr. to get value  */
     private AXIOMXPath expression = null;
+    /** The scope for which decide properties where to go*/
     private String scope = null;
-
+    /** The Action - set or remove */
+    public static final int ACTION_SET = 0;
+    public static final int ACTION_REMOVE = 1;
+    /** Set the property (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
+    private int action = ACTION_SET;
     private static final Log log = LogFactory.getLog(PropertyMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
-     * Sets a property into the current (local) Synapse Context
+     * Sets or  a property into the current (local) Synapse Context or into the Axis Configuration Context
+     * or into Transports Header
+     * And Removes above properties from the corresspounding locations
      *
      * @param smc the message context
      * @return true always
@@ -58,54 +69,103 @@ public class PropertyMediator extends AbstractMediator {
         if (shouldTrace) {
             trace.trace("Start : Entry mediator");
         }
-        String value = (this.value != null ? this.value : Axis2MessageContext.getStringValue(
-                getExpression(), smc));
-        log.debug("Setting property : " + name +
-                " (scope:" + (scope == null ? "default" : scope) + ") = " + value);
-        if (shouldTrace) {
-            trace.trace("Entry Name : " + getName() +
-                " (scope:" + (scope == null ? "default" : scope) + ") set to " +
-                (getValue() != null ? " value = " + getValue() :
-                    " result of expression " + getExpression() + " = " + value));
-        }
-        if (scope == null) {
-            smc.setProperty(name, value);
-
-        } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
-            smc.setProperty(name, value);
-
-        } else if (Constants.SCOPE_AXIS2.equals(scope)
-                && smc instanceof Axis2MessageContext) {
-            Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
-            org.apache.axis2.context.MessageContext axis2MessageCtx =
-                    axis2smc.getAxis2MessageContext();
-            axis2MessageCtx.getConfigurationContext().setProperty(name, value);
-
-        } else if (Constants.SCOPE_TRANSPORT.equals(scope)
-                && smc instanceof Axis2MessageContext) {
-            Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
-            org.apache.axis2.context.MessageContext axis2MessageCtx =
-                    axis2smc.getAxis2MessageContext();
-            Object headers = axis2MessageCtx.getProperty(
-                    org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-
-            if (headers != null && headers instanceof Map) {
-                Map headersMap = (HashMap) headers;
-                headersMap.put(name, value);
+        if (action == ACTION_SET) {
+            String resultValue = (this.value != null ? this.value : Axis2MessageContext.getStringValue(
+                    expression, smc));
+            log.debug("Setting : " + name +
+                    " property (scope:" + (scope == null ? "default" : scope) + ") = " + resultValue);
+            if (shouldTrace) {
+                trace.trace("Entry Name : " + name +                                                                    
+                        " (scope:" + (scope == null ? "default" : scope) + ") set to " +
+                        (value != null ? " resultValue = " + value :
+                                " result of expression " + expression + " = " + resultValue));
             }
-            if (headers == null) {
-                Map headersMap = new HashMap();
-                headersMap.put(name, value);
-                axis2MessageCtx.setProperty(
-                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
-                        headersMap);
-            }
+            if (scope == null) {
+                //Setting property into the  Synapse Context
+                smc.setProperty(name, resultValue);
+            } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
+                //Setting property into the  Synapse Context
+                smc.setProperty(name, resultValue);
+            } else if (Constants.SCOPE_AXIS2.equals(scope)
+                    && smc instanceof Axis2MessageContext) {
+                //Setting property into the  Axis2 Configuaration Context Context
+                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                org.apache.axis2.context.MessageContext axis2MessageCtx =
+                        axis2smc.getAxis2MessageContext();
+                axis2MessageCtx.getConfigurationContext().setProperty(name, resultValue);
 
+            } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+                    && smc instanceof Axis2MessageContext) {
+                //Setting Transport Headers
+                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                org.apache.axis2.context.MessageContext axis2MessageCtx =
+                        axis2smc.getAxis2MessageContext();
+                Object headers = axis2MessageCtx.getProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+                if (headers != null && headers instanceof Map) {
+                    Map headersMap = (HashMap) headers;
+                    headersMap.put(name, resultValue);
+                }
+                if (headers == null) {
+                    Map headersMap = new HashMap();
+                    headersMap.put(name, resultValue);
+                    axis2MessageCtx.setProperty(
+                            org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+                            headersMap);
+                }
+            } else {
+                String msg = "Unsupported scope : " + scope + " for property mediator";
+                handleException(msg);
+            }
         } else {
-            String msg = "Unsupported scope : " + scope + " for set-property mediator";
-            handleException(msg);
-        }
+            log.debug("Removing : " + name +
+                    " property (scope:" + (scope == null ? "default" : scope) + ") ");
+            trace.trace("Remove - Entry Name : " + name +
+                    " (scope:" + (scope == null ? "default" : scope) + ")");
+            if (scope == null) {
+                //Removing property from the  Synapse Context
+                Set pros = smc.getLocalPropertyKeySet();
+                if (pros != null) {
+                    pros.remove(name);
+                }
+            } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
+                //Removing property from the  Synapse Context
+                Set pros = smc.getLocalPropertyKeySet();
+                if (pros != null) {
+                    pros.remove(name);
+                }
+            } else if (Constants.SCOPE_AXIS2.equals(scope)
+                    && smc instanceof Axis2MessageContext) {
+                //Removing property from the  Axis2 Configuration Context
+                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                org.apache.axis2.context.MessageContext axis2MessageCtx =
+                        axis2smc.getAxis2MessageContext();
+                Map pros = axis2MessageCtx.getConfigurationContext().getProperties();
+                if (pros != null) {
+                    pros.remove(name);
+                }
+            } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+                    && smc instanceof Axis2MessageContext) {
+                // Removing transport headers
+                Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
+                org.apache.axis2.context.MessageContext axis2MessageCtx =
+                        axis2smc.getAxis2MessageContext();
+                Object headers = axis2MessageCtx.getProperty(
+                        org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+                if (headers != null && headers instanceof Map) {
+                    Map headersMap = (HashMap) headers;
+                    headersMap.remove(name);
+                }
+                if (headers == null) {
+                    log.info("No Headers found ");
+                }
 
+            } else {
+                String msg = "Unsupported scope : " + scope + " for property mediator";
+                handleException(msg);
+            }
+        }
         if (shouldTrace) {
             trace.trace("End : Entry mediator");
         }
@@ -147,5 +207,13 @@ public class PropertyMediator extends AbstractMediator {
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    public int getAction() {
+        return action;
+    }
+
+    public void setAction(int action) {
+        this.action = action;
     }
 }

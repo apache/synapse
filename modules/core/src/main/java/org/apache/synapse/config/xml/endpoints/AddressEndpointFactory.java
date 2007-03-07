@@ -88,7 +88,7 @@ public class AddressEndpointFactory implements EndpointFactory {
         OMAttribute optimize = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "optimize"));
         OMAttribute reference = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "ref"));
+                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "key"));
 
         EndpointDefinition endpoint = new EndpointDefinition();
 

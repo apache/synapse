@@ -35,7 +35,7 @@ import org.jaxen.JaxenException;
  * Creates a property mediator through the supplied XML configuration
  * <p/>
  * <pre>
- * &lt;property name="string" [action=set] (value="literal" | expression="xpath")/&gt;
+ * &lt;property name="string" [action=set/remove] (value="literal" | expression="xpath")/&gt;
  * </pre>
  */
 public class PropertyMediatorFactory extends AbstractMediatorFactory {
@@ -78,11 +78,11 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         }
         if (scope != null) {
             String valueStr = scope.getAttributeValue();
-            if (!Constants.SCOPE_AXIS2.equals(valueStr) && !Constants.SCOPE_TRANSPORT.equals(valueStr))
-            {
+            if (!Constants.SCOPE_AXIS2.equals(valueStr) && !Constants.SCOPE_TRANSPORT.equals(valueStr)
+                    && !Constants.SCOPE_DEFAULT.equals(valueStr)) {
                 String msg = "Only '" + Constants.SCOPE_AXIS2 + "' or '" + Constants.SCOPE_TRANSPORT
                         + "' values are allowed for attribute scope for a property mediator"
-                        + ", Unsupported scope " + scope.getAttributeValue();
+                        + ", Unsupported scope " + valueStr;
                 log.error(msg);
                 throw new SynapseException(msg);
             }

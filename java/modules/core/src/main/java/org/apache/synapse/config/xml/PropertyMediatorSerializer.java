@@ -28,7 +28,7 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
 
 /**
  * <pre>
- * &lt;property name="string" [action=set] (value="literal" | expression="xpath")/&gt;
+ * &lt;property name="string" [action=set/remove] (value="literal" | expression="xpath")/&gt;
  * </pre>
  */
 public class PropertyMediatorSerializer extends AbstractMediatorSerializer {

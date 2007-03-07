@@ -57,7 +57,12 @@ public interface Constants {
      * The scope for a set-property mediator, when the property should be set
      * on the underlying transport
      */
-    String SCOPE_TRANSPORT = "transport";
+    String SCOPE_TRANSPORT = org.apache.synapse.Constants.SCOPE_TRANSPORT;
+
+    // -- Synapse message context property keys --
+       /** The scope for the synapse message context properties */
+    String SCOPE_DEFAULT = org.apache.synapse.Constants.SCOPE_DEFAULT;
+
 
     //  -- Synapse property values for WS-RM sequence handling --
     /** The String value for a WS-RM version 1.0*/

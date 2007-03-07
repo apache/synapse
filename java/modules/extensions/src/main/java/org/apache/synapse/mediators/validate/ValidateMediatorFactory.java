@@ -108,7 +108,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         }
 
         if (onFail != null && onFail.getChildElements().hasNext()) {
-            super.addChildren(onFail, validateMediator);
+            addChildren(onFail, validateMediator);
         } else {
             handleException("A non-empty <on-fail> child element is required for " +
                 "the <validate> mediator");

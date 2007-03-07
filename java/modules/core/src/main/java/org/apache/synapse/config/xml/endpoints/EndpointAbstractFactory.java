@@ -28,7 +28,7 @@ public class EndpointAbstractFactory {
 
     public static EndpointFactory getEndpointFactroy(OMElement configElement) {
 
-        if (configElement.getAttribute(new QName("ref")) != null) {
+        if (configElement.getAttribute(new QName("key")) != null) {
             IndirectEndpointFactory endpointFactory = IndirectEndpointFactory.getInstance();
             return endpointFactory;
         }

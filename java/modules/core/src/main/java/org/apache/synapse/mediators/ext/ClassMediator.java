@@ -103,13 +103,14 @@ public class ClassMediator extends AbstractMediator {
                 Axis2MessageContext.getStringValue(mProp.getExpression(), synCtx));
 
             try {
-                Method method = m.getClass().getMethod(mName, new Class[] {String.class});
-                log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
-                if (shouldTrace) {
-                    trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
+                if (value != null) {
+                    Method method = m.getClass().getMethod(mName, new Class[]{String.class});
+                    log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
+                    if (shouldTrace) {
+                        trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
+                    }
+                    method.invoke(m, new Object[]{value});
                 }
-                method.invoke(m, new Object[] { value });
-
             } catch (Exception e) {
                 String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
                     " mediator : " + m.getClass() + " : " + e.getMessage();

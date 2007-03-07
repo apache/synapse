@@ -34,12 +34,32 @@ public class PropertyMediatorTest extends TestCase {
         propMediator.setName("name");
         propMediator.setValue("value");
 
+         // set a local property to the synapse context
+        PropertyMediator propMediatorTwo = new PropertyMediator();
+        propMediatorTwo.setName("nameTwo");
+        propMediatorTwo.setValue("valueTwo");
+
         MessageContext synCtx = TestUtils.getTestContext("<empty/>");
         propMediator.mediate(synCtx);
-
+        propMediatorTwo.mediate(synCtx);
         assertTrue(
             "value".equals(Axis2MessageContext.getStringValue(
                 new AXIOMXPath("synapse:get-property('name')"), synCtx)));
+        assertTrue(
+            "valueTwo".equals(Axis2MessageContext.getStringValue(
+                new AXIOMXPath("synapse:get-property('nameTwo')"), synCtx)));
+
+        PropertyMediator propMediatorThree = new PropertyMediator();
+        propMediatorThree.setName("name");
+        propMediatorThree.setValue("value");
+        propMediatorThree.setAction(PropertyMediator.ACTION_REMOVE);
+        propMediatorThree.mediate(synCtx) ;
+        assertNull(Axis2MessageContext.getStringValue(
+                new AXIOMXPath("synapse:get-property('name')"), synCtx));
+        assertTrue(
+                   "valueTwo".equals(Axis2MessageContext.getStringValue(
+                       new AXIOMXPath("synapse:get-property('nameTwo')"), synCtx)));
+                
     }
 
     /**

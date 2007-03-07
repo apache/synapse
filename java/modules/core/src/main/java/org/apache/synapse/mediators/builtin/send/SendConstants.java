@@ -40,8 +40,8 @@ public class SendConstants {
     public static final String DISPATCHERS_ELEMENT      = "dispatchers";
     public static final String DISPATCHER_ELEMENT       = "dispatcher";
 
-    public static final QName ATT_REF_Q =
-            new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "ref");
+    public static final QName ATT_KEY_Q =
+            new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "key");
     public static final QName ATT_ADDRESS_Q =
             new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "address");
 }

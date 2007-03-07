@@ -45,7 +45,7 @@ public class OutMediatorFactory extends AbstractListMediatorFactory {
         // set its common attributes such as tracing etc
         initMediator(filter,elem);
 
-        super.addChildren(elem, filter);
+        addChildren(elem, filter);
         return filter;
     }
 

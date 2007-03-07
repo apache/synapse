@@ -41,7 +41,7 @@ public class InMediatorSerializer extends AbstractListMediatorSerializer
         OMElement in = fac.createOMElement("in", synNS);
         finalizeSerialization(in,mediator);
 
-        super.serializeChildren(in, mediator.getList());
+        serializeChildren(in, mediator.getList());
 
         if (parent != null) {
             parent.addChild(in);

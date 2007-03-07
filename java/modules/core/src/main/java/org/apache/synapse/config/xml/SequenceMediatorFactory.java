@@ -61,7 +61,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             seqMediator.setErrorHandler(e.getAttributeValue());
         }
         initMediator(seqMediator, elem);
-        super.addChildren(elem, seqMediator);
+        addChildren(elem, seqMediator);
         OMAttribute statistics = elem.getAttribute(
                 new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
@@ -89,7 +89,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 seqMediator.setErrorHandler(e.getAttributeValue());
             }
             initMediator(seqMediator, elem);
-            super.addChildren(elem, seqMediator);
+            addChildren(elem, seqMediator);
 
         } else {
             n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));

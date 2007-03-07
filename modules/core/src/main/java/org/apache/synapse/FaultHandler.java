@@ -25,12 +25,20 @@ package org.apache.synapse;
  * will be examined by one of the SynapseMR, ProxyServiceMR, or CallbackReceiver and faultStack
  * will be poped to get the most relevant FaultHandler and execute the handleFault method.
  */
-public interface FaultHandler {
+public abstract class FaultHandler {
+
+    public void handleFault(MessageContext synCtx) {
+        try {
+            handleFault(synCtx);
+        } catch (SynapseException syne) {
+            ((FaultHandler)synCtx.getFaultStack().pop()).onFault(synCtx);
+        }
+    }
 
     /**
      * This will be executed to handle any Exceptions occured within the Synapse environment.
      * @param synCtx SynapseMessageContext of which the fault occured message comprises
      * @throws SynapseException in case there is a failure in the fault execution
      */
-    public void handleFault(MessageContext synCtx) throws SynapseException;
+    public abstract void onFault(MessageContext synCtx);
 }

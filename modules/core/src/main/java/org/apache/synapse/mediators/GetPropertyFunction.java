@@ -41,6 +41,7 @@ public class GetPropertyFunction implements Function {
 
     private static final Log log = LogFactory.getLog(GetPropertyFunction.class);
 
+    /** Synapse Message context*/
     private MessageContext synCtx = null;
 
     public MessageContext getSynCtx() {
@@ -51,6 +52,15 @@ public class GetPropertyFunction implements Function {
         this.synCtx = synCtx;
     }
 
+    /**
+     * Returns the string value of the property which is get from the corresponding context to the provided scope .
+     * The default scope is used to get property from the synapse message context
+     *
+     * @param context
+     * @param args
+     * @return The string value of a property
+     * @throws FunctionCallException
+     */
     public Object call(Context context, List args) throws FunctionCallException {
 
         int size = args.size();
@@ -69,6 +79,14 @@ public class GetPropertyFunction implements Function {
         }
     }
 
+    /**
+     * Returns the string value of the property using arg. one as key and arg. two as scope
+     *
+     * @param scopeObject
+     * @param keyObject
+     * @param navigator
+     * @return The String value of property using arg. one as key and arg. two as scope
+     */
     public Object evaluate(Object scopeObject, Object keyObject, Navigator navigator) {
         if (synCtx == null) {
             log.warn("Synapse context has not been set for the XPath extension function" +
@@ -80,7 +98,8 @@ public class GetPropertyFunction implements Function {
         String key = StringFunction.evaluate(keyObject, navigator);
 
         if (key == null || "".equals(key)) {
-            log.warn("property-name should be provided when executing synapse:get-property(scope,prop-name)" +
+            log.warn("property-name should be provided when executing " +
+                    "synapse:get-property(scope,prop-name)" +
                     " or synapse:get-property(prop-name) Xpath function");
             return null;
         }
@@ -111,13 +130,15 @@ public class GetPropertyFunction implements Function {
         if (Constants.SCOPE_TRANSPORT.equals(scope) && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-            Object headers = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            Object headers = axis2MessageContext.getProperty(
+                    org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
             if (headers != null && headers instanceof Map) {
                 Map headersMap = (HashMap) headers;
                 return headersMap.get(key);
             }
         } else {
-            log.warn("Invalid scope : '" + scope + "' has been set for the synapse:get-property(scope,prop-name) XPath function");
+            log.warn("Invalid scope : '" + scope + "' has been set for the " +
+                    "synapse:get-property(scope,prop-name) XPath function");
         }
         return null;
     }

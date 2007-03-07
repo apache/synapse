@@ -28,11 +28,10 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
 
 /**
  * <pre>
- * &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
+ * &lt;property name="string" [action=set] (value="literal" | expression="xpath")/&gt;
  * </pre>
  */
-public class PropertyMediatorSerializer extends AbstractMediatorSerializer
-     {
+public class PropertyMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(PropertyMediatorSerializer.class);
 
@@ -43,34 +42,36 @@ public class PropertyMediatorSerializer extends AbstractMediatorSerializer
         }
 
         PropertyMediator mediator = (PropertyMediator) m;
-        OMElement property = fac.createOMElement("set-property", synNS);
-        finalizeSerialization(property,mediator);
+        OMElement property = fac.createOMElement("property", synNS);
+        finalizeSerialization(property, mediator);
 
         if (mediator.getName() != null) {
             property.addAttribute(fac.createOMAttribute(
-                "name", nullNS, mediator.getName()));
+                    "name", nullNS, mediator.getName()));
         } else {
             handleException("Invalid property mediator. Name is required");
         }
 
         if (mediator.getValue() != null) {
             property.addAttribute(fac.createOMAttribute(
-                "value", nullNS, mediator.getValue()));
+                    "value", nullNS, mediator.getValue()));
 
         } else if (mediator.getExpression() != null) {
             property.addAttribute(fac.createOMAttribute(
-                "expression", nullNS, mediator.getExpression().toString()));
+                    "expression", nullNS, mediator.getExpression().toString()));
             super.serializeNamespaces(property, mediator.getExpression());
 
-        } else {
-            handleException("Invalid property mediator. Value or expression is required");
+        } else if (mediator.getAction() == PropertyMediator.ACTION_SET) {
+            handleException("Invalid property mediator. Value or expression is required if action is SET");
         }
-        
         if (mediator.getScope() != null) {
             // if we have already built a mediator with scope, scope should be valid, now save it
             property.addAttribute(fac.createOMAttribute("scope", nullNS, mediator.getScope()));
         }
-
+        if (mediator.getAction() == PropertyMediator.ACTION_REMOVE) {
+            property.addAttribute(fac.createOMAttribute(
+                    "action", nullNS, "remove"));
+        }
         if (parent != null) {
             parent.addChild(property);
         }

@@ -349,11 +349,17 @@ public class Axis2MessageContext implements MessageContext {
             }
             try {
                 Object result = xpath.evaluate(synCtx.getEnvelope());
+                if (result == null) {
+                    return null;
+                }
                 StringBuffer textValue = new StringBuffer();
                 if (result instanceof List) {
                     Iterator iter = ((List) result).iterator();
                     while (iter.hasNext()) {
                         Object o = iter.next();
+                        if (o == null) {
+                            return null;
+                        }
                         if (o instanceof OMTextImpl) {
                             textValue.append(((OMTextImpl) o).getText());
                         } else if (o instanceof OMElementImpl) {

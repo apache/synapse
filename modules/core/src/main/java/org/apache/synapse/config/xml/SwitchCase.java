@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * A SwitchCase define a case element of Switch Mediator and It has a list mediator and
@@ -96,7 +97,11 @@ public class SwitchCase {
      * @return boolean value
      */
     public boolean matches(String value) {
-        boolean retVal = regex.matcher(value).matches();
+        Matcher matcher = regex.matcher(value);
+        if(matcher == null){
+            return false;
+        }
+        boolean retVal = matcher.matches();
         log.debug("Case : " + regex.pattern() + " evaluated to : " + retVal);
         return retVal;
     }

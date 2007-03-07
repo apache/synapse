@@ -44,7 +44,7 @@ public class IndirectEndpointFactory implements EndpointFactory {
     public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         IndirectEndpoint indirectEndpoint = new IndirectEndpoint();
-        String ref = epConfig.getAttributeValue(new QName("ref"));
+        String ref = epConfig.getAttributeValue(new QName("key"));
         indirectEndpoint.setRef(ref);
         return indirectEndpoint;
     }

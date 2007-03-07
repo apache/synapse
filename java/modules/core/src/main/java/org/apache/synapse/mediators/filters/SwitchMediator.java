@@ -72,20 +72,24 @@ public class SwitchMediator extends AbstractMediator {
                 trace.trace("Source Value : " + sourceText);
                 trace.trace("Start Case mediator list");
             }
-            Iterator iter = cases.iterator();
-            while (iter.hasNext()) {
-                SwitchCase swCase = (SwitchCase) iter.next();
-                if (swCase != null) {
-                    if (swCase.matches(sourceText)) {
-                        if (shouldTrace) {
-                            trace.trace("Executing case for : " + swCase.getRegex());
+            if (sourceText != null) {
+                Iterator iter = cases.iterator();
+                while (iter.hasNext()) {
+                    SwitchCase swCase = (SwitchCase) iter.next();
+                    if (swCase != null) {
+                        if (swCase.matches(sourceText)) {
+                            if (shouldTrace) {
+                                trace.trace("Executing case for : " + swCase.getRegex());
+                            }
+                            return swCase.mediate(synCtx);
                         }
-                        return swCase.mediate(synCtx);
                     }
                 }
-            }
-            if (shouldTrace) {
-                trace.trace("End Case mediator list");
+                if (shouldTrace) {
+                    trace.trace("End Case mediator list");
+                }
+            } else {
+                log.warn("Source has been evaluated to Null...Default Case will be run");
             }
             if (defaultCase != null) {
                 log.debug("Executing default case");

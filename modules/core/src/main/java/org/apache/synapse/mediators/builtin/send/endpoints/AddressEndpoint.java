@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * message, performing reries if a failure occured and informing the parent endpoint if a failure
  * couldn't be recovered.
  */
-public class AddressEndpoint implements Endpoint, FaultHandler {
+public class AddressEndpoint extends FaultHandler implements Endpoint {
 
     private static final Log log = LogFactory.getLog(AddressEndpoint.class);
 
@@ -149,7 +149,7 @@ public class AddressEndpoint implements Endpoint, FaultHandler {
         this.parentEndpoint = parentEndpoint;
     }
 
-    public void handleFault(MessageContext synCtx) throws SynapseException {
+    public void onFault(MessageContext synCtx) throws SynapseException {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.

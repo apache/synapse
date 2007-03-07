@@ -25,6 +25,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
@@ -37,10 +38,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
+import java.util.*;
 import java.net.URLConnection;
 import java.io.IOException;
 
@@ -86,6 +84,18 @@ public class SynapseConfiguration {
      */
     public void addSequence(String key, Entry entry) {
         localRegistry.put(key, entry);
+    }
+
+    public Map getDefinedSequences() {
+        Map definedSequences = new HashMap();
+        Iterator itr = localRegistry.values().iterator();
+        while(itr.hasNext()) {
+            Object o = itr.next();
+            if(o instanceof SequenceMediator) {
+                definedSequences.put(((SequenceMediator) o).getName(), o);
+            }
+        }
+        return definedSequences;
     }
 
     /**
@@ -212,7 +222,7 @@ public class SynapseConfiguration {
      * Deletes any reference mapped to the given key from the local registry
      * @param key the key of the reference to be removed
      */
-    public void deleteEntry(String key) {
+    public void removeEntry(String key) {
         localRegistry.remove(key);
     }
 
@@ -258,7 +268,7 @@ public class SynapseConfiguration {
      * Deletes the endpoint with the given key
      * @param key of the endpoint to be deleted
      */
-    public void deleteEndpoint(String key) {
+    public void removeEndpoint(String key) {
         localRegistry.remove(key);
     }
 
@@ -284,7 +294,7 @@ public class SynapseConfiguration {
      * Deletes the Proxy Service named with the given name
      * @param name of the Proxy Service to be deleted
      */
-    public void deleteProxyService(String name) {
+    public void removeProxyService(String name) {
         Object o = proxyServices.get(name);
         if (o == null) {
             handleException("Unknown proxy service for name : " + name);

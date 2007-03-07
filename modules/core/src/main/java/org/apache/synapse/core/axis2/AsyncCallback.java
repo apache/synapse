@@ -21,87 +21,29 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.client.async.AsyncResult;
-import org.apache.axis2.context.MessageContext;
-import org.apache.synapse.Constants;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 
-import java.util.Iterator;
-
+/**
+ * This class only "holds" the Synapse out message context for the Synapse callback message
+ * receiver when a response is received or error is encountered
+ */
 public class AsyncCallback extends Callback {
 
-    private static final Log log = LogFactory.getLog(AsyncCallback.class);
-
-    org.apache.synapse.MessageContext synapseOutMsgCtx = null;
+    MessageContext synapseOutMsgCtx = null;
 
     public AsyncCallback(org.apache.synapse.MessageContext synapseOutMsgCtx) {
         this.synapseOutMsgCtx = synapseOutMsgCtx;
     }
 
-    public void onComplete(AsyncResult result) {
+    public void onComplete(AsyncResult result) {}
 
-        MessageContext response = result.getResponseMessageContext();
+    public void onError(Exception e) {}
 
-        log.debug("Synapse received an asynchronous response message");
-        log.debug("Received To: " +
-            (response.getTo() != null ? response.getTo().getAddress() : "null"));
-        log.debug("SOAPAction: " +
-            (response.getSoapAction() != null ? response.getSoapAction() : "null"));
-        if (log.isDebugEnabled()) {
-            log.debug("Body : \n" + response.getEnvelope());
-        }
-
-        MessageContext axisOutMsgCtx =
-            ((Axis2MessageContext)synapseOutMsgCtx).getAxis2MessageContext();
-
-        response.setOperationContext(axisOutMsgCtx.getOperationContext());
-        response.setAxisService(axisOutMsgCtx.getAxisService());
-
-        // set properties on response
-        response.setServerSide(true);
-        response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
-        response.setProperty(MessageContext.TRANSPORT_OUT,
-            axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
-        response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-            axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
-        response.setTransportIn(axisOutMsgCtx.getTransportIn());
-        response.setTransportOut(axisOutMsgCtx.getTransportOut());
-
-        // If request is REST assume that the response is REST too
-        response.setDoingREST(axisOutMsgCtx.isDoingREST());
-
-        // create the synapse message context for the response
-        Axis2MessageContext synapseInMessageContext =
-            new Axis2MessageContext(
-                response,
-                synapseOutMsgCtx.getConfiguration(),
-                synapseOutMsgCtx.getEnvironment());
-
-        synapseInMessageContext.setResponse(true);
-        synapseInMessageContext.setTo(null);
-
-        // set the properties of the original MC to the new MC
-        Iterator iter = synapseOutMsgCtx.getLocalPropertyKeySet().iterator();
-
-        while (iter.hasNext()) {
-            Object key = iter.next();
-            synapseInMessageContext.setProperty(
-                (String) key, synapseOutMsgCtx.getLocalProperty((String) key));
-        }
-
-        // send the response message through the synapse mediation flow
-        synapseOutMsgCtx.getEnvironment().
-            injectMessage(synapseInMessageContext);
-    }
-
-    public void onError(Exception e) {
-        // this will never be called as our custom SynapseCallbackReceiver will push
-        // faults as well through the onComplete()
-        log.warn(e);
-        e.printStackTrace();
-    }
-
-    public void setSynapseOutMshCtx(org.apache.synapse.MessageContext synapseOutMsgCtx) {
+    public void setSynapseOutMshCtx(MessageContext synapseOutMsgCtx) {
         this.synapseOutMsgCtx = synapseOutMsgCtx;
+    }
+
+    public MessageContext getSynapseOutMsgCtx() {
+        return synapseOutMsgCtx;
     }
 }

@@ -21,11 +21,23 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Abstract factory for endpoint factories. Use this class to obtain the EndpointFactory implementation
+ * for the required endpoint configuration.
+ */
 public class EndpointAbstractFactory {
 
+    /**
+     * Returns the EndpointFactory implementation for given endpoint configuration. Throws a SynapseException,
+     * if there is no EndpointFactory for given configuration.
+     *
+     * @param configElement Endpoint configuration.
+     * @return EndpointFactory implementation.
+     */
     public static EndpointFactory getEndpointFactroy(OMElement configElement) {
 
         if (configElement.getAttribute(new QName("key")) != null) {
@@ -61,6 +73,6 @@ public class EndpointAbstractFactory {
             return endpointFactory;
         }
 
-        return null;
+        throw new SynapseException("Invalid endpoint configuration.");
     }
 }

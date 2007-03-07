@@ -41,7 +41,7 @@ public class RegistryFactory {
     private static final Log log = LogFactory.getLog(RegistryFactory.class);
 
     public static final QName PROVIDER_Q = new QName(Constants.NULL_NAMESPACE, "provider");
-    public static final QName PROPERTY_Q = new QName(Constants.NULL_NAMESPACE, "property");
+    public static final QName PARAMETER_Q = new QName(Constants.NULL_NAMESPACE, "parameter");
     public static final QName NAME_Q     = new QName(Constants.NULL_NAMESPACE, "name");
     public static final QName VALUE_Q    = new QName(Constants.NULL_NAMESPACE, "value");
 
@@ -73,7 +73,7 @@ public class RegistryFactory {
     }
 
     private static void setProperties(Registry reg, OMElement elem) {
-        Iterator iter = elem.getChildrenWithName(PROPERTY_Q);
+        Iterator iter = elem.getChildrenWithName(PARAMETER_Q);
         while (iter.hasNext()) {
             Object o = iter.next();
             if (o instanceof OMElement) {

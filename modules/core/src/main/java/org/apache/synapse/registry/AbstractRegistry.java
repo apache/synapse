@@ -105,9 +105,7 @@ public abstract class AbstractRegistry implements Registry {
                 seq.setDynamic(true);
                 seq.setRegistryKey(entry.getKey());
             } else if (entry.getValue() instanceof Endpoint) {
-                Endpoint ep = (Endpoint) entry.getValue();
-                ep.setDynamic(true);
-                ep.setRegistryKey(entry.getKey());
+                Endpoint ep = (Endpoint) entry.getValue();                
             }
 
         } else {

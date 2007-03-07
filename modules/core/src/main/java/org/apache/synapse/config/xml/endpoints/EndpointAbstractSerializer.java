@@ -22,8 +22,19 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.synapse.mediators.builtin.send.endpoints.*;
 import org.apache.synapse.SynapseException;
 
+/**
+ * Abstract serialier for endpoint serializers. Use this class to obtain the EndpointSerializer
+ * implementation for particular endpoint type.
+ */
 public class EndpointAbstractSerializer {
 
+    /**
+     * Returns the EndpointSerializer implementation for the given endpoint. Throws a SynapseException,
+     * if there is no serializer for the given endpoint type.
+     *
+     * @param endpoint Endpoint implementaion.
+     * @return EndpointSerializer implementation.
+     */
     public static EndpointSerializer getEndpointSerializer(Endpoint endpoint) {
 
         if (endpoint instanceof AddressEndpoint) {

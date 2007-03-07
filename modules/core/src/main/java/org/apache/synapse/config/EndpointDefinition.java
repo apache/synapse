@@ -23,20 +23,14 @@ import org.apache.synapse.Constants;
 
 
 /**
- * An endpoint can be used to give a logical name to an endpoint address, and possibly reused.
- * If the address is not just a simple URL, then extensibility elements may be used to indicate
- * the address. (i.e. an endpoint always will "resolve" into an absolute endpoint address.
- *
- * In future registry lookups etc may be used to resolve a named endpoint into its absolute address
+ * Endpoint definition contains the information about an web services endpoint. It is used by leaf
+ * level endpoints to keep these information (e.g. AddressEndpoint and WSDLEndpoint). An EndpointDefinition
+ * object is used by only one endpoint and they cannot be looked up in the registry.
  */
 public class EndpointDefinition {
 
-    /** The name of this endpoint instance */
-    private String name = null;
     /** The simple address this endpoint resolves to - if explicitly specified */
     private String address = null;
-    /** The name of the actual endpoint to which this instance refers to */
-    private String ref = null;
     /** Should messages be sent in an WS-RM Sequence ? */
     private boolean reliableMessagingOn = false;
     /** Should messages be sent using WS-A? */
@@ -57,30 +51,9 @@ public class EndpointDefinition {
     private boolean useMTOM = false;
     /** use SWA **/
     private boolean useSwa = false;
-    /** is this definition dynamic */
-    private boolean dynamic = false;
-    /** the registry key to load this definition if dynamic */
-    private String registryKey = null;
-    
 
     /** To decide to whether statistics should have collected or not */
     private int statisticsEnable = Constants.STATISTICS_UNSET;
-
-    /**
-     * Return the name of the endpoint
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Set the name of this named endpoint
-     * @param name the name to be set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
      * This should return the absolute EPR address referenced by the named endpoint. This may be possibly computed.
@@ -96,22 +69,6 @@ public class EndpointDefinition {
      */
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    /**
-     * Get the name of the Endpoint to which this instance refers to
-     * @return the name of the referenced endpoint
-     */
-    public String getRef() {
-        return ref;
-    }
-
-    /**
-     * Set the name of an Endpoint as the referenced endpoint of this instance
-     * @param ref the name of the Endpoint referenced
-     */
-    public void setRef(String ref) {
-        this.ref = ref;
     }
 
     /**
@@ -249,37 +206,5 @@ public class EndpointDefinition {
      */
     public void setStatisticsEnable(int statisticsEnable) {
         this.statisticsEnable = statisticsEnable;
-    }
-
-    /**
-     * Is this a dynamic endpoint?
-     * @return true if dynamic
-     */
-    public boolean isDynamic() {
-        return dynamic;
-    }
-
-    /**
-     * Mark this as a dynamic endpoint
-     * @param dynamic true if this is a dynamic endpoint
-     */
-    public void setDynamic(boolean dynamic) {
-        this.dynamic = dynamic;
-    }
-
-    /**
-     * Return the registry key used to load this endpoint dynamically
-     * @return
-     */
-    public String getRegistryKey() {
-        return registryKey;
-    }
-
-    /**
-     * get the registry key used to load this endpoint dynamically
-     * @param registryKey
-     */
-    public void setRegistryKey(String registryKey) {
-        this.registryKey = registryKey;
     }
 }

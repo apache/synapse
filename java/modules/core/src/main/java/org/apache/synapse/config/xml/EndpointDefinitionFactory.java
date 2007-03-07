@@ -44,75 +44,43 @@ import javax.xml.namespace.QName;
  */
 public class EndpointDefinitionFactory implements XMLToObjectMapper {
 
-	private static Log log = LogFactory.getLog(EndpointDefinitionFactory.class);
+    private static Log log = LogFactory.getLog(EndpointDefinitionFactory.class);
 
-	private static final EndpointDefinitionFactory instance = new EndpointDefinitionFactory();
+    private static final EndpointDefinitionFactory instance = new EndpointDefinitionFactory();
 
-	private EndpointDefinitionFactory() {
-	}
+    private EndpointDefinitionFactory() {
+    }
 
-	public static EndpointDefinition createEndpoint(OMElement elem,
-			boolean anonymousEndpoint) {
+    public static EndpointDefinition createEndpoint(OMElement elem,
+                                                    boolean anonymousEndpoint) {
 
-		OMAttribute name = elem.getAttribute(new QName(
-				Constants.NULL_NAMESPACE, "name"));
-		OMAttribute address = elem.getAttribute(new QName(
-				Constants.NULL_NAMESPACE, "address"));
-		OMAttribute force = elem.getAttribute(new QName(
-					Constants.NULL_NAMESPACE, "force"));
+        OMAttribute address = elem.getAttribute(new QName(
+                Constants.NULL_NAMESPACE, "address"));
+        OMAttribute force = elem.getAttribute(new QName(
+                Constants.NULL_NAMESPACE, "force"));
         OMAttribute optimize = elem.getAttribute(new QName(
-					Constants.NULL_NAMESPACE, "optimize"));
+                Constants.NULL_NAMESPACE, "optimize"));
 
         EndpointDefinition endpoint = new EndpointDefinition();
-		if (!anonymousEndpoint) {
-			if (name == null) {
-				handleException("The 'name' attribute is required for a named endpoint definition");
-			} else {
-				endpoint.setName(name.getAttributeValue());
-			}
-			if (address != null) {
-				endpoint.setAddress(address.getAttributeValue());
-			} else {
-				// right now an address is *required*
-				handleException("The 'address' attribute is required for an endpoint");
-			}
-            OMAttribute statistics = elem.getAttribute(
-                    new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
-            if (statistics != null) {
-                String statisticsValue = statistics.getAttributeValue();
-                if (statisticsValue != null) {
-                    if (Constants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                        endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
-                    } else if (Constants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                        endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
-                    }
-                }
-            }
+
+        if (address != null) {
+            endpoint.setAddress(address.getAttributeValue());
         } else {
-			OMAttribute reference = elem.getAttribute(new QName(
-					Constants.NULL_NAMESPACE, "key"));
-			if (reference != null) {
-				endpoint.setRef(reference.getAttributeValue());
-			} else if (address != null) {
-				endpoint.setAddress(address.getAttributeValue());
-			} else {
-				handleException("One of the 'address' or 'ref' attributes are required in an "
-						+ "anonymous endpoint");
-			}
-		}
-		
-		
-		if (force != null)
-		{
-			String forceValue = force.getAttributeValue().trim().toLowerCase();
-			if (forceValue.equals("pox")) {
-				endpoint.setForcePOX(true);
-			} else if (forceValue.equals("soap")) {
-				endpoint.setForceSOAP(true);
-			} else {
-				handleException("force value -\""+forceValue+"\" not yet implemented");
-			}
-		}
+            handleException("One of the 'address' or 'ref' attributes are required in an "
+                    + "anonymous endpoint");
+        }
+
+        if (force != null)
+        {
+            String forceValue = force.getAttributeValue().trim().toLowerCase();
+            if (forceValue.equals("pox")) {
+                endpoint.setForcePOX(true);
+            } else if (forceValue.equals("soap")) {
+                endpoint.setForceSOAP(true);
+            } else {
+                handleException("force value -\""+forceValue+"\" not yet implemented");
+            }
+        }
 
         if (optimize != null && optimize.getAttributeValue().length() > 0) {
             String method = optimize.getAttributeValue().trim();
@@ -120,68 +88,68 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
                 endpoint.setUseMTOM(true);
             } else if ("swa".equalsIgnoreCase(method)) {
                 endpoint.setUseSwa(true);
-            }            
+            }
         }
 
         OMElement wsAddr = elem.getFirstChildWithName(new QName(
-				Constants.SYNAPSE_NAMESPACE, "enableAddressing"));
-		if (wsAddr != null) {
-			endpoint.setAddressingOn(true);
-			String useSepList = wsAddr.getAttributeValue(new QName(
-					"separateListener"));
-			if (useSepList != null) {
-				if (useSepList.trim().toLowerCase().startsWith("tr")
-						|| useSepList.trim().startsWith("1")) {
-					endpoint.setUseSeparateListener(true);
-				}
-			}
-		}
+                Constants.SYNAPSE_NAMESPACE, "enableAddressing"));
+        if (wsAddr != null) {
+            endpoint.setAddressingOn(true);
+            String useSepList = wsAddr.getAttributeValue(new QName(
+                    "separateListener"));
+            if (useSepList != null) {
+                if (useSepList.trim().toLowerCase().startsWith("tr")
+                        || useSepList.trim().startsWith("1")) {
+                    endpoint.setUseSeparateListener(true);
+                }
+            }
+        }
 
-		OMElement wsSec = elem.getFirstChildWithName(new QName(
-				Constants.SYNAPSE_NAMESPACE, "enableSec"));
-		if (wsSec != null) {
-			endpoint.setSecurityOn(true);
-			OMAttribute policy = wsSec.getAttribute(new QName(
-					Constants.NULL_NAMESPACE, "policy"));
-			if (policy != null) {
-				endpoint.setWsSecPolicyKey(policy.getAttributeValue());
-			}
-		}
-		OMElement wsRm = elem.getFirstChildWithName(new QName(
-				Constants.SYNAPSE_NAMESPACE, "enableRM"));
-		if (wsRm != null) {
-			endpoint.setReliableMessagingOn(true);
-			OMAttribute policy = wsRm.getAttribute(new QName(
-					Constants.NULL_NAMESPACE, "policy"));
-			if (policy != null) {
-				endpoint.setWsRMPolicyKey(policy.getAttributeValue());
-			}
-		}
+        OMElement wsSec = elem.getFirstChildWithName(new QName(
+                Constants.SYNAPSE_NAMESPACE, "enableSec"));
+        if (wsSec != null) {
+            endpoint.setSecurityOn(true);
+            OMAttribute policy = wsSec.getAttribute(new QName(
+                    Constants.NULL_NAMESPACE, "policy"));
+            if (policy != null) {
+                endpoint.setWsSecPolicyKey(policy.getAttributeValue());
+            }
+        }
+        OMElement wsRm = elem.getFirstChildWithName(new QName(
+                Constants.SYNAPSE_NAMESPACE, "enableRM"));
+        if (wsRm != null) {
+            endpoint.setReliableMessagingOn(true);
+            OMAttribute policy = wsRm.getAttribute(new QName(
+                    Constants.NULL_NAMESPACE, "policy"));
+            if (policy != null) {
+                endpoint.setWsRMPolicyKey(policy.getAttributeValue());
+            }
+        }
 
-		return endpoint;
-		// }
-	}
+        return endpoint;
+        // }
+    }
 
-	private static void handleException(String msg) {
-		log.error(msg);
-		throw new SynapseException(msg);
-	}
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
 
-	private static void handleException(String msg, Exception e) {
-		log.error(msg, e);
-		throw new SynapseException(msg, e);
-	}
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
 
-	public Object getObjectFromOMNode(OMNode om) {
-		if (om instanceof OMElement) {
-			return createEndpoint((OMElement) om, false);
-		} else {
-			handleException("Invalid XML configuration for an Endpoint. OMElement expected");
-		}
-		return null;
-	}
+    public Object getObjectFromOMNode(OMNode om) {
+        if (om instanceof OMElement) {
+            return createEndpoint((OMElement) om, false);
+        } else {
+            handleException("Invalid XML configuration for an Endpoint. OMElement expected");
+        }
+        return null;
+    }
 
-	public static EndpointDefinitionFactory getInstance() {
-		return instance;
-	}
+    public static EndpointDefinitionFactory getInstance() {
+        return instance;
+    }
 }

@@ -45,7 +45,7 @@ public class IndirectEndpointFactory implements EndpointFactory {
 
         IndirectEndpoint indirectEndpoint = new IndirectEndpoint();
         String ref = epConfig.getAttributeValue(new QName("key"));
-        indirectEndpoint.setRef(ref);
+        indirectEndpoint.setKey(ref);
         return indirectEndpoint;
     }
 

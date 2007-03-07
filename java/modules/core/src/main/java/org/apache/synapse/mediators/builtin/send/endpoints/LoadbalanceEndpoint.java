@@ -81,14 +81,6 @@ public class LoadbalanceEndpoint implements Endpoint {
         this.active = active;
     }
 
-    public void setDynamic(boolean dynamic) {
-        // TODO chathura
-    }
-
-    public void setRegistryKey(String registryKey) {
-        // TODO chathura
-    }
-
     public ArrayList getEndpoints() {
         return endpoints;
     }
@@ -111,6 +103,6 @@ public class LoadbalanceEndpoint implements Endpoint {
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         endpoint.setActive(false);
-        send(synMessageContext);
+        send(synMessageContext);        
     }
 }

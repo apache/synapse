@@ -41,7 +41,7 @@ public class IndirectEndpointSerializer implements EndpointSerializer {
         OMElement endpointElement = fac.createOMElement("endpoint", Constants.SYNAPSE_OMNAMESPACE);
 
         IndirectEndpoint indirectEndpoint = (IndirectEndpoint) endpoint;
-        String ref = indirectEndpoint.getRef();
+        String ref = indirectEndpoint.getKey();
         if (ref != null) {
             endpointElement.addAttribute("ref", ref, null);
         }

@@ -23,7 +23,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.builtin.send.FailureListener;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.config.EndpointDefinition;
 import org.apache.axis2.addressing.EndpointReference;
@@ -66,15 +65,7 @@ public class AddressEndpoint implements Endpoint, FaultHandler {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public void setDynamic(boolean dynamic) {
-        // TODO chathura
-    }
-
-    public void setRegistryKey(String registryKey) {
-        // TODO chathura
-    }
+    }    
 
     public void send(MessageContext synCtx) {
 
@@ -98,7 +89,7 @@ public class AddressEndpoint implements Endpoint, FaultHandler {
                 synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
             }
 
-            String endPointName = endpoint.getName();
+            String endPointName = this.getName();
 
             // Setting Required property to collect the End Point statistics
             boolean statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
@@ -162,6 +153,6 @@ public class AddressEndpoint implements Endpoint, FaultHandler {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
-        parentEndpoint.onChildEndpointFail(this, synCtx);
+        parentEndpoint.onChildEndpointFail(this, synCtx);       
     }
 }

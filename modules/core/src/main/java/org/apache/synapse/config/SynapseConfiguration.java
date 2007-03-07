@@ -26,6 +26,8 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
 import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
+import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
@@ -243,8 +245,7 @@ public class SynapseConfiguration {
             return (Endpoint) o;
         } else if (registry != null) {
             Entry entry = new Entry(key);
-            //entry.setMapper(EndpointFactory.getInstance());
-            // TODO chathura
+            entry.setMapper(XMLToEndpointMapper.getInstance());                        
             o = registry.getResource(entry);
             if (o != null && o instanceof Endpoint) {
                 return (Endpoint) o;

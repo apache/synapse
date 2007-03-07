@@ -31,6 +31,7 @@ import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
+import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 
 import javax.xml.stream.XMLStreamException;
@@ -116,9 +117,15 @@ public class XMLConfigurationSerializer {
     private static void serializeEndpoints(OMElement definitions, Map endpoints) {
         Iterator iter = endpoints.keySet().iterator();
         while (iter.hasNext()) {
-            String key = (String) iter.next();
-            //EndpointSerializer.serializeEndpoint((Endpoint) endpoints.get(key), definitions);
-            // TODO chathura
+            String key = (String) iter.next();            
+            Object o = endpoints.get(key);
+            if (o instanceof Endpoint) {
+                Endpoint endpoint = (Endpoint) o;
+                OMElement epElement = EndpointAbstractSerializer.
+                        getEndpointSerializer(endpoint).serializeEndpoint(endpoint);
+                definitions.addChild(epElement);
+            }
+
         }
     }
 

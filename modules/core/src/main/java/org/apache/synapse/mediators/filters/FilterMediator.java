@@ -29,6 +29,7 @@ import org.apache.synapse.mediators.AbstractListMediator;
 import org.jaxen.JaxenException;
 
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * The filter mediator combines the regex and xpath filtering functionality. If an xpath
@@ -92,11 +93,20 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
             } else if (source != null && regex != null) {
                 log.debug("Evaluating regular expression : " + regex.pattern() + " against source : " + source);
                 String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
+                if (sourceString == null) {
+                    log.warn("Source String has been evaluated to Null");
+                    return false;
+                }
                 if (shouldTrace(synCtx.getTracingState())) {
                     trace.trace("Regular expression : " + regex.pattern() + " and Source " +
-                        sourceString + " matches : " + regex.matcher(sourceString).matches());
+                            sourceString + " matches : " + regex.matcher(sourceString).matches());
                 }
-                return regex.matcher(sourceString).matches();
+                Matcher matcher = regex.matcher(sourceString);
+                if (matcher == null) {
+                    log.warn("Can not find a Regex Pattren Matcher");
+                    return false;
+                }
+                return matcher.matches();
 
             } else {
                 log.error("Invalid configuration specified");

@@ -32,17 +32,17 @@ import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.jaxen.JaxenException;
 
 /**
- * Creates a set-property mediator through the supplied XML configuration
- *
+ * Creates a property mediator through the supplied XML configuration
+ * <p/>
  * <pre>
- * &lt;set-property name="string" (value="literal" | expression="xpath")/&gt;
+ * &lt;property name="string" [action=set] (value="literal" | expression="xpath")/&gt;
  * </pre>
  */
-public class PropertyMediatorFactory extends AbstractMediatorFactory  {
+public class PropertyMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
-    private static final QName PROP_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "set-property");
+    private static final QName PROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "property");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -51,21 +51,20 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory  {
         OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
         OMAttribute expression = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "expression"));
         OMAttribute scope = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "scope"));
-
+        OMAttribute action = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "action"));
         if (name == null) {
             String msg = "The 'name' attribute is required for the configuration of a property mediator";
             log.error(msg);
             throw new SynapseException(msg);
-        } else if (value == null && expression == null) {
-            String msg = "Either an 'value' or 'expression' attribute is required for a property mediator";
+        } else if ((value == null && expression == null) && !(action != null && "remove".equals(action.getAttributeValue()))) {
+            String msg = "Either an 'value' or 'expression' attribute is required for a property mediator when action is SET";
             log.error(msg);
             throw new SynapseException(msg);
         }
-
         propMediator.setName(name.getAttributeValue());
         if (value != null) {
             propMediator.setValue(value.getAttributeValue());
-        } else {
+        } else if (expression != null) {
             try {
                 AXIOMXPath xp = new AXIOMXPath(expression.getAttributeValue());
                 OMElementUtils.addNameSpaces(xp, elem, log);
@@ -77,22 +76,26 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory  {
                 throw new SynapseException(msg);
             }
         }
-
         if (scope != null) {
             String valueStr = scope.getAttributeValue();
-            if (!Constants.SCOPE_AXIS2.equals(valueStr) && !Constants.SCOPE_TRANSPORT.equals(valueStr)) {
-        		String msg = "Only '" + Constants.SCOPE_AXIS2 + "' or '" + Constants.SCOPE_TRANSPORT
+            if (!Constants.SCOPE_AXIS2.equals(valueStr) && !Constants.SCOPE_TRANSPORT.equals(valueStr))
+            {
+                String msg = "Only '" + Constants.SCOPE_AXIS2 + "' or '" + Constants.SCOPE_TRANSPORT
                         + "' values are allowed for attribute scope for a property mediator"
                         + ", Unsupported scope " + scope.getAttributeValue();
                 log.error(msg);
                 throw new SynapseException(msg);
-        	}
+            }
             propMediator.setScope(valueStr);
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(propMediator,elem);
-
+        initMediator(propMediator, elem);
+        // The action attribute is optional, if provided and equals to 'remove' the
+        // property mediator will act as a property remove mediator
+        if (action != null && "remove".equals(action.getAttributeValue())) {
+            propMediator.setAction(PropertyMediator.ACTION_REMOVE);
+        }
         return propMediator;
     }
 

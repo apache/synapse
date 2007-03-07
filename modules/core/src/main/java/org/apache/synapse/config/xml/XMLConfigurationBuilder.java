@@ -147,7 +147,7 @@ public class XMLConfigurationBuilder {
 
     public static void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
-        String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "nane"));
+        String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
         if (name != null) {
             if (config.getLocalRegistry().get(name) != null) {
                 handleException("Duplicate endpoint definition : " + name);

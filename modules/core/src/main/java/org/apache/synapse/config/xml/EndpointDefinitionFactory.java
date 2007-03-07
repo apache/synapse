@@ -90,7 +90,7 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
             }
         } else {
 			OMAttribute reference = elem.getAttribute(new QName(
-					Constants.NULL_NAMESPACE, "ref"));
+					Constants.NULL_NAMESPACE, "key"));
 			if (reference != null) {
 				endpoint.setRef(reference.getAttributeValue());
 			} else if (address != null) {

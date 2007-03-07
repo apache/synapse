@@ -65,7 +65,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
     public void setActive(boolean active) {
         this.active = active;
-    }    
+    }
 
     public void send(MessageContext synCtx) {
 
@@ -97,7 +97,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
                 EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
                 boolean isFault =synCtx.getEnvelope().getBody().hasFault();
                 endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
-                synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);                
+                synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
             }
             synCtx.setTo(new EndpointReference(eprAddress));
 
@@ -135,7 +135,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
             if (endpoint.isAddressingOn()) {
                 synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
             }
-            
+
             synCtx.pushFault(this);
             synCtx.getEnvironment().send(endpoint, synCtx);
         }
@@ -153,6 +153,11 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
-        parentEndpoint.onChildEndpointFail(this, synCtx);       
+        if (parentEndpoint != null) {
+            parentEndpoint.onChildEndpointFail(this, synCtx);
+        } else {
+            Object o = synCtx.getFaultStack().pop();
+            ((FaultHandler) o).handleFault(synCtx);
+        }
     }
 }

@@ -26,6 +26,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
+import org.apache.synapse.FaultHandler;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -77,10 +78,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private void handleMessage(MessageContext response,
         org.apache.synapse.MessageContext synapseOutMsgCtx) {
 
-        if (response.getEnvelope().getBody().hasFault()) {
-            // synapseOutMsgCtx.getFaultStack().pop(); and handle the
-            // response.getEnvelope().getBody().getFault().getException()
-            // TODO chathura
+        if (response.getEnvelope().getBody().hasFault()) {            
+            Object o = synapseOutMsgCtx.getFaultStack().pop();
+            ((FaultHandler) o).handleFault(synapseOutMsgCtx);
 
         } else {
 

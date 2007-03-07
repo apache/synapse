@@ -58,7 +58,7 @@ public class RegistrySerializer {
         while (iter.hasNext()) {
             String name = (String) iter.next();
             String value = (String) registry.getConfigProperties().get(name);
-            OMElement property = fac.createOMElement("property", synNS);
+            OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
                 "name", nullNS, name));
             property.addAttribute(fac.createOMAttribute(

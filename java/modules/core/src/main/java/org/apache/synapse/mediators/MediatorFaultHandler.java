@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @see org.apache.synapse.FaultHandler
  */
-public class MediatorFaultHandler implements FaultHandler {
+public class MediatorFaultHandler extends FaultHandler {
 
     private static final Log log = LogFactory.getLog(MediatorFaultHandler.class);
 
@@ -44,11 +44,11 @@ public class MediatorFaultHandler implements FaultHandler {
 
     /**
      * Constructs the FaultHandler object for handling mediator faults
-     * 
+     *
      * @param faultMediator Mediator in which fault sequence is specified
      */
     public MediatorFaultHandler(Mediator faultMediator) {
-        
+
         this.faultMediator = faultMediator;
     }
 
@@ -57,39 +57,32 @@ public class MediatorFaultHandler implements FaultHandler {
      *
      * @param synCtx Synapse Message Context of which mediation occurs
      * @throws SynapseException in case there is a failure in the fault execution
-     * @see org.apache.synapse.FaultHandler#handleFault(org.apache.synapse.MessageContext) 
+     * @see org.apache.synapse.FaultHandler#handleFault(org.apache.synapse.MessageContext)
      */
-    public void handleFault(MessageContext synCtx) throws SynapseException {
-        
-        try {
-            
-            log.debug("MediatorFaultHandler :: handleFault");
-            
-            this.faultMediator.mediate(synCtx);
-            
-        } catch (SynapseException syne) {
-            
-            ((FaultHandler)(synCtx.getFaultStack().pop())).handleFault(synCtx);
-        }
+    public void onFault(MessageContext synCtx) throws SynapseException {
+
+        log.debug("MediatorFaultHandler :: handleFault");
+
+        this.faultMediator.mediate(synCtx);
     }
 
     /**
      * Getter for the mediator describing the fault sequence
-     * 
+     *
      * @return Mediator specifying the fault sequence for mediator fault handler
      */
     public Mediator getFaultMediator() {
-        
+
         return faultMediator;
     }
 
     /**
      * Setter of the mediator describing the fault sequence
-     * 
+     *
      * @param faultMediator Mediator specifying the fault sequence to be used by the handler
      */
     public void setFaultMediator(Mediator faultMediator) {
-        
+
         this.faultMediator = faultMediator;
     }
 }

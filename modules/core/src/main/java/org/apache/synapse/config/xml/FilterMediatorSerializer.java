@@ -66,7 +66,7 @@ public class FilterMediatorSerializer extends AbstractListMediatorSerializer
         }
 
         finalizeSerialization(filter, mediator);
-        super.serializeChildren(filter, mediator.getList());
+        serializeChildren(filter, mediator.getList());
 
         if (parent != null) {
             parent.addChild(filter);

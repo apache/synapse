@@ -61,7 +61,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
                     "onError", nullNS, mediator.getErrorHandler()));
         }
         finalizeSerialization(sequence, mediator);
-        super.serializeChildren(sequence, mediator.getList());
+        serializeChildren(sequence, mediator.getList());
         if (parent != null) {
             parent.addChild(sequence);
         }
@@ -111,7 +111,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
                             "onError", nullNS, mediator.getErrorHandler()));
                 }
                 finalizeSerialization(sequence, mediator);
-                super.serializeChildren(sequence, mediator.getList());
+                serializeChildren(sequence, mediator.getList());
             }
         }
 

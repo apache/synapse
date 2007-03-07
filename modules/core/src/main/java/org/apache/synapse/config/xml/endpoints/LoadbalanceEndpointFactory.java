@@ -69,7 +69,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
             }
 
             // set endpoints
-            ArrayList endpoints = getEndpoints(loadbalanceElement);
+            ArrayList endpoints = getEndpoints(loadbalanceElement, loadbalanceEndpoint);
             loadbalanceEndpoint.setEndpoints(endpoints);
 
             // set load balance algorithm
@@ -120,7 +120,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
         return null;
     }
 
-    private ArrayList getEndpoints(OMElement loadbalanceElement) {
+    private ArrayList getEndpoints(OMElement loadbalanceElement, Endpoint parent) {
 
         ArrayList endpoints = new ArrayList();
         Iterator iter = loadbalanceElement.getChildrenWithName
@@ -131,6 +131,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
 
             EndpointFactory epFac = EndpointAbstractFactory.getEndpointFactroy(endptElem);
             Endpoint endpoint = epFac.createEndpoint(endptElem, true);
+            endpoint.setParentEndpoint(parent);
             endpoints.add(endpoint);
         }
 

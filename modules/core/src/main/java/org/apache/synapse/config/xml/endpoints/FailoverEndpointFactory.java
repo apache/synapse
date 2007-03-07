@@ -59,7 +59,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
             }
 
             // set endpoints
-            ArrayList endpoints = getEndpoints(failoverElement);
+            ArrayList endpoints = getEndpoints(failoverElement, failoverEndpoint);
             failoverEndpoint.setEndpoints(endpoints);
 
             return failoverEndpoint;
@@ -77,7 +77,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
         return null;
     }
 
-    private ArrayList getEndpoints(OMElement failoverElement) {
+    private ArrayList getEndpoints(OMElement failoverElement, Endpoint parent) {
 
         ArrayList endpoints = new ArrayList();
         Iterator iter = failoverElement.getChildrenWithName
@@ -88,6 +88,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
 
             EndpointFactory epFac = EndpointAbstractFactory.getEndpointFactroy(endptElem);
             Endpoint endpoint = epFac.createEndpoint(endptElem, true);
+            endpoint.setParentEndpoint(parent);
             endpoints.add(endpoint);
         }
 

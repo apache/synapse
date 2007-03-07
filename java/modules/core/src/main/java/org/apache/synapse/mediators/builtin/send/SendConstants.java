@@ -34,7 +34,7 @@ public class SendConstants {
     public static final String RETRY_INTERVAL           = "retryInterval";
     public static final String FAILOVER                 = "failover";   // failover attribute in the loadbalance element
     public static final String SESSION_AFFINITY         = "sessionAffinity";
-    public static final String ALGORITHM_NAME           = "algorithmName";
+    public static final String ALGORITHM_NAME           = "policy";
     public static final String FAILOVER_GROUP_ELEMENT   = "failover"; // failover group element inside the loadbalance element
     public static final String DISPATCH_MANAGER         = "DISPATCH_MANAGER";
     public static final String DISPATCHERS_ELEMENT      = "dispatchers";

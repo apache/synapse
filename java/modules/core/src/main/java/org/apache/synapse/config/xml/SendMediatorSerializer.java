@@ -33,7 +33,8 @@ import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import java.util.Iterator;
 
 /**
- * //TODO support endpoints, failover and loadbalacing
+ *
+ * //TODO document endpoints, failover and loadbalacing
  *
  * The &lt;send&gt; element is used to send messages out of Synapse to some endpoint. In the simplest case,
  * the place to send the message to is implicit in the message (via a property of the message itself)-

@@ -24,13 +24,13 @@ import org.apache.synapse.MessageContext;
 public class IndirectEndpoint implements Endpoint {
 
     private String name = null;
-    private String ref = null;
+    private String key = null;
     private boolean active = true;
     private Endpoint parentEndpoint = null;
 
     public void send(MessageContext synMessageContext) {
         // get the actual endpoint and send
-        Endpoint endpoint = synMessageContext.getEndpoint(ref);
+        Endpoint endpoint = synMessageContext.getEndpoint(key);
 
         if (endpoint.isActive()) {
             endpoint.send(synMessageContext);
@@ -47,12 +47,12 @@ public class IndirectEndpoint implements Endpoint {
         this.name = name;
     }
 
-    public String getRef() {
-        return ref;
+    public String getKey() {
+        return key;
     }
 
-    public void setRef(String ref) {
-        this.ref = ref;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public boolean isActive() {
@@ -61,15 +61,7 @@ public class IndirectEndpoint implements Endpoint {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public void setDynamic(boolean dynamic) {
-        // TODO chathura
-    }
-
-    public void setRegistryKey(String registryKey) {
-        // TODO chathura
-    }
+    }   
 
     public void setParentEndpoint(Endpoint parentEndpoint) {
         this.parentEndpoint = parentEndpoint;

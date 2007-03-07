@@ -38,7 +38,7 @@ import java.util.Iterator;
 /**
  * The Send mediator factory parses a Send element and creates an instance of the mediator
  *
- * //TODO support endpoints, failover and loadbalacing
+ * //TODO document endpoints, failover and loadbalacing
  *
  * The &lt;send&gt; element is used to send messages out of Synapse to some endpoint. In the simplest case,
  * the place to send the message to is implicit in the message (via a property of the message itself)-

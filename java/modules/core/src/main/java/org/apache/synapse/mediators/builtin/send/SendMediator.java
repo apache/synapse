@@ -27,12 +27,11 @@ import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
 import org.apache.synapse.mediators.AbstractMediator;
 
 /**
- * The Send mediator sends the message using the following semantics.
- * <p/>
- * This is a leaf mediator (i.e. further processing halts after this mediator completes)
- * <p/>
- * TODO support loadbalancing and failover
- */
+ * SendMediator sends a message using specified semantics. If it contains an endpoint it will send the
+ * message to that endpoint. Once a message is sent to the endpoint further sending behaviors are completely
+ * governed by that endpoint. If there is no endpoint available, SendMediator will send the message to
+ * the implicitly stated destination.
+ * */
 public class SendMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SendMediator.class);

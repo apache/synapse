@@ -78,23 +78,17 @@ public class AddressEndpointFactory implements EndpointFactory {
     }
 
     private EndpointDefinition createEndpointDefinition(OMElement elem) {
-
-        OMAttribute name = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "name"));
+        
         OMAttribute address = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "uri"));
         OMAttribute force = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "force"));
         OMAttribute optimize = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "optimize"));
-        OMAttribute reference = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "key"));
 
         EndpointDefinition endpoint = new EndpointDefinition();
 
-        if (reference != null) {
-            endpoint.setRef(reference.getAttributeValue());
-        } else if (address != null) {
+        if (address != null) {
             endpoint.setAddress(address.getAttributeValue());
         } else {
             handleException("One of the 'address' or 'ref' attributes are required in an "

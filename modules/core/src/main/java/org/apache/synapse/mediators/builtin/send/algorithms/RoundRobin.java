@@ -35,7 +35,8 @@ public class RoundRobin implements LoadbalanceAlgorithm {
     }
 
     /**
-     * Choose an active endpoint using the round robin algorithm.
+     * Choose an active endpoint using the round robin algorithm. If there are no active endpoints
+     * available, returns null.
      *
      * @param synapseMessageContext
      * @return endpoint to send the next message
@@ -56,7 +57,7 @@ public class RoundRobin implements LoadbalanceAlgorithm {
 
             attempts++;
             if (attempts > endpoints.size()) {
-                throw new SynapseException("All endpoints have failed.");
+                return null;
             }
 
         } while (!nextEndpoint.isActive());

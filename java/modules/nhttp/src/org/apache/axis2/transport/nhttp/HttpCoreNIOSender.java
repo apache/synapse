@@ -17,8 +17,11 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
@@ -32,6 +35,7 @@ import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.SessionRequest;
+import org.apache.http.nio.reactor.SessionRequestCallback;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
@@ -68,6 +72,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     private ConnectingIOReactor ioReactor = null;
     /** The client handler */
     private NHttpClientHandler handler = null;
+    /** The session request callback that calls back to the message receiver with errors */
+    private final SessionRequestCallback sessionRequestCallback = getSessionRequestCallback();
     /** The SSL Context to be used */
     SSLContext sslContext = null;
 
@@ -240,6 +246,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             if (conn == null) {
                 SessionRequest req = ioReactor.connect(
                     new InetSocketAddress(url.getHost(), port), null, axis2Req);
+                req.setCallback(sessionRequestCallback);
                 log.debug("A new connection established");
             } else {
                 ((ClientHandler) handler).submitRequest(conn, axis2Req);
@@ -340,6 +347,47 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         } catch (IOException e) {
             log.warn("Error shutting down IOReactor", e);
         }
+    }
+
+    /**
+     * Return a SessionRequestCallback which gets notified of a connection failure
+     * or an error during a send operation. This method finds the corresponding
+     * Axis2 message context for the outgoing request, and find the message receiver
+     * and sends a fault message back to the message receiver that is marked as
+     * related to the outgoing request
+     * @return a Session request callback
+     */
+    private static SessionRequestCallback getSessionRequestCallback() {
+        return new SessionRequestCallback() {
+            public void completed(SessionRequest request) {
+            }
+
+            public void failed(SessionRequest request) {
+                handleError(request);
+            }
+
+            public void timeout(SessionRequest request) {
+                handleError(request);
+            }
+
+            private void handleError(SessionRequest request) {
+                if (request.getAttachment() != null &&
+                    request.getAttachment() instanceof Axis2HttpRequest) {
+
+                    Axis2HttpRequest axis2Request = (Axis2HttpRequest) request.getAttachment();
+                    MessageContext mc = axis2Request.getMsgContext();
+                    MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+
+                    try {
+                        mr.receive(
+                            new AxisEngine(mc.getConfigurationContext()).
+                                createFaultMessageContext(mc, request.getException()));
+                    } catch (AxisFault af) {
+                        log.error("Unable to report back failure to the message receiver", af);
+                    }
+                }
+            }
+        };
     }
 
     // -------------- utility methods -------------

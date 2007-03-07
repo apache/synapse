@@ -49,7 +49,7 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
         // set its common attributes such as tracing etc
         initMediator(sm,elem);
 
-        super.addChildren(elem, sm);
+        addChildren(elem, sm);
         return sm;
     }
 

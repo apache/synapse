@@ -20,10 +20,20 @@
 package org.apache.synapse.mediators.builtin.send.endpoints;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.FaultHandler;
 import org.apache.synapse.mediators.builtin.send.algorithms.LoadbalanceAlgorithm;
 
 import java.util.ArrayList;
 
+/**
+ * Load balance endpoint can have multiple endpoints. It will route messages according to the
+ * specified loadbalance algorithm. This will assume that all immediate child endpoints are identical
+ * in state (state is replicated) or state is not maintained at those endpoints. If an endpoint is
+ * failing, the failed endpoint is marked as inactive and the message to the next endpoint obtained
+ * using the loadbalance algorithm. If all the endpoints have failed and the parent endpoint is
+ * available, onChildEndpointFail(...) methos of parent endpoint is called. If parent is not
+ * avialable, this will call next FaultHandler for the message context.
+ */
 public class LoadbalanceEndpoint implements Endpoint {
 
     private ArrayList endpoints = null;
@@ -38,7 +48,16 @@ public class LoadbalanceEndpoint implements Endpoint {
     public void send(MessageContext synMessageContext) {
 
         Endpoint endpoint = algorithm.getNextEndpoint(synMessageContext);
-        endpoint.send(synMessageContext);
+        if (endpoint != null) {
+            endpoint.send(synMessageContext);
+        } else {
+            if (parentEndpoint != null) {
+                parentEndpoint.onChildEndpointFail(this, synMessageContext);
+            } else {
+                Object o = synMessageContext.getFaultStack().pop();
+                ((FaultHandler) o).handleFault(synMessageContext);
+            }
+        }
     }
 
     public String getName() {

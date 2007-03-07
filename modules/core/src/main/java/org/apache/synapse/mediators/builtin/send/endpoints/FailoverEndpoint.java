@@ -20,9 +20,18 @@
 package org.apache.synapse.mediators.builtin.send.endpoints;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.FaultHandler;
 
 import java.util.ArrayList;
 
+/**
+ * FailoverEndpoint can have multiple child endpoints. It will always try to send messages to current
+ * endpoint. If the current endpoint is failing, it gets another active endpoint from the list and
+ * make it the current endpoint. Then the message is sent to the current endpoint and if it fails, above
+ * procedure repeats until there are no active endpoints. If all endpoints are failing and parent
+ * endpoint is available, this will delegate the problem to the parent endpoint. If parent endpoint
+ * is not available it will pop the next FaultHandler and delegate the problem to that.
+ */
 public class FailoverEndpoint implements Endpoint {
 
     private String name = null;
@@ -52,6 +61,11 @@ public class FailoverEndpoint implements Endpoint {
             if (!foundEndpoint) {
                 if (parentEndpoint != null) {
                     parentEndpoint.onChildEndpointFail(this, synMessageContext);
+                } else {
+                    Object o = synMessageContext.getFaultStack().pop();
+                    if (o != null) {
+                        ((FaultHandler) o).handleFault(synMessageContext);
+                    }
                 }
             }
         }

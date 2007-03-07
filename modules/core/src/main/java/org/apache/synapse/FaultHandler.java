@@ -29,9 +29,9 @@ public abstract class FaultHandler {
 
     public void handleFault(MessageContext synCtx) {
         try {
-            handleFault(synCtx);
+            onFault(synCtx);
         } catch (SynapseException syne) {
-            ((FaultHandler)synCtx.getFaultStack().pop()).onFault(synCtx);
+            ((FaultHandler)synCtx.getFaultStack().pop()).handleFault(synCtx);
         }
     }
 

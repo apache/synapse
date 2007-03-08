@@ -62,8 +62,8 @@ public class SynapseMessageReceiver implements MessageReceiver {
             // invoke synapse message mediation
             synCtx.getEnvironment().injectMessage(synCtx);
         } catch (SynapseException syne) {
-            if(!synCtx.getFaultStack().empty()) {
-                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx);
+            if (!synCtx.getFaultStack().isEmpty()) {
+                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx, syne);
             } else {
                 log.error("Synapse encountered an exception, " +
                         "No error handlers found - [Message Dropped]\n" + syne.getMessage());

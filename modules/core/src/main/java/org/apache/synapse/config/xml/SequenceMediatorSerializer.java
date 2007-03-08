@@ -99,9 +99,9 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
                         Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
             }
 
-            if (mediator.getRef() != null) {
+            if (mediator.getKey() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
-                        "key", nullNS, mediator.getRef()));
+                        "key", nullNS, mediator.getKey()));
             } else if (mediator.getName() != null) {
                 sequence.addAttribute(fac.createOMAttribute(
                         "name", nullNS, mediator.getName()));

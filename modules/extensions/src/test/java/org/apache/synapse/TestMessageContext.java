@@ -270,7 +270,7 @@ public class TestMessageContext implements MessageContext {
         return null;
     }
 
-    public void pushFault(FaultHandler fault) {
+    public void pushFaultHandler(FaultHandler fault) {
         return;
     }
 }

@@ -275,8 +275,8 @@ public class ScriptMessageContext implements MessageContext {
         return mc.getFaultStack();
     }
 
-    public void pushFault(FaultHandler fault) {
-        mc.pushFault(fault);
+    public void pushFaultHandler(FaultHandler fault) {
+        mc.pushFaultHandler(fault);
     }
 
 }

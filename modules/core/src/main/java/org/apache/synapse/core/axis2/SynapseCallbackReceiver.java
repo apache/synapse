@@ -27,11 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.endpoints.Endpoint;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 public class SynapseCallbackReceiver implements MessageReceiver {
 
@@ -79,10 +77,21 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         org.apache.synapse.MessageContext synapseOutMsgCtx) {
 
         if (response.getEnvelope().getBody().hasFault()) {            
-            Object o = synapseOutMsgCtx.getFaultStack().pop();
-            ((FaultHandler) o).handleFault(synapseOutMsgCtx);
+            Stack faultStack = synapseOutMsgCtx.getFaultStack();
+            if (faultStack != null && !faultStack.isEmpty()) {
+                ((FaultHandler) faultStack.pop()).handleFault(
+                    synapseOutMsgCtx,
+                    response.getEnvelope().getBody().getFault().getException());
+            }
 
         } else {
+
+            // there can always be only one instance of an Endpoint in the faultStack of a message
+            // if the send was successful, so remove it before we proceed any further
+            Stack faultStack = synapseOutMsgCtx.getFaultStack();
+            if (!faultStack.isEmpty() && faultStack.peek() instanceof Endpoint) {
+                faultStack.pop();
+            }
 
             if (log.isDebugEnabled()) {
                 log.debug("Synapse received an asynchronous response message");

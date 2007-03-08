@@ -175,7 +175,7 @@ public class Axis2MessageContext implements MessageContext {
         setAxis2MessageContext(axisMsgCtx);
         this.synCfg = synCfg;
         this.synEnv = synEnv;
-        this.pushFault(new MediatorFaultHandler(synCfg.getFaultSequence()));
+        this.pushFaultHandler(new MediatorFaultHandler(synCfg.getFaultSequence()));
     }
 
     public EndpointReference getFaultTo() {
@@ -292,6 +292,10 @@ public class Axis2MessageContext implements MessageContext {
     }
 
     public boolean isResponse() {
+        Object o = properties.get(Constants.RESPONSE);
+        if (o != null && o instanceof String && ((String) o).equalsIgnoreCase("true")) {
+            return true;
+        }
         return response;
     }
 
@@ -315,7 +319,7 @@ public class Axis2MessageContext implements MessageContext {
         return this.faultStack;
     }
 
-    public void pushFault(FaultHandler fault) {
+    public void pushFaultHandler(FaultHandler fault) {
         this.faultStack.push(fault);
     }
 
@@ -446,11 +450,5 @@ public class Axis2MessageContext implements MessageContext {
         }
 
         return sb.toString();
-    }
-
-    public static void setErrorInformation(MessageContext synCtx, SynapseException e) {
-        synCtx.setProperty(Constants.ERROR_CODE, "00000"); //TODO not yet defined
-        synCtx.setProperty(Constants.ERROR_MESSAGE, e.getMessage());
-        synCtx.setProperty(Constants.ERROR_DETAIL, e.getStackTrace().toString());
     }
 }

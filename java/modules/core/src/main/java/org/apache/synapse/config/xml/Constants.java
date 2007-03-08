@@ -69,4 +69,21 @@ public interface Constants {
     public static final String SEQUENCE_VERSION_1_0 = org.apache.synapse.Constants.SEQUENCE_VERSION_1_0;
     /** The String value for a WS-RM version 1.1*/
     public static final String SEQUENCE_VERSION_1_1 = org.apache.synapse.Constants.SEQUENCE_VERSION_1_1;
+    String SEND_ELEMENT = "send";
+    String LOADBALANCE_ELEMENT      = "loadbalance";
+    String FAILOVER_ELEMENT         = "failover";   // failover only element
+    String RETRY_AFTER_FAILURE_TIME = "retryAfterFailure";
+    String MAXIMUM_RETRIES          = "maximumRetries";
+    String RETRY_INTERVAL           = "retryInterval";
+    String FAILOVER                 = "failover";   // failover attribute in the loadbalance element
+    String SESSION_AFFINITY         = "sessionAffinity";
+    String ALGORITHM_NAME           = "policy";
+    String FAILOVER_GROUP_ELEMENT   = "failover"; // failover group element inside the loadbalance element
+    String DISPATCH_MANAGER         = "DISPATCH_MANAGER";
+    String DISPATCHERS_ELEMENT      = "dispatchers";
+    String DISPATCHER_ELEMENT       = "dispatcher";
+    QName ATT_KEY_Q =
+            new QName(NULL_NAMESPACE, "key");
+    QName ATT_ADDRESS_Q =
+                    new QName(NULL_NAMESPACE, "address");
 }

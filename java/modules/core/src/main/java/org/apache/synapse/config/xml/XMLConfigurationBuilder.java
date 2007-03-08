@@ -30,7 +30,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.builtin.send.SendMediator;
+import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.LogMediator;
 

@@ -27,7 +27,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class TestMessageContext implements MessageContext {
     public void setEnvironment(SynapseEnvironment se) {
     }
 
-    public Object getLocalProperty(String key) {
+    public Object getProperty(String key) {
         return properties.get(key);
     }
 
@@ -80,7 +80,7 @@ public class TestMessageContext implements MessageContext {
         properties.put(key, value);
     }
 
-    public Set getLocalPropertyKeySet() {
+    public Set getPropertyKeySet() {
         return properties.keySet();
     }
 

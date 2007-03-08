@@ -117,6 +117,6 @@ public class SequenceMediatorTest extends TestCase {
 
         assertTrue("T1.T2.T4".equals(result.toString()));
 
-        assertEquals("test", synCtx.getLocalProperty(Constants.ERROR_MESSAGE));
+        assertEquals("test", synCtx.getProperty(Constants.ERROR_MESSAGE));
     }
 }

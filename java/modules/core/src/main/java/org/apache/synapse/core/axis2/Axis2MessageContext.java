@@ -30,8 +30,9 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.*;
 import org.apache.synapse.mediators.GetPropertyFunction;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,39 +42,58 @@ import org.jaxen.JaxenException;
 
 import java.util.*;
 
+/**
+ * This is the MessageContext implementation that synapse uses almost all the time because Synapse
+ * is implemented on top of the Axis2
+ */
 public class Axis2MessageContext implements MessageContext {
 
     private static final Log log = LogFactory.getLog(Axis2MessageContext.class);
 
-    private SynapseConfiguration cfg = null;
-    private SynapseEnvironment   env = null;
+    /** Holds the reference to the Synapse Message Context */
+    private SynapseConfiguration synCfg = null;
+
+    /** Holds the environment on which synapse operates */
+    private SynapseEnvironment synEnv = null;
+
+    /** Synapse Message Context properties */
     private Map properties = new HashMap();
+
+    /**
+     * Local entries fetched from the configuration or from the registry for the transactional
+     * resource access
+     */
     private Map localEntries = new HashMap();
+
+    /** Fault Handler stack which will be popped and called the handleFault in error states */
     private Stack faultStack = new Stack();
 
     /** The Axis2 MessageContext reference */
     private org.apache.axis2.context.MessageContext axis2MessageContext = null;
 
+    /** Attribute of the MC specifying whether this is a response or not */
     private boolean response = false;
 
+    /** Attribute specifying whether this MC corresponds to fault response or not */
     private boolean faultResponse = false;
 
+    /** Attribute of MC stating the tracing state of the message */
     private int tracingState = Constants.TRACING_UNSET;
 
     public SynapseConfiguration getConfiguration() {
-        return cfg;
+        return synCfg;
     }
 
-    public void setConfiguration(SynapseConfiguration cfg) {
-        this.cfg = cfg;
+    public void setConfiguration(SynapseConfiguration synCfg) {
+        this.synCfg = synCfg;
     }
 
     public SynapseEnvironment getEnvironment() {
-        return env;
+        return synEnv;
     }
 
-    public void setEnvironment(SynapseEnvironment env) {
-        this.env = env;
+    public void setEnvironment(SynapseEnvironment synEnv) {
+        this.synEnv = synEnv;
     }
 
     public Mediator getMainSequence() {
@@ -120,35 +140,41 @@ public class Axis2MessageContext implements MessageContext {
         }
     }
 
-    public Object getLocalProperty(String key) {
-        return properties.get(key);
+    public Object getEntry(String key) {
+        Object o = localEntries.get(key);
+        if (o != null && o instanceof Entry) {
+            return ((Entry) o).getValue();
+        } else {
+            Object e = getConfiguration().getEntry(key);
+            localEntries.put(key, e);
+            return e;
+        }
     }
 
-    public Object getEntry(String key) {
-        Object ret = properties.get(key);
-        if (ret != null) {
-            return ret;
-        } else if (getConfiguration() != null) {
-            return getConfiguration().getEntry(key);
-        } else {
-            return null;
-        }
+    public Object getProperty(String key) {
+        return properties.get(key);
     }
 
     public void setProperty(String key, Object value) {
         properties.put(key, value);
     }
 
-    public Set getLocalPropertyKeySet() {
+    public Set getPropertyKeySet() {
         return properties.keySet();
     }
 
-    //--------------------
+    /**
+     * Constructor for the Axis2MessageContext inside Synapse
+     * 
+     * @param axisMsgCtx MessageContext representing the relevant Axis MC
+     * @param synCfg SynapseConfiguraion describing Synapse
+     * @param synEnv SynapseEnvironment describing the environment of Synapse
+     */
     public Axis2MessageContext(org.apache.axis2.context.MessageContext axisMsgCtx,
                                SynapseConfiguration synCfg, SynapseEnvironment synEnv) {
         setAxis2MessageContext(axisMsgCtx);
-        cfg = synCfg;
-        env = synEnv;
+        this.synCfg = synCfg;
+        this.synEnv = synEnv;
         this.pushFault(new MediatorFaultHandler(synCfg.getFaultSequence()));
     }
 

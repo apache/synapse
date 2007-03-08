@@ -19,7 +19,7 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.synapse.mediators.builtin.send.endpoints.*;
+import org.apache.synapse.endpoints.*;
 import org.apache.synapse.SynapseException;
 
 /**

@@ -24,16 +24,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.mediators.builtin.send.SendMediator;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 import javax.xml.namespace.QName;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Iterator;
 
 /**
  * The Send mediator factory parses a Send element and creates an instance of the mediator

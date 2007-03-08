@@ -17,14 +17,12 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<!-- a registry based Synapse configuration -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+    
+    <log level="custom">
+        <property name="message" value="This is a dynamic Synapse configuration"/>
+    </log>
+    <send/>
 
-    <!-- a registry based Synapse configuration -->
-    <rules>
-        <log level="custom">
-            <property name="message" value="This is a fully dynamic configuration"/>
-        </log>
-        <send/>
-    </rules>
-
-</synapse> 
+</definitions>

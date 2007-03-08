@@ -17,25 +17,21 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<!-- simple content based routing of messages -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- simple content based routing of messages -->
-    <rules>
+    <!-- simple filtering of messages with XPath and regex matches -->
+    <filter source="get-property('To')" regex=".*/StockQuote.*">
 
-        <!-- simple filtering of messages with XPath and regex matches -->
-        <filter source="get-property('To')" regex=".*/StockQuote.*">
+        <!-- route the message to the SimpleStockQuoteService1 service EPR -->
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </filter>
 
-            <!-- route the message to the SimpleStockQuoteService1 service EPR -->
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-                </endpoint>
-            </send>
-        </filter>
+    <!-- send any other messages without change -->
+    <send/>
 
-        <!-- send any other messages without change -->
-        <send/>
-
-    </rules>
-
-</synapse> 
+</definitions> 

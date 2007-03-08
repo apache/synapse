@@ -75,7 +75,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     Mediator faultSequence = synCtx.getSequence(proxy.getTargetFaultSequence());
                     if (faultSequence != null) {
                         log.debug("setting the fault sequence of the proxy to context");
-                        synCtx.pushFault(new MediatorFaultHandler(
+                        synCtx.pushFaultHandler(new MediatorFaultHandler(
                                 synCtx.getSequence(proxy.getTargetFaultSequence())));
                     } else {
                         // when we can not find the reference to the fault sequence of the proxy service we should not
@@ -86,7 +86,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     }
                 } else if (proxy.getTargetInLineFaultSequence() != null) {
                     log.debug("Setting the anonymous fault sequence of the proxy to context");
-                    synCtx.pushFault(new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
+                    synCtx.pushFaultHandler(new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
                 }
 
                 // Using inSequence for the incoming message mediation
@@ -136,8 +136,8 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                 throw new SynapseException("Proxy Service with the name " + name + " does not exists");
             }
         } catch (SynapseException syne) {
-            if(!synCtx.getFaultStack().empty()) {
-                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx);
+            if (!synCtx.getFaultStack().isEmpty()) {
+                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx, syne);
             } else {
                 log.error("Synapse encountered an exception, " +
                         "No error handlers found - [Message Dropped]\n" + syne.getMessage());

@@ -17,71 +17,71 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<!-- introduction to error handling -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- illustration of various mediators : try-catch-finally and makefault mediators -->
-    <definitions>
+    <!-- define an endpoint for the stock quote service -->
+    <endpoint name="simple">
+        <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    </endpoint>
 
-        <!-- define an endpoint for the stock quote service -->
-        <endpoint name="simple">
-            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-        </endpoint>
+    <!-- define a non-existent host to test error handling (runtime exception for invalid host)-->
+    <endpoint name="bogusHost">
+        <address uri="http://bogus:9000/axis2/services/NonExistentStockQuoteService"/>
+    </endpoint>
 
-        <!-- define a non-existent endpoint to test error handling -->
-        <endpoint name="bogus">
-            <address uri="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/>
-        </endpoint>
+    <!-- define a non-existent port to test error handling (error handling) -->
+    <endpoint name="bogusPort">
+        <address uri="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/>
+    </endpoint>
 
-        <!-- define a sequence to be used for error handling -->
-        <sequence name="errorHandler">
+    <!-- the default fault handling sequence used by Synapse - named 'fault' -->
+    <sequence name="fault">
+        <!-- Log the error -->
+        <log level="custom">
+            <property name="text" value="An unexpected error occured"/>
+            <property name="message" expression="get-property('ERROR_MESSAGE')"/>
+            <!--<property name="detail" expression="get-property('ERROR_DETAIL')"/>-->
+        </log>
 
-            <!-- Log the error -->
-            <log level="custom">
-                <property name="text" value="An unexpected error occured"/>
-                <property name="message" expression="get-property('ERROR_MESSAGE')"/>
-                <property name="detail" expression="get-property('ERROR_DETAIL')"/>
-            </log>
+        <!-- create a custom fault message -->
+        <makefault>
+            <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+            <reason expression="get-property('ERROR_MESSAGE')"/>
+        </makefault>
 
-            <!-- create a custom fault message -->
-            <makefault>
-                <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-                <reason expression="get-property('ERROR_MESSAGE')"/>
-            </makefault>
-
-            <send/>
-        </sequence>
-    </definitions>
-
-    <rules>
-
-        <try>
-            <sequence>
-                <switch source="//m0:getQuote/m0:request/m0:symbol"
-                        xmlns:m0="http://services.samples/xsd">
-                    <case regex="IBM">
-                        <send>
-                            <endpoint ref="simple"/>
-                        </send>
-                    </case>
-                    <case regex="MSFT">
-                        <send>
-                            <endpoint ref="bogus"/>
-                        </send>
-                    </case>
-                </switch>
-            </sequence>
-            <onError>
-                <sequence ref="errorHandler"/>
-            </onError>
-            <finally>
-                <log level="custom">
-                    <property name="message" value="Processed request"/>
-                </log>
-            </finally>
-        </try>
-
+        <property name="RESPONSE" value="true"/>
+        <header name="To" expression="get-property('ReplyTo')"/>
         <send/>
+    </sequence>
 
-    </rules>
+    <!-- default message handling sequence used by Synapse - named 'main' -->
+    <sequence name="main">
+        <in>
+            <switch source="//m0:getQuote/m0:request/m0:symbol"
+                    xmlns:m0="http://services.samples/xsd">
+                <case regex="IBM">
+                    <send>
+                        <endpoint key="simple"/>
+                    </send>
+                </case>
+                <case regex="MSFT">
+                    <send>
+                        <endpoint key="bogusHost"/>
+                    </send>
+                </case>
+                <case regex="SUN">
+                    <send>
+                        <endpoint key="bogusPort"/>
+                    </send>
+                </case>
+            </switch>
+            <drop/>
+        </in>
 
-</synapse> 
+        <out>
+            <send/>
+        </out>
+    </sequence>
+
+</definitions>

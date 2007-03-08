@@ -118,10 +118,10 @@ public class GetPropertyFunction implements Function {
                     return synCtx.getFaultTo().getAddress();
                 } else if (Constants.HEADER_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
                     return synCtx.getReplyTo().getAddress();
-                } else {
-                    return null;
                 }
             }
+            return synCtx.getEntry(key);
+
         } else if (Constants.SCOPE_AXIS2.equals(scope) && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();

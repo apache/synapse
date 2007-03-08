@@ -76,7 +76,7 @@ public class SendMediator extends AbstractMediator {
                 trace.trace("End : Send mediator");
             }
         }
-        return false;
+        return true;
     }
 
     public Endpoint getEndpoint() {

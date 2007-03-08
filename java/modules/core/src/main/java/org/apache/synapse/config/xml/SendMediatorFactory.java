@@ -26,7 +26,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
-import org.apache.synapse.mediators.builtin.send.SendMediator;
+import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.Endpoint;
 
 import javax.xml.namespace.QName;

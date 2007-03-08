@@ -130,7 +130,10 @@ public class ServerWorker implements Runnable {
         // find the remote party IP address and set it to the message context
         if (conn instanceof HttpInetConnection) {
             HttpInetConnection inetConn = (HttpInetConnection) conn;
-            msgContext.setProperty(MessageContext.REMOTE_ADDR, inetConn.getRemoteAddress());
+            InetAddress remoteAddr = inetConn.getRemoteAddress();
+            if (remoteAddr != null) {
+                msgContext.setProperty(MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
+            }
         }
 
         try {

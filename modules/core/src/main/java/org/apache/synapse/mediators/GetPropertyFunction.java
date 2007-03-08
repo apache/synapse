@@ -126,8 +126,8 @@ public class GetPropertyFunction implements Function {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             return axis2MessageContext.getConfigurationContext().getProperty(key);
-        } else
-        if (Constants.SCOPE_TRANSPORT.equals(scope) && synCtx instanceof Axis2MessageContext) {
+        } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+                && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             Object headers = axis2MessageContext.getProperty(

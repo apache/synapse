@@ -269,7 +269,7 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().getFaultStack();
     }
 
-    public void pushFault(FaultHandler fault) {
-        getMC().pushFault(fault);
+    public void pushFaultHandler(FaultHandler fault) {
+        getMC().pushFaultHandler(fault);
     }
 }

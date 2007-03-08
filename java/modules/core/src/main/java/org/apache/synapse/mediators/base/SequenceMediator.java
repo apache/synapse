@@ -25,11 +25,13 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.impl.SequenceStatisticsStack;
+
+import java.util.Stack;
 
 /**
  * The Sequence mediator either refers to a named Sequence mediator instance
@@ -45,7 +47,7 @@ public class SequenceMediator extends AbstractListMediator {
     private static final Log log = LogFactory.getLog(SequenceMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     private String name = null;
-    private String ref = null;
+    private String key = null;
     private String errorHandler = null;
     /** is this definition dynamic */
     private boolean dynamic = false;
@@ -69,7 +71,7 @@ public class SequenceMediator extends AbstractListMediator {
     public boolean mediate(MessageContext synCtx) {
         log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (ref == null) {
+        if (key == null) {
             // Setting Required property to collect the sequence statistics
             boolean isStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
             if (isStatisticsEnable) {
@@ -86,42 +88,24 @@ public class SequenceMediator extends AbstractListMediator {
                 if (shouldTrace) {
                     trace.trace("Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }
-                return super.mediate(synCtx);
 
-            } catch (SynapseException e) {
-
+                // push the errorHandler sequence into the current message as the fault handler
                 if (errorHandler != null) {
-                    if (shouldTrace) {
-                        trace.trace("Sequence " + name + " encountered an exception. " +
-                                "Locating error handler sequence : " + errorHandler);
-                    }
-                    // set exception information to message context
-                    Axis2MessageContext.setErrorInformation(synCtx, e);
-                    Mediator errHandler = synCtx.getSequence(errorHandler);
-                    if (errHandler == null) {
-                        if (shouldTrace) {
-                            trace.trace("Sequence " + name + "; error handler sequence named '" +
-                                    errorHandler + "' not found");
-                        }
-                        handleException("Error handler sequence mediator instance named " +
-                                errorHandler + " cannot be found");
-                    } else {
-                        if (shouldTrace) {
-                            trace.trace("Sequence " + name + "; Executing error handler sequence : "
-                                    + errorHandler);
-                        }
-                        return errHandler.mediate(synCtx);
-                    }
-
-                } else {
-                    if (shouldTrace) {
-                        trace.trace("Sequence " + name + " encountered an exception, but does " +
-                                "not specify an error handler");
-                    }
-                    throw e;
+                    synCtx.pushFaultHandler(
+                        new MediatorFaultHandler(synCtx.getSequence(errorHandler)));
                 }
 
+                return super.mediate(synCtx);
+
             } finally {
+
+                // pop our error handler from the fault stack if we pushed it
+                Stack faultStack = synCtx.getFaultStack();
+                if (errorHandler != null && !faultStack.isEmpty() &&
+                    synCtx.getSequence(errorHandler).equals(faultStack.peek())) {
+                    faultStack.pop();
+                }
+
                 //If this sequence is finished it's task normally
                 if (isStatisticsEnable) {
                     StatisticsUtils.processSequenceStatistics(synCtx);
@@ -134,15 +118,15 @@ public class SequenceMediator extends AbstractListMediator {
             }
 
         } else {
-            Mediator m = synCtx.getSequence(ref);
+            Mediator m = synCtx.getSequence(key);
             if (m == null) {
                 if (shouldTrace) {
-                    trace.trace("Sequence named " + ref + " cannot be found.");
+                    trace.trace("Sequence named " + key + " cannot be found.");
                 }
-                handleException("Sequence named " + ref + " cannot be found.");
+                handleException("Sequence named " + key + " cannot be found.");
             } else {
                 if (shouldTrace) {
-                    trace.trace("Executing sequence named " + ref);
+                    trace.trace("Executing sequence named " + key);
                 }
                 return m.mediate(synCtx);
             }
@@ -163,12 +147,12 @@ public class SequenceMediator extends AbstractListMediator {
         this.name = name;
     }
 
-    public String getRef() {
-        return ref;
+    public String getKey() {
+        return key;
     }
 
-    public void setRef(String ref) {
-        this.ref = ref;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getErrorHandler() {

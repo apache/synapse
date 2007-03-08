@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -131,9 +132,17 @@ public class HeaderMediator extends AbstractMediator {
         
         Iterator iter = headersList.iterator();
         while (iter.hasNext()) {
-            SOAPHeaderBlock header = (SOAPHeaderBlock) iter.next();
-            if (header.getLocalName().equals(qName.getLocalPart())) {
-                header.detach();
+            Object o = iter.next();
+            if (o instanceof SOAPHeaderBlock) {
+                SOAPHeaderBlock header = (SOAPHeaderBlock) o;
+                if (header.getLocalName().equals(qName.getLocalPart())) {
+                    header.detach();
+                }
+            } else if (o instanceof OMElement) {
+                OMElement omElem = (OMElement) o;
+                if (omElem.getLocalName().equals(qName.getLocalPart())) {
+                    omElem.detach();
+                }
             }
         }
     }

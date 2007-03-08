@@ -21,6 +21,7 @@ package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
@@ -129,8 +130,13 @@ public class FaultMediator extends AbstractMediator {
         Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
         if (iter.hasNext()) {
             while (iter.hasNext()) {
-                SOAPHeaderBlock header = (SOAPHeaderBlock) iter.next();
-                faultEnvelope.getHeader().addChild(header);
+                Object o = iter.next();
+                if (o instanceof SOAPHeaderBlock) {
+                    SOAPHeaderBlock header = (SOAPHeaderBlock) o;
+                    faultEnvelope.getHeader().addChild(header);
+                } else if (o instanceof OMElement) {
+                    faultEnvelope.getHeader().addChild((OMElement) o);
+                }
             }
         }
         log.debug("The fault message as : " + fault);

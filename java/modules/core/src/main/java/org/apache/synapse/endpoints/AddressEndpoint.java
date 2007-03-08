@@ -30,6 +30,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Stack;
+
 /**
  * This class represents an actual endpoint to send the message. It is resposible for sending the
  * message, performing reries if a failure occured and informing the parent endpoint if a failure
@@ -137,7 +139,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
                 synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
             }
 
-            synCtx.pushFault(this);
+            synCtx.pushFaultHandler(this);
             synCtx.getEnvironment().send(endpoint, synCtx);
         }
     }
@@ -150,15 +152,17 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         this.parentEndpoint = parentEndpoint;
     }
 
-    public void onFault(MessageContext synCtx) throws SynapseException {
+    public void onFault(MessageContext synCtx) {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
         if (parentEndpoint != null) {
             parentEndpoint.onChildEndpointFail(this, synCtx);
         } else {
-            Object o = synCtx.getFaultStack().pop();
-            ((FaultHandler) o).handleFault(synCtx);
+            Stack faultStack = synCtx.getFaultStack();
+            if (!faultStack.isEmpty()) {
+                ((FaultHandler) faultStack.pop()).handleFault(synCtx);
+            }
         }
     }
 }

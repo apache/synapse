@@ -94,7 +94,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         } else {
             n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
             if (n != null) {
-                seqMediator.setRef(n.getAttributeValue());
+                seqMediator.setKey(n.getAttributeValue());
                 if (e != null) {
                     String msg = "A sequence mediator swhich a reference to another sequence can not have 'ErrorHandler'";
                     log.error(msg);

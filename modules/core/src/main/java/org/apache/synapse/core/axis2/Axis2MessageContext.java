@@ -24,6 +24,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -444,8 +445,14 @@ public class Axis2MessageContext implements MessageContext {
         if (iter.hasNext()) {
             sb.append(separator + "Headers : ");
             while (iter.hasNext()) {
-                SOAPHeaderBlock header = (SOAPHeaderBlock) iter.next();
-                sb.append(separator + header.getLocalName() + " : " + header.getText());
+                Object o = iter.next();
+                if (o instanceof SOAPHeaderBlock) {
+                    SOAPHeaderBlock header = (SOAPHeaderBlock) o;
+                    sb.append(separator + header.getLocalName() + " : " + header.getText());
+                } else if (o instanceof OMElement) {
+                    OMElement headerElem = (OMElement) o;
+                    sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+                }
             }
         }
 

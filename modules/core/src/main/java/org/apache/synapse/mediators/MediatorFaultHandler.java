@@ -62,7 +62,6 @@ public class MediatorFaultHandler extends FaultHandler {
     public void onFault(MessageContext synCtx) throws SynapseException {
 
         log.debug("MediatorFaultHandler :: handleFault");
-
         this.faultMediator.mediate(synCtx);
     }
 

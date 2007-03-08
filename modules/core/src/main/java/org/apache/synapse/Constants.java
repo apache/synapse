@@ -119,6 +119,8 @@ public interface Constants {
     /** Refers the ReplyTo header */
     String HEADER_REPLY_TO = "ReplyTo";
 
+    String RESPONSE = "RESPONSE";
+
     /** The tracing state -off */
     int TRACING_OFF =0;
     /** The tracing state-on */

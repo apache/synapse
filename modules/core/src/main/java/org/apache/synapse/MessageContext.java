@@ -312,6 +312,6 @@ public interface MessageContext {
 
     public Stack getFaultStack();
 
-    public void pushFault(FaultHandler fault);
+    public void pushFaultHandler(FaultHandler fault);
 
 }

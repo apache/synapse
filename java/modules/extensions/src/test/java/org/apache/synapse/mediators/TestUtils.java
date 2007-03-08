@@ -55,7 +55,7 @@ public class TestUtils {
             Iterator iter = props.keySet().iterator();
             while (iter.hasNext()) {
                 String key = (String) iter.next();
-                testConfig.addResource(key, (Entry)props.get(key));
+                testConfig.addEntry(key, (Entry)props.get(key));
             }
         }
         synCtx.setConfiguration(testConfig);
@@ -86,7 +86,7 @@ public class TestUtils {
             Iterator iter = props.keySet().iterator();
             while (iter.hasNext()) {
                 String key = (String) iter.next();
-                testConfig.addResource(key, (Entry) props.get(key));
+                testConfig.addEntry(key, (Entry) props.get(key));
             }
         }
         synCtx.setConfiguration(testConfig);

@@ -20,7 +20,6 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -28,9 +27,8 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
-import org.apache.synapse.config.EndpointDefinition;
 
 /**
  * This is the MessageReceiver set to act on behalf of Proxy services.

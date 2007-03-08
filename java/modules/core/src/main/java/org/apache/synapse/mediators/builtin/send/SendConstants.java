@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
  */
 public class SendConstants {
 
-    public static final String ESBSEND_ELEMENT          = "send";
+    public static final String SEND_ELEMENT = "send";
     public static final String LOADBALANCE_ELEMENT      = "loadbalance";
     public static final String FAILOVER_ELEMENT         = "failover";   // failover only element
     public static final String RETRY_AFTER_FAILURE_TIME = "retryAfterFailure";

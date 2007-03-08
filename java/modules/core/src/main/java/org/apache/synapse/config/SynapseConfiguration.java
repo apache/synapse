@@ -24,10 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
@@ -86,6 +85,11 @@ public class SynapseConfiguration {
         localRegistry.put(key, entry);
     }
 
+    /**
+     * Returns the map of defined sequences in the configuraiton excluding the fetched sequences
+     * from remote registry
+     * @return Map of SequenceMediators defined in the local configuraion
+     */
     public Map getDefinedSequences() {
         Map definedSequences = new HashMap();
         Iterator itr = localRegistry.values().iterator();
@@ -165,7 +169,7 @@ public class SynapseConfiguration {
      * contents (or cached contents if the Entry refers to a dynamic resource off a
      * remote registry)
      */
-    public void addResource(String key, Entry entry) {
+    public void addEntry(String key, Entry entry) {
 
         if (entry.getType() == Entry.URL_SRC) {
             try {
@@ -184,6 +188,23 @@ public class SynapseConfiguration {
         } else {
             localRegistry.put(key, entry);
         }
+    }
+
+    /**
+     * Returns the map of defined entries in the configuraiton excluding the fetched entries
+     * from remote registry
+     * @return Map of Entries defined in the local configuraion
+     */
+    public Map getDefinedEntries() {
+        Map definedEntries = new HashMap();
+        Iterator itr = localRegistry.values().iterator();
+        while(itr.hasNext()) {
+            Object o = itr.next();
+            if(o instanceof Entry && ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
+                definedEntries.put(((Entry) o).getKey(), o);
+            }
+        }
+        return definedEntries;
     }
 
     /**
@@ -242,6 +263,23 @@ public class SynapseConfiguration {
      */
     public void addEndpoint(String key, Entry entry) {
         localRegistry.put(key, entry);
+    }
+
+    /**
+     * Returns the map of defined endpoints in the configuraiton excluding the fetched endpoints
+     * from remote registry
+     * @return Map of Endpoints defined in the local configuraion
+     */
+    public Map getDefinedEndpoints() {
+        Map definedEndpoints = new HashMap();
+        Iterator itr = localRegistry.values().iterator();
+        while(itr.hasNext()) {
+            Object o = itr.next();
+            if(o instanceof Endpoint) {
+                definedEndpoints.put(((Endpoint) o).getName(), o);
+            }
+        }
+        return definedEndpoints;
     }
 
     /**

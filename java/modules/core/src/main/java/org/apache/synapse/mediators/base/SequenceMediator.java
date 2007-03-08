@@ -73,7 +73,7 @@ public class SequenceMediator extends AbstractListMediator {
             // Setting Required property to collect the sequence statistics
             boolean isStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
             if (isStatisticsEnable) {
-                StatisticsStack sequenceStack = (StatisticsStack) synCtx.getLocalProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
                 if (sequenceStack == null) {
                     sequenceStack = new SequenceStatisticsStack();
                     synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);

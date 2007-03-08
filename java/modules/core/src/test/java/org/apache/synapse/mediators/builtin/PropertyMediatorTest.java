@@ -75,7 +75,7 @@ public class PropertyMediatorTest extends TestCase {
         prop.setKey("name");
         prop.setType(Entry.VALUE_TYPE);
         prop.setValue("value");
-        synCfg.addResource("name", prop);
+        synCfg.addEntry("name", prop);
         synCtx.setConfiguration(synCfg);
 
         assertTrue(

@@ -125,13 +125,13 @@ public class PropertyMediator extends AbstractMediator {
                     " (scope:" + (scope == null ? "default" : scope) + ")");
             if (scope == null) {
                 //Removing property from the  Synapse Context
-                Set pros = smc.getLocalPropertyKeySet();
+                Set pros = smc.getPropertyKeySet();
                 if (pros != null) {
                     pros.remove(name);
                 }
             } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
                 //Removing property from the  Synapse Context
-                Set pros = smc.getLocalPropertyKeySet();
+                Set pros = smc.getPropertyKeySet();
                 if (pros != null) {
                     pros.remove(name);
                 }

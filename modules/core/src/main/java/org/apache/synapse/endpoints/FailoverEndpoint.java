@@ -17,10 +17,10 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.builtin.send.endpoints;
+package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.MessageContext;
 
 import java.util.ArrayList;
 
@@ -85,7 +85,7 @@ public class FailoverEndpoint implements Endpoint {
 
     public void setActive(boolean active) {
         this.active = active;
-    }   
+    }
 
     public ArrayList getEndpoints() {
         return endpoints;

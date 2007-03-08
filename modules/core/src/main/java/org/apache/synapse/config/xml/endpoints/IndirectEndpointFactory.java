@@ -19,8 +19,8 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
-import org.apache.synapse.mediators.builtin.send.endpoints.IndirectEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;

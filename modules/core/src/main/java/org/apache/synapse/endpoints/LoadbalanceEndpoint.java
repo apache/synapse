@@ -17,11 +17,11 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.builtin.send.endpoints;
+package org.apache.synapse.endpoints;
 
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.mediators.builtin.send.algorithms.LoadbalanceAlgorithm;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
 import java.util.ArrayList;
 
@@ -122,6 +122,6 @@ public class LoadbalanceEndpoint implements Endpoint {
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         endpoint.setActive(false);
-        send(synMessageContext);        
+        send(synMessageContext);
     }
 }

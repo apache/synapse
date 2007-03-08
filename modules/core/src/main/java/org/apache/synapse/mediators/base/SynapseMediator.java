@@ -53,7 +53,7 @@ public class SynapseMediator extends AbstractListMediator {
         if(synCtx.isResponse()) {
             StatisticsUtils.processAllSequenceStatistics(synCtx);
         }
-        StatisticsStack sequenceStack = (StatisticsStack) synCtx.getLocalProperty(Constants.SEQUENCE_STATISTICS_STACK);
+        StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
         if (sequenceStack == null) {
             sequenceStack = new SequenceStatisticsStack();
             synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);

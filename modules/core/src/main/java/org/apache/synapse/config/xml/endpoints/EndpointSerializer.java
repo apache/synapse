@@ -20,7 +20,7 @@
 package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 /**
  * All endpoint serializers should implement this interface. Use EndpointAbstractSerializer to obtain

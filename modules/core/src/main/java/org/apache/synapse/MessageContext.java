@@ -26,7 +26,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.Set;
 import java.util.Stack;
@@ -115,7 +115,7 @@ public interface MessageContext {
      * @param key key to look up property
      * @return value for the given key
      */
-    public Object getLocalProperty(String key);
+    public Object getProperty(String key);
 
     /**
      * Get the value of a property set on the message instance, from the local registry
@@ -136,7 +136,7 @@ public interface MessageContext {
      * Returns the Set of keys over the properties on this message context
      * @return a Set of keys over message properties
      */
-    public Set getLocalPropertyKeySet();
+    public Set getPropertyKeySet();
 
     /**
      * Get the SOAP envelope of this message

@@ -31,7 +31,7 @@ import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.send.SendMediator;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
 import javax.xml.namespace.QName;
@@ -129,10 +129,10 @@ public class XMLConfigurationBuilder {
         if (config.getLocalRegistry().get(entry.getKey()) != null) {
             handleException("Duplicate registry entry definition for key : " + entry.getKey());
         }
-        config.addResource(entry.getKey(), entry);
+        config.addEntry(entry.getKey(), entry);
     }
 
-    private static void defineSequence(SynapseConfiguration config, OMElement ele) {
+    public static void defineSequence(SynapseConfiguration config, OMElement ele) {
 
         String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
         if (name != null) {

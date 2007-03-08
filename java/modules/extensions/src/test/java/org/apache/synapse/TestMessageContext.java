@@ -40,6 +40,8 @@ public class TestMessageContext implements MessageContext {
 
     private Map localEntries = new HashMap();
 
+    private Stack faultStack = new Stack();
+
     private SynapseConfiguration synCfg = null;
 
     SOAPEnvelope envelope = null;
@@ -267,10 +269,10 @@ public class TestMessageContext implements MessageContext {
     }
 
     public Stack getFaultStack() {
-        return null;
+        return faultStack;
     }
 
     public void pushFaultHandler(FaultHandler fault) {
-        return;
+        faultStack.push(fault);
     }
 }

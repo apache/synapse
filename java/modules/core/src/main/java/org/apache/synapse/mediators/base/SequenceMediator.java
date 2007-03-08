@@ -95,16 +95,22 @@ public class SequenceMediator extends AbstractListMediator {
                         new MediatorFaultHandler(synCtx.getSequence(errorHandler)));
                 }
 
-                return super.mediate(synCtx);
+                boolean ret = super.mediate(synCtx);
+
+                // pop our error handler from the fault stack before we exit, if we have pushed it
+                Stack faultStack = synCtx.getFaultStack();
+                if (errorHandler != null && !faultStack.isEmpty()) {
+                    Object o = faultStack.peek();
+                    if (o instanceof MediatorFaultHandler &&
+                        synCtx.getSequence(errorHandler).equals(
+                            ((MediatorFaultHandler) o).getFaultMediator())) {
+                        faultStack.pop();
+                    }
+                }
+
+                return ret;
 
             } finally {
-
-                // pop our error handler from the fault stack if we pushed it
-                Stack faultStack = synCtx.getFaultStack();
-                if (errorHandler != null && !faultStack.isEmpty() &&
-                    synCtx.getSequence(errorHandler).equals(faultStack.peek())) {
-                    faultStack.pop();
-                }
 
                 //If this sequence is finished it's task normally
                 if (isStatisticsEnable) {

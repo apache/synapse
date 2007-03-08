@@ -17,12 +17,13 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.builtin.send.endpoints;
+package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.config.EndpointDefinition;
 import org.apache.axis2.addressing.EndpointReference;

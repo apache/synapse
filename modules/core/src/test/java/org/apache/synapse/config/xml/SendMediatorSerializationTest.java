@@ -19,13 +19,12 @@
 
 package org.apache.synapse.config.xml;
 
-import org.apache.axiom.om.impl.exception.XMLComparisonException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.mediators.builtin.send.SendMediator;
-import org.apache.synapse.mediators.builtin.send.endpoints.LoadbalanceEndpoint;
-import org.apache.synapse.mediators.builtin.send.endpoints.AddressEndpoint;
-import org.apache.synapse.mediators.builtin.send.endpoints.FailoverEndpoint;
+import org.apache.synapse.endpoints.LoadbalanceEndpoint;
+import org.apache.synapse.endpoints.AddressEndpoint;
+import org.apache.synapse.endpoints.FailoverEndpoint;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;

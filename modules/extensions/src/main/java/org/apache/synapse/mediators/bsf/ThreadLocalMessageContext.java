@@ -29,7 +29,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 
@@ -113,16 +113,16 @@ public class ThreadLocalMessageContext implements MessageContext {
         return getMC().getWSAMessageID();
     }
 
-    public Object getLocalProperty(String key) {
-        return getMC().getLocalProperty(key);
+    public Object getProperty(String key) {
+        return getMC().getProperty(key);
     }
 
     public Object getEntry(String key) {
         return getMC().getEntry(key);
     }
 
-    public Set getLocalPropertyKeySet() {
-        return getMC().getLocalPropertyKeySet();
+    public Set getPropertyKeySet() {
+        return getMC().getPropertyKeySet();
     }
 
     public Mediator getMainSequence() {

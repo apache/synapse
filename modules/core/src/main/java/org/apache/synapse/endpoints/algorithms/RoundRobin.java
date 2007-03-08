@@ -17,11 +17,10 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.builtin.send.algorithms;
+package org.apache.synapse.endpoints.algorithms;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.ArrayList;
 

@@ -123,12 +123,12 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             synapseInMessageContext.setTo(null);
 
             // set the properties of the original MC to the new MC
-            Iterator iter = synapseOutMsgCtx.getLocalPropertyKeySet().iterator();
+            Iterator iter = synapseOutMsgCtx.getPropertyKeySet().iterator();
 
             while (iter.hasNext()) {
                 Object key = iter.next();
                 synapseInMessageContext.setProperty(
-                    (String) key, synapseOutMsgCtx.getLocalProperty((String) key));
+                    (String) key, synapseOutMsgCtx.getProperty((String) key));
             }
 
             // send the response message through the synapse mediation flow

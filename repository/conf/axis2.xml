@@ -44,7 +44,6 @@
     <!--is set then, Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
     <parameter name="DrillDownToRootCauseForFaultReason" locked="false">false</parameter>
 
-
     <parameter name="Sandesha2StorageManager" locked="false">inmemory</parameter>
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
@@ -58,7 +57,6 @@
     <!--context path to proper Axis2 servlets-->
     <!--<parameter name="servicePath" locked="false">services</parameter>-->
     <!--<parameter name="restPath" locked="false">rest</parameter>-->
-
 
     <!--Set the flag to true if you want to enable transport level session mangment-->
     <parameter name="manageTransportSession" locked="false">false</parameter>
@@ -79,7 +77,6 @@
     <!-- If you have a frontend host which exposes this webservice using a different public URL  -->
     <!-- use this parameter to override autodetected url -->
     <!--<parameter name="httpFrontendHostUrl" locked="false">https://someotherhost/context</parameter>-->
-
 
     <!--    The way of adding listener to the system-->
     <!--    <listener class="org.apache.axis2.ObserverIMPL">-->
@@ -102,40 +99,13 @@
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
-    <!--<transportReceiver name="http"
-                       class="org.apache.axis2.transport.http.SimpleHTTPServer">
-        <parameter name="port" locked="false">8080</parameter>-->
-    <!-- Here is the complete list of supported parameters (see example settings further below):
-        port: the port to listen on (default 6060)
-        hostname:  if non-null, url prefix used in reply-to endpoint references                                 (default null)
-        originServer:  value of http Server header in outgoing messages                                         (default "Simple-Server/1.1")
-        requestTimeout:  value in millis of time that requests can wait for data                                (default 20000)
-        requestTcpNoDelay:  true to maximize performance and minimize latency                                   (default true)
-                            false to minimize bandwidth consumption by combining segments  
-        requestCoreThreadPoolSize:  number of threads available for request processing (unless queue fills up)  (default 25)
-        requestMaxThreadPoolSize:  number of threads available for request processing if queue fills us         (default 150)
-                                   note that default queue never fills up:  see HttpFactory
-        threadKeepAliveTime:  time to keep threads in excess of core size alive while inactive                  (default 180)
-                              note that no such threads can exist with default unbounded request queue
-        threadKeepAliveTimeUnit:  TimeUnit of value in threadKeepAliveTime (default SECONDS)                    (default SECONDS)
-    -->
-        <!-- <parameter name="hostname"                  locked="false">http://www.myApp.com/ws</parameter> -->
-        <!-- <parameter name="originServer"              locked="false">My-Server/1.1</parameter>           -->
-        <!-- <parameter name="requestTimeout"            locked="false">10000</parameter>                   -->
-        <!-- <parameter name="requestTcpNoDelay"         locked="false">false</parameter>                   -->
-        <!-- <parameter name="requestCoreThreadPoolSize" locked="false">50</parameter>                      -->
-        <!-- <parameter name="RequestMaxThreadPoolSize"  locked="false">100</parameter>                     -->
-        <!-- <parameter name="threadKeepAliveTime"       locked="false">240000</parameter>                  -->
-        <!-- <parameter name="threadKeepAliveTimeUnit"   locked="false">MILLISECONDS</parameter>            -->
-    <!--</transportReceiver>-->
-    
-    <!-- the experimental non blocking http transport based on HttpCore + NIO extensions -->
+    <!-- the non blocking http transport based on HttpCore + NIO extensions -->
     <transportReceiver name="http" class="org.apache.axis2.transport.nhttp.HttpCoreNIOListener">
     	<parameter name="port" locked="false">8080</parameter>
     	<parameter name="non-blocking" locked="false">true</parameter>
     </transportReceiver>
 
-    <!-- the experimental non blocking https transport based on HttpCore + SSL-NIO extensions -->
+    <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->
     <transportReceiver name="https" class="org.apache.axis2.transport.nhttp.HttpCoreNIOSSLListener">
     	<parameter name="port" locked="false">8443</parameter>
     	<parameter name="non-blocking" locked="false">true</parameter>
@@ -177,31 +147,12 @@
         </parameter>
     </transportReceiver>-->
 
-    <!--Uncomment if you want to have SMTP transport support-->
-    <!--<transportReceiver name="mail" class="org.apache.axis2.transport.mail.SimpleMailListener">-->
-    <!--<parameter name="transport.mail.pop3.host" locked="false">127.0.0.1</parameter>-->
-    <!--<parameter name="transport.mail.pop3.user" locked="false">axis2</parameter>-->
-    <!--<parameter name="transport.mail.pop3.password" locked="false">axis2</parameter>-->
-    <!--<parameter name="transport.mail.pop3.port" locked="false">110</parameter>-->
-    <!--<parameter name="transport.mail.replyToAddress" locked="false">axis2@127.0.0.1</parameter>-->
-    <!--</transportReceiver>-->
-
-    <!--<transportReceiver name="tcp"-->
-                       <!--class="org.apache.axis2.transport.tcp.TCPServer">-->
-        <!--<parameter name="port" locked="false">6060</parameter>-->
-        <!--If you want to give your own host address for EPR generation-->
-        <!--uncommet following paramter , and set as you required.-->
-        <!--<parameter name="hostname" locked="false">tcp://myApp.com/ws</parameter>-->
-    <!--</transportReceiver>-->
-
     <!-- ================================================= -->
     <!-- Transport Outs -->
     <!-- ================================================= -->
 
-    <transportSender name="tcp"   class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
-    <transportSender name="local" class="org.apache.axis2.transport.local.LocalTransportSender"/>
-    <transportSender name="jms"   class="org.apache.axis2.transport.jms.JMSSender"/>    
-    <!-- the experimental non-blocking http transport based on HttpCore + NIO extensions -->
+    <transportSender name="jms"   class="org.apache.axis2.transport.jms.JMSSender"/>
+    <!-- the non-blocking http transport based on HttpCore + NIO extensions -->
     <transportSender name="http"  class="org.apache.axis2.transport.nhttp.HttpCoreNIOSender">
         <parameter name="non-blocking" locked="false">true</parameter>
     </transportSender>
@@ -223,15 +174,6 @@
             </TrustStore>
         </parameter>                
     </transportSender>
-
-    <!-- Uncomment this one with the appropriate papameters to enable the SMTP transport Receiver
-   <transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender">
-       <parameter name="transport.mail.smtp.host" locked="false">127.0.0.1</parameter>
-       <parameter name="transport.mail.smtp.user" locked="false">axis2</parameter>
-       <parameter name="transport.mail.smtp.password" locked="false">axis2</parameter>
-       <parameter name="transport.mail.smtp.port" locked="false">25</parameter>
-   </transportSender>
-   -->
 
     <!-- ================================================= -->
     <!-- Global Modules  -->

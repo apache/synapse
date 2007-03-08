@@ -25,14 +25,21 @@ import javax.xml.namespace.QName;
  * Constants used in the XML processing
  */
 public interface Constants {
-    public static final QName DEFINITIONS_ELT   = new QName(Constants.SYNAPSE_NAMESPACE, "definitions");
-    public static final QName SEQUENCE_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
-    public static final QName ENDPOINT_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "endpoint");
-    public static final QName ENTRY_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "localEntry");
-    public static final QName REGISTRY_ELT      = new QName(Constants.SYNAPSE_NAMESPACE, "registry");
-    public static final QName PROXY_ELT         = new QName(Constants.SYNAPSE_NAMESPACE, "proxy");
+    public static final QName DEFINITIONS_ELT
+            = new QName(Constants.SYNAPSE_NAMESPACE, "definitions");
+    public static final QName SEQUENCE_ELT      
+            = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
+    public static final QName ENDPOINT_ELT
+            = new QName(Constants.SYNAPSE_NAMESPACE, "endpoint");
+    public static final QName ENTRY_ELT
+            = new QName(Constants.SYNAPSE_NAMESPACE, "localEntry");
+    public static final QName REGISTRY_ELT
+            = new QName(Constants.SYNAPSE_NAMESPACE, "registry");
+    public static final QName PROXY_ELT
+            = new QName(Constants.SYNAPSE_NAMESPACE, "proxy");
 
-    public static final String SYNAPSE_NAMESPACE = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
+    public static final String SYNAPSE_NAMESPACE
+            = org.apache.synapse.Constants.SYNAPSE_NAMESPACE;
     public static final String NULL_NAMESPACE    = "";
     public static final String RAMPART_POLICY    = "rampartPolicy";
     public static final String SANDESHA_POLICY   = "sandeshaPolicy";
@@ -66,24 +73,29 @@ public interface Constants {
 
     //  -- Synapse property values for WS-RM sequence handling --
     /** The String value for a WS-RM version 1.0*/
-    public static final String SEQUENCE_VERSION_1_0 = org.apache.synapse.Constants.SEQUENCE_VERSION_1_0;
+    public static final String SEQUENCE_VERSION_1_0
+            = org.apache.synapse.Constants.SEQUENCE_VERSION_1_0;
     /** The String value for a WS-RM version 1.1*/
-    public static final String SEQUENCE_VERSION_1_1 = org.apache.synapse.Constants.SEQUENCE_VERSION_1_1;
+    public static final String SEQUENCE_VERSION_1_1
+            = org.apache.synapse.Constants.SEQUENCE_VERSION_1_1;
+
+    // -- Synapse Send mediator releated constants -- //
     String SEND_ELEMENT = "send";
     String LOADBALANCE_ELEMENT      = "loadbalance";
-    String FAILOVER_ELEMENT         = "failover";   // failover only element
+    /** failover only element */
+    String FAILOVER_ELEMENT         = "failover";
     String RETRY_AFTER_FAILURE_TIME = "retryAfterFailure";
     String MAXIMUM_RETRIES          = "maximumRetries";
     String RETRY_INTERVAL           = "retryInterval";
-    String FAILOVER                 = "failover";   // failover attribute in the loadbalance element
+    /** failover attribute in the loadbalance element */
+    String FAILOVER                 = "failover";
     String SESSION_AFFINITY         = "sessionAffinity";
     String ALGORITHM_NAME           = "policy";
-    String FAILOVER_GROUP_ELEMENT   = "failover"; // failover group element inside the loadbalance element
+    /** failover group element inside the loadbalance element */
+    String FAILOVER_GROUP_ELEMENT   = "failover";
     String DISPATCH_MANAGER         = "DISPATCH_MANAGER";
     String DISPATCHERS_ELEMENT      = "dispatchers";
     String DISPATCHER_ELEMENT       = "dispatcher";
-    QName ATT_KEY_Q =
-            new QName(NULL_NAMESPACE, "key");
-    QName ATT_ADDRESS_Q =
-                    new QName(NULL_NAMESPACE, "address");
+    QName ATT_KEY_Q = new QName(NULL_NAMESPACE, "key");
+    QName ATT_ADDRESS_Q = new QName(NULL_NAMESPACE, "address");
 }

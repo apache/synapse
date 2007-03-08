@@ -23,6 +23,11 @@ import junit.framework.TestCase;
 import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.SynapseMessageReceiver;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.mediators.TestMediateHandler;
 import org.apache.synapse.mediators.TestMediator;
 import org.apache.synapse.mediators.TestUtils;
@@ -96,6 +101,7 @@ public class SequenceMediatorTest extends TestCase {
             new TestMediateHandler() {
                 public void handle(MessageContext synCtx) {
                     result.append("T4");
+                    assertEquals("test", synCtx.getProperty(Constants.ERROR_MESSAGE));
                 }
             });
 
@@ -110,13 +116,18 @@ public class SequenceMediatorTest extends TestCase {
         seqErr.addChild(t4);
 
         // invoke transformation, with static enveope
-        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
-        synCtx.getConfiguration().addSequence("myErrorHandler", seqErr);
+        SynapseConfiguration synConfig = new SynapseConfiguration();
+        synConfig.addSequence("myErrorHandler", seqErr);
+        synConfig.addSequence(Constants.MAIN_SEQUENCE_KEY, seq);
 
-        seq.mediate(synCtx);
+        MessageContextCreatorForAxis2.setSynConfig(synConfig);
+        MessageContextCreatorForAxis2.setSynEnv(new Axis2SynapseEnvironment());
+        org.apache.axis2.context.MessageContext mc =
+            new org.apache.axis2.context.MessageContext();
+        mc.setEnvelope(TestUtils.getTestContext("<empty/>").getEnvelope());
+
+        new SynapseMessageReceiver().receive(mc);
 
         assertTrue("T1.T2.T4".equals(result.toString()));
-
-        assertEquals("test", synCtx.getProperty(Constants.ERROR_MESSAGE));
     }
 }

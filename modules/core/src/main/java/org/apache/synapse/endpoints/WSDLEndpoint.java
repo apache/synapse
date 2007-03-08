@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.builtin.send.endpoints;
+package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.EndpointDefinition;

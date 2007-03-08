@@ -27,10 +27,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 

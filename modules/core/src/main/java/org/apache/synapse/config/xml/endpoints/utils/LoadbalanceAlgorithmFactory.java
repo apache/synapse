@@ -21,8 +21,8 @@ package org.apache.synapse.config.xml.endpoints.utils;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
-import org.apache.synapse.mediators.builtin.send.algorithms.LoadbalanceAlgorithm;
-import org.apache.synapse.mediators.builtin.send.algorithms.RoundRobin;
+import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
+import org.apache.synapse.endpoints.algorithms.RoundRobin;
 import org.apache.synapse.mediators.builtin.send.SendConstants;
 
 import javax.xml.namespace.QName;

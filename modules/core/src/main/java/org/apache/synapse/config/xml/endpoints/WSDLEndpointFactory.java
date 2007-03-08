@@ -19,8 +19,8 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
-import org.apache.synapse.mediators.builtin.send.endpoints.WSDLEndpoint;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.WSDLEndpoint;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.EndpointDefinition;

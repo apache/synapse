@@ -22,10 +22,10 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
-import org.apache.synapse.mediators.builtin.send.endpoints.LoadbalanceEndpoint;
-import org.apache.synapse.mediators.builtin.send.algorithms.LoadbalanceAlgorithm;
-import org.apache.synapse.mediators.builtin.send.algorithms.RoundRobin;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.LoadbalanceEndpoint;
+import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
+import org.apache.synapse.endpoints.algorithms.RoundRobin;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 

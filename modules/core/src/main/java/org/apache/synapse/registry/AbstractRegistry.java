@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 import java.net.URI;
 import java.util.HashMap;

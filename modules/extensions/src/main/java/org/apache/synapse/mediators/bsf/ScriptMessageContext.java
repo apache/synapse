@@ -31,7 +31,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
-import org.apache.synapse.mediators.builtin.send.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Endpoint;
 
 /**
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the message payload XML in a way natural to the scripting language.
@@ -107,8 +107,8 @@ public class ScriptMessageContext implements MessageContext {
         mc.setEnvironment(se);
     }
 
-    public Object getLocalProperty(String key) {
-        return mc.getLocalProperty(key);
+    public Object getProperty(String key) {
+        return mc.getProperty(key);
     }
 
     public Object getEntry(String key) {
@@ -119,8 +119,8 @@ public class ScriptMessageContext implements MessageContext {
         mc.setProperty(key, value);
     }
 
-    public Set getLocalPropertyKeySet() {
-        return mc.getLocalPropertyKeySet();
+    public Set getPropertyKeySet() {
+        return mc.getPropertyKeySet();
     }
 
     public Mediator getMainSequence() {

@@ -17,67 +17,42 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<!-- illustration of local registry entry definitions, and reusable endpoints and sequences -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- illustration of simple properties, and reusable endpoints and sequences -->
-    <definitions>
+    <!-- define a string resource entry to the local registry -->
+    <localEntry key="version">0.1</localEntry>
 
-        <!-- define a string literal property -->
-        <set-property name="version" value="0.1"/>
+    <!-- define a reuseable endpoint definition -->
+    <endpoint name="simple">
+        <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    </endpoint>
 
-        <!-- define a reuseable endpoint definition -->
-        <endpoint name="simple"
-                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    <!-- define a reusable sequence -->
+    <sequence name="stockquote">
 
-        <!-- define a reusable sequence -->
-        <sequence name="stockquote">
+        <!-- log the message using the custom log level. illustrates custom properties for log -->
+        <log level="custom">
+            <property name="Text" value="Sending quote request"/>
+            <property name="version" expression="get-property('version')"/>
+            <property name="direction" expression="get-property('direction')"/>
+        </log>
 
-            <!-- log the message using the custom log level. illustrates custom properties for log messages -->
-            <log level="custom">
-                <property name="Text" value="Sending quote request"/>
-                <property name="version" expression="get-property('version')"/>
-                <property name="symbol" expression="get-property('symbol')"/>
-            </log>
+        <!-- send message to real endpoint referenced by key "simple" endpoint definition -->
+        <send>
+            <endpoint key="simple"/>
+        </send>
+    </sequence>
 
-            <!-- send message to real endpoint referenced by name "stockquote" endpoint definition -->
-            <send>
-                <endpoint ref="simple"/>
-            </send>
-        </sequence>
-    </definitions>
+    <sequence name="main">
+        <in>
+            <property name="direction" value="incoming"/>
+            <sequence key="stockquote"/>
+        </in>
+        <out>
+            <!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
+            <send/>
+        </out>
+    </sequence>
 
-    <rules>
-
-        <!-- match the 'To' EPR to the given regex -->
-        <filter source="get-property('To')" regex=".*/SimpleStockQuoteService.*">
-
-            <!-- set a custom local message property based on the stock code requested -->
-            <switch source="//m0:getQuote/m0:request/m0:symbol"
-                    xmlns:m0="http://services.samples/xsd">
-                <case regex="IBM">
-                    <set-property name="symbol" value="Great stock - IBM"/>
-                </case>
-                <case regex="MSFT">
-                    <set-property name="symbol" value="Are you sure? - MSFT"/>
-                </case>
-                <default>
-                    <!-- it is possible to assign the result of an XPath expression as the value of a local message property -->
-                    <set-property name="symbol"
-                                  expression="fn:concat('Normal Stock - ', //m0:getQuote/m0:request/m0:symbol)"
-                                  xmlns:m0="http://services.samples/xsd"/>
-                </default>
-            </switch>
-
-            <!-- invoke an already defined [reusable] sequence at this point -->
-            <sequence ref="stockquote"/>
-        </filter>
-
-        <!-- Log all messages passing through -->
-        <log level="full"/>
-
-        <!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
-        <send/>
-
-    </rules>
-
-</synapse> 
+</definitions>

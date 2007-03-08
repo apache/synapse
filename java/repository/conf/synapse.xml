@@ -17,15 +17,13 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<!-- A simple Synapse configuration -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
   
-  <!-- The most simple Synapse configuration -->
-  <rules>
   	<!-- Log all messages passing through -->
   	<log level="full"/>
   	
-  	<!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
+  	<!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
   	<send/>
-  </rules>
 
-</synapse> 
+</definitions>

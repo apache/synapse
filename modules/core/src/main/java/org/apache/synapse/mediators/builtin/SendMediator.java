@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.builtin.send;
+package org.apache.synapse.mediators.builtin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

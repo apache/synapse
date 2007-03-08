@@ -21,7 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.mediators.builtin.send.SendMediator;
+import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;

@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
-import org.apache.synapse.mediators.builtin.send.SendConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
@@ -80,7 +79,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
             // set abandon time
             long abandonTime = 0;
             OMAttribute atAttribute = loadbalanceElement.getAttribute
-                    (new QName(null, SendConstants.RETRY_AFTER_FAILURE_TIME));
+                    (new QName(null, org.apache.synapse.config.xml.Constants.RETRY_AFTER_FAILURE_TIME));
             if(atAttribute != null) {
                 String at = atAttribute.getAttributeValue();
                 abandonTime = Long.parseLong(at);

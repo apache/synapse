@@ -1,0 +1,48 @@
+/*
+* Copyright 2004,2005 The Apache Software Foundation.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package org.apache.synapse.mediators.throttle;
+
+import org.apache.synapse.mediators.AbstractTestCase;
+
+
+/**
+ *
+ *
+ */
+
+public class ThrottleMediatorSerializationTest extends AbstractTestCase {
+
+    ThrottleMediatorFactory throttleMediatorFactory;
+    ThrottleMediatorSerializer throttleMediatorSerializer;
+
+    public ThrottleMediatorSerializationTest() {
+        throttleMediatorFactory = new ThrottleMediatorFactory();
+        throttleMediatorSerializer = new ThrottleMediatorSerializer();
+    }
+
+    public void testPropertyMediatorSerializationSenarioOne() throws Exception {
+        String inputXml = "<throttle:throttle xmlns:throttle=\"http://ws.apache.org/ns/synapse/throttle\" xmlns=\"http://ws.apache.org/ns/synapse\" >" +
+                "<policy key=\"thottleKey\"/></throttle:throttle>";
+        assertTrue(serialization(inputXml, throttleMediatorFactory, throttleMediatorSerializer));
+        assertTrue(serialization(inputXml, throttleMediatorSerializer));
+    }
+//     public void testPropertyMediatorSerializationSenarioTwo() throws Exception {
+//        String inputXml = "<throttle:throttle xmlns:throttle=\"http://ws.apache.org/ns/synapse/throttle\" xmlns=\"http://ws.apache.org/ns/synapse\" >" +
+//                "<policy><inXml/></policy></throttle:throttle>";
+//        assertTrue(serialization(inputXml, throttleMediatorFactory, throttleMediatorSerializer));
+//        assertTrue(serialization(inputXml, throttleMediatorSerializer));
+//    }
+}

@@ -245,8 +245,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
             if (conn == null) {
                 SessionRequest req = ioReactor.connect(
-                    new InetSocketAddress(url.getHost(), port), null, axis2Req);
-                req.setCallback(sessionRequestCallback);
+                    new InetSocketAddress(url.getHost(), port), null, axis2Req,sessionRequestCallback);
                 log.debug("A new connection established");
             } else {
                 ((ClientHandler) handler).submitRequest(conn, axis2Req);
@@ -368,6 +367,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
             public void timeout(SessionRequest request) {
                 handleError(request);
+            }
+
+            public void cancelled(SessionRequest sessionRequest) {
+
             }
 
             private void handleError(SessionRequest request) {

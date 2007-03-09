@@ -431,6 +431,13 @@
             <artifactId>jakarta-httpcore-niossl</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
+        <!-- WSO2 Throttle -->
+        <dependency>
+            <groupId>org.wso2.throttle</groupId>
+            <artifactId>wso2throttle</artifactId>
+            <version>${wso2commons.version}</version>
+            <type>jar</type>
+        </dependency>
 
     </dependencies>
 
@@ -486,7 +493,7 @@
         <repository>
             <id>wso2</id>
             <name>wso2</name>
-            <url>http://dist.wso2.org/maven/</url>
+            <url>http://dist.wso2.org/maven2/</url>
             <releases>
             	<updatePolicy>never</updatePolicy>
             </releases>
@@ -558,6 +565,18 @@
             <name>Apache People Ibiblio RSync</name>
             <layout>legacy</layout>
             <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/</url>
+            <releases>
+            	<updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>WSO2 Maven2 Repository</id>
+            <name>WSO2 Maven2 Repository</name>
+            <layout>legacy</layout>
+            <url>http://dist.wso2.org/maven2/</url>
             <releases>
             	<updatePolicy>never</updatePolicy>
             </releases>
@@ -643,6 +662,8 @@
         <!-- misc -->
         <junit.version>3.8.2</junit.version>
         <log4j.version>1.2.13</log4j.version>
+        <wso2commons.version>1.2-SNAPSHOT</wso2commons.version>
+                
     </properties>
 
     <developers>

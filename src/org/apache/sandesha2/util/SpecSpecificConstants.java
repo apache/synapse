@@ -346,8 +346,11 @@ public class SpecSpecificConstants {
 			case Sandesha2Constants.MessageTypes.ACK_REQUEST:
 			case Sandesha2Constants.MessageTypes.LAST_MESSAGE:
 				result = service.getOperation(new QName("RMOutOnlyOperation"));
-				break;
-			}
+				break;			
+      case Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE:
+        result = service.getOperation(new QName("RMInOutDuplicateMessageOperation"));
+        break;
+      }
 		} else if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
 			switch(messageType) {
 			case Sandesha2Constants.MessageTypes.CREATE_SEQ:

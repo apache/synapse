@@ -169,6 +169,14 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// sending the message
 			boolean successfullySent = false;
 
+			// have to commit the transaction before sending. This may
+			// get changed when WS-AT is available.
+			if(transaction != null) {
+				transaction.commit();
+				transaction = null;
+				transaction = storageManager.getTransaction();
+			}
+
 			// Although not actually sent yet, update the send count to indicate an attempt
 			if (senderBean.isReSend()) {
 				SenderBean bean2 = senderBeanMgr.retrieve(senderBean.getMessageID());

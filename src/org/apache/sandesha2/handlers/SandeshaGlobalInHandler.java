@@ -17,15 +17,34 @@
 
 package org.apache.sandesha2.handlers;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.i18n.SandeshaMessageHelper;
+import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.security.SecurityManager;
+import org.apache.sandesha2.security.SecurityToken;
+import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.Range;
+import org.apache.sandesha2.util.RangeString;
+import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.wsrm.Sequence;
 
 /**
@@ -84,10 +103,103 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 			}
 
 		}
-		
+    
+    // Check if this is an application message and if it is a duplicate
+    RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgContext);
+    
+    // Set the RMMMessageContext as a property on the message so we can retrieve it later
+    msgContext.setProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT, rmMsgCtx);
+
+    if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+      processApplicationMessage(rmMsgCtx);
+    }
+    
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaGlobalInHandler::invoke, continuing");
+			log.debug("Exit: SandeshaGlobalInHandler::invoke " + InvocationResponse.CONTINUE);
 		return InvocationResponse.CONTINUE;
 	}
 	
+  private static void processApplicationMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+    if (log.isDebugEnabled())
+      log.debug("Enter: SandeshaGlobalInHandler::processApplicationMessage");
+    // Check if this is a duplicate message
+    Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+    String sequenceId = sequence.getIdentifier().getIdentifier();
+    long msgNo = sequence.getMessageNumber().getMessageNumber();
+
+    StorageManager storageManager = 
+      SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getConfigurationContext(), 
+          rmMsgCtx.getConfigurationContext().getAxisConfiguration());
+    
+    Transaction transaction = storageManager.getTransaction();
+    
+    try {
+    
+      // Check that both the Sequence header and message body have been secured properly
+      RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
+      RMDBean bean = mgr.retrieve(sequenceId);
+      
+      if(bean != null && bean.getSecurityTokenData() != null) {
+        SecurityManager secManager = SandeshaUtil.getSecurityManager(rmMsgCtx.getConfigurationContext());
+        
+        QName seqName = new QName(rmMsgCtx.getRMNamespaceValue(), Sandesha2Constants.WSRM_COMMON.SEQUENCE);
+        
+        SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
+        OMElement body = envelope.getBody();
+        OMElement seqHeader = envelope.getHeader().getFirstChildWithName(seqName);
+        
+        SecurityToken token = secManager.recoverSecurityToken(bean.getSecurityTokenData());
+        
+        secManager.checkProofOfPossession(token, seqHeader, rmMsgCtx.getMessageContext());
+        secManager.checkProofOfPossession(token, body, rmMsgCtx.getMessageContext());
+      }
+    
+      if (bean != null) {
+        
+        if (msgNo == 0) {
+          String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
+              .toString(msgNo));
+          log.debug(message);
+          throw new SandeshaException(message);
+        }
+    
+        // Get the server completed message ranges list
+        RangeString serverCompletedMessageRanges = bean.getServerCompletedMessages();
+    
+        // See if the message is in the list of completed ranges
+        boolean msgNoPresentInList = 
+          serverCompletedMessageRanges.isMessageNumberInRanges(msgNo);
+          
+        if (!msgNoPresentInList) {
+          serverCompletedMessageRanges.addRange(new Range(msgNo));
+          
+          storageManager.getRMDBeanMgr().update(bean);
+        }
+        else {
+          // Add the duplicate RM AxisOperation to the message
+          AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
+              Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
+              Sandesha2Constants.SPEC_VERSIONS.v1_0,
+              rmMsgCtx.getMessageContext().getAxisService());
+          rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
+        }
+              
+      } else {
+        // Add the duplicate RM AxisOperation to the message
+        AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
+            Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
+            Sandesha2Constants.SPEC_VERSIONS.v1_0,
+            rmMsgCtx.getMessageContext().getAxisService());
+        rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
+      }
+      transaction.commit();
+      transaction = null;
+    }
+    finally {
+      if (transaction != null)
+        transaction.rollback();
+    }
+    if (log.isDebugEnabled())
+      log.debug("Exit: SandeshaGlobalInHandler::processApplicationMessage");
+  }
 }

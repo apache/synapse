@@ -101,6 +101,8 @@ public class RMScenariosTest extends SandeshaTestCase {
 	public void testSyncEcho() throws Exception {
 		// Test sync echo with an offer, and the 1.1 spec
 		Options clientOptions = new Options();
+//		org.apache.log4j.BasicConfigurator.configure();
+//		to = "http://127.0.0.1:" + 9999 + "/axis2/services/RMSampleService";
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		runEcho(clientOptions, false, false, false);

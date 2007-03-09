@@ -90,9 +90,14 @@ public class SandeshaInHandler extends AbstractHandler {
 				throw new AxisFault(message);
 			}
 
-			//processing any incoming faults.			
-			RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+			RMMsgContext rmMsgCtx = null;
+      
+      if (msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT) != null)
+        rmMsgCtx = (RMMsgContext)msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT);
+      else
+        rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
+      //processing any incoming faults.     
 			//This is responsible for Sandesha2 specific 
 			FaultManager.processMessagesForFaults(rmMsgCtx);
 

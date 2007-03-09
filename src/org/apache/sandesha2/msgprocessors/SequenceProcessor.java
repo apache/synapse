@@ -51,8 +51,6 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
-import org.apache.sandesha2.util.Range;
-import org.apache.sandesha2.util.RangeString;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.workers.SandeshaThread;
@@ -171,13 +169,6 @@ public class SequenceProcessor {
 			return InvocationResponse.ABORT;
 		}
 
-		if (msgNo == 0) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidMsgNumber, Long
-					.toString(msgNo));
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
-
 		// Pause the messages bean if not the right message to invoke.
 		
 		// updating the last activated time of the sequence.
@@ -207,15 +198,9 @@ public class SequenceProcessor {
 			bean.setHighestInMessageId(messageId);
 			bean.setHighestInMessageNumber(msgNo);
 		}
-
-		// Get the server completed message ranges list
-		RangeString serverCompletedMessageRanges = bean.getServerCompletedMessages();
-		// See if the message is in the list of completed ranges
-		boolean msgNoPresentInList = 
-			serverCompletedMessageRanges.isMessageNumberInRanges(msgNo);
 		
 		String specVersion = rmMsgCtx.getRMSpecVersion();
-		if (msgNoPresentInList
+		if (rmMsgCtx.getMessageContext().getAxisOperation().getName().getLocalPart().equals("RMInOutDuplicateMessageOperation")
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			// this is a duplicate message and the invocation type is EXACTLY_ONCE. We try to return
 			// ack messages at this point, as if someone is sending duplicates then they may have
@@ -254,11 +239,6 @@ public class SequenceProcessor {
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, dropping duplicate: " + result);
 			return result;
-		}
-
-		if (!msgNoPresentInList)
-		{
-			serverCompletedMessageRanges.addRange(new Range(msgNo));
 		}
 		
 		// If the message is a reply to an outbound message then we can update the RMSBean that

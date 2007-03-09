@@ -25,6 +25,7 @@ import org.apache.axis2.receivers.AbstractMessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
@@ -48,7 +49,13 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 	public final void receive(MessageContext msgCtx) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: RMMessageReceiver::receive");
 		
-		RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+    RMMsgContext rmMsgCtx = null;
+    
+    if (msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT) != null)
+      rmMsgCtx = (RMMsgContext)msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT);
+    else
+      rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+    
 		if(log.isDebugEnabled()) log.debug("MsgReceiver got type: " + SandeshaUtil.getMessageTypeString(rmMsgCtx.getMessageType()));	
 
 		// Note that some messages (such as stand-alone acks) will be routed here, but

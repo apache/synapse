@@ -75,6 +75,10 @@
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 
+    <operation name="RMInOutDuplicateMessageOperation" mep="http://www.w3.org/2006/01/wsdl/in-out">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+    </operation>
+
    <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />
 
 	<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"

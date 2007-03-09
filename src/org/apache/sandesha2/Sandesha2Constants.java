@@ -249,8 +249,10 @@ public interface Sandesha2Constants {
 		int MAKE_CONNECTION_MSG = 11;
 		
 		int LAST_MESSAGE = 12;
-		
-		int MAX_MESSAGE_TYPE = 12;
+
+    int DUPLICATE_MESSAGE = 13;
+
+		int MAX_MESSAGE_TYPE = 13;
 	}
 
 	public interface MessageParts {
@@ -541,6 +543,7 @@ public interface Sandesha2Constants {
 		static final String INBOUND_MESSAGE_NUMBER = "Sandesha2InboundMessageNumber";
 		static final String INBOUND_LAST_MESSAGE   = "Sandesha2InboundLastMessage";
 		static final String MAKECONNECTION_ENTRY   = "Sandesha2MakeConnectionEntry";
+    static final String RM_MESSAGE_CONTEXT     = "RMMessageContext";
 	}
     
     public interface Assertions {

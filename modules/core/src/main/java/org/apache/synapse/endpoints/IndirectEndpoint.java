@@ -24,6 +24,13 @@ import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * This class represents the endpoints referred by keys. It does not store the actual referred
+ * endpoint as a private variable as it could expire. Therefore, it only stores the key and gets the
+ * actual endpoint from the synapse configuration.
+ *
+ * As this is also an instance of endpoint, this can be used any place, where a normal endpoint is used.
+ */
 public class IndirectEndpoint implements Endpoint {
 
     private static final Log log = LogFactory.getLog(IndirectEndpoint.class);
@@ -37,7 +44,7 @@ public class IndirectEndpoint implements Endpoint {
         // get the actual endpoint and send
         Endpoint endpoint = synMessageContext.getEndpoint(key);
         if (endpoint == null) {
-            handleException("Reference to non-existent endpoint for key : " + key);    
+            handleException("Reference to non-existent endpoint for key : " + key);
         }
 
         if (endpoint.isActive()) {
@@ -69,7 +76,7 @@ public class IndirectEndpoint implements Endpoint {
 
     public void setActive(boolean active) {
         this.active = active;
-    }   
+    }
 
     public void setParentEndpoint(Endpoint parentEndpoint) {
         this.parentEndpoint = parentEndpoint;

@@ -195,7 +195,9 @@ public class Axis2FlexibleMEPClient {
         newMC.setServerSide(false);
 
         // set SOAP envelope on the message context, removing WS-A headers
-        newMC.setEnvelope(removeAddressingHeaders(ori));
+        newMC.setEnvelope(ori.getEnvelope());
+        removeAddressingHeaders(newMC);
+
         return newMC;
     }
     

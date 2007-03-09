@@ -193,7 +193,7 @@ public class ClientHandler implements NHttpClientHandler {
      * @param e the exception encountered
      */
     public void exception(final NHttpClientConnection conn, final IOException e) {
-        log.error("I/O error : " + e.getMessage());
+        log.error("I/O error : " + e.getMessage(), e);
         shutdownConnection(conn);
     }
 

@@ -35,10 +35,6 @@
             <order phase="RMPhase"/>
         </handler>   
     </OutFaultFlow>
-    
-    <!-- Parameters that will be copied when creating related MessageContexts -->
-    <parameter name="propertiesToCopyFromReferenceMessage" locked="false">TransportURL,WSAddressingVersion,disableAddressingForOutMessages,rampartPolicy,RECV_RESULTS,PROXY</parameter>
-    <parameter name="propertiesToCopyFromReferenceRequestMessage" locked="false">WSAddressingVersion,RECV_RESULTS,rampartPolicy</parameter>
 
     <operation name="RMInOnlyOperation" mep="http://www.w3.org/2006/01/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
@@ -137,5 +133,10 @@
 			</wsp:Policy>
 		</sandesha2:RMAssertion>
 	</wsp:Policy>
-	
+
+
+    <!-- Parameters that will be copied when creating related MessageContexts -->
+    <parameter name="propertiesToCopyFromReferenceMessage" locked="false">TransportURL,WSAddressingVersion,disableAddressingForOutMessages,rampartPolicy,RECV_RESULTS,PROXY</parameter>
+    <parameter name="propertiesToCopyFromReferenceRequestMessage" locked="false">WSAddressingVersion,RECV_RESULTS,rampartPolicy</parameter>
+
 </module>

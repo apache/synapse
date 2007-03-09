@@ -103,7 +103,7 @@ public class Sender extends SandeshaThread {
 				if(rms != null && !rms.isTerminated() && !rms.isTimedOut()) {
 					sequenceId = rms.getSequenceID();					
 					if (SequenceManager.hasSequenceTimedOut(rms, sequenceId, storageManager))					
-						SequenceManager.finalizeTimedOutSequence(sequenceId, null, storageManager);
+						SequenceManager.finalizeTimedOutSequence(rms.getInternalSequenceID(), null, storageManager);
 					else
 						found = true;
 				}

@@ -24,6 +24,10 @@ import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.ArrayList;
 
+/**
+ * This is the implementation of the round robin load balancing algorithm. It simply iterates through
+ * the endpoint list one by one for until an active endpoint is found.
+ */
 public class RoundRobin implements LoadbalanceAlgorithm {
 
     private ArrayList endpoints = null;

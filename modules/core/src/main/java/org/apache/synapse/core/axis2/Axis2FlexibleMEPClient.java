@@ -119,6 +119,8 @@ public class Axis2FlexibleMEPClient {
 
         if (wsAddressingEnabled) {
             axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+        } else {
+            axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
         }
 
         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();

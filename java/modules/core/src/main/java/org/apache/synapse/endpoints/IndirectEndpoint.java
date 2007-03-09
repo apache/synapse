@@ -20,8 +20,13 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class IndirectEndpoint implements Endpoint {
+
+    private static final Log log = LogFactory.getLog(IndirectEndpoint.class);
 
     private String name = null;
     private String key = null;
@@ -31,6 +36,9 @@ public class IndirectEndpoint implements Endpoint {
     public void send(MessageContext synMessageContext) {
         // get the actual endpoint and send
         Endpoint endpoint = synMessageContext.getEndpoint(key);
+        if (endpoint == null) {
+            handleException("Reference to non-existent endpoint for key : " + key);    
+        }
 
         if (endpoint.isActive()) {
             endpoint.send(synMessageContext);
@@ -70,5 +78,10 @@ public class IndirectEndpoint implements Endpoint {
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
         endpoint.setActive(false);
         parentEndpoint.onChildEndpointFail(this, synMessageContext);
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

@@ -58,8 +58,8 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
 
         OMAttribute address = elem.getAttribute(new QName(
                 Constants.NULL_NAMESPACE, "address"));
-        OMAttribute force = elem.getAttribute(new QName(
-                Constants.NULL_NAMESPACE, "force"));
+        OMAttribute format = elem.getAttribute(new QName(
+                Constants.NULL_NAMESPACE, "format"));
         OMAttribute optimize = elem.getAttribute(new QName(
                 Constants.NULL_NAMESPACE, "optimize"));
 
@@ -72,9 +72,9 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
                     + "anonymous endpoint");
         }
 
-        if (force != null)
+        if (format != null)
         {
-            String forceValue = force.getAttributeValue().trim().toLowerCase();
+            String forceValue = format.getAttributeValue().trim().toLowerCase();
             if (forceValue.equals("pox")) {
                 endpoint.setForcePOX(true);
             } else if (forceValue.equals("soap")) {

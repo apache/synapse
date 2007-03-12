@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.config.xml;
+package org.apache.synapse.config.xml.endpoints.utils;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -26,10 +26,11 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
- * <endpoint name="string" address="url">
+ * <address uri="url">
  *
  *    .. extensibility ..
  *
@@ -48,7 +49,7 @@ import org.apache.synapse.config.EndpointDefinition;
  *    <enableSec/>+
  *    <enableAddressing/>+
  *
- * </endpoint>
+ * </address>
  */
 public class EndpointDefinitionSerializer {
 

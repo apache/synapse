@@ -26,8 +26,17 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
+/**
+ * Serializes AddressEndpoint to XML.
+ *
+ * <endpoint [name="name"]>
+ *    <address uri="uri">
+ *       configuration for the epr. see EndpointDefintionFactory.
+ *    </address>
+ * </endpoint>
+ */
 public class AddressEndpointSerializer implements EndpointSerializer {
 
     private OMFactory fac = null;

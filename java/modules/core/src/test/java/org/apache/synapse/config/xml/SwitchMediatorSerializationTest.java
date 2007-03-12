@@ -41,7 +41,7 @@ public class SwitchMediatorSerializationTest extends AbstractTestCase {
 
         try {
             assertTrue(serialization(switchConfiguration, switchMediatorFactory, switchMediatorSerializer));
-        } catch (XMLComparisonException e) {
+        } catch (Exception e) {
             fail("Exception in test");
         }
     }
@@ -55,7 +55,7 @@ public class SwitchMediatorSerializationTest extends AbstractTestCase {
 
         try {
             assertTrue(serialization(switchConfiguration, switchMediatorFactory, switchMediatorSerializer));
-        } catch (XMLComparisonException e) {
+        } catch (Exception e) {
             fail("Exception in test");
         }
     }

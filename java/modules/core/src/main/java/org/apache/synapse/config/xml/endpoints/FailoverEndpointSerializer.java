@@ -29,6 +29,15 @@ import org.apache.synapse.Constants;
 
 import java.util.ArrayList;
 
+/**
+ * Serializes FailoverEndpoint to XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <failover>
+ *       <endpoint>+
+ *    </failover>
+ * </endpoint>
+ */
 public class FailoverEndpointSerializer implements EndpointSerializer {
 
     private OMFactory fac = null;

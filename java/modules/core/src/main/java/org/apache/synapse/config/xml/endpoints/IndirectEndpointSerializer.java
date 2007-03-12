@@ -27,6 +27,11 @@ import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 
+/**
+ * Serializes an IndirectEndpoint to an XML configuration.
+ *
+ * <endpoint key="key" />
+ */
 public class IndirectEndpointSerializer implements EndpointSerializer {
 
     private OMFactory fac = null;

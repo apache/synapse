@@ -48,7 +48,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -195,12 +195,12 @@ public class Axis2FlexibleMEPClient {
                 ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM));
         newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA,
                 ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
-        
+
         newMC.setDoingREST(ori.isDoingREST());
         newMC.setDoingMTOM(ori.isDoingMTOM());
         newMC.setServerSide(false);
 
-        // set SOAP envelope on the message context, removing WS-A headers        
+        // set SOAP envelope on the message context, removing WS-A headers
         newMC.setEnvelope(ori.getEnvelope());
         removeAddressingHeaders(newMC);
 

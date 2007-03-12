@@ -23,7 +23,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL20EndpointBuilder;
 import org.apache.axiom.om.OMElement;
@@ -37,6 +37,15 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import javax.xml.namespace.QName;
 import java.net.URL;
 
+/**
+ * Creates an WSDL based endpoint from a XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <wsdl uri="wsdl uri" service="service name" port="port name">
+ *       .. extensibility ..
+ *    </wsdl>
+ * </endpoint>
+ */
 public class WSDLEndpointFactory implements EndpointFactory {
 
     private static Log log = LogFactory.getLog(WSDLEndpointFactory.class);
@@ -92,9 +101,11 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     endpoint = new WSDL20EndpointBuilder().
                             createEndpointDefinitionFromWSDL(wsdlElement);
                 }
+
+
                 wsdlEndpoint.setEndpointDefinition(endpoint);
             } catch (Exception e1) {
-
+                handleException("Unable to create endpoint from the given WSDL.", e1);
             }
         }
 
@@ -106,4 +117,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
         throw new SynapseException(msg);
     }
 
+    private static void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
 }

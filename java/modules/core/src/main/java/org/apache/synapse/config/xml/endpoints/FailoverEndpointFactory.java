@@ -32,6 +32,15 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * Creates FailoverEndpoint using a XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <failover>
+ *       <endpoint>+
+ *    </failover>
+ * </endpoint>
+ */
 public class FailoverEndpointFactory implements EndpointFactory {
 
     private static Log log = LogFactory.getLog(FailoverEndpointFactory.class);

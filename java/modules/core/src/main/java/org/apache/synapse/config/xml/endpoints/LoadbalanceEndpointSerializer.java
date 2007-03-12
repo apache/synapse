@@ -31,6 +31,15 @@ import org.apache.synapse.Constants;
 
 import java.util.ArrayList;
 
+/**
+ * Serializes LoadbalanceEndpoint to an XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <loadbalance policy="load balance algorithm">
+ *       <endpoint>+
+ *    </loadbalance>
+ * </endpoint>
+ */
 public class LoadbalanceEndpointSerializer implements EndpointSerializer {
 
     private OMFactory fac = null;

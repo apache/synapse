@@ -22,8 +22,7 @@ package org.apache.synapse.endpoints;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.config.EndpointDefinition;
 import org.apache.axis2.addressing.EndpointReference;
@@ -84,8 +83,16 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
             if (endpoint.isUseMTOM()) {
                 synCtx.setDoingMTOM(true);
+                // fix / workaround for AXIS2-1798
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                    org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                    org.apache.axis2.Constants.VALUE_TRUE);
             } else if (endpoint.isUseSwa()) {
                 synCtx.setDoingSWA(true);
+                // fix / workaround for AXIS2-1798
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
+                    org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                    org.apache.axis2.Constants.VALUE_TRUE);
             }
 
             if (endpoint.isUseSeparateListener()) {

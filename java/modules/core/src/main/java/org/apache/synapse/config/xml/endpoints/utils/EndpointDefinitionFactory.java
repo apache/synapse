@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.config.xml;
+package org.apache.synapse.config.xml.endpoints.utils;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
@@ -25,22 +25,25 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.xml.Constants;
 
 import javax.xml.namespace.QName;
 
 /**
- * Creates an Endpoint instance using the XML fragment specification
+ * Creates an EndpointDefinition instance using the XML fragment specification. Configuration for
+ * EndpointDefinition always resides inside a configuration of an AddressEndpoint. This factory
+ * extracts the details related to the EPR provided for address endpoint.
  * 
- * <endpoint name="string" address="url" [force="soap|pox"] [optimize="mtom|swa"]>
+ * <address uri="url" [force="soap|pox"] [optimize="mtom|swa"]>
  *  .. extensibility ..
  * 
  * <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
  * separateListener="true|false"/>+
  * 
  * 
- * </endpoint>
+ * </address>
  */
 public class EndpointDefinitionFactory implements XMLToObjectMapper {
 
@@ -51,8 +54,7 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
     private EndpointDefinitionFactory() {
     }
 
-    public static EndpointDefinition createEndpoint(OMElement elem,
-                                                    boolean anonymousEndpoint) {
+    public static EndpointDefinition createEndpoint(OMElement elem) {
 
         OMAttribute address = elem.getAttribute(new QName(
                 Constants.NULL_NAMESPACE, "address"));
@@ -127,7 +129,6 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
         }
 
         return endpoint;
-        // }
     }
 
     private static void handleException(String msg) {
@@ -142,7 +143,7 @@ public class EndpointDefinitionFactory implements XMLToObjectMapper {
 
     public Object getObjectFromOMNode(OMNode om) {
         if (om instanceof OMElement) {
-            return createEndpoint((OMElement) om, false);
+            return createEndpoint((OMElement) om);
         } else {
             handleException("Invalid XML configuration for an Endpoint. OMElement expected");
         }

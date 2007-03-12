@@ -21,7 +21,7 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
@@ -32,6 +32,15 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Creates AddressEndpoint using a XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <address uri="uri">
+ *       configuration for the epr. see EndpointDefintionFactory.
+ *    </address>
+ * </endpoint>
+ */
 public class AddressEndpointFactory implements EndpointFactory {
 
     private static Log log = LogFactory.getLog(AddressEndpointFactory.class);

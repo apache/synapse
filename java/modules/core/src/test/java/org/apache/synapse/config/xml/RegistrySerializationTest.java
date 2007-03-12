@@ -36,17 +36,16 @@ public class RegistrySerializationTest extends AbstractTestCase {
     public void testRegistrySerialization() {
 
         String regitryConfiguration = "<syn:registry xmlns:syn=\"http://ws.apache.org/ns/synapse\" provider=\"org.apache.synapse.registry.url.SimpleURLRegistry\">" +
-                "<syn:parameter name=\"root\" value=\"file:./../../repository/\"/>" +
-                "<syn:parameter name=\"cachableDuration\" value=\"15000\"/>" +
+                "<syn:parameter name=\"root\">file:./../../repository/</syn:parameter>" +
+                "<syn:parameter name=\"cachableDuration\">15000</syn:parameter>" +
                 "</syn:registry>";
 
         OMElement registryElement = createOMElement(regitryConfiguration);
         Registry registry = RegistryFactory.createRegistry(registryElement);
         OMElement serializedElement = RegistrySerializer.serializeRegistry(null, registry);
-
         try {
             assertTrue(compare(registryElement, serializedElement));
-        } catch (XMLComparisonException e) {
+        } catch (Exception e) {
             fail("Exception in test.");
         }
     }

@@ -17,30 +17,23 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+    <!-- define a static property for the JRuby source code file -->
+    <localEntry name="stockquoteScript"
+                src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>
 
-    <!-- Introduction to the script mediator with Ruby scripts-->
-
-    <definitions>
-
-        <!-- define a static property for the JRuby source code file -->
-        <set-property name="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>
-
-        <!-- define a reuseable endpoint definition and use it within config -->
-        <endpoint name="stockquote">
-            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-        </endpoint>
-
-    </definitions>
-
-    <rules>
+    <!-- define a reuseable endpoint definition and use it within config -->
+    <endpoint name="stockquote">
+        <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    </endpoint>
+    <sequence name="main">
         <in>
             <!-- transform the custom quote request into a standard quote request expected by the service -->
             <script key="stockquoteScript" function="transformRequest"/>
 
             <!-- send message to real endpoint referenced by name "stockquote" and stop -->
             <send>
-                <endpoint ref="stockquote"/>
+                <endpoint key="stockquote"/>
             </send>
         </in>
 
@@ -51,6 +44,6 @@
             <!-- now send the custom response back to the client and stop -->
             <send/>
         </out>
-    </rules>
+    </sequence>
 
-</synapse> 
+</definitions>

@@ -431,6 +431,13 @@
             <artifactId>jakarta-httpcore-niossl</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
+        <!-- Xml Unit Test -->
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>${xmlunit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <reporting>
@@ -655,7 +662,8 @@
         <junit.version>3.8.2</junit.version>
         <log4j.version>1.2.13</log4j.version>
         <wso2commons.version>1.2-SNAPSHOT</wso2commons.version>
-                
+        <xmlunit.version>1.0</xmlunit.version>
+
     </properties>
 
     <developers>

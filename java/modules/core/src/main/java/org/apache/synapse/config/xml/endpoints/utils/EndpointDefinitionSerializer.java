@@ -64,9 +64,9 @@ public class EndpointDefinitionSerializer {
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
 
         if (endpt.isForcePOX()) {
-            endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "pox"));
+            endpoint.addAttribute(fac.createOMAttribute("format", nullNS, "pox"));
         } else if (endpt.isForceSOAP()) {
-            endpoint.addAttribute(fac.createOMAttribute("force", nullNS, "soap"));
+            endpoint.addAttribute(fac.createOMAttribute("format", nullNS, "soap"));
         }
 
         if (endpt.getAddress() != null) {

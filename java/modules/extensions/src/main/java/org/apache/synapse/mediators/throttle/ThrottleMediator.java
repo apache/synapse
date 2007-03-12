@@ -16,12 +16,12 @@
 package org.apache.synapse.mediators.throttle;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Constants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -38,7 +38,7 @@ import org.wso2.throttle.*;
 public class ThrottleMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(ThrottleMediator.class);
-
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     /** The key for getting policy value - key refer to registry entry  */
     private String policyKey = null;
     /** InLine policy object - XML   */
@@ -47,20 +47,30 @@ public class ThrottleMediator extends AbstractMediator {
     Throttle throttle = null;
 
     public boolean mediate(MessageContext synCtx) {
-        //init method to init throttle
-        init(synCtx);
-        // check access allow or not
-        return canAccess(synCtx);
-
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        try {
+            if (shouldTrace) {
+                trace.trace("Start : Throttle mediator");
+            }
+            //init method to init throttle
+            init(synCtx, shouldTrace);
+            // check access allow or not
+            return canAccess(synCtx, shouldTrace);
+        } finally {
+            if (shouldTrace) {
+                trace.trace("End : Throttle mediator");
+            }
+        }
     }
 
     /**
      * To check whether allow access or not for caller
      * Current Implementaion only support IP Based Throttling
+     *
      * @param synContext
      * @return boolean which indicate whether this caller can or not access
      */
-    protected boolean canAccess(MessageContext synContext) {
+    protected boolean canAccess(MessageContext synContext, boolean shouldTrace) {
 
         if (throttle == null) {
             log.info("Can not find a throttle");
@@ -72,6 +82,9 @@ public class ThrottleMediator extends AbstractMediator {
         Object remoteIP = axis2MessageContext.getProperty(
                 org.apache.axis2.context.MessageContext.REMOTE_ADDR);
         if (remoteIP == null) {
+            if (shouldTrace) {
+                trace.trace("IP Address of the caller :" + remoteIP);
+            }
             log.info("IP address of the caller can not find - Currently only support caller-IP base access control" +
                     "- Thottling will not happen ");
             return true;
@@ -86,7 +99,11 @@ public class ThrottleMediator extends AbstractMediator {
                 AccessController accessControler = AccessControllerFactory.createAccessControler(ThrottleConstants.IP_BASE);
                 boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
                 if (!canAccess) {
-                    log.info("Access has currently been denied by the IP_BASE throttle for IP :\t" + remoteIP);
+                    String msg = "Access has currently been denied by the IP_BASE throttle for IP :\t" + remoteIP;
+                    if (shouldTrace) {
+                        trace.trace(msg);
+                    }
+                    log.info(msg);
                 }
                 return canAccess;
             }
@@ -104,9 +121,10 @@ public class ThrottleMediator extends AbstractMediator {
      * Any runtime changes to the policy will take effect
      * If the policy is defined as a Inline XML ,then only one time policy will process and any runtime
      * changes to the policy will not reflect
+     *
      * @param synContext
      */
-    protected void init(MessageContext synContext) {
+    protected void init(MessageContext synContext, boolean shouldTrace) {
 
         boolean reCreate = false; // It is not need to recreate ,if property is not dyanamic
         OMElement policyOmElement = null;
@@ -131,6 +149,9 @@ public class ThrottleMediator extends AbstractMediator {
         if (policyOmElement == null) {
             log.warn("Cant not find a Policy - Throttling will not occur");
             return;
+        }
+        if (shouldTrace) {
+            trace.trace("Throttle Policy :" + policyOmElement.toString());
         }
         if (!reCreate) {
             //The first time creation

@@ -55,6 +55,7 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
                 throttle.addChild(policy);
             }
         }
+        finalizeSerialization(throttle, throttleMediator);           
         if (parent != null) {
             parent.addChild(throttle);
         }

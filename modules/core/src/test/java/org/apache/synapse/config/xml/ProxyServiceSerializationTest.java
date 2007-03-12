@@ -31,7 +31,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
-        assertTrue(comparator.compare(resultOM, inputOM));
+        assertTrue(compare(resultOM, inputOM));
     }
 
     public void testProxyServiceSerializationSenarioTwo() throws Exception {
@@ -39,7 +39,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
-        assertTrue(comparator.compare(resultOM, inputOM));
+        assertTrue(compare(resultOM, inputOM));
     }
 
     public void testProxyServiceSerializationSenarioThree() throws Exception {
@@ -47,7 +47,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
-        assertTrue(comparator.compare(resultOM, inputOM));
+        assertTrue(compare(resultOM, inputOM));
     }
 
 //    public void testProxyServiceSerializationSenarioFour() throws Exception {
@@ -63,7 +63,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);     
-        assertTrue(comparator.compare(resultOM, inputOM));
+        assertTrue(compare(resultOM, inputOM));
     }
 //     public void testProxyServiceSerializationSenarioSix() throws Exception {
 //        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" startOnLoad=\"true\" name=\"name\"  transports=\"http\"><description>description</description><target><endpoint address=\"http://www.example.com/testepr\" /></target><publish-wsdl uri=\"http://uri\" key=\"key\"></publish-wsdl><policy key=\"key\"/><parameter name=\"para\"><inline xmlns=\"http://customns\"><test/></inline></parameter></proxy>";

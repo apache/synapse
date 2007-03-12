@@ -43,7 +43,6 @@ public class RegistryFactory {
     public static final QName PROVIDER_Q = new QName(Constants.NULL_NAMESPACE, "provider");
     public static final QName PARAMETER_Q = new QName(Constants.NULL_NAMESPACE, "parameter");
     public static final QName NAME_Q     = new QName(Constants.NULL_NAMESPACE, "name");
-    public static final QName VALUE_Q    = new QName(Constants.NULL_NAMESPACE, "value");
 
     public static Registry createRegistry(OMElement elem) {
 
@@ -73,21 +72,22 @@ public class RegistryFactory {
     }
 
     private static void setProperties(Registry reg, OMElement elem) {
-        Iterator iter = elem.getChildrenWithName(PARAMETER_Q);
-        while (iter.hasNext()) {
-            Object o = iter.next();
+        Iterator params = elem.getChildrenWithName(PARAMETER_Q);
+        while (params.hasNext()) {
+            Object o = params.next();
             if (o instanceof OMElement) {
-                OMElement propEle = (OMElement) o;
-                OMAttribute nAtt = propEle.getAttribute(NAME_Q);
-                OMAttribute vAtt = propEle.getAttribute(VALUE_Q);
-                if (nAtt != null && vAtt !=null) {
-                    reg.addConfigProperty(nAtt.getAttributeValue(), vAtt.getAttributeValue());
+                OMElement prop = (OMElement) o;
+                OMAttribute pname = prop.getAttribute(NAME_Q);
+                String propertyValue = prop.getText();
+                if (pname != null) {
+                    if (propertyValue != null) {
+                        reg.addConfigProperty(pname.getAttributeValue(), propertyValue.trim());
+                    }
                 } else {
-                    handleException("The 'name' and 'value' attributes are required for a " +
-                        "registry property definition");
+                    handleException("Invalid registry property - property should have a name ");
                 }
             } else {
-                handleException("Invalid 'property' definition for registry.");
+                handleException("Invalid registry property");
             }
         }
     }

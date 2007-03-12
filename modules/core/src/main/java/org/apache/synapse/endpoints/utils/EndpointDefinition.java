@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.config;
+package org.apache.synapse.endpoints.utils;
 
 import org.apache.synapse.Constants;
 

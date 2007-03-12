@@ -26,10 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
-
-import java.util.Iterator;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method

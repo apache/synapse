@@ -19,7 +19,7 @@
 
 package org.apache.synapse.config.xml.endpoints.utils;
 
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 
@@ -33,6 +33,9 @@ import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import java.util.List;
 
+/**
+ * Builds the EndpointDefinition containing the details for an epr using a WSDL 1.1 document.
+ */
 public class WSDL11EndpointBuilder {
 
     public EndpointDefinition createEndpointDefinitionFromWSDL(OMElement wsdlElement) {

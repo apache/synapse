@@ -20,7 +20,7 @@
 package org.apache.synapse.core;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsCollector;
 
 /**

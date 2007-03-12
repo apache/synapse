@@ -191,6 +191,10 @@ public class Axis2FlexibleMEPClient {
 
         newMC.setProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING,
                 ori.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING));
+        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_MTOM));
+        newMC.setProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA,
+                ori.getProperty(org.apache.axis2.Constants.Configuration.ENABLE_SWA));
         
         newMC.setDoingREST(ori.isDoingREST());
         newMC.setDoingMTOM(ori.isDoingMTOM());

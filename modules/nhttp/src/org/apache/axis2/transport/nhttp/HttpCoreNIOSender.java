@@ -26,6 +26,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -39,6 +40,7 @@ import org.apache.http.nio.reactor.SessionRequestCallback;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.impl.nio.DefaultClientIOEventDispatch;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -75,7 +77,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     /** The session request callback that calls back to the message receiver with errors */
     private final SessionRequestCallback sessionRequestCallback = getSessionRequestCallback();
     /** The SSL Context to be used */
-    SSLContext sslContext = null;
+    private SSLContext sslContext = null;
+    /** The SSL session handler that manages hostname verification etc */
+    private SSLIOSessionHandler sslIOSessionHandler = null;
 
     /**
      * Initialize the transport sender, and execute reactor in new seperate thread
@@ -88,6 +92,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // is this an SSL Sender?
         sslContext = getSSLContext(transportOut);
+        sslIOSessionHandler = getSSLIOSessionHandler(transportOut);
 
         // start the Sender in a new seperate thread
         Thread t = new Thread(new Runnable() {
@@ -112,7 +117,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         }
 
         handler = new ClientHandler(cfgCtx, params);
-        IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext, params);
+        IOEventDispatch ioEventDispatch = getEventDispatch(
+            handler, sslContext, sslIOSessionHandler, params);
 
         try {
             ioReactor.execute(ioEventDispatch);
@@ -133,7 +139,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return
      */
     protected IOEventDispatch getEventDispatch(
-        NHttpClientHandler handler, SSLContext sslContext, HttpParams params) {
+        NHttpClientHandler handler, SSLContext sslContext,
+        SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
         return new DefaultClientIOEventDispatch(handler, params);
     }
 
@@ -144,6 +151,16 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @throws AxisFault
      */
     protected SSLContext getSSLContext(TransportOutDescription transportOut) throws AxisFault {
+        return null;
+    }
+
+    /**
+     * Create the SSL IO Session handler to be used by this listener
+     * @param transportOut
+     * @return always null
+     */
+    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportOutDescription transportOut)
+        throws AxisFault {
         return null;
     }
 
@@ -244,8 +261,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), port);
 
             if (conn == null) {
-                SessionRequest req = ioReactor.connect(
-                    new InetSocketAddress(url.getHost(), port), null, axis2Req,sessionRequestCallback);
+                SessionRequest req = ioReactor.connect(new InetSocketAddress(url.getHost(), port),
+                    null, axis2Req, sessionRequestCallback);
                 log.debug("A new connection established");
             } else {
                 ((ClientHandler) handler).submitRequest(conn, axis2Req);

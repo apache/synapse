@@ -20,8 +20,8 @@
 <synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
 
 	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
-		<parameter name="root" value="file:./../../repository/"/>
-		<parameter name="cachableDuration" value="15000"/>
+		<parameter name="root">file:./../../repository/</parameter>
+		<parameter name="cachableDuration">15000</parameter>
 	</registry>
   
     <localEntry key="springconfig2" src="file:./../../repository/conf/sample/resources/spring/springsample.xml"/>

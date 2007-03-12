@@ -24,20 +24,27 @@ import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.config.xml.MediatorSerializer;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.Mediator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
+import org.custommonkey.xmlunit.XMLTestCase;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.StringReader;
+import java.io.IOException;
 
 /**
  *
  *
  */
 
-public abstract class AbstractTestCase extends TestCase {
+public abstract class AbstractTestCase extends XMLTestCase {
 
-    XMLComparator comparator = null;
+
+    private static final Log log = LogFactory.getLog(AbstractTestCase.class);
 
     public AbstractTestCase(String name) {
         super(name);
@@ -48,7 +55,6 @@ public abstract class AbstractTestCase extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        comparator = new XMLComparator();
     }
 
     protected OMElement createOMElement(String xml) {
@@ -65,19 +71,39 @@ public abstract class AbstractTestCase extends TestCase {
         }
     }
 
-    protected boolean serialization(String inputXml, MediatorFactory mediatorFactory, MediatorSerializer mediatorSerializer) throws XMLComparisonException {
+    protected boolean serialization(String inputXml, MediatorFactory mediatorFactory, MediatorSerializer mediatorSerializer) {
 
         OMElement inputOM = createOMElement(inputXml);
         Mediator mediator = mediatorFactory.createMediator(inputOM);
         OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
-        return comparator.compare(resultOM, inputOM);
+        try {
+            assertXMLEqual(resultOM.toString(), inputOM.toString());
+            return true;
+        } catch (SAXException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } catch (ParserConfigurationException e) {
+            log.error(e);
+        }
+        return false;
     }
 
-    protected boolean serialization(String inputXml, MediatorSerializer mediatorSerializer) throws XMLComparisonException {
+    protected boolean serialization(String inputXml, MediatorSerializer mediatorSerializer) {
         OMElement inputOM = createOMElement(inputXml);
         Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(inputOM);
         OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
-        return comparator.compare(resultOM, inputOM);
+        try {
+            assertXMLEqual(resultOM.toString(), inputOM.toString());
+            return true;
+        } catch (SAXException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } catch (ParserConfigurationException e) {
+            log.error(e);
+        }
+        return false;
     }
 
     protected OMElement getParent() {
@@ -85,7 +111,17 @@ public abstract class AbstractTestCase extends TestCase {
         return createOMElement(parentXML);
     }
 
-    protected boolean compare(OMElement inputElement, OMElement serializedElement) throws XMLComparisonException {
-        return comparator.compare(inputElement, serializedElement);
+    protected boolean compare(OMElement inputElement, OMElement serializedElement) {
+        try {
+            assertXMLEqual(inputElement.toString(), serializedElement.toString());
+            return true;
+        } catch (SAXException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } catch (ParserConfigurationException e) {
+            log.error(e);
+        }
+        return false;
     }
 }

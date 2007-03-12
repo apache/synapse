@@ -61,8 +61,7 @@ public class RegistrySerializer {
             OMElement property = fac.createOMElement("parameter", synNS);
             property.addAttribute(fac.createOMAttribute(
                 "name", nullNS, name));
-            property.addAttribute(fac.createOMAttribute(
-                "value", nullNS, value));
+            property.setText(value.trim());
             reg.addChild(property);
         }
 

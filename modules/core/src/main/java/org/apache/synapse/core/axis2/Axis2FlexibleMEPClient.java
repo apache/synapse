@@ -200,7 +200,7 @@ public class Axis2FlexibleMEPClient {
         newMC.setDoingMTOM(ori.isDoingMTOM());
         newMC.setServerSide(false);
 
-        // set SOAP envelope on the message context, removing WS-A headers
+        // set SOAP envelope on the message context, removing WS-A headers        
         newMC.setEnvelope(ori.getEnvelope());
         removeAddressingHeaders(newMC);
 

@@ -25,10 +25,11 @@
     <!-- file system (file://) or a web server (http://) -->
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
-        <property name="root" value="file:repository/conf/sample/resources/"/>
+        <parameter name="root">file:./../../repository/</parameter>
         <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
-        <property name="cachableDuration" value="15000"/>
+        <parameter name="cachableDuration">15000</parameter>
     </registry>
+
 
     <definitions>
 

@@ -63,6 +63,9 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
         } else {
             handleException("Throttle Mediator must have a policy");
         }
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        initMediator(throttleMediator,elem);
         return throttleMediator;
     }
 

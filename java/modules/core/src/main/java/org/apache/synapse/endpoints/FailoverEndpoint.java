@@ -42,6 +42,11 @@ public class FailoverEndpoint implements Endpoint {
 
     public void send(MessageContext synMessageContext) {
 
+        // We have to build the envelop if we are supporting failover.
+        // Failover should sent the original message multiple times if failures occur. So we have to
+        // access the envelop multiple times.
+        synMessageContext.getEnvelope().build();
+
         if (currentEndpoint.isActive()) {
             currentEndpoint.send(synMessageContext);
         } else {

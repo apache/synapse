@@ -32,6 +32,7 @@ import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.ListeningIOReactor;
 import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
+import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
 
 import javax.net.ssl.SSLContext;
@@ -60,6 +61,8 @@ public class HttpCoreNIOListener implements TransportListener {
     private String host = "localhost";
     /** SSLContext if this listener is a SSL listener */
     private SSLContext sslContext = null;
+    /** The SSL session handler that manages client authentication etc */
+    private SSLIOSessionHandler sslIOSessionHandler = null;
 
     /**
      * configure and start the IO reactor on the specified port
@@ -74,7 +77,8 @@ public class HttpCoreNIOListener implements TransportListener {
         }
 
         NHttpServiceHandler handler = new ServerHandler(cfgCtx, params);
-        IOEventDispatch ioEventDispatch = getEventDispatch(handler, sslContext, params);
+        IOEventDispatch ioEventDispatch = getEventDispatch(
+            handler, sslContext, sslIOSessionHandler, params);
 
         try {
             ioReactor.listen(new InetSocketAddress(port));
@@ -88,7 +92,8 @@ public class HttpCoreNIOListener implements TransportListener {
     }
 
     protected IOEventDispatch getEventDispatch(
-        NHttpServiceHandler handler, SSLContext sslContext, HttpParams params) {
+        NHttpServiceHandler handler, SSLContext sslContext, 
+        SSLIOSessionHandler sslioSessionHandler, HttpParams params) {
         return new DefaultServerIOEventDispatch(handler, params);
     }
 
@@ -134,6 +139,7 @@ public class HttpCoreNIOListener implements TransportListener {
 
         // is this an SSL listener?
         sslContext = getSSLContext(transprtIn);
+        sslIOSessionHandler = getSSLIOSessionHandler(transprtIn);
 
         serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, host, port);
     }
@@ -155,6 +161,16 @@ public class HttpCoreNIOListener implements TransportListener {
      * @return always null
      */
     protected SSLContext getSSLContext(TransportInDescription transportIn) throws AxisFault {
+        return null;
+    }
+
+    /**
+     * Create the SSL IO Session handler to be used by this listener
+     * @param transportIn
+     * @return always null
+     */
+    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportInDescription transportIn)
+        throws AxisFault {
         return null;
     }
 

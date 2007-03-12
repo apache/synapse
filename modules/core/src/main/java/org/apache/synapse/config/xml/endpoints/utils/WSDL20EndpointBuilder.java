@@ -19,7 +19,7 @@
 
 package org.apache.synapse.config.xml.endpoints.utils;
 
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.woden.WSDLFactory;

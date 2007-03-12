@@ -26,8 +26,17 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
-import org.apache.synapse.config.EndpointDefinition;
+import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
+/**
+ * Serializes an WSDL based endpoint to an XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <wsdl uri="wsdl uri" service="service name" port="port name">
+ *       .. extensibility ..
+ *    </wsdl>
+ * </endpoint>
+ */
 public class WSDLEndpointSerializer implements EndpointSerializer {
 
    private OMFactory fac = null;

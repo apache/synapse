@@ -35,6 +35,15 @@ import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.ArrayList;
 
+/**
+ * Creates LoadbalanceEndpoint using an XML configuration.
+ *
+ * <endpoint [name="name"]>
+ *    <loadbalance policy="load balance algorithm">
+ *       <endpoint>+
+ *    </loadbalance>
+ * </endpoint>
+ */
 public class LoadbalanceEndpointFactory implements EndpointFactory {
 
     private static Log log = LogFactory.getLog(LoadbalanceEndpointFactory.class);

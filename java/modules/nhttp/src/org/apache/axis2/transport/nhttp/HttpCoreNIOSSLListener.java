@@ -2,12 +2,14 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.SSLServerIOEventDispatch;
+import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.params.HttpParams;
@@ -17,6 +19,7 @@ import javax.xml.namespace.QName;
 import java.security.KeyStore;
 import java.security.GeneralSecurityException;
 import java.net.URL;
+import java.net.SocketAddress;
 import java.io.IOException;
 
 public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
@@ -24,8 +27,9 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
     private static final Log log = LogFactory.getLog(HttpCoreNIOSSLListener.class);
 
     protected IOEventDispatch getEventDispatch(
-        NHttpServiceHandler handler, SSLContext sslContext, HttpParams params) {
-        return new SSLServerIOEventDispatch(handler,  sslContext, params);
+        NHttpServiceHandler handler, SSLContext sslContext,
+        SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
+        return new SSLServerIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
     }
 
     /**
@@ -115,5 +119,36 @@ public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
             log.error("Unable to create SSL context with the given configuration", gse);
             throw new AxisFault("Unable to create SSL context with the given configuration", gse);
         }
+    }
+
+    /**
+     * Create the SSLIOSessionHandler to initialize the SSL session / engine, and request for
+     * client authentication at the following levels, through an Axis2 transport configuration
+     * parameter as follows:
+     * SSLVerifyClient - none, optional, require
+     *
+     * @param transportIn the Axis2 transport configuration
+     * @return the SSLIOSessionHandler to be used
+     * @throws AxisFault if a configuration error occurs
+     */
+    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportInDescription transportIn) throws AxisFault {
+
+        final Parameter clientAuth = transportIn.getParameter("SSLVerifyClient");
+
+        return new SSLIOSessionHandler() {
+
+            public void initalize(SSLEngine sslengine, HttpParams params) {
+                if (clientAuth != null) {
+                    if ("optional".equals(clientAuth.getValue())) {
+                        sslengine.setWantClientAuth(true);
+                    } else if ("require".equals(clientAuth.getValue())) {
+                        sslengine.setNeedClientAuth(true);
+                    }
+                }
+            }
+
+            public void verify(SocketAddress removeAddress, SSLSession session)
+                throws SSLException {}
+        };
     }
 }

@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.impl.nio.reactor.SSLClientIOEventDispatch;
+import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.params.HttpParams;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
@@ -16,6 +17,8 @@ import javax.xml.namespace.QName;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.net.URL;
+import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import java.io.IOException;
 
 public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
@@ -23,8 +26,9 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
     private static final Log log = LogFactory.getLog(HttpCoreNIOSSLSender.class);
 
     protected IOEventDispatch getEventDispatch(
-        NHttpClientHandler handler, SSLContext sslContext, HttpParams params) {
-        return new SSLClientIOEventDispatch(handler, sslContext, params);
+        NHttpClientHandler handler, SSLContext sslContext,
+        SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
+        return new SSLClientIOEventDispatch(handler, sslContext, sslIOSessionHandler, params);
     }
 
     /**
@@ -102,5 +106,52 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             log.error("Unable to create SSL context with the given configuration", gse);
             throw new AxisFault("Unable to create SSL context with the given configuration", gse);
         }
+    }
+
+    /**
+     * Create the SSLIOSessionHandler to initialize the host name verification at the following
+     * levels, through an Axis2 transport configuration parameter as follows:
+     * HostnameVerifier - Default, DefaultAndLocalhost, Strict, AllowAll
+     *
+     * @param transportOut the Axis2 transport configuration
+     * @return the SSLIOSessionHandler to be used
+     * @throws AxisFault if a configuration error occurs
+     */
+    protected SSLIOSessionHandler getSSLIOSessionHandler(TransportOutDescription transportOut) throws AxisFault {
+
+        final Parameter hostnameVerifier = transportOut.getParameter("HostnameVerifier");
+
+        return new SSLIOSessionHandler() {
+
+            public void initalize(SSLEngine sslengine, HttpParams params) {
+            }
+
+            public void verify(SocketAddress remoteAddress, SSLSession session)
+                throws SSLException {
+
+                String address = null;
+                if (remoteAddress instanceof InetSocketAddress) {
+                    address = ((InetSocketAddress) remoteAddress).getHostName();
+                } else {
+                    address = remoteAddress.toString();
+                }
+
+                boolean valid = false;
+                if (hostnameVerifier != null) {
+                    if ("Strict".equals(hostnameVerifier.getValue())) {
+                        valid = HostnameVerifier.STRICT.verify(address, session);
+                    } else if ("Allowall".equals(hostnameVerifier.getValue())) {
+                        valid = HostnameVerifier.STRICT.verify(address, session);
+                    } else if ("DefaultAndLocalhost".equals(hostnameVerifier.getValue())) {
+                        valid = HostnameVerifier.DEFAULT_AND_LOCALHOST.verify(address, session);
+                    }
+                }
+                valid = HostnameVerifier.DEFAULT.verify(address, session);
+
+                if (!valid) {
+                    throw new SSLException("Host name verification failed for host : " + address);    
+                }
+            }
+        };
     }
 }

@@ -47,7 +47,7 @@ public class EntrySerializer {
      */
     public static OMElement serializeEntry(Entry entry, OMElement parent) {
 
-        OMElement propertyElement = fac.createOMElement("set-entry", synNS);
+        OMElement propertyElement = fac.createOMElement("localEntry", synNS);
         propertyElement.addAttribute(fac.createOMAttribute(
                 "key", nullNS, entry.getKey()));
 //	    propertyElement.addAttribute(fac.createOMAttribute(

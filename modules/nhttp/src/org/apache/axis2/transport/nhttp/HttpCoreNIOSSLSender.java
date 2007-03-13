@@ -140,13 +140,14 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
                 if (hostnameVerifier != null) {
                     if ("Strict".equals(hostnameVerifier.getValue())) {
                         valid = HostnameVerifier.STRICT.verify(address, session);
-                    } else if ("Allowall".equals(hostnameVerifier.getValue())) {
-                        valid = HostnameVerifier.STRICT.verify(address, session);
+                    } else if ("AllowAll".equals(hostnameVerifier.getValue())) {
+                        valid = HostnameVerifier.ALLOW_ALL.verify(address, session);
                     } else if ("DefaultAndLocalhost".equals(hostnameVerifier.getValue())) {
                         valid = HostnameVerifier.DEFAULT_AND_LOCALHOST.verify(address, session);
                     }
+                } else {
+                    valid = HostnameVerifier.DEFAULT.verify(address, session);
                 }
-                valid = HostnameVerifier.DEFAULT.verify(address, session);
 
                 if (!valid) {
                     throw new SSLException("Host name verification failed for host : " + address);    

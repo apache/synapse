@@ -176,6 +176,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
           storageManager.getRMDBeanMgr().update(bean);
         }
         else {
+          if (log.isDebugEnabled())
+            log.debug("Detected duplicate message " + msgNo);
+          rmMsgCtx.getMessageContext().setRelationships(null);
           // Add the duplicate RM AxisOperation to the message
           AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
               Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
@@ -185,6 +188,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         }
               
       } else {
+        if (log.isDebugEnabled())
+          log.debug("Detected message for no sequence " + msgNo);
+        rmMsgCtx.getMessageContext().setRelationships(null);
         // Add the duplicate RM AxisOperation to the message
         AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
             Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,

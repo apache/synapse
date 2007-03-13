@@ -68,17 +68,35 @@ public class AcknowledgementManager {
 		// If this message is going to an anonymous address, and the inbound sequence has
 		// anonymous acksTo, then we add in an ack for the inbound sequence.
 		EndpointReference target = rmMessageContext.getTo();
-		if(target.hasAnonymousAddress()) {
-			String inboundSequence = (String) rmMessageContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
-			if(inboundSequence != null) {
-				RMDBean inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
-				if(inboundBean != null) {
-					String acksTo = inboundBean.getAcksToEPR();
-					EndpointReference acksToEPR = new EndpointReference(acksTo);
-					
-					if(acksTo == null || acksToEPR.hasAnonymousAddress()) {
-						if(log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
-						RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean);
+		if(target == null || target.hasAnonymousAddress()) {
+			if(target != null && SandeshaUtil.isWSRMAnonymous(target.getAddress())) {
+				// Search for any sequences that have an acksTo that matches this target, and add an ack
+				// for each of them.
+				RMDBean findBean = new RMDBean();
+				findBean.setAcksToEPR(target.getAddress());
+				findBean.setTerminated(false);
+				Collection rmdBeans = storageManager.getRMDBeanMgr().find(findBean);
+				Iterator sequences = rmdBeans.iterator();
+				while(sequences.hasNext()) {
+					RMDBean sequence = (RMDBean) sequences.next();
+					if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequence.getSequenceID());
+					RMMsgCreator.addAckMessage(rmMessageContext, sequence.getSequenceID(), sequence);
+				}
+				
+			} else {
+				// We have no good indicator of the identity of the destination, so the only sequence
+				// we can ack is the inbound one that caused us to create this response.
+				String inboundSequence = (String) rmMessageContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
+				if(inboundSequence != null) {
+					RMDBean inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
+					if(inboundBean != null) {
+						String acksTo = inboundBean.getAcksToEPR();
+						EndpointReference acksToEPR = new EndpointReference(acksTo);
+						
+						if(acksTo == null || acksToEPR.hasAnonymousAddress()) {
+							if(log.isDebugEnabled()) log.debug("Piggybacking ack for inbound sequence: " + inboundSequence);
+							RMMsgCreator.addAckMessage(rmMessageContext, inboundSequence, inboundBean);
+						}
 					}
 				}
 			}

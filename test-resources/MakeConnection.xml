@@ -1,4 +1,4 @@
-<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope"
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
 xmlns:wsrm="http://docs.oasis-open.org/ws-rx/wsrm/200702"
 xmlns:wsmc="http://docs.oasis-open.org/ws-rx/wsmc/200702"
 xmlns:wsa="http://www.w3.org/2005/08/addressing">
@@ -13,4 +13,4 @@ wsrm/200608/MakeConnection</wsa:Action>
 <wsmc:Address>http://docs.oasis-open.org/wsrx/wsrm/200702/anonymous?id=550e8400-e29b-11d4-a716-446655440000</wsmc:Address>
 </wsmc:MakeConnection>
 </S:Body>
-</S:Envelope>s
+</S:Envelope>

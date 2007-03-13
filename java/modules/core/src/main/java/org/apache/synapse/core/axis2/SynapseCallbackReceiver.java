@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.axiom.soap.SOAPFault;
 
 import java.util.*;
 
@@ -79,9 +80,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         if (response.getEnvelope().getBody().hasFault()) {            
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
             if (faultStack != null && !faultStack.isEmpty()) {
-                ((FaultHandler) faultStack.pop()).handleFault(
-                    synapseOutMsgCtx,
-                    response.getEnvelope().getBody().getFault().getException());
+
+                SOAPFault fault = response.getEnvelope().getBody().getFault();
+                Exception e = fault.getException();
+                if (e == null) {
+                    e = new Exception(fault.getReason().getFirstSOAPText().getText());    
+                }
+
+                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx,e);
             }
 
         } else {

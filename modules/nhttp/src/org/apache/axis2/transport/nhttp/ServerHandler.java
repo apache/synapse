@@ -224,7 +224,11 @@ public class ServerHandler implements NHttpServiceHandler {
      */
     public void timeout(final NHttpServerConnection conn) {
         HttpRequest req = (HttpRequest) conn.getContext().getAttribute(HttpContext.HTTP_REQUEST);
-        log.warn("Connection Timeout for request to : " + req.getRequestLine().getUri());
+        if (req != null) {
+            log.warn("Connection Timeout for request to : " + req.getRequestLine().getUri());
+        } else {
+            log.warn("Connection Timeout");
+        }
         shutdownConnection(conn);
     }
 

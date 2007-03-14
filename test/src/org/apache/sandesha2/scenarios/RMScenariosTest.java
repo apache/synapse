@@ -101,8 +101,6 @@ public class RMScenariosTest extends SandeshaTestCase {
 	public void testSyncEcho() throws Exception {
 		// Test sync echo with an offer, and the 1.1 spec
 		Options clientOptions = new Options();
-//		org.apache.log4j.BasicConfigurator.configure();
-//		to = "http://127.0.0.1:" + 9999 + "/axis2/services/RMSampleService";
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		runEcho(clientOptions, false, false, false);
@@ -149,13 +147,15 @@ public class RMScenariosTest extends SandeshaTestCase {
 			
 			try {
 				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
-				assertTrue(sequenceReport.getCompletedMessages().contains(new Long(1)));
-				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
-				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+				System.out.println("Checking Outbound Sequence: " + sequenceReport.getSequenceID());
+				assertTrue("Checking completed messages", sequenceReport.getCompletedMessages().contains(new Long(1)));
+				assertEquals("Checking sequence terminated", SequenceReport.SEQUENCE_STATUS_TERMINATED, sequenceReport.getSequenceStatus());
+				assertEquals("Checking sequence direction", SequenceReport.SEQUENCE_DIRECTION_OUT, sequenceReport.getSequenceDirection());
 
 				lastError = null;
 				break;
 			} catch(Error e) {
+				System.out.println("Possible error:" + e);
 				lastError = e;
 			}
 		}

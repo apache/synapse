@@ -20,60 +20,39 @@
 <!-- introduction to error handling -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- define an endpoint for the stock quote service -->
-    <endpoint name="simple">
-        <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    </endpoint>
-
-    <!-- define a non-existent host to test error handling (runtime exception for invalid host)-->
-    <endpoint name="bogusHost">
-        <address uri="http://bogus:9000/axis2/services/NonExistentStockQuoteService"/>
-    </endpoint>
-
-    <!-- define a non-existent port to test error handling (error handling) -->
-    <endpoint name="bogusPort">
-        <address uri="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/>
-    </endpoint>
-
     <!-- the default fault handling sequence used by Synapse - named 'fault' -->
     <sequence name="fault">
-        <!-- Log the error -->
         <log level="custom">
             <property name="text" value="An unexpected error occured"/>
             <property name="message" expression="get-property('ERROR_MESSAGE')"/>
-            <!--<property name="detail" expression="get-property('ERROR_DETAIL')"/>-->
         </log>
+		<drop/>
+    </sequence>
 
-        <!-- create a custom fault message -->
-        <makefault>
-            <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-            <reason expression="get-property('ERROR_MESSAGE')"/>
-        </makefault>
-
-        <property name="RESPONSE" value="true"/>
-        <header name="To" expression="get-property('ReplyTo')"/>
-        <send/>
+	<sequence name="sunErrorHandler">
+        <log level="custom">
+            <property name="text" value="An unexpected error occured for stock SUN"/>
+            <property name="message" expression="get-property('ERROR_MESSAGE')"/>
+        </log>
+		<drop/>
     </sequence>
 
     <!-- default message handling sequence used by Synapse - named 'main' -->
     <sequence name="main">
         <in>
-            <switch source="//m0:getQuote/m0:request/m0:symbol"
-                    xmlns:m0="http://services.samples/xsd">
+            <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd">
                 <case regex="IBM">
                     <send>
-                        <endpoint key="simple"/>
+                        <endpoint><address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/></endpoint>
                     </send>
                 </case>
                 <case regex="MSFT">
                     <send>
-                        <endpoint key="bogusHost"/>
+                        <endpoint key="bogus"/>
                     </send>
                 </case>
                 <case regex="SUN">
-                    <send>
-                        <endpoint key="bogusPort"/>
-                    </send>
+					<sequence key="sunSequence"/>
                 </case>
             </switch>
             <drop/>
@@ -83,5 +62,11 @@
             <send/>
         </out>
     </sequence>
+
+	<sequence name="sunSequence" onError="sunErrorHandler">
+        <send>
+            <endpoint key="sunPort"/>
+        </send>
+	</sequence>
 
 </definitions>

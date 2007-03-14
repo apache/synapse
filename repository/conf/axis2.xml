@@ -123,7 +123,9 @@
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>
-        </parameter>                        
+        </parameter>
+        <!--<parameter name="SSLVerifyClient">require</parameter>
+            supports optional|require or defaults to none -->
     </transportReceiver>
 
     <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
@@ -172,7 +174,9 @@
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>
-        </parameter>                
+        </parameter>
+        <!--<parameter name="HostnameVerifier">DefaultAndLocalhost</parameter>
+            supports Strict|AllowAll|DefaultAndLocalhost or the default if none specified -->
     </transportSender>
 
     <!-- ================================================= -->

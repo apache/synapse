@@ -22,6 +22,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.http.*;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.HttpPost;
 import org.apache.axiom.om.OMOutputFormat;
@@ -98,6 +99,10 @@ public class Axis2HttpRequest {
                 }
             }
         }
+
+        httpRequest.setHeader(
+            HTTP.CONTENT_TYPE, Util.getContentType(msgContext) +
+            "; charset=" + Util.getOMOutputFormat(msgContext).getCharSetEncoding());
 
         return httpRequest;
     }

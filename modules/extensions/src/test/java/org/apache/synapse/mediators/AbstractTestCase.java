@@ -15,10 +15,7 @@
 */
 package org.apache.synapse.mediators;
 
-import junit.framework.TestCase;
-import org.apache.axiom.om.impl.llom.util.XMLComparator;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.exception.XMLComparisonException;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.MediatorFactory;
 import org.apache.synapse.config.xml.MediatorSerializer;

@@ -54,6 +54,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         try {
             URL url = new URL(getRoot() + key);
             urlc = url.openConnection();
+            urlc.connect();
         } catch (IOException e) {
             return null;
         }

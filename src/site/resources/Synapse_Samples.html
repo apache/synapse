@@ -458,66 +458,43 @@ context properties as well as transport headers. The local entry definition
 for "version" defines a simple text/string registry entry for that is visible
 to all messages that passes through Synapse.</p>
 
-<h2><a name="Sample4">HERE___</a></h2>
-
 <h2><a name="Sample41" id="Sample41">Sample 4:</a></h2>
 <pre>&lt;!-- introduction to error handling --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- define an endpoint for the stock quote service --&gt;
-    &lt;endpoint name="simple"&gt;
-        &lt;address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-    &lt;/endpoint&gt;
-
-    &lt;!-- define a non-existent host to test error handling (runtime exception for invalid host)--&gt;
-    &lt;endpoint name="bogusHost"&gt;
-        &lt;address uri="http://bogus:9000/axis2/services/NonExistentStockQuoteService"/&gt;
-    &lt;/endpoint&gt;
-
-    &lt;!-- define a non-existent port to test error handling (error handling) --&gt;
-    &lt;endpoint name="bogusPort"&gt;
-        &lt;address uri="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/&gt;
-    &lt;/endpoint&gt;
-
     &lt;!-- the default fault handling sequence used by Synapse - named 'fault' --&gt;
     &lt;sequence name="fault"&gt;
-        &lt;!-- Log the error --&gt;
         &lt;log level="custom"&gt;
             &lt;property name="text" value="An unexpected error occured"/&gt;
             &lt;property name="message" expression="get-property('ERROR_MESSAGE')"/&gt;
-            &lt;!-- # pick stack trace # &lt;property name="detail" expression="get-property('ERROR_DETAIL')"/&gt;--&gt;
         &lt;/log&gt;
+&lt;drop/&gt;
+    &lt;/sequence&gt;
 
-        &lt;!-- create a custom fault message --&gt;
-        &lt;makefault&gt;
-            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
-        &lt;/makefault&gt;
-
-        &lt;property name="RESPONSE" value="true"/&gt;
-        &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
-        &lt;send/&gt;
+&lt;sequence name="sunErrorHandler"&gt;
+        &lt;log level="custom"&gt;
+            &lt;property name="text" value="An unexpected error occured for stock SUN"/&gt;
+            &lt;property name="message" expression="get-property('ERROR_MESSAGE')"/&gt;
+        &lt;/log&gt;
+&lt;drop/&gt;
     &lt;/sequence&gt;
 
     &lt;!-- default message handling sequence used by Synapse - named 'main' --&gt;
     &lt;sequence name="main"&gt;
         &lt;in&gt;
-            &lt;switch source="//m0:getQuote/m0:request/m0:symbol"
-                    xmlns:m0="http://services.samples/xsd"&gt;
+            &lt;switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd"&gt;
                 &lt;case regex="IBM"&gt;
                     &lt;send&gt;
-                        &lt;endpoint key="simple"/&gt;
+                        &lt;endpoint&gt;&lt;address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;&lt;/endpoint&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex="MSFT"&gt;
                     &lt;send&gt;
-                        &lt;endpoint key="bogusHost"/&gt;
+                        &lt;endpoint key="bogus"/&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex="SUN"&gt;
-                    &lt;send&gt;
-                        &lt;endpoint key="bogusPort"/&gt;
-                    &lt;/send&gt;
+&lt;sequence key="sunSequence"/&gt;
                 &lt;/case&gt;
             &lt;/switch&gt;
             &lt;drop/&gt;
@@ -528,12 +505,17 @@ to all messages that passes through Synapse.</p>
         &lt;/out&gt;
     &lt;/sequence&gt;
 
-&lt;/definitions&gt;
+&lt;sequence name="sunSequence" onError="sunErrorHandler"&gt;
+        &lt;send&gt;
+            &lt;endpoint key="sunPort"/&gt;
+        &lt;/send&gt;
+&lt;/sequence&gt;
 
+&lt;/definitions&gt;
  </pre>
 
-<p><strong>Objective: Introduction to error handling with the try and
-makefault mediators</strong></p>
+<p><strong>Objective: Introduction to error handling with the 'fault'
+sequence</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
 Start the Synapse configuration numbered 4: i.e. synapse -sample 4<br>
@@ -561,63 +543,77 @@ property named 'ERROR_MESSAGE' which is set on the current message by the try
 mediator on encountering an exception. At the client end, you would see the
 custom SOAP fault message instead of a stock quote.</p>
 
-<h2><a name="Sample5">Sample 5:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<h2><a name="Sample5">HERE___</a></h2>
 
-    &lt;!-- error handling within a sequence using the 'onError' sequence  --&gt;
-    &lt;definitions&gt;
+<h2><a name="Sample51" id="Sample51">Sample 5:</a></h2>
+<pre>&lt;!-- introduction to error handling --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-        &lt;!-- define an endpoint for the stock quote service --&gt;
-        &lt;endpoint name="simple"
-                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+    &lt;!-- define an endpoint for the stock quote service --&gt;
+    &lt;endpoint name="simple"&gt;
+        &lt;address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+    &lt;/endpoint&gt;
 
-        &lt;!-- define a non-existent endpoint to test error handling --&gt;
-        &lt;endpoint name="bogus"
-                  address="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/&gt;
+    &lt;!-- define a non-existent host to test error handling (runtime exception for invalid host)--&gt;
+    &lt;endpoint name="bogusHost"&gt;
+        &lt;address uri="http://bogus:9000/axis2/services/NonExistentStockQuoteService"/&gt;
+    &lt;/endpoint&gt;
 
-        &lt;!-- demonstrate the specification of an error handler sequence for a sequence --&gt;
-        &lt;sequence name="stockquote" onError="errorHandler"&gt;
+    &lt;!-- define a non-existent port to test error handling (error handling) --&gt;
+    &lt;endpoint name="bogusPort"&gt;
+        &lt;address uri="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/&gt;
+    &lt;/endpoint&gt;
+
+    &lt;!-- the default fault handling sequence used by Synapse - named 'fault' --&gt;
+    &lt;sequence name="myFaultHandler"&gt;
+        &lt;!-- Log the error --&gt;
+        &lt;log level="custom"&gt;
+            &lt;property name="text" value="An unexpected error occured"/&gt;
+            &lt;property name="message" expression="get-property('ERROR_MESSAGE')"/&gt;
+            &lt;!-- # pick stack trace # &lt;property name="detail" expression="get-property('ERROR_DETAIL')"/&gt;--&gt;
+        &lt;/log&gt;
+
+        &lt;!-- create a custom fault message --&gt;
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
+        &lt;/makefault&gt;
+
+        &lt;property name="RESPONSE" value="true"/&gt;
+        &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+    &lt;!-- default message handling sequence used by Synapse - named 'main' --&gt;
+    &lt;sequence name="main" onError="myFaultHandler"&gt;
+        &lt;in&gt;
             &lt;switch source="//m0:getQuote/m0:request/m0:symbol"
                     xmlns:m0="http://services.samples/xsd"&gt;
                 &lt;case regex="IBM"&gt;
                     &lt;send&gt;
-                        &lt;endpoint ref="simple"/&gt;
+                        &lt;endpoint key="simple"/&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex="MSFT"&gt;
                     &lt;send&gt;
-                        &lt;endpoint ref="bogus"/&gt;
+                        &lt;endpoint key="bogusHost"/&gt;
+                    &lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="SUN"&gt;
+                    &lt;send&gt;
+                        &lt;endpoint key="bogusPort"/&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
             &lt;/switch&gt;
-        &lt;/sequence&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
 
-        &lt;!-- define a sequence to be used for error handling --&gt;
-        &lt;sequence name="errorHandler"&gt;
-
-            &lt;!-- Log the error --&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="text" value="An unexpected error occured"/&gt;
-                &lt;property name="message" expression="get-property('ERROR_MESSAGE')"/&gt;
-                &lt;property name="detail" expression="get-property('ERROR_DETAIL')"/&gt;
-            &lt;/log&gt;
-
-            &lt;!-- create a custom fault message --&gt;
-            &lt;makefault&gt;
-                &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-                &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
-            &lt;/makefault&gt;
-
+        &lt;out&gt;
             &lt;send/&gt;
-        &lt;/sequence&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
 
-    &lt;/definitions&gt;
-
-    &lt;rules&gt;
-        &lt;sequence ref="stockquote"/&gt;
-        &lt;send/&gt;
-    &lt;/rules&gt;
-&lt;/synapse&gt; </pre>
+&lt;/definitions&gt; </pre>
 
 <p><strong>Objective: Introduction to error handling within a sequence using
 the 'onError' sequence</strong></p>

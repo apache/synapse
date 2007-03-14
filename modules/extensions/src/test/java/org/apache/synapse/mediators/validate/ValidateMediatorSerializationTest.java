@@ -19,23 +19,9 @@
 
 package org.apache.synapse.mediators.validate;
 
-import org.apache.axiom.om.impl.exception.XMLComparisonException;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.llom.util.XMLComparator;
-import org.apache.axiom.om.OMElement;
-import org.apache.synapse.mediators.validate.ValidateMediatorSerializer;
-import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
-import org.apache.synapse.config.xml.MediatorFactory;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.Mediator;
-import org.apache.xmlbeans.xml.stream.XMLStreamException;
-import junit.framework.TestCase;
+import org.apache.synapse.mediators.AbstractTestCase;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import java.io.StringReader;
-
-public class ValidateMediatorSerializationTest extends TestCase {
+public class ValidateMediatorSerializationTest extends AbstractTestCase {
 
     private ValidateMediatorFactory validateMediatorFactory = null;
     private ValidateMediatorSerializer validateMediatorSerializer = null;
@@ -61,27 +47,5 @@ public class ValidateMediatorSerializationTest extends TestCase {
         }
     }
 
-    private boolean serialization(String inputXml, MediatorFactory mediatorFactory, MediatorSerializer mediatorSerializer) throws XMLComparisonException {
-
-        XMLComparator comparator = new XMLComparator();
-
-        OMElement inputOM = createOMElement(inputXml);
-        Mediator mediator = mediatorFactory.createMediator(inputOM);
-        OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
-        return comparator.compare(resultOM, inputOM);
-    }
-
-    private OMElement createOMElement(String xml) {
-        try {
-
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
-        }
-        catch (javax.xml.stream.XMLStreamException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
 

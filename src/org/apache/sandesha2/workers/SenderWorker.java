@@ -467,6 +467,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 			responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
 
+			responseMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY,
+					msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY));
+
 			// copying required properties from op. context to the response msg
 			// ctx.
 			
@@ -481,7 +484,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			responseMessageContext.setProperty(HTTPConstants.CONTENT_TYPE, requestMsgOpCtx
 							.getProperty(HTTPConstants.CONTENT_TYPE));
 
-			
 			// If request is REST we assume the responseMessageContext is REST,
 			// so set the variable
 

@@ -63,7 +63,7 @@ public class RMDBean extends RMSequenceBean {
 	 * Client side, we keep track of inbound and outbound sequence pairs. Each
 	 * inbound sequence has the identifier of the associated outbound sequence.
 	 */
-	private String outboundSequence;
+	private String outboundInternalSequence;
 
 	/**
 	 * Comment for <code>nextMsgNoToProcess</code>
@@ -163,12 +163,12 @@ public class RMDBean extends RMSequenceBean {
 		this.toAddress = toAddress;
 	}
 
-	public String getOutboundSequence() {
-		return outboundSequence;
+	public String getOutboundInternalSequence() {
+		return outboundInternalSequence;
 	}
 
-	public void setOutboundSequence(String outboundSequence) {
-		this.outboundSequence = outboundSequence;
+	public void setOutboundInternalSequence(String outboundSequence) {
+		this.outboundInternalSequence = outboundSequence;
 	}
 
 
@@ -181,8 +181,9 @@ public class RMDBean extends RMSequenceBean {
 		result.append("\nHishestInMessageNumber: "); result.append(highestInMessageNumber);
 		result.append("\nHishestInMessageKey: "); result.append(highestInMessageId);
 		result.append("\nLastInMessageId: "); result.append(lastInMessageId);
-		result.append("\nOutOfOrderRanges   :"); result.append(outOfOrderRanges);
-		result.append("\nServerCompletedMsgs:"); result.append(serverCompletedMessages);
+		result.append("\nOutOfOrderRanges   : "); result.append(outOfOrderRanges);
+		result.append("\nServerCompletedMsgs: "); result.append(serverCompletedMessages);
+		result.append("\nOutbound int seq   : "); result.append(outboundInternalSequence);
 		return result.toString();
 	}
 
@@ -212,7 +213,7 @@ public class RMDBean extends RMSequenceBean {
 		else if(bean.getToAddress() != null && !bean.getToAddress().equals(this.getToAddress()))
 			equal = false;
 		
-		else if(bean.getOutboundSequence() != null && !bean.getOutboundSequence().equals(this.getOutboundSequence()))
+		else if(bean.getOutboundInternalSequence() != null && !bean.getOutboundInternalSequence().equals(this.getOutboundInternalSequence()))
 			equal = false;
 		
 		else if ((bean.rmdFlags & NEXT_MSG_NO_FLAG) != 0 && bean.getNextMsgNoToProcess() != this.getNextMsgNoToProcess())

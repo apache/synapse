@@ -166,10 +166,10 @@ public class PollingManager extends SandeshaThread {
 			// The sequence is still there, but if we have a running related sequence
 			// that is not expecting replies then there is no need to poll.
 			boolean doPoll = true;
-			String outboundSequence = nextMsgBean.getOutboundSequence();
+			String outboundSequence = nextMsgBean.getOutboundInternalSequence();
 			if(outboundSequence != null) {
 				RMSBean findRMS = new RMSBean();
-				findRMS.setSequenceID(outboundSequence);
+				findRMS.setInternalSequenceID(outboundSequence);
 				findRMS.setTerminated(false);
 				RMSBeanMgr mgr = storageManager.getRMSBeanMgr();
 				RMSBean outbound = mgr.findUnique(findRMS);

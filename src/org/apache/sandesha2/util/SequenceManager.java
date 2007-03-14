@@ -97,8 +97,9 @@ public class SequenceManager {
 		// If this create is the result of a MakeConnection, then we must have a related
 		// outbound sequence.
 		SequenceEntry entry = (SequenceEntry) createSeqContext.getProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY);
+		if(log.isDebugEnabled()) log.debug("This message is associated with sequence entry: " + entry);
 		if(entry != null && entry.isRmSource()) {
-			rmdBean.setOutboundSequence(entry.getSequenceId());
+			rmdBean.setOutboundInternalSequence(entry.getSequenceId());
 		}
 
 		rmdBean.setServerCompletedMessages(new RangeString());

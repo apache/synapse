@@ -243,9 +243,9 @@ public class SequenceProcessor {
 		
 		// If the message is a reply to an outbound message then we can update the RMSBean that
 		// matches.
-		String outboundSequence = bean.getOutboundSequence();
+		String outboundSequence = bean.getOutboundInternalSequence();
 		if(outboundSequence != null) {
-			RMSBean outBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outboundSequence);
+			RMSBean outBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, outboundSequence);
 			if(outBean != null && outBean.getExpectedReplies() > 0 ) {
 				outBean.setExpectedReplies(outBean.getExpectedReplies() - 1);
 				RMSBeanMgr outMgr = storageManager.getRMSBeanMgr();

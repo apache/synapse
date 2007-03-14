@@ -164,7 +164,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setAcksToEPR(acksToEPR.getAddress());
 			rMDBean.setSequenceID(rmsBean.getOfferedSequence());
 			rMDBean.setNextMsgNoToProcess(1);
-			rMDBean.setOutboundSequence(rmsBean.getSequenceID());
+			rMDBean.setOutboundInternalSequence(rmsBean.getInternalSequenceID());
 
 			//Storing the referenceMessage of the sending side sequence as the reference message
 			//of the receiving side as well.

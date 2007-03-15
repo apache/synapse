@@ -69,7 +69,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         this.active = active;
     }
 
-    public void send(MessageContext synCtx) {
+    public void send(MessageContext synCtx) {        
 
         String eprAddress = null;
         if (endpoint.getAddress() != null) {

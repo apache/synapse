@@ -28,6 +28,8 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.bsf.BSFEngine;
 import org.apache.bsf.BSFException;
 import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * OMElementConvertor for Ruby scripts
@@ -37,42 +39,56 @@ import org.apache.synapse.SynapseException;
  */
 public class RBOMElementConvertor implements OMElementConvertor {
 
+    private static final Log log = LogFactory.getLog(RBOMElementConvertor.class);
+
     protected BSFEngine bsfEngine;
 
-    public RBOMElementConvertor() {
-    }
-
     public Object toScript(OMElement omElement) {
-        try {
 
+        try {
             StringBuffer srcFragment = new StringBuffer("Document.new(<<EOF\n");
             srcFragment.append(omElement.toString());
             srcFragment.append("\nEOF\n");
             srcFragment.append(")");
-            
-            Object o = bsfEngine.eval("RBOMElementConvertor", 0, 0, srcFragment.toString());
-            return o;
 
-        } catch (BSFException e) {
-            throw new SynapseException(e);
+            if (bsfEngine == null) {
+                handleException("Cannot convert OMElement to Ruby Object as BSF Engine is not set");
+            }
+            return bsfEngine.eval("RBOMElementConvertor", 0, 0, srcFragment.toString());
+
+        } catch (Exception e) {
+            handleException("Error converting OMElement to Ruby Object", e);
         }
+        return null;
     }
 
     public OMElement fromScript(Object o) {
-        try {
+        if (o == null) {
+            handleException("Cannot convert null Ruby Object to an OMElement");
+        }
 
+        try {
             byte[] xmlBytes = o.toString().getBytes();
             StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xmlBytes));
-            OMElement omElement = builder.getDocumentElement();
-
-            return omElement;
-
-        } catch (XMLStreamException e) {
-            throw new SynapseException(e);
+            return builder.getDocumentElement();
+        } catch (Exception e) {
+            handleException("Error converting Ruby object of type : " + o.getClass().getName() +
+                " to an OMElement", e);
         }
+        return null;
     }
 
     public void setEngine(BSFEngine e) {
         this.bsfEngine = e;
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

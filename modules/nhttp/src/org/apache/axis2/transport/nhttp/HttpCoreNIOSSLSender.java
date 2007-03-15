@@ -4,7 +4,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.NHttpClientHandler;
-import org.apache.http.impl.nio.reactor.SSLClientIOEventDispatch;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.params.HttpParams;
 import org.apache.axis2.AxisFault;

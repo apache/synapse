@@ -21,12 +21,14 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.AckRequestedProcessor;
@@ -75,6 +77,15 @@ public class SandeshaInHandler extends AbstractHandler {
 			return returnValue;
 		}
 		
+		// look at the service to see if RM is totally disabled. This allows the user to disable RM using
+		// a property on the service, even when Sandesha is engaged.
+		if (msgCtx.getAxisService() != null) {
+			Parameter unreliableParam = msgCtx.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
+				log.debug("Exit: SandeshaInHandler::invoke, Service has disabled RM " + returnValue);
+				return returnValue;
+			}
+		}
 		if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Continuing beyond basic checks");
 
 		Transaction transaction = null;

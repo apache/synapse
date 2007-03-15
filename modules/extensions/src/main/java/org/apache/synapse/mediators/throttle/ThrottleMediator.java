@@ -83,23 +83,29 @@ public class ThrottleMediator extends AbstractMediator {
                 org.apache.axis2.context.MessageContext.REMOTE_ADDR);
         if (remoteIP == null) {
             if (shouldTrace) {
-                trace.trace("IP Address of the caller :" + remoteIP);
+                trace.trace("The IP Address of the caller is cannnot find- The Throttling will" +
+                        "not occur");
             }
-            log.info("IP address of the caller can not find - Currently only support caller-IP base access control" +
-                    "- Thottling will not happen ");
+            log.info("The IP address of the caller can not find - Currently only support caller-IP base"
+                    + "access control - Thottling will not happen ");
             return true;
         } else {
+            if (shouldTrace) {
+                trace.trace("The IP Address of the caller :" + remoteIP);
+            }
             ThrottleContext throttleContext
                     = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
             if (throttleContext == null) {
-                log.info("Can not find a configuartion for IP Based Throttle");
+                log.info("Can not find a configuartion for the IP Based Throttle");
                 return true;
             }
             try {
-                AccessController accessControler = AccessControllerFactory.createAccessControler(ThrottleConstants.IP_BASE);
+                AccessController accessControler = AccessControllerFactory.createAccessControler(
+                        ThrottleConstants.IP_BASE);
                 boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
                 if (!canAccess) {
-                    String msg = "Access has currently been denied by the IP_BASE throttle for IP :\t" + remoteIP;
+                    String msg = "Access has currently been denied by" +
+                            " the IP_BASE throttle for the IP :\t" + remoteIP;
                     if (shouldTrace) {
                         trace.trace(msg);
                     }
@@ -108,7 +114,7 @@ public class ThrottleMediator extends AbstractMediator {
                 return canAccess;
             }
             catch (ThrottleException e) {
-                log.warn(e.getMessage());
+                handleException("Error occur during throttling ",e);
                 return true;
             }
         }
@@ -131,11 +137,17 @@ public class ThrottleMediator extends AbstractMediator {
         if (policyKey != null) {
             Entry entry = synContext.getConfiguration().getEntryDefinition(policyKey);
             if (entry == null) {
+                log.warn("Cant not find a Entry from the Entry key " + policyKey);
                 return;
             }
             Object entryValue = entry.getValue();
-
+            if (entryValue == null) {
+                log.warn("Cant not find a Policy(Enrty value) from the Entry key " + policyKey);
+                return;
+            }
             if (!(entryValue instanceof OMElement)) {
+                log.warn("Entry value which is refered from the key " + policyKey + " is Incompatible " +
+                        "for the policy element");
                 return;
             }
             // if entry is dynamic, need to check wheather updated or not
@@ -151,7 +163,7 @@ public class ThrottleMediator extends AbstractMediator {
             return;
         }
         if (shouldTrace) {
-            trace.trace("Throttle Policy :" + policyOmElement.toString());
+            trace.trace("The Throttle Policy :" + policyOmElement.toString());
         }
         if (!reCreate) {
             //The first time creation
@@ -171,16 +183,23 @@ public class ThrottleMediator extends AbstractMediator {
      */
     protected void createThrottleMetaData(OMElement policyOmElement) {
         try {
+            log.info("Creating a new throttle configuration by parsing the Policy");
             throttle = ThrottlePolicyProcessor
                     .processPoclicy(PolicyEngine.getPolicy(policyOmElement));
         }
         catch (ThrottleException e) {
-            handleException("Error during processing thorttle policy  " + e.getMessage());
+            handleException("Error during processing the thorttle policy  " + e.getMessage());
         }
     }
 
     private void handleException(String msg) {
         log.error(msg);
+        throw new SynapseException(msg);
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.info(msg);
+        log.error(e);
         throw new SynapseException(msg);
     }
 

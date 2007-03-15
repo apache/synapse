@@ -27,17 +27,38 @@ import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Serializes AddressEndpoint to XML.
  *
  * <endpoint [name="name"]>
- *    <address uri="uri">
- *       configuration for the epr. see EndpointDefintionFactory.
- *    </address>
+ *  <address uri="url">
+ *
+ *    .. extensibility ..
+ *
+ *    <!-- Axis2 Rampart configurations : may be obsolete soon -->
+ *    <parameter name="OutflowSecurity">
+ *      ...
+ *    </parameter>+
+ *
+ *    <!-- Apache Sandesha configurations : may be obsolete soon -->
+ *    <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"..
+ *      xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+ *      ...
+ *    </Policy>+
+ *
+ *    <enableRM/>+
+ *    <enableSec/>+
+ *    <enableAddressing/>+
+ *
+ *  </address>
  * </endpoint>
  */
 public class AddressEndpointSerializer implements EndpointSerializer {
+
+    private static Log log = LogFactory.getLog(AddressEndpointSerializer.class);
 
     private OMFactory fac = null;
 
@@ -57,24 +78,72 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         }
 
         EndpointDefinition epAddress = addressEndpoint.getEndpoint();
-        OMElement addressElement = serializeAddress(epAddress);
+        OMElement addressElement = serializeEndpointDefinition(epAddress);
         endpointElement.addChild(addressElement);
 
         return endpointElement;
     }
 
-    public OMElement serializeAddress(EndpointDefinition address) {
+    public OMElement serializeEndpointDefinition(EndpointDefinition endpt) {
 
-        OMElement addressElement = fac.createOMElement("address", Constants.SYNAPSE_OMNAMESPACE);
-        String uri = address.getAddress();
-        if (uri != null) {
-            addressElement.addAttribute("uri", uri, null);
+        OMElement address = fac.createOMElement("address", Constants.SYNAPSE_OMNAMESPACE);
+
+        if (endpt.isForcePOX()) {
+            address.addAttribute(fac.createOMAttribute("format", null, "pox"));
+        } else if (endpt.isForceSOAP()) {
+            address.addAttribute(fac.createOMAttribute("format", null, "soap"));
         }
 
-        if (address.isAddressingOn()) {
-            addressElement.addChild(fac.createOMElement("enableAddressing", Constants.SYNAPSE_OMNAMESPACE));
+        if (endpt.getAddress() != null) {
+            address.addAttribute(fac.createOMAttribute(
+                    "uri", null, endpt.getAddress()));
+        } else {
+            handleException("Invalid Endpoint. Address is required");
         }
 
-        return addressElement;
+        int isEnableStatistics = endpt.getStatisticsEnable();
+        String statisticsValue = null;
+        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
+            statisticsValue = org.apache.synapse.config.xml.Constants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
+            statisticsValue = org.apache.synapse.config.xml.Constants.STATISTICS_DISABLE;
+        }
+        if (statisticsValue != null) {
+            address.addAttribute(fac.createOMAttribute(
+                    org.apache.synapse.config.xml.Constants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
+        }
+        if (endpt.isAddressingOn()) {
+            OMElement addressing = fac.createOMElement("enableAddressing", Constants.SYNAPSE_OMNAMESPACE);
+            if (endpt.isUseSeparateListener()) {
+                addressing.addAttribute(fac.createOMAttribute(
+                        "separateListener", null, "true"));
+            }
+            address.addChild(addressing);
+        }
+
+        if (endpt.isReliableMessagingOn()) {
+            OMElement rm = fac.createOMElement("enableRM", Constants.SYNAPSE_OMNAMESPACE);
+            if (endpt.getWsRMPolicyKey() != null) {
+                rm.addAttribute(fac.createOMAttribute(
+                        "policy", null, endpt.getWsRMPolicyKey()));
+            }
+            address.addChild(rm);
+        }
+
+        if (endpt.isSecurityOn()) {
+            OMElement sec = fac.createOMElement("enableSec", Constants.SYNAPSE_OMNAMESPACE);
+            if (endpt.getWsSecPolicyKey() != null) {
+                sec.addAttribute(fac.createOMAttribute(
+                        "policy", null, endpt.getWsSecPolicyKey()));
+            }
+            address.addChild(sec);
+        }
+
+        return address;
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

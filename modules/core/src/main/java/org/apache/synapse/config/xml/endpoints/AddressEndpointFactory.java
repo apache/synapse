@@ -36,9 +36,12 @@ import javax.xml.namespace.QName;
  * Creates AddressEndpoint using a XML configuration.
  *
  * <endpoint [name="name"]>
- *    <address uri="uri">
- *       configuration for the epr. see EndpointDefintionFactory.
- *    </address>
+ *   <address uri="url" [format="soap|pox"] [optimize="mtom|swa"]>
+ *      .. extensibility ..
+ *
+ *      <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
+ *      separateListener="true|false"/>+
+ *   </address>
  * </endpoint>
  */
 public class AddressEndpointFactory implements EndpointFactory {
@@ -86,12 +89,20 @@ public class AddressEndpointFactory implements EndpointFactory {
         return null;
     }
 
-    private EndpointDefinition createEndpointDefinition(OMElement elem) {
-        
+    /**
+     * Creates an EndpointDefinition instance using the XML fragment specification. Configuration for
+     * EndpointDefinition always resides inside a configuration of an AddressEndpoint. This factory
+     * extracts the details related to the EPR provided for address endpoint.
+     *
+     * @param elem XML configuration element
+     * @return EndpointDefinition object containing the endpoint details.
+     */
+    public EndpointDefinition createEndpointDefinition(OMElement elem) {
+
         OMAttribute address = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "uri"));
-        OMAttribute force = elem.getAttribute(new QName(
-                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "force"));
+        OMAttribute format = elem.getAttribute(new QName(
+                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "format"));
         OMAttribute optimize = elem.getAttribute(new QName(
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "optimize"));
 
@@ -104,9 +115,9 @@ public class AddressEndpointFactory implements EndpointFactory {
                     + "anonymous endpoint");
         }
 
-        if (force != null)
+        if (format != null)
         {
-            String forceValue = force.getAttributeValue().trim().toLowerCase();
+            String forceValue = format.getAttributeValue().trim().toLowerCase();
             if (forceValue.equals("pox")) {
                 endpoint.setForcePOX(true);
             } else if (forceValue.equals("soap")) {
@@ -161,7 +172,7 @@ public class AddressEndpointFactory implements EndpointFactory {
         }
 
         return endpoint;
-    }
+    }    
 
     private static void handleException(String msg) {
         log.error(msg);

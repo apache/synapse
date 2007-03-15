@@ -146,6 +146,15 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if((toEPR==null || toEPR.hasAnonymousAddress()) &&
 			   (makeConnection == null || !makeConnection.booleanValue()) &&
 			   (t == null || !t.getStatus().equals(RequestResponseTransportStatus.WAITING))) {
+				
+				// Mark this sender bean so that we know that the transport is unavailable, if the
+				// bean is still stored.
+				SenderBean bean = senderBeanMgr.retrieve(senderBean.getMessageID());
+				if(bean != null && bean.isTransportAvailable()) {
+					bean.setTransportAvailable(false);
+					senderBeanMgr.update(bean);
+				}
+				
 				if (log.isDebugEnabled())
 					log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
 				return;

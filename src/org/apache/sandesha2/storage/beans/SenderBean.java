@@ -113,6 +113,14 @@ public class SenderBean extends RMBean {
 	private long inboundMessageNumber;
 	
 	/**
+	 * If this flag is set to false then the message cannot be delivered, as it is
+	 * targetted at an anonymous address, and we have no approriate transport available.
+	 * When this happens the message will be picked up by a MakeConnection message (or
+	 * by replaying the request message)
+	 */
+	private boolean transportAvailable = true;
+	
+	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
 	 * be ignored within the match method.
@@ -126,6 +134,7 @@ public class SenderBean extends RMBean {
 	private static final int MSG_TYPE_FLAG     = 0x00100000;
 	private static final int LAST_MSG_FLAG     = 0x01000000;
 	private static final int IN_MSG_NUM_FLAG   = 0x10000000;
+	private static final int TRANSPORT_FLAG    = 0x00000002;
 
 	public SenderBean() {
 
@@ -262,6 +271,15 @@ public class SenderBean extends RMBean {
 		this.inboundSequence = inboundSequence;
 	}
 
+	public boolean isTransportAvailable() {
+		return transportAvailable;
+	}
+
+	public void setTransportAvailable(boolean transportAvailable) {
+		this.transportAvailable = transportAvailable;
+		this.flags |= TRANSPORT_FLAG;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		// There is a lot of data in this bean, so we don't trace it all.
@@ -276,6 +294,7 @@ public class SenderBean extends RMBean {
 		result.append("\nResend         : "); result.append(reSend);
 		result.append("\nSent count     : "); result.append(sentCount);
 		result.append("\nTime to send   : "); result.append(timeToSend);
+		result.append("\nTransport avail: "); result.append(transportAvailable);
 		return result.toString();
 	}
 	
@@ -324,6 +343,9 @@ public class SenderBean extends RMBean {
 			match = false;
 
 		else if((bean.flags & IN_MSG_NUM_FLAG) != 0 && bean.getInboundMessageNumber() != this.getInboundMessageNumber())
+			match = false;
+
+		else if((bean.flags & TRANSPORT_FLAG) != 0 && bean.isTransportAvailable() != this.isTransportAvailable())
 			match = false;
 
 		return match;

@@ -374,6 +374,11 @@ public class TerminateManager {
 		if (to!=null)
 			terminateBean.setToAddress(to.getAddress());
 
+		// If this message is targetted at an anonymous address then we must not have a transport
+		// ready for it, as the terminate sequence is not a reply.
+		if(to == null || to.hasAnonymousAddress())
+			terminateBean.setTransportAvailable(false);
+
 		rmsBean.setTerminateAdded(true);
 
 		storageManager.getRMSBeanMgr().update(rmsBean);

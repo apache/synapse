@@ -60,6 +60,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//selecting the set of SenderBeans that suit the given criteria.
 		SenderBean findSenderBean = new SenderBean ();
 		findSenderBean.setSend(true);
+		findSenderBean.setTransportAvailable(false);
 		
 		if (address!=null)
 			findSenderBean.setToAddress(address.getAddress());

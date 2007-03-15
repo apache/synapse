@@ -432,6 +432,10 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		EndpointReference to = createSeqRMMessage.getTo();
 		if (to!=null)
 			createSeqEntry.setToAddress(to.getAddress());
+		// If this message is targetted at an anonymous address then we must not have a transport
+		// ready for it, as the create sequence is not a reply.
+		if(to == null || to.hasAnonymousAddress())
+			createSeqEntry.setTransportAvailable(false);
 
 		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 		

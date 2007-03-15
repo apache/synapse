@@ -74,6 +74,7 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 		matcher.setSend(true);
 		matcher.setSequenceID(sequenceId);
 		matcher.setTimeToSend(System.currentTimeMillis());
+		matcher.setTransportAvailable(true);
 		
 		List matches = super.find(matcher);
 		if(log.isDebugEnabled()) log.debug("Found " + matches.size() + " messages");

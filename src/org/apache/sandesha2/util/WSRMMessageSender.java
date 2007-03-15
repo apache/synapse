@@ -148,6 +148,11 @@ public class WSRMMessageSender  {
 		EndpointReference to = msgContext.getTo();
 		if (to!=null)
 			senderBean.setToAddress(to.getAddress());
+
+		// If this message is targetted at an anonymous address then we must not have a transport
+		// ready for it, as the current message is not a reply.
+		if(to == null || to.hasAnonymousAddress())
+			senderBean.setTransportAvailable(false);
 		
 		msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 

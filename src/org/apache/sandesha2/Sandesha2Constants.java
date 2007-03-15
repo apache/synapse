@@ -31,7 +31,7 @@ public interface Sandesha2Constants {
 	
 	public interface SPEC_VERSIONS {
 		String v1_0 = "Spec_2005_02";
-		String v1_1 = "Spec_2006_08";
+		String v1_1 = "Spec_2007_02";
 	}
 	
 	public interface SPEC_2005_02 {

@@ -36,68 +36,41 @@ import org.apache.synapse.mediators.bsf.convertors.RBOMElementConvertor;
 
 public class ScriptMediatorTest extends TestCase {
 
-    private static final OMElement TRUE_MEDIATOR = TestUtils.createOMElement(
-       "<x><![CDATA[ function mediate(mc) { return true;} ]]></x>");
+    private static final String inlinescript = "<x><![CDATA[ function mediate(mc) { return true;} ]]></x>";
 
-    private static final OMElement FALSE_MEDIATOR = TestUtils.createOMElement(
-       "<x><![CDATA[ function mediate(mc) { return false;} ]]></x>");
+    private static final String falsescript = "<x><![CDATA[ function mediate(mc) { return false;} ]]></x>";
 
-    private static final OMElement XML_MEDIATOR = TestUtils.createOMElement(
-       "<x><![CDATA[ function mediate(mc) { return 'xml' == (typeof mc.getPayloadXML());} ]]></x>");
+
 
     public void testTrueMediator() throws Exception {
 
-        Entry prop = new Entry();
-        prop.setValue(TRUE_MEDIATOR);
-        prop.setSrc(new URL("http://MyMediator.js"));
-        Map props = new HashMap();
-        props.put("TRUE_MEDIATOR", prop);
-        MessageContext mc = TestUtils.getTestContext("<foo/>", props);
-
-        ScriptMediator mediator = new ScriptMediator("TRUE_MEDIATOR", "mediate");
+        MessageContext mc = TestUtils.getTestContext("<foo/>", null);
+        ScriptMediator mediator = new ScriptMediator("javascript",inlinescript);
         assertTrue(mediator.mediate(mc));
     }
 
     public void testFalseMediator() throws Exception {
-        Entry prop = new Entry();
-        prop.setValue(FALSE_MEDIATOR);
-        prop.setSrc(new URL("http://MyFooMediator.js"));
-        Map props = new HashMap();
-        props.put("FALSE_MEDIATOR", prop);
-        MessageContext mc = TestUtils.getTestContext("<foo/>", props);
-
-        ScriptMediator mediator = new ScriptMediator("FALSE_MEDIATOR", "mediate");
-        assertFalse(mediator.mediate(mc));
-    }
-
-    public void testXMLMediator() throws Exception {
-
-        Entry prop = new Entry();
-        prop.setValue(XML_MEDIATOR);
-        prop.setSrc(new URL("http://MyFooMediator.js"));
-        Map props = new HashMap();
-        props.put("XML_MEDIATOR", prop);
-        MessageContext mc = TestUtils.getTestContext("<foo/>", props);
-
-        ScriptMediator mediator = new ScriptMediator("XML_MEDIATOR", "mediate");
+        MessageContext mc = TestUtils.getTestContext("<foo/>", null);
+        ScriptMediator mediator = new ScriptMediator("javascript",falsescript);
         assertTrue(mediator.mediate(mc));
     }
-    
+
+      
     public void testJSCreateOMElementConvertor() {
-        ScriptMediator mediator = new ScriptMediator(null, null);
-        OMElementConvertor convertor = mediator.createOMElementConvertor("foo.js");
+        ScriptMediator mediator = new ScriptMediator("javascript", null);
+        OMElementConvertor convertor = mediator.getOMElementConvertor();
         assertTrue(convertor instanceof JSOMElementConvertor);
     }
 
     public void testRBCreateOMElementConvertor() {
-        ScriptMediator mediator = new ScriptMediator(null, null);
-        OMElementConvertor convertor = mediator.createOMElementConvertor("foo.rb");
+        ScriptMediator mediator = new ScriptMediator("ruby", null);
+        OMElementConvertor convertor = mediator.getOMElementConvertor();
         assertTrue(convertor instanceof RBOMElementConvertor);
     }
     
     public void testDefaultCreateOMElementConvertor() {
-        ScriptMediator mediator = new ScriptMediator(null, null);
-        OMElementConvertor convertor = mediator.createOMElementConvertor("foo.bla");
+        ScriptMediator mediator = new ScriptMediator("foo.bar", null);
+        OMElementConvertor convertor = mediator.getOMElementConvertor();
         assertTrue(convertor instanceof DefaultOMElementConvertor);
     }
 

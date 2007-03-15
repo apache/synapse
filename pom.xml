@@ -492,14 +492,28 @@
         <repository>
             <id>wso2</id>
             <name>wso2</name>
-            <url>http://dist.wso2.org/maven2/</url>
+            <url>http://dist.wso2.org/maven/</url>
             <releases>
             	<updatePolicy>never</updatePolicy>
             </releases>
+            <layout>legacy</layout>
             <snapshots>
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
+        <!--for Axiom/E4X
+        <repository>
+            <id>thilina</id>
+            <name>thilina</name>
+            <url>http://www-lk.wso2.com/~thilina/repository/</url>
+            <releases>
+            	<updatePolicy>never</updatePolicy>
+            </releases>
+            <layout>legacy</layout>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
+        </repository>-->
         <repository>
             <id>ibiblio-m2</id>
             <name>Ibiblio Maven 2 Repo</name>

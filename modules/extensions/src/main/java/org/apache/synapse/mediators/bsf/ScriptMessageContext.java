@@ -22,6 +22,7 @@ package org.apache.synapse.mediators.bsf;
 import java.util.Set;
 import java.util.Stack;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
@@ -34,12 +35,14 @@ import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 import org.apache.synapse.endpoints.Endpoint;
 
 /**
- * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the message payload XML in a way natural to the scripting language.
+ * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the
+ * message payload XML in a way natural to the scripting languageS
  */
 public class ScriptMessageContext implements MessageContext {
 
+    /** The actual Synapse message context reference */
     private MessageContext mc;
-
+    /** The OMElement to scripting language object converter for the selected language */
     private OMElementConvertor convertor;
 
     public ScriptMessageContext(MessageContext mc, OMElementConvertor convertor) {
@@ -63,19 +66,22 @@ public class ScriptMessageContext implements MessageContext {
      * @param payload
      * 
      */
+
     public void setPayloadXML(Object payload) {
-        mc.getEnvelope().getBody().setFirstChild(convertor.fromScript(payload));
+        OMElement firstChild = mc.getEnvelope().getBody().getFirstElement();
+        firstChild.insertSiblingAfter(convertor.fromScript(payload));
+        firstChild.detach();
     }
 
     /**
      * Get the XML representation of the complete SOAP envelope
+     * @return return an object that represents the payload in the current scripting language
      */
     public Object getEnvelopeXML() {
         return convertor.toScript(mc.getEnvelope());
     }
 
-    // helpers to set EPRs from a script string    
-    
+    // helpers to set EPRs from a script string
     public void setTo(String reference) {
         mc.setTo(new EndpointReference(reference));
     }
@@ -90,7 +96,6 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     // -- all the remainder just use the underlying MessageContext
-
     public SynapseConfiguration getConfiguration() {
         return mc.getConfiguration();
     }
@@ -278,5 +283,4 @@ public class ScriptMessageContext implements MessageContext {
     public void pushFaultHandler(FaultHandler fault) {
         mc.pushFaultHandler(fault);
     }
-
 }

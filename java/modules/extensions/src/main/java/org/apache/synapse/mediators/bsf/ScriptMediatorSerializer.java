@@ -21,33 +21,43 @@ import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+
+import javax.xml.stream.XMLStreamConstants;
 
 /**
- * Serializer for a script mediator, which use a script specified in registry properties
+ * Serializer for a script mediator
+ * @see org.apache.synapse.mediators.bsf.ScriptMediatorFactory
  */
-
 public class ScriptMediatorSerializer extends AbstractMediatorSerializer {
 
     private static final Log log = LogFactory.getLog(ScriptMediatorSerializer.class);
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
-        if (!(m instanceof ScriptMediator)) {
+        if (!(m instanceof ScriptMediator) ) {
             handleException("Unsupported mediator passed in for serialization : " + m.getType());
         }
+
         ScriptMediator scriptMediator = (ScriptMediator) m;
         OMElement script = fac.createOMElement("script", synNS);
-        String key = scriptMediator.getScriptKey();
-        String function = scriptMediator.getFunctionName();
-        if (key != null && function != null) {
-            script.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, key));
+
+        String language = scriptMediator.getLanguage();
+        String key = scriptMediator.getKey();
+        String function = scriptMediator.getFunction();
+
+        if (key != null) {
+            script.addAttribute(fac.createOMAttribute("language", nullNS, language));
+            script.addAttribute(fac.createOMAttribute("key", nullNS, key));
             if (!function.equals("mediate")) {
-                script.addAttribute(fac.createOMAttribute(
-                        "function", nullNS, function));
+                script.addAttribute(fac.createOMAttribute("function", nullNS, function));
             }
         } else {
-            handleException("Invalid Script mediator. Both of the Script registry key and the function name are required");
+            script.addAttribute(fac.createOMAttribute("language", nullNS, language));
+            OMTextImpl textData = (OMTextImpl) fac.createOMText(scriptMediator.getScriptSrc().trim());
+            textData.setType(XMLStreamConstants.CDATA);
+            script.addChild(textData);
         }
+
         finalizeSerialization(script, scriptMediator);
         if (parent != null) {
             parent.addChild(script);

@@ -36,13 +36,13 @@ import org.apache.synapse.mediators.TestUtils;
 public class ScriptMediatorFactoryTest extends TestCase {
 
     private static final OMElement INLINE_MEDIATOR_CONFIG = TestUtils.createOMElement(
-       "<script.js>true</script.js>");
+       "<script language=\"javascript\">true</script>");
 
     private static final OMElement REG_PROP_MEDIATOR_CONFIG = TestUtils.createOMElement(
-       "<script key=\"MyMediator\"/>");
+       "<script language=\"javascript\" key=\"MyMediator\"/>");
     
     private static final OMElement REG_PROP_FOO_FUNC_MEDIATOR_CONFIG = TestUtils.createOMElement(
-       "<script key=\"MyFooMediator\" function=\"foo\"/>");
+       "<script language=\"javascript\" key=\"MyFooMediator\" function=\"foo\"/>");
 
     private static final OMElement MY_MEDIATOR = TestUtils.createOMElement(
        "<x><![CDATA[ function mediate(mc) { return true;} ]]></x>");
@@ -53,13 +53,19 @@ public class ScriptMediatorFactoryTest extends TestCase {
     public void testInlineScriptMediatorFactory() throws XMLStreamException {
         ScriptMediatorFactory mf = new ScriptMediatorFactory();
         Mediator mediator = mf.createMediator(INLINE_MEDIATOR_CONFIG);
-        assertTrue(mediator.mediate(null));
+        try{
+            MessageContext mc = TestUtils.getTestContext("<foo/>",null);
+            assertTrue(mediator.mediate(mc));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void testRegPropMediatorFactory() throws Exception {
+
         Entry prop = new Entry();
+        prop.setKey("MyMediator");
         prop.setValue(MY_MEDIATOR);
-        prop.setSrc(new URL("http://MyMediator.js"));
         Map props = new HashMap();
         props.put("MyMediator", prop);
         MessageContext mc = TestUtils.getTestContext("<foo/>", props);
@@ -72,7 +78,6 @@ public class ScriptMediatorFactoryTest extends TestCase {
     public void testRegPropWithFunctionMediatorFactory() throws Exception {
         Entry prop = new Entry();
         prop.setValue(MY_MEDIATOR_FOO_FUNC);
-        prop.setSrc(new URL("http://MyFooMediator.js"));
         Map props = new HashMap();
         props.put("MyFooMediator", prop);
         MessageContext mc = TestUtils.getTestContext("<foo/>", props);

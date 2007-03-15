@@ -29,19 +29,18 @@ import org.apache.bsf.BSFEngine;
  * has no support for those so Synapse needs to handle this itself, which is what
  * the OMElementConvertor does.
  * 
- * Which OMElementConvertor type to use is discovered based on the file name suffix of 
- * the mediator script. The suffix is converted to uppercase and used as the prefix to 
- * the OMElementConvertor classname. For example, with a JavaScript script named myscript.js
- * the .js suffix is taken to make the convertor class name 
- * "org.apache.synapse.mediators.bsf.convertors.JSOMElementConvertor"
- * If the convertor class is not found then a default convertor is used which converts
- * XML to a String representation.
+ * Which OMElementConvertor type to use is determined by the script language specified for
+ * the mediator script. If a suitable convertor class is not found then a default convertor
+ * is used which converts XML to a String representation.
  */
 public interface OMElementConvertor {
-    
-    public void setEngine(BSFEngine e);
-    public Object toScript(OMElement omElement);
-    
-    public OMElement fromScript(Object o);
 
+    /** Set a reference to the BSFEngine to evalue the script */
+    public void setEngine(BSFEngine e);
+
+    /** Convert the OMElement to a suitable script object for the scripting language */
+    public Object toScript(OMElement omElement);
+
+    /** Convert a scripting language object into an OMElement */
+    public OMElement fromScript(Object o);
 }

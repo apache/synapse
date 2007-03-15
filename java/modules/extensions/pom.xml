@@ -97,6 +97,19 @@
             <version>${js.version}</version>
         </dependency>
 
+        <!--For Axiom/E4X -->
+        <!--<dependency>
+            <groupId>org.wso2.javascript.rhino</groupId>
+            <artifactId>js-axiom</artifactId>
+            <version>SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mozilla.javascript</groupId>
+            <artifactId>js-core</artifactId>
+            <version>SNAPSHOT</version>
+        </dependency>-->
+
         <dependency>
             <groupId>xmlbeans</groupId>
             <artifactId>xbean</artifactId>

@@ -57,7 +57,6 @@ public class InMemoryStorageManager extends StorageManager {
 	private static Log log = LogFactory.getLog(InMemoryStorageManager.class);
 
 	private static InMemoryStorageManager instance = null;
-    private final String MESSAGE_MAP_KEY = "Sandesha2MessageMap";
     private RMSBeanMgr  rMSBeanMgr = null;
     private RMDBeanMgr rMDBeanMgr = null;
     private SenderBeanMgr senderBeanMgr = null;
@@ -67,6 +66,7 @@ public class InMemoryStorageManager extends StorageManager {
     private PollingManager pollingManager = null;
     private HashMap transactions = new HashMap();
     private boolean useSerialization = false;
+    private HashMap storageMap = new HashMap();
     
 	public InMemoryStorageManager(ConfigurationContext context)
 	throws SandeshaException
@@ -196,11 +196,6 @@ public class InMemoryStorageManager extends StorageManager {
 	
 	public MessageContext retrieveMessageContext(String key,ConfigurationContext context) throws SandeshaStorageException {
 		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::retrieveMessageContext, key: " + key);
-		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
-		if (storageMap==null) {
-			if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::retrieveMessageContext");
-			return null;
-		}
 		
 		MessageContext messageContext = null;
 		try {
@@ -252,12 +247,6 @@ public class InMemoryStorageManager extends StorageManager {
 	throws SandeshaStorageException
 	{
 		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::storeMessageContext, key: " + key);
-		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
-		
-		if (storageMap==null) {
-			storageMap = new HashMap ();
-			getContext().setProperty(MESSAGE_MAP_KEY,storageMap);
-		}
 		
 		if (key==null)
 		    key = SandeshaUtil.getUUID();
@@ -309,13 +298,6 @@ public class InMemoryStorageManager extends StorageManager {
 	public void updateMessageContext(String key,MessageContext msgContext) throws SandeshaStorageException { 
 		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::updateMessageContext, key: " + key);
 
-		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
-		
-		if (storageMap==null) {
-			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.storageMapNotPresent));
-		}
-		
 		Object oldEntry = storageMap.remove(key);
 		if (oldEntry==null)
 			throw new SandeshaStorageException (SandeshaMessageHelper.getMessage(
@@ -329,10 +311,7 @@ public class InMemoryStorageManager extends StorageManager {
 	public void removeMessageContext(String key) { 
 		if(log.isDebugEnabled()) log.debug("Enter: InMemoryStorageManager::removeMessageContext, key: " + key);
 
-		HashMap storageMap = (HashMap) getContext().getProperty(MESSAGE_MAP_KEY);
-
-		if (storageMap!=null)
-			storageMap.remove(key);
+		storageMap.remove(key);
 		
 		if(log.isDebugEnabled()) log.debug("Exit: InMemoryStorageManager::removeMessageContext, key: " + key);
 	}

@@ -181,7 +181,6 @@ public class SandeshaMessageKeys {
 	public static final String newSeqIdIsNull="newSeqIdIsNull";
 	public static final String terminateAddedPreviously="terminateAddedPreviously";
 	public static final String nullMsgId="nullMsgId";
-	public static final String storageMapNotPresent="storageMapNotPresent";
 	public static final String failedToStoreMessage="failedToStoreMessage";
 	public static final String failedToLoadMessage="failedToLoadMessage";
 	public static final String entryNotPresentForUpdating="entryNotPresentForUpdating";

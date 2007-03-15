@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
+<definitions xmlns="http://ws.apache.org/ns/synapse" xmlns:spring="http://ws.apache.org/ns/synapse/spring">
 
 	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
 		<parameter name="root">file:./../../repository/</parameter>
@@ -29,4 +29,4 @@
   	<spring:spring bean="springtest" key="conf/sample/resources/spring/springsample.xml"/>
   	<spring:spring bean="springtest" key="springconfig2"/>
 
-</synapse> 
+</definitions> 

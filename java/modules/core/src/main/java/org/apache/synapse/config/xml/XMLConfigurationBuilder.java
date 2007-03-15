@@ -61,27 +61,34 @@ public class XMLConfigurationBuilder {
             definitions = new StAXOMBuilder(is).getDocumentElement();
             definitions.build();
 
-            Iterator iter = definitions.getChildren();
+            if (Constants.SYNAPSE_NAMESPACE.equals(definitions.getNamespace().getNamespaceURI())
+                && Constants.DEFINITIONS_ELT.getLocalPart()
+                    .equals(definitions.getQName().getLocalPart())) {
 
-            while (iter.hasNext()) {
-                Object o = iter.next();
-                if (o instanceof OMElement) {
-                    OMElement elt = (OMElement) o;
-                    if (Constants.SEQUENCE_ELT.equals(elt.getQName())) {
-                        defineSequence(config, elt);
-                    } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
-                        defineEndpoint(config, elt);
-                    } else if (Constants.ENTRY_ELT.equals(elt.getQName())) {
-                        defineEntry(config, elt);
-                    } else if (Constants.PROXY_ELT.equals(elt.getQName())) {
-                        defineProxy(config, elt);
-                    } else if (Constants.REGISTRY_ELT.equals(elt.getQName())) {
-                        defineRegistry(config, elt);
-                    } else {
-                        Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
-                        rootSequence.addChild(m);
+                Iterator iter = definitions.getChildren();
+
+                while (iter.hasNext()) {
+                    Object o = iter.next();
+                    if (o instanceof OMElement) {
+                        OMElement elt = (OMElement) o;
+                        if (Constants.SEQUENCE_ELT.equals(elt.getQName())) {
+                            defineSequence(config, elt);
+                        } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
+                            defineEndpoint(config, elt);
+                        } else if (Constants.ENTRY_ELT.equals(elt.getQName())) {
+                            defineEntry(config, elt);
+                        } else if (Constants.PROXY_ELT.equals(elt.getQName())) {
+                            defineProxy(config, elt);
+                        } else if (Constants.REGISTRY_ELT.equals(elt.getQName())) {
+                            defineRegistry(config, elt);
+                        } else {
+                            Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
+                            rootSequence.addChild(m);
+                        }
                     }
                 }
+            } else {
+                handleException("Invalid Synapse Configuration : No definition element found");
             }
 
         } catch (XMLStreamException e) {
@@ -153,7 +160,7 @@ public class XMLConfigurationBuilder {
                 handleException("Duplicate endpoint definition : " + name);
             }
             Endpoint endpoint =
-                EndpointAbstractFactory.getEndpointFactroy(ele).createEndpoint(ele, false);
+                    EndpointAbstractFactory.getEndpointFactroy(ele).createEndpoint(ele, false);
             config.addEndpoint(name, endpoint);
         } else {
             handleException("Invalid endpoint definition without a name");
@@ -163,6 +170,7 @@ public class XMLConfigurationBuilder {
     /**
      * Return the main sequence if one is not defined. This implementation defaults to
      * a simple sequence with a <send/>
+     *
      * @param config the configuration to be updated
      */
     private static void setDefaultMainSequence(SynapseConfiguration config) {
@@ -175,6 +183,7 @@ public class XMLConfigurationBuilder {
     /**
      * Return the fault sequence if one is not defined. This implementation defaults to
      * a simple sequence with a <log level="full"/>
+     *
      * @param config the configuration to be updated
      */
     private static void setDefaultFaultSequence(SynapseConfiguration config) {

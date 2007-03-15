@@ -35,6 +35,8 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Converts between AXIOM OMElement and Groovy Node objects
@@ -42,62 +44,71 @@ import org.apache.synapse.SynapseException;
  */
 public class GROOVYOMElementConvertor extends DefaultOMElementConvertor {
 
-    public GROOVYOMElementConvertor() {
-    }
+    private static final Log log = LogFactory.getLog(GROOVYOMElementConvertor.class);
 
     /**
      * Converts an OMElement into a groovy.util.Node
      */
     public Object toScript(OMElement o) {
         try {
-
-            Node xmlNode = new XmlParser().parseText(o.toString());
-            return xmlNode;
+            return new XmlParser().parseText(o.toString());
 
         } catch (Exception e) {
-            throw new SynapseException(e);
-        }        
+            handleException("Error converting OMElement to Groovy object", e);
+        }
+        return null;
     }
 
     /**
      * Converts a Groovy object into a OMElement
      */
     public OMElement fromScript(Object o) {
+
+        if (o == null) {
+            handleException("Cannot convert null Groovy Object to an OMElement");
+        }
+
         try {
-
-            OMElement omElement;
-
             if (o instanceof Node) {
-                omElement = nodeToOMElement((Node)o);
+                return nodeToOMElement((Node)o);
             } else if (o instanceof Writable){
-                omElement = writableToOMElement((Writable)o);
+                return writableToOMElement((Writable)o);
             } else {
-                throw new SynapseException("unknown type: " + o);
+                handleException("Unknown Groovy object : " + o.getClass().getName() +
+                " to be converted to an OMElement");
             }
 
-            return omElement;
-
         } catch (Exception e) {
-            throw new SynapseException(e);
+            handleException("Error convering Groovy object : " + o.getClass().getName() +
+                " into an OMElement" + e);
         }
+        return null;
     }
 
-    protected OMElement writableToOMElement(Writable writable) throws IOException, XMLStreamException {
+    private OMElement writableToOMElement(Writable writable) throws IOException, XMLStreamException {
         Writer out = new StringWriter();
         writable.writeTo(out);
         out.close();
         StAXOMBuilder builder = new StAXOMBuilder(out.toString());
-        OMElement omElement = builder.getDocumentElement();
-        return omElement;
+        return builder.getDocumentElement();
     }
 
-    protected OMElement nodeToOMElement(Node node) throws XMLStreamException {
+    private OMElement nodeToOMElement(Node node) throws XMLStreamException {
         StringWriter out = new StringWriter();
         new XmlNodePrinter(new PrintWriter(out)).print(node);
         String xmlString = out.toString();
         StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xmlString.getBytes()));
-        OMElement omElement = builder.getDocumentElement();
-        return omElement;
+        return builder.getDocumentElement();
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
 }

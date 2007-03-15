@@ -27,23 +27,30 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.bsf.BSFEngine;
 import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * The DefaultOMElementConvertor converts between Synapse OMElements and Strings
+ * The DefaultOMElementConvertor converts between OMElements and Strings
  */
 public class DefaultOMElementConvertor implements OMElementConvertor {
 
-    public OMElement fromScript(Object o) {
-        try {
+    private static final Log log = LogFactory.getLog(DefaultOMElementConvertor.class);
 
-            byte[] xmlBytes = o.toString().getBytes();
-            StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(xmlBytes));
-            OMElement omElement = builder.getDocumentElement();
-            return omElement;
+    public OMElement fromScript(Object o) {
+        if (o == null) {
+            handleException("Cannot convert null JavaScript Object to an OMElement");
+        }
+
+        try {
+            StAXOMBuilder builder = new StAXOMBuilder(
+                new ByteArrayInputStream(o.toString().getBytes()));
+            return builder.getDocumentElement();
 
         } catch (XMLStreamException e) {
-            throw new SynapseException(e);
+            handleException("Error converting Object of type : " + o.getClass().getName() + " to String");
         }
+        return null;
     }
 
     public Object toScript(OMElement omElement) {
@@ -51,6 +58,11 @@ public class DefaultOMElementConvertor implements OMElementConvertor {
     }
 
     public void setEngine(BSFEngine e) {
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
 }

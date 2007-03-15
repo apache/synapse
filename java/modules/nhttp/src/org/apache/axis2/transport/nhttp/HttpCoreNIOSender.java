@@ -15,51 +15,48 @@
 */
 package org.apache.axis2.transport.nhttp;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.engine.MessageReceiver;
-import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.AddressingConstants;
-import org.apache.axis2.addressing.RelatesTo;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
+import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.transport.TransportSender;
 import org.apache.axis2.transport.OutTransportInfo;
-import org.apache.axiom.om.OMOutputFormat;
-import org.apache.http.nio.NHttpClientHandler;
+import org.apache.axis2.transport.TransportSender;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
+import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.SessionRequest;
 import org.apache.http.nio.reactor.SessionRequestCallback;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpHost;
-import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.impl.nio.DefaultClientIOEventDispatch;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.xml.stream.XMLStreamException;
-import javax.net.ssl.SSLContext;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.Iterator;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -141,7 +138,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
     protected IOEventDispatch getEventDispatch(
         NHttpClientHandler handler, SSLContext sslContext,
         SSLIOSessionHandler sslIOSessionHandler, HttpParams params) {
-        return new DefaultClientIOEventDispatch(handler, params);
+        return new PlainClientIOEventDispatch(handler, params);
     }
 
     /**
@@ -261,7 +258,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             NHttpClientConnection conn = ConnectionPool.getConnection(url.getHost(), port);
 
             if (conn == null) {
-                SessionRequest req = ioReactor.connect(new InetSocketAddress(url.getHost(), port),
+                ioReactor.connect(new InetSocketAddress(url.getHost(), port),
                     null, axis2Req, sessionRequestCallback);
                 log.debug("A new connection established");
             } else {

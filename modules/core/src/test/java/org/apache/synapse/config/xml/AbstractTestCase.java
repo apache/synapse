@@ -71,7 +71,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
         Mediator mediator = mediatorFactory.createMediator(inputOM);
         OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
         try {
-            assertXMLEqual(resultOM.toString(), inputOM.toString());
+            assertXMLEqual(resultOM.toString(), inputXml);
             return true;
         } catch (SAXException e) {
             log.error(e);
@@ -88,7 +88,7 @@ public abstract class AbstractTestCase extends XMLTestCase {
         Mediator mediator = MediatorFactoryFinder.getInstance().getMediator(inputOM);
         OMElement resultOM = mediatorSerializer.serializeMediator(null, mediator);
         try {
-            assertXMLEqual(resultOM.toString(), inputOM.toString());
+            assertXMLEqual(resultOM.toString(), inputXml);
             return true;
         } catch (SAXException e) {
             log.error(e);

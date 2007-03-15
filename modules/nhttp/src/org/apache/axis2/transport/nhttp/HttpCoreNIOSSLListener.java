@@ -1,26 +1,32 @@
 package org.apache.axis2.transport.nhttp;
 
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
+import java.io.IOException;
+import java.net.SocketAddress;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.xml.namespace.QName;
+
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axiom.om.OMElement;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.impl.nio.reactor.SSLServerIOEventDispatch;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.params.HttpParams;
-
-import javax.net.ssl.*;
-import javax.xml.namespace.QName;
-import java.security.KeyStore;
-import java.security.GeneralSecurityException;
-import java.net.URL;
-import java.net.SocketAddress;
-import java.io.IOException;
 
 public class HttpCoreNIOSSLListener extends HttpCoreNIOListener {
 

@@ -15,31 +15,30 @@
 */
 package org.apache.axis2.transport.nhttp;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.nio.reactor.IOEventDispatch;
-import org.apache.http.nio.reactor.ListeningIOReactor;
-import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
-import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
-
-import javax.net.ssl.SSLContext;
-import java.io.InterruptedIOException;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
+import org.apache.http.nio.NHttpServiceHandler;
+import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.nio.reactor.ListeningIOReactor;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 
 /**
  * NIO transport listener for Axis2 based on HttpCore and NIO extensions
@@ -94,7 +93,7 @@ public class HttpCoreNIOListener implements TransportListener {
     protected IOEventDispatch getEventDispatch(
         NHttpServiceHandler handler, SSLContext sslContext, 
         SSLIOSessionHandler sslioSessionHandler, HttpParams params) {
-        return new DefaultServerIOEventDispatch(handler, params);
+        return new PlainServerIOEventDispatch(handler, params);
     }
 
     /**

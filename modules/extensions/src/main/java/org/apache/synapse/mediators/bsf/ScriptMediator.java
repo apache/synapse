@@ -154,7 +154,12 @@ public class ScriptMediator extends AbstractMediator {
             } else {
                 // load script if not already loaded
                 if (scriptSourceCode == null) {
-                    scriptSourceCode = ((OMElement) (synCtx.getEntry(key))).getText();
+                    Object o = synCtx.getEntry(key);
+                    if (o instanceof OMElement) {
+                        scriptSourceCode = ((OMElement) (o)).getText();
+                    } else if (o instanceof String) {
+                        scriptSourceCode = (String) o;
+                    }
                 }
                 // load BSFEngine if not already loaded
                 if (bsfEngine == null) {

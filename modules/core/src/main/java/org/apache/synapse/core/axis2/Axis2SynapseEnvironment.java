@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -61,37 +62,41 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             StatisticsUtils.processProxyServiceStatistics(synCtx);
             StatisticsUtils.processSequenceStatistics(synCtx);
         }
-        
+
         // if this is a response to a proxy service 
         if (synCtx.getProperty(Constants.PROXY_SERVICE) != null) {
 
-            if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(Constants.PROXY_SERVICE))
-                    .getTargetOutSequence() != null) {
+            if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
+                    Constants.PROXY_SERVICE)).getTargetOutSequence() != null) {
 
-                String sequenceName = synCtx.getConfiguration().getProxyService(
-                        (String) synCtx.getProperty(Constants.PROXY_SERVICE)).getTargetOutSequence();
+                String sequenceName = synCtx.getConfiguration().getProxyService((String) synCtx.
+                        getProperty(Constants.PROXY_SERVICE)).getTargetOutSequence();
                 Mediator outSequence = synCtx.getSequence(sequenceName);
 
                 if (outSequence != null) {
-                    log.debug("Using the sequence named " + sequenceName + " for the outgoing message mediation of " +
-                            "the proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE));
+                    log.debug("Using the sequence named " + sequenceName
+                            + " for the outgoing message mediation of the proxy service "
+                            + synCtx.getProperty(Constants.PROXY_SERVICE));
                     outSequence.mediate(synCtx);
                 } else {
-                    log.error("Unable to find the sequence specified by the name " + sequenceName);
-                    // TODO invoke a generic synapse error handler for this message
+                    log.error("Unable to find the out-sequence " +
+                            "specified by the name " + sequenceName);
+                    throw new SynapseException("Unable to find the " +
+                            "out-sequence specified by the name " + sequenceName);
                 }
 
             } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
                     Constants.PROXY_SERVICE)).getTargetInLineOutSequence() != null) {
 
-                log.debug("Using the anonymous out sequence specified in the proxy service "
-                        + synCtx.getProperty(Constants.PROXY_SERVICE) + " for out going message mediation");
+                log.debug("Using the anonymous out-sequence specified in the proxy service "
+                        + synCtx.getProperty(Constants.PROXY_SERVICE)
+                        + " for outgoing message mediation");
                 synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
                         Constants.PROXY_SERVICE)).getTargetInLineOutSequence().mediate(synCtx);
             } else {
 
-                log.debug("Proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE) + " does not specifies " +
-                        "an out sequence - sending the response back");
+                log.debug("Proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE)
+                        + " does not specifies an out-sequence - sending the response back");
                 Axis2Sender.sendBack(synCtx);
             }
 

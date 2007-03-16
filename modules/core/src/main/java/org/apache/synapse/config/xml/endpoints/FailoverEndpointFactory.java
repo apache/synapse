@@ -62,7 +62,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
             FailoverEndpoint failoverEndpoint = new FailoverEndpoint();
 
             // set endpoint name
-            String name = failoverElement.getAttributeValue(new QName("name"));
+            String name = epConfig.getAttributeValue(new QName("name"));
             if (name != null) {
                 failoverEndpoint.setName(name);
             }

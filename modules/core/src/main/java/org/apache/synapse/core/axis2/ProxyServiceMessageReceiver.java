@@ -60,33 +60,37 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             // Setting Required property to collect the proxy service statistics
             boolean statisticsEnable;
             if (proxy != null) {
-                statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == proxy.getStatisticsEnable());
+                statisticsEnable = (
+                        org.apache.synapse.Constants.STATISTICS_ON == proxy.getStatisticsEnable());
                 if (statisticsEnable) {
-                    ProxyServiceStatisticsStack proxyServiceStatisticsStack = new ProxyServiceStatisticsStack();
+                    ProxyServiceStatisticsStack proxyServiceStatisticsStack
+                            = new ProxyServiceStatisticsStack();
                     boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-                    proxyServiceStatisticsStack.put(
-                            name, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable, isFault);
-                    synCtx.setProperty(
-                            org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK, proxyServiceStatisticsStack);
+                    proxyServiceStatisticsStack.put(name, System.currentTimeMillis(),
+                            !synCtx.isResponse(), statisticsEnable, isFault);
+                    synCtx.setProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK,
+                            proxyServiceStatisticsStack);
                 }
 
                 if (proxy.getTargetFaultSequence() != null) {
 
                     Mediator faultSequence = synCtx.getSequence(proxy.getTargetFaultSequence());
                     if (faultSequence != null) {
-                        log.debug("setting the fault sequence of the proxy to context");
+                        log.debug("setting the fault-sequence of the " +
+                                "proxy service to MessageContext");
                         synCtx.pushFaultHandler(new MediatorFaultHandler(
                                 synCtx.getSequence(proxy.getTargetFaultSequence())));
                     } else {
-                        // when we can not find the reference to the fault sequence of the proxy service we should not
-                        // throw an exception because still we have the global fault sequence and the message mediation
-                        // can still continue
-                        log.warn("Unable to find the fault sequence for the proxy service " +
+                        // when we can not find the reference to the fault sequence of the proxy
+                        // service we should not throw an exception because still we have the global
+                        // fault sequence and the message mediation can still continue
+                        log.warn("Unable to find the fault-sequence for the proxy service " +
                                 "specified by the name " + proxy.getTargetFaultSequence());
                     }
                 } else if (proxy.getTargetInLineFaultSequence() != null) {
-                    log.debug("Setting the anonymous fault sequence of the proxy to context");
-                    synCtx.pushFaultHandler(new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
+                    log.debug("Setting the anonymous fault-sequence of the proxy to context");
+                    synCtx.pushFaultHandler(
+                            new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
                 }
 
                 // Using inSequence for the incoming message mediation
@@ -94,17 +98,19 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                     Mediator inSequence = synCtx.getSequence(proxy.getTargetInSequence());
                     if (inSequence != null) {
-                        log.debug("Using the sequence named " + proxy.getTargetInSequence() + " for message mediation");
+                        log.debug("Using the sequence named "
+                                + proxy.getTargetInSequence() + " for message mediation");
                         inSequence.mediate(synCtx);
                     } else {
 
-                        log.error("Unable to find the in sequence for the proxy service " +
+                        log.error("Unable to find the in-sequence for the proxy service " +
                                 "specified by the name " + proxy.getTargetInSequence());
-                        throw new SynapseException("Unable to find the in sequence for the proxy service " +
-                                "specified by the name " + proxy.getTargetInSequence());
+                        throw new SynapseException("Unable to find the in-sequence for the proxy " +
+                                "service specified by the name " + proxy.getTargetInSequence());
                     }
                 } else if (proxy.getTargetInLineInSequence() != null) {
-                    log.debug("Using the anonymous in sequence of the proxy service for message mediation");
+                    log.debug("Using the anonymous " +
+                            "in-sequence of the proxy service for message mediation");
                     proxy.getTargetInLineInSequence().mediate(synCtx);
                 }
 
@@ -114,26 +120,23 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         log.debug("Forwarding message to the endpoint named "
                                 + proxy.getTargetEndpoint() + " after message mediation");
                         endpoint.send(synCtx);
-                        //synCtx.setTo(new EndpointReference(endpoint.getAddress()));
-                        //Axis2FlexibleMEPClient.send(endpoint, synCtx);
                     } else {
 
                         log.error("Unable to find the endpoint for the proxy service " +
                                 "specified by the name " + proxy.getTargetEndpoint());
-                        throw new SynapseException("Unable to find the endpoint for the proxy service " +
-                                "specified by the name " + proxy.getTargetEndpoint());
+                        throw new SynapseException("Unable to find the endpoint for the " +
+                                "proxy service specified by the name " + proxy.getTargetEndpoint());
                     }
                 } else if (proxy.getTargetInLineEndpoint() != null) {
                     log.debug("Forwarding the message to the anonymous " +
                             "endpoint of the proxy service after message mediation");
                     proxy.getTargetInLineEndpoint().send(synCtx);
-                    //synCtx.setTo(new EndpointReference(proxy.getTargetInLineEndpoint().getAddress()));
-                    //Axis2FlexibleMEPClient.send(proxy.getTargetInLineEndpoint(), synCtx);
                 }
 
             } else {
                 log.error("Proxy Service with the name " + name + " does not exists");
-                throw new SynapseException("Proxy Service with the name " + name + " does not exists");
+                throw new SynapseException(
+                        "Proxy Service with the name " + name + " does not exists");
             }
         } catch (SynapseException syne) {
             if (!synCtx.getFaultStack().isEmpty()) {

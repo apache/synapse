@@ -30,7 +30,7 @@
 
 # if JAVA_HOME is not set we're not happy
 if [ -z "$JAVA_HOME" ]; then
-  echo "You must set the JAVA_HOME variable before running Tungsten."
+  echo "You must set the JAVA_HOME variable before running Synapse."
   exit 1
 fi
 

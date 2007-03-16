@@ -106,7 +106,7 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 :runSynapse
 rem set the classes by looping through the libs
 setlocal EnableDelayedExpansion
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%"
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/lib;%SYNAPSE_HOME%/repository/conf"
 FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
 set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
 
@@ -117,6 +117,11 @@ set SYNAPSE_ENDORSED="%SYNAPSE_HOME%\lib\endorsed";"%JAVA_ENDORSED_DIRS%";"%JAVA
 
 @rem @echo on
 cd %SYNAPSE_HOME%
+echo Starting Synapse/Java ...
+echo Using SYNAPSE_HOME:    %SYNAPSE_HOME%
+echo Using JAVA_HOME:       %JAVA_HOME%
+echo Using SYNAPSE_XML:     %_SYNAPSE_XML%
+
 "%_JAVACMD%" %_PORT% %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer %SYNAPSE_CMD_LINE_ARGS%
 goto end
 

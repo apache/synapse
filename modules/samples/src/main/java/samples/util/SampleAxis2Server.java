@@ -1,21 +1,3 @@
-package samples.util;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.transport.http.SimpleHTTPServer;
-import org.apache.axis2.util.CommandLineOptionParser;
-import org.apache.axis2.util.OptionsValidator;
-import org.apache.axis2.util.CommandLineOption;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.description.TransportInDescription;
-
-import javax.xml.namespace.QName;
-import java.util.List;
-import java.util.Map;
-import java.io.File;
-import java.net.ServerSocket;
 /*
  *  Licensed to the Apache Software Foundation (ASF) under one
  *  or more contributor license agreements.  See the NOTICE file
@@ -34,6 +16,25 @@ import java.net.ServerSocket;
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
+package samples.util;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.axis2.transport.http.SimpleHTTPServer;
+import org.apache.axis2.util.CommandLineOptionParser;
+import org.apache.axis2.util.OptionsValidator;
+import org.apache.axis2.util.CommandLineOption;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.description.TransportInDescription;
+
+import javax.xml.namespace.QName;
+import java.util.List;
+import java.util.Map;
+import java.io.File;
+import java.net.ServerSocket;
 
 public class SampleAxis2Server {
 

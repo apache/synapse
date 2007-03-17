@@ -31,12 +31,12 @@
     <parameter name="attachmentDIR" locked="false"></parameter>
     <parameter name="sizeThreshold" locked="false">4000</parameter-->
 
-    <!--This will give out the timout of the configuration contexts, in seconds-->
-    <parameter name="ConfigContextTimeoutInterval" locked="false">30</parameter>
+    <!--This will give out the timout of the configuration contexts, in milliseconds-->
+    <parameter name="ConfigContextTimeoutInterval" locked="false">30000</parameter>
 
     <!--During a fault, stacktrace can be sent with the fault message. The following flag will control -->
     <!--that behaviour.-->
-    <parameter name="sendStacktraceDetailsWithFaults" locked="false">true</parameter>
+    <parameter name="sendStacktraceDetailsWithFaults" locked="false">false</parameter>
 
     <!--If there aren't any information available to find out the fault reason, we set the message of the expcetion-->
     <!--as the faultreason/Reason. But when a fault is thrown from a service or some where, it will be -->
@@ -48,6 +48,13 @@
     <parameter name="userName" locked="false">admin</parameter>
     <parameter name="password" locked="false">axis2</parameter>
 
+    <!--To override repository/services you need to uncomment following parameter and value SHOULD be absolute file path.-->
+    <!--<parameter name="ServicesDirectory" locked="false">service</parameter>-->
+    <!--To override repository/modules you need to uncomment following parameter and value SHOULD be absolute file path-->
+    <!--<parameter name="ModulesDirectory" locked="false">modules</parameter>-->
+
+
+
     <!--Following params will set the proper context paths for invocations. All the endpoints will have a commons context-->
     <!--root which can configured using the following contextRoot parameter-->
     <!--<parameter name="contextRoot" locked="false">axis2</parameter>-->
@@ -58,25 +65,13 @@
     <!--<parameter name="servicePath" locked="false">services</parameter>-->
     <!--<parameter name="restPath" locked="false">rest</parameter>-->
 
-    <!--Set the flag to true if you want to enable transport level session mangment-->
-    <parameter name="manageTransportSession" locked="false">false</parameter>
-
-    <!--Following two parameters will be used to handle REST in Axis2. The default settings will make Axis2 to have two-->
-    <!--different endpoints, one for REST (AxisRESTServlet) one for SOAP message handling (AxisServlet). But following-->
-    <!--parameters help to tweak the message handling of two main servlets. -->
-
-    <!-- If the enableRESTInAxis2MainServlet is true, then Axis2MainServlet will handle both SOAP and REST messages -->
-    <parameter name="enableRESTInAxis2MainServlet" locked="true">false</parameter>
-
-    <!-- Following parameter will completely disable REST handling in both the servlets-->
+    <!-- Following parameter will completely disable REST handling in Axis2-->
     <parameter name="disableREST" locked="true">false</parameter>
-
-    <!-- This will disable the separate servlet we have for REST handling. -->
-    <parameter name="disableSeparateEndpointForREST" locked="true">false</parameter>
 
     <!-- If you have a frontend host which exposes this webservice using a different public URL  -->
     <!-- use this parameter to override autodetected url -->
     <!--<parameter name="httpFrontendHostUrl" locked="false">https://someotherhost/context</parameter>-->
+
 
     <!--    The way of adding listener to the system-->
     <!--    <listener class="org.apache.axis2.ObserverIMPL">-->
@@ -95,7 +90,40 @@
                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
         <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
     </messageReceivers>
+
+    <!-- ================================================= -->
+    <!-- Message Formatter -->
+    <!-- ================================================= -->
+    <!--Following content type to message formatter mapping can be used to implement support for different message -->
+    <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->
+    <messageFormatters>
+        <messageFormatter contentType="application/x-www-form-urlencoded"
+                         class="org.apache.axis2.transport.http.XFormURLEncodedFormatter"/>
+        <messageFormatter contentType="multipart/form-data"
+                         class="org.apache.axis2.transport.http.MultipartFormDataFormatter"/>
+        <messageFormatter contentType="application/xml"
+                         class="org.apache.axis2.transport.http.ApplicationXMLFormatter"/>
+    </messageFormatters>
+
+    <!-- ================================================= -->
+    <!-- Message Builders -->
+    <!-- ================================================= -->
+    <!--Following content type to builder mapping can be used to implement support for different message -->
+    <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->
+    <messageBuilders>
+        <messageBuilder contentType="application/xml"
+                         class="org.apache.axis2.builder.ApplicationXMLBuilder"/>
+        <messageBuilder contentType="application/x-www-form-urlencoded"
+                         class="org.apache.axis2.builder.XFormURLEncodedBuilder"/>
+        <messageBuilder contentType="multipart/form-data"
+                         class="org.apache.axis2.builder.MultipartFormDataBuilder"/>
+    </messageBuilders>
+
     <!-- ================================================= -->
     <!-- Transport Ins -->
     <!-- ================================================= -->
@@ -184,7 +212,7 @@
     <!-- ================================================= -->
     <!-- Comment this to disable Addressing -->
     <module ref="addressing"/>
-    <module ref="synapse"/>
+    <module ref="synapse-1.0-RC1"/>
 
     <!--Configuring module , providing parameters for modules whether they refer or not-->
     <!--<moduleConfig name="addressing">-->
@@ -192,11 +220,21 @@
     <!--</moduleConfig>-->
 
     <!-- ================================================= -->
+    <!-- Clustering  -->
+    <!-- ================================================= -->
+    <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->
+    <!-- 
+    <cluster class="org.apache.axis2.cluster.tribes.TribesClusterManager">
+    	<parameter name="param1" locked="false">value1</parameter>
+    </cluster>
+     -->
+     
+    <!-- ================================================= -->
     <!-- Phases  -->
     <!-- ================================================= -->
     <phaseOrder type="InFlow">
         <!--  System pre defined phases       -->
-         <phase name="Transport">
+        <phase name="Transport">
             <handler name="RequestURIBasedDispatcher"
                      class="org.apache.axis2.engine.RequestURIBasedDispatcher">
                 <order phase="Transport"/>
@@ -213,11 +251,21 @@
                      class="org.apache.axis2.engine.AddressingBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
+            <handler name="RequestURIOperationDispatcher"
+                     class="org.apache.axis2.engine.RequestURIOperationDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
 
             <handler name="SOAPMessageBodyBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
+
+            <handler name="HTTPLocationBasedDispatcher"
+                     class="org.apache.axis2.engine.HTTPLocationBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+            
             <handler name="InstanceDispatcher"
                      class="org.apache.axis2.engine.InstanceDispatcher">
                 <order phase="Dispatch"/>
@@ -255,11 +303,21 @@
                      class="org.apache.axis2.engine.AddressingBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
+            <handler name="RequestURIOperationDispatcher"
+                     class="org.apache.axis2.engine.RequestURIOperationDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
 
             <handler name="SOAPMessageBodyBasedDispatcher"
                      class="org.apache.axis2.engine.SOAPMessageBodyBasedDispatcher">
                 <order phase="Dispatch"/>
             </handler>
+
+            <handler name="HTTPLocationBasedDispatcher"
+                     class="org.apache.axis2.engine.HTTPLocationBasedDispatcher">
+                <order phase="Dispatch"/>
+            </handler>
+
             <handler name="InstanceDispatcher"
                      class="org.apache.axis2.engine.InstanceDispatcher">
                 <order phase="PostDispatch"/>

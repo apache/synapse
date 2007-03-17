@@ -25,6 +25,8 @@ import javax.net.ssl.SSLContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.SessionContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.transport.TransportListener;
@@ -225,6 +227,16 @@ public class HttpCoreNIOListener implements TransportListener {
         EndpointReference[] endpointReferences = new EndpointReference[1];
         endpointReferences[0] = new EndpointReference(serviceEPRPrefix + serviceName);
         return endpointReferences;
+    }
+
+    /**
+     * TODO: Return session context from transport, this is an improvement in axis2 1.2 and
+     * is not currently supported
+     * @param messageContext
+     * @return
+     */
+    public SessionContext getSessionContext(MessageContext messageContext) {
+        return null;
     }
 
     // -------------- utility methods -------------

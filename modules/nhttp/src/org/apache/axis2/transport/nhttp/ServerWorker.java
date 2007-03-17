@@ -136,15 +136,10 @@ public class ServerWorker implements Runnable {
             }
         }
 
-        try {
-            msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
-                .getTransportOut(new QName(Constants.TRANSPORT_HTTP)));
-            msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
-                .getTransportIn(new QName(Constants.TRANSPORT_HTTP)));
-        } catch (AxisFault af) {
-            handleException("Unable to get out/in http transport configurations from Axis2", af);
-            return null;
-        }
+        msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
+            .getTransportOut(new QName(Constants.TRANSPORT_HTTP)));
+        msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
+            .getTransportIn(new QName(Constants.TRANSPORT_HTTP)));
 
         return msgContext;
     }

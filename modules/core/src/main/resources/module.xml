@@ -24,11 +24,11 @@
         SynapseMessageReceiver will be initialize by SynapseModule
     </Description>
 
-    <inflow>
+    <InFlow>
         <handler name="SynapseDispatcher"
                  class="org.apache.synapse.core.axis2.SynapseDispatcher">
             <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
         </handler>
-    </inflow>
+    </InFlow>
 
 </module>

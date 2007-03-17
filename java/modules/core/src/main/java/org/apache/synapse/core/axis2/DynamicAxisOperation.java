@@ -227,9 +227,9 @@ public class DynamicAxisOperation extends OutInAxisOperation {
                     // If request is REST we assume the responseMessageContext is
                     // REST, so set the variable
 
-                    SOAPEnvelope resenvelope = TransportUtils.createSOAPMessage(
-                        responseMessageContext, msgctx.getEnvelope()
-                        .getNamespace().getNamespaceURI());
+                    SOAPEnvelope resenvelope =
+                        TransportUtils.createSOAPMessage(responseMessageContext);
+
                     if (resenvelope != null) {
                         responseMessageContext.setEnvelope(resenvelope);
                         engine = new AxisEngine(msgctx.getConfigurationContext());

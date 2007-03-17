@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.Header;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -121,6 +122,8 @@ public class ClientWorker implements Runnable {
         } catch (AxisFault af) {
             log.error("Fault creating response SOAP envelope", af);
             return;
+        } catch (XMLStreamException e) {
+            log.error("Error creating response SOAP envelope", e);
         } catch (IOException e) {
             log.error("Error closing input stream from which message was read", e);
         }

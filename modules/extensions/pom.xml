@@ -117,8 +117,8 @@
         </dependency>
 
         <dependency>
-            <groupId>bsf</groupId>
-            <artifactId>bsf</artifactId>
+            <groupId>org.apache.bsf</groupId>
+            <artifactId>bsf-all</artifactId>
             <version>${bsf.version}</version>
         </dependency>
 
@@ -155,9 +155,9 @@
         <xerces.version>2.8.1</xerces.version>
         <xml_apis.version>1.3.03</xml_apis.version>
         <xalan.version>2.7.0</xalan.version>
-        <js.version>1.6R2</js.version>
+        <js.version>1.6R5</js.version>
         <xbean.version>2.2.0</xbean.version>
-        <bsf.version>2.4.0</bsf.version>
+        <bsf.version>3.0-beta1-SNAPSHOT</bsf.version>
         <groovy.version>1.0</groovy.version>
     </properties>
 </project>

@@ -21,15 +21,13 @@ package org.apache.synapse.mediators.bsf.convertors;
 
 import java.io.ByteArrayInputStream;
 
-import javax.xml.stream.XMLStreamException;
+import javax.script.ScriptEngine;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.bsf.BSFEngine;
-import org.apache.bsf.BSFException;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 
 /**
  * OMElementConvertor for Ruby scripts
@@ -41,7 +39,7 @@ public class RBOMElementConvertor implements OMElementConvertor {
 
     private static final Log log = LogFactory.getLog(RBOMElementConvertor.class);
 
-    protected BSFEngine bsfEngine;
+    protected ScriptEngine bsfEngine;
 
     public Object toScript(OMElement omElement) {
 
@@ -54,7 +52,7 @@ public class RBOMElementConvertor implements OMElementConvertor {
             if (bsfEngine == null) {
                 handleException("Cannot convert OMElement to Ruby Object as BSF Engine is not set");
             }
-            return bsfEngine.eval("RBOMElementConvertor", 0, 0, srcFragment.toString());
+            return bsfEngine.eval(srcFragment.toString());
 
         } catch (Exception e) {
             handleException("Error converting OMElement to Ruby Object", e);
@@ -78,7 +76,7 @@ public class RBOMElementConvertor implements OMElementConvertor {
         return null;
     }
 
-    public void setEngine(BSFEngine e) {
+    public void setEngine(ScriptEngine e) {
         this.bsfEngine = e;
     }
 

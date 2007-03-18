@@ -98,8 +98,9 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     endpoint = new WSDL11EndpointBuilder().
                             createEndpointDefinitionFromWSDL(wsdlElement);
                 } else if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.equals(ns)) {
-                    endpoint = new WSDL20EndpointBuilder().
-                            createEndpointDefinitionFromWSDL(wsdlElement);
+                    //endpoint = new WSDL20EndpointBuilder().
+                    //        createEndpointDefinitionFromWSDL(wsdlElement);
+                    handleException("WSDL 2.0 Endpoints are currently not supported");
                 }
 
 

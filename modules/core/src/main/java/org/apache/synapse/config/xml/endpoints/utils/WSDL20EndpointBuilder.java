@@ -22,19 +22,20 @@ package org.apache.synapse.config.xml.endpoints.utils;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
-import org.apache.woden.WSDLFactory;
-import org.apache.woden.WSDLReader;
-import org.apache.woden.WSDLException;
-import org.apache.woden.types.NCName;
-import org.apache.woden.wsdl20.xml.DescriptionElement;
-import org.apache.woden.wsdl20.Description;
-import org.apache.woden.wsdl20.Service;
-import org.apache.woden.wsdl20.Endpoint;
+//import org.apache.woden.WSDLFactory;
+//import org.apache.woden.WSDLReader;
+//import org.apache.woden.WSDLException;
+//import org.apache.woden.types.NCName;
+//import org.apache.woden.wsdl20.xml.DescriptionElement;
+//import org.apache.woden.wsdl20.Description;
+//import org.apache.woden.wsdl20.Service;
+//import org.apache.woden.wsdl20.Endpoint;
 
 import javax.xml.namespace.QName;
 
 public class WSDL20EndpointBuilder {
 
+/*
     public EndpointDefinition createEndpointDefinitionFromWSDL(OMElement wsdlElement) {
 
         EndpointDefinition endpointDefinition = null;
@@ -77,4 +78,5 @@ public class WSDL20EndpointBuilder {
 
         return endpointDefinition;
     }
+*/
 }

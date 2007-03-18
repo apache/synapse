@@ -19,8 +19,9 @@
 
 package org.apache.synapse.mediators.bsf.convertors;
 
+import javax.script.ScriptEngine;
+
 import org.apache.axiom.om.OMElement;
-import org.apache.bsf.BSFEngine;
 
 /**
  * The OMElementConvertor interface enables customizing the conversion of 
@@ -36,7 +37,7 @@ import org.apache.bsf.BSFEngine;
 public interface OMElementConvertor {
 
     /** Set a reference to the BSFEngine to evalue the script */
-    public void setEngine(BSFEngine e);
+    public void setEngine(ScriptEngine e);
 
     /** Convert the OMElement to a suitable script object for the scripting language */
     public Object toScript(OMElement omElement);

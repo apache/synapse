@@ -25,8 +25,8 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.Constants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
+import org.apache.synapse.config.xml.Constants;
 
 /**
  * Creates an instance of a Script mediator for inline or external script mediation for BSF
@@ -58,16 +58,20 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
         OMAttribute langAtt = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "language"));
         OMAttribute funcAtt = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "function"));
 
-        if (langAtt != null) {
-            if (keyAtt != null) {
-                String functionName = (funcAtt == null ? "mediate" : funcAtt.getAttributeValue());
-                mediator = new ScriptMediator(
-                    langAtt.getAttributeValue(), keyAtt.getAttributeValue(), functionName);
-            } else {
-                mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText());
-            }
-        } else {
+        if (langAtt == null) {
             throw new SynapseException("The 'language' attribute is required for a script mediator");
+            // TODO: couldn't this be determined from the key in some scenarios?
+        }
+        if (keyAtt == null && funcAtt != null) {
+            throw new SynapseException("Cannot use 'function' attribute without 'key' attribute for a script mediator");
+        }
+
+        if (keyAtt != null) {
+            String functionName = (funcAtt == null ? null : funcAtt.getAttributeValue());
+            mediator = new ScriptMediator(
+                langAtt.getAttributeValue(), keyAtt.getAttributeValue(), functionName);
+        } else {
+            mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText());
         }
 
         initMediator(mediator, elem);

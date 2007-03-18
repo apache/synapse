@@ -494,18 +494,6 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
-        <repository>
-            <id>wso2</id>
-            <name>wso2</name>
-            <url>http://dist.wso2.org/maven/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <layout>legacy</layout>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>
         <!--for Axiom/E4X
         <repository>
             <id>thilina</id>
@@ -523,30 +511,6 @@
             <id>ibiblio-m2</id>
             <name>Ibiblio Maven 2 Repo</name>
             <url>http://www.ibiblio.org/maven2</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>
-<!--        <repository>
-            <id>ibiblio-m1</id>
-            <name>Ibiblio Maven 1 Repo</name>
-            <layout>legacy</layout>
-            <url>http://www.ibiblio.org/maven</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>Apache Repo1</id>
-            <name>Apache Repo1</name>
-            <layout>legacy</layout>
-            <url>http://repo1.maven.org/maven/</url>
             <releases>
             	<updatePolicy>never</updatePolicy>
             </releases>
@@ -579,32 +543,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>Apache People Ibiblio RSync</id>
-            <name>Apache People Ibiblio RSync</name>
-            <layout>legacy</layout>
-            <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>Jibx</id>
-            <name>Jibx</name>
-            <layout>legacy</layout>
-            <url>http://jibx.sourceforge.net/maven/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>-->
-        <repository>
-            <id>apache-snapshot</id>
-            <name>Apache Snapshot Repository</name>
+            <id>apache-m2-snapshot</id>
+            <name>Apache Maven 2 Snapshot Repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
             <releases>
             	<updatePolicy>never</updatePolicy>

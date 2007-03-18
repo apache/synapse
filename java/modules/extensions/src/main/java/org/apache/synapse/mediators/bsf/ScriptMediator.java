@@ -19,24 +19,27 @@
 
 package org.apache.synapse.mediators.bsf;
 
+import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.axiom.om.OMElement;
-import org.apache.bsf.BSFEngine;
-import org.apache.bsf.BSFException;
-import org.apache.bsf.BSFManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
-import org.apache.synapse.mediators.bsf.convertors.*;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.bsf.convertors.DefaultOMElementConvertor;
+import org.apache.synapse.mediators.bsf.convertors.GROOVYOMElementConvertor;
+import org.apache.synapse.mediators.bsf.convertors.JSOMElementConvertor;
 import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 import org.apache.synapse.mediators.bsf.convertors.RBOMElementConvertor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.Vector;
-import java.util.Arrays;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
@@ -62,7 +65,6 @@ public class ScriptMediator extends AbstractMediator {
 
     /** The name of the variable made available to the scripting language to access the message */
     private static final String MC_VAR_NAME = "mc";
-    private static final Vector PARAM_NAMES = new Vector(Arrays.asList(new String[]{MC_VAR_NAME}));
 
     /** The registry entry key for a script loaded from the registry */
     private String key;
@@ -72,10 +74,12 @@ public class ScriptMediator extends AbstractMediator {
     private String function = "mediate";
     /** The source code of the script */
     private String scriptSourceCode;
-    /** The BSF Manager */
-    private BSFManager bsfManager;
     /** The BSF engine created to process each message through the script */
-    private BSFEngine bsfEngine;
+    private ScriptEngine scriptEngine;
+    /** The compiled script. Only used for inline scripts */
+    private CompiledScript compiledScript;
+    /** The Invocable script. Only used for external scripts */
+    private Invocable invocableScript;
     /** A converter to get the code for the scripting language from XML */
     private OMElementConvertor convertor;
 
@@ -87,6 +91,7 @@ public class ScriptMediator extends AbstractMediator {
     public ScriptMediator(String language, String scriptSourceCode) {
         this.language = language;
         this.scriptSourceCode = scriptSourceCode;
+        initInlineScript();
     }
 
     /**
@@ -98,37 +103,55 @@ public class ScriptMediator extends AbstractMediator {
     public ScriptMediator(String language, String key, String function) {
         this.language = language;
         this.key = key;
-        this.function = function;
+        if (function != null) {
+            this.function = function;
+        }
     }
 
     /**
      * Perform Script mediation
      * @param synCtx the Synapse message context
-     * @return true for inline mediation and the boolean result (if any) for other scripts that
-     * specify a function that returns a boolean value
+     * @return the boolean result from the script invocation
      */
     public boolean mediate(MessageContext synCtx) {
-        
-        log.debug("Script Mediator - mediate() # Language : " + language +
-            (key == null ? " inline script" : " script with key : " + key) +
-            " function : " + function);
+        if (log.isDebugEnabled()) {
+            log.debug("Script Mediator - mediate() # Language : " + language +
+                      (key == null ? " inline script" : " script with key : " + key) +
+                      " function : " + function);
+        }
 
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+
         if (shouldTrace) {
             trace.trace("Start : Script mediator # Language : " + language +
                 (key == null ? " inline script" : " script with key : " + key) +
                 " function : " + function);
+            trace.trace("Invoking inline script for current message : " + synCtx);
         }
 
-        boolean returnValue = false;
-        if (key != null) {
-            returnValue = mediateWithExternalScript(synCtx);
-        } else {
-            returnValue = mediateForInlineScript(synCtx);
+        boolean returnValue;
+        try {
+
+            Object returnObject;
+            if (key != null) {
+                returnObject = mediateWithExternalScript(synCtx);
+            } else {
+                returnObject = mediateForInlineScript(synCtx);
+            }
+            if (returnObject != null && returnObject instanceof Boolean) {
+                returnValue = ((Boolean) returnObject).booleanValue();
+            } else {
+                returnValue = true;
+            }
+
+        } catch (ScriptException e) {
+            handleException("Error executing inline " + language + " script", e);
+            returnValue = false;
         }
 
-        if (shouldTrace && returnValue) {
-            trace.trace("End : Script mediator");
+        if (shouldTrace) {
+            trace.trace("Result message after execution of script : " + synCtx);
+            trace.trace("End : Script mediator " + returnValue);
         }
 
         return returnValue;
@@ -138,133 +161,92 @@ public class ScriptMediator extends AbstractMediator {
      * Mediation implementation when the script to be executed should be loaded from the registry
      * @param synCtx the message context
      * @return script result
+     * @throws ScriptException 
      */
-    private boolean mediateWithExternalScript(MessageContext synCtx) {
-
-        try {
-            Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
-
-            // if the key refers to a dynamic script
-            if (entry != null && entry.isDynamic()) {
-                if (!entry.isCached() || entry.isExpired()) {
-                    scriptSourceCode = ((OMElement) (synCtx.getEntry(key))).getText();
-                    loadBSFEngine(synCtx, false);
-                }
-            // if the key is static, we will load the script and create a BSFEngine only once
-            } else {
-                // load script if not already loaded
-                if (scriptSourceCode == null) {
-                    Object o = synCtx.getEntry(key);
-                    if (o instanceof OMElement) {
-                        scriptSourceCode = ((OMElement) (o)).getText();
-                    } else if (o instanceof String) {
-                        scriptSourceCode = (String) o;
-                    }
-                }
-                // load BSFEngine if not already loaded
-                if (bsfEngine == null) {
-                    loadBSFEngine(synCtx, false);
-                }
-            }
-
-            if (shouldTrace(synCtx.getTracingState())) {
-                trace.trace("Invoking script for current message : " + synCtx);
-            }
-
-            // prepare engine for the execution of the script
-            bsfEngine.exec(language, 0, 0, scriptSourceCode);
-            // calling the function with script message context as a parameter
-            Object[] args = new Object[]{ new ScriptMessageContext(synCtx, convertor) };
-            Object response = bsfEngine.call(null, function, args);
-
-            if (shouldTrace(synCtx.getTracingState())) {
-                trace.trace("Result message after execution of script : " + synCtx);
-            }
-
-            if (response != null && response instanceof Boolean) {
-                return ((Boolean) response).booleanValue();
-            }
-            return true;
-
-        } catch (BSFException e) {
-            handleException("Error invoking " + language +
-                " script : " + key + " function : " + function, e);
-        }
-        return false;
+    protected Object mediateWithExternalScript(MessageContext synCtx) throws ScriptException {
+        prepareExternalScript(synCtx);
+        ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
+        Object response = invocableScript.invokeFunction(function, new Object[]{scriptMC});
+        return response;
     }
 
     /**
      * Perform mediation with static inline script of the given scripting language
      * @param synCtx message context
      * @return true, or the script return value
+     * @throws ScriptException 
      */
-    private boolean mediateForInlineScript(MessageContext synCtx) {
+    protected Object mediateForInlineScript(MessageContext synCtx) throws ScriptException {
 
-        try {
-            if (bsfEngine == null) {
-                loadBSFEngine(synCtx, true);
-            }
+        ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
 
-            if (shouldTrace(synCtx.getTracingState())) {
-                trace.trace("Invoking inline script for current message : " + synCtx);
-            }
-
-            ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
-            Vector paramValues = new Vector();
-            paramValues.add(scriptMC);
-
-            // applying the source to the specified engine with parameter names and values
-            Object response = bsfEngine.apply(
-                language, 0, 0, scriptSourceCode, PARAM_NAMES, paramValues);
-
-            if (shouldTrace(synCtx.getTracingState())) {
-                trace.trace("Result message after execution of script : " + synCtx);
-            }
-
-            if (response != null && response instanceof Boolean) {
-                return ((Boolean) response).booleanValue();
-            }
-            return true;
-
-        } catch (BSFException e) {
-            handleException("Error executing inline " + language + " script", e);
+        Bindings bindings = scriptEngine.createBindings();
+        bindings.put(MC_VAR_NAME, scriptMC);
+        
+        Object response;
+        if (compiledScript != null) {
+            response = compiledScript.eval(bindings);
+        } else {
+            response = scriptEngine.eval(scriptSourceCode, bindings);
         }
-        return false;
+
+        return response;
+
     }
 
     /**
-     * Load the BSFEngine through the BSFManager. BSF engines should be cached within this
-     * mediator.
-     * TODO check if the constructed engine thread safe?
-     * TODO i.e. if a script defines var X = $1 and then reads it back, and if the
-     * TODO first thread sets X to 10, and is context switched and second thread sets X to 20
-     * TODO and completes. Now when the first thread comes back, will it read 10 or 20?
-     * TODO hopefully 10 
-     * @param synCtx the message context
-     * @param isInline true for inline scripts
+     * Initialise the Mediator for the inline script
      */
-    public synchronized void loadBSFEngine(MessageContext synCtx, boolean isInline) {
-
-        if (bsfManager == null) {
-            bsfManager = new BSFManager();
-            convertor = getOMElementConvertor();
-        }
-
+    protected void initInlineScript() {
         try {
-            if (isInline) {
-                ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
-                bsfManager.declareBean(MC_VAR_NAME, scriptMC, ScriptMessageContext.class);
-                bsfEngine = bsfManager.loadScriptingEngine(language);
+            ScriptEngineManager manager = new ScriptEngineManager();
+            this.scriptEngine = manager.getEngineByExtension(language);
+            if (scriptEngine == null) {
+                throw new SynapseException("No script engine found for language: " + language);
+            }
+            if (scriptEngine instanceof Compilable) {
+                compiledScript = ((Compilable)scriptEngine).compile(scriptSourceCode);
             } else {
-                bsfEngine = bsfManager.loadScriptingEngine(language);
+                // do nothing. If the script enging doesn't support Compilable then
+                // the inline script will be evaluated on each invocation
+            }
+            
+            convertor = getOMElementConvertor();
+
+        } catch (ScriptException e) {
+            throw new SynapseException("Exception compiling inline script", e);
+        }
+    }
+
+    /**
+     * Prepares the mediator for the invocation of an external script
+     * @throws ScriptException 
+     */
+    protected synchronized void prepareExternalScript(MessageContext synCtx) throws ScriptException {
+        Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
+        boolean needsReload = (entry != null) && entry.isDynamic() && (!entry.isCached() || entry.isExpired());
+
+        if (scriptSourceCode == null || needsReload) {
+            Object o = synCtx.getEntry(key);
+            if (o instanceof OMElement) {
+                scriptSourceCode = ((OMElement) (o)).getText();
+            } else if (o instanceof String) {
+                scriptSourceCode = (String) o;
             }
 
-        } catch (BSFException e) {
-            handleException("Error loading BSF Engine for : " + language +
-                (isInline ? " for inline mediation" : " for external script execution"), e);
-        }
+            ScriptEngineManager manager = new ScriptEngineManager();
+            this.scriptEngine = manager.getEngineByExtension(language);
+            if (scriptEngine == null) {
+                throw new SynapseException("No script engine found for language: " + language);
+            }
+            if (!(scriptEngine instanceof Invocable)) {
+                throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
+            }
 
-        convertor.setEngine(bsfEngine);
+            scriptEngine.eval(scriptSourceCode);
+            invocableScript = (Invocable)scriptEngine;
+            convertor = getOMElementConvertor();
+        }
     }
 
     /**
@@ -272,9 +254,7 @@ public class ScriptMediator extends AbstractMediator {
      * @return a suitable OMElementConverter for the scripting language
      */
     public OMElementConvertor getOMElementConvertor() {
-        OMElementConvertor oc = null;
-
-        if ("javascript".equals(language)) {
+        if ("js".equals(language)) {
             return new JSOMElementConvertor();
         } else if ("ruby".equals(language)) {
             return new RBOMElementConvertor();

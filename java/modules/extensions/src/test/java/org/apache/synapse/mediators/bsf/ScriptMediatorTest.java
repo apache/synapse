@@ -45,33 +45,33 @@ public class ScriptMediatorTest extends TestCase {
     public void testTrueMediator() throws Exception {
 
         MessageContext mc = TestUtils.getTestContext("<foo/>", null);
-        ScriptMediator mediator = new ScriptMediator("javascript",inlinescript);
+        ScriptMediator mediator = new ScriptMediator("js",inlinescript);
         assertTrue(mediator.mediate(mc));
     }
 
     public void testFalseMediator() throws Exception {
         MessageContext mc = TestUtils.getTestContext("<foo/>", null);
-        ScriptMediator mediator = new ScriptMediator("javascript",falsescript);
+        ScriptMediator mediator = new ScriptMediator("js",falsescript);
         assertTrue(mediator.mediate(mc));
     }
 
       
     public void testJSCreateOMElementConvertor() {
-        ScriptMediator mediator = new ScriptMediator("javascript", null);
+        ScriptMediator mediator = new ScriptMediator("js", "true;");
         OMElementConvertor convertor = mediator.getOMElementConvertor();
         assertTrue(convertor instanceof JSOMElementConvertor);
     }
 
-    public void testRBCreateOMElementConvertor() {
-        ScriptMediator mediator = new ScriptMediator("ruby", null);
-        OMElementConvertor convertor = mediator.getOMElementConvertor();
-        assertTrue(convertor instanceof RBOMElementConvertor);
-    }
-    
-    public void testDefaultCreateOMElementConvertor() {
-        ScriptMediator mediator = new ScriptMediator("foo.bar", null);
-        OMElementConvertor convertor = mediator.getOMElementConvertor();
-        assertTrue(convertor instanceof DefaultOMElementConvertor);
-    }
+//    public void testRBCreateOMElementConvertor() {
+//        ScriptMediator mediator = new ScriptMediator("ruby", null);
+//        OMElementConvertor convertor = mediator.getOMElementConvertor();
+//        assertTrue(convertor instanceof RBOMElementConvertor);
+//    }
+//    
+//    public void testDefaultCreateOMElementConvertor() {
+//        ScriptMediator mediator = new ScriptMediator("foo.bar", null);
+//        OMElementConvertor convertor = mediator.getOMElementConvertor();
+//        assertTrue(convertor instanceof DefaultOMElementConvertor);
+//    }
 
 }

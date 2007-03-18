@@ -21,14 +21,14 @@ package org.apache.synapse.mediators.bsf.convertors;
 
 import java.io.ByteArrayInputStream;
 
+import javax.script.ScriptEngine;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.bsf.BSFEngine;
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 
 /**
  * The DefaultOMElementConvertor converts between OMElements and Strings
@@ -57,7 +57,7 @@ public class DefaultOMElementConvertor implements OMElementConvertor {
         return omElement.toString();
     }
 
-    public void setEngine(BSFEngine e) {
+    public void setEngine(ScriptEngine e) {
     }
 
     private void handleException(String msg) {

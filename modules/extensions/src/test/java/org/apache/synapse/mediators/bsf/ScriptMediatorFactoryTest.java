@@ -19,7 +19,6 @@
 
 package org.apache.synapse.mediators.bsf;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,13 +35,13 @@ import org.apache.synapse.mediators.TestUtils;
 public class ScriptMediatorFactoryTest extends TestCase {
 
     private static final OMElement INLINE_MEDIATOR_CONFIG = TestUtils.createOMElement(
-       "<script language=\"javascript\">true</script>");
+       "<script language='js'>true</script>");
 
     private static final OMElement REG_PROP_MEDIATOR_CONFIG = TestUtils.createOMElement(
-       "<script language=\"javascript\" key=\"MyMediator\"/>");
+       "<script language='js' key='MyMediator'/>");
     
     private static final OMElement REG_PROP_FOO_FUNC_MEDIATOR_CONFIG = TestUtils.createOMElement(
-       "<script language=\"javascript\" key=\"MyFooMediator\" function=\"foo\"/>");
+       "<script language='js' key='MyFooMediator' function='foo'/>");
 
     private static final OMElement MY_MEDIATOR = TestUtils.createOMElement(
        "<x><![CDATA[ function mediate(mc) { return true;} ]]></x>");

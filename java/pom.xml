@@ -530,7 +530,7 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
-        <repository>
+<!--        <repository>
             <id>ibiblio-m1</id>
             <name>Ibiblio Maven 1 Repo</name>
             <layout>legacy</layout>
@@ -591,18 +591,6 @@
             </snapshots>
         </repository>
         <repository>
-            <id>WSO2 Maven2 Repository</id>
-            <name>WSO2 Maven2 Repository</name>
-            <layout>legacy</layout>
-            <url>http://dist.wso2.org/maven2/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
             <id>Jibx</id>
             <name>Jibx</name>
             <layout>legacy</layout>
@@ -613,7 +601,7 @@
             <snapshots>
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
-        </repository>
+        </repository>-->
         <repository>
             <id>apache-snapshot</id>
             <name>Apache Snapshot Repository</name>

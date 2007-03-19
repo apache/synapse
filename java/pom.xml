@@ -553,6 +553,17 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>wso2-m2</id>
+            <name>WSO2 Maven 2 Repository</name>
+            <url>http://dist.wso2.org/maven2/</url>
+            <releases>
+            	<updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>interval:1440</updatePolicy>
+            </snapshots>
+        </repository>
 
     </repositories>
 

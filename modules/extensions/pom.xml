@@ -134,18 +134,6 @@
             <version>${wso2commons.version}</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>wstx</artifactId>
-            <version>asl-3.2.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>woodstox</groupId>
-            <artifactId>wstx</artifactId>
-            <version>asl-3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
 
     </dependencies>
 

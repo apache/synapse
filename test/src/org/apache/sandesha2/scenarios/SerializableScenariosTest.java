@@ -18,6 +18,9 @@ package org.apache.sandesha2.scenarios;
 
 import java.io.File;
 
+import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axis2.client.Options;
+
 public class SerializableScenariosTest extends RMScenariosTest {
 
 	public SerializableScenariosTest() {
@@ -29,4 +32,14 @@ public class SerializableScenariosTest extends RMScenariosTest {
 		this.axis2_xmlClient = repoPathClient + File.separator + "client_axis2.xml";
 	}
 
+  public void testMustUnderstandSerialization() throws Exception {
+    
+    Options clientOptions = new Options();
+    clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+    clientOptions.setProperty(org.apache.axis2.addressing.AddressingConstants.ADD_MUST_UNDERSTAND_TO_ADDRESSING_HEADERS, 
+        Boolean.TRUE.toString());
+    
+    // Run the echo test
+    runEcho(clientOptions, true, true, false);
+  }
 }

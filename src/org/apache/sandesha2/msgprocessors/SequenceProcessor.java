@@ -140,11 +140,6 @@ public class SequenceProcessor {
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
 			return InvocationResponse.ABORT;
 		}
-		
-
-		// setting mustUnderstand to false.
-		sequence.setMustUnderstand(false);
-		rmMsgCtx.addSOAPEnvelope();
 
 		// throwing a fault if the sequence is terminated
 		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, bean)) {

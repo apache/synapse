@@ -61,6 +61,9 @@ public class UsesSequenceSTR implements IOMRMPart {
 		if (factory==null)
 			factory = defaultFactory;
 		
+    // Set that we have processed the must understand
+    ((SOAPHeaderBlock)header).setProcessed();
+    
 		return this;
 	}
 

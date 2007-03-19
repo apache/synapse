@@ -854,6 +854,39 @@ public class SandeshaUtil {
 		
 	}
 
+  /**
+   * Remove the MustUnderstand header blocks.
+   * @param envelope
+   */
+  public static SOAPEnvelope removeMustUnderstand(SOAPEnvelope envelope) {
+    if (log.isDebugEnabled())
+      log.debug("Enter: SandeshaUtil::removeMustUnderstand");
+    // you have to explicitely set the 'processed' attribute for header
+    // blocks, since it get lost in the above read from the stream.
+
+    SOAPHeader header = envelope.getHeader();
+    if (header != null) {
+      Iterator childrenOfOldEnv = header.getChildElements();
+      while (childrenOfOldEnv.hasNext()) {
+        
+        SOAPHeaderBlock oldEnvHeaderBlock = (SOAPHeaderBlock) childrenOfOldEnv.next();
+
+        QName oldEnvHeaderBlockQName = oldEnvHeaderBlock.getQName();
+        if (oldEnvHeaderBlockQName != null) {
+          // If we've processed the part and it has a must understand, set it as processed
+          if (oldEnvHeaderBlock.isProcessed() && oldEnvHeaderBlock.getMustUnderstand()) {
+            // Remove the MustUnderstand part
+            oldEnvHeaderBlock.setMustUnderstand(false);
+          }
+        }
+      }
+    }
+    
+    if (log.isDebugEnabled())
+      log.debug("Exit: SandeshaUtil::removeMustUnderstand");
+    return envelope;
+  }
+
 	public static EndpointReference cloneEPR (EndpointReference epr) {
 		EndpointReference newEPR = new EndpointReference (epr.getAddress());
 		Map referenceParams = epr.getAllReferenceParameters();

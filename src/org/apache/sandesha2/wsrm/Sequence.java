@@ -42,7 +42,6 @@ public class Sequence implements IOMRMPart {
 	private Identifier identifier;
 	private MessageNumber messageNumber;
 	private LastMessage lastMessage = null;
-	private boolean mustUnderstand = true;
 	private String namespaceValue = null;
 	
 	public Sequence(String namespaceValue) throws SandeshaException {
@@ -86,6 +85,9 @@ public class Sequence implements IOMRMPart {
 			lastMessage.fromOMElement(sequencePart);
 		}
 
+    // Indicate that we have processed this part of the message.
+    ((SOAPHeaderBlock)sequencePart).setProcessed();
+    
 		return this;
 	}
 
@@ -111,7 +113,8 @@ public class Sequence implements IOMRMPart {
 		SOAPHeaderBlock sequenceHeaderBlock = soapHeader.addHeaderBlock(
 				Sandesha2Constants.WSRM_COMMON.SEQUENCE, rmNamespace);
 		
-		sequenceHeaderBlock.setMustUnderstand(isMustUnderstand());
+    // Always set the MustUnderstand to true for Sequence messages 
+		sequenceHeaderBlock.setMustUnderstand(true);
 		identifier.toOMElement(sequenceHeaderBlock);
 		messageNumber.toOMElement(sequenceHeaderBlock);
 		if (lastMessage != null)
@@ -159,14 +162,6 @@ public class Sequence implements IOMRMPart {
 			elem.detach();
 		
 		toOMElement(header);
-	}
-
-	public boolean isMustUnderstand() {
-		return mustUnderstand;
-	}
-
-	public void setMustUnderstand(boolean mustUnderstand) {
-		this.mustUnderstand = mustUnderstand;
 	}
 	
 	public boolean isNamespaceSupported (String namespaceName) {

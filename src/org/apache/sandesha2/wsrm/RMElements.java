@@ -189,7 +189,7 @@ public class RMElements {
 			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.UsesSequenceSTR);
 			if (element != null) {
 				usesSequenceSTR = new UsesSequenceSTR(factory, Sandesha2Constants.SPEC_2007_02.NS_URI);
-				usesSequenceSTR.fromOMElement(envelope.getHeader());
+				usesSequenceSTR.fromOMElement(element);
 			}
 			
 			element = header.getFirstChildWithName(Sandesha2Constants.SPEC_2007_02.QNames.MessagePending);

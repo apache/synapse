@@ -47,7 +47,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 	private ArrayList acknowledgementRangeList;
 	private ArrayList nackList;
 	private String namespaceValue = null;
-	private boolean mustUnderstand = false;
 	private AckNone ackNone = null;
 	private AckFinal ackFinal = null;
 	
@@ -110,6 +109,10 @@ public class SequenceAcknowledgement implements IOMRMPart {
 			}
 		}
 		
+    // Indicate that we have processed this part of the message.
+    ((SOAPHeaderBlock)sequenceAckElement).setProcessed();
+
+    
 		return this;
 	}
 
@@ -151,7 +154,8 @@ public class SequenceAcknowledgement implements IOMRMPart {
 							SandeshaMessageKeys.invalidIdentifier,
 							header.toString()));
 
-		sequenceAcknowledgementHeaderBlock.setMustUnderstand(isMustUnderstand());
+    // SequenceACK messages should always have the MustUnderstand flag set to true
+		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
 		identifier.toOMElement(sequenceAcknowledgementHeaderBlock);
 
 		Iterator ackRangeIt = acknowledgementRangeList.iterator();
@@ -251,14 +255,6 @@ public class SequenceAcknowledgement implements IOMRMPart {
 		}
 		
 		toOMElement(header);
-	}
-
-	public boolean isMustUnderstand() {
-		return mustUnderstand;
-	}
-
-	public void setMustUnderstand(boolean mustUnderstand) {
-		this.mustUnderstand = mustUnderstand;
 	}
 
 	public boolean isNamespaceSupported (String namespaceName) {

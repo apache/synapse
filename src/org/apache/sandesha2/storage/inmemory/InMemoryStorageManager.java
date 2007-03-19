@@ -254,6 +254,9 @@ public class InMemoryStorageManager extends StorageManager {
 		try {
 			if(useSerialization) {
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				// Remove the MustUnderstand parts for serialized message
+
+        SandeshaUtil.removeMustUnderstand(msgContext.getEnvelope());
 				ObjectOutputStream s = new ObjectOutputStream(stream);
 				s.writeObject(msgContext);
 				s.close();

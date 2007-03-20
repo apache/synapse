@@ -28,6 +28,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.bsf.xml.XMLHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
@@ -35,11 +36,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.bsf.convertors.DefaultOMElementConvertor;
-import org.apache.synapse.mediators.bsf.convertors.GROOVYOMElementConvertor;
-import org.apache.synapse.mediators.bsf.convertors.JSOMElementConvertor;
-import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
-import org.apache.synapse.mediators.bsf.convertors.RBOMElementConvertor;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
@@ -75,13 +71,13 @@ public class ScriptMediator extends AbstractMediator {
     /** The source code of the script */
     private String scriptSourceCode;
     /** The BSF engine created to process each message through the script */
-    private ScriptEngine scriptEngine;
+    protected ScriptEngine scriptEngine;
     /** The compiled script. Only used for inline scripts */
     private CompiledScript compiledScript;
     /** The Invocable script. Only used for external scripts */
     private Invocable invocableScript;
-    /** A converter to get the code for the scripting language from XML */
-    private OMElementConvertor convertor;
+    /** The BSF helper to convert between the XML representations used by Java and the scripting language */
+    private XMLHelper xmlHelper;
 
     /**
      * Create a script mediator for the given language and given script source
@@ -165,7 +161,7 @@ public class ScriptMediator extends AbstractMediator {
      */
     protected Object mediateWithExternalScript(MessageContext synCtx) throws ScriptException {
         prepareExternalScript(synCtx);
-        ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
+        ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
         Object response = invocableScript.invokeFunction(function, new Object[]{scriptMC});
         return response;
     }
@@ -178,7 +174,7 @@ public class ScriptMediator extends AbstractMediator {
      */
     protected Object mediateForInlineScript(MessageContext synCtx) throws ScriptException {
 
-        ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, convertor);
+        ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
 
         Bindings bindings = scriptEngine.createBindings();
         bindings.put(MC_VAR_NAME, scriptMC);
@@ -199,22 +195,18 @@ public class ScriptMediator extends AbstractMediator {
      */
     protected void initInlineScript() {
         try {
-            ScriptEngineManager manager = new ScriptEngineManager();
-            this.scriptEngine = manager.getEngineByExtension(language);
-            if (scriptEngine == null) {
-                throw new SynapseException("No script engine found for language: " + language);
-            }
+
+            initScriptEngine();
+
             if (scriptEngine instanceof Compilable) {
                 compiledScript = ((Compilable)scriptEngine).compile(scriptSourceCode);
             } else {
                 // do nothing. If the script enging doesn't support Compilable then
                 // the inline script will be evaluated on each invocation
             }
-            
-            convertor = getOMElementConvertor();
 
         } catch (ScriptException e) {
-            throw new SynapseException("Exception compiling inline script", e);
+            throw new SynapseException("Exception initializing inline script", e);
         }
     }
 
@@ -234,35 +226,23 @@ public class ScriptMediator extends AbstractMediator {
                 scriptSourceCode = (String) o;
             }
 
-            ScriptEngineManager manager = new ScriptEngineManager();
-            this.scriptEngine = manager.getEngineByExtension(language);
-            if (scriptEngine == null) {
-                throw new SynapseException("No script engine found for language: " + language);
-            }
-            if (!(scriptEngine instanceof Invocable)) {
-                throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
-            }
+            initScriptEngine();
 
             scriptEngine.eval(scriptSourceCode);
             invocableScript = (Invocable)scriptEngine;
-            convertor = getOMElementConvertor();
         }
     }
 
-    /**
-     * Return the appropriate OMElementConverter for the language of the script
-     * @return a suitable OMElementConverter for the scripting language
-     */
-    public OMElementConvertor getOMElementConvertor() {
-        if ("js".equals(language)) {
-            return new JSOMElementConvertor();
-        } else if ("ruby".equals(language)) {
-            return new RBOMElementConvertor();
-        } else if ("groovy".equals(language)) {
-            return new GROOVYOMElementConvertor();
-        } else {
-            return new DefaultOMElementConvertor();
+    protected void initScriptEngine() {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        this.scriptEngine = manager.getEngineByExtension(language);
+        if (scriptEngine == null) {
+            throw new SynapseException("No script engine found for language: " + language);
         }
+        if (!(scriptEngine instanceof Invocable)) {
+            throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
+        }
+        xmlHelper = XMLHelper.getArgHelper(scriptEngine);
     }
 
     public String getLanguage() {

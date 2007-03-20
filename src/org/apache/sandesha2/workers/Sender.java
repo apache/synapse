@@ -229,52 +229,55 @@ public class Sender extends SandeshaThread {
 			SandeshaPolicyBean propertyBean = 
 				SandeshaUtil.getPropertyBean(storageManager.getContext().getAxisConfiguration());			
 
-			// Find terminated sequences.
-	    List rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
-	    
-	    deleteRMSBeans(rmsBeans, propertyBean);
-	    
-	    finderBean.setTerminated(false);
-	    finderBean.setTimedOut(true);
-	    
-	    // Find timed out sequences
-	    rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
-	    	    
-	    deleteRMSBeans(rmsBeans, propertyBean);
-	    
-	    // Remove any terminated RMDBeans.
-	    RMDBean finderRMDBean = new RMDBean();
-	    finderRMDBean.setTerminated(true);
-	    
-	    List rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+    	long deleteTime = propertyBean.getSequenceRemovalTimeoutInterval();
+    	if (deleteTime < 0)
+    		deleteTime = 0;
 
-	    Iterator beans = rmdBeans.iterator();
-	    while (beans.hasNext()) {
-	    	RMDBean rmdBean = (RMDBean)beans.next();
-	    	
-	    	long timeNow = System.currentTimeMillis();
-	    	long lastActivated = rmdBean.getLastActivatedTime();
-	    	long deleteTime = propertyBean.getSequenceRemovalTimeoutInterval();
-	    	
-	    	if (deleteTime < 0)
-	    		deleteTime = 0;
-
-	    	// delete sequences that have been timedout or deleted for more than 
-	    	// the SequenceRemovalTimeoutInterval
-	    	if ((lastActivated + deleteTime) < timeNow) {
-	    		if (log.isDebugEnabled())
-	    			log.debug("Deleting RMDBean " + deleteTime + " : " + rmdBean);
-	    		storageManager.getRMDBeanMgr().delete(rmdBean.getSequenceID());
-	    	}	    		    	
-	    }
+    	if (deleteTime > 0) {
+				// Find terminated sequences.
+		    List rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
+		    
+		    deleteRMSBeans(rmsBeans, propertyBean, deleteTime);
+		    
+		    finderBean.setTerminated(false);
+		    finderBean.setTimedOut(true);
+		    
+		    // Find timed out sequences
+		    rmsBeans = storageManager.getRMSBeanMgr().find(finderBean);
+		    	    
+		    deleteRMSBeans(rmsBeans, propertyBean, deleteTime);
+		    
+		    // Remove any terminated RMDBeans.
+		    RMDBean finderRMDBean = new RMDBean();
+		    finderRMDBean.setTerminated(true);
+		    
+		    List rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+	
+		    Iterator beans = rmdBeans.iterator();
+		    while (beans.hasNext()) {
+		    	RMDBean rmdBean = (RMDBean)beans.next();
+		    	
+		    	long timeNow = System.currentTimeMillis();
+		    	long lastActivated = rmdBean.getLastActivatedTime();
+	
+		    	// delete sequences that have been timedout or deleted for more than 
+		    	// the SequenceRemovalTimeoutInterval
+		    	if ((lastActivated + deleteTime) < timeNow) {
+		    		if (log.isDebugEnabled())
+		    			log.debug("Deleting RMDBean " + deleteTime + " : " + rmdBean);
+		    		storageManager.getRMDBeanMgr().delete(rmdBean.getSequenceID());
+		    	}	    		    	
+		    }
+    	}
 
 	    // Terminate RMD Sequences that have been inactive.			
 			if (propertyBean.getInactivityTimeoutInterval() > 0) {
-				finderRMDBean.setTerminated(false);
+		    RMDBean finderRMDBean = new RMDBean();
+		    finderRMDBean.setTerminated(false);
 				
-				rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
+		    List rmdBeans = storageManager.getRMDBeanMgr().find(finderRMDBean);
 			
-		    beans = rmdBeans.iterator();
+		    Iterator beans = rmdBeans.iterator();
 		    while (beans.hasNext()) {
 		    	RMDBean rmdBean = (RMDBean)beans.next();
 		    	
@@ -303,7 +306,7 @@ public class Sender extends SandeshaThread {
 			log.debug("Exit: Sender::deleteTerminatedSequences");
 	}
 	
-	private void deleteRMSBeans(List rmsBeans, SandeshaPolicyBean propertyBean) 
+	private void deleteRMSBeans(List rmsBeans, SandeshaPolicyBean propertyBean, long deleteTime) 
 
 	throws SandeshaStorageException {		
 		if (log.isDebugEnabled()) 
@@ -318,9 +321,6 @@ public class Sender extends SandeshaThread {
     	long lastActivated = rmsBean.getLastActivatedTime();
     	// delete sequences that have been timedout or deleted for more than 
     	// the SequenceRemovalTimeoutInterval
-    	long deleteTime = propertyBean.getSequenceRemovalTimeoutInterval();
-    	if (deleteTime < 0)
-    		deleteTime = 0;
    	
     	if ((lastActivated + deleteTime) < timeNow) {
     		if (log.isDebugEnabled())

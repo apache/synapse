@@ -87,6 +87,9 @@ public class MessagePending implements IOMRMPart {
 			throw new SandeshaException (message);
 		}
 		
+		// Mark this element as processed
+		((SOAPHeaderBlock)messagePendingElement).setProcessed();
+
 		return messagePendingElement;
 	}
 

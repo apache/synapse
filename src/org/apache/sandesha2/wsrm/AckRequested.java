@@ -64,7 +64,10 @@ public class AckRequested implements IOMRMPart {
 
 		identifier = new Identifier(namespaceValue);
 		identifier.fromOMElement(ackReqElement);
-		
+
+		// Indicate that we have processed this SOAPHeaderBlock
+		((SOAPHeaderBlock)ackReqElement).setProcessed();
+
 		return this;
 	}
 

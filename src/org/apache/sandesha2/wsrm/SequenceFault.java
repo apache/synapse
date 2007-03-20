@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -69,16 +70,18 @@ public class SequenceFault implements IOMRMPart {
 			faultCode.fromOMElement(sequenceFaultPart);
 		}
 
+		((SOAPHeaderBlock)sequenceFaultPart).setProcessed();
+
 		return this;
 	}
 
-	public OMElement toOMElement(OMElement body) throws OMException {
+	public OMElement toOMElement(OMElement header) throws OMException {
 
-		if (body == null || !(body instanceof SOAPHeader))
+		if (header == null || !(header instanceof SOAPHeader))
 			throw new OMException(SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.seqFaultCannotBeExtractedToNonHeader));
 
-		OMFactory factory = body.getOMFactory();
+		OMFactory factory = header.getOMFactory();
 
 		OMNamespace rmNamespace = factory.createOMNamespace(namespaceValue,Sandesha2Constants.WSRM_COMMON.NS_PREFIX_RM);
 		OMElement sequenceFaultElement =factory.createOMElement(
@@ -86,9 +89,9 @@ public class SequenceFault implements IOMRMPart {
 		if (faultCode != null)
 			faultCode.toOMElement(sequenceFaultElement);
 
-		body.addChild(sequenceFaultElement);
+		header.addChild(sequenceFaultElement);
 
-		return body;
+		return header;
 	}
 
 	public void setFaultCode(FaultCode faultCode) {

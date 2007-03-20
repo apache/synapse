@@ -304,7 +304,6 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	 * Runs at SOAP12 level	 
 	 */
 	public void testRMSSequenceTerminatedOnSequenceUnknownFaultSOAP12() throws Exception {	
-		org.apache.log4j.BasicConfigurator.configure();
 		runSequenceTerminated(true, true);
 	}
 

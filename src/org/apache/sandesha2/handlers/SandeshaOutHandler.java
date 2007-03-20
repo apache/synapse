@@ -20,8 +20,10 @@ package org.apache.sandesha2.handlers;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -136,6 +138,14 @@ public class SandeshaOutHandler extends AbstractHandler {
 				}
 			}
 				
+			// Server-side, when we are suspend the outbound flow we may still be connected to an
+			// inbound transport. If we are then they don't see the InvocationResponse that we
+			// return, so we need to set a flag on the operation context too.
+			OperationContext opCtx = msgCtx.getOperationContext();
+			if(opCtx != null && returnValue == InvocationResponse.SUSPEND) {
+				if(log.isDebugEnabled()) log.debug("Setting HOLD_RESPONSE property");
+				opCtx.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
+			}
 
 		} catch (Exception e) {
 			// message should not be sent in a exception situation.

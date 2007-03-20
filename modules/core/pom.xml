@@ -102,9 +102,9 @@
                                     <fileset dir="target/modules/synapse">
                                          <include name="**"/>
                                     </fileset>
-                                    <fileset dir="target/classes">
+                                    <!--<fileset dir="target/classes">
                                         <include name="**"/>
-                                    </fileset>                        
+                                    </fileset>-->
                                 </jar>
 
                                 <copy file="target/synapse-${version}.mar"

@@ -27,7 +27,7 @@ import org.apache.synapse.mediators.bsf.ScriptMediator;
 
 public class JavaScriptMediatorTest extends TestCase {
 
-    public void testTrueMediator() throws Exception {
+    public void testInlineMediator() throws Exception {
         ScriptMediator mediator = new ScriptMediator("js", "mc.getPayloadXML().b == 'petra';");
 
         MessageContext mc = TestUtils.getTestContext("<a><b>petra</b></a>", null);
@@ -40,4 +40,16 @@ public class JavaScriptMediatorTest extends TestCase {
         assertTrue(mediator.mediate(mc));
     }
 
+    public void testInlineMediator2() throws Exception {
+        ScriptMediator mediator = new ScriptMediator("js", "mc.getPayloadXML().b == 'petra';");
+
+        MessageContext mc = TestUtils.getTestContext("<a><b>petra</b></a>", null);
+        assertTrue(mediator.mediate(mc));
+
+        mc = TestUtils.getTestContext("<a><b>sue</b></a>", null);
+        assertFalse(mediator.mediate(mc));
+
+        mc = TestUtils.getTestContext("<a><b>petra</b></a>", null);
+        assertTrue(mediator.mediate(mc));
+    }
 }

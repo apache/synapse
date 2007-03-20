@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -105,6 +106,7 @@ public class SynapseModule implements Module {
     private static SynapseConfiguration initializeSynapse(
         ConfigurationContext cfgCtx) {
 
+        cfgCtx.setProperty("addressing.validateAction", Boolean.FALSE);
         AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
         SynapseConfiguration synapseConfiguration;
 

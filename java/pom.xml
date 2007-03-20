@@ -224,7 +224,6 @@
                 <artifactId>synapse-nhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -232,10 +231,20 @@
         <!-- core Axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
+            <artifactId>axis2-kernel</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-                
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-adb</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-java2wsdl</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+
         <!-- core Axiom -->
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
@@ -513,7 +522,7 @@
             	<updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
         <repository>
@@ -525,7 +534,7 @@
             	<updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
         <repository>
@@ -537,9 +546,10 @@
             	<updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
+<!--
         <repository>
             <id>apache-m2-snapshot</id>
             <name>Apache Maven 2 Snapshot Repository</name>
@@ -551,6 +561,7 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
+-->
         <repository>
             <id>wso2-m2</id>
             <name>WSO2 Maven 2 Repository</name>
@@ -562,7 +573,6 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
-
     </repositories>
 
     <modules>

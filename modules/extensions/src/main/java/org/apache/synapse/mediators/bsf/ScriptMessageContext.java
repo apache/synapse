@@ -21,17 +21,21 @@ package org.apache.synapse.mediators.bsf;
 
 import java.util.Set;
 import java.util.Stack;
-import org.apache.axiom.soap.SOAPEnvelope;
+
+import javax.script.ScriptException;
+
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Mediator;
+import org.apache.bsf.xml.XMLHelper;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.mediators.bsf.convertors.OMElementConvertor;
 import org.apache.synapse.endpoints.Endpoint;
 
 /**
@@ -43,11 +47,11 @@ public class ScriptMessageContext implements MessageContext {
     /** The actual Synapse message context reference */
     private MessageContext mc;
     /** The OMElement to scripting language object converter for the selected language */
-    private OMElementConvertor convertor;
+    private XMLHelper xmlHelper;
 
-    public ScriptMessageContext(MessageContext mc, OMElementConvertor convertor) {
+    public ScriptMessageContext(MessageContext mc, XMLHelper xmlHelper) {
         this.mc = mc;
-        this.convertor = convertor;
+        this.xmlHelper = xmlHelper;
     }
 
     /**
@@ -55,30 +59,35 @@ public class ScriptMessageContext implements MessageContext {
      * The payload is the first element inside the SOAP <Body> tags
      * 
      * @return the XML SOAP Body
+     * @throws ScriptException 
+     * @throws OMException 
      */
-    public Object getPayloadXML() {
-        return convertor.toScript(mc.getEnvelope().getBody().getFirstElement());
+    public Object getPayloadXML() throws OMException, ScriptException {
+        return xmlHelper.toScriptXML(mc.getEnvelope().getBody().getFirstElement());
     }
 
     /**
      * Set the SOAP body payload from XML
      * 
      * @param payload
+     * @throws ScriptException 
+     * @throws OMException 
      * 
      */
 
-    public void setPayloadXML(Object payload) {
+    public void setPayloadXML(Object payload) throws OMException, ScriptException {
         OMElement firstChild = mc.getEnvelope().getBody().getFirstElement();
-        firstChild.insertSiblingAfter(convertor.fromScript(payload));
+        firstChild.insertSiblingAfter(xmlHelper.toOMElement(payload));
         firstChild.detach();
     }
 
     /**
      * Get the XML representation of the complete SOAP envelope
      * @return return an object that represents the payload in the current scripting language
+     * @throws ScriptException 
      */
-    public Object getEnvelopeXML() {
-        return convertor.toScript(mc.getEnvelope());
+    public Object getEnvelopeXML() throws ScriptException {
+        return xmlHelper.toScriptXML(mc.getEnvelope());
     }
 
     // helpers to set EPRs from a script string

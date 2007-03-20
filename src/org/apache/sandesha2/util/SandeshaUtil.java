@@ -244,30 +244,52 @@ public class SandeshaUtil {
 	
 	public static StorageManager getInMemoryStorageManager(ConfigurationContext context) throws SandeshaException {
 
-		StorageManager inMemoryStorageManager = (StorageManager) context.getProperty(Sandesha2Constants.INMEMORY_STORAGE_MANAGER);
-		if (inMemoryStorageManager != null)
-			return inMemoryStorageManager;
+		StorageManager inMemoryStorageManager = null;
+		
+		AxisConfiguration config = context.getAxisConfiguration();
+		Parameter parameter = config.getParameter(Sandesha2Constants.INMEMORY_STORAGE_MANAGER);
+		if(parameter != null) inMemoryStorageManager = (StorageManager) parameter.getValue();
+		if (inMemoryStorageManager != null)	return inMemoryStorageManager;
 
-		//Currently module policies (default) are used to find the storage manager. These cant be overriden
-		//TODO change this so that different services can hv different storage managers.
-		String storageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getInMemoryStorageManagerClass();
-		inMemoryStorageManager = getStorageManagerInstance(storageManagerClassStr,context);
-		context.setProperty(Sandesha2Constants.INMEMORY_STORAGE_MANAGER,inMemoryStorageManager);
+		try {
+			//Currently module policies (default) are used to find the storage manager. These cant be overriden
+			//TODO change this so that different services can hv different storage managers.
+			String storageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getInMemoryStorageManagerClass();
+			inMemoryStorageManager = getStorageManagerInstance(storageManagerClassStr,context);
+			parameter = new Parameter(Sandesha2Constants.INMEMORY_STORAGE_MANAGER, inMemoryStorageManager);
+			config.addParameter(parameter);
+		} catch(AxisFault e) {
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotInitInMemoryStorageManager,
+					e.toString());
+			throw new SandeshaException(message, e);
+		}
 		
 		return inMemoryStorageManager;
 	}
 	
 	public static StorageManager getPermanentStorageManager(ConfigurationContext context) throws SandeshaException {
 
-		StorageManager permanentStorageManager = (StorageManager) context.getProperty(Sandesha2Constants.PERMANENT_STORAGE_MANAGER);
-		if (permanentStorageManager != null)
-			return permanentStorageManager;
+		StorageManager permanentStorageManager = null;
+		
+		AxisConfiguration config = context.getAxisConfiguration();
+		Parameter parameter = config.getParameter(Sandesha2Constants.PERMANENT_STORAGE_MANAGER);
+		if(parameter != null) permanentStorageManager = (StorageManager) parameter.getValue();
+		if (permanentStorageManager != null)	return permanentStorageManager;
 
-		//Currently module policies (default) are used to find the storage manager. These cant be overriden
-		//TODO change this so that different services can hv different storage managers.
-		String storageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getPermanentStorageManagerClass ();
-		permanentStorageManager = getStorageManagerInstance(storageManagerClassStr,context);
-		context.setProperty(Sandesha2Constants.PERMANENT_STORAGE_MANAGER,permanentStorageManager);
+		try {
+			//Currently module policies (default) are used to find the storage manager. These cant be overriden
+			//TODO change this so that different services can hv different storage managers.
+			String storageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getInMemoryStorageManagerClass();
+			permanentStorageManager = getStorageManagerInstance(storageManagerClassStr,context);
+			parameter = new Parameter(Sandesha2Constants.PERMANENT_STORAGE_MANAGER, permanentStorageManager);
+			config.addParameter(parameter);
+		} catch(AxisFault e) {
+			String message = SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.cannotInitPersistentStorageManager,
+					e.toString());
+			throw new SandeshaException(message, e);
+		}
 		
 		return permanentStorageManager;
 	}
@@ -276,7 +298,10 @@ public class SandeshaUtil {
 		
 		StorageManager storageManager = null;
 		try {
-		    ClassLoader classLoader = (ClassLoader)	context.getProperty(Sandesha2Constants.MODULE_CLASS_LOADER);
+			ClassLoader classLoader = null;
+			AxisConfiguration config = context.getAxisConfiguration();
+			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
+			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
 
 		    if (classLoader==null)
 		    	throw new SandeshaException (SandeshaMessageHelper.getMessage(
@@ -688,20 +713,31 @@ public class SandeshaUtil {
 	
 
 	public static SecurityManager getSecurityManager(ConfigurationContext context) throws SandeshaException {
-		SecurityManager util = (SecurityManager) context.getProperty(Sandesha2Constants.SECURITY_MANAGER);
+		SecurityManager util = null;
+		AxisConfiguration config = context.getAxisConfiguration();
+		Parameter p = config.getParameter(Sandesha2Constants.SECURITY_MANAGER);
+		if(p != null) util = (SecurityManager) p.getValue();
 		if (util != null) return util;
 
-		//Currently module policies are used to find the security impl. These cant be overriden
-		String securityManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getSecurityManagerClass();
-		util = getSecurityManagerInstance(securityManagerClassStr,context);
-		context.setProperty(Sandesha2Constants.SECURITY_MANAGER,util);
-		
+		try {
+			//Currently module policies are used to find the security impl. These cant be overriden
+			String securityManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getSecurityManagerClass();
+			util = getSecurityManagerInstance(securityManagerClassStr,context);
+			p = new Parameter(Sandesha2Constants.SECURITY_MANAGER,util);
+			config.addParameter(p);
+		} catch(AxisFault e) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitSecurityManager, e.toString());
+			throw new SandeshaException(message,e);
+		}
 		return util;
 	}
 
 	private static SecurityManager getSecurityManagerInstance (String className,ConfigurationContext context) throws SandeshaException {
 		try {
-		  ClassLoader classLoader = (ClassLoader)	context.getProperty(Sandesha2Constants.MODULE_CLASS_LOADER);
+			ClassLoader classLoader = null;
+			AxisConfiguration config = context.getAxisConfiguration();
+			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
+			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
 
 		  if (classLoader==null)
 	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));

@@ -24,6 +24,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.axis2.modules.ModulePolicyExtension;
 import org.apache.axis2.modules.PolicyExtension;
@@ -55,8 +56,11 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			AxisModule module) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::init, " + configContext);
 
-		//storing the Sandesha module as a property.
-		configContext.setProperty(Sandesha2Constants.MODULE_CLASS_LOADER,module.getModuleClassLoader());
+		AxisConfiguration config = configContext.getAxisConfiguration();
+
+		//storing the Sandesha module as a parameter.
+		Parameter parameter = new Parameter(Sandesha2Constants.MODULE_CLASS_LOADER,module.getModuleClassLoader());
+		config.addParameter(parameter);
 
 		//init the i18n messages
 		SandeshaMessageHelper.innit();
@@ -81,14 +85,15 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			}
 		}
 		
-		Parameter parameter = new Parameter ();
-		parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
-		parameter.setValue(propertyBean);
-		configContext.getAxisConfiguration().addParameter(parameter);;
+		parameter = new Parameter (Sandesha2Constants.SANDESHA_PROPERTY_BEAN, propertyBean);
+		config.addParameter(parameter);
 		
-		configContext.setProperty(Sandesha2Constants.INMEMORY_STORAGE_MANAGER,null);   // this must be resetted by the module settings.
-		configContext.setProperty(Sandesha2Constants.PERMANENT_STORAGE_MANAGER,null);
-		
+		// Reset both storage managers
+		parameter = config.getParameter(Sandesha2Constants.INMEMORY_STORAGE_MANAGER);
+		if(parameter != null) config.removeParameter(parameter);
+		parameter = config.getParameter(Sandesha2Constants.PERMANENT_STORAGE_MANAGER);
+		if(parameter != null) config.removeParameter(parameter);
+
 		try {
 			StorageManager inMemorytorageManager = SandeshaUtil.getInMemoryStorageManager(configContext);
 			inMemorytorageManager.initStorage(module);
@@ -109,7 +114,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			log.debug(message,e);
 		}
 		
-		configContext.setProperty(Sandesha2Constants.SECURITY_MANAGER,null);
+		// Reset the security manager, and then load it
+		parameter = config.getParameter(Sandesha2Constants.SECURITY_MANAGER);
+		if(parameter != null) config.removeParameter(parameter);
 		SecurityManager util = SandeshaUtil.getSecurityManager(configContext);
 		util.initSecurity(module);
 

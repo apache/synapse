@@ -49,7 +49,8 @@ public class InvokerBeanMgrTest extends SandeshaTestCase {
         ConfigurationContext configCtx = new ConfigurationContext(axisConfig);
         
         ClassLoader classLoader = getClass().getClassLoader();
-        configCtx.setProperty(Sandesha2Constants.MODULE_CLASS_LOADER,classLoader);
+        parameter = new Parameter(Sandesha2Constants.MODULE_CLASS_LOADER,classLoader);
+        axisConfig.addParameter(parameter);
         
         StorageManager storageManager = SandeshaUtil.getInMemoryStorageManager(configCtx);
         transaction = storageManager.getTransaction();

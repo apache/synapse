@@ -228,6 +228,10 @@ public class ScriptMediator extends AbstractMediator {
 
             initScriptEngine();
 
+            if (!(scriptEngine instanceof Invocable)) {
+                throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
+            }
+
             scriptEngine.eval(scriptSourceCode);
             invocableScript = (Invocable)scriptEngine;
         }
@@ -238,9 +242,6 @@ public class ScriptMediator extends AbstractMediator {
         this.scriptEngine = manager.getEngineByExtension(language);
         if (scriptEngine == null) {
             throw new SynapseException("No script engine found for language: " + language);
-        }
-        if (!(scriptEngine instanceof Invocable)) {
-            throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
         }
         xmlHelper = XMLHelper.getArgHelper(scriptEngine);
     }

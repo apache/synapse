@@ -466,7 +466,11 @@ public class FaultManager {
 			
 			referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-
+						
+			// Set the action
+			faultMessageContext.setWSAAction(
+					SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
+			
 			if (log.isDebugEnabled())
 				log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
 			// Send the message
@@ -479,6 +483,7 @@ public class FaultManager {
 			throw new SandeshaException (message);
 		}
 		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+	  fault.setFaultAction(SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
 		throw fault;		
 		
 	}
@@ -516,6 +521,7 @@ public class FaultManager {
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
 		String soapFaultSubcode = null;
+		String identifier = null;
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
 			// Log the fault
 			if (faultPart.getCode() != null && 
@@ -530,15 +536,21 @@ public class FaultManager {
 	      // If the sequence fault part is not null, then we have an RM specific fault.
 	      if (sequenceFault != null) {
 	      	soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode();
+	      	
+	      	// Get the identifier - if there is one.
+	      	identifier = sequenceFault.getFaultCode().getDetail();
 	      }
       } catch (SandeshaException e) {
       	if (log.isDebugEnabled()) 
-      		log.debug("Unable to process SequenceFault");
+      		log.debug("Unable to process SequenceFault", e);
       }
 		}
 		
 		if (Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED.equals(soapFaultSubcode)) {
 			processCreateSequenceRefusedFault(rmMsgCtx, fault);
+		} else if (Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE.equals(soapFaultSubcode) ||
+				Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED.equals(soapFaultSubcode) ) {
+			processSequenceUnknownFault(rmMsgCtx, fault, identifier);
 		}
 	}
 	
@@ -683,7 +695,52 @@ public class FaultManager {
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::processCreateSequenceRefusedFault");
 	}
-	
+
+	/**
+	 * If the RMD returns a SequenceTerminated, or an Unknown sequence fault, then we should 
+	 * mark the RMS Sequence as terminated and notify clients of the error.
+	 * 
+	 * @param rmMsgCtx
+	 * @param fault
+	 * @param identifier 
+	 */
+	private static void processSequenceUnknownFault(RMMsgContext rmMsgCtx, AxisFault fault, String sequenceID) throws AxisFault {
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::processSequenceUnknownFault " + sequenceID);
+
+		ConfigurationContext configCtx = rmMsgCtx.getMessageContext().getConfigurationContext();
+
+		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configCtx, configCtx
+				.getAxisConfiguration());
+		
+		// Find the rmsBean
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
+		if (rmsBean == null) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: FaultManager::processSequenceUnknownFault Unable to find RMSBean");
+			return;
+		}
+
+		// Notify the clients of a failure
+		notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
+		
+		rmMsgCtx.pause();
+		
+		// Cleanup sending side.
+		if (log.isDebugEnabled())
+			log.debug("Terminating sending sequence " + rmsBean);
+		TerminateManager.terminateSendingSide(rmsBean, storageManager);
+		
+		// Update the last activated time.
+		rmsBean.setLastActivatedTime(System.currentTimeMillis());
+		
+		// Update the bean in the map
+		storageManager.getRMSBeanMgr().update(rmsBean);
+
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::processSequenceUnknownFault");	  
+  }
+
 	static void notifyClientsOfFault(String internalSequenceId, 
 			StorageManager storageManager, ConfigurationContext configCtx, AxisFault fault) throws SandeshaStorageException {
 		// Locate and update all of the messages for this sequence, now that we know

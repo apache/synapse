@@ -293,15 +293,15 @@ public class SpecSpecificConstants {
 					addressingNSURI));
 	}
 	
-	public static String getAddressingFaultAction (String addressingNSURI) throws SandeshaException {
-		if (AddressingConstants.Submission.WSA_NAMESPACE.equals(addressingNSURI))
-			return "http://docs.oasis-open.org/ws-rx/wsrm/200608/fault";  //this is not available in addressing constants )-:
-		else if (AddressingConstants.Final.WSA_NAMESPACE.equals(addressingNSURI))
+	public static String getAddressingFaultAction (String specVersion) throws SandeshaException {
+		if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(specVersion)) 
 			return AddressingConstants.Final.WSA_FAULT_ACTION;
-		else
+		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
+			return Sandesha2Constants.SPEC_2007_02.Actions.SOAP_ACTION_FAULT;
+		else 
 			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownWSAVersion,
-					addressingNSURI));
+					SandeshaMessageKeys.unknownSpec,
+					specVersion));
 	}
 	
 	public static String getAddressingNamespace(String rmNamespace) throws SandeshaException {

@@ -20,19 +20,28 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;
+import org.apache.sandesha2.client.SandeshaClient;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
@@ -263,6 +272,134 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	}
 
 	/**
+	 * When sending application messages, if the RMD sequence returns a sequence terminated
+	 * fault, then the RMS Sequence should be terminated	 
+	 */
+	public void testRMSSequenceTerminatedOnSequenceTerminatedFault() throws Exception {
+		runSequenceTerminated(false, false);
+	}
+
+	/**
+	 * When sending application messages, if the RMD sequence returns a sequence terminated
+	 * fault, then the RMS Sequence should be terminated.
+	 * 
+	 * Runs at SOAP12 level	 
+	 */
+	public void testRMSSequenceTerminatedOnSequenceTerminatedFaultSOAP12() throws Exception {
+		runSequenceTerminated(false, true);
+	}
+
+	/**
+	 * When sending application messages, if the RMD sequence returns a sequence terminated
+	 * fault, then the RMS Sequence should be terminated	 
+	 */
+	public void testRMSSequenceTerminatedOnSequenceUnknownFault() throws Exception {		
+		runSequenceTerminated(true, false);
+	}
+
+	/**
+	 * When sending application messages, if the RMD sequence returns a sequence terminated
+	 * fault, then the RMS Sequence should be terminated	 
+	 * 
+	 * Runs at SOAP12 level	 
+	 */
+	public void testRMSSequenceTerminatedOnSequenceUnknownFaultSOAP12() throws Exception {	
+		org.apache.log4j.BasicConfigurator.configure();
+		runSequenceTerminated(true, true);
+	}
+
+	private void runSequenceTerminated(boolean deleteRMSBean, boolean soap12) throws Exception {
+		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
+		
+		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
+		String axis2_xml = "target" + File.separator + "repos" + File.separator + "client" + File.separator + "client_axis2.xml";
+		
+		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(repoPath,axis2_xml);		
+		
+		Options clientOptions = new Options ();
+		clientOptions.setAction(pingAction);
+		clientOptions.setTo(new EndpointReference (to));
+
+		String sequenceKey = SandeshaUtil.getUUID();
+		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);
+		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
+		
+		if (soap12)
+			clientOptions.setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+		
+		ServiceClient serviceClient = new ServiceClient (configContext,null);
+		serviceClient.setOptions(clientOptions);
+
+    // Send a single ping message
+		serviceClient.fireAndForget(getPingOMBlock("ping1"));
+	
+		long limit = System.currentTimeMillis() + waitTime;
+		Error lastError = null;
+		while(System.currentTimeMillis() < limit) {
+			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
+			
+			// Check that the sequence has been deleted.
+			StorageManager storageManager = 
+				SandeshaUtil.getSandeshaStorageManager(serverConfigContext, serverConfigContext.getAxisConfiguration());
+			
+			Transaction tran = storageManager.getTransaction();
+			
+			RMDBean finderBean = new RMDBean();
+			List rmdBeans = storageManager.getRMDBeanMgr().find(finderBean);
+			
+			tran.commit();
+			
+			lastError = null;
+			
+			if (rmdBeans.isEmpty())
+				lastError = new Error("rmdBeans empty " + rmdBeans);
+			else {
+				RMDBean bean = (RMDBean)rmdBeans.get(0);
+				if (!bean.getServerCompletedMessages().getContainedElementsAsNumbersList().contains(new Integer(1))) {
+					tran = storageManager.getTransaction();
+					if (deleteRMSBean) {
+						storageManager.getRMDBeanMgr().delete(bean.getSequenceID());
+					} else {
+						bean.setTerminated(true);
+						storageManager.getRMDBeanMgr().update(bean);
+					}
+					tran.commit();
+					break;				
+				}
+				
+				lastError = new Error("App message has not arrived");
+			}
+		}
+
+		if(lastError != null) throw lastError;
+
+		// Send a second application message.
+		serviceClient.fireAndForget(getPingOMBlock("ping2"));
+		
+		while(System.currentTimeMillis() < limit) {
+			Thread.sleep(tickTime); // Try the assertions each tick interval, until they pass or we time out
+			
+			try {
+        //Check that the outgoing sequence is terminated
+				SequenceReport sequenceReport = SandeshaClient.getOutgoingSequenceReport(serviceClient);
+				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TERMINATED);
+				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
+				
+				lastError = null;
+				break;
+			} catch(Error e) {
+				lastError = e;
+			}
+		}
+
+		if(lastError != null) throw lastError;
+		
+		configContext.getListenerManager().stop();
+		serviceClient.cleanup();
+
+	}
+	
+	/**
 	 * Get an application message as bytes
 	 * 
 	 * @return
@@ -410,4 +547,5 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	}
 
 }
+
 

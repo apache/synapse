@@ -96,27 +96,29 @@ public interface Sandesha2Constants {
 		public interface Actions {
 			
 			// WS-RM actions
-			String ACTION_CREATE_SEQUENCE             = SPEC_2007_02.NS_URI + "/CreateSequence";
-			String ACTION_CREATE_SEQUENCE_RESPONSE    = SPEC_2007_02.NS_URI + "/CreateSequenceResponse";
-			String ACTION_CLOSE_SEQUENCE              = SPEC_2007_02.NS_URI + "/CloseSequence";
-			String ACTION_CLOSE_SEQUENCE_RESPONSE     = SPEC_2007_02.NS_URI + "/CloseSequenceResponse";
-			String ACTION_TERMINATE_SEQUENCE          = SPEC_2007_02.NS_URI + "/TerminateSequence";
-			String ACTION_TERMINATE_SEQUENCE_RESPONSE = SPEC_2007_02.NS_URI + "/TerminateSequenceResponse";
-			String ACTION_SEQUENCE_ACKNOWLEDGEMENT    = SPEC_2007_02.NS_URI + "/SequenceAcknowledgement";
-			String ACTION_ACK_REQUEST                 = SPEC_2007_02.NS_URI + "/AckRequested";
+			public static final String ACTION_CREATE_SEQUENCE             = SPEC_2007_02.NS_URI + "/CreateSequence";
+			public static final String ACTION_CREATE_SEQUENCE_RESPONSE    = SPEC_2007_02.NS_URI + "/CreateSequenceResponse";
+			public static final String ACTION_CLOSE_SEQUENCE              = SPEC_2007_02.NS_URI + "/CloseSequence";
+			public static final String ACTION_CLOSE_SEQUENCE_RESPONSE     = SPEC_2007_02.NS_URI + "/CloseSequenceResponse";
+			public static final String ACTION_TERMINATE_SEQUENCE          = SPEC_2007_02.NS_URI + "/TerminateSequence";
+			public static final String ACTION_TERMINATE_SEQUENCE_RESPONSE = SPEC_2007_02.NS_URI + "/TerminateSequenceResponse";
+			public static final String ACTION_SEQUENCE_ACKNOWLEDGEMENT    = SPEC_2007_02.NS_URI + "/SequenceAcknowledgement";
+			public static final String ACTION_ACK_REQUEST                 = SPEC_2007_02.NS_URI + "/AckRequested";
+			public static final String ACTION_FAULT                       = SPEC_2007_02.NS_URI + "/fault";
 			
 			// WS-MC actions
-			String ACTION_MAKE_CONNECTION             = SPEC_2007_02.MC_NS_URI + "/MakeConnection";
+			public static final String ACTION_MAKE_CONNECTION             = SPEC_2007_02.MC_NS_URI + "/MakeConnection";
 
-			String SOAP_ACTION_CREATE_SEQUENCE             = ACTION_CREATE_SEQUENCE;
-			String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE    = ACTION_CREATE_SEQUENCE_RESPONSE;
-			String SOAP_ACTION_CLOSE_SEQUENCE              = ACTION_CLOSE_SEQUENCE;
-			String SOAP_ACTION_CLOSE_SEQUENCE_RESPONSE     = ACTION_CLOSE_SEQUENCE_RESPONSE;
-			String SOAP_ACTION_TERMINATE_SEQUENCE          = ACTION_TERMINATE_SEQUENCE;
-			String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = ACTION_TERMINATE_SEQUENCE_RESPONSE;
-			String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT    = ACTION_SEQUENCE_ACKNOWLEDGEMENT;
-			String SOAP_ACTION_ACK_REQUEST                 = ACTION_ACK_REQUEST;
-			String SOAP_ACTION_MAKE_CONNECTION             = ACTION_MAKE_CONNECTION;
+			public static final String SOAP_ACTION_CREATE_SEQUENCE             = ACTION_CREATE_SEQUENCE;
+			public static final String SOAP_ACTION_CREATE_SEQUENCE_RESPONSE    = ACTION_CREATE_SEQUENCE_RESPONSE;
+			public static final String SOAP_ACTION_CLOSE_SEQUENCE              = ACTION_CLOSE_SEQUENCE;
+			public static final String SOAP_ACTION_CLOSE_SEQUENCE_RESPONSE     = ACTION_CLOSE_SEQUENCE_RESPONSE;
+			public static final String SOAP_ACTION_TERMINATE_SEQUENCE          = ACTION_TERMINATE_SEQUENCE;
+			public static final String SOAP_ACTION_TERMINATE_SEQUENCE_RESPONSE = ACTION_TERMINATE_SEQUENCE_RESPONSE;
+			public static final String SOAP_ACTION_SEQUENCE_ACKNOWLEDGEMENT    = ACTION_SEQUENCE_ACKNOWLEDGEMENT;
+			public static final String SOAP_ACTION_ACK_REQUEST                 = ACTION_ACK_REQUEST;
+			public static final String SOAP_ACTION_MAKE_CONNECTION             = ACTION_MAKE_CONNECTION;
+			public static final String SOAP_ACTION_FAULT                       = ACTION_FAULT;
 		}
 		
 		public interface QNames {

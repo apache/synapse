@@ -81,8 +81,16 @@ public class FaultCode implements IOMRMElement {
 		
 		this.faultCode = faultCodePart.getText();
 		
-		if (detailPart != null)
-			detail = detailPart.getText();
+		if (detailPart != null) {
+			detailOMElement = detailPart;
+			
+			OMElement identifier = detailPart
+				.getFirstChildWithName(new QName(namespaceValue, 
+						Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+			if (identifier != null) {
+				detail = identifier.getText();
+			}
+		}
 
 		return sequenceFault;
 

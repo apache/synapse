@@ -104,6 +104,35 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 				secManager.checkProofOfPossession(token, body, msgcontext);
 			}
 	
+			//if toAddress is RMAnon we may need to terminate the request side sequence here.
+			EndpointReference toEPR = createSeqMsg.getTo();
+			if (toEPR.hasAnonymousAddress()) {
+	
+				RMSBean findBean = new RMSBean ();
+				findBean.setReplyToEPR(toEPR.getAddress());
+				findBean.setTerminationPauserForCS(true);
+				
+				//TODO recheck
+				RMSBean rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
+				if (rmsBean!=null) {					
+					//AckManager hs not done the termination. Do the termination here.
+					MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
+					if (requestSideRefMessage==null) {
+						FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getInternalSequenceID()),
+								new Exception());						
+						// Return false if an Exception hasn't been thrown.
+						if (log.isDebugEnabled())
+							log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
+						return false;
+					}
+					
+					RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
+					TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
+				}
+			}
+				
+
 			MessageContext outMessage = null;
 	
 			// Create the new sequence id, as well as establishing the beans that handle the
@@ -206,7 +235,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			
 			// If the inbound sequence is targetted at the anonymous URI, we need to start
 			// polling for this sequence.
-			EndpointReference toEPR = createSeqMsg.getTo();
 			if (toEPR.hasAnonymousAddress()) {
 				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqRMMsg.getRMSpecVersion())) {
 					rmdBean.setPollingMode(true);
@@ -242,33 +270,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	//		findBean.setName (Sandesha2Constants.SequenceProperties.TERMINATE_ON_CREATE_SEQUENCE);
 	//		findBean.setValue(createSeqMsg.getTo().getAddress());
 			
-			//if toAddress is RMAnon we may need to terminate the request side sequence here.
-			if (toEPR.hasAnonymousAddress()) {
-	
-				RMSBean findBean = new RMSBean ();
-				findBean.setReplyToEPR(toEPR.getAddress());
-				findBean.setTerminationPauserForCS(true);
-				
-				//TODO recheck
-				RMSBean rmsBean = storageManager.getRMSBeanMgr().findUnique(findBean);
-				if (rmsBean!=null) {					
-					//AckManager hs not done the termination. Do the termination here.
-					MessageContext requestSideRefMessage = storageManager.retrieveMessageContext(rmsBean.getReferenceMessageStoreKey(),context);
-					if (requestSideRefMessage==null) {
-						FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
-								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.referencedMessageNotFound, rmsBean.getInternalSequenceID()),
-								new Exception());						
-						// Return false if an Exception hasn't been thrown.
-						if (log.isDebugEnabled())
-							log.debug("Exit: CreateSeqMsgProcessor::processInMessage " + Boolean.FALSE);				
-						return false;
-					}
-					
-					RMMsgContext requestSideRefRMMessage = MsgInitializer.initializeMessage(requestSideRefMessage);
-					TerminateManager.addTerminateSequenceMessage(requestSideRefRMMessage, rmsBean.getInternalSequenceID(), rmsBean.getSequenceID(), storageManager);
-				}
-			}
-				
 			createSeqRMMsg.pause();
 		}
 		catch (Exception e) {

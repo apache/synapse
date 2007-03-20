@@ -254,9 +254,19 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-rahas</artifactId>
-            <version>${axis2.security.version}</version>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart-policy</artifactId>
+            <version>${rampart.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart-trust</artifactId>
+            <version>${rampart.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart-core</artifactId>
+            <version>${rampart.version}</version>
         </dependency>
 
         <dependency>
@@ -272,27 +282,15 @@
         </dependency>
 
         <dependency>
-            <groupId>wss4j</groupId>
+            <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
             <version>${wss4j.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-secpolicy</artifactId>
-            <version>${axis2.security.version}</version>
-        </dependency>
-        
-        <dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-policy</artifactId>
             <version>${sandesha2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-security</artifactId>
-            <version>${axis2.security.version}</version>
         </dependency>
 
         <dependency>
@@ -323,7 +321,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.axis2</groupId>
+            <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
             <version>${rampart.version}</version>
             <type>mar</type>
@@ -339,6 +337,12 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>${commons.httpclient.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>httpcomponents-httpcore</groupId>
+                    <artifactId>jakarta-httpcore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -413,12 +417,6 @@
             <artifactId>backport-util-concurrent</artifactId>
             <version>${backport_util_concurrent.version}</version>
         </dependency>
-
-        <!--<dependency>
-            <groupId>httpcomponents-httpcore</groupId>
-            <artifactId>jakarta-httpcore</artifactId>
-            <version>${jakarta.httpcore.version}</version>
-        </dependency>-->
 
         <!-- dependencies for nhttp transport -->
         <dependency>
@@ -582,7 +580,7 @@
 
         <!-- Axis2 1.1.1 and its dependencies -->
         <axis2.version>SNAPSHOT</axis2.version>
-        <axis2.security.version>1.1</axis2.security.version>
+        <rampart.version>SNAPSHOT</rampart.version>
         <axiom.version>SNAPSHOT</axiom.version>
         <xml_schema.version>SNAPSHOT</xml_schema.version>
 
@@ -609,11 +607,9 @@
 
         <!-- rampart, sandesha, neethi -->
         <addressing.version>SNAPSHOT</addressing.version>
-        <rampart.version>1.1</rampart.version>
         <sandesha2.version>1.1</sandesha2.version>
-        <neethi.version>2.0</neethi.version>
-
-        <wss4j.version>1.5.1</wss4j.version>
+        <neethi.version>SNAPSHOT</neethi.version>
+        <wss4j.version>SNAPSHOT</wss4j.version>
         <xmlsec.version>1.3.0</xmlsec.version>
 
         <!-- misc -->

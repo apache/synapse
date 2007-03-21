@@ -17,32 +17,27 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- Connecting to endpoints with WS-Security for outgoing messages -->
-    <definitions>
-    		<set-property name="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
-    		
-        <endpoint name="secure">
-            <address uri="http://localhost:9000/axis2/services/SecureStockQuoteService3">
-        	    <enableSec policy="sec_policy"/>
-        	    <enableAddressing/>
-            </address>
-        </endpoint>
-    </definitions>
+    <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 
-    <rules>
-    	<in>
-    		<header name="To" value="http://localhost:9000/axis2/services/SecureStockQuoteService3"/>
+    <endpoint name="secure">
+        <address uri="http://localhost:9000/axis2/services/SecureStockQuoteService3">
+            <enableSec policy="sec_policy"/>
+            <enableAddressing/>
+        </address>
+    </endpoint>
+
+    <in>
         <send>
-        	<endpoint ref="secure"/>
+            <endpoint key="secure"/>
         </send>
-      </in>
-      <out>
-	      <header name="wsse:Security" action="remove"
-                    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
-      	<send/>
-      </out>
-    </rules>
+    </in>
+    <out>
+        <header name="wsse:Security" action="remove"
+                xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+        <send/>
+    </out>
 
-</synapse> 
+</definitions>

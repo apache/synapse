@@ -20,8 +20,10 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.AxisMessage;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -128,6 +130,12 @@ public class AnonymousServiceFactory {
             DynamicAxisOperation dynamicOperation =
                 new DynamicAxisOperation(new QName(DYNAMIC_OPERATION));
             dynamicOperation.setMessageReceiver(synapseCallback);
+            AxisMessage inMsg = new AxisMessage();
+            inMsg.setName("in-message");
+            AxisMessage outMsg = new AxisMessage();
+            outMsg.setName("out-message");
+            dynamicOperation.addMessage(inMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+            dynamicOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             AxisService axisAnonymousService  = new AxisService(serviceKey);
             axisAnonymousService.addOperation(dynamicOperation);
             axisCfg.addService(axisAnonymousService);

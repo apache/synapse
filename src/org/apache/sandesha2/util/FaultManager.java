@@ -20,6 +20,8 @@ package org.apache.sandesha2.util;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -528,6 +530,17 @@ public class FaultManager {
 					faultPart.getCode().getSubCode() != null &&
 					faultPart.getCode().getSubCode().getValue() != null)
 				soapFaultSubcode = faultPart.getCode().getSubCode().getValue().getText();
+			
+			// Get the identifier, if there is one.
+			SOAPFaultDetail detail = faultPart.getDetail();
+			if (detail != null)
+			{
+				OMElement identifierOM = detail.getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), 
+					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+			  if (identifierOM != null)
+			  	identifier = identifierOM.getText();
+			}
+			
 		} else {
 			// Need to get the sequence part from the Header.
 			try {

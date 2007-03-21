@@ -72,6 +72,8 @@ public class ScriptMediator extends AbstractMediator {
     private String scriptSourceCode;
     /** The BSF engine created to process each message through the script */
     protected ScriptEngine scriptEngine;
+    /** Does the ScriptEngine support multi-threading */
+    private boolean multiThreadedEngine;
     /** The compiled script. Only used for inline scripts */
     private CompiledScript compiledScript;
     /** The Invocable script. Only used for external scripts */
@@ -102,6 +104,12 @@ public class ScriptMediator extends AbstractMediator {
         if (function != null) {
             this.function = function;
         }
+
+        initScriptEngine();
+        if (!(scriptEngine instanceof Invocable)) {
+            throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
+        }
+        invocableScript = (Invocable)scriptEngine;
     }
 
     /**
@@ -126,6 +134,25 @@ public class ScriptMediator extends AbstractMediator {
         }
 
         boolean returnValue;
+        if (multiThreadedEngine) {
+            returnValue = invokeScript(synCtx);
+        } else {
+            // TODO: change to use a pool of script engines (requires an update to BSF)
+            synchronized (scriptEngine.getClass()) {
+                returnValue = invokeScript(synCtx);
+            }
+        }
+
+        if (shouldTrace) {
+            trace.trace("Result message after execution of script : " + synCtx);
+            trace.trace("End : Script mediator " + returnValue);
+        }
+
+        return returnValue;
+    }
+
+    private boolean invokeScript(MessageContext synCtx) {
+        boolean returnValue;
         try {
 
             Object returnObject;
@@ -144,12 +171,6 @@ public class ScriptMediator extends AbstractMediator {
             handleException("Error executing inline " + language + " script", e);
             returnValue = false;
         }
-
-        if (shouldTrace) {
-            trace.trace("Result message after execution of script : " + synCtx);
-            trace.trace("End : Script mediator " + returnValue);
-        }
-
         return returnValue;
     }
 
@@ -215,6 +236,11 @@ public class ScriptMediator extends AbstractMediator {
      * @throws ScriptException 
      */
     protected synchronized void prepareExternalScript(MessageContext synCtx) throws ScriptException {
+        
+        // TODO: only need this synchronized method for dynamic registry entries. If there was a way
+        // to access the registry entry during mediator initialization then for non-dynamic entries
+        // this could be done just the once during mediator initialization.
+        
         Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
         boolean needsReload = (entry != null) && entry.isDynamic() && (!entry.isCached() || entry.isExpired());
 
@@ -226,14 +252,7 @@ public class ScriptMediator extends AbstractMediator {
                 scriptSourceCode = (String) o;
             }
 
-            initScriptEngine();
-
-            if (!(scriptEngine instanceof Invocable)) {
-                throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
-            }
-
             scriptEngine.eval(scriptSourceCode);
-            invocableScript = (Invocable)scriptEngine;
         }
     }
 
@@ -244,6 +263,8 @@ public class ScriptMediator extends AbstractMediator {
             throw new SynapseException("No script engine found for language: " + language);
         }
         xmlHelper = XMLHelper.getArgHelper(scriptEngine);
+        
+        this.multiThreadedEngine = scriptEngine.getFactory().getParameter("THREADING") != null;
     }
 
     public String getLanguage() {

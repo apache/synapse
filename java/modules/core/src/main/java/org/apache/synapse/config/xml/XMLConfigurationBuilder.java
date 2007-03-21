@@ -72,7 +72,15 @@ public class XMLConfigurationBuilder {
                     if (o instanceof OMElement) {
                         OMElement elt = (OMElement) o;
                         if (Constants.SEQUENCE_ELT.equals(elt.getQName())) {
-                            defineSequence(config, elt);
+                            String key = elt.getAttributeValue(
+                                new QName(Constants.NULL_NAMESPACE, "key"));
+                            // this could be a sequence def or a mediator of the main sequence
+                            if (key != null) {
+                                Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
+                                rootSequence.addChild(m);
+                            } else {
+                                defineSequence(config, elt);
+                            }
                         } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
                             defineEndpoint(config, elt);
                         } else if (Constants.ENTRY_ELT.equals(elt.getQName())) {

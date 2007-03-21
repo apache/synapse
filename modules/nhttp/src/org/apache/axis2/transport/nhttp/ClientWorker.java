@@ -22,6 +22,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -99,6 +100,8 @@ public class ClientWorker implements Runnable {
                 responseMsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headerMap);
             }
 
+            responseMsgCtx.setAxisMessage(outMsgCtx.getOperationContext().getAxisOperation().
+                getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
             responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
             responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
             //responseMsgCtx.getOptions().setRelationships(

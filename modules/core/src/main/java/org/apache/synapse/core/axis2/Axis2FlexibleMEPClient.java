@@ -30,6 +30,7 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
@@ -165,6 +166,8 @@ public class Axis2FlexibleMEPClient {
         OperationClient mepClient = axisAnonymousOperation.createClient(
             serviceCtx, clientOptions);
         mepClient.addMessageContext(axisOutMsgCtx);
+        axisOutMsgCtx.setAxisMessage(
+            axisAnonymousOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
 
         // always set a callback as we decide if the send it blocking or non blocking within
         // the MEP client. This does not cause an overhead, as we simply create a 'holder'

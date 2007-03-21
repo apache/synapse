@@ -27,6 +27,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.Util;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -107,6 +108,12 @@ public class XMLConfigurationBuilder {
             try {
                 is.close();
             } catch (IOException ignore) {}
+        }
+
+        if (config.getLocalRegistry().isEmpty() && config
+                .getProxyServices().isEmpty() && config.getRegistry() != null) {
+            OMNode remoteConfigNode = config.getRegistry().lookup("synapse.xml");
+            config = getConfiguration(Util.getStreamSource(remoteConfigNode).getInputStream());
         }
 
         if (config.getMainSequence() == null) {

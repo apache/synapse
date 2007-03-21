@@ -207,7 +207,7 @@
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
-                <exclude>org.apache.axis2:rampart:mar</exclude>
+                <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
             </excludes>
         </dependencySet>
@@ -215,7 +215,7 @@
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
-                <include>org.apache.axis2:rampart:mar</include>
+                <include>org.apache.rampart:rampart:mar</include>
                 <include>org.apache.sandesha2:sandesha2:mar</include>
             </includes>
         </dependencySet>
@@ -223,7 +223,7 @@
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
-                <!--<include>org.apache.axis2:rampart:mar</include>-->
+                <include>org.apache.rampart:rampart:mar</include>
                 <!--<include>org.apache.sandesha2:sandesha2:mar</include>-->
             </includes>
         </dependencySet>
@@ -231,7 +231,7 @@
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
-                <!--<include>org.apache.axis2:rampart:mar</include>-->
+                <include>org.apache.rampart:rampart:mar</include>
                 <!--<include>org.apache.sandesha2:sandesha2:mar</include>-->
             </includes>
         </dependencySet>

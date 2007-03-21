@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,15 +119,18 @@ public class LogMediator extends AbstractMediator {
 
     private String getHeadersLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
-        Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
-        while (iter.hasNext()) {
-            Object o = iter.next();
-            if (o instanceof SOAPHeaderBlock) {
-                SOAPHeaderBlock header = (SOAPHeaderBlock) o;
-                sb.append(separator + header.getLocalName() + " : " + header.getText());
-            } else if (o instanceof OMElement) {
-                OMElement headerElem = (OMElement) o;
-                sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+        SOAPHeader header = synCtx.getEnvelope().getHeader();
+        if (header != null) {
+            Iterator iter = header.examineAllHeaderBlocks();
+            while (iter.hasNext()) {
+                Object o = iter.next();
+                if (o instanceof SOAPHeaderBlock) {
+                    SOAPHeaderBlock headerBlk = (SOAPHeaderBlock) o;
+                    sb.append(separator + headerBlk.getLocalName() + " : " + headerBlk.getText());
+                } else if (o instanceof OMElement) {
+                    OMElement headerElem = (OMElement) o;
+                    sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+                }
             }
         }
         setCustomProperties(sb, synCtx);
@@ -135,7 +139,7 @@ public class LogMediator extends AbstractMediator {
 
     private String getFullLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
-        sb.append(getSimpleLogMessage(synCtx));
+        sb.append(getHeadersLogMessage(synCtx));
         if (synCtx.getEnvelope() != null)
             sb.append(separator + "Envelope: " + synCtx.getEnvelope());        
         return trimLeadingSeparator(sb);

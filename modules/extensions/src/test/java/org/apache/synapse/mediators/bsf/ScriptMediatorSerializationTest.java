@@ -32,13 +32,13 @@ public class ScriptMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testScriptMediatorSerializationScenarioOne() throws XMLComparisonException {
-        String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" key=\"script-key\" function=\"funOne\" language=\"myown\"></script> ";
+        String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" key=\"script-key\" function=\"funOne\" language=\"js\"></script> ";
         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }
 
     public void testScriptMediatorSerializationScenarioTwo() throws XMLComparisonException {
-        String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" language=\"javascript\" key=\"script-key\" ></script> ";
+        String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" language=\"js\" key=\"script-key\" ></script> ";
         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
         assertTrue(serialization(inputXml, scriptMediatorSerializer));
     }

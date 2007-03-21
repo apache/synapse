@@ -74,18 +74,18 @@ public class SynapseCommodityServiceTest extends TestCase {
 
         TransportInDescription synTrsIn = (TransportInDescription)
             synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
-        synTrsIn.getParameter("port").setValue("10000");
+        synTrsIn.getParameter("port").setValue("10100");
         synTrsIn = (TransportInDescription)
             synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
-        synTrsIn.getParameter("port").setValue("12000");
+        synTrsIn.getParameter("port").setValue("12100");
         startServer(synapseConfigCtx);
 
         TransportInDescription busTrsIn = (TransportInDescription)
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
-        busTrsIn.getParameter("port").setValue("10001");
+        busTrsIn.getParameter("port").setValue("10101");
         busTrsIn = (TransportInDescription)
             businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
-        busTrsIn.getParameter("port").setValue("12001");
+        busTrsIn.getParameter("port").setValue("12101");
         startServer(businessConfigCtx);
         System.out.println("");
     }
@@ -123,7 +123,7 @@ public class SynapseCommodityServiceTest extends TestCase {
         ServiceClient businessClient = new ServiceClient(null, null);
         Options options = new Options();
         options.setTo(
-                new EndpointReference("http://127.0.0.1:10000/CommodityQuote"));
+                new EndpointReference("http://127.0.0.1:10100/CommodityQuote"));
         businessClient.setOptions(options);
 
         OMElement response = businessClient.sendReceive(commodityPayload());

@@ -29,6 +29,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.Service;
 import javax.wsdl.Port;
 import javax.wsdl.extensions.soap.SOAPAddress;
+import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import java.util.List;
@@ -73,6 +74,10 @@ public class WSDL11EndpointBuilder {
                         Object o = ext.get(i);
                         if (o instanceof SOAPAddress) {
                             SOAPAddress address = (SOAPAddress) o;
+                            serviceURL = address.getLocationURI();
+                            break;
+                        } else if (o instanceof SOAP12Address) {
+                            SOAP12Address address = (SOAP12Address) o;
                             serviceURL = address.getLocationURI();
                             break;
                         }

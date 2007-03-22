@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.Header;
+import org.apache.http.protocol.HTTP;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.InputStream;
@@ -119,7 +120,7 @@ public class ClientWorker implements Runnable {
             envelope = TransportUtils.createSOAPMessage(
                 responseMsgCtx,
                 in,
-                outMsgCtx.getEnvelope().getNamespace().getNamespaceURI());
+                response.getFirstHeader(HTTP.CONTENT_TYPE).getValue());
             responseMsgCtx.setEnvelope(envelope);
 
         } catch (AxisFault af) {

@@ -17,18 +17,25 @@
 
 package org.apache.sandesha2;
 
+import java.util.Iterator;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.modules.Module;
 import org.apache.axis2.modules.ModulePolicyExtension;
 import org.apache.axis2.modules.PolicyExtension;
 import org.apache.axis2.util.TargetResolver;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Assertion;
@@ -151,6 +158,34 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 			parameter.setValue(axisDescPropertyBean);
 			axisDescription.addParameter(parameter);
+		}
+		
+		// When we engage Sandesha for a Service, we check to see if there are
+		// any OUT_IN MEPs on it's operations. If there are then we record that,
+		// so that we know we should send an Offer for WSRM 1.0 Sequences.
+		// We check the operation names, as the RM operations are added in as
+		// well, and and we only want to consider the user's operations.
+		if(axisDescription instanceof AxisService) {
+			AxisService service = (AxisService) axisDescription;
+			Iterator ops = service.getOperations();
+			while(ops.hasNext()) {
+				AxisOperation op = (AxisOperation) ops.next();
+				log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecifMEPConstant());
+
+				String name = null;
+				QName qName = op.getName();
+				if(qName != null) name = qName.getLocalPart();
+				if(name != null && name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX))
+					break;
+
+				// If we get to here then we must have one of the user's operations, so
+				// check the MEP.
+				if(op.getAxisSpecifMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+					Parameter p = new Parameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS, Boolean.TRUE);
+					service.addParameter(p);
+					break;
+				}
+			}
 		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::engageNotify");

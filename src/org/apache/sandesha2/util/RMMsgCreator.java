@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -30,6 +29,8 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -133,36 +134,49 @@ public class RMMsgCreator {
 		
 		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue);
 
-		// Adding sequence offer - if present
-		OperationContext operationcontext = applicationMsgContext.getOperationContext();
-		if (operationcontext != null) {
-			String offeredSequence = (String) applicationMsgContext
-					.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
-			EndpointReference offeredEndpoint = (EndpointReference) applicationMsgContext
-					.getProperty(SandeshaClientConstants.OFFERED_ENDPOINT);
-			
-			if (offeredEndpoint==null) {
-				EndpointReference replyTo = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
-			
-				if (replyTo!=null) {
-					offeredEndpoint = SandeshaUtil.cloneEPR(replyTo);
+		// Adding sequence offer - if present. We send an offer if the client has assigned an
+		// id, or if we are using WS-RM 1.0 and the service contains out-in MEPs
+		boolean autoOffer = false;
+		if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) {
+			AxisService service = applicationMsgContext.getAxisService();
+			if(service != null) {
+				Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
+				if(p != null && p.getValue() != null) {
+					autoOffer = ((Boolean) p.getValue()).booleanValue();
 				}
 			}
-			// Finally fall back to using an anonymous endpoint
-			if (offeredEndpoint==null) {
-				offeredEndpoint = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
+		}
+		String offeredSequenceId = (String) applicationMsgContext.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
+			
+		if(autoOffer ||
+		   (offeredSequenceId != null && offeredSequenceId.length() > 0))  {
+			
+			if (offeredSequenceId == null || offeredSequenceId.length() == 0) {
+				offeredSequenceId = SandeshaUtil.getUUID();
 			}
-			if (offeredSequence != null && !"".equals(offeredSequence)) {
-				SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);
-				Identifier identifier = new Identifier(rmNamespaceValue);
-				identifier.setIndentifer(offeredSequence);
-				offerPart.setIdentifier(identifier);
-				createSequencePart.setSequenceOffer(offerPart);
+
+			SequenceOffer offerPart = new SequenceOffer(rmNamespaceValue);
+			Identifier identifier = new Identifier(rmNamespaceValue);
+			identifier.setIndentifer(offeredSequenceId);
+			offerPart.setIdentifier(identifier);
+			createSequencePart.setSequenceOffer(offerPart);
+			
+			if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespaceValue)) {
+				// We are going to send an offer, so decide which endpoint to include
+				EndpointReference offeredEndpoint = (EndpointReference) applicationMsgContext.getProperty(SandeshaClientConstants.OFFERED_ENDPOINT);
+				if (offeredEndpoint==null) {
+					EndpointReference replyTo = applicationMsgContext.getReplyTo();  //using replyTo as the Endpoint if it is not specified
 				
-				if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(rmNamespaceValue)) {
-					Endpoint endpoint = new Endpoint (offeredEndpoint, rmNamespaceValue, addressingNamespace);
-					offerPart.setEndpoint(endpoint);
+					if (replyTo!=null) {
+						offeredEndpoint = SandeshaUtil.cloneEPR(replyTo);
+					}
 				}
+				// Finally fall back to using an anonymous endpoint
+				if (offeredEndpoint==null) {
+					offeredEndpoint = new EndpointReference(SpecSpecificConstants.getAddressingAnonymousURI(addressingNamespace));
+				}
+				Endpoint endpoint = new Endpoint (offeredEndpoint, rmNamespaceValue, addressingNamespace);
+				offerPart.setEndpoint(endpoint);
 			}
 		}
 		

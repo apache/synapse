@@ -540,7 +540,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						// Generate a new RM In Only operation
 
 						ServiceContext serviceCtx = responseMessageContext.getServiceContext();
-						AxisOperation op = msgCtx.getAxisService().getOperation(new QName("RMInOnlyOperation"));
+						AxisOperation op = msgCtx.getAxisService().getOperation(Sandesha2Constants.RM_IN_ONLY_OPERATION);
 						responseMsgOpCtx = ContextFactory.createOperationContext (op, serviceCtx);					
 
 					}

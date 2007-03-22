@@ -1155,7 +1155,7 @@ public class SandeshaClient {
 				anonOutOnlyOperation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_OUT_ONLY);
 				anonOutOnlyOperation.setName(ServiceClient.ANON_OUT_ONLY_OP);
 				
-				AxisOperation referenceOperation = service.getOperation(new QName (Sandesha2Constants.RM_IN_ONLY_OPERATION));
+				AxisOperation referenceOperation = service.getOperation(Sandesha2Constants.RM_IN_ONLY_OPERATION);
 				
 				if (referenceOperation!=null) {
 					anonOutOnlyOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());
@@ -1176,7 +1176,7 @@ public class SandeshaClient {
 				anonOutInOperation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_OUT_IN);
 				anonOutInOperation.setName(ServiceClient.ANON_OUT_IN_OP);
 				
-				AxisOperation referenceOperation = service.getOperation(new QName (Sandesha2Constants.RM_IN_OUT_OPERATION_NAME));
+				AxisOperation referenceOperation = service.getOperation(Sandesha2Constants.RM_IN_OUT_OPERATION);
 				
 				if (referenceOperation!=null) {
 					anonOutInOperation.setPhasesOutFlow(referenceOperation.getPhasesOutFlow());

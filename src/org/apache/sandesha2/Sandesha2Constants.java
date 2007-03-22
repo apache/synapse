@@ -517,10 +517,6 @@ public interface Sandesha2Constants {
 	
 	static final String SECURITY_MANAGER = "Sandesha2SecurityManager";
 	
-	static final String RM_IN_OUT_OPERATION_NAME = "RMInOutOperation";
-	
-	static final String RM_IN_ONLY_OPERATION = "RMInOnlyOperation";
-	
 	static final String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
 	
 	static final String propertiesToCopyFromReferenceMessage = "propertiesToCopyFromReferenceMessage";
@@ -531,6 +527,15 @@ public interface Sandesha2Constants {
 	
 	static final String MAKE_CONNECTION_RESPONSE = "MakeConnectionResponse";
 	
+	static final String SERVICE_CONTAINS_OUT_IN_MEPS = "ServiceContainsOutInMeps";
+	
+	static final String SANDESHA_OP_PREFIX    = "Sandesha2Operation";
+	static final QName RM_OUT_IN_OPERATION    = new QName(SANDESHA_OP_PREFIX + "OutIn");
+	static final QName RM_OUT_ONLY_OPERATION  = new QName(SANDESHA_OP_PREFIX + "OutOnly");
+	static final QName RM_DUPLICATE_OPERATION = new QName(SANDESHA_OP_PREFIX + "Duplicate");
+	static final QName RM_IN_OUT_OPERATION    = new QName(SANDESHA_OP_PREFIX + "InOut");
+	static final QName RM_IN_ONLY_OPERATION   = new QName(SANDESHA_OP_PREFIX + "InOnly");
+
 	static final String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,
 			SPEC_2007_02.NS_URI

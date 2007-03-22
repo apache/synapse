@@ -36,7 +36,7 @@
         </handler>   
     </OutFaultFlow>
 
-    <operation name="RMInOnlyOperation" mep="http://www.w3.org/2006/01/wsdl/in-only">
+    <operation name="Sandesha2OperationInOnly" mep="http://www.w3.org/2006/01/wsdl/in-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
@@ -51,7 +51,7 @@
 
      </operation>
  
-     <operation name="RMInOutOperation" mep="http://www.w3.org/2006/01/wsdl/in-out">
+     <operation name="Sandesha2OperationInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         
         <!-- namespaces for the 2005-02 spec -->
@@ -70,14 +70,14 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsmc/200702/MakeConnection</actionMapping>
     </operation>
 
-    <operation name="RMOutOnlyOperation" mep="http://www.w3.org/2006/01/wsdl/out-only">
+    <operation name="Sandesha2OperationOutOnly" mep="http://www.w3.org/2006/01/wsdl/out-only">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
-    <operation name="RMOutInOperation" mep="http://www.w3.org/2006/01/wsdl/out-in">
+    <operation name="Sandesha2OperationOutIn" mep="http://www.w3.org/2006/01/wsdl/out-in">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 
-    <operation name="RMInOutDuplicateMessageOperation" mep="http://www.w3.org/2006/01/wsdl/in-out">
+    <operation name="Sandesha2OperationDuplicate" mep="http://www.w3.org/2006/01/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 

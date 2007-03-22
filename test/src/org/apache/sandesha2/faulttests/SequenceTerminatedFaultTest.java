@@ -22,8 +22,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -438,7 +436,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		messageContext.setWSAAction(pingAction);
 
 		// Set the AxisOperation to be InOut
-		AxisOperation operation = messageContext.getAxisService().getOperation(new QName("RMInOutOperation"));
+		AxisOperation operation = messageContext.getAxisService().getOperation(Sandesha2Constants.RM_IN_OUT_OPERATION);
 		operation.setMessageReceiver(new RMMessageReceiver());
 		messageContext.setAxisOperation(operation);
 
@@ -486,7 +484,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		messageContext.setWSAAction(pingAction);
 
 		// Set the AxisOperation to be InOut
-		AxisOperation operation = messageContext.getAxisService().getOperation(new QName("RMInOutOperation"));
+		AxisOperation operation = messageContext.getAxisService().getOperation(Sandesha2Constants.RM_IN_OUT_OPERATION);
 		operation.setMessageReceiver(new RMMessageReceiver());
 		messageContext.setAxisOperation(operation);
 
@@ -534,7 +532,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		messageContext.setWSAAction(pingAction);
 
 		// Set the AxisOperation to be InOut
-		AxisOperation operation = messageContext.getAxisService().getOperation(new QName("RMInOutOperation"));
+		AxisOperation operation = messageContext.getAxisService().getOperation(Sandesha2Constants.RM_IN_OUT_OPERATION);
 		operation.setMessageReceiver(new RMMessageReceiver());
 		messageContext.setAxisOperation(operation);
 

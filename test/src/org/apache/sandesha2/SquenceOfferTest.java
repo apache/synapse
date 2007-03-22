@@ -17,6 +17,7 @@
 package org.apache.sandesha2;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -26,6 +27,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.client.SandeshaReport;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -45,7 +47,6 @@ public class SquenceOfferTest extends SandeshaTestCase {
 	}
 	
 	public void testSequenceOffer () throws Exception {
-		
 		String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 		
 		String repoPath = "target" + File.separator + "repos" + File.separator + "client";
@@ -99,10 +100,10 @@ public class SquenceOfferTest extends SandeshaTestCase {
 				assertEquals(callback1.getResult(),"echo1");
 				
 				//checking weather the incomingSequenceReport has the offered sequence ID
-				//SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
-				//ArrayList incomingSeqList = rmReport.getIncomingSequenceList();
-				//assertEquals(incomingSeqList.size(),1);
-				//assertEquals(incomingSeqList.get(0),offeredSequenceID);	
+				SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
+				ArrayList incomingSeqList = rmReport.getIncomingSequenceList();
+				assertEquals(incomingSeqList.size(),1);
+				assertEquals(incomingSeqList.get(0),offeredSequenceID);	
 	
 				lastError = null;
 				break;

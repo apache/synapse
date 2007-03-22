@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
@@ -139,7 +137,7 @@ public class UnknownSequenceFaultTest extends SandeshaTestCase {
 		messageContext.setWSAAction(pingAction);
 
 		// Set the AxisOperation to be InOut
-		AxisOperation operation = messageContext.getAxisService().getOperation(new QName("RMInOutOperation"));
+		AxisOperation operation = messageContext.getAxisService().getOperation(Sandesha2Constants.RM_IN_OUT_OPERATION);
 		operation.setMessageReceiver(new RMMessageReceiver());
 		messageContext.setAxisOperation(operation);
 

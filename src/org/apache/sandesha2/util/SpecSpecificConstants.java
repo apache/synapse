@@ -17,8 +17,6 @@
 
 package org.apache.sandesha2.util;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
@@ -339,16 +337,16 @@ public class SpecSpecificConstants {
 		if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) {
 			switch(messageType) {
 			case Sandesha2Constants.MessageTypes.CREATE_SEQ:
-				result = service.getOperation(new QName("RMOutInOperation"));
+				result = service.getOperation(Sandesha2Constants.RM_OUT_IN_OPERATION);
 				break;
 			case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
 			case Sandesha2Constants.MessageTypes.ACK:
 			case Sandesha2Constants.MessageTypes.ACK_REQUEST:
 			case Sandesha2Constants.MessageTypes.LAST_MESSAGE:
-				result = service.getOperation(new QName("RMOutOnlyOperation"));
+				result = service.getOperation(Sandesha2Constants.RM_OUT_ONLY_OPERATION);
 				break;			
       case Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE:
-        result = service.getOperation(new QName("RMInOutDuplicateMessageOperation"));
+        result = service.getOperation(Sandesha2Constants.RM_DUPLICATE_OPERATION);
         break;
       }
 		} else if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
@@ -357,11 +355,11 @@ public class SpecSpecificConstants {
 			case Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE:
 			case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
 			case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
-				result = service.getOperation(new QName("RMOutInOperation"));
+				result = service.getOperation(Sandesha2Constants.RM_OUT_IN_OPERATION);
 				break;
 			case Sandesha2Constants.MessageTypes.ACK:
 			case Sandesha2Constants.MessageTypes.ACK_REQUEST:
-				result = service.getOperation(new QName("RMOutOnlyOperation"));
+				result = service.getOperation(Sandesha2Constants.RM_OUT_ONLY_OPERATION);
 				break;
 			}
 		}

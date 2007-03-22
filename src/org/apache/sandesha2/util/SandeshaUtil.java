@@ -280,7 +280,7 @@ public class SandeshaUtil {
 		try {
 			//Currently module policies (default) are used to find the storage manager. These cant be overriden
 			//TODO change this so that different services can hv different storage managers.
-			String storageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getInMemoryStorageManagerClass();
+			String storageManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getPermanentStorageManagerClass();
 			permanentStorageManager = getStorageManagerInstance(storageManagerClassStr,context);
 			parameter = new Parameter(Sandesha2Constants.PERMANENT_STORAGE_MANAGER, permanentStorageManager);
 			config.addParameter(parameter);

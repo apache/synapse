@@ -107,5 +107,18 @@ if [ "$1" = "-port" ]; then
   PORT="-Dport=$2"
 fi
 
-java $PORT -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
+if [ "$3" = "-port" ]; then
+  PORT="-Dport=$4"
+fi
+
+if [ "$1" = "-xdebug" ]; then
+  XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
+fi
+
+if [ "$3" = "-xdebug" ]; then
+  XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
+fi
+
+
+java $PORT $XDEBUG -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
 -repo $AXIS2_HOME/repository -conf $AXIS2_HOME/repository/conf/axis2.xml

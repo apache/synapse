@@ -22,6 +22,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
@@ -117,10 +118,19 @@ public class ClientWorker implements Runnable {
     public void run() {
         SOAPEnvelope envelope = null;
         try {
+            String contentType = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue();
+            if (contentType.indexOf(HTTP.CHARSET_PARAM) > 0) {
+                responseMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
+                    contentType.substring(contentType.indexOf(HTTP.CHARSET_PARAM) +
+                    HTTP.CHARSET_PARAM.length()));
+            } else {
+                responseMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
+                    MessageContext.DEFAULT_CHAR_SET_ENCODING);
+            }
             envelope = TransportUtils.createSOAPMessage(
                 responseMsgCtx,
                 in,
-                response.getFirstHeader(HTTP.CONTENT_TYPE).getValue());
+                contentType);
             responseMsgCtx.setEnvelope(envelope);
 
         } catch (AxisFault af) {

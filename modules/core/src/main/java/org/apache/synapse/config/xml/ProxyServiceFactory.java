@@ -41,7 +41,7 @@ import java.net.URISyntaxException;
  * <p/>
  * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
  *    <description>..</description>?
- *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]> // todo: do we realy need this
+ *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
  *       <endpoint>...</endpoint>
  *       <inSequence>...</inSequence>
  *       <outSequence>...</outSequence>
@@ -51,7 +51,9 @@ import java.net.URISyntaxException;
  *       <wsdl:definition>...</wsdl:definition>?
  *       <wsdl20:description>...</wsdl20:description>?
  *    </publishWSDL>?
- *    <policy key="string">
+ *    <enableSec/>?
+ *    <enableRM/>?
+ *    <policy key="string">?
  *       // optional service parameters
  *    <parameter name="string">
  *       text | xml
@@ -256,15 +258,15 @@ public class ProxyServiceFactory {
             }
         }
 
-//        if (elem.getFirstChildWithName(
-//                new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
-//            proxy.setWsRMEnabled(true);
-//        }
-//
-//        if (elem.getFirstChildWithName(
-//                new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
-//            proxy.setWsSecEnabled(true);
-//        }
+        if (elem.getFirstChildWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
+            proxy.setWsRMEnabled(true);
+        }
+
+        if (elem.getFirstChildWithName(
+                new QName(Constants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
+            proxy.setWsSecEnabled(true);
+        }
 
         return proxy;
     }

@@ -52,15 +52,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * <proxy name="string" [description="string"] [transports="(http|https|jms)+|all"]>
- * <target sequence="name" | endpoint="name"/>?   // default is main sequence
- * <wsdl key="string">?
- * <schema key="string">*
- * <policy key="string">*
- * <property name="string" value="string"/>*
- * <enableRM/>+
- * <enableSec/>+
- * </proxy>
+ * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
+ *    <description>..</description>?
+ *    <target [inSequence="name"] [outSequence="name"] [faultSequence="name"] [endpoint="name"]>
+ *       <endpoint>...</endpoint>
+ *       <inSequence>...</inSequence>
+ *       <outSequence>...</outSequence>
+ *       <faultSequence>...</faultSequence>
+ *    </target>?
+ *    <publishWSDL uri=".." key="string">
+ *       <wsdl:definition>...</wsdl:definition>?
+ *       <wsdl20:description>...</wsdl20:description>?
+ *    </publishWSDL>?
+ *    <enableSec/>?
+ *    <enableRM/>?
+ *    <policy key="string">?
+ *       // optional service parameters
+ *    <parameter name="string">
+ *       text | xml
+ *    </parameter>?
+ * </proxy-service>
  */
 public class ProxyService {
 

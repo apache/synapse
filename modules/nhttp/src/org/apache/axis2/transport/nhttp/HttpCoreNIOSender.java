@@ -399,9 +399,14 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                     MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
 
                     try {
-                        mr.receive(
-                            new AxisEngine(mc.getConfigurationContext()).
-                                createFaultMessageContext(mc, request.getException()));
+                        // this fault is NOT caused by the endpoint while processing. so we have to
+                        // inform that this is a sending error (e.g. endpoint failure) and handle it
+                        // differently at the message receiver.
+                        MessageContext nioFaultMessageContext = new AxisEngine
+                            (mc.getConfigurationContext()).createFaultMessageContext(mc, request.getException());
+                        nioFaultMessageContext.setProperty("sending_fault", Boolean.TRUE);
+                        mr.receive(nioFaultMessageContext);
+                        
                     } catch (AxisFault af) {
                         log.error("Unable to report back failure to the message receiver", af);
                     }

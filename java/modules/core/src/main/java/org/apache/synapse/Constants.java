@@ -172,5 +172,5 @@ public interface Constants {
     int  PROXYSERVICE_STATISTICS = 1;
 
     /** Endpoint statistics category*/
-    int ENDPOINT_STATISTICS = 2;
+    int ENDPOINT_STATISTICS = 2;    
 }

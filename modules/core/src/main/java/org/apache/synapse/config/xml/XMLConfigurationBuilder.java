@@ -110,8 +110,8 @@ public class XMLConfigurationBuilder {
             } catch (IOException ignore) {}
         }
 
-        if (config.getLocalRegistry().isEmpty() && config
-                .getProxyServices().isEmpty() && config.getRegistry() != null) {
+        if (config.getLocalRegistry().isEmpty() && config.getProxyServices().isEmpty() &&
+                rootSequence.getList().isEmpty() && config.getRegistry() != null) {
             OMNode remoteConfigNode = config.getRegistry().lookup("synapse.xml");
             config = getConfiguration(Util.getStreamSource(remoteConfigNode).getInputStream());
         }
@@ -122,6 +122,10 @@ public class XMLConfigurationBuilder {
             } else {
                 config.addSequence(rootSequence.getName(), rootSequence);
             }
+        } else if (!rootSequence.getList().isEmpty()) {
+            handleException("Invalid Synapse Configuration : Conflict in resolving the \"main\" " +
+                    "mediator\n\tSynapse Configuration cannot have sequence named \"main\" and " +
+                    "toplevel mediators simultaniously");
         }
 
         if (config.getFaultSequence() == null) {

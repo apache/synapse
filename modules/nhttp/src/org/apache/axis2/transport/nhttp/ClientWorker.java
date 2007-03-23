@@ -152,6 +152,12 @@ public class ClientWorker implements Runnable {
         } catch (AxisFault af) {
             log.error("Fault processing response message through Axis2", af);
         }
+
+        try {
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException ignore) {}
     }
 
     // -------------- utility methods -------------

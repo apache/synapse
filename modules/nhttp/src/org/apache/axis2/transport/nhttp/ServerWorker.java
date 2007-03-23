@@ -27,7 +27,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
-import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.*;
@@ -166,6 +166,11 @@ public class ServerWorker implements Runnable {
 
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
             serverHandler.commitResponse(conn, response);
+
+            // make sure that the output stream is flushed and closed properly
+            try {
+                is.close();
+            } catch (IOException ignore) {}
 
             // make sure that the output stream is flushed and closed properly
             try {

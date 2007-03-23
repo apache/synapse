@@ -77,7 +77,11 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private void handleMessage(MessageContext response,
         org.apache.synapse.MessageContext synapseOutMsgCtx) {
 
-        if (response.getEnvelope().getBody().hasFault()) {            
+        Object o = response.getProperty("sending_fault");
+        if (o != null && Boolean.TRUE.equals(o)) {
+
+            // there is a sending fault. propagate the fault to fault handlers.
+
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
             if (faultStack != null && !faultStack.isEmpty()) {
 

@@ -90,8 +90,10 @@ public class FaultMediator extends AbstractMediator {
                 if (envelop != null) {
                     if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
                         envelop.getNamespace().getNamespaceURI())) {
+                        soapVersion = SOAP12;
                         return makeSOAPFault(synCtx, SOAP12,shouldTrace);
                     } else {
+                        soapVersion = SOAP11;
                         return makeSOAPFault(synCtx, SOAP11,shouldTrace);
                     }
                 } else {
@@ -171,8 +173,13 @@ public class FaultMediator extends AbstractMediator {
         }
 
         SOAPFaultCode code = factory.createSOAPFaultCode();
-        SOAPFaultValue value = factory.createSOAPFaultValue(code);
-        value.setText(fault_code);
+        switch(soapVersion){
+            case SOAP11:
+                 code.setText(fault_code);
+            case SOAP12:
+                SOAPFaultValue value = factory.createSOAPFaultValue(code);
+                value.setText(fault_code);
+        }
         fault.setCode(code);
     }
 
@@ -188,17 +195,22 @@ public class FaultMediator extends AbstractMediator {
         }
 
         SOAPFaultReason reason = factory.createSOAPFaultReason();
-        SOAPFaultText text = factory.createSOAPFaultText();
-        text.setText(reasonString);
-        reason.addSOAPText(text);
+        switch(soapVersion){
+            case SOAP11:
+                reason.setText(reasonString);
+            case SOAP12:
+                SOAPFaultText text = factory.createSOAPFaultText();
+                text.setText(reasonString);
+                reason.addSOAPText(text);
+        }
         fault.setReason(reason);
     }
 
     private void setFaultNode(SOAPFactory factory, SOAPFault fault) {
         if (faultNode != null) {
-            SOAPFaultNode faultNode = factory.createSOAPFaultNode();
-            faultNode.setNodeValue(faultNode.toString());
-            fault.setNode(faultNode);
+            SOAPFaultNode soapfaultNode = factory.createSOAPFaultNode();
+            soapfaultNode.setNodeValue(faultNode.toString());
+            fault.setNode(soapfaultNode);
         }
     }
 

@@ -23,6 +23,7 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
@@ -51,6 +52,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
             String messageID  = messageCtx.getOptions().getRelatesTo().getValue();
             Callback callback = (Callback) callbackStore.remove(messageID);
+
+            RelatesTo[] relates = messageCtx.getRelationships();
+            if (relates.length > 1) {
+                // we set a relates to to the response message so that if WSA is not used, we
+                // could still link back to the original message. But if WSA was used, this
+                // gets duplicated, and we should remove it
+                removeDuplicateRelatesTo(messageCtx, relates);
+            }
 
             if (callback != null) {
                 handleMessage(messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());
@@ -88,7 +97,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 SOAPFault fault = response.getEnvelope().getBody().getFault();
                 Exception e = fault.getException();
                 if (e == null) {
-                    e = new Exception(fault.getReason().getFirstSOAPText().getText());    
+                    e = new Exception(fault.toString());    
                 }
 
                 ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx,e);
@@ -130,6 +139,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             // If request is REST assume that the response is REST too
             response.setDoingREST(axisOutMsgCtx.isDoingREST());
+            if (axisOutMsgCtx.getMessageID() != null) {
+                response.setRelationships(
+                    new RelatesTo[] {new RelatesTo(axisOutMsgCtx.getMessageID())});
+            }
 
             // create the synapse message context for the response
             Axis2MessageContext synapseInMessageContext =
@@ -154,5 +167,32 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             synapseOutMsgCtx.getEnvironment().
                 injectMessage(synapseInMessageContext);
         }
+    }
+
+    private void removeDuplicateRelatesTo(MessageContext mc, RelatesTo[] relates) {
+
+        int insertPos = 0;
+        RelatesTo[] newRelates = new RelatesTo[relates.length];
+
+        for (int i=0; i<relates.length; i++) {
+            RelatesTo current = relates[i];
+            boolean found = false;
+
+            for (int j=0; j<newRelates.length && j<insertPos; j++) {
+                if (newRelates[j].equals(current) ||
+                    newRelates[j].getValue().equals(current.getValue())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                newRelates[insertPos++] = current;
+            }
+        }
+
+        RelatesTo[] trimmedRelates = new RelatesTo[insertPos];
+        System.arraycopy(newRelates, 0, trimmedRelates, 0, insertPos);
+        mc.setRelationships(trimmedRelates);
     }
 }

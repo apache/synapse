@@ -42,7 +42,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.util.UUIDGenerator;
+import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -188,7 +188,7 @@ public class Axis2FlexibleMEPClient {
 
         // do not copy options from the original
         newMC.setConfigurationContext(ori.getConfigurationContext());
-        newMC.setMessageID("uuid:" + UUIDGenerator.getUUID());
+        newMC.setMessageID(UUIDGenerator.getUUID());
         newMC.setTo(ori.getTo());
         newMC.setSoapAction(ori.getSoapAction());
 
@@ -253,7 +253,7 @@ public class Axis2FlexibleMEPClient {
      * @param axisMsgCtx the Axis2 Message context
      * @return the resulting SOAPEnvelope
      */
-    private static SOAPEnvelope removeAddressingHeaders(MessageContext axisMsgCtx) {
+    public static SOAPEnvelope removeAddressingHeaders(MessageContext axisMsgCtx) {
 
         SOAPEnvelope env = axisMsgCtx.getEnvelope();
         SOAPHeader soapHeader = env.getHeader();
@@ -299,5 +299,5 @@ public class Axis2FlexibleMEPClient {
                }
            }
        }
-   } 
+   }
 }

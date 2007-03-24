@@ -28,6 +28,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
+import org.apache.axiom.om.util.UUIDGenerator;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
@@ -69,6 +70,8 @@ public class Axis2Sender {
                 StatisticsUtils.processProxyServiceStatistics(smc);
                 StatisticsUtils.processAllSequenceStatistics(smc);
             }
+            Axis2FlexibleMEPClient.removeAddressingHeaders(messageContext);
+            messageContext.setMessageID(UUIDGenerator.getUUID());
             ae.send(messageContext);
 
         } catch (AxisFault e) {

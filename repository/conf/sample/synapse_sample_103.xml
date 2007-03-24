@@ -18,42 +18,41 @@
   -->
 
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-    <!-- attaching service level WS-Security policies to proxy services -->
+<!-- attaching service level WS-Security policies to proxy services -->
 
-    <localEntry key="proxy_wsdl"
-                src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-    <localEntry key="sec_policy"
-                src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
-    <proxy name="StockQuoteProxy">
-        <target>
-            <inSequence>
-                <header name="wsse:Security" action="remove"
-                        xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
-                <send>
-                    <endpoint>
-                        <address
-                            uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-                    </endpoint>
-                </send>
-            </inSequence>
-        </target>
-        <publishWSDL key="proxy_wsdl"/>
-        <policy key="sec_policy"/>
-        <enableSec/>
-    </proxy>
+        <localEntry key="proxy_wsdl"
+                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+        <localEntry key="sec_policy"
+                      src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
+        <proxy name="StockQuoteProxy">
+            <target>
+                <inSequence>
+                    <header name="wsse:Security" action="remove"
+                            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+                    <send>
+                        <endpoint>
+                            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                        </endpoint>
+                    </send>
+                </inSequence>
+            </target>
+            <publishWSDL key="proxy_wsdl"/>
+            <policy key="sec_policy"/>
+            <enableSec/>
+        </proxy>
 
-    <in>
-        <header name="wsse:Security" action="remove"
-                xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
-        <send>
-            <endpoint>
-                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-            </endpoint>
-        </send>
-    </in>
-    <out>
-        <send/>
-    </out>
+        <in>
+            <header name="wsse:Security" action="remove"
+                    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+            <send>
+                <endpoint>
+                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                </endpoint>
+            </send>
+        </in>
+        <out>
+            <send/>
+        </out>
 
 
 </definitions>

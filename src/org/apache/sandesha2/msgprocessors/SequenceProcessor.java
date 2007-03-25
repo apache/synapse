@@ -228,7 +228,14 @@ public class SequenceProcessor {
 			EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 			
 			// Send an Ack if needed.
-			sendAckIfNeeded(bean, sequenceId, rmMsgCtx, storageManager, true, acksTo.hasAnonymousAddress());			
+			//We are not sending acks for duplicate messages in the RM 1.0 anon InOut case.
+			//If a standalone ack get sent before the actualy message (I.e. before the original msg get
+			//replied), the client may take this as a InOnly message and may avoid looking for the application
+			//response.
+			if (!(Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgCtx.getRMSpecVersion()) && 
+					rmMsgCtx.getReplyTo().hasAnonymousAddress())) {
+				sendAckIfNeeded(bean, sequenceId, rmMsgCtx, storageManager, true, acksTo.hasAnonymousAddress());	
+			}
 			
 			result = InvocationResponse.ABORT;
 			if (log.isDebugEnabled())

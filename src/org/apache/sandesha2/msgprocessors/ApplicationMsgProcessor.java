@@ -286,18 +286,23 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				rmsBean.setExpectedReplies(expectedReplies + 1);
 
 				// If we support the RM anonymous URI then rewrite the ws-a anon to use the RM equivalent.
-				EndpointReference oldEndpoint = msgContext.getReplyTo();
-				String oldAddress = (oldEndpoint == null) ? null : oldEndpoint.getAddress(); 
-				EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext.getReplyTo(), configContext);
-				String newAddress = (newReplyTo == null) ? null : newReplyTo.getAddress();
-				if(newAddress != null && !newAddress.equals(oldAddress)) {
-					// We have rewritten the replyTo. If this is the first message that we have needed to
-					// rewrite then we should set the sequence up for polling, and once we have saved the
-					// changes to the sequence then we can start the polling thread.
-					msgContext.setReplyTo(newReplyTo);
-					if(!rmsBean.isPollingMode()) {
-						rmsBean.setPollingMode(true);
-						startPolling = true;
+				//(do should be done only for WSRM 1.1)
+				
+				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmMsgCtx.getRMSpecVersion())) {
+					EndpointReference oldEndpoint = msgContext.getReplyTo();
+					String oldAddress = (oldEndpoint == null) ? null : oldEndpoint.getAddress();
+					EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext
+							.getReplyTo(), configContext);
+					String newAddress = (newReplyTo == null) ? null : newReplyTo.getAddress();
+					if (newAddress != null && !newAddress.equals(oldAddress)) {
+						// We have rewritten the replyTo. If this is the first message that we have needed to
+						// rewrite then we should set the sequence up for polling, and once we have saved the
+						// changes to the sequence then we can start the polling thread.
+						msgContext.setReplyTo(newReplyTo);
+						if (!rmsBean.isPollingMode()) {
+							rmsBean.setPollingMode(true);
+							startPolling = true;
+						}
 					}
 				}
 			}

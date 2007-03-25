@@ -257,9 +257,13 @@ public class SequenceManager {
 			}
 		}
 		// In case either of the replyTo or AcksTo is anonymous, rewrite them using the AnonURI template
+		//(this should be done only for RM 1.1)
 		ConfigurationContext config = firstAplicationMsgCtx.getConfigurationContext();
-		replyToEPR = SandeshaUtil.rewriteEPR(rmsBean, replyToEPR, config);
-		acksToEPR = SandeshaUtil.rewriteEPR(rmsBean, acksToEPR, config);
+		
+		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) {
+			replyToEPR = SandeshaUtil.rewriteEPR(rmsBean, replyToEPR, config);
+			acksToEPR = SandeshaUtil.rewriteEPR(rmsBean, acksToEPR, config);
+		}
 		
 		// Store both the acksTo and replyTo 
 		if(replyToEPR != null) rmsBean.setReplyToEPR(replyToEPR.getAddress());

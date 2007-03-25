@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.wsrm.IOMRMPart;
 
@@ -306,6 +307,12 @@ public class RMMsgContext {
 	}
 	
 	public String getRMSpecVersion () {
+		if (rmSpecVersion==null) {
+			//this may hv been set in the Options object.
+			if (msgContext!=null && msgContext.getOptions()!=null)
+			rmSpecVersion = (String) msgContext.getOptions().getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+		}
+		
 		return rmSpecVersion;
 	}
 	

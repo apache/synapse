@@ -22,6 +22,9 @@ package org.apache.synapse.config.xml.endpoints.utils;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.InputSource;
 
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.WSDLException;
@@ -32,71 +35,133 @@ import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * Builds the EndpointDefinition containing the details for an epr using a WSDL 1.1 document.
  */
 public class WSDL11EndpointBuilder {
 
-    public EndpointDefinition createEndpointDefinitionFromWSDL(OMElement wsdlElement) {
+    private static Log log = LogFactory.getLog(WSDL11EndpointBuilder.class);
 
-        EndpointDefinition endpointDefinition = null;
-        String serviceURL = null;
+    /**
+     * Creates an EndpointDefinition for WSDL endpoint from an inline WSDL supplied in the WSDL
+     * endpoint configuration.
+     *
+     * @param wsdl OMElement representing the inline WSDL
+     * @param service Service of the endpoint
+     * @param port Port of the endpoint
+     *
+     * @return EndpointDefinition containing the information retrieved from the WSDL
+     */
+    public EndpointDefinition createEndpointDefinitionFromWSDL
+            (OMElement wsdl, String service, String port) {
 
-        String wsdlURI = wsdlElement.getAttributeValue(new QName("uri"));
-        String serviceName = wsdlElement.getAttributeValue(new QName("service"));
-        String portName = wsdlElement.getAttributeValue(new QName("port"));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            wsdl.serialize(baos);
+            InputStream in = new ByteArrayInputStream(baos.toByteArray());
+            InputSource inputSource = new InputSource(in);
+            WSDLFactory fac = WSDLFactory.newInstance();
+            WSDLReader reader = fac.newWSDLReader();
+            Definition definition = reader.readWSDL(null, inputSource);
 
-        if (wsdlURI == null) {
-            throw new SynapseException("WSDL is not specified.");
+            return createEndpointDefinitionFromWSDL(definition, service, port);
+
+        } catch (XMLStreamException e) {
+            handleException("Error retrieving the WSDL definition from the inline WSDL.");
+        } catch (WSDLException e) {
+            handleException("Error retrieving the WSDL definition from the inline WSDL.");
         }
 
-        if (serviceName == null) {
-            throw new SynapseException("Service is not specified.");
-        }
+        return null;
+    }
 
-        if (portName == null) {
-            throw new SynapseException("Port is not specified.");
-        }
+    /**
+     * Creates an EndpointDefinition for WSDL endpoint from a WSDL document residing in the given URI.
+     *
+     * @param wsdlURI URI of the WSDL document
+     * @param service Service of the endpoint
+     * @param port Port of the endpoint
+     *
+     * @return EndpointDefinition containing the information retrieved from the WSDL
+     */
+    public EndpointDefinition createEndpointDefinitionFromWSDL
+            (String wsdlURI, String service, String port) {
 
         try {
             WSDLFactory fac = WSDLFactory.newInstance();
             WSDLReader reader = fac.newWSDLReader();
             Definition definition = reader.readWSDL(wsdlURI);
-            String tns = definition.getTargetNamespace();
-            Service service = definition.getService(new QName(tns, serviceName));
-            if (service != null) {
-                Port port = service.getPort(portName);
-                if (port != null) {
-                    List ext = port.getExtensibilityElements();
-                    for (int i = 0; i < ext.size(); i++) {
-                        Object o = ext.get(i);
-                        if (o instanceof SOAPAddress) {
-                            SOAPAddress address = (SOAPAddress) o;
-                            serviceURL = address.getLocationURI();
-                            break;
-                        } else if (o instanceof SOAP12Address) {
-                            SOAP12Address address = (SOAP12Address) o;
-                            serviceURL = address.getLocationURI();
-                            break;
-                        }
+
+            return createEndpointDefinitionFromWSDL(definition, service, port);
+
+        } catch (WSDLException e) {
+            handleException("Error retrieving the WSDL definition from the WSDL URI.");
+        }
+
+        return null;
+    }
+
+    private EndpointDefinition createEndpointDefinitionFromWSDL
+            (Definition definition, String serviceName, String portName) {
+
+        if (definition == null) {
+            handleException("WSDL is not specified.");
+        }
+
+        if (serviceName == null) {
+            handleException("Service is not specified.");
+        }
+
+        if (portName == null) {
+            handleException("Port is not specified.");
+        }
+
+
+        String serviceURL = null;
+        String tns = definition.getTargetNamespace();
+        Service service = definition.getService(new QName(tns, serviceName));
+        if (service != null) {
+            Port port = service.getPort(portName);
+            if (port != null) {
+                List ext = port.getExtensibilityElements();
+                for (int i = 0; i < ext.size(); i++) {
+                    Object o = ext.get(i);
+                    if (o instanceof SOAPAddress) {
+                        SOAPAddress address = (SOAPAddress) o;
+                        serviceURL = address.getLocationURI();
+                        break;
+                    } else if (o instanceof SOAP12Address) {
+                        SOAP12Address address = (SOAP12Address) o;
+                        serviceURL = address.getLocationURI();
+                        break;
                     }
                 }
             }
-
-        } catch (WSDLException e) {
-            throw new SynapseException("Unable create endpoint definition from WSDL.");
         }
 
         if (serviceURL != null) {
-            endpointDefinition = new EndpointDefinition();
+            EndpointDefinition endpointDefinition = new EndpointDefinition();
             endpointDefinition.setAddress(serviceURL);
 
-            // todo: determine this using wsdl and policy
-            endpointDefinition.setAddressingOn(true);
+            // todo: determine this using wsdl and policy                                    
+
+            return endpointDefinition;
+
+        } else {
+            handleException("Couldn't retrieve endpoint information from the WSDL.");
         }
 
-        return endpointDefinition;
+        return null;
+    }
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

@@ -25,7 +25,11 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.axis2.context.OperationContext;
+
+import java.util.List;
 
 /**
  * SendMediator sends a message using specified semantics. If it contains an endpoint it will send the
@@ -65,6 +69,22 @@ public class SendMediator extends AbstractMediator {
                     log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
                             synCtx.getWSAAction() : "null"));
                     log.debug("Body : \n" + synCtx.getEnvelope());
+                }
+
+                if (synCtx.isResponse()) {
+                    Axis2MessageContext axis2MsgCtx = (Axis2MessageContext) synCtx;
+                    OperationContext opCtx = axis2MsgCtx.getAxis2MessageContext().getOperationContext();
+                    Object o = opCtx.getProperty("endpointList");
+                    if (o != null) {
+                        // we are in the response of the first message of a server initiated session.
+                        // so update all session maps.
+                        List endpointList = (List) o;
+                        Object e = endpointList.remove(0);
+                        if (e != null && e instanceof SALoadbalanceEndpoint) {
+                            SALoadbalanceEndpoint saLoadbalanceEndpoint = (SALoadbalanceEndpoint) e;
+                            saLoadbalanceEndpoint.updateSession(synCtx, endpointList);
+                        }
+                    }
                 }
                 synCtx.getEnvironment().send(null, synCtx);
 

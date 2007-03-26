@@ -25,6 +25,7 @@ import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.AddressEndpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
+import org.apache.synapse.endpoints.WSDLEndpoint;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
@@ -196,6 +197,43 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 children2.get(0) instanceof AddressEndpoint);
         assertTrue("Children of the fail over endpoint should be address endpoints.",
                 children2.get(1) instanceof AddressEndpoint);
+    }
+
+    public void testWSDLEndpointSerialization() {      
+
+        String sendConfig = "<send xmlns=\"http://ws.apache.org/ns/synapse\">" +
+                     "<endpoint>" +
+                          "<wsdl uri='file:src/test/resources/esbservice.wsdl' service='esbservice' port='esbserviceSOAP11port_http'>" +
+                               "<enableAddressing/>" +
+                          "</wsdl>" +
+                     "</endpoint>" +
+                "</send>";
+
+        OMElement config1 = createOMElement(sendConfig);
+        SendMediator send1 = (SendMediator) factory.createMediator(config1);
+
+        OMElement config2 = serializer.serializeMediator(null, send1);
+        SendMediator send2 = (SendMediator) factory.createMediator(config2);
+
+        assertTrue("Top level endpoint should be a WSDL endpoint.",
+                send1.getEndpoint() instanceof WSDLEndpoint);
+        WSDLEndpoint ep1 = (WSDLEndpoint) send1.getEndpoint();
+
+        assertTrue("Top level endpoint should be a WSDL endpoint.",
+                send2.getEndpoint() instanceof WSDLEndpoint);
+        WSDLEndpoint ep2 = (WSDLEndpoint) send2.getEndpoint();
+
+        assertEquals("Service name is not serialized properly.",
+                ep1.getServiceName(), ep2.getServiceName());
+
+        assertEquals("Port name is not serialized properly", ep1.getPortName(), ep2.getPortName());
+
+        assertEquals("WSDL URI is not serialized properly", ep1.getWsdlURI(), ep2.getWsdlURI());
+
+        assertEquals(
+                "Addressing information is not serialized properly",
+                ep1.getEndpointDefinition().isAddressingOn(),
+                ep2.getEndpointDefinition().isAddressingOn());
     }
 
     protected OMElement createOMElement(String xml) {

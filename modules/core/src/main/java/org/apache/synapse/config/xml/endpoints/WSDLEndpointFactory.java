@@ -41,7 +41,7 @@ import java.net.URL;
  * Creates an WSDL based endpoint from a XML configuration.
  *
  * <endpoint [name="name"]>
- *    <wsdl uri="wsdl uri" service="service name" port="port name"> 
+ *    <wsdl uri="wsdl uri" service="service name" port="port name">
  *       .. extensibility ..
  *    </wsdl>
  * </endpoint>
@@ -115,7 +115,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
                     } else if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.equals(ns)) {
                         //endpoint = new WSDL20EndpointBuilder().
-                        //        createEndpointDefinitionFromWSDL(wsdlElement);
+                        //        createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
+
                         handleException("WSDL 2.0 Endpoints are currently not supported");
                     }
 

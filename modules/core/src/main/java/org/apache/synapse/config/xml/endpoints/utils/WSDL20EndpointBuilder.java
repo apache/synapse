@@ -22,29 +22,52 @@ package org.apache.synapse.config.xml.endpoints.utils;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
-//import org.apache.woden.WSDLFactory;
-//import org.apache.woden.WSDLReader;
-//import org.apache.woden.WSDLException;
-//import org.apache.woden.types.NCName;
-//import org.apache.woden.wsdl20.xml.DescriptionElement;
-//import org.apache.woden.wsdl20.Description;
-//import org.apache.woden.wsdl20.Service;
-//import org.apache.woden.wsdl20.Endpoint;
+import org.apache.woden.WSDLFactory;
+import org.apache.woden.WSDLReader;
+import org.apache.woden.WSDLException;
+import org.apache.woden.types.NCName;
+import org.apache.woden.wsdl20.xml.DescriptionElement;
+import org.apache.woden.wsdl20.Description;
+import org.apache.woden.wsdl20.Service;
+import org.apache.woden.wsdl20.Endpoint;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Currently this class is not used as woden is dependent on xerces, which is not included in the
+ * current release.
+ *  
+ * Builder for WSDL 2.0 endpoints. This class extracts endpoint information from the given WSDL 2.0
+ * documents.
+ */
 public class WSDL20EndpointBuilder {
 
-/*
-    public EndpointDefinition createEndpointDefinitionFromWSDL(OMElement wsdlElement) {
+    private static Log log = LogFactory.getLog(WSDL20EndpointBuilder.class);
 
-        EndpointDefinition endpointDefinition = null;
+    public EndpointDefinition createEndpointDefinitionFromWSDL
+            (String wsdlURI, String serviceName, String portName) {
 
-        String wsdlURI = wsdlElement.getAttributeValue(new QName("uri"));
-        String serviceName = wsdlElement.getAttributeValue(new QName("service"));
-        String portName = wsdlElement.getAttributeValue(new QName("port"));
+        try {
+            WSDLFactory fac = WSDLFactory.newInstance();
+            WSDLReader reader = fac.newWSDLReader();
+            reader.setFeature(WSDLReader.FEATURE_VALIDATION, false);
 
-        if (wsdlURI == null) {
+            DescriptionElement descriptionElement = reader.readWSDL(wsdlURI);
+            return createEndpointDefinitionFromWSDL(descriptionElement, serviceName, portName);
+
+        } catch (WSDLException e) {
+            handleException("Couldn't process the given WSDL document.");
+        }
+
+        return null;
+    }
+
+    private EndpointDefinition createEndpointDefinitionFromWSDL
+            (DescriptionElement dElement, String serviceName, String portName) {
+
+        if (dElement == null) {
             throw new SynapseException("WSDL is not specified.");
         }
 
@@ -56,27 +79,30 @@ public class WSDL20EndpointBuilder {
             throw new SynapseException("Port is not specified.");
         }
 
-        try {
-            WSDLFactory fac = WSDLFactory.newInstance();
-            WSDLReader reader = fac.newWSDLReader();
-            reader.setFeature(WSDLReader.FEATURE_VALIDATION, true);
-
-            DescriptionElement descriptionElement = reader.readWSDL(wsdlURI);
-            Description description = descriptionElement.toComponent();
-            String tns = descriptionElement.getTargetNamespace().toString();
-            Service service = description.getService(new QName(tns, serviceName));
-            if (service != null) {
-                Endpoint wsdlEndpoint = service.getEndpoint(new NCName(portName));
+        Description description = dElement.toComponent();
+        String tns = dElement.getTargetNamespace().toString();
+        Service service = description.getService(new QName(tns, serviceName));
+        if (service != null) {
+            Endpoint wsdlEndpoint = service.getEndpoint(new NCName(portName));
+            if (wsdlEndpoint != null) {
                 String serviceURL = wsdlEndpoint.getAddress().toString();
-                endpointDefinition = new EndpointDefinition();
-                endpointDefinition.setAddress(serviceURL);
-            }
 
-        } catch (WSDLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                EndpointDefinition endpointDefinition = new EndpointDefinition();
+                endpointDefinition.setAddress(serviceURL);
+
+                return endpointDefinition;
+            } else {
+                handleException("Specified port is not defined in the given WSDL.");
+            }
+        } else {
+            handleException("Specified service is not defined in the given WSDL.");
         }
 
-        return endpointDefinition;
+        return null;
     }
-*/
+
+    private static void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
+    }
 }

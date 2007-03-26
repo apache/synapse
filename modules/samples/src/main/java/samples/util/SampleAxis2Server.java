@@ -78,7 +78,7 @@ public class SampleAxis2Server {
 		log.info("[SimpleAxisServer] Starting");
 		if (repoOption != null) {
 			repoLocation = repoOption.getOptionValue();
-			log.info("[SimpleAxisServer] Using the Axis2 Repository"
+			System.out.println("[SimpleAxisServer] Using the Axis2 Repository"
 					+ new File(repoLocation).getAbsolutePath());
 		}
 		if (confOption != null) {
@@ -110,17 +110,35 @@ public class SampleAxis2Server {
             configCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
 
         if(trsIn != null) {
-            String port = System.getProperty("port");
+            String port = System.getProperty("http_port");
             if(port != null) {
                 try {
                     new Integer(port);
                     trsIn.getParameter("port").setValue(port);
                 } catch (NumberFormatException e) {
-                    log.error("Given port is not a valid integer. Using 9000 for port.");
-                    trsIn.getParameter("port").setValue("9000");
+                    log.error("Given port is not a valid integer. Using 9001 for port.");
+                    trsIn.getParameter("port").setValue("9001");
                 }
             } else {
-                trsIn.getParameter("port").setValue("9000");
+                trsIn.getParameter("port").setValue("9001");
+            }
+        }
+
+        TransportInDescription httpsTrsIn = (TransportInDescription)
+            configCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
+
+        if(httpsTrsIn != null) {
+            String port = System.getProperty("https_port");
+            if(port != null) {
+                try {
+                    new Integer(port);
+                    httpsTrsIn.getParameter("port").setValue(port);
+                } catch (NumberFormatException e) {
+                    log.error("Given port is not a valid integer. Using 9000 for port.");
+                    httpsTrsIn.getParameter("port").setValue("9002");
+                }
+            } else {
+                httpsTrsIn.getParameter("port").setValue("9002");
             }
         }
     }

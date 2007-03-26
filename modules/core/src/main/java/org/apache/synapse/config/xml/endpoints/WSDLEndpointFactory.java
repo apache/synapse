@@ -41,7 +41,7 @@ import java.net.URL;
  * Creates an WSDL based endpoint from a XML configuration.
  *
  * <endpoint [name="name"]>
- *    <wsdl uri="wsdl uri" service="service name" port="port name">
+ *    <wsdl uri="wsdl uri" service="service name" port="port name"> 
  *       .. extensibility ..
  *    </wsdl>
  * </endpoint>
@@ -85,28 +85,71 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
         if (wsdlElement != null) {
 
+            EndpointDefinition endpoint = null;
+
+            // get the service name and port name. at this point we should not worry about the presence
+            // of those parameters. they are handled by corresponding WSDL builders.
+            String serviceName = wsdlElement.getAttributeValue(new QName("service"));
+            String portName = wsdlElement.getAttributeValue(new QName("port"));
+
+            // check if wsdl is supplied as a URI
             String wsdlURI = wsdlElement.getAttributeValue(new QName("uri"));
-            try {
-                EndpointDefinition endpoint = new EndpointDefinition();
 
-                URL wsdlURL = new URL(wsdlURI);
-                StAXOMBuilder OMBuilder = new StAXOMBuilder(wsdlURL.openConnection().getInputStream());
-                OMElement docElement = OMBuilder.getDocumentElement();
-                String ns = docElement.getNamespace().getNamespaceURI();
+            // set serviceName and portName in the endpoint. it does not matter if these are
+            // null at this point. we are setting them only for serialization purpose.
+            wsdlEndpoint.setServiceName(serviceName);
+            wsdlEndpoint.setPortName(portName);
 
-                if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(ns)) {
-                    endpoint = new WSDL11EndpointBuilder().
-                            createEndpointDefinitionFromWSDL(wsdlElement);
-                } else if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.equals(ns)) {
-                    //endpoint = new WSDL20EndpointBuilder().
-                    //        createEndpointDefinitionFromWSDL(wsdlElement);
-                    handleException("WSDL 2.0 Endpoints are currently not supported");
+            if (wsdlURI != null) {
+                wsdlEndpoint.setWsdlURI(wsdlURI);
+
+                try {
+                    URL wsdlURL = new URL(wsdlURI);
+                    StAXOMBuilder OMBuilder = new StAXOMBuilder(wsdlURL.openConnection().getInputStream());
+                    OMElement docElement = OMBuilder.getDocumentElement();
+                    String ns = docElement.getNamespace().getNamespaceURI();
+
+                    if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(ns)) {
+                        endpoint = new WSDL11EndpointBuilder().
+                                createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
+
+                    } else if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.equals(ns)) {
+                        //endpoint = new WSDL20EndpointBuilder().
+                        //        createEndpointDefinitionFromWSDL(wsdlElement);
+                        handleException("WSDL 2.0 Endpoints are currently not supported");
+                    }
+
+                } catch (Exception e) {
+                    handleException("Couldn't create endpoint from the given WSDL URI.");
                 }
+            }
 
+            // check if the wsdl 1.1 document is suppled inline
+            OMElement definitionElement = wsdlElement.getFirstChildWithName
+                    (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "definitions"));
+            if (endpoint == null && definitionElement != null) {
+                wsdlEndpoint.setWsdlDoc(definitionElement);
+
+                endpoint = new WSDL11EndpointBuilder().
+                        createEndpointDefinitionFromWSDL(definitionElement, serviceName, portName);
+            }
+
+            // check if a wsdl 2.0 document is supplied inline
+            OMElement descriptionElement = wsdlElement.getFirstChildWithName
+                    (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "description"));
+            if (endpoint == null && descriptionElement != null) {
+                wsdlEndpoint.setWsdlDoc(descriptionElement);
+
+                handleException("WSDL 2.0 Endpoints are currently not supported.");
+            }
+
+            if (endpoint != null) {
+                // for now, QOS information has to be provided explicitly.
+                extractQOSInformation(endpoint, wsdlElement);
 
                 wsdlEndpoint.setEndpointDefinition(endpoint);
-            } catch (Exception e1) {
-                handleException("Unable to create endpoint from the given WSDL.", e1);
+            } else {
+                handleException("WSDL is not specified for WSDL endpoint.");
             }
         }
 
@@ -121,5 +164,69 @@ public class WSDLEndpointFactory implements EndpointFactory {
     private static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+    private void extractQOSInformation(EndpointDefinition endpointDefinition, OMElement wsdlElement) {
+
+        OMAttribute format = wsdlElement.getAttribute(new QName(
+                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "format"));
+        OMAttribute optimize = wsdlElement.getAttribute(new QName(
+                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "optimize"));
+
+        if (format != null)
+        {
+            String forceValue = format.getAttributeValue().trim().toLowerCase();
+            if (forceValue.equals("pox")) {
+                endpointDefinition.setForcePOX(true);
+            } else if (forceValue.equals("soap")) {
+                endpointDefinition.setForceSOAP(true);
+            } else {
+                handleException("force value -\""+forceValue+"\" not yet implemented");
+            }
+        }
+
+        if (optimize != null && optimize.getAttributeValue().length() > 0) {
+            String method = optimize.getAttributeValue().trim();
+            if ("mtom".equalsIgnoreCase(method)) {
+                endpointDefinition.setUseMTOM(true);
+            } else if ("swa".equalsIgnoreCase(method)) {
+                endpointDefinition.setUseSwa(true);
+            }
+        }
+
+        OMElement wsAddr = wsdlElement.getFirstChildWithName(new QName(
+                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableAddressing"));
+        if (wsAddr != null) {
+            endpointDefinition.setAddressingOn(true);
+            String useSepList = wsAddr.getAttributeValue(new QName(
+                    "separateListener"));
+            if (useSepList != null) {
+                if (useSepList.trim().toLowerCase().startsWith("tr")
+                        || useSepList.trim().startsWith("1")) {
+                    endpointDefinition.setUseSeparateListener(true);
+                }
+            }
+        }
+
+        OMElement wsSec = wsdlElement.getFirstChildWithName(new QName(
+                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableSec"));
+        if (wsSec != null) {
+            endpointDefinition.setSecurityOn(true);
+            OMAttribute policy = wsSec.getAttribute(new QName(
+                    org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "policy"));
+            if (policy != null) {
+                endpointDefinition.setWsSecPolicyKey(policy.getAttributeValue());
+            }
+        }
+        OMElement wsRm = wsdlElement.getFirstChildWithName(new QName(
+                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableRM"));
+        if (wsRm != null) {
+            endpointDefinition.setReliableMessagingOn(true);
+            OMAttribute policy = wsRm.getAttribute(new QName(
+                    org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "policy"));
+            if (policy != null) {
+                endpointDefinition.setWsRMPolicyKey(policy.getAttributeValue());
+            }
+        }
     }
 }

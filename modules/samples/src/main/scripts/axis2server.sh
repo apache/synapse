@@ -102,23 +102,39 @@ echo " Using JAVA_HOME:   $JAVA_HOME"
 echo " Using AXIS2 Repository :   $AXIS2_HOME/repository"
 echo " Using AXIS2 Configuration :   $AXIS2_HOME/repository/conf/axis2.xml"
 
-PORT="-Dport=9000"
-if [ "$1" = "-port" ]; then
-  PORT="-Dport=$2"
+HTTP_PORT_SET="FALSE"
+HTTPS_PORT_SET="FALSE"
+
+PROGRAM_PARAMS=""
+while [ "$1" != "" ]; do
+
+    if [ "$1" = "-xdebug" ]; then
+        PROGRAM_PARAMS="$PROGRAM_PARAMS""-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000 "
+        shift
+
+    elif [ "$1" = "-http" ]; then
+        PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttp_port=$2 "
+	HTTP_PORT_SET="TRUE"
+        shift
+        shift
+
+    elif [ "$1" = "-https" ]; then
+        PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttps_port=$2 "
+	HTTPS_PORT_SET="TRUE"
+        shift
+        shift
+
+    fi
+
+done
+
+if [ "$HTTP_PORT_SET" = "FALSE" ]; then
+	PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttp_port=9001 "
 fi
 
-if [ "$3" = "-port" ]; then
-  PORT="-Dport=$4"
+if [ "$HTTPS_PORT_SET" = "FALSE" ]; then
+	PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttps_port=9002 "
 fi
 
-if [ "$1" = "-xdebug" ]; then
-  XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
-fi
-
-if [ "$3" = "-xdebug" ]; then
-  XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
-fi
-
-
-java $PORT $XDEBUG -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
+java $PROGRAM_PARAMS -Djava.endorsed.dirs=$AXIS2_ENDORSED -classpath $AXIS2_CLASSPATH samples.util.SampleAxis2Server \
 -repo $AXIS2_HOME/repository -conf $AXIS2_HOME/repository/conf/axis2.xml

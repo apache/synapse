@@ -62,8 +62,15 @@ public class EndpointAbstractFactory {
         OMElement lbElement = configElement.getFirstChildWithName
                 (new QName(Constants.SYNAPSE_NAMESPACE, "loadbalance"));
         if (lbElement != null) {
-            EndpointFactory endpointFactory = LoadbalanceEndpointFactory.getInstance();
-            return endpointFactory;
+            OMElement sessionElement = configElement.
+                    getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "session"));
+            if (sessionElement != null) {
+                EndpointFactory endpointFactory = SALoadbalanceEndpointFactory.getInstance();
+                return endpointFactory;
+            } else {
+                EndpointFactory endpointFactory = LoadbalanceEndpointFactory.getInstance();
+                return endpointFactory;
+            }            
         }
 
         OMElement foElement = configElement.getFirstChildWithName

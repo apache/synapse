@@ -28,6 +28,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.axiom.om.OMElement;
 
 import java.util.Stack;
 
@@ -45,6 +46,11 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     private static final Log log = LogFactory.getLog(AddressEndpoint.class);
 
     private String name;
+    private String wsdlURI;
+    private OMElement wsdlDoc;
+    private String serviceName;
+    private String portName;
+
     private boolean active = true;
     private Endpoint parentEndpoint = null;
     private EndpointDefinition endpointDefinition = null;
@@ -155,6 +161,38 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getWsdlURI() {
+        return wsdlURI;
+    }
+
+    public void setWsdlURI(String wsdlURI) {
+        this.wsdlURI = wsdlURI;
+    }
+
+    public OMElement getWsdlDoc() {
+        return wsdlDoc;
+    }
+
+    public void setWsdlDoc(OMElement wsdlDoc) {
+        this.wsdlDoc = wsdlDoc;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getPortName() {
+        return portName;
+    }
+
+    public void setPortName(String portName) {
+        this.portName = portName;
     }
 
     public boolean isActive() {

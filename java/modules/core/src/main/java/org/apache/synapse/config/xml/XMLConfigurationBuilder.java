@@ -175,12 +175,12 @@ public class XMLConfigurationBuilder {
 
         String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
         if (name != null) {
-            if (config.getLocalRegistry().get(name) != null) {
+            if (config.getLocalRegistry().get(name.trim()) != null) {
                 handleException("Duplicate endpoint definition : " + name);
             }
             Endpoint endpoint =
                     EndpointAbstractFactory.getEndpointFactroy(ele).createEndpoint(ele, false);
-            config.addEndpoint(name, endpoint);
+            config.addEndpoint(name.trim(), endpoint);
         } else {
             handleException("Invalid endpoint definition without a name");
         }

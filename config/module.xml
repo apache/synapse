@@ -48,7 +48,8 @@
 
         <!--  For interoparability perposes. Some WSRM implementations tend to send this as the LastMessage -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage</actionMapping>
-
+ 
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
      </operation>
  
      <operation name="Sandesha2OperationInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
@@ -59,9 +60,6 @@
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/AckRequested</actionMapping>
         
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/AckRequested</actionMapping>
-        
-        <!--  TerminateSequence works as a InOut in RM 1.0 anonymous scenario -->
-        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
         
         <!-- namespaces for the 2007-02 spec -->
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/CreateSequence</actionMapping>

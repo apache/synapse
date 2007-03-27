@@ -227,4 +227,5 @@ public class SandeshaMessageKeys {
 	public final static String policyHasNotBeenSet = "policyHasNotBeenSet";
 	public final static String referenceMessageNotSetForSequence = "referenceMessageNotSetForSequence";
 	public final static String moduleNotSet = "moduleNotSet";
+	public final static String cannotSetPolicyBeanServiceNull = "cannotSetPolicyBeanServiceNull";
 }

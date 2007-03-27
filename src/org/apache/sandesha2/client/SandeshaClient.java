@@ -39,6 +39,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,12 +47,15 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.SequenceProcessor;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.workers.Invoker;
@@ -1318,9 +1322,7 @@ public class SandeshaClient {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	private static String getInternalSequenceIdFromServiceClient(ServiceClient serviceClient) 
-	
-	throws SandeshaException
+	private static String getInternalSequenceIdFromServiceClient(ServiceClient serviceClient) throws SandeshaException
 	{
 		Options options = serviceClient.getOptions();
 		if (options == null)
@@ -1339,4 +1341,31 @@ public class SandeshaClient {
 
 		return internalSequenceID;
 	}
+	
+	
+	public static void setPolicyBean (ServiceClient serviceClient, SandeshaPolicyBean policyBean) throws SandeshaException {
+		try {
+			AxisService axisService = serviceClient.getAxisService();
+			if (axisService!=null) {
+				Parameter parameter = axisService.getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+				SandeshaPolicyBean parent = null;
+				if (parameter==null) {
+					parameter = new Parameter ();
+					parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
+				} else {
+					parent = (SandeshaPolicyBean) parameter.getValue();
+					policyBean.setParent(parent);
+				}
+				
+				parameter.setValue(policyBean);
+				axisService.addParameter(parameter);
+			} else {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSetPolicyBeanServiceNull);
+				throw new SandeshaException (message);
+			}
+		} catch (AxisFault e) {
+			throw new SandeshaException (e);
+		}
+	}
+	
 }

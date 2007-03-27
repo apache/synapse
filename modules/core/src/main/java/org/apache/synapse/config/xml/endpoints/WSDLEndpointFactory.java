@@ -89,11 +89,11 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
             // get the service name and port name. at this point we should not worry about the presence
             // of those parameters. they are handled by corresponding WSDL builders.
-            String serviceName = wsdlElement.getAttributeValue(new QName("service"));
-            String portName = wsdlElement.getAttributeValue(new QName("port"));
+            String serviceName = wsdlElement.getAttributeValue(new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"service"));
+            String portName = wsdlElement.getAttributeValue(new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"port"));
 
             // check if wsdl is supplied as a URI
-            String wsdlURI = wsdlElement.getAttributeValue(new QName("uri"));
+            String wsdlURI = wsdlElement.getAttributeValue(new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"uri"));
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
@@ -101,7 +101,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
             wsdlEndpoint.setPortName(portName);
 
             if (wsdlURI != null) {
-                wsdlEndpoint.setWsdlURI(wsdlURI);
+                wsdlEndpoint.setWsdlURI(wsdlURI.trim());
 
                 try {
                     URL wsdlURL = new URL(wsdlURI);

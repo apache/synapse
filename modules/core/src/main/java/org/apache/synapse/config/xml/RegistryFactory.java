@@ -41,7 +41,7 @@ public class RegistryFactory {
     private static final Log log = LogFactory.getLog(RegistryFactory.class);
 
     public static final QName PROVIDER_Q = new QName(Constants.NULL_NAMESPACE, "provider");
-    public static final QName PARAMETER_Q = new QName(Constants.NULL_NAMESPACE, "parameter");
+    public static final QName PARAMETER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "parameter");
     public static final QName NAME_Q     = new QName(Constants.NULL_NAMESPACE, "name");
 
     public static Registry createRegistry(OMElement elem) {

@@ -106,7 +106,7 @@ public class LoadbalanceFailoverClient {
             options.setTimeOutInMilliSeconds(10000000);
 
             client.setOptions(options);
-            client.engageModule(new QName("addressing"));
+            client.engageModule("addressing");
 
             long i = 0;
             while(i < iterations || infinite) {
@@ -173,7 +173,7 @@ public class LoadbalanceFailoverClient {
             ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem("client_repo", null);
             ServiceClient client = new ServiceClient(configContext, null);
             client.setOptions(options);
-            client.engageModule(new QName("addressing"));
+            client.engageModule("addressing");
 
             int i = 0;
             int sessionNumber = 0;

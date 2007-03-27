@@ -77,7 +77,7 @@ public class DumbStockQuoteClient {
             }
             
             if (secpol != null && secpol.length() > 0) {
-                serviceClient.engageModule(new QName("rampart"));
+                serviceClient.engageModule("rampart");
             }
             serviceClient.setOptions(options);
 

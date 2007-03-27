@@ -549,7 +549,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-<!--
         <repository>
             <id>apache-m2-snapshot</id>
             <name>Apache Maven 2 Snapshot Repository</name>
@@ -561,7 +560,6 @@
                 <updatePolicy>interval:1440</updatePolicy>
             </snapshots>
         </repository>
--->
         <repository>
             <id>wso2-m2</id>
             <name>WSO2 Maven 2 Repository</name>
@@ -592,7 +590,7 @@
       <!-- Axis2 1.1.1 and its dependencies -->
         <axis2.version>SNAPSHOT</axis2.version>
         <rampart.version>SNAPSHOT</rampart.version>
-        <axiom.version>SNAPSHOT</axiom.version>
+        <axiom.version>1.2.3-RC1</axiom.version>
         <xml_schema.version>SNAPSHOT</xml_schema.version>
 
         <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>

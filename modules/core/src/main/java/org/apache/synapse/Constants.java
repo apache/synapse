@@ -99,14 +99,14 @@ public interface Constants {
     String ERROR_DETAIL = "ERROR_DETAIL";
 
     // -- names of modules to be engaged at runtime --
-    /** The QName of the WS-RM Sandesha module */
-    QName SANDESHA2_MODULE_NAME = new QName("sandesha2");
+    /** The Name of the WS-RM Sandesha module */
+    String SANDESHA2_MODULE_NAME = "sandesha2";
 
-    /** The QName of the WS-A Addressing module */
-    QName ADDRESSING_MODULE_NAME = new QName("addressing");
+    /** The Name of the WS-A Addressing module */
+    String ADDRESSING_MODULE_NAME = "addressing";
 
-    /** The QName of the WS-Security Rampart module */
-    QName RAMPART_MODULE_NAME = new QName("rampart");
+    /** The Name of the WS-Security Rampart module */
+    String RAMPART_MODULE_NAME = "rampart";
 
     /** Refers the To header */
     String HEADER_TO = "To";

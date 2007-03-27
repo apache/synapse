@@ -73,18 +73,18 @@ public class SynapseCommodityServiceTest extends TestCase {
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
         TransportInDescription synTrsIn = (TransportInDescription)
-            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
         synTrsIn.getParameter("port").setValue("10100");
         synTrsIn = (TransportInDescription)
-            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
+            synapseConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         synTrsIn.getParameter("port").setValue("12100");
         startServer(synapseConfigCtx);
 
         TransportInDescription busTrsIn = (TransportInDescription)
-            businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+            businessConfigCtx.getAxisConfiguration().getTransportsIn().get("http");
         busTrsIn.getParameter("port").setValue("10101");
         busTrsIn = (TransportInDescription)
-            businessConfigCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
+            businessConfigCtx.getAxisConfiguration().getTransportsIn().get("https");
         busTrsIn.getParameter("port").setValue("12101");
         startServer(businessConfigCtx);
         System.out.println("");
@@ -105,7 +105,7 @@ public class SynapseCommodityServiceTest extends TestCase {
         Iterator iter = configctx.getAxisConfiguration().
             getTransportsIn().keySet().iterator();
         while (iter.hasNext()) {
-            QName trp = (QName) iter.next();
+            String trp = (String) iter.next();
             TransportInDescription trsIn = (TransportInDescription)
                 configctx.getAxisConfiguration().getTransportsIn().get(trp);
             listenerManager.addListener(trsIn, false);

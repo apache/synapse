@@ -129,7 +129,7 @@ while [ "$1" != "" ]; do
 done
 
 if [ "$HTTP_PORT_SET" = "FALSE" ]; then
-	PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttp_port=9001 "
+	PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttp_port=9000 "
 fi
 
 if [ "$HTTPS_PORT_SET" = "FALSE" ]; then

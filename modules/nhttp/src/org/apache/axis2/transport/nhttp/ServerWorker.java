@@ -137,9 +137,9 @@ public class ServerWorker implements Runnable {
         }
 
         msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
-            .getTransportOut(new QName(Constants.TRANSPORT_HTTP)));
+            .getTransportOut(Constants.TRANSPORT_HTTP));
         msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
-            .getTransportIn(new QName(Constants.TRANSPORT_HTTP)));
+            .getTransportIn(Constants.TRANSPORT_HTTP));
 
         return msgContext;
     }

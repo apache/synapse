@@ -54,7 +54,7 @@ public class Util {
             } else {
                 serviceClient = new ServiceClient();
             }
-            serviceClient.engageModule(new QName("addressing"));
+            serviceClient.engageModule("addressing");
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote).getFirstElement();
@@ -88,7 +88,7 @@ public class Util {
             } else {
                 serviceClient = new ServiceClient();
             }
-            serviceClient.engageModule(new QName("addressing"));
+            serviceClient.engageModule("addressing");
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote);
@@ -121,7 +121,7 @@ public class Util {
             } else {
                 serviceClient = new ServiceClient();
             }
-            serviceClient.engageModule(new QName("addressing"));
+            serviceClient.engageModule("addressing");
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote);
@@ -154,7 +154,7 @@ public class Util {
             } else {
                 serviceClient = new ServiceClient();
             }
-            serviceClient.engageModule(new QName("addressing"));
+            serviceClient.engageModule("addressing");
             serviceClient.setOptions(options);
 
             OMElement result = serviceClient.sendReceive(getQuote);

@@ -79,9 +79,9 @@ public class StockQuoteClient {
             } else {
                 serviceClient = new ServiceClient();
             }
-            serviceClient.engageModule(new QName("addressing"));
+            serviceClient.engageModule("addressing");
             if (secpol != null && secpol.length() > 0) {
-                serviceClient.engageModule(new QName("rampart"));
+                serviceClient.engageModule("rampart");
             }
 
             serviceClient.setOptions(options);

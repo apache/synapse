@@ -132,8 +132,10 @@ public class AnonymousServiceFactory {
             dynamicOperation.setMessageReceiver(synapseCallback);
             AxisMessage inMsg = new AxisMessage();
             inMsg.setName("in-message");
+            inMsg.setParent(dynamicOperation);
             AxisMessage outMsg = new AxisMessage();
             outMsg.setName("out-message");
+            outMsg.setParent(dynamicOperation);
             dynamicOperation.addMessage(inMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
             dynamicOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             AxisService axisAnonymousService  = new AxisService(serviceKey);

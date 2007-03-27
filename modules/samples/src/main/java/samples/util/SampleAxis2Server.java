@@ -107,7 +107,7 @@ public class SampleAxis2Server {
     private static void configurePort(ConfigurationContext configCtx) {
 
         TransportInDescription trsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+            configCtx.getAxisConfiguration().getTransportsIn().get("http");
 
         if(trsIn != null) {
             String port = System.getProperty("http_port");
@@ -125,7 +125,7 @@ public class SampleAxis2Server {
         }
 
         TransportInDescription httpsTrsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get(new QName("https"));
+            configCtx.getAxisConfiguration().getTransportsIn().get("https");
 
         if(httpsTrsIn != null) {
             String port = System.getProperty("https_port");

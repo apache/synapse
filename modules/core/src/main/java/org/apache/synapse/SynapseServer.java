@@ -72,7 +72,7 @@ public class SynapseServer {
             Iterator iter = configctx.getAxisConfiguration().
                 getTransportsIn().keySet().iterator();
             while (iter.hasNext()) {
-                QName trp = (QName) iter.next();
+                String trp = (String) iter.next();
                 TransportInDescription trsIn = (TransportInDescription)
                     configctx.getAxisConfiguration().getTransportsIn().get(trp);
                 listenerManager.addListener(trsIn, false);
@@ -93,7 +93,7 @@ public class SynapseServer {
     private static void selectPort(ConfigurationContext configCtx) {
         // check if configured port is available
         TransportInDescription trsIn = (TransportInDescription)
-            configCtx.getAxisConfiguration().getTransportsIn().get(new QName("http"));
+            configCtx.getAxisConfiguration().getTransportsIn().get("http");
 
         if (trsIn != null) {
 

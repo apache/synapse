@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2;
 
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
 
 /**
@@ -30,7 +32,7 @@ public class FaultData {
 
 	private String code;
 
-	private String subcode;
+	private QName subcode;
 
 	private String reason;
 
@@ -69,11 +71,11 @@ public class FaultData {
 		this.reason = reason;
 	}
 
-	public String getSubcode() {
+	public QName getSubcode() {
 		return subcode;
 	}
 
-	public void setSubcode(String subcode) {
+	public void setSubcode(QName subcode) {
 		this.subcode = subcode;
 	}
 

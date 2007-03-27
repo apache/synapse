@@ -85,7 +85,7 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
     assertNotNull(message);
     
     // Check that the response contains the wsrm:CreateSequenceRefused tag    
-    assertTrue(message.indexOf("wsrm:CreateSequenceRefused") > -1);
+    assertTrue(message.indexOf("CreateSequenceRefused") > -1);
     
     // Disconnect at the end of the test
     connection.disconnect();
@@ -145,5 +145,6 @@ public class CreateSequenceRefusedFaultTest extends SandeshaTestCase {
 		return outputStream.toByteArray();
 	}
 }
+
 
 

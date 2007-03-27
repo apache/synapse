@@ -119,7 +119,7 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
     assertNotNull(message);
     
     // Check that the response contains the InvalidAcknowledgement tag    
-    assertTrue(message.indexOf("wsrm:InvalidAcknowledgement") > -1);
+    assertTrue(message.indexOf("InvalidAcknowledgement") > -1);
     
     // Check that the <wsrm:Identifier>seqID</wsrm:Identifier> matches the sequence ID specified
     String faultID = message.substring(message.indexOf("<wsrm:Identifier>") + 17, message.indexOf("</wsrm:Identifier>"));
@@ -274,5 +274,6 @@ public class InvalidAcknowledgementTest extends SandeshaTestCase {
 		return bean;
 	}
 }
+
 
 

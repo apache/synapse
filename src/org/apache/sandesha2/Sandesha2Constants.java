@@ -82,6 +82,15 @@ public interface Sandesha2Constants {
 			
 			// Other elements
 			QName Identifier = new QName(NS_URI, WSRM_COMMON.IDENTIFIER);
+
+			// Fault elements
+			QName UnknownSequence = new QName(NS_URI, SOAPFaults.Subcodes.UNKNOWN_SEQUENCE);
+			QName MessageNumberRollover = new QName(NS_URI, SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER);
+			QName InvalidAcknowledgement = new QName(NS_URI, SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+			QName CreateSequenceRefused = new QName(NS_URI, SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
+			QName LastMessageNoExceeded = new QName(NS_URI, SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED);
+			QName SequenceClosed = new QName(NS_URI, SOAPFaults.Subcodes.SEQUENCE_CLOSED);
+			QName SequenceTerminated = new QName(NS_URI, SOAPFaults.Subcodes.SEQUENCE_TERMINATED);
 		}
 	}
 	
@@ -141,6 +150,15 @@ public interface Sandesha2Constants {
 			
 			// Other elements
 			QName Identifier = new QName(NS_URI, WSRM_COMMON.IDENTIFIER);
+			
+			// Fault elements
+			QName UnknownSequence = new QName(NS_URI, SOAPFaults.Subcodes.UNKNOWN_SEQUENCE);
+			QName MessageNumberRollover = new QName(NS_URI, SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER);
+			QName InvalidAcknowledgement = new QName(NS_URI, SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+			QName CreateSequenceRefused = new QName(NS_URI, SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
+			QName LastMessageNoExceeded = new QName(NS_URI, SOAPFaults.Subcodes.LAST_MESSAGE_NO_EXCEEDED);
+			QName SequenceClosed = new QName(NS_URI, SOAPFaults.Subcodes.SEQUENCE_CLOSED);
+			QName SequenceTerminated = new QName(NS_URI, SOAPFaults.Subcodes.SEQUENCE_TERMINATED);
 		}
 	}
 	
@@ -336,19 +354,19 @@ public interface Sandesha2Constants {
 
 		public interface Subcodes {
 
-			String SEQUENCE_TERMINATED = "wsrm:SequenceTerminated";
+			String SEQUENCE_TERMINATED = "SequenceTerminated";
 			
-			String SEQUENCE_CLOSED = "wsrm:SequenceClosed";
+			String SEQUENCE_CLOSED = "SequenceClosed";
 
-			String UNKNOWN_SEQUENCE = "wsrm:UnknownSequence";
+			String UNKNOWN_SEQUENCE = "UnknownSequence";
 
-			String INVALID_ACKNOWLEDGEMENT = "wsrm:InvalidAcknowledgement";
+			String INVALID_ACKNOWLEDGEMENT = "InvalidAcknowledgement";
 
-			String MESSAGE_NUMBER_ROLEOVER = "wsrm:MessageNumberRollover";
+			String MESSAGE_NUMBER_ROLEOVER = "MessageNumberRollover";
 
-			String LAST_MESSAGE_NO_EXCEEDED = "wsrm:LastMessageNumberExceeded";
+			String LAST_MESSAGE_NO_EXCEEDED = "LastMessageNumberExceeded";
 
-			String CREATE_SEQUENCE_REFUSED = "wsrm:CreateSequenceRefused";
+			String CREATE_SEQUENCE_REFUSED = "CreateSequenceRefused";
 			
 
 		}

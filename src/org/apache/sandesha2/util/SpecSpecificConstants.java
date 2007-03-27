@@ -17,6 +17,10 @@
 
 package org.apache.sandesha2.util;
 
+import java.util.MissingResourceException;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
@@ -373,5 +377,67 @@ public class SpecSpecificConstants {
 		
 		return result;
 	}
+
+	public static QName getFaultSubcode(String namespaceValue, int faultType) 
+	throws SandeshaException, MissingResourceException {
+		QName result = null;
+		
+		if (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(namespaceValue)) {
+			switch (faultType) {
+				case Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.UnknownSequence;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.MessageNumberRollover;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.InvalidAcknowledgement;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.CreateSequenceRefused;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.LAST_MESSAGE_NO_EXCEEDED:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.LastMessageNoExceeded;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.SequenceClosed;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED:
+					result = Sandesha2Constants.SPEC_2005_02.QNames.SequenceTerminated;
+					break;
+			}
+		}
+		else if (Sandesha2Constants.SPEC_2007_02.NS_URI.equals(namespaceValue)) {
+			switch (faultType) {
+				case Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.UnknownSequence;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.MessageNumberRollover;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.InvalidAcknowledgement;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.CreateSequenceRefused;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.LAST_MESSAGE_NO_EXCEEDED:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.LastMessageNoExceeded;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.SequenceClosed;
+					break;
+				case Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED:
+					result = Sandesha2Constants.SPEC_2007_02.QNames.SequenceTerminated;
+					break;
+			}
+		}
+		else
+			throw new SandeshaException (SandeshaMessageHelper.getMessage(
+					SandeshaMessageKeys.unknownSpec,
+					namespaceValue));
+		
+		return result;
+  }
 
 }

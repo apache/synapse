@@ -34,7 +34,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 
 public class FaultCode implements IOMRMElement {
 
-	private String faultCode = null;
+	private QName faultCode = null;
 	
 	private String namespaceValue = null;
 
@@ -73,13 +73,11 @@ public class FaultCode implements IOMRMElement {
 					SandeshaMessageKeys.noFaultCode,
 					sequenceFault.toString()));
 
-		this.faultCode = faultCodePart.getText();
+		this.faultCode = faultCodePart.getTextAsQName();
 
 		OMElement detailPart = sequenceFault
 			.getFirstChildWithName(new QName(namespaceValue,
 					Sandesha2Constants.WSRM_COMMON.DETAIL));
-		
-		this.faultCode = faultCodePart.getText();
 		
 		if (detailPart != null) {
 			detailOMElement = detailPart;
@@ -103,7 +101,7 @@ public class FaultCode implements IOMRMElement {
 					SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.nullPassedElement));
 
-		if (faultCode == null || faultCode == "")
+		if (faultCode == null)
 			throw new OMException(
 					SandeshaMessageHelper.getMessage(
 							SandeshaMessageKeys.noFaultCode));
@@ -132,11 +130,11 @@ public class FaultCode implements IOMRMElement {
 		return sequenceFault;
 	}
     
-    public void setFaultCode(String faultCode) {
+    public void setFaultCode(QName faultCode) {
         this.faultCode = faultCode;
     }
     
-    public String getFaultCode() {
+    public QName getFaultCode() {
         return faultCode;
     }
 

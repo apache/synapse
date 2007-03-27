@@ -179,7 +179,8 @@ public class FaultManager {
 			else
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE);
+			data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMessageContext.getRMNamespaceValue(), 
+					Sandesha2Constants.SOAPFaults.FaultType.UNKNOWN_SEQUENCE ));
 
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 
@@ -271,7 +272,8 @@ public class FaultManager {
 			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
 		data.setType(Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT);
-		data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.INVALID_ACKNOWLEDGEMENT);
+		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMsgCtx.getRMNamespaceValue(), 
+				Sandesha2Constants.SOAPFaults.FaultType.INVALID_ACKNOWLEDGEMENT ));
 		data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.invalidAckFault));
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
@@ -314,7 +316,8 @@ public class FaultManager {
 		else
 			data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-		data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED);
+		data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMessageContext.getRMNamespaceValue(), 
+				Sandesha2Constants.SOAPFaults.FaultType.CREATE_SEQUENCE_REFUSED ));
 
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 		OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,
@@ -357,7 +360,8 @@ public class FaultManager {
 			else
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED);
+			data.setSubcode(SpecSpecificConstants.getFaultSubcode(referenceRMMessage.getRMNamespaceValue(), 
+					Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED ));
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sequenceTerminatedFault, sequenceID));
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_TERMINATED);
 			
@@ -394,7 +398,8 @@ public class FaultManager {
 			else
 				data.setCode(SOAP12Constants.FAULT_CODE_SENDER);
 
-			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_CLOSED);
+			data.setSubcode(SpecSpecificConstants.getFaultSubcode(referenceRMMessage.getRMNamespaceValue(), 
+					Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED ));
 			data.setReason(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotAcceptMsgAsSequenceClosedFault));
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.SEQUENCE_CLOSED);
 			
@@ -437,6 +442,7 @@ public class FaultManager {
 		SOAPFaultValue faultSubcodeValue = factory.createSOAPFaultValue(faultSubCode);
 		
 		faultColdValue.setText(data.getCode());
+		
 		faultSubcodeValue.setText(data.getSubcode());
 
 		faultCode.setSubCode(faultSubCode);
@@ -529,7 +535,8 @@ public class FaultManager {
 			if (faultPart.getCode() != null && 
 					faultPart.getCode().getSubCode() != null &&
 					faultPart.getCode().getSubCode().getValue() != null)
-				soapFaultSubcode = faultPart.getCode().getSubCode().getValue().getText();
+				
+				soapFaultSubcode = faultPart.getCode().getSubCode().getValue().getTextAsQName().getLocalPart();
 			
 			// Get the identifier, if there is one.
 			SOAPFaultDetail detail = faultPart.getDetail();
@@ -548,7 +555,7 @@ public class FaultManager {
 	      
 	      // If the sequence fault part is not null, then we have an RM specific fault.
 	      if (sequenceFault != null) {
-	      	soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode();
+	      	soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode().getLocalPart();
 	      	
 	      	// Get the identifier - if there is one.
 	      	identifier = sequenceFault.getFaultCode().getDetail();
@@ -611,7 +618,8 @@ public class FaultManager {
 
 			FaultData data = new FaultData();
 			data.setCode(SOAP11Constants.FAULT_CODE_SENDER);
-			data.setSubcode(Sandesha2Constants.SOAPFaults.Subcodes.MESSAGE_NUMBER_ROLEOVER);
+			data.setSubcode(SpecSpecificConstants.getFaultSubcode(rmMessageContext.getRMNamespaceValue(), 
+					Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER ));
 
 			SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SOAPVersion);
 			OMElement identifierElement = factory.createOMElement(Sandesha2Constants.WSRM_COMMON.IDENTIFIER,

@@ -26,7 +26,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
-    <version>${synapse.version}</version>
+    <version>1.0-RC1-SNAPSHOT</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -588,7 +588,8 @@
         <synapse.version>1.0-RC1-SNAPSHOT</synapse.version>
         <jakarta.httpcore.nio.version>4.0-alpha4-SNAPSHOT</jakarta.httpcore.nio.version>
 
-        <!-- Axis2 1.1.1 and its dependencies -->
+
+      <!-- Axis2 1.1.1 and its dependencies -->
         <axis2.version>SNAPSHOT</axis2.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <axiom.version>SNAPSHOT</axiom.version>

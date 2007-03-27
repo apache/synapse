@@ -218,6 +218,7 @@
                 <include>org.apache.rampart:rampart:mar</include>
                 <include>org.apache.sandesha2:sandesha2:mar</include>
             </includes>
+            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules</outputDirectory>
@@ -226,6 +227,7 @@
                 <include>org.apache.rampart:rampart:mar</include>
                 <!--<include>org.apache.sandesha2:sandesha2:mar</include>-->
             </includes>
+            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules</outputDirectory>
@@ -234,6 +236,7 @@
                 <include>org.apache.rampart:rampart:mar</include>
                 <!--<include>org.apache.sandesha2:sandesha2:mar</include>-->
             </includes>
+            <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
 
     </dependencySets>

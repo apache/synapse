@@ -41,40 +41,40 @@ public class LogMediatorSerializationTest extends AbstractTestCase {
 
     public void testLogMediatorSerializationSenarioOne() throws Exception {
 
-        //    assertTrue(serialization(getXmlOfMediatorSenarioOne(SIMPLE), logMediatorFactory, logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioOne(HEADERS), logMediatorFactory, logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioOne(FULL), logMediatorFactory, logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioOne(CUSTOM), logMediatorFactory, logMediatorSerializer));
+        //    assertTrue(serialization(getXmlOfMediatorScenarioOne(SIMPLE), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioOne(HEADERS), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioOne(FULL), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioOne(CUSTOM), logMediatorFactory, logMediatorSerializer));
 
-//        assertTrue(serialization(getXmlOfMediatorSenarioOne(SIMPLE), logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioOne(HEADERS), logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioOne(FULL), logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioOne(CUSTOM), logMediatorSerializer));
-
-
-    }
-
-    public void testLogMediatorSerializationSenarioTwo() throws Exception {
-
-//        assertTrue(serialization(getXmlOfMediatorSenarioTwo(SIMPLE, ":"), logMediatorFactory, logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioTwo(HEADERS, ":"), logMediatorFactory, logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioTwo(FULL, ";"), logMediatorFactory, logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioTwo(CUSTOM, ":"), logMediatorFactory, logMediatorSerializer));
-
-        //       assertTrue(serialization(getXmlOfMediatorSenarioTwo(SIMPLE, ":"), logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioTwo(HEADERS, ":"), logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioTwo(FULL, ";"), logMediatorSerializer));
-        assertTrue(serialization(getXmlOfMediatorSenarioTwo(CUSTOM, ":"), logMediatorSerializer));
+//        assertTrue(serialization(getXmlOfMediatorScenarioOne(SIMPLE), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioOne(HEADERS), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioOne(FULL), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioOne(CUSTOM), logMediatorSerializer));
 
 
     }
 
-    private String getXmlOfMediatorSenarioOne(String level) {
+    public void testLogMediatorSerializationScenarioTwo() throws Exception {
+
+//        assertTrue(serialization(getXmlOfMediatorScenarioTwo(SIMPLE, ":"), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioTwo(HEADERS, ":"), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioTwo(FULL, ";"), logMediatorFactory, logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioTwo(CUSTOM, ":"), logMediatorFactory, logMediatorSerializer));
+
+        //       assertTrue(serialization(getXmlOfMediatorScenarioTwo(SIMPLE, ":"), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioTwo(HEADERS, ":"), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioTwo(FULL, ";"), logMediatorSerializer));
+        assertTrue(serialization(getXmlOfMediatorScenarioTwo(CUSTOM, ":"), logMediatorSerializer));
+
+
+    }
+
+    private String getXmlOfMediatorScenarioOne(String level) {
         return "<log xmlns=\"http://ws.apache.org/ns/synapse\" level=\"" + level + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }
 
-    private String getXmlOfMediatorSenarioTwo(String level, String seperator) {
+    private String getXmlOfMediatorScenarioTwo(String level, String seperator) {
         return "<log xmlns=\"http://ws.apache.org/ns/synapse\" level=\"" + level + "\" separator=\"" + seperator + "\"><property name=\"Text\" value=\"Sending quote request\"/></log>";
 
     }

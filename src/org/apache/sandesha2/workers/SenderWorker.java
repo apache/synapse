@@ -3,11 +3,10 @@ package org.apache.sandesha2.workers;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -448,7 +447,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		return piggybackable;
 	}
 	
-	private void checkForSyncResponses(MessageContext msgCtx) throws SandeshaException {
+	private void checkForSyncResponses(MessageContext msgCtx) {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SenderWorker::checkForSyncResponses, " + msgCtx.getEnvelope().getHeader());
 
@@ -490,8 +489,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 							.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
 			responseMessageContext.setProperty(HTTPConstants.CHAR_SET_ENCODING, requestMsgOpCtx
 							.getProperty(HTTPConstants.CHAR_SET_ENCODING));
-			responseMessageContext.setProperty(HTTPConstants.CONTENT_TYPE, requestMsgOpCtx
-							.getProperty(HTTPConstants.CONTENT_TYPE));
+			responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx
+							.getProperty(Constants.Configuration.CONTENT_TYPE));
 
 			// If request is REST we assume the responseMessageContext is REST,
 			// so set the variable
@@ -554,8 +553,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 							(Sandesha2Constants.MessageTypes.ACK, responseRMMessage.getRMSpecVersion(), responseMessageContext.getAxisService()));
 					responseMessageContext.setOperationContext(null);
 				}
-
-				
 				
 				AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 
@@ -568,8 +565,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noValidSyncResponse);
-			log.debug(message, e);
-			throw new SandeshaException(message, e);
+			if (log.isWarnEnabled())
+				log.warn(message, e);
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: SenderWorker::checkForSyncResponses");

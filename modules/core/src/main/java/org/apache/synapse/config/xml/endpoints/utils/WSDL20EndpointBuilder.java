@@ -44,6 +44,7 @@ import javax.xml.namespace.QName;
  */
 public class WSDL20EndpointBuilder {
 
+/*  COMMENT DUE TO BUILD FAILURE - TO BE FIXED LATER WHEN WSDL 2.0 SUPPORT IS OFFICIALLY IN 
     private static Log log = LogFactory.getLog(WSDL20EndpointBuilder.class);
 
     public EndpointDefinition createEndpointDefinitionFromWSDL
@@ -104,5 +105,5 @@ public class WSDL20EndpointBuilder {
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);
-    }
+    }*/
 }

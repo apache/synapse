@@ -196,7 +196,7 @@ public class HttpCoreNIOListener implements TransportListener {
         }, "HttpCoreNIOListener");
 
         t.start();
-        log.info("Listener starting on port : " + port);
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Listener starting on port : " + port);
     }
 
     /**

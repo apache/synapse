@@ -101,7 +101,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             }
         }, "HttpCoreNIOSender");
         t.start();
-        log.info("Sender started");
+        log.info((sslContext == null ? "HTTP" : "HTTPS") + " Sender starting");
     }
 
     /**

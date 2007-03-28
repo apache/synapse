@@ -69,20 +69,25 @@ public class SequenceMediator extends AbstractListMediator {
      * @return as per standard mediator result
      */
     public boolean mediate(MessageContext synCtx) {
+        
         log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
+        
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (key == null) {
             // Setting Required property to collect the sequence statistics
-            boolean isStatisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
+            boolean isStatisticsEnable
+                    = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
             if (isStatisticsEnable) {
-                StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                StatisticsStack sequenceStack
+                        = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
                 if (sequenceStack == null) {
                     sequenceStack = new SequenceStatisticsStack();
                     synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
                 }
                 String seqName = (name == null ? "anonymous" : name);
                 boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                sequenceStack.put(seqName, System.currentTimeMillis(), !synCtx.isResponse(), isStatisticsEnable,isFault);
+                sequenceStack.put(seqName,System.currentTimeMillis(),
+                        !synCtx.isResponse(), isStatisticsEnable,isFault);
             }
             try {
                 if (shouldTrace) {
@@ -91,6 +96,7 @@ public class SequenceMediator extends AbstractListMediator {
 
                 // push the errorHandler sequence into the current message as the fault handler
                 if (errorHandler != null) {
+                    log.debug("Setting the onError handler for the sequence");
                     synCtx.pushFaultHandler(
                         new MediatorFaultHandler(synCtx.getSequence(errorHandler)));
                 }

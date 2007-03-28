@@ -76,7 +76,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                     Mediator faultSequence = synCtx.getSequence(proxy.getTargetFaultSequence());
                     if (faultSequence != null) {
-                        log.debug("setting the fault-sequence of the " +
+                        log.debug("Setting the fault-sequence of the " +
                                 "proxy service to MessageContext");
                         synCtx.pushFaultHandler(new MediatorFaultHandler(
                                 synCtx.getSequence(proxy.getTargetFaultSequence())));

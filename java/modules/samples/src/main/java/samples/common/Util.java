@@ -163,7 +163,7 @@ public class Util {
 
         } catch (Exception e) {
             if (e instanceof AxisFault) {
-                System.out.println("Fault : " + ((AxisFault)e).getFaultElements());
+                System.out.println("Fault : " + e);
             } else {
                 e.printStackTrace();
             }

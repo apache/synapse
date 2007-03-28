@@ -33,6 +33,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.axis2.description.WSDL2Constants;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
@@ -113,7 +114,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
                         endpoint = new WSDL11EndpointBuilder().
                                 createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
 
-                    } else if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.equals(ns)) {
+                    } else if (WSDL2Constants.WSDL_NAMESPACE.equals(ns)) {
                         //endpoint = new WSDL20EndpointBuilder().
                         //        createEndpointDefinitionFromWSDL(wsdlURI, serviceName, portName);
 

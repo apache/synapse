@@ -59,26 +59,35 @@ public class XSLTMediator extends AbstractMediator {
     private static final Log log = LogFactory.getLog(XSLTMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
-    /** The property key/name which refers to the XSLT to be used for the transformation */
+    /**
+     * The property key/name which refers to the XSLT to be used for the transformation
+     */
     private String xsltKey = null;
 
-    /** The (optional) XPath expression which yeilds the source element for a transformation */
+    /**
+     * The (optional) XPath expression which yeilds the source element for a transformation
+     */
     private AXIOMXPath source = null;
 
-    /** Any parameters which should be passed into the XSLT transformation */
+    /**
+     * Any parameters which should be passed into the XSLT transformation
+     */
     private List properties = new ArrayList();
 
     /**
      * The Transformer instance used to perform XSLT transformations. This is not thread-safe
+     *
      * @see javax.xml.transform.Transformer
      */
     private Transformer transformer = null;
 
-    /** Lock used to ensure thread-safe creation and use of the above Transformer */
+    /**
+     * Lock used to ensure thread-safe creation and use of the above Transformer
+     */
     private final Object transformerLock = new Object();
 
     public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-        "//s12:Envelope/s12:Body/child::*[position()=1]";
+            "//s12:Envelope/s12:Body/child::*[position()=1]";
 
     public XSLTMediator() {
         // create the default XPath
@@ -94,24 +103,30 @@ public class XSLTMediator extends AbstractMediator {
     /**
      * Transforms this message (or its element specified as the source) using the
      * given XSLT transformation
+     *
      * @param synCtx the current message where the transformation will apply
      * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("XSLT mediator mediate()");
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : XSLT mediator");
+        try {
+            log.debug("XSLT mediator mediate()");
+            boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+            if (shouldTrace) {
+                trace.trace("Start : XSLT mediator");
+            }
+            log.debug("Performing XSLT transformation against property with key : " + xsltKey);
+            performXLST(synCtx, shouldTrace);
+            if (shouldTrace) {
+                trace.trace("Start : XSLT mediator");
+            }
+            return true;
+        } catch (Exception e) {
+            handleException("Unable to do the transformation");
         }
-        log.debug("Performing XSLT transformation against property with key : " + xsltKey);
-        performXLST(synCtx,shouldTrace);
-        if (shouldTrace) {
-            trace.trace("Start : XSLT mediator");
-        }
-        return true;
+        return false;
     }
 
-    private void performXLST(MessageContext msgCtx,boolean shouldTrace) {
+    private void performXLST(MessageContext msgCtx, boolean shouldTrace) {
 
         Source transformSrc = null;
         ByteArrayOutputStream baosForTarget = new ByteArrayOutputStream();
@@ -131,7 +146,7 @@ public class XSLTMediator extends AbstractMediator {
             // create a byte array output stream and serialize the source node into it
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
             XMLStreamWriter xsWriterForSource = XMLOutputFactory.newInstance().
-                createXMLStreamWriter(baosForSource);
+                    createXMLStreamWriter(baosForSource);
 
             sourceNode.serialize(xsWriterForSource);
             transformSrc = new StreamSource(new ByteArrayInputStream(baosForSource.toByteArray()));
@@ -146,27 +161,27 @@ public class XSLTMediator extends AbstractMediator {
         // if the xsltKey refers to a dynamic property
         if (dp != null && dp.isDynamic()) {
             if (!dp.isCached() || dp.isExpired()) {
-                synchronized(transformerLock) {
+                synchronized (transformerLock) {
                     try {
                         transformer = TransformerFactory.newInstance().
-                            newTransformer(Util.getStreamSource(
-                                msgCtx.getConfiguration().getEntry(xsltKey)
-                            ));
+                                newTransformer(Util.getStreamSource(
+                                        msgCtx.getConfiguration().getEntry(xsltKey)
+                                ));
                     } catch (TransformerConfigurationException e) {
                         handleException("Error creating XSLT transformer using : " + xsltKey, e);
                     }
                 }
             }
 
-        // if the property is not a DynamicProperty, we will create a transformer only once
+            // if the property is not a DynamicProperty, we will create a transformer only once
         } else {
             if (transformer == null) {
-                synchronized(transformerLock) {
+                synchronized (transformerLock) {
                     try {
                         transformer = TransformerFactory.newInstance().
-                            newTransformer(
-                                Util.getStreamSource(
-                                msgCtx.getConfiguration().getEntry(xsltKey)));
+                                newTransformer(
+                                        Util.getStreamSource(
+                                                msgCtx.getConfiguration().getEntry(xsltKey)));
                     } catch (TransformerConfigurationException e) {
                         handleException("Error creating XSLT transformer using : " + xsltKey, e);
                     }
@@ -179,7 +194,7 @@ public class XSLTMediator extends AbstractMediator {
             transformer.transform(transformSrc, transformTgt);
 
             StAXOMBuilder builder = new StAXOMBuilder(
-                new ByteArrayInputStream(baosForTarget.toByteArray()));
+                    new ByteArrayInputStream(baosForTarget.toByteArray()));
             OMElement result = builder.getDocumentElement();
             if (shouldTrace) {
                 trace.trace("Transformation result : " + result.toString());
@@ -189,7 +204,7 @@ public class XSLTMediator extends AbstractMediator {
             }
 
             // replace the sourceNode with the result.
-            sourceNode.insertSiblingAfter( result );
+            sourceNode.insertSiblingAfter(result);
             sourceNode.detach();
 
         } catch (TransformerException e) {
@@ -217,7 +232,7 @@ public class XSLTMediator extends AbstractMediator {
                 return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
             } else {
                 handleException("The evaluation of the XPath expression "
-                    + source + " must result in an OMNode");
+                        + source + " must result in an OMNode");
             }
         } catch (JaxenException e) {
             handleException("Error evaluating XPath " + source + " on message");

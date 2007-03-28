@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.axiom.soap.SOAPFault;
 
@@ -50,7 +51,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     public void receive(MessageContext messageCtx) throws AxisFault {
 
         if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
-            String messageID  = messageCtx.getOptions().getRelatesTo().getValue();
+            String messageID = messageCtx.getOptions().getRelatesTo().getValue();
             Callback callback = (Callback) callbackStore.remove(messageID);
 
             RelatesTo[] relates = messageCtx.getRelationships();
@@ -66,7 +67,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             } else {
                 // TODO invoke a generic synapse error handler for this message
                 log.warn("Synapse received a response for the request with message Id : " +
-                    messageID + " But a callback has not been registered to process this response");
+                        messageID + " But a callback has not been registered to process this response");
             }
 
         } else {
@@ -78,13 +79,13 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     /**
      * Handle the response or error (during a failed send) message received for an outgoing request
      *
-     * @param response the Axis2 MessageContext that has been received and has to be handled
+     * @param response         the Axis2 MessageContext that has been received and has to be handled
      * @param synapseOutMsgCtx the corresponding (outgoing) Synapse MessageContext for the above
-     * Axis2 MC, that holds Synapse specific information such as the error handler stack and
-     * local properties etc.
+     *                         Axis2 MC, that holds Synapse specific information such as the error handler stack and
+     *                         local properties etc.
      */
     private void handleMessage(MessageContext response,
-        org.apache.synapse.MessageContext synapseOutMsgCtx) {
+                               org.apache.synapse.MessageContext synapseOutMsgCtx) {
 
         Object o = response.getProperty("sending_fault");
         if (o != null && Boolean.TRUE.equals(o)) {
@@ -97,14 +98,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 SOAPFault fault = response.getEnvelope().getBody().getFault();
                 Exception e = fault.getException();
                 if (e == null) {
-                    e = new Exception(fault.toString());    
+                    e = new Exception(fault.toString());
                 }
 
-                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx,e);
+                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
             }
 
         } else {
-             
+
             // there can always be only one instance of an Endpoint in the faultStack of a message
             // if the send was successful, so remove it before we proceed any further
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
@@ -115,14 +116,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             if (log.isDebugEnabled()) {
                 log.debug("Synapse received an asynchronous response message");
                 log.debug("Received To: " +
-                    (response.getTo() != null ? response.getTo().getAddress() : "null"));
+                        (response.getTo() != null ? response.getTo().getAddress() : "null"));
                 log.debug("SOAPAction: " +
-                    (response.getSoapAction() != null ? response.getSoapAction() : "null"));
+                        (response.getSoapAction() != null ? response.getSoapAction() : "null"));
                 log.debug("Body : \n" + response.getEnvelope());
             }
 
             MessageContext axisOutMsgCtx =
-                ((Axis2MessageContext)synapseOutMsgCtx).getAxis2MessageContext();
+                    ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext();
 
             response.setOperationContext(axisOutMsgCtx.getOperationContext());
             response.getAxisMessage().setParent(
@@ -133,9 +134,9 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             response.setServerSide(true);
             response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             response.setProperty(MessageContext.TRANSPORT_OUT,
-                axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
+                    axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
             response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,
-                axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
+                    axisOutMsgCtx.getProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO));
             response.setTransportIn(axisOutMsgCtx.getTransportIn());
             response.setTransportOut(axisOutMsgCtx.getTransportOut());
 
@@ -143,15 +144,15 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             response.setDoingREST(axisOutMsgCtx.isDoingREST());
             if (axisOutMsgCtx.getMessageID() != null) {
                 response.setRelationships(
-                    new RelatesTo[] {new RelatesTo(axisOutMsgCtx.getMessageID())});
+                        new RelatesTo[]{new RelatesTo(axisOutMsgCtx.getMessageID())});
             }
 
             // create the synapse message context for the response
             Axis2MessageContext synapseInMessageContext =
-                new Axis2MessageContext(
-                    response,
-                    synapseOutMsgCtx.getConfiguration(),
-                    synapseOutMsgCtx.getEnvironment());
+                    new Axis2MessageContext(
+                            response,
+                            synapseOutMsgCtx.getConfiguration(),
+                            synapseOutMsgCtx.getEnvironment());
 
             synapseInMessageContext.setResponse(true);
             synapseInMessageContext.setTo(null);
@@ -162,12 +163,21 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             while (iter.hasNext()) {
                 Object key = iter.next();
                 synapseInMessageContext.setProperty(
-                    (String) key, synapseOutMsgCtx.getProperty((String) key));
+                        (String) key, synapseOutMsgCtx.getProperty((String) key));
             }
 
             // send the response message through the synapse mediation flow
-            synapseOutMsgCtx.getEnvironment().
-                injectMessage(synapseInMessageContext);
+            try {
+                synapseOutMsgCtx.getEnvironment().injectMessage(synapseInMessageContext);
+            } catch (SynapseException syne) {
+                if (!synapseInMessageContext.getFaultStack().isEmpty()) {
+                    ((FaultHandler) synapseInMessageContext
+                            .getFaultStack().pop()).handleFault(synapseInMessageContext, syne);
+                } else {
+                    log.error("Synapse encountered an exception, " +
+                            "No error handlers found - [Message Dropped]\n" + syne.getMessage());
+                }
+            }
         }
     }
 
@@ -176,13 +186,13 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         int insertPos = 0;
         RelatesTo[] newRelates = new RelatesTo[relates.length];
 
-        for (int i=0; i<relates.length; i++) {
+        for (int i = 0; i < relates.length; i++) {
             RelatesTo current = relates[i];
             boolean found = false;
 
-            for (int j=0; j<newRelates.length && j<insertPos; j++) {
+            for (int j = 0; j < newRelates.length && j < insertPos; j++) {
                 if (newRelates[j].equals(current) ||
-                    newRelates[j].getValue().equals(current.getValue())) {
+                        newRelates[j].getValue().equals(current.getValue())) {
                     found = true;
                     break;
                 }

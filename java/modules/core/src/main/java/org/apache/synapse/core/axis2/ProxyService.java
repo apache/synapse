@@ -232,7 +232,7 @@ public class ProxyService {
                     // detect version of the WSDL 1.1 or 2.0
                     if (wsdlNamespace != null) {
                         WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
-                        if (WSDLConstants.WSDL20_2006Constants.DEFAULT_NAMESPACE_URI.
+                        if (WSDL2Constants.WSDL_NAMESPACE.
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
                                     new WSDL20ToAxisServiceBuilder(wsdlInputStream, null, null);

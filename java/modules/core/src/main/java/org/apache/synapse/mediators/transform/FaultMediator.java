@@ -175,10 +175,12 @@ public class FaultMediator extends AbstractMediator {
         SOAPFaultCode code = factory.createSOAPFaultCode();
         switch(soapVersion){
             case SOAP11:
-                 code.setText(fault_code);
+                code.setText(fault_code);
+                break;
             case SOAP12:
                 SOAPFaultValue value = factory.createSOAPFaultValue(code);
                 value.setText(fault_code);
+                break;
         }
         fault.setCode(code);
     }
@@ -198,10 +200,12 @@ public class FaultMediator extends AbstractMediator {
         switch(soapVersion){
             case SOAP11:
                 reason.setText(reasonString);
+                break;
             case SOAP12:
                 SOAPFaultText text = factory.createSOAPFaultText();
                 text.setText(reasonString);
                 reason.addSOAPText(text);
+                break;
         }
         fault.setReason(reason);
     }

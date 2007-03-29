@@ -30,6 +30,7 @@ import org.apache.http.protocol.*;
 import org.apache.axis2.util.threadpool.DefaultThreadFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -38,6 +39,8 @@ import org.apache.axiom.soap.SOAP12Constants;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.io.IOException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
@@ -205,7 +208,7 @@ public class ClientHandler implements NHttpClientHandler {
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        Pipe.SinkChannel sink = (Pipe.SinkChannel) context.getAttribute(RESPONSE_SINK_CHANNEL);
+        WritableByteChannel sink = (WritableByteChannel) context.getAttribute(RESPONSE_SINK_CHANNEL);
         ByteBuffer inbuf = (ByteBuffer) context.getAttribute(REQUEST_BUFFER);
 
         try {
@@ -238,7 +241,7 @@ public class ClientHandler implements NHttpClientHandler {
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
 
-        Pipe.SourceChannel source = (Pipe.SourceChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL);
+        ReadableByteChannel source = (ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL);
         ByteBuffer outbuf = (ByteBuffer) context.getAttribute(RESPONSE_BUFFER);
 
         try {
@@ -301,7 +304,7 @@ public class ClientHandler implements NHttpClientHandler {
     private void processResponse(final NHttpClientConnection conn, HttpContext context, HttpResponse response) {
 
         try {
-            Pipe responsePipe = Pipe.open();
+            PipeImpl responsePipe = new PipeImpl();
             context.setAttribute(RESPONSE_SINK_CHANNEL, responsePipe.sink());
 
             BasicHttpEntity entity = new BasicHttpEntity();

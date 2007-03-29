@@ -67,9 +67,15 @@ public class WSRMMessageSender  {
 		storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,
 				configurationContext.getAxisConfiguration());
 
-		toAddress = rmMsgCtx.getTo().getAddress();
-		sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		internalSequenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);
+		internalSequenceID = 
+			(String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
+		
+		if(internalSequenceID==null)
+		{
+			toAddress = rmMsgCtx.getTo().getAddress();
+			sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+			internalSequenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);			
+		}
 
 		// Does the sequence exist ?
 		sequenceExists = false;

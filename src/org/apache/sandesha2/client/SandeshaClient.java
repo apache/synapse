@@ -47,7 +47,6 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
-import org.apache.sandesha2.msgprocessors.SequenceProcessor;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -55,7 +54,6 @@ import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
-import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.workers.Invoker;
@@ -752,6 +750,9 @@ public class SandeshaClient {
 		options.setAction(SpecSpecificConstants.getAckRequestAction(rmSpecVersion));
 		
 		String soapNamespaceURI = options.getSoapVersionURI();
+		if (soapNamespaceURI == null) 
+			soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
+		
 		SOAPFactory factory = null;
 		SOAPEnvelope dummyEnvelope = null;
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
@@ -931,6 +932,9 @@ public class SandeshaClient {
 		SOAPEnvelope dummyEnvelope = null;
 		SOAPFactory factory = null;
 		String soapNamespaceURI = options.getSoapVersionURI();
+		if (soapNamespaceURI == null) 
+			soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
+
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
 			factory = new SOAP12Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
@@ -1071,6 +1075,8 @@ public class SandeshaClient {
 		SOAPEnvelope dummyEnvelope = null;
 		SOAPFactory factory = null;
 		String soapNamespaceURI = options.getSoapVersionURI();
+		if (soapNamespaceURI == null) 
+			soapNamespaceURI = getSOAPNamespaceURI(storageManager, internalSequenceID);
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(soapNamespaceURI)) {
 			factory = new SOAP12Factory();
 			dummyEnvelope = factory.getDefaultEnvelope();
@@ -1341,7 +1347,23 @@ public class SandeshaClient {
 
 		return internalSequenceID;
 	}
-	
+
+	private static final String getSOAPNamespaceURI(StorageManager storageManager, String internalSequenceID) throws SandeshaException {
+		String soapNamespaceURI = null;
+		
+		// Get the RMSBean for this sequence.
+		Transaction transaction = storageManager.getTransaction();
+		
+		try {				
+			RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
+			if (rmsBean.getSoapVersion() == Sandesha2Constants.SOAPVersion.v1_2)
+				soapNamespaceURI = SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI;
+		} finally {
+			transaction.commit();
+		}
+		
+		return soapNamespaceURI;
+	}
 	
 	public static void setPolicyBean (ServiceClient serviceClient, SandeshaPolicyBean policyBean) throws SandeshaException {
 		try {

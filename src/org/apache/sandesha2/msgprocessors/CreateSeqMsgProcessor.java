@@ -40,7 +40,6 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
-import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.FaultManager;
@@ -201,7 +200,6 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
 					}
 		
-					RMSBeanMgr rmsBeanMgr = storageManager.getRMSBeanMgr();
 	
 					// Store the inbound token (if any) with the new sequence
 					rMSBean.setSecurityTokenData(rmdBean.getSecurityTokenData());
@@ -215,8 +213,11 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqRMMsg.getRMSpecVersion())) {
 						rMSBean.setPollingMode(true);
 					}
+					
+					// Set the SOAP Version for this sequence.
+					rMSBean.setSoapVersion(SandeshaUtil.getSOAPVersion(createSeqRMMsg.getSOAPEnvelope()));
 
-					rmsBeanMgr.insert(rMSBean);
+					storageManager.getRMSBeanMgr().insert(rMSBean);
 					
 					SandeshaUtil.startWorkersForSequence(context, rMSBean);
 					
@@ -314,11 +315,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			return false;
 		}
 
-		RMSBeanMgr createSeqMgr = storageManager.getRMSBeanMgr();
-
 		RMSBean createSeqFindBean = new RMSBean();
 		createSeqFindBean.setSequenceID(sequenceId);
-		Collection arr = createSeqMgr.find(createSeqFindBean);
+		Collection arr = storageManager.getRMSBeanMgr().find(createSeqFindBean);
 
 		if (arr.size() > 0) {
 			if (log.isDebugEnabled())

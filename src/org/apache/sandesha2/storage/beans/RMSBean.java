@@ -129,6 +129,13 @@ public class RMSBean extends RMSequenceBean {
 	private long expectedReplies = 0;
 	
 	/**
+	 * When sending a RM Protocol message from SandeshaClient if there isn't
+	 * a SOAP version specified in the Options, this version will be used.
+	 * .NET interop requires all messages to be sent with the same SOAP version.
+	 */
+	private int soapVersion;
+	
+	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
 	 * be ignored within the match method.
@@ -144,6 +151,7 @@ public class RMSBean extends RMSequenceBean {
 	private static final int ACKED_MESSAGES_FLAG       = 0x10000000;
 	private static final int TERM_PAUSER_FOR_CS        = 0x00000002;
 	private static final int EXPECTED_REPLIES          = 0x00000020;
+	private static final int SOAP_VERSION_FLAG         = 0x00000200;
 
   /**
    * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
@@ -348,7 +356,15 @@ public class RMSBean extends RMSequenceBean {
 	public void setAvoidAutoTermination(boolean avoidAutoTermination) {
 		this.avoidAutoTermination = avoidAutoTermination;
 	}
-	
+
+	public int getSoapVersion() {
+		return soapVersion;
+	}
+
+	public void setSoapVersion(int soapVersion) {
+		this.soapVersion = soapVersion;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());
@@ -376,6 +392,7 @@ public class RMSBean extends RMSequenceBean {
 		}
 		result.append("\nClientCompletedMsgs: "); result.append(clientCompletedMessages);
 		result.append("\nAnonymous UUID     : "); result.append(anonymousUUID);
+		result.append("\nSOAPVersion  : "); result.append(soapVersion);
 		return result.toString();
 	}
 	
@@ -435,7 +452,10 @@ public class RMSBean extends RMSequenceBean {
 		
 		else if((bean.rmsFlags & TERMINATE_ADDED_FLAG) != 0 && bean.isTerminateAdded() != this.isTerminateAdded())
 			match = false;
-		
+
+		else if ((bean.rmsFlags & SOAP_VERSION_FLAG) != 0 && bean.getSoapVersion() != this.getSoapVersion())
+			match = false;
+	
 		else if((bean.rmsFlags & TIMED_OUT_FLAG) != 0 && bean.isTimedOut() != this.isTimedOut())
 			match = false;
 		

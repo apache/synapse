@@ -278,6 +278,9 @@ public class SequenceManager {
 			rmsBean.setTransportTo(transportTo);
 		}
 
+		// Set the soap version use by this client
+		rmsBean.setSoapVersion(SandeshaUtil.getSOAPVersion(firstAplicationMsgCtx.getEnvelope()));
+
 		//setting the autoTermination property for the client side.
 		if (!firstAplicationMsgCtx.isServerSide()) {
 			Object avoidAutoTermination = firstAplicationMsgCtx.getProperty(SandeshaClientConstants.AVOID_AUTO_TERMINATION);

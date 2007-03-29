@@ -24,6 +24,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.DefaultThreadFactory;
+import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -43,6 +44,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
+import java.nio.channels.WritableByteChannel;
+import java.nio.channels.ReadableByteChannel;
 
 /**
  * The server connection handler. An instance of this class is used by each IOReactor, to
@@ -104,8 +107,8 @@ public class ServerHandler implements NHttpServiceHandler {
         context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(2048));
 
         try {
-            Pipe requestPipe = Pipe.open();     // the pipe used to process the request
-            Pipe responsePipe = Pipe.open();    // the pipe used to process the response
+            PipeImpl requestPipe  = new PipeImpl(); // the pipe used to process the request
+            PipeImpl responsePipe = new PipeImpl(); // the pipe used to process the response
             context.setAttribute(REQUEST_SINK_CHANNEL, requestPipe.sink());
             context.setAttribute(RESPONSE_SOURCE_CHANNEL, responsePipe.source());
 
@@ -143,7 +146,7 @@ public class ServerHandler implements NHttpServiceHandler {
     public void inputReady(final NHttpServerConnection conn, final ContentDecoder decoder) {
 
         HttpContext context = conn.getContext();
-        Pipe.SinkChannel sink = (Pipe.SinkChannel) context.getAttribute(REQUEST_SINK_CHANNEL);
+        WritableByteChannel sink = (WritableByteChannel) context.getAttribute(REQUEST_SINK_CHANNEL);
         ByteBuffer inbuf = (ByteBuffer) context.getAttribute(REQUEST_BUFFER);
 
         try {
@@ -175,7 +178,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
         HttpContext context = conn.getContext();
         HttpResponse response = conn.getHttpResponse();
-        Pipe.SourceChannel source = (Pipe.SourceChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL);
+        ReadableByteChannel source = (ReadableByteChannel) context.getAttribute(RESPONSE_SOURCE_CHANNEL);
         ByteBuffer outbuf = (ByteBuffer) context.getAttribute(RESPONSE_BUFFER);
 
         try {
@@ -264,7 +267,8 @@ public class ServerHandler implements NHttpServiceHandler {
      * @param e the exception encountered
      */
     public void exception(NHttpServerConnection conn, IOException e) {
-        if (e instanceof ConnectionClosedException) {
+        if (e instanceof ConnectionClosedException ||
+            "Connection reset by peer".equals(e.getMessage())) {
             log.debug("I/O error: " + e.getMessage());
         } else {
             log.error("I/O error: " + e.getMessage());

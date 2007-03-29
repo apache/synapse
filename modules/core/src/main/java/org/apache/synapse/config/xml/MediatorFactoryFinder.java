@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.transform.XSLTMediatorFactory;
+import org.apache.synapse.mediators.validate.ValidateMediatorFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
 import sun.misc.Service;
 
@@ -60,7 +62,9 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         OutMediatorFactory.class,
         RMSequenceMediatorFactory.class,          
         ClassMediatorFactory.class,
-      };
+        ValidateMediatorFactory.class,
+        XSLTMediatorFactory.class
+    };
 
     private static MediatorFactoryFinder instance = null;
 

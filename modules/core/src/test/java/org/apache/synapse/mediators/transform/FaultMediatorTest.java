@@ -50,8 +50,8 @@ public class FaultMediatorTest extends TestCase {
 
         SOAPEnvelope envelope = synCtx.getEnvelope();
         SOAPFault fault = envelope.getBody().getFault();
-        assertTrue(F_CODE.equals(fault.getCode().getValue().getTextAsQName()));
-        assertTrue(F_STRING.equals(fault.getReason().getFirstSOAPText().getText()));
+        assertTrue(F_CODE.equals(fault.getCode().getTextAsQName()));
+        assertTrue(F_STRING.equals(fault.getReason().getText()));
         assertTrue(F_ACTOR_URI.equals(fault.getRole().getRoleValue()));
         assertTrue(F_DETAIL.equals(fault.getDetail().getText()));
     }

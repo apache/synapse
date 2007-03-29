@@ -41,6 +41,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This is the Synapse Module implementation class, which would initialize Synapse when it is
@@ -87,6 +89,10 @@ public class SynapseModule implements Module {
         AxisOperation mediateOperation = new InOutAxisOperation(MEDIATE_OPERATION_Q_NAME);
         mediateOperation.setMessageReceiver(new SynapseMessageReceiver());
         synapseService.addOperation(mediateOperation);
+        List transports = new ArrayList();
+        transports.add(org.apache.axis2.Constants.TRANSPORT_HTTP);
+        transports.add("https");
+        synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
 
         log.info("Deploying Proxy services...");

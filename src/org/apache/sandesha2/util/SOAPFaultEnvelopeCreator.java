@@ -150,14 +150,7 @@ public class SOAPFaultEnvelopeCreator {
 				.getSOAPVersion(faultMsgEnvelope));
 
 		SOAPFault fault = faultMsgEnvelope.getBody().getFault();
-		
-		// Set the faultcode
-		SOAPFaultCode faultCode = fault.getCode();
-		faultCode.getValue().setText(data.getCode());
-			
-		// Set the faultstring
-		fault.getReason().getFirstSOAPText().setText(data.getReason());
-		
+
 		if (data.getExceptionString() != null)
 			fault.getDetail().setText(data.getExceptionString());
 		
@@ -166,7 +159,6 @@ public class SOAPFaultEnvelopeCreator {
 			addSequenceFaultHeader(faultMsgContext, data, factory, rmNamespaceValue);
 
 	}
-
 	
 	/**
 	 * Building the envelope with SOAP 1.2

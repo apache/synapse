@@ -450,7 +450,6 @@ public class FaultManager {
 		SOAPFaultReason reason = factory.createSOAPFaultReason();
 		SOAPFaultText reasonText = factory.createSOAPFaultText();
 		reasonText.setText(data.getReason());
-		reason.addSOAPText(reasonText);
 		
 		SOAPFaultDetail detail = factory.createSOAPFaultDetail();
 		detail.addDetailEntry(data.getDetail());
@@ -458,11 +457,12 @@ public class FaultManager {
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+			reason.addSOAPText(reasonText);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
 		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
-			
+			reason.setText(data.getReason());
 			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
 			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
 			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);

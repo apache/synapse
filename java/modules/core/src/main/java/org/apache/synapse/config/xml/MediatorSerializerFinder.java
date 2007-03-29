@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.validate.ValidateMediatorSerializer;
+import org.apache.synapse.mediators.transform.XSLTMediatorSerializer;
 import sun.misc.Service;
 
 import java.util.HashMap;
@@ -47,7 +49,9 @@ public class MediatorSerializerFinder {
         InMediatorSerializer.class,
         OutMediatorSerializer.class,
         RMSequenceMediatorSerializer.class,     
-        ClassMediatorSerializer.class
+        ClassMediatorSerializer.class,
+        ValidateMediatorSerializer.class,
+        XSLTMediatorSerializer.class        
     };
 
     private static MediatorSerializerFinder instance = null;

@@ -242,6 +242,10 @@ public class HttpCoreNIOListener implements TransportListener {
         return null;
     }
 
+    public void destroy() {
+        ioReactor = null;
+    }
+
     // -------------- utility methods -------------
     private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);

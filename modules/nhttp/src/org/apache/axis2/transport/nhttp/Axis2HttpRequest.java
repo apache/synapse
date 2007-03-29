@@ -21,6 +21,7 @@ package org.apache.axis2.transport.nhttp;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.http.*;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.entity.BasicHttpEntity;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Pipe;
 import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 import java.util.Iterator;
 
@@ -53,14 +55,14 @@ public class Axis2HttpRequest {
     /** the message context being sent */
     private MessageContext msgContext = null;
     /** the Pipe which facilitates the serialization output to be written to the channel */
-    private Pipe pipe = null;
+    private PipeImpl pipe = null;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
         this.epr = epr;
         this.httpHost = httpHost;
         this.msgContext = msgContext;
         try {
-            this.pipe = Pipe.open();
+            this.pipe = new PipeImpl();
         } catch (IOException e) {
             log.error("Error creating pipe to write message body");
         }
@@ -111,7 +113,7 @@ public class Axis2HttpRequest {
      * Return the source channel of the pipe that bridges the serialized output to the socket
      * @return source channel to read serialized message contents
      */
-    public Pipe.SourceChannel getSourceChannel() {
+    public ReadableByteChannel getSourceChannel() {
         log.debug("get source channel of the pipe on which the outgoing response is written");
         return pipe.source();
     }

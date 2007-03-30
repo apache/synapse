@@ -147,7 +147,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
             // this is the first request. so an endpoint has not been bound to this session and we
             // are free to failover if the currently selected endpoint is not working. but for
             // failover to work, we have to build the soap envelope.
-            //synMessageContext.getEnvelope().build();
+            synMessageContext.getEnvelope().build();
 
             // we should also indicate that this is the first message in the session. so that
             // onFault(...) method can resend only the failed attempts for the first message.
@@ -158,8 +158,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
 
             // endpoints given by session dispatchers may not be active. therefore, we have check
             // it here.
-            if (endpoint.isActive(synMessageContext)) {
-                //synMessageContext.getEnvelope().build(); todo: why this is needed here
+            if (endpoint.isActive(synMessageContext)) {                
                 endpoint.send(synMessageContext);
             } else {
                 informFailure(synMessageContext);

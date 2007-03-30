@@ -27,16 +27,21 @@ import org.apache.axiom.om.OMElement;
 import javax.xml.namespace.QName;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections;
 
 /**
  * This dispatcher is implemented to demonstrate a sample client session. It will detect sessions
  * based on the <syn:ClientID xmlns:syn="http://ws.apache.org/namespaces/synapse"> soap header of the
  * request message. Therefore, above header has to be included in the request soap messages by the
- * client who want to initiate and maintain a session.
+ * client who wants to initiate and maintain a session.
  */
 public class SimpleClientSessionDispatcher implements Dispatcher {
 
-    private Map sessionMap = new HashMap();
+    /**
+     * Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
+     * multiple threds (e.g. multiple clients different sessions).
+     */
+    private Map sessionMap = Collections.synchronizedMap(new HashMap());
 
     public Endpoint getEndpoint(MessageContext synCtx) {
 
@@ -46,9 +51,9 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
             OMElement csID = header.getFirstChildWithName(
                     new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
             if(csID != null && csID.getText() != null) {
-                if (sessionMap.containsKey(csID.getText())) {
-                    Endpoint endpoint = (Endpoint)sessionMap.get(csID.getText());
-                    return endpoint;
+                Object o = sessionMap.get(csID.getText());
+                if (o != null) {
+                    return (Endpoint) o;
                 }
             }
         }
@@ -64,9 +69,25 @@ public class SimpleClientSessionDispatcher implements Dispatcher {
             OMElement csID = header.getFirstChildWithName(
                     new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
             if(csID != null && csID.getText() != null) {
-                if (!sessionMap.containsKey(csID.getText())) {
-                    sessionMap.put(csID.getText(), endpoint);
+                // synchronized to avoid possible replacement of sessions
+                synchronized(sessionMap) {
+                    if (!sessionMap.containsKey(csID.getText())) {
+                        sessionMap.put(csID.getText(), endpoint);
+                    }
                 }
+            }
+        }
+    }
+
+    public void unbind(MessageContext synCtx) {
+
+        SOAPHeader header = synCtx.getEnvelope().getHeader();
+
+        if(header != null) {
+            OMElement csID = header.getFirstChildWithName(
+                    new QName("http://ws.apache.org/namespaces/synapse", "ClientID", "syn"));
+            if(csID != null && csID.getText() != null) {
+                sessionMap.remove(csID.getText());
             }
         }
     }

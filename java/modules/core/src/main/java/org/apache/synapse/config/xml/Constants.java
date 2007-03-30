@@ -84,7 +84,7 @@ public interface Constants {
     String LOADBALANCE_ELEMENT      = "loadbalance";
     /** failover only element */
     String FAILOVER_ELEMENT         = "failover";
-    String RETRY_AFTER_FAILURE_TIME = "retryAfterFailure";
+    String SUSPEND_DURATION_ON_FAILURE = "suspendDurationOnFailure";
     String MAXIMUM_RETRIES          = "maximumRetries";
     String RETRY_INTERVAL           = "retryInterval";
     /** failover attribute in the loadbalance element */

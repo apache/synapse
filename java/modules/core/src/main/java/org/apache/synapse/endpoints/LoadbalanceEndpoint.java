@@ -24,6 +24,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Load balance endpoint can have multiple endpoints. It will route messages according to the
@@ -36,26 +37,67 @@ import java.util.ArrayList;
  */
 public class LoadbalanceEndpoint implements Endpoint {
 
-    private ArrayList endpoints = null;
-    private long abandonTime = 0;
-    private LoadbalanceAlgorithm algorithm = null;
-    private int maximumRetries = 1;
-    private long retryInterval = 30000;
+    /**
+     * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
+     * of indirect endpoints.
+     */
     private String name = null;
-    private boolean active = true;
+
+    /**
+     * List of endpoints among which the load is distributed. Any object implementing the Endpoint
+     * interface could be used.
+     */
+    private List endpoints = null;
+
+    /**
+     * Algorithm used for selecting the next endpoint to direct the load. Default is RoundRobin.
+     */
+    private LoadbalanceAlgorithm algorithm = null;
+
+    /**
+     * Determine whether this endpoint is active or not. This is active iff all child endpoints of
+     * this endpoint is active. This is always loaded from the memory as it could be accessed from
+     * multiple threads simultaneously.
+     */
+    private volatile boolean active = true;
+
+    /**
+     * If this supports load balancing with failover. If true, request will be directed to the next
+     * endpoint if the current one is failing.
+     */
+    private boolean failover = true;
+
+    /**
+     * Parent endpoint of this endpoint if this used inside another endpoint. Possible parents are
+     * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects.
+     */
     private Endpoint parentEndpoint = null;
 
     public void send(MessageContext synMessageContext) {
 
         Endpoint endpoint = algorithm.getNextEndpoint(synMessageContext);
         if (endpoint != null) {
+
+            // We have to build the envelop if we are supporting failover.
+            // Failover should sent the original message multiple times if failures occur. So we have to
+            // access the envelop multiple times.
+            if (failover) {
+                synMessageContext.getEnvelope().build();
+            }
+
             endpoint.send(synMessageContext);
+
         } else {
+            // there are no active child endpoints. so mark this endpoint as failed.
+            setActive(false, synMessageContext);
+
             if (parentEndpoint != null) {
                 parentEndpoint.onChildEndpointFail(this, synMessageContext);
             } else {
                 Object o = synMessageContext.getFaultStack().pop();
-                ((FaultHandler) o).handleFault(synMessageContext);
+                if (o != null) {
+                    ((FaultHandler) o).handleFault(synMessageContext);
+                }
             }
         }
     }
@@ -76,44 +118,53 @@ public class LoadbalanceEndpoint implements Endpoint {
         this.algorithm = algorithm;
     }
 
-    public int getMaximumRetries() {
-        return maximumRetries;
-    }
+    /**
+     * If this endpoint is in inactive state, checks if all immediate child endpoints are still
+     * failed. If so returns false. If at least one child endpoint is in active state, sets this
+     * endpoint's state to active and returns true. As this a sessionless load balancing endpoint
+     * having one active child endpoint is enough to consider this as active.
+     *
+     * @param synMessageContext MessageContext of the current message. This is not used here.
+     *
+     * @return true if active. false otherwise.
+     */
+    public boolean isActive(MessageContext synMessageContext) {
 
-    public void setMaximumRetries(int maximumRetries) {
-        this.maximumRetries = maximumRetries;
-    }
+        if (!active) {
+            for (int i = 0; i < endpoints.size(); i++) {
+                Endpoint endpoint = (Endpoint) endpoints.get(i);
+                if (endpoint.isActive(synMessageContext)) {
+                    active = true;
 
-    public long getRetryInterval() {
-        return retryInterval;
-    }
+                    // don't break the loop though we found one active endpoint. calling isActive()
+                    // on all child endpoints will update their active state. so this is a good
+                    // time to do that.
+                }
+            }
+        }
 
-    public void setRetryInterval(long retryInterval) {
-        this.retryInterval = retryInterval;
-    }
-
-    public boolean isActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(boolean active, MessageContext synMessageContext) {
+        // setting a volatile boolean variable is thread safe.
         this.active = active;
     }
 
-    public ArrayList getEndpoints() {
+    public boolean isFailover() {
+        return failover;
+    }
+
+    public void setFailover(boolean failover) {
+        this.failover = failover;
+    }
+
+    public List getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(ArrayList endpoints) {
+    public void setEndpoints(List endpoints) {
         this.endpoints = endpoints;
-    }
-
-    public long getAbandonTime() {
-        return abandonTime;
-    }
-
-    public void setAbandonTime(long abandonTime) {
-        this.abandonTime = abandonTime;
     }
 
     public void setParentEndpoint(Endpoint parentEndpoint) {
@@ -121,7 +172,19 @@ public class LoadbalanceEndpoint implements Endpoint {
     }
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-        endpoint.setActive(false);
-        send(synMessageContext);
+
+        // resend (to a different endpoint) only if we support failover
+        if (failover) {
+            send(synMessageContext);
+        } else {
+            // we are not informing this to the parent endpoint as the failure of this loadbalance
+            // endpoint. there can be more active endpoints under this, and current request has
+            // failed only because the currently selected child endpoint has failed AND failover is
+            // turned off in this load balance endpoint. so just call the next fault handler.
+            Object o = synMessageContext.getFaultStack().pop();
+            if (o != null) {
+                ((FaultHandler) o).handleFault(synMessageContext);
+            }
+        }
     }
 }

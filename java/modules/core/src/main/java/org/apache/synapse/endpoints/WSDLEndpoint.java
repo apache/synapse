@@ -51,6 +51,18 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     private String serviceName;
     private String portName;
 
+    /**
+     * Leaf level endpoints will be suspended for the specified time by this variable, after a
+     * failure. If this is not explicitly set, endpoints will be suspended forever.
+     */
+    private long suspendOnFailDuration = Long.MAX_VALUE;
+
+    /**
+     * Time to recover a failed endpoint. Value of this is calculated when endpoint is set as
+     * failed by adding suspendOnFailDuration to current time.
+     */
+    private long recoverOn = Long.MAX_VALUE;
+
     private boolean active = true;
     private Endpoint parentEndpoint = null;
     private EndpointDefinition endpointDefinition = null;
@@ -163,6 +175,14 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         this.name = name;
     }
 
+    public long getSuspendOnFailDuration() {
+        return suspendOnFailDuration;
+    }
+
+    public void setSuspendOnFailDuration(long suspendOnFailDuration) {
+        this.suspendOnFailDuration = suspendOnFailDuration;
+    }
+
     public String getWsdlURI() {
         return wsdlURI;
     }
@@ -195,11 +215,39 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         this.portName = portName;
     }
 
-    public boolean isActive() {
+    /**
+     * Checks if the endpoint is active (failed or not). If endpoint is in failed state and
+     * suspendOnFailDuration has elapsed, it will be set to active.
+     *
+     * @param synMessageContext MessageContext of the current message. This is not used here.
+     *
+     * @return true if endpoint is active. false otherwise.
+     */
+    public boolean isActive(MessageContext synMessageContext) {
+
+        if (!active) {
+            if (System.currentTimeMillis() > recoverOn) {
+                active = true;
+            }
+        }
+
         return active;
     }
 
-    public void setActive(boolean active) {
+    /**
+     * Sets if endpoint active or not. if endpoint is set as failed (active = false), the recover on
+     * time is calculated so that it will be activated after the recover on time.
+     *
+     * @param active true if active. false otherwise.
+     *
+     * @param synMessageContext MessageContext of the current message. This is not used here.
+     */
+    public void setActive(boolean active, MessageContext synMessageContext) {
+
+        if (!active) {
+            recoverOn = System.currentTimeMillis() + suspendOnFailDuration;
+        }
+
         this.active = active;
     }
 

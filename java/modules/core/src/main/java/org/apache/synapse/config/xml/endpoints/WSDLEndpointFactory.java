@@ -81,6 +81,22 @@ public class WSDLEndpointFactory implements EndpointFactory {
             }
         }
 
+        // set the suspend on fail duration.
+        OMElement suspendElement = epConfig.getFirstChildWithName
+                (new QName(Constants.SYNAPSE_NAMESPACE, "suspendOnFailDuration"));
+
+        if (suspendElement != null) {
+            String suspend = suspendElement.getText();
+
+            try {
+                long suspendDuration = Long.parseLong(suspend);
+                wsdlEndpoint.setSuspendOnFailDuration(suspendDuration);
+
+            } catch (NumberFormatException e) {
+                handleException("suspendOnFailDuration should be valid number.");
+            }
+        }
+
         OMElement wsdlElement = epConfig.getFirstChildWithName
                 (new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
 
@@ -90,11 +106,15 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
             // get the service name and port name. at this point we should not worry about the presence
             // of those parameters. they are handled by corresponding WSDL builders.
-            String serviceName = wsdlElement.getAttributeValue(new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"service"));
-            String portName = wsdlElement.getAttributeValue(new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"port"));
+            String serviceName = wsdlElement.getAttributeValue
+                    (new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"service"));
+
+            String portName = wsdlElement.getAttributeValue
+                    (new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"port"));
 
             // check if wsdl is supplied as a URI
-            String wsdlURI = wsdlElement.getAttributeValue(new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"uri"));
+            String wsdlURI = wsdlElement.getAttributeValue
+                    (new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"uri"));
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
@@ -106,7 +126,9 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
                 try {
                     URL wsdlURL = new URL(wsdlURI);
-                    StAXOMBuilder OMBuilder = new StAXOMBuilder(wsdlURL.openConnection().getInputStream());
+                    StAXOMBuilder OMBuilder = new StAXOMBuilder
+                            (wsdlURL.openConnection().getInputStream());
+
                     OMElement docElement = OMBuilder.getDocumentElement();
                     String ns = docElement.getNamespace().getNamespaceURI();
 

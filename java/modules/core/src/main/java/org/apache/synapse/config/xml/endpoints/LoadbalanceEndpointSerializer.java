@@ -30,6 +30,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Serializes LoadbalanceEndpoint to an XML configuration.
@@ -68,9 +69,15 @@ public class LoadbalanceEndpointSerializer implements EndpointSerializer {
         if (algorithm instanceof RoundRobin) {
              algorithmName = "roundRobin";
         }
-        loadbalanceElement.addAttribute("algorithm", algorithmName, null);
+        loadbalanceElement.addAttribute
+                (org.apache.synapse.config.xml.Constants.ALGORITHM_NAME, algorithmName, null);
 
-        ArrayList endpoints = loadbalanceEndpoint.getEndpoints();
+        // set if failover is turned off in the endpoint
+        if (!loadbalanceEndpoint.isFailover()) {
+            loadbalanceElement.addAttribute("failover", "false", null);
+        }
+
+        List endpoints = loadbalanceEndpoint.getEndpoints();
         for (int i = 0; i < endpoints.size(); i++) {
             Endpoint childEndpoint = (Endpoint) endpoints.get(i);
             EndpointSerializer serializer = EndpointAbstractSerializer.

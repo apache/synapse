@@ -77,9 +77,13 @@ public interface Endpoint {
      * Returns if the endpoint is currently active or not. Messages should not be sent to inactive
      * endpoints.
      *
+     * @param synMessageContext MessageContext for the current message. This is required for
+     * IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
+     * Endpoint implementations may ignore this parameter.
+     *
      * @return true if the endpoint is in active state. false otherwise.
      */
-    public boolean isActive();
+    public boolean isActive(MessageContext synMessageContext);
 
     /**
      * Sets the endpoint as active or inactive. If an endpoint is detected as failed, it should be
@@ -87,6 +91,10 @@ public interface Endpoint {
      * avoid ignoring endpoints forever.
      *
      * @param active true if active. false otherwise.
+     *
+     * @param synMessageContext MessageContext for the current message. This is required for
+     * IndirectEndpoints where the actual endpoint is retrieved from the MessageContext. Other
+     * Endpoint implementations may ignore this parameter.
      */
-    public void setActive(boolean active);
+    public void setActive(boolean active, MessageContext synMessageContext);
 }

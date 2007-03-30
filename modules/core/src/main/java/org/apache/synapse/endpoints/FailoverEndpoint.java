@@ -22,7 +22,7 @@ package org.apache.synapse.endpoints;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.MessageContext;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * FailoverEndpoint can have multiple child endpoints. It will always try to send messages to current
@@ -34,20 +34,45 @@ import java.util.ArrayList;
  */
 public class FailoverEndpoint implements Endpoint {
 
+    /**
+     * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
+     * of indirect endpoints.
+     */
     private String name = null;
-    private boolean active = true;
-    private ArrayList endpoints = null;
+
+    /**
+     * Determine whether this endpoint is active or not. This is active iff all child endpoints of
+     * this endpoint is active. This is always loaded from the memory as it could be accessed from
+     * multiple threads simultaneously.
+     */
+    private volatile boolean active = true;
+
+    /**
+     * List of child endpoints. Failover sending is done among these. Any object implementing the
+     * Endpoint interface can be a child.
+     */
+    private List endpoints = null;
+
+    /**
+     * Endpoint for which currently sending the SOAP traffic.
+     */
     private Endpoint currentEndpoint = null;
+
+    /**
+     * Parent endpoint of this endpoint if this used inside another endpoint. Possible parents are
+     * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects. But use of
+     * SALoadbalanceEndpoint as the parent is the logical scenario.
+     */
     private Endpoint parentEndpoint = null;
 
     public void send(MessageContext synMessageContext) {
 
         // We have to build the envelop if we are supporting failover.
         // Failover should sent the original message multiple times if failures occur. So we have to
-        // access the envelop multiple times.
-        synMessageContext.getEnvelope().build();        
+        // access the envelop multiple times.        
+        synMessageContext.getEnvelope().build();
 
-        if (currentEndpoint.isActive()) {
+        if (currentEndpoint.isActive(synMessageContext)) {
             currentEndpoint.send(synMessageContext);
         } else {
 
@@ -55,7 +80,7 @@ public class FailoverEndpoint implements Endpoint {
             boolean foundEndpoint = false;
             for (int i = 0; i < endpoints.size(); i++) {
                 liveEndpoint = (Endpoint) endpoints.get(i);
-                if (liveEndpoint.isActive()) {
+                if (liveEndpoint.isActive(synMessageContext)) {
                     foundEndpoint = true;
                     currentEndpoint = liveEndpoint;
                     currentEndpoint.send(synMessageContext);
@@ -64,6 +89,9 @@ public class FailoverEndpoint implements Endpoint {
             }
 
             if (!foundEndpoint) {
+                // there are no active child endpoints. so mark this endpoint as failed.
+                setActive(false, synMessageContext);
+
                 if (parentEndpoint != null) {
                     parentEndpoint.onChildEndpointFail(this, synMessageContext);
                 } else {
@@ -84,19 +112,43 @@ public class FailoverEndpoint implements Endpoint {
         this.name = name;
     }
 
-    public boolean isActive() {
-        return this.active;
+    /**
+     * If this endpoint is in inactive state, checks if all immediate child endpoints are still
+     * failed. If so returns false. If at least one child endpoint is in active state, sets this
+     * endpoint's state to active and returns true.
+     *
+     * @param synMessageContext MessageContext of the current message. This is not used here.
+     *
+     * @return true if active. false otherwise.
+     */
+    public boolean isActive(MessageContext synMessageContext) {
+
+        if (!active) {
+            for (int i = 0; i < endpoints.size(); i++) {
+                Endpoint endpoint = (Endpoint) endpoints.get(i);
+                if (endpoint.isActive(synMessageContext)) {
+                    active = true;
+
+                    // don't break the loop though we found one active endpoint. calling isActive()
+                    // on all child endpoints will update their active state. so this is a good
+                    // time to do that.
+                }
+            }
+        }
+
+        return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(boolean active, MessageContext synMessageContext) {
+        // setting a volatile boolean value is thread safe.
         this.active = active;
     }
 
-    public ArrayList getEndpoints() {
+    public List getEndpoints() {
         return endpoints;
     }
 
-    public void setEndpoints(ArrayList endpoints) {
+    public void setEndpoints(List endpoints) {
         this.endpoints = endpoints;
         if (endpoints.size() > 0) {
             currentEndpoint = (Endpoint) endpoints.get(0);
@@ -104,7 +156,6 @@ public class FailoverEndpoint implements Endpoint {
     }
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-        endpoint.setActive(false);
         send(synMessageContext);
     }
 

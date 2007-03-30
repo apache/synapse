@@ -69,6 +69,23 @@ public class AddressEndpointFactory implements EndpointFactory {
             }
         }
 
+        // set the suspend on fail duration.
+        OMElement suspendElement = epConfig.getFirstChildWithName(new QName(
+                Constants.SYNAPSE_NAMESPACE,
+                org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE));
+
+        if (suspendElement != null) {
+            String suspend = suspendElement.getText();
+
+            try {
+                long suspendDuration = Long.parseLong(suspend);
+                addressEndpoint.setSuspendOnFailDuration(suspendDuration);
+
+            } catch (NumberFormatException e) {
+                handleException("suspendDuratiOnFailure should be valid number.");
+            }
+        }
+
         OMElement addressElement = epConfig.getFirstChildWithName
                 (new QName(Constants.SYNAPSE_NAMESPACE, "address"));
 

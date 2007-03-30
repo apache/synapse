@@ -40,10 +40,41 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
     private static final Log log = LogFactory.getLog(AddressEndpoint.class);
 
+    /**
+     * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
+     * of indirect endpoints.
+     */
     private String name;
-    private boolean active = true;
+
+    /**
+     * Determines if this endpoint is active or not. This variable have to be loaded always from the
+     * memory as multiple threads could access it.
+     */
+    private volatile boolean active = true;
+
+    /**
+     * Stores the endpoint details for this endpoint. Details include EPR, WS-Addressing information,
+     * WS-Security information, etc.
+     */
     private EndpointDefinition endpoint = null;
+
+    /**
+     * Parent endpoint of this endpoint if this used inside another endpoint. Possible parents are
+     * LoadbalanceEndpoint, SALoadbalanceEndpoint and FailoverEndpoint objects.
+     */
     private Endpoint parentEndpoint = null;
+
+    /**
+     * Leaf level endpoints will be suspended for the specified time by this variable, after a
+     * failure. If this is not explicitly set, endpoints will be suspended forever.
+     */
+    private long suspendOnFailDuration = Long.MAX_VALUE;
+
+    /**
+     * Time to recover a failed endpoint. Value of this is calculated when endpoint is set as
+     * failed by adding suspendOnFailDuration to current time.
+     */
+    private long recoverOn = Long.MAX_VALUE;
 
     public EndpointDefinition getEndpoint() {
         return endpoint;
@@ -61,11 +92,43 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         this.name = name;
     }
 
-    public boolean isActive() {
+    /**
+     * Checks if the endpoint is active (failed or not). If endpoint is in failed state and
+     * suspendOnFailDuration has elapsed, it will be set to active.
+     *
+     * @param synMessageContext MessageContext of the current message. This is not used here.
+     *
+     * @return true if endpoint is active. false otherwise.
+     */
+    public boolean isActive(MessageContext synMessageContext) {
+
+        if (!active) {
+            if (System.currentTimeMillis() > recoverOn) {
+                active = true;
+                recoverOn = 0;
+            }
+        }
+
         return active;
     }
 
-    public void setActive(boolean active) {
+    /**
+     * Sets if endpoint active or not. if endpoint is set as failed (active = false), the recover on
+     * time is calculated so that it will be activated after the recover on time.
+     *
+     * @param active true if active. false otherwise.
+     *
+     * @param synMessageContext MessageContext of the current message. This is not used here.
+     */
+    public synchronized void setActive(boolean active, MessageContext synMessageContext) {
+
+        // this is synchronized as recoverOn can be set to unpredictable values if two threads call
+        // this method simultaneously.
+
+        if (!active && suspendOnFailDuration != Long.MAX_VALUE) {
+            recoverOn = System.currentTimeMillis() + suspendOnFailDuration;
+        }
+
         this.active = active;
     }
 
@@ -146,7 +209,9 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
                 synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
             }
 
+            // register this as the immediate fault handler for this message.
             synCtx.pushFaultHandler(this);
+
             synCtx.getEnvironment().send(endpoint, synCtx);
         }
     }
@@ -159,10 +224,20 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         this.parentEndpoint = parentEndpoint;
     }
 
+    public long getSuspendOnFailDuration() {
+        return suspendOnFailDuration;
+    }
+
+    public void setSuspendOnFailDuration(long suspendOnFailDuration) {
+        this.suspendOnFailDuration = suspendOnFailDuration;
+    }
+
     public void onFault(MessageContext synCtx) {
         // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
+        setActive(false, synCtx);
+
         if (parentEndpoint != null) {
             parentEndpoint.onChildEndpointFail(this, synCtx);
         } else {

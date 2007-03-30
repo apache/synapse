@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
+import java.util.List;
 import java.io.StringReader;
 
 public class SendMediatorSerializationTest extends AbstractTestCase {
@@ -77,7 +78,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 send2.getEndpoint() instanceof LoadbalanceEndpoint);
 
         LoadbalanceEndpoint endpoint = (LoadbalanceEndpoint) send2.getEndpoint();
-        ArrayList addresses = endpoint.getEndpoints();
+        List addresses = endpoint.getEndpoints();
         assertEquals("There should be 3 leaf level address endpoints", addresses.size(), 3);
 
         assertTrue("Leaf level endpoints should be address endpoints",
@@ -126,7 +127,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 send2.getEndpoint() instanceof FailoverEndpoint);
 
         FailoverEndpoint endpoint = (FailoverEndpoint) send2.getEndpoint();
-        ArrayList addresses = endpoint.getEndpoints();
+        List addresses = endpoint.getEndpoints();
         assertEquals("There should be 3 leaf level address endpoints", addresses.size(), 3);
 
         assertTrue("Leaf level endpoints should be address endpoints",
@@ -180,7 +181,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         LoadbalanceEndpoint loadbalanceEndpoint = (LoadbalanceEndpoint) send2.getEndpoint();
 
-        ArrayList children = loadbalanceEndpoint.getEndpoints();
+        List children = loadbalanceEndpoint.getEndpoints();
         assertEquals("Top level endpoint should have 2 child endpoints.", children.size(), 2);
 
         assertTrue("First child should be a address endpoint",
@@ -190,7 +191,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 children.get(1) instanceof FailoverEndpoint);
 
         FailoverEndpoint failoverEndpoint = (FailoverEndpoint) children.get(1);
-        ArrayList children2 = failoverEndpoint.getEndpoints();
+        List children2 = failoverEndpoint.getEndpoints();
 
         assertEquals("Fail over endpoint should have 2 children.", children2.size(), 2);
         assertTrue("Children of the fail over endpoint should be address endpoints.",

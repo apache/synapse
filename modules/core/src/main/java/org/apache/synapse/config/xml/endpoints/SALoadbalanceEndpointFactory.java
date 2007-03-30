@@ -27,6 +27,7 @@ import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
@@ -76,6 +77,10 @@ public class SALoadbalanceEndpointFactory implements EndpointFactory {
             if (type.equalsIgnoreCase("soap")) {
                 Dispatcher soapDispatcher = new SoapSessionDispatcher();
                 loadbalanceEndpoint.setDispatcher(soapDispatcher);
+
+            } else if (type.equalsIgnoreCase("http")) {
+                Dispatcher httpDispatcher = new HttpSessionDispatcher();
+                loadbalanceEndpoint.setDispatcher(httpDispatcher);
 
             } else if (type.equalsIgnoreCase("simpleClientSession")) {
                 Dispatcher csDispatcher = new SimpleClientSessionDispatcher();

@@ -60,6 +60,16 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
+        long suspendDuration = wsdlEndpoint.getSuspendOnFailDuration();
+        if (suspendDuration != Long.MAX_VALUE) {
+            // user has set some value for this. let's serialize it.
+
+            OMElement suspendElement = fac.createOMElement
+                    ("suspendOnFailDuration", Constants.SYNAPSE_OMNAMESPACE);
+            suspendElement.setText(Long.toString(suspendDuration));
+            endpointElement.addChild(suspendElement);
+        }
+
         OMElement wsdlElement = fac.createOMElement("wsdl", Constants.SYNAPSE_OMNAMESPACE);
         String serviceName = wsdlEndpoint.getServiceName();
         if (serviceName != null) {

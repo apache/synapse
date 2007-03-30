@@ -77,6 +77,18 @@ public class AddressEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
+        long suspendDuration = addressEndpoint.getSuspendOnFailDuration();
+        if (suspendDuration != Long.MAX_VALUE) {
+            // user has set some value for this. let's serialize it.
+
+            OMElement suspendElement = fac.createOMElement(
+                    org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE,
+                    Constants.SYNAPSE_OMNAMESPACE);
+
+            suspendElement.setText(Long.toString(suspendDuration));
+            endpointElement.addChild(suspendElement);
+        }
+
         EndpointDefinition epAddress = addressEndpoint.getEndpoint();
         OMElement addressElement = serializeEndpointDefinition(epAddress);
         endpointElement.addChild(addressElement);

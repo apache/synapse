@@ -40,6 +40,12 @@ public class IndirectEndpoint implements Endpoint {
     private boolean active = true;
     private Endpoint parentEndpoint = null;
 
+    /**
+     * This should have a reference to the current message context as it gets the referred endpoint
+     * from it.
+     */
+    private MessageContext currentMsgCtx = null;
+
     public void send(MessageContext synMessageContext) {
         // get the actual endpoint and send
         Endpoint endpoint = synMessageContext.getEndpoint(key);
@@ -47,7 +53,7 @@ public class IndirectEndpoint implements Endpoint {
             handleException("Reference to non-existent endpoint for key : " + key);
         }
 
-        if (endpoint.isActive()) {
+        if (endpoint.isActive(synMessageContext)) {
             endpoint.send(synMessageContext);
         } else {
             parentEndpoint.onChildEndpointFail(this, synMessageContext);
@@ -70,12 +76,38 @@ public class IndirectEndpoint implements Endpoint {
         this.key = key;
     }
 
-    public boolean isActive() {
-        return active;
+    /**
+     * IndirectEndpoints are active if its referref endpoint is active and vise versa. Therefore,
+     * this returns if its referred endpoint is active or not.
+     *
+     * @param synMessageContext MessageContext of the current message.
+     *
+     * @return true if the referred endpoint is active. false otherwise.
+     */
+    public boolean isActive(MessageContext synMessageContext) {
+        Endpoint endpoint = synMessageContext.getEndpoint(key);
+        if (endpoint == null) {
+            handleException("Reference to non-existent endpoint for key : " + key);
+        }
+
+        return endpoint.isActive(synMessageContext);
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    /**
+     * Activating or deactivating an IndirectEndpoint is the activating or deactivating its
+     * referref endpoint. Therefore, this sets the active state of its referred endpoint.
+     *
+     * @param active true if active. false otherwise.
+     *
+     * @param synMessageContext MessageContext of the current message.
+     */
+    public void setActive(boolean active, MessageContext synMessageContext) {
+        Endpoint endpoint = synMessageContext.getEndpoint(key);
+        if (endpoint == null) {
+            handleException("Reference to non-existent endpoint for key : " + key);
+        }
+
+        endpoint.setActive(active, synMessageContext);
     }
 
     public void setParentEndpoint(Endpoint parentEndpoint) {
@@ -83,7 +115,6 @@ public class IndirectEndpoint implements Endpoint {
     }
 
     public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-        endpoint.setActive(false);
         parentEndpoint.onChildEndpointFail(this, synMessageContext);
     }
 

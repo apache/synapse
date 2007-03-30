@@ -30,10 +30,15 @@ import org.apache.axis2.AxisFault;
 import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
 public class SoapSessionDispatcher implements Dispatcher {
 
-    private Map sessionMap = new HashMap();
+    /**
+     * Map to store session -> endpoint mappings. Synchronized map is used as this is accessed by
+     * multiple threds (e.g. multiple clients different sessions).
+     */
+    private Map sessionMap = Collections.synchronizedMap(new HashMap());
 
     /**
      * Gives the endpoint based on the service group context ID of the request message.
@@ -52,9 +57,13 @@ public class SoapSessionDispatcher implements Dispatcher {
         if(header != null) {
             OMElement sgcID = header.getFirstChildWithName(
                     new QName("http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
+
             if(sgcID != null && sgcID.getText() != null) {
-                if (sessionMap.containsKey(sgcID.getText())) {  
-                    endpoint = (Endpoint)sessionMap.get(sgcID);
+
+                Object e = sessionMap.get(sgcID.getText());
+
+                if (e != null) {
+                    endpoint = (Endpoint) e;
                 }
             }
         }
@@ -90,10 +99,26 @@ public class SoapSessionDispatcher implements Dispatcher {
                     OMElement sgcID = referenceParameters.getFirstChildWithName(new QName(
                             "http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
 
-                    if(!sessionMap.containsKey(sgcID)) {
-                        sessionMap.put(sgcID.getText(), endpoint);
+                    // synchronized to avoid possible replacement of sessions
+                    synchronized(sessionMap) {
+                        if(!sessionMap.containsKey(sgcID.getText())) {
+                            sessionMap.put(sgcID.getText(), endpoint);
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    public void unbind(MessageContext synCtx) {
+
+        SOAPHeader header = synCtx.getEnvelope().getHeader();
+
+        if(header != null) {
+            OMElement sgcID = header.getFirstChildWithName(
+                    new QName("http://ws.apache.org/namespaces/axis2", "ServiceGroupId", "axis2"));
+            if(sgcID != null && sgcID.getText() != null) {
+                sessionMap.remove(sgcID.getText());
             }
         }
     }

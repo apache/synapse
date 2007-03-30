@@ -207,6 +207,10 @@ public class Axis2FlexibleMEPClient {
         newMC.setEnvelope(ori.getEnvelope());
         removeAddressingHeaders(newMC);
 
+        // pass any transport headers on the original request
+        newMC.setProperty(MessageContext.TRANSPORT_HEADERS,
+            ori.getProperty(MessageContext.TRANSPORT_HEADERS));
+
         return newMC;
     }
     

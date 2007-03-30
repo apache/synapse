@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Serializes FailoverEndpoint to XML configuration.
@@ -61,7 +62,7 @@ public class FailoverEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        ArrayList endpoints = failoverEndpoint.getEndpoints();
+        List endpoints = failoverEndpoint.getEndpoints();
         for (int i = 0; i < endpoints.size(); i++) {
             Endpoint childEndpoint = (Endpoint) endpoints.get(i);
             EndpointSerializer serializer = EndpointAbstractSerializer.

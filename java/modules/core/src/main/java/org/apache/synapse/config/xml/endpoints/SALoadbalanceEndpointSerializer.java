@@ -27,6 +27,7 @@ import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.endpoints.dispatch.Dispatcher;
 import org.apache.synapse.endpoints.dispatch.SoapSessionDispatcher;
 import org.apache.synapse.endpoints.dispatch.SimpleClientSessionDispatcher;
+import org.apache.synapse.endpoints.dispatch.HttpSessionDispatcher;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
 import org.apache.synapse.SynapseException;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SALoadbalanceEndpointSerializer implements EndpointSerializer {
 
@@ -67,6 +69,11 @@ public class SALoadbalanceEndpointSerializer implements EndpointSerializer {
             sessionElement.addAttribute("type", "soap", null);
             endpointElement.addChild(sessionElement);
 
+        } else if (dispatcher instanceof HttpSessionDispatcher) {
+            OMElement sessionElement = fac.createOMElement("session", Constants.SYNAPSE_OMNAMESPACE);
+            sessionElement.addAttribute("type", "http", null);
+            endpointElement.addChild(sessionElement);
+
         } else if (dispatcher instanceof SimpleClientSessionDispatcher) {
             OMElement sessionElement = fac.createOMElement("session", Constants.SYNAPSE_OMNAMESPACE);
             sessionElement.addAttribute("type", "clientSession", null);
@@ -83,7 +90,7 @@ public class SALoadbalanceEndpointSerializer implements EndpointSerializer {
         }
         loadbalanceElement.addAttribute("algorithm", algorithmName, null);
 
-        ArrayList endpoints = loadbalanceEndpoint.getEndpoints();
+        List endpoints = loadbalanceEndpoint.getEndpoints();
         for (int i = 0; i < endpoints.size(); i++) {
             Endpoint childEndpoint = (Endpoint) endpoints.get(i);
             EndpointSerializer serializer = EndpointAbstractSerializer.

@@ -57,4 +57,25 @@ public class LoadbalanceFailoverService {
         }
         return timeElement;
     }
+        
+    public OMElement loadOperation(OMElement loadElement) throws AxisFault {
+
+        loadElement.build();
+        loadElement.detach();
+
+        String l = loadElement.getText();
+        long load = Long.parseLong(l);
+
+        for (long i = 0; i < load; i++) {
+            System.out.println("Iteration: " + i);
+        }
+
+        String port = System.getProperty("http_port");
+        if (port != null) {
+            loadElement.setText("Response from server: " + port);
+        } else {
+            loadElement.setText("Response from anonymous server");
+        }
+        return loadElement;
+    }
 }

@@ -18,13 +18,13 @@
   -->
 
 <serviceGroup>
-<service name="LoadbalanceFailoverService">
+<service name="LBService1">
 	<messageReceivers>
 		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
 				class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
 		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
 				class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
 		</messageReceivers>
-		<parameter locked="false" name="ServiceClass">samples.services.LoadbalanceFailoverService</parameter>
+		<parameter locked="false" name="ServiceClass">samples.services.LBService1</parameter>
 </service>
 </serviceGroup>

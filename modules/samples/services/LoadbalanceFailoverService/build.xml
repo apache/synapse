@@ -17,7 +17,7 @@
   ~  under the License.
   -->
 
-<project default="build-service">
+<project default="build-services">
 
     <property name="synapse.home" value="../../../.."/>
     <property name="lib" value="${synapse.home}/lib"/>
@@ -32,6 +32,11 @@
             <include name="lib/*.jar"/>
         </fileset>
     </path>
+
+    <target name="build-services" depends="compile-all">
+        <ant target="build-service1"/>
+        <ant target="build-service2"/>
+    </target>
 
     <target name="init" depends="clean">
         <mkdir dir="${temp.dir}"/>
@@ -51,20 +56,37 @@
         </javac>
     </target>
 
-    <target name="build-service" depends="compile-all">
-        <property name="LBFA.dir" value="${temp.dir}/LoadbalanceFailoverService"/>
-        <mkdir dir="${LBFA.dir}"/>
+    <target name="build-service1">
+        <property name="LBFA1.dir" value="${temp.dir}/LBService1"/>
+        <mkdir dir="${LBFA1.dir}"/>
 
-        <mkdir dir="${LBFA.dir}/META-INF"/>
-        <copy file="conf/services.xml" tofile="${LBFA.dir}/META-INF/services.xml"/>
-        <copy toDir="${LBFA.dir}">
+        <mkdir dir="${LBFA1.dir}/META-INF"/>
+        <copy file="conf/service1/services.xml" tofile="${LBFA1.dir}/META-INF/services.xml"/>
+        <copy toDir="${LBFA1.dir}">
             <fileset dir="${classes}">
-                <include name="**/*.class"/>
+                <include name="**/LBService1.class"/>
             </fileset>
         </copy>
 
-        <jar destfile="${services}/LoadbalanceFailoverService.aar">
-            <fileset dir="${LBFA.dir}"/>
+        <jar destfile="${services}/LBService1.aar">
+            <fileset dir="${LBFA1.dir}"/>
+        </jar>
+    </target>
+
+    <target name="build-service2">
+        <property name="LBFA2.dir" value="${temp.dir}/LBService2"/>
+        <mkdir dir="${LBFA2.dir}"/>
+
+        <mkdir dir="${LBFA2.dir}/META-INF"/>
+        <copy file="conf/service2/services.xml" tofile="${LBFA2.dir}/META-INF/services.xml"/>
+        <copy toDir="${LBFA2.dir}">
+            <fileset dir="${classes}">
+                <include name="**/LBService2.class"/>
+            </fileset>
+        </copy>
+
+        <jar destfile="${services}/LBService2.aar">
+            <fileset dir="${LBFA2.dir}"/>
         </jar>
     </target>
 

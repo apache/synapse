@@ -97,11 +97,14 @@ public class LoadbalanceFailoverClient {
         value.setText("Sample string");
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/soap/services/LoadbalanceFailoverService"));
+        options.setTo(new EndpointReference
+                ("http://localhost:" + synapsePort + "/soap/services/LoadbalanceFailoverService"));
+
         options.setAction("sampleOperation");
 
         try {
-            ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem("client_repo", null);
+            ConfigurationContext configContext = ConfigurationContextFactory.
+                    createConfigurationContextFromFileSystem("client_repo", null);
             ServiceClient client = new ServiceClient(configContext, null);
             options.setTimeOutInMilliSeconds(10000000);
 
@@ -159,7 +162,8 @@ public class LoadbalanceFailoverClient {
         }
 
         Options options = new Options();
-        options.setTo(new EndpointReference("http://localhost:" + synapsePort + "/soap/services/LoadbalanceFailoverService"));
+        options.setTo(new EndpointReference
+                ("http://localhost:" + synapsePort + "/soap/services/LoadbalanceFailoverService"));
         options.setAction("sampleOperation");
         options.setTimeOutInMilliSeconds(10000000);
 
@@ -170,7 +174,8 @@ public class LoadbalanceFailoverClient {
             SOAPEnvelope env3 = buildSoapEnvelope("c3", "v1");
             SOAPEnvelope[] envelopes = {env1, env2, env3};
 
-            ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem("client_repo", null);
+            ConfigurationContext configContext = ConfigurationContextFactory.
+                    createConfigurationContextFromFileSystem("client_repo", null);
             ServiceClient client = new ServiceClient(configContext, null);
             client.setOptions(options);
             client.engageModule("addressing");
@@ -189,15 +194,19 @@ public class LoadbalanceFailoverClient {
                 op.addMessageContext(messageContext);
                 op.execute(true);
 
-                MessageContext responseContext = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+                MessageContext responseContext =
+                        op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
                 SOAPEnvelope responseEnvelope = responseContext.getEnvelope();
 
-                OMElement vElement = responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
-                System.out.println("Request: " + i + " Session number: " + sessionNumber + " " + vElement.getText());
+                OMElement vElement =
+                        responseEnvelope.getBody().getFirstChildWithName(new QName("Value"));
+                System.out.println(
+                        "Request: " + i + " Session number: " +
+                                sessionNumber + " " + vElement.getText());
             }
 
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            axisFault.printStackTrace();
         }
     }
 
@@ -213,14 +222,16 @@ public class LoadbalanceFailoverClient {
 
         SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();
 
-        OMNamespace wsaNamespace = soapFactory.createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
+        OMNamespace wsaNamespace = soapFactory.
+                createOMNamespace("http://www.w3.org/2005/08/addressing", "wsa");
 
         SOAPEnvelope envelope = soapFactory.createSOAPEnvelope();
 
         SOAPHeader header = soapFactory.createSOAPHeader();
         envelope.addChild(header);
 
-        OMNamespace synNamespace = soapFactory.createOMNamespace("http://ws.apache.org/namespaces/synapse", "syn");
+        OMNamespace synNamespace = soapFactory.
+                createOMNamespace("http://ws.apache.org/namespaces/synapse", "syn");
         OMElement clientIDElement = soapFactory.createOMElement("ClientID", synNamespace);
         clientIDElement.setText(clientID);
         header.addChild(clientIDElement);

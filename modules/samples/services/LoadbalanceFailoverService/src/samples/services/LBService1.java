@@ -22,15 +22,25 @@ package samples.services;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 
-public class LoadbalanceFailoverService {
+public class LBService1 {
+
+    public OMElement setClientName(OMElement cName) {
+
+        cName.build();
+        cName.detach();
+
+        cName.setText("Sessions are not supported in this service.");
+
+        return cName;
+    }
 
     public OMElement sampleOperation(OMElement param) {
         param.build();
         param.detach();
 
-        String port = System.getProperty("http_port");
-        if (port != null) {
-            param.setText("Response from server: " + port);
+        String sName = System.getProperty("server_name");
+        if (sName != null) {
+            param.setText("Response from server: " + sName);
         } else {
             param.setText("Response from anonymous server");
         }
@@ -49,9 +59,9 @@ public class LoadbalanceFailoverService {
             throw new AxisFault("Service is interrupted while sleeping.");
         }
 
-        String port = System.getProperty("http_port");
-        if (port != null) {
-            timeElement.setText("Response from server: " + port);
+        String sName = System.getProperty("server_name");
+        if (sName != null) {
+            timeElement.setText("Response from server: " + sName);
         } else {
             timeElement.setText("Response from anonymous server");
         }
@@ -70,9 +80,9 @@ public class LoadbalanceFailoverService {
             System.out.println("Iteration: " + i);
         }
 
-        String port = System.getProperty("http_port");
-        if (port != null) {
-            loadElement.setText("Response from server: " + port);
+        String sName = System.getProperty("server_name");
+        if (sName != null) {
+            loadElement.setText("Response from server: " + sName);
         } else {
             loadElement.setText("Response from anonymous server");
         }

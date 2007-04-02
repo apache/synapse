@@ -25,20 +25,20 @@ maintain session specific data, such data have to replicated among the failover 
         <in>
             <send>
                 <endpoint>
-                    <!-- specify the session as the simple client session provided by Synapse for
-                    testing purpose -->
-                    <session type="simpleClientSession"/>
+
+                    <!-- bind to HTTP sessions based on HTTP cookies -->
+                    <session type="http"/>
 
                     <loadbalance>
                         <endpoint>
                             <failover>
                                 <endpoint>
-                                    <address uri="http://localhost:9001/axis2/services/LBService1">
+                                    <address uri="http://localhost:9001/axis2/services/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>
                                 <endpoint>
-                                    <address uri="http://localhost:9002/axis2/services/LBService1">
+                                    <address uri="http://localhost:9002/axis2/services/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>
@@ -47,12 +47,12 @@ maintain session specific data, such data have to replicated among the failover 
                         <endpoint>
                             <failover>
                                 <endpoint>
-                                    <address uri="http://localhost:9003/axis2/services/LBService1">
+                                    <address uri="http://localhost:9003/axis2/services/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>
                                 <endpoint>
-                                    <address uri="http://localhost:9004/axis2/services/LBService1">
+                                    <address uri="http://localhost:9004/axis2/services/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>

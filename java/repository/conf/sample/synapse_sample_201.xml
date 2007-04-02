@@ -26,17 +26,17 @@
                 <endpoint>
                     <failover>
                         <endpoint>
-                            <address uri="http://localhost:9001/axis2/services/LoadbalanceFailoverService">
+                            <address uri="http://localhost:9001/axis2/services/LBService1">
                                 <enableAddressing/>
                             </address>
                         </endpoint>
                         <endpoint>
-                            <address uri="http://localhost:9002/axis2/services/LoadbalanceFailoverService">
+                            <address uri="http://localhost:9002/axis2/services/LBService1">
                                 <enableAddressing/>
                             </address>
                         </endpoint>
                         <endpoint>
-                            <address uri="http://localhost:9003/axis2/services/LoadbalanceFailoverService">
+                            <address uri="http://localhost:9003/axis2/services/LBService1">
                                 <enableAddressing/>
                             </address>
                         </endpoint>

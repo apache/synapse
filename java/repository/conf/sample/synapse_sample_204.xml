@@ -17,26 +17,31 @@
   ~  under the License.
   -->
 
-<!-- demontrates simple session less load balancing between 3 endpoints -->
+<!-- Demontrates session affinity load balancing between 3 endpoints. We are using client
+ initiated session for this sample. -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main">
         <in>
             <send>
                 <endpoint>
+
+                    <!-- bind to HTTP sessions based on HTTP cookies -->
+                    <session type="http"/>
+
                     <loadbalance>
                         <endpoint>
-                            <address uri="http://localhost:9001/axis2/services/LBService1">
+                            <address uri="http://localhost:9001/axis2/services/LBService2">
                                 <enableAddressing/>
                             </address>
                         </endpoint>
                         <endpoint>
-                            <address uri="http://localhost:9002/axis2/services/LBService1">
+                            <address uri="http://localhost:9002/axis2/services/LBService2">
                                 <enableAddressing/>
                             </address>
                         </endpoint>
                         <endpoint>
-                            <address uri="http://localhost:9003/axis2/services/LBService1">
+                            <address uri="http://localhost:9003/axis2/services/LBService2">
                                 <enableAddressing/>
                             </address>
                         </endpoint>

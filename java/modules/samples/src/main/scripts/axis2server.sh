@@ -112,15 +112,20 @@ while [ "$1" != "" ]; do
         PROGRAM_PARAMS="$PROGRAM_PARAMS""-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000 "
         shift
 
+    elif [ "$1" = "-name" ]; then
+        PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dserver_name=$2 "
+        shift
+        shift
+
     elif [ "$1" = "-http" ]; then
         PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttp_port=$2 "
-	HTTP_PORT_SET="TRUE"
+	    HTTP_PORT_SET="TRUE"
         shift
         shift
 
     elif [ "$1" = "-https" ]; then
         PROGRAM_PARAMS="$PROGRAM_PARAMS""-Dhttps_port=$2 "
-	HTTPS_PORT_SET="TRUE"
+	    HTTPS_PORT_SET="TRUE"
         shift
         shift
 

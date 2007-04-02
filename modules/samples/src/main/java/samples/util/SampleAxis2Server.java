@@ -46,7 +46,14 @@ public class SampleAxis2Server {
 
 
     /**
-     * @param args
+     * Expected system properties
+     *      http_port: Port to bind HTTP transport (default is 9000)
+     *      https_port: Port to bind HTTPS transport (default is 9002)
+     *      server_name: Name of this instance of the server (optional)
+     *
+     * @param args  1: Axis2 repository
+     *              2: Axis2 configuration file (axis2.xml)
+     *
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {

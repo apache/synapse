@@ -173,6 +173,18 @@
         </java>
     </target>
 
+    <target name="threadedclient" depends="compile">
+        <java classname="samples.userguide.ThreadedClient"
+              classpathref="javac.classpath" fork="true">
+            <sysproperty key="epr" value="${epr}"/>
+            <sysproperty key="op" value="${op}"/>
+            <sysproperty key="req" value="${req}"/>
+            <sysproperty key="load" value="${load}"/>
+            <sysproperty key="t" value="${t}"/>
+            <sysproperty key="session" value="${session}"/>            
+        </java>
+    </target>
+
     <target name="jmsclient" depends="compile">
         <java classname="samples.userguide.GenericJMSClient"
               classpathref="javac.classpath" fork="true">

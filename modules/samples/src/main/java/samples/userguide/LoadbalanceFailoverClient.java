@@ -97,8 +97,7 @@ public class LoadbalanceFailoverClient {
         value.setText("Sample string");
 
         Options options = new Options();
-        options.setTo(new EndpointReference
-                ("http://localhost:" + synapsePort + "/soap/services/LoadbalanceFailoverService"));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort));
 
         options.setAction("sampleOperation");
 
@@ -121,7 +120,7 @@ public class LoadbalanceFailoverClient {
             }
 
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
+            System.out.println(axisFault.getMessage());
         }
     }
 
@@ -162,8 +161,7 @@ public class LoadbalanceFailoverClient {
         }
 
         Options options = new Options();
-        options.setTo(new EndpointReference
-                ("http://localhost:" + synapsePort + "/soap/services/LoadbalanceFailoverService"));
+        options.setTo(new EndpointReference("http://localhost:" + synapsePort));
         options.setAction("sampleOperation");
         options.setTimeOutInMilliSeconds(10000000);
 
@@ -206,7 +204,7 @@ public class LoadbalanceFailoverClient {
             }
 
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
+            System.out.println(axisFault.getMessage());
         }
     }
 

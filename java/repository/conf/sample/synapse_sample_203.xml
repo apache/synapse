@@ -21,7 +21,7 @@
 maintain session specific data, such data have to replicated among the failover endpoints. -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <sequence name="main">
+    <sequence name="main" onError="errorHandler">
         <in>
             <send>
                 <endpoint>
@@ -67,6 +67,19 @@ maintain session specific data, such data have to replicated among the failover 
             <!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
             <send/>
         </out>
+    </sequence>
+
+    <sequence name="errorHandler">
+
+        <makefault>
+            <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+            <reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/>
+        </makefault>
+
+        <header name="To" action="remove"/>
+        <property name="RESPONSE" value="true"/>
+
+        <send/>
     </sequence>
 
 </definitions>

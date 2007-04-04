@@ -180,6 +180,7 @@
             <sysproperty key="op" value="${op}"/>
             <sysproperty key="req" value="${req}"/>
             <sysproperty key="load" value="${load}"/>
+            <sysproperty key="msg" value="${msg}"/>
             <sysproperty key="t" value="${t}"/>
             <sysproperty key="session" value="${session}"/>            
         </java>

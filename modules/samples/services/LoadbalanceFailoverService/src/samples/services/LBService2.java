@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 
+import javax.xml.namespace.QName;
+
 public class LBService2 {
 
     private ServiceContext serviceContext = null;
@@ -31,13 +33,17 @@ public class LBService2 {
         this.serviceContext = serviceContext;
     }
 
-    public OMElement sleepOperation(OMElement param) {
+    public OMElement sleepOperation(OMElement topParam) {
 
-        param.build();
-        param.detach();
+        topParam.build();
+        topParam.detach();
+
+        OMElement param = topParam.getFirstChildWithName(new QName("load"));
+        String l = param.getText();
+        long time = Long.parseLong(l);
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(time);
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -71,14 +77,15 @@ public class LBService2 {
 
         param.setText(msg);
 
-        return param;
+        return topParam;
     }
 
-    public OMElement loadOperation(OMElement param) {
+    public OMElement loadOperation(OMElement topParam) {
 
-        param.build();
-        param.detach();
+        topParam.build();
+        topParam.detach();
 
+        OMElement param = topParam.getFirstChildWithName(new QName("load"));
         String l = param.getText();
         long load = Long.parseLong(l);
 
@@ -115,7 +122,7 @@ public class LBService2 {
 
         param.setText(msg);
 
-        return param;
+        return topParam;
     }
 
     public OMElement setClientName(OMElement name) {

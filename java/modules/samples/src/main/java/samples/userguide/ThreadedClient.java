@@ -61,11 +61,18 @@ public class ThreadedClient {
         }
         System.out.println("Number of requests: " + requests);
 
-        String msg = System.getProperty("load");
-        if (msg == null) {
-            msg = "1000";
+        String loadParameter = System.getProperty("load");
+        if (loadParameter == null) {
+            loadParameter = "1000";
         }
-        System.out.println("Load: " + msg);
+        System.out.println("Load: " + loadParameter);
+
+        long msgSize = 0;
+        String msgSizeProp = System.getProperty("msg");
+        if (msgSizeProp != null) {
+            msgSize = Long.parseLong(msgSizeProp);
+        }
+        System.out.println("Number of dummy elements in the message: " + msgSize);
 
         String sessionProp = System.getProperty("session");
         if (sessionProp == null) {
@@ -97,7 +104,8 @@ public class ThreadedClient {
 
             invoker.setInvokerName("CLIENT " + i);
             invoker.setIterations(requests);
-            invoker.setMessage(msg);
+            invoker.setLoad(loadParameter);
+            invoker.addDummyElements(msgSize);
 
             if (session == SIMPLE_CLIENT_SESSION) {
                 invoker.setClientSessionID("CLIENT " + i);

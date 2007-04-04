@@ -22,6 +22,8 @@ package samples.services;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 
+import javax.xml.namespace.QName;
+
 public class LBService1 {
 
     public OMElement setClientName(OMElement cName) {
@@ -47,11 +49,12 @@ public class LBService1 {
         return param;
     }
 
-    public OMElement sleepOperation(OMElement timeElement) throws AxisFault {
+    public OMElement sleepOperation(OMElement param) throws AxisFault {
 
-        timeElement.build();
-        timeElement.detach();
+        param.build();
+        param.detach();
 
+        OMElement timeElement = param.getFirstChildWithName(new QName("load"));
         String time = timeElement.getText();
         try {
             Thread.sleep(Long.parseLong(time));
@@ -65,14 +68,15 @@ public class LBService1 {
         } else {
             timeElement.setText("Response from anonymous server");
         }
-        return timeElement;
+        return param;
     }
-        
-    public OMElement loadOperation(OMElement loadElement) throws AxisFault {
 
-        loadElement.build();
-        loadElement.detach();
+    public OMElement loadOperation(OMElement param) throws AxisFault {
 
+        param.build();
+        param.detach();
+
+        OMElement loadElement = param.getFirstChildWithName(new QName("load"));
         String l = loadElement.getText();
         long load = Long.parseLong(l);
 
@@ -86,6 +90,6 @@ public class LBService1 {
         } else {
             loadElement.setText("Response from anonymous server");
         }
-        return loadElement;
+        return param;
     }
 }

@@ -30,8 +30,6 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 
 import javax.xml.namespace.QName;
@@ -72,8 +70,11 @@ public class ServiceInvoker extends Thread {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        msg = fac.createOMElement("sleepTime", null);
-        msg.setText("1000");
+        msg = fac.createOMElement("SampleMsg", null);
+
+        OMElement load = fac.createOMElement("load", null);
+        load.setText("1000");
+        msg.addChild(load);
     }
 
     public String getInvokerName() {
@@ -103,8 +104,20 @@ public class ServiceInvoker extends Thread {
         return runningTime;
     }
 
-    public void setMessage(String msgText) {
-        msg.setText(msgText);
+    public void setLoad(String load) {
+        OMElement loadElement = msg.getFirstChildWithName(new QName("load"));
+        loadElement.setText(load);
+    }
+
+    public void addDummyElements(long numElements) {
+        OMElement dummies = fac.createOMElement("Dummies", null);
+        msg.addChild(dummies);
+
+        for (long i = 0; i < numElements; i++) {
+            OMElement dummy = fac.createOMElement("Dummy", null);
+            dummy.setText("This is the dummy element " + i);
+            dummies.addChild(dummy);
+        }
     }
 
     public void setClientSessionID(String id) {
@@ -137,7 +150,8 @@ public class ServiceInvoker extends Thread {
 
             for (long i=0; i < iterations; i++) {
                 OMElement response2 = client.sendReceive(msg);
-                System.out.println(invokerName + ": " + response2.toString());
+                OMElement loadElement = response2.getFirstChildWithName(new QName("load"));
+                System.out.println(invokerName + ": " + loadElement.toString());
             }
 
             long t2 = System.currentTimeMillis();
@@ -148,7 +162,7 @@ public class ServiceInvoker extends Thread {
             runningTime = t2 - t1;
 
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            System.out.println(axisFault.getMessage());
         }
     }
 }

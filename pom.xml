@@ -167,43 +167,9 @@
         </plugins>
     </build>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codehaus-snapshot</id>
-            <name>Snapshot repository</name>
-            <url>http://snapshots.maven.codehaus.org/maven2/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>apache-snapshot</id>
-            <name>Apache Snapshot repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>Codehaus Snapshots</id>
-            <url>http://snapshots.repository.codehaus.org/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
     <dependencyManagement>
         <dependencies>
+            <!-- Synapse -->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
@@ -224,129 +190,158 @@
                 <artifactId>synapse-nhttp</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-- Axis2 -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-kernel</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-adb</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-java2wsdl</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+
+            <!-- Rampart -->
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-policy</artifactId>
+                <version>${rampart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-trust</artifactId>
+                <version>${rampart.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-core</artifactId>
+                <version>${rampart.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-api</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-impl</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-dom</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ws.commons.schema</groupId>
+                <artifactId>XmlSchema</artifactId>
+                <version>${xml_schema.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.neethi</groupId>
+                <artifactId>neethi</artifactId>
+                <version>${neethi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ws.security</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.sandesha2</groupId>
+                <artifactId>sandesha2-policy</artifactId>
+                <version>${sandesha2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>jakarta-httpcore</artifactId>
+                <version>${jakarta.httpcore.nio.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>wsdl4j</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>${wsdl4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <!-- core Axis2 -->
+        <!-- Axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-java2wsdl</artifactId>
-            <version>${axis2.version}</version>
         </dependency>
 
-        <!-- core Axiom -->
+        <!-- Neethi -->
         <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <version>${axiom.version}</version>
+            <groupId>org.apache.neethi</groupId>
+            <artifactId>neethi</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-            <version>${axiom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-dom</artifactId>
-            <version>${axiom.version}</version>
-        </dependency>
-
+        
+        <!-- Rampart -->
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
-            <version>${rampart.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2-mtompolicy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>httpcomponents-httpcore</groupId>
+                    <artifactId>jakarta-httpcore</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.neethi</groupId>
+                    <artifactId>neethi</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-trust</artifactId>
-            <version>${rampart.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart-core</artifactId>
-            <version>${rampart.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.ws.commons.schema</groupId>
-            <artifactId>XmlSchema</artifactId>
-            <version>${xml_schema.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.neethi</groupId>
-            <artifactId>neethi</artifactId>
-            <version>${neethi.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.ws.security</groupId>
-            <artifactId>wss4j</artifactId>
-            <version>${wss4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2-policy</artifactId>
-            <version>${sandesha2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xml-security</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>${xmlsec.version}</version>
-        </dependency>
-
-        <dependency>
-                <groupId>incubator-woden</groupId>
-            <artifactId>woden</artifactId>
-            <version>${woden.version}</version>
-        </dependency>
-
-        <!-- external MARs -->
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>addressing</artifactId>
-            <version>${addressing.version}</version>
-            <type>mar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2</artifactId>
-            <version>${sandesha2.version}</version>
-            <type>mar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.rampart</groupId>
-            <artifactId>rampart</artifactId>
-            <version>${rampart.version}</version>
-            <type>mar</type>
-        </dependency>
-
-        <!-- external JARs -->
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>${commons.logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>${commons.httpclient.version}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2-mtompolicy</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>httpcomponents-httpcore</groupId>
                     <artifactId>jakarta-httpcore</artifactId>
@@ -354,29 +349,69 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>${commons.codec.version}</version>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2-mtompolicy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>httpcomponents-httpcore</groupId>
+                    <artifactId>jakarta-httpcore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>${commons.fileupload.version}</version>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart</artifactId>
+            <version>${rampart.version}</version>
+            <type>mar</type>
         </dependency>
+
+        <!-- Sandesha -->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${sandesha2.version}</version>
+            <type>mar</type>
         </dependency>
+
+        <!-- Addressing -->
         <dependency>
-            <groupId>${stax.impl.groupid}</groupId>
-            <artifactId>${stax.impl.artifactid}</artifactId>
-            <version>${stax.impl.version}</version>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>addressing</artifactId>
+            <version>${addressing.version}</version>
+            <type>mar</type>
         </dependency>
+
+        <!-- direct dependencies for 3rd party JARs / Util JARs -->
         <dependency>
-            <groupId>stax</groupId>
-            <artifactId>stax-api</artifactId>
-            <version>${stax.api.version}</version>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>logkit</groupId>
+                    <artifactId>logkit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>avalon-framework</groupId>
+                    <artifactId>avalon-framework</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -385,42 +420,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>${jaxen.version}</version>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>${xmlunit.version}</version>
+            <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-            <version>${wsdl4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${servletapi.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${javamail.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>${activation.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jms</artifactId>
-            <version>${geronimo.spec.jms.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>annogen</groupId>
-            <artifactId>annogen</artifactId>
-            <version>${annogen.version}</version>
-        </dependency>
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
@@ -432,19 +437,11 @@
             <artifactId>xercesImpl</artifactId>
             <version>${xerces.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>${xml_apis.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
             <version>${xalan.version}</version>
         </dependency>
-
         <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
@@ -467,13 +464,6 @@
             <artifactId>jakarta-httpcore-niossl</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
-        <!-- Xml Unit Test -->
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>${xmlunit.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <reporting>
@@ -495,49 +485,23 @@
     </reporting>
 
     <distributionManagement>
-        <!--
-            <repository>
-              <id>apache-repo</id>
-              <name>Maven Central Repository</name>
-              <url>scpexe://people.apache.org/www/www.apache.org/dist/maven-repository</url>
-            </repository>
-            <snapshotRepository>
-              <id>apache-snapshots</id>
-              <name>Apache Development Repository</name>
-              <url>scpexe://minotaur.apache.org/www/cvs.apache.org/maven-snapshot-repository</url>
-            </snapshotRepository>
-        -->
+        <repository>
+          <id>apache-snapshots</id>
+          <name>Maven Central Repository</name>
+          <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</url>
+        </repository>
+        <!--<snapshotRepository>
+          <id>apache-releases</id>
+          <name>Apache Ibiblio rsync Repository</name>
+          <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
+        </snapshotRepository>-->
         <site>
             <id>website</id>
-            <url>scpexe://people.apache.org/www/ws.apache.org/commons/axiom</url>
+            <url>scpexe://people.apache.org/www/ws.apache.org/synapse</url>
         </site>
     </distributionManagement>
 
     <repositories>
-        <!--<repository>
-            <id>asankha-m2</id>
-            <name>asankha-m2</name>
-            <url>http://people.apache.org/~asankha/maven2/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>-->
-        <!--for Axiom/E4X
-        <repository>
-            <id>thilina</id>
-            <name>thilina</name>
-            <url>http://www-lk.wso2.com/~thilina/repository/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <layout>legacy</layout>
-            <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
-            </snapshots>
-        </repository>-->
         <repository>
             <id>ibiblio-m2</id>
             <name>Ibiblio Maven 2 Repo</name>
@@ -550,38 +514,14 @@
             </snapshots>
         </repository>
         <repository>
-            <id>Apache Zones</id>
-            <name>Apache Zones</name>
-            <layout>legacy</layout>
-            <url>http://ws.zones.apache.org/repository/</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>Apache People</id>
-            <name>Apache People Repo</name>
-            <layout>legacy</layout>
-            <url>http://people.apache.org/repository</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>apache-m2-snapshot</id>
+            <id>apache-snapshots</id>
             <name>Apache Maven 2 Snapshot Repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
             <releases>
             	<updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
+                <updatePolicy>interval:60</updatePolicy>
             </snapshots>
         </repository>
         <repository>
@@ -592,7 +532,7 @@
             	<updatePolicy>never</updatePolicy>
             </releases>
             <snapshots>
-                <updatePolicy>interval:1440</updatePolicy>
+                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
     </repositories>
@@ -608,11 +548,10 @@
     <properties>
         <!-- Synapse and related components -->
         <synapse.version>1.0-RC1-SNAPSHOT</synapse.version>
-        <jakarta.httpcore.nio.version>4.0-alpha4-SNAPSHOT</jakarta.httpcore.nio.version>
+        <jakarta.httpcore.nio.version>4.0-alpha4</jakarta.httpcore.nio.version>
 
-
-      <!-- Axis2 1.1.1 and its dependencies -->
-        <axis2.version>SNAPSHOT</axis2.version>
+        <!-- Axis2 1.2 and its dependencies -->
+        <axis2.version>1.2-SNAPSHOT</axis2.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <axiom.version>SNAPSHOT</axiom.version>
         <xml_schema.version>SNAPSHOT</xml_schema.version>
@@ -639,7 +578,7 @@
         <geronimo.spec.jms.version>1.1-rc4</geronimo.spec.jms.version>
 
         <!-- rampart, sandesha, neethi -->
-        <addressing.version>SNAPSHOT</addressing.version>
+        <addressing.version>1.2-SNAPSHOT</addressing.version>
         <sandesha2.version>1.1</sandesha2.version>
         <neethi.version>SNAPSHOT</neethi.version>
         <wss4j.version>SNAPSHOT</wss4j.version>
@@ -742,6 +681,9 @@
     </developers>
 
     <contributors>
+        <contributor>
+            <name>Kasun Samarasinghe</name>
+        </contributor>
         <contributor>
             <name>Hadrian Zbarcea</name>
         </contributor>

@@ -130,7 +130,8 @@ public class SynapseCommodityServiceTest extends TestCase {
 
         assertNotNull(response);
 
-        OMElement returnEle = response.getFirstChildWithName(new QName("return"));
+        OMElement returnEle = response.getFirstElement().getFirstElement().
+            getFirstChildWithName(new QName("return"));
 
         assertNotNull(returnEle);
 

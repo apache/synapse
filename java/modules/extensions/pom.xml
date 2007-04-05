@@ -109,6 +109,16 @@
             <artifactId>wso2throttle</artifactId>
             <version>${wso2commons.version}</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.neethi</groupId>
+                    <artifactId>neethi</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

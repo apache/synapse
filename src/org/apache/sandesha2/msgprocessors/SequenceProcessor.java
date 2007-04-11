@@ -195,7 +195,7 @@ public class SequenceProcessor {
 		}
 		
 		String specVersion = rmMsgCtx.getRMSpecVersion();
-		if (rmMsgCtx.getMessageContext().getAxisOperation().getName().getLocalPart().equals("RMInOutDuplicateMessageOperation")
+		if (rmMsgCtx.getMessageContext().getAxisOperation().getName().getLocalPart().equals(Sandesha2Constants.RM_DUPLICATE_OPERATION.getLocalPart())
 				&& (Sandesha2Constants.QOS.InvocationType.DEFAULT_INVOCATION_TYPE == Sandesha2Constants.QOS.InvocationType.EXACTLY_ONCE)) {
 			// this is a duplicate message and the invocation type is EXACTLY_ONCE. We try to return
 			// ack messages at this point, as if someone is sending duplicates then they may have

@@ -121,7 +121,7 @@ public class MTOMPingClient {
 		try {
 			dataSource = new FileDataSource (new File (imageName));
 		} catch (Exception e) {
-			throw new AxisFault (e);
+			throw AxisFault.makeFault (e);
 		}
 		
 	    DataHandler dataHandler = new DataHandler(dataSource);

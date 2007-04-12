@@ -878,7 +878,7 @@ public class SandeshaUtil {
 
 			newMsg.setEnvelope(envelope);
 		} catch (XMLStreamException e) {
-			throw new AxisFault (e);
+			throw AxisFault.makeFault(e);
 		}
 		
 		newMsg.setConfigurationContext(oldMsg.getConfigurationContext());

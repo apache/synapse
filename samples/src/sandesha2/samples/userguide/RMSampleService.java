@@ -113,7 +113,7 @@ public class RMSampleService {
 			fileOutputStream.close();
 
 		} catch (Exception e) {
-			throw new AxisFault(e);
+			throw AxisFault.makeFault(e);
 		}
 	}
 }

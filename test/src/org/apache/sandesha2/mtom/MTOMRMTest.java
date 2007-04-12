@@ -239,7 +239,7 @@ public class MTOMRMTest extends SandeshaTestCase {
 			destinationFile.delete();
 
 		} catch (Exception e) {
-			throw new AxisFault(e);
+			throw AxisFault.makeFault(e);
 		}
 	}
 

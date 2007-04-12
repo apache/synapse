@@ -135,6 +135,17 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
+        <pluginRepository>
+            <id>ibiblio-m2</id>
+            <name>Ibiblio Maven 2 Repo</name>
+            <url>http://www.ibiblio.org/maven2/</url>
+            <releases>
+            	<updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
 
     <build>

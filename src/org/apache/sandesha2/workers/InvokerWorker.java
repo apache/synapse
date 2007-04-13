@@ -60,7 +60,15 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				transaction.commit();
 				transaction = null;
 			}
-			
+					
+			//starting a transaction for the invocation work.
+			transaction = storageManager.getTransaction();
+			// Depending on the transaction  support, the service will be invoked only once. 
+			// Therefore we delete the invoker bean and message now, ahead of time
+			invokerBeanMgr.delete(messageContextKey);
+			// removing the corresponding message context as well.
+			storageManager.removeMessageContext(messageContextKey);
+
 			try {
 
 				boolean postFailureInvocation = false;
@@ -95,10 +103,10 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 				handleFault(msgToInvoke, e);
 			}
-				
-			//starting a transaction for the post-invocation work.
-			transaction = storageManager.getTransaction();
-						
+
+
+
+			
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -127,13 +135,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				}
 			}
 			
-			// Service will be invoked only once. I.e. even if an
-			// exception get thrown in invocation
-			// the service will not be invoked again.
-			invokerBeanMgr.delete(messageContextKey);
-
-			// removing the corresponding message context as well.
-			storageManager.removeMessageContext(messageContextKey);
 			
 			if(!ignoreNextMsg){
 				// updating the next msg to invoke

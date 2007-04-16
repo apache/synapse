@@ -148,6 +148,23 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             }
             wsdlElement.addChild(sec);
         }
+
+        if (endpointDefinition.getTimeoutAction() != Constants.NONE) {
+            OMElement timeout = fac.createOMElement("timeout", Constants.SYNAPSE_OMNAMESPACE);
+            wsdlElement.addChild(timeout);
+
+            OMElement duration = fac.createOMElement("duration", Constants.SYNAPSE_OMNAMESPACE);
+            duration.setText(Long.toString(endpointDefinition.getTimeoutDuration()));
+            timeout.addChild(duration);
+
+            OMElement action = fac.createOMElement("action", Constants.SYNAPSE_OMNAMESPACE);
+            if (endpointDefinition.getTimeoutAction() == Constants.DISCARD) {
+                action.setText("discard");
+            } else if (endpointDefinition.getTimeoutAction() == Constants.DISCARD_AND_FAULT) {
+                action.setText("fault");
+            }
+            timeout.addChild(action);
+        }
     }
 
     private static void handleException(String msg) {

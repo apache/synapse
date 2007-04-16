@@ -39,6 +39,11 @@ import javax.xml.namespace.QName;
  *   <address uri="url" [format="soap|pox"] [optimize="mtom|swa"]>
  *      .. extensibility ..
  *
+ *      <timeout>
+ *          <duration>duration in milliseconds</duration>
+ *          <action>discard | fault</action>
+ *      </timeout>
+ * 
  *      <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
  *      separateListener="true|false"/>+
  *   </address>
@@ -185,6 +190,33 @@ public class AddressEndpointFactory implements EndpointFactory {
                     org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
                 endpoint.setWsRMPolicyKey(policy.getAttributeValue());
+            }
+        }
+
+        // set the timeout configuration
+        OMElement timeout = elem.getFirstChildWithName(new QName(
+                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "timeout"));
+        if (timeout != null) {
+            OMElement duration = timeout.getFirstChildWithName(new QName(
+                    org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "duration"));
+            if (duration != null) {
+                String d = duration.getText();
+                if (d != null) {
+                    endpoint.setTimeoutDuration(new Long(d).longValue());
+                }
+            }
+
+            OMElement action = timeout.getFirstChildWithName(new QName(
+                    org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "action"));
+            if (action != null) {
+                String a = action.getText();
+                if (a != null) {
+                    if (a.equalsIgnoreCase("discard")) {
+                        endpoint.setTimeoutAction(Constants.DISCARD);
+                    } else if (a.equalsIgnoreCase("fault")) {
+                        endpoint.setTimeoutAction(Constants.DISCARD_AND_FAULT);
+                    }
+                }
             }
         }
 

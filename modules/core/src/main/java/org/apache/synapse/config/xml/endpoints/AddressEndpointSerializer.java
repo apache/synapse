@@ -158,6 +158,7 @@ public class AddressEndpointSerializer implements EndpointSerializer {
 
         if (endpt.getTimeoutAction() != Constants.NONE) {
             OMElement timeout = fac.createOMElement("timeout", Constants.SYNAPSE_OMNAMESPACE);
+            address.addChild(timeout);
 
             OMElement duration = fac.createOMElement("duration", Constants.SYNAPSE_OMNAMESPACE);
             duration.setText(Long.toString(endpt.getTimeoutDuration()));
@@ -169,6 +170,7 @@ public class AddressEndpointSerializer implements EndpointSerializer {
             } else if (endpt.getTimeoutAction() == Constants.DISCARD_AND_FAULT) {
                 action.setText("fault");
             }
+            timeout.addChild(action);
         }
 
         return address;

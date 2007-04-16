@@ -252,5 +252,32 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 endpointDefinition.setWsRMPolicyKey(policy.getAttributeValue());
             }
         }
+
+        // set the timeout configuration
+        OMElement timeout = wsdlElement.getFirstChildWithName(new QName(
+                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "timeout"));
+        if (timeout != null) {
+            OMElement duration = timeout.getFirstChildWithName(new QName(
+                    org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "duration"));
+            if (duration != null) {
+                String d = duration.getText();
+                if (d != null) {
+                    endpointDefinition.setTimeoutDuration(new Long(d).longValue());
+                }
+            }
+
+            OMElement action = timeout.getFirstChildWithName(new QName(
+                    org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "action"));
+            if (action != null) {
+                String a = action.getText();
+                if (a != null) {
+                    if (a.equalsIgnoreCase("discard")) {
+                        endpointDefinition.setTimeoutAction(Constants.DISCARD);
+                    } else if (a.equalsIgnoreCase("fault")) {
+                        endpointDefinition.setTimeoutAction(Constants.DISCARD_AND_FAULT);
+                    }
+                }
+            }
+        }
     }
 }

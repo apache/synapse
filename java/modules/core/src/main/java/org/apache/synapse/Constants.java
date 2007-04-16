@@ -149,8 +149,7 @@ public interface Constants {
     int STATISTICS_ON =1;
     /** The statistics state-unset */
     int STATISTICS_UNSET=2;
-    
-    /** */
+
     String SYNAPSE_ERROR ="syapse_error" ;
 
     /** key for lookup sequence statistics stack */
@@ -172,5 +171,26 @@ public interface Constants {
     int  PROXYSERVICE_STATISTICS = 1;
 
     /** Endpoint statistics category*/
-    int ENDPOINT_STATISTICS = 2;    
+    int ENDPOINT_STATISTICS = 2;
+
+    /**
+     * don't do anything for response timeouts. this means infinite timeout. this is the default
+     * action, if the timeout configuration is not explicitly set.
+     */
+    int NONE = 100;
+
+    /** Discard the callback if the timeout for the response is expired */
+    int DISCARD = 101;
+
+    /**
+     * Discard the callback and activate specified fault sequence if the timeout for the response
+     * is expired
+     */
+    int DISCARD_AND_FAULT = 102;
+
+    /**
+     * Error codes for message sending
+     */
+    String TIME_OUT = "500";
+    String SENDING_FAULT = "600";
 }

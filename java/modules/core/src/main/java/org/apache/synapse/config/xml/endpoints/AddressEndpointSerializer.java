@@ -53,6 +53,11 @@ import org.apache.commons.logging.LogFactory;
  *    <enableSec/>+
  *    <enableAddressing/>+
  *
+ *    <timeout>
+ *      <duration>duration in milliseconds</duration>
+ *      <action>discard | fault</action>
+ *    </timeout>
+ *
  *  </address>
  * </endpoint>
  */
@@ -149,6 +154,21 @@ public class AddressEndpointSerializer implements EndpointSerializer {
                         "policy", null, endpt.getWsSecPolicyKey()));
             }
             address.addChild(sec);
+        }
+
+        if (endpt.getTimeoutAction() != Constants.NONE) {
+            OMElement timeout = fac.createOMElement("timeout", Constants.SYNAPSE_OMNAMESPACE);
+
+            OMElement duration = fac.createOMElement("duration", Constants.SYNAPSE_OMNAMESPACE);
+            duration.setText(Long.toString(endpt.getTimeoutDuration()));
+            timeout.addChild(duration);
+
+            OMElement action = fac.createOMElement("action", Constants.SYNAPSE_OMNAMESPACE);
+            if (endpt.getTimeoutAction() == Constants.DISCARD) {
+                action.setText("discard");
+            } else if (endpt.getTimeoutAction() == Constants.DISCARD_AND_FAULT) {
+                action.setText("fault");
+            }
         }
 
         return address;

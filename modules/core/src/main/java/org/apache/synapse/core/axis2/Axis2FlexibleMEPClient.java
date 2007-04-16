@@ -172,7 +172,14 @@ public class Axis2FlexibleMEPClient {
         // always set a callback as we decide if the send it blocking or non blocking within
         // the MEP client. This does not cause an overhead, as we simply create a 'holder'
         // object with a reference to the outgoing synapse message context synapseOutMessageContext
-        mepClient.setCallback(new AsyncCallback(synapseOutMessageContext));
+        AsyncCallback callback = new AsyncCallback(synapseOutMessageContext);
+        if (endpoint != null) {
+            // set the timeout time and the timeout action to the callback, so that the TimeoutHandler
+            // can detect timed out callbacks and take approprite action.
+            callback.setTimeOutOn(System.currentTimeMillis() + endpoint.getTimeoutDuration());
+            callback.setTimeOutAction(endpoint.getTimeoutAction());
+        }
+        mepClient.setCallback(callback);
         
         mepClient.execute(false);
 

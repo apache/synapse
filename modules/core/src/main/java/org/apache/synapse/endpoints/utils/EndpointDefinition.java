@@ -52,6 +52,17 @@ public class EndpointDefinition {
     /** use SWA **/
     private boolean useSwa = false;
 
+    /**
+     * timeout duration for waiting for a response. if the user has set some timeout action and
+     * the timeout duration is not set, default is set to 30 seconds. note that if the user has
+     * not set any timeout configuration, default timeout action is set to NONE, which won't do
+     * anything for timeouts.
+    */
+    private long timeoutDuration = 30000;
+
+    /** action to perform when a timeout occurs (NONE | DISCARD | DISCARD_AND_FAULT) **/
+    private int timeoutAction = Constants.NONE;
+
     /** To decide to whether statistics should have collected or not */
     private int statisticsEnable = Constants.STATISTICS_UNSET;
 
@@ -188,6 +199,22 @@ public class EndpointDefinition {
 
     public void setUseSwa(boolean useSwa) {
         this.useSwa = useSwa;
+    }
+
+    public long getTimeoutDuration() {
+        return timeoutDuration;
+    }
+
+    public void setTimeoutDuration(long timeoutDuration) {
+        this.timeoutDuration = timeoutDuration;
+    }
+
+    public int getTimeoutAction() {
+        return timeoutAction;
+    }
+
+    public void setTimeoutAction(int timeoutAction) {
+        this.timeoutAction = timeoutAction;
     }
 
     /**

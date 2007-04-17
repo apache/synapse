@@ -20,46 +20,51 @@
 package org.apache.synapse.mediators.bsf;
 
 import junit.framework.TestCase;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+import junit.extensions.RepeatedTest;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.TestUtils;
 
+import java.util.Random;
+
 public class ScriptMediatorTest extends TestCase {
 
-    private static final String inlinescript = "<x><![CDATA[ function mediate(mc) { return true;} ]]></x>";
+    private static final String inlinescript = "var state=5;";
 
-    private static final String falsescript = "<x><![CDATA[ function mediate(mc) { return false;} ]]></x>";
+    private String randomno = null;
 
-    public void testTrueMediator() throws Exception {
+    private String threadsafetyscript = "var rno = mc.getPayloadXML().toString(); rno=rno*2; mc.setPayloadXML" +
+            "(<randomNo>{rno}</randomNo>)";
 
+    public void testInlineMediator() throws Exception {
         MessageContext mc = TestUtils.getTestContext("<foo/>", null);
         ScriptMediator mediator = new ScriptMediator("js", inlinescript);
         assertTrue(mediator.mediate(mc));
     }
 
-    public void testFalseMediator() throws Exception {
-        MessageContext mc = TestUtils.getTestContext("<foo/>", null);
-        ScriptMediator mediator = new ScriptMediator("js", falsescript);
-        assertTrue(mediator.mediate(mc));
+    public void testThreadSafety() throws Exception {
+        MessageContext mc = TestUtils.getTestContext("<randomNo/>", null);
+        Random rand = new Random();
+        randomno = new Integer(rand.nextInt(200)).toString();
+        mc.getEnvelope().getBody().getFirstElement().setText(randomno);
+        ScriptMediator mediator = new ScriptMediator("js", threadsafetyscript);
+        mediator.mediate(mc);
+        assertEquals(Integer.parseInt(mc.getEnvelope().getBody().getFirstElement().getText()),
+                Integer.parseInt(randomno) * 2);
     }
 
-    public void testJSCreateOMElementConvertor() {
-        // ScriptMediator mediator = new ScriptMediator("js", "true;");
-        // ScriptEngine engine = mediator.scriptEngine;
-        // XMLHelper convertor = mediator.getOMElementConvertor(engine);
-        // assertTrue(convertor instanceof JavaScriptXMLHelper);
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
+        for (int i = 0; i < 10; i++) {
+            suite.addTest(new RepeatedTest(new ScriptMediatorTest("testThreadSafety"), 10));
+        }
+        return suite;
     }
 
-    // public void testRBCreateOMElementConvertor() {
-    // ScriptMediator mediator = new ScriptMediator("ruby", null);
-    // OMElementConvertor convertor = mediator.getOMElementConvertor();
-    // assertTrue(convertor instanceof RBOMElementConvertor);
-    // }
-    //    
-    // public void testDefaultCreateOMElementConvertor() {
-    // ScriptMediator mediator = new ScriptMediator("foo.bar", null);
-    // OMElementConvertor convertor = mediator.getOMElementConvertor();
-    // assertTrue(convertor instanceof DefaultOMElementConvertor);
-    // }
-
+    public ScriptMediatorTest(String name) {
+        super(name);
+    }
 }

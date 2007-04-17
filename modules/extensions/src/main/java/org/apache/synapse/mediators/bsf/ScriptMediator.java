@@ -59,31 +59,52 @@ public class ScriptMediator extends AbstractMediator {
     private static final Log log = LogFactory.getLog(ScriptMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
-    /** The name of the variable made available to the scripting language to access the message */
+    /**
+     * The name of the variable made available to the scripting language to access the message
+     */
     private static final String MC_VAR_NAME = "mc";
 
-    /** The registry entry key for a script loaded from the registry */
+    /**
+     * The registry entry key for a script loaded from the registry
+     */
     private String key;
-    /** The language of the script code */
+    /**
+     * The language of the script code
+     */
     private String language;
-    /** The optional name of the function to be invoked, defaults to mediate */
+    /**
+     * The optional name of the function to be invoked, defaults to mediate
+     */
     private String function = "mediate";
-    /** The source code of the script */
+    /**
+     * The source code of the script
+     */
     private String scriptSourceCode;
-    /** The BSF engine created to process each message through the script */
+    /**
+     * The BSF engine created to process each message through the script
+     */
     protected ScriptEngine scriptEngine;
-    /** Does the ScriptEngine support multi-threading */
+    /**
+     * Does the ScriptEngine support multi-threading
+     */
     private boolean multiThreadedEngine;
-    /** The compiled script. Only used for inline scripts */
+    /**
+     * The compiled script. Only used for inline scripts
+     */
     private CompiledScript compiledScript;
-    /** The Invocable script. Only used for external scripts */
+    /**
+     * The Invocable script. Only used for external scripts
+     */
     private Invocable invocableScript;
-    /** The BSF helper to convert between the XML representations used by Java and the scripting language */
+    /**
+     * The BSF helper to convert between the XML representations used by Java and the scripting language
+     */
     private XMLHelper xmlHelper;
 
     /**
      * Create a script mediator for the given language and given script source
-     * @param language the BSF language
+     *
+     * @param language         the BSF language
      * @param scriptSourceCode the source code of the script
      */
     public ScriptMediator(String language, String scriptSourceCode) {
@@ -94,8 +115,9 @@ public class ScriptMediator extends AbstractMediator {
 
     /**
      * Create a script mediator for the given language and given script entry key and function
+     *
      * @param language the BSF language
-     * @param key the registry entry key to load the script
+     * @param key      the registry entry key to load the script
      * @param function the function to be invoked
      */
     public ScriptMediator(String language, String key, String function) {
@@ -109,27 +131,28 @@ public class ScriptMediator extends AbstractMediator {
         if (!(scriptEngine instanceof Invocable)) {
             throw new SynapseException("Script engine is not an Invocable engine for language: " + language);
         }
-        invocableScript = (Invocable)scriptEngine;
+        invocableScript = (Invocable) scriptEngine;
     }
 
     /**
      * Perform Script mediation
+     *
      * @param synCtx the Synapse message context
      * @return the boolean result from the script invocation
      */
     public boolean mediate(MessageContext synCtx) {
         if (log.isDebugEnabled()) {
             log.debug("Script Mediator - mediate() # Language : " + language +
-                      (key == null ? " inline script" : " script with key : " + key) +
-                      " function : " + function);
+                    (key == null ? " inline script" : " script with key : " + key) +
+                    " function : " + function);
         }
 
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
 
         if (shouldTrace) {
             trace.trace("Start : Script mediator # Language : " + language +
-                (key == null ? " inline script" : " script with key : " + key) +
-                " function : " + function);
+                    (key == null ? " inline script" : " script with key : " + key) +
+                    " function : " + function);
             trace.trace("Invoking inline script for current message : " + synCtx);
         }
 
@@ -176,22 +199,23 @@ public class ScriptMediator extends AbstractMediator {
 
     /**
      * Mediation implementation when the script to be executed should be loaded from the registry
+     *
      * @param synCtx the message context
      * @return script result
-     * @throws ScriptException 
+     * @throws ScriptException
      */
     protected Object mediateWithExternalScript(MessageContext synCtx) throws ScriptException {
         prepareExternalScript(synCtx);
         ScriptMessageContext scriptMC = new ScriptMessageContext(synCtx, xmlHelper);
-        Object response = invocableScript.invokeFunction(function, new Object[]{scriptMC});
-        return response;
+        return invocableScript.invokeFunction(function, new Object[]{scriptMC});
     }
 
     /**
      * Perform mediation with static inline script of the given scripting language
+     *
      * @param synCtx message context
      * @return true, or the script return value
-     * @throws ScriptException 
+     * @throws ScriptException
      */
     protected Object mediateForInlineScript(MessageContext synCtx) throws ScriptException {
 
@@ -199,7 +223,7 @@ public class ScriptMediator extends AbstractMediator {
 
         Bindings bindings = scriptEngine.createBindings();
         bindings.put(MC_VAR_NAME, scriptMC);
-        
+
         Object response;
         if (compiledScript != null) {
             response = compiledScript.eval(bindings);
@@ -233,14 +257,14 @@ public class ScriptMediator extends AbstractMediator {
 
     /**
      * Prepares the mediator for the invocation of an external script
-     * @throws ScriptException 
+     * @throws ScriptException
      */
     protected synchronized void prepareExternalScript(MessageContext synCtx) throws ScriptException {
-        
+
         // TODO: only need this synchronized method for dynamic registry entries. If there was a way
         // to access the registry entry during mediator initialization then for non-dynamic entries
         // this could be done just the once during mediator initialization.
-        
+
         Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
         boolean needsReload = (entry != null) && entry.isDynamic() && (!entry.isCached() || entry.isExpired());
 
@@ -263,7 +287,7 @@ public class ScriptMediator extends AbstractMediator {
             throw new SynapseException("No script engine found for language: " + language);
         }
         xmlHelper = XMLHelper.getArgHelper(scriptEngine);
-        
+
         this.multiThreadedEngine = scriptEngine.getFactory().getParameter("THREADING") != null;
     }
 

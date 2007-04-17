@@ -66,13 +66,6 @@
             <artifactId>synapse-core</artifactId>
         </dependency>
 
-        <!-- external JARs -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-
         <!--For Axiom/E4X -->
         <!--<dependency>
             <groupId>org.wso2.javascript.rhino</groupId>
@@ -85,49 +78,5 @@
             <artifactId>js-core</artifactId>
             <version>SNAPSHOT</version>
         </dependency>-->
-
-        <dependency>
-            <groupId>xmlbeans</groupId>
-            <artifactId>xbean</artifactId>
-            <version>${xbean.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.bsf</groupId>
-            <artifactId>bsf-all</artifactId>
-            <version>${bsf.version}</version>
-        </dependency>
-
-        <dependency>
-           <groupId>groovy</groupId>
-           <artifactId>groovy-all</artifactId>
-           <version>${groovy.version}</version>
-        </dependency>
-        <!-- WSO2 Throttle -->
-        <dependency>
-            <groupId>org.wso2.throttle</groupId>
-            <artifactId>wso2throttle</artifactId>
-            <version>${wso2commons.version}</version>
-            <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.neethi</groupId>
-                    <artifactId>neethi</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
     </dependencies>
-
-    <properties>
-        <wso2commons.version>1.2-SNAPSHOT</wso2commons.version>
-        <spring.version>1.2.6</spring.version>
-        <xbean.version>2.2.0</xbean.version>
-        <bsf.version>3.0-beta1-SNAPSHOT</bsf.version>
-        <groovy.version>1.0</groovy.version>
-    </properties>
 </project>

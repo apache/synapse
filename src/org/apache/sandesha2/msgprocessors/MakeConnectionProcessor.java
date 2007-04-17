@@ -135,7 +135,8 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		if (returnMessage==null) {
 			String message = "Cannot find the message stored with the key:" + messageStorageKey;
 			if(log.isDebugEnabled()) log.debug(message);
-			throw new SandeshaException (message);
+			// Someone else has either removed the sender & message, or another make connection got here first.
+			return;
 		}
 		
 		if(pending) addMessagePendingHeader(returnMessage, namespace);

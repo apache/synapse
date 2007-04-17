@@ -210,46 +210,48 @@ public class PollingManager extends SandeshaThread {
 		}
 		
 		MessageContext referenceMessage = storageManager.retrieveMessageContext(referenceMsgKey,context);
-		RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
-		RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
-				rmBean, wireSeqId, wireAddress, storageManager);
-		
-		
-		//we must set serverSide to false. Having serverSide as true (I.e. when polling for RMD) will cause the SenderWorker to ignore
-		//the sync response message.
-		makeConnectionRMMessage.getMessageContext().setServerSide(false);
-		
-		// Store properties so that we know which sequence we are polling for. This can be used
-		// to match reply sequences up to requests, as well as to help process messagePending
-		// headers.
-		OperationContext ctx = makeConnectionRMMessage.getMessageContext().getOperationContext();
-		ctx.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY, entry);
-		
-		makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
-		//storing the MakeConnection message.
-		String makeConnectionMsgStoreKey = SandeshaUtil.getUUID();
-		
-		//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
-		SenderBean makeConnectionSenderBean = new SenderBean ();
-		makeConnectionSenderBean.setInternalSequenceID(internalSeqId);
-		makeConnectionSenderBean.setMessageContextRefKey(makeConnectionMsgStoreKey);
-		makeConnectionSenderBean.setMessageID(makeConnectionRMMessage.getMessageId());
-		makeConnectionSenderBean.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
-		makeConnectionSenderBean.setReSend(false);
-		makeConnectionSenderBean.setSend(true);
-		makeConnectionSenderBean.setSequenceID(rmBean.getSequenceID());
-		EndpointReference to = makeConnectionRMMessage.getTo();
-		if (to!=null)
-			makeConnectionSenderBean.setToAddress(to.getAddress());
+		if(referenceMessage!=null){
+			RMMsgContext referenceRMMessage = MsgInitializer.initializeMessage(referenceMessage);
+			RMMsgContext makeConnectionRMMessage = RMMsgCreator.createMakeConnectionMessage(referenceRMMessage,
+					rmBean, wireSeqId, wireAddress, storageManager);
+			
+			
+			//we must set serverSide to false. Having serverSide as true (I.e. when polling for RMD) will cause the SenderWorker to ignore
+			//the sync response message.
+			makeConnectionRMMessage.getMessageContext().setServerSide(false);
+			
+			// Store properties so that we know which sequence we are polling for. This can be used
+			// to match reply sequences up to requests, as well as to help process messagePending
+			// headers.
+			OperationContext ctx = makeConnectionRMMessage.getMessageContext().getOperationContext();
+			ctx.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY, entry);
+			
+			makeConnectionRMMessage.setProperty(MessageContext.TRANSPORT_IN,null);
+			//storing the MakeConnection message.
+			String makeConnectionMsgStoreKey = SandeshaUtil.getUUID();
+			
+			//add an entry for the MakeConnection message to the sender (with ,send=true, resend=false)
+			SenderBean makeConnectionSenderBean = new SenderBean ();
+			makeConnectionSenderBean.setInternalSequenceID(internalSeqId);
+			makeConnectionSenderBean.setMessageContextRefKey(makeConnectionMsgStoreKey);
+			makeConnectionSenderBean.setMessageID(makeConnectionRMMessage.getMessageId());
+			makeConnectionSenderBean.setMessageType(Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG);
+			makeConnectionSenderBean.setReSend(false);
+			makeConnectionSenderBean.setSend(true);
+			makeConnectionSenderBean.setSequenceID(rmBean.getSequenceID());
+			EndpointReference to = makeConnectionRMMessage.getTo();
+			if (to!=null)
+				makeConnectionSenderBean.setToAddress(to.getAddress());
 
-		SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
-		
-		//this message should not be sent until it is qualified. I.e. till it is sent through the Sandesha2TransportSender.
-		makeConnectionRMMessage.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-		
-		SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey);
-		
-		senderBeanMgr.insert(makeConnectionSenderBean);
+			SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
+			
+			//this message should not be sent until it is qualified. I.e. till it is sent through the Sandesha2TransportSender.
+			makeConnectionRMMessage.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
+			
+			SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey);
+			
+			senderBeanMgr.insert(makeConnectionSenderBean);			
+		}
 		
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollForSequence");
 	}

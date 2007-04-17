@@ -90,6 +90,10 @@ public class InMemorySenderBeanMgr extends InMemoryBeanMgr implements SenderBean
 			if (bean.getSentCount() > 0 && !bean.isReSend())
 				continue; //Avoid re-sending messages that we should not resend
 			
+			// Check that the Send time has not been updated under another thread
+			if (!bean.match(matcher))
+				continue;
+			
 			if(result == null) {
 				result = bean;
 			} else if(result.getTimeToSend() > bean.getTimeToSend()) {

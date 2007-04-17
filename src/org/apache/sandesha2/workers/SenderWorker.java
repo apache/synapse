@@ -372,6 +372,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	 */
 	private boolean updateMessage(RMMsgContext rmMsgContext, SenderBean senderBean, StorageManager storageManager) throws AxisFault {
 		
+		// Lock the message to enable retransmission update
+		senderBean = storageManager.getSenderBeanMgr().retrieve(senderBean.getMessageID());
+		
 		boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(
 				rmMsgContext, senderBean, rmMsgContext.getConfigurationContext(), storageManager);
 		if(!continueSending) return false;

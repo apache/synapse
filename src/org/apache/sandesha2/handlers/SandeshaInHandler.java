@@ -114,10 +114,18 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			// validating the message
 			MessageValidator.validateMessage(rmMsgCtx, storageManager);
+			
+			// commit the current transaction
+			transaction.commit();
+			transaction = storageManager.getTransaction();
 
 			// Process Ack headers in the message
 			AcknowledgementProcessor ackProcessor = new AcknowledgementProcessor();
 			ackProcessor.processAckHeaders(rmMsgCtx);
+
+			// commit the current transaction
+			transaction.commit();
+			transaction = storageManager.getTransaction();
 
 			// Process Ack Request headers in the message
 			AckRequestedProcessor reqProcessor = new AckRequestedProcessor();
@@ -128,6 +136,10 @@ public class SandeshaInHandler extends AbstractHandler {
 			// Process MessagePending headers
 			MessagePendingProcessor pendingProcessor = new MessagePendingProcessor();
 			pendingProcessor.processMessagePendingHeaders(rmMsgCtx);
+
+			// commit the current transaction
+			transaction.commit();
+			transaction = storageManager.getTransaction();
 
 			// Process the Sequence header, if there is one
 			SequenceProcessor seqProcessor = new SequenceProcessor();

@@ -67,35 +67,20 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     private Endpoint parentEndpoint = null;
     private EndpointDefinition endpointDefinition = null;
 
+    /**
+     * Sends the message through this endpoint. This method just handles statistics related functions
+     * and gives the message to the Synapse environment to send. It does not add any endpoint
+     * specific details to the message context. These details are added only to the cloned message
+     * context by the Axis2FlexibleMepClient. So that we can reuse the original message context for
+     * resending through different endpoints.
+     *
+     * @param synCtx MessageContext sent by client to Synapse
+     */
     public void send(MessageContext synCtx) {
 
         String eprAddress = null;
         if (endpointDefinition.getAddress() != null) {
             eprAddress = endpointDefinition.getAddress().toString();
-
-            if (endpointDefinition.isForcePOX()) {
-                synCtx.setDoingPOX(true);
-            } else if (endpointDefinition.isForceSOAP()) {
-                synCtx.setDoingPOX(false);
-            }
-
-            if (endpointDefinition.isUseMTOM()) {
-                synCtx.setDoingMTOM(true);
-                // fix / workaround for AXIS2-1798
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
-                    org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
-                    org.apache.axis2.Constants.VALUE_TRUE);
-            } else if (endpointDefinition.isUseSwa()) {
-                synCtx.setDoingSWA(true);
-                // fix / workaround for AXIS2-1798
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(
-                    org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
-                    org.apache.axis2.Constants.VALUE_TRUE);
-            }
-
-            if (endpointDefinition.isUseSeparateListener()) {
-                synCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
-            }
 
             String endPointName = this.getName();
 
@@ -107,41 +92,17 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
                 endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
                 synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
             }
-            synCtx.setTo(new EndpointReference(eprAddress));
 
             if (log.isDebugEnabled()) {
                 log.debug("Sending message to endpoint :: name = " +
                         endPointName + " resolved address = " + eprAddress);
                 log.debug("Sending To: " + (synCtx.getTo() != null ?
                         synCtx.getTo().getAddress() : "null"));
-                log.debug("SOAPAction: " + (synCtx.getWSAAction() != null ?
+                log.debug("SOAPAction: " + (synCtx.getSoapAction() != null ?
+                        synCtx.getSoapAction() : "null"));
+                log.debug("WSA-Action: " + (synCtx.getWSAAction() != null ?
                         synCtx.getWSAAction() : "null"));
                 log.debug("Body : \n" + synCtx.getEnvelope());
-            }
-
-            // if RM is turned on
-            if (endpointDefinition.isReliableMessagingOn()) {
-                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                synCtx.setProperty(Constants.OUTFLOW_RM_ON, Boolean.TRUE);
-                if (endpointDefinition.getWsRMPolicyKey() != null) {
-                    synCtx.setProperty(Constants.OUTFLOW_RM_POLICY,
-                            endpointDefinition.getWsRMPolicyKey());
-                }
-            }
-
-            // if WS Security is specified
-            if (endpointDefinition.isSecurityOn()) {
-                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
-                synCtx.setProperty(Constants.OUTFLOW_SECURITY_ON, Boolean.TRUE);
-                if (endpointDefinition.getWsSecPolicyKey() != null) {
-                    synCtx.setProperty(Constants.OUTFLOW_SEC_POLICY,
-                            endpointDefinition.getWsSecPolicyKey());
-                }
-            }
-
-            // if WS Addressing is specified
-            if (endpointDefinition.isAddressingOn()) {
-                synCtx.setProperty(Constants.OUTFLOW_ADDRESSING_ON, Boolean.TRUE);
             }
 
             synCtx.pushFaultHandler(this);

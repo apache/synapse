@@ -51,7 +51,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         // create the Timer object and a TimeoutHandler task. Schedule it to run every 10 seconds from here
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
         timeOutTimer = new Timer(true);
-        timeOutTimer.schedule(timeoutHandler, 0, 1000);
+        timeOutTimer.schedule(timeoutHandler, 0, Constants.TIMEOUT_HANDLER_INTERVAL);
     }
 
     public void addCallback(String MsgID, Callback callback) {

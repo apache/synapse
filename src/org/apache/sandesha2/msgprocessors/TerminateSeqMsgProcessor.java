@@ -136,7 +136,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		}
 		
 		if (doFullTermination) {
-			TerminateManager.cleanReceivingSideAfterInvocation(context, sequenceId, storageManager);
+			TerminateManager.cleanReceivingSideAfterInvocation(sequenceId, storageManager);
 			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);
 		} else
 			TerminateManager.cleanReceivingSideOnTerminateMessage(context, sequenceId, storageManager);

@@ -112,14 +112,25 @@ public class AcknowledgementProcessor {
 		SenderBeanMgr retransmitterMgr = storageManager.getSenderBeanMgr();
 
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
+		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
+
 		if (outSequenceId == null || "".equals(outSequenceId)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.outSeqIDIsNull);
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence");
+			return;
+		}
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, outSequenceId, rmsBean)) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Sequence terminated");
+			return;
+		}
 
 		// Check that the sender of this Ack holds the correct token
-		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 		String internalSequenceId = rmsBean.getInternalSequenceID();
 		if(rmsBean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configCtx);

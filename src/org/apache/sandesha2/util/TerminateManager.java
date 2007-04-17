@@ -163,14 +163,16 @@ public class TerminateManager {
 			// there is no invoking by Sandesha2. So clean invocations storages.
 			
 			receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
-			cleanReceivingSideAfterInvocation(configContext, sequenceId, storageManager);
+			cleanReceivingSideAfterInvocation(sequenceId, storageManager);
 		} else {
 
 			String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
 			if (cleanStatus != null
 					&& CLEANED_AFTER_INVOCATION.equals(cleanStatus))
-				completeTerminationOfReceivingSide(configContext,
-						sequenceId, storageManager);
+				// Remove the sequence from the map
+				receivingSideCleanMap.remove(sequenceId);
+				//completeTerminationOfReceivingSide(configContext,
+				//		sequenceId, storageManager);
 			else
 				receivingSideCleanMap.put(sequenceId, CLEANED_ON_TERMINATE_MSG);
 		}
@@ -181,11 +183,10 @@ public class TerminateManager {
 	 * data left by the above method. This had to be called after the Invocation
 	 * of the Last Message.
 	 * 
-	 * @param configContext
 	 * @param sequenceID
 	 * @throws SandeshaException
 	 */
-	public static void cleanReceivingSideAfterInvocation(ConfigurationContext configContext, String sequenceId,
+	public static void cleanReceivingSideAfterInvocation(String sequenceId,
 			StorageManager storageManager) throws SandeshaException {
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateManager::cleanReceivingSideAfterInvocation " +sequenceId);
 		
@@ -207,37 +208,13 @@ public class TerminateManager {
 
 		String cleanStatus = (String) receivingSideCleanMap.get(sequenceId);
 		if (cleanStatus != null && CLEANED_ON_TERMINATE_MSG.equals(cleanStatus))
-			completeTerminationOfReceivingSide(configContext, sequenceId, storageManager);
-		else {
-			receivingSideCleanMap.put(sequenceId, CLEANED_AFTER_INVOCATION);
-		}
+			// Remove the sequence id from the map
+			receivingSideCleanMap.remove(sequenceId);
+			//completeTerminationOfReceivingSide(configContext, sequenceId, storageManager);
+		else 
+			receivingSideCleanMap.put(sequenceId, CLEANED_AFTER_INVOCATION);		
 		
 		if(log.isDebugEnabled()) log.debug("Exit: TerminateManager::cleanReceivingSideAfterInvocation");
-	}
-
-	/**
-	 * This has to be called by the lastly invocated one of the above two
-	 * methods.
-	 * 
-	 */
-	private static void completeTerminationOfReceivingSide(ConfigurationContext configContext,String sequenceId,
-			StorageManager storageManager) throws SandeshaException {
-		
-		// TODO We need to remove the RMDBean, but doing so quickly can stop
-		// the user from calling the sequence report to discover the state of
-		// the sequence. We should impement something with a little more delay,
-		// perhaps a few minutes.
-//		// removing nextMsgMgr entries
-//		RMDBeanMgr rMDBeanMgr = storageManager.getRMDBeanMgr();
-//		RMDBean findNextMsgBean = new RMDBean();
-//		findNextMsgBean.setSequenceID(sequenceId);
-//		Collection collection = rMDBeanMgr.find(findNextMsgBean);
-//		Iterator iterator = collection.iterator();
-//		while (iterator.hasNext()) {
-//			RMDBean rMDBean = (RMDBean) iterator.next();
-//			 rMDBeanMgr.delete(rMDBean.getSequenceID());
-//		}
-
 	}
 
 	/**

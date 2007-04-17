@@ -79,8 +79,10 @@ public class AcknowledgementManager {
 				Iterator sequences = rmdBeans.iterator();
 				while(sequences.hasNext()) {
 					RMDBean sequence = (RMDBean) sequences.next();
-					if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequence.getSequenceID());
-					RMMsgCreator.addAckMessage(rmMessageContext, sequence.getSequenceID(), sequence);
+					if (sequence.getHighestInMessageNumber() > 0) {
+						if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequence.getSequenceID());
+						RMMsgCreator.addAckMessage(rmMessageContext, sequence.getSequenceID(), sequence);
+					}
 				}
 				
 			} else {
@@ -89,7 +91,7 @@ public class AcknowledgementManager {
 				String inboundSequence = (String) rmMessageContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
 				if(inboundSequence != null) {
 					RMDBean inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
-					if(inboundBean != null) {
+					if(inboundBean != null && !inboundBean.isTerminated()) {
 						String acksTo = inboundBean.getAcksToEPR();
 						EndpointReference acksToEPR = new EndpointReference(acksTo);
 						
@@ -127,7 +129,7 @@ public class AcknowledgementManager {
 				if (log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
 
 				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
-				if(rmdBean != null) {
+				if(rmdBean != null && !rmdBean.isTerminated()) {
 					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, rmdBean);
 				}
 			}

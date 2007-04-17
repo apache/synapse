@@ -63,6 +63,7 @@ import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
+import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
@@ -345,13 +346,13 @@ public class FaultManager {
 	 * @return
 	 * @throws AxisFault 
 	 */
-	public static boolean checkForSequenceTerminated(RMMsgContext referenceRMMessage, String sequenceID, RMDBean rmdBean) 
+	public static boolean checkForSequenceTerminated(RMMsgContext referenceRMMessage, String sequenceID, RMSequenceBean bean) 
 	
 	throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
-		if (rmdBean.isTerminated()) {
+		if (bean.isTerminated()) {
 			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
 			FaultData data = new FaultData();
 			int SOAPVersion = SandeshaUtil.getSOAPVersion(referenceMessage.getEnvelope());
@@ -736,27 +737,47 @@ public class FaultManager {
 		
 		// Find the rmsBean
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
-		if (rmsBean == null) {
+		if (rmsBean != null) {
+		
+			// Notify the clients of a failure
+			notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
+			
+			rmMsgCtx.pause();
+			
+			// Cleanup sending side.
 			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::processSequenceUnknownFault Unable to find RMSBean");
-			return;
+				log.debug("Terminating sending sequence " + rmsBean);
+			TerminateManager.terminateSendingSide(rmsBean, storageManager);
+			
+			// Update the last activated time.
+			rmsBean.setLastActivatedTime(System.currentTimeMillis());
+			
+			// Update the bean in the map
+			storageManager.getRMSBeanMgr().update(rmsBean);
 		}
-
-		// Notify the clients of a failure
-		notifyClientsOfFault(rmsBean.getInternalSequenceID(), storageManager, configCtx, fault);
-		
-		rmMsgCtx.pause();
-		
-		// Cleanup sending side.
-		if (log.isDebugEnabled())
-			log.debug("Terminating sending sequence " + rmsBean);
-		TerminateManager.terminateSendingSide(rmsBean, storageManager);
-		
-		// Update the last activated time.
-		rmsBean.setLastActivatedTime(System.currentTimeMillis());
-		
-		// Update the bean in the map
-		storageManager.getRMSBeanMgr().update(rmsBean);
+		else {
+			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
+			if (rmdBean != null) {
+				rmMsgCtx.pause();
+				
+				// Cleanup sending side.
+				if (log.isDebugEnabled())
+					log.debug("Terminating sending sequence " + rmdBean);
+				TerminateManager.cleanReceivingSideOnTerminateMessage(configCtx, rmdBean.getSequenceID(), storageManager);
+				
+				// Update the last activated time.
+				rmdBean.setLastActivatedTime(System.currentTimeMillis());
+				
+				// Update the bean in the map
+				storageManager.getRMDBeanMgr().update(rmdBean);
+			
+			}
+			else {
+				if (log.isDebugEnabled())
+					log.debug("Exit: FaultManager::processSequenceUnknownFault Unable to find sequence");
+				return;
+			}
+		}
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::processSequenceUnknownFault");	  

@@ -127,7 +127,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				
 				if (highestMessage) {
 					//do cleaning stuff that hs to be done after the invocation of the last message.
-					TerminateManager.cleanReceivingSideAfterInvocation(configurationContext, invokerBean.getSequenceID(), storageManager);
+					TerminateManager.cleanReceivingSideAfterInvocation(invokerBean.getSequenceID(), storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
 					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");					

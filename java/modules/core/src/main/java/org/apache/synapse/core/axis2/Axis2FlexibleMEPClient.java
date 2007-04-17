@@ -32,6 +32,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
@@ -49,6 +50,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 
 /**
@@ -100,28 +102,51 @@ public class Axis2FlexibleMEPClient {
         // we need to create the response to the original message later on
         MessageContext axisOutMsgCtx = cloneForSend(originalInMsgCtx);
 
-        if (endpoint != null) {
+        // set all the details of the endpoint only to the cloned message context
+        // so that we can use the original message context for resending through different endpoints
+        String eprAddress = null;
+        if (endpoint != null && endpoint.getAddress() != null) {
+
+            eprAddress = endpoint.getAddress().toString();
+
             if (endpoint.isForcePOX()) {
                 axisOutMsgCtx.setDoingREST(true);
             } else if (endpoint.isForceSOAP()) {
                 axisOutMsgCtx.setDoingREST(false);
+                if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
+                    axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
+                }
             }
 
             if (endpoint.isUseMTOM()) {
                 axisOutMsgCtx.setDoingMTOM(true);
+                // fix / workaround for AXIS2-1798
+                axisOutMsgCtx.setProperty(
+                        org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                        org.apache.axis2.Constants.VALUE_TRUE);
+
             } else if (endpoint.isUseSwa()) {
                 axisOutMsgCtx.setDoingSwA(true);
+                // fix / workaround for AXIS2-1798
+                axisOutMsgCtx.setProperty(
+                        org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                        org.apache.axis2.Constants.VALUE_TRUE);
             }
 
             if (endpoint.isUseSeparateListener()) {
                 axisOutMsgCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
             }
+
+            axisOutMsgCtx.setTo(new EndpointReference(eprAddress));
         }
 
         if (wsAddressingEnabled) {
-            axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+            axisOutMsgCtx.setProperty
+                    (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
+
         } else {
-            axisOutMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+            axisOutMsgCtx.setProperty
+                    (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
         }
 
         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();

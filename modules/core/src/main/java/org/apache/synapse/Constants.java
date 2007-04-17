@@ -200,4 +200,7 @@ public interface Constants {
      */
     String TIME_OUT = "504";
     String SENDING_FAULT = "503";
+
+    /** Property name to store the last endpoint through which the message has flowed */
+    String PROCESSED_ENDPOINT = "processed_endpoint";
 }

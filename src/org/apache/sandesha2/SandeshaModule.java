@@ -186,7 +186,24 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 					break;
 				}
 			}
-		}
+		} else if(axisDescription instanceof AxisOperation) {
+				AxisOperation op = (AxisOperation) axisDescription;
+				log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecifMEPConstant());
+	
+				String name = null;
+				QName qName = op.getName();
+				if(qName != null) name = qName.getLocalPart();
+				if(name != null && !name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) {
+	
+				// If we get to here then we must have one of the user's operations, so
+				// check the MEP.
+				if(op.getAxisSpecifMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+					Parameter p = new Parameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS, Boolean.TRUE);
+					op.getParent().addParameter(p);
+				}
+			}
+		} 
+
 
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::engageNotify");
 	}

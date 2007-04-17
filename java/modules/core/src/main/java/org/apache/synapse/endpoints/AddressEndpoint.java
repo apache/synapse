@@ -44,7 +44,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
      * Name of the endpoint. Used for named endpoints which can be referred using the key attribute
      * of indirect endpoints.
      */
-    private String name;
+    private String name = null;
 
     /**
      * Determines if this endpoint is active or not. This variable have to be loaded always from the
@@ -170,6 +170,9 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
         // register this as the immediate fault handler for this message.
         synCtx.pushFaultHandler(this);
+
+        // add this as the last endpoint to process this message. it is used by statistics code.
+        synCtx.setProperty(Constants.PROCESSED_ENDPOINT, this);
 
         synCtx.getEnvironment().send(endpoint, synCtx);
     }

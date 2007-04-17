@@ -174,6 +174,13 @@ public interface Constants {
     int ENDPOINT_STATISTICS = 2;
 
     /**
+     * Interval for activating the timeout handler for cleaning up expired requests. Note that
+     * there can be an error as large as the value of the interval. But for smaller intervals and
+     * larger timeouts this error is negligable.
+     */
+    long TIMEOUT_HANDLER_INTERVAL = 1000;
+
+    /**
      * don't do anything for response timeouts. this means infinite timeout. this is the default
      * action, if the timeout configuration is not explicitly set.
      */
@@ -189,8 +196,8 @@ public interface Constants {
     int DISCARD_AND_FAULT = 102;
 
     /**
-     * Error codes for message sending
+     * Error codes for message sending. We go with closest HTTP fault codes.
      */
-    String TIME_OUT = "500";
-    String SENDING_FAULT = "600";
+    String TIME_OUT = "504";
+    String SENDING_FAULT = "503";
 }

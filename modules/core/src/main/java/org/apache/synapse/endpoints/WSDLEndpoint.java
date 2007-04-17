@@ -45,7 +45,7 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
 
     private static final Log log = LogFactory.getLog(AddressEndpoint.class);
 
-    private String name;
+    private String name = null;
     private String wsdlURI;
     private OMElement wsdlDoc;
     private String serviceName;
@@ -105,13 +105,18 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
                 log.debug("Body : \n" + synCtx.getEnvelope());
             }
 
+            // register this as the immediate fault handler for this message.
             synCtx.pushFaultHandler(this);
+
+            // add this as the last endpoint to process this message. it is used by statistics code.
+            synCtx.setProperty(Constants.PROCESSED_ENDPOINT, this);
+
             synCtx.getEnvironment().send(endpointDefinition, synCtx);
         }
     }
 
     public void onFault(MessageContext synCtx) {
-         // perform retries here
+        // perform retries here
 
         // if this endpoint has actually failed, inform the parent.
         if (parentEndpoint != null) {

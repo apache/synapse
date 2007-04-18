@@ -20,6 +20,9 @@ package org.apache.synapse.statistics.impl;
 
 import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.StatisticsCollector;
+import org.apache.synapse.SynapseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The data structure to hold statistics related to the Proxy Services
@@ -28,6 +31,7 @@ import org.apache.synapse.statistics.StatisticsCollector;
 
 public class ProxyServiceStatisticsStack implements StatisticsStack {
 
+    private static final Log log = LogFactory.getLog(ProxyServiceStatisticsStack.class);
     /** The name of the proxy service*/
     private String proxyServiceName;
     /** To check whether statistics is enabled or not */
@@ -40,6 +44,7 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
     private boolean isINFault;
     /** To indicate whether OUT Flow is fault or not*/
     private boolean isOUTFault;
+
     /**
      * To put a statistics
      * @param key                   - The Name of the proxy service
@@ -47,8 +52,8 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
      * @param isInFlow
      * @param isStatisticsEnable
      */
-    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault) {
-
+    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable,
+                    boolean isFault) {
         if (isInFlow) {
             this.proxyServiceName = key;
             this.isStatisticsEnable = isStatisticsEnable;
@@ -61,16 +66,34 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
      * This method used to report the latest  statistics to the StatisticsCollector
      * @param statisticsCollector
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                            boolean isFault) {
         if (proxyServiceName != null && isStatisticsEnable && inTimeForInFlow != -1) {
             inTimeForOutFlow = System.currentTimeMillis();
             isOUTFault = isFault;
-            statisticsCollector.reportForProxyService(proxyServiceName, false, inTimeForInFlow, inTimeForOutFlow, isINFault);
+            statisticsCollector.reportForProxyService(proxyServiceName, false,
+                    inTimeForInFlow, inTimeForOutFlow, isINFault);
             inTimeForInFlow = -1;
-        } else if (inTimeForOutFlow != -1) {            
-            statisticsCollector.reportForProxyService(proxyServiceName, true, inTimeForOutFlow, System.currentTimeMillis(), isFault);
+        } else if (inTimeForOutFlow != -1) {
+            statisticsCollector.reportForProxyService(proxyServiceName, true,
+                    inTimeForOutFlow, System.currentTimeMillis(), isFault);
             inTimeForOutFlow = -1;
+        }
+    }
+
+    /**
+     * Report a particular statistics to the StatisticsReporter
+     *
+     * @param statisticsCollector
+     * @param isFault
+     * @param name
+     */
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                            boolean isFault, String name) {
+        if (name != null && proxyServiceName != null && proxyServiceName.equals(name)) {
+            reportToStatisticsCollector(statisticsCollector, isFault);
+        } else {
+            handleException("Invalid ProxyService Name " + name + " expected " + proxyServiceName);
         }
     }
 
@@ -79,7 +102,13 @@ public class ProxyServiceStatisticsStack implements StatisticsStack {
      * @param statisticsCollector
      * @param isFault
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-        reportToStatisticsCollector(statisticsCollector,isFault);
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                               boolean isFault) {
+        reportToStatisticsCollector(statisticsCollector, isFault);
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

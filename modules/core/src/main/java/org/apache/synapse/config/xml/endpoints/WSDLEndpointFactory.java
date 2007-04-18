@@ -163,14 +163,26 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     (new QName(org.apache.axis2.namespace.Constants.NS_URI_WSDL11, "description"));
             if (endpoint == null && descriptionElement != null) {
                 wsdlEndpoint.setWsdlDoc(descriptionElement);
-
                 handleException("WSDL 2.0 Endpoints are currently not supported.");
             }
-
             if (endpoint != null) {
                 // for now, QOS information has to be provided explicitly.
                 extractQOSInformation(endpoint, wsdlElement);
-
+                OMAttribute statistics = epConfig.getAttribute(
+                        new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,
+                                org.apache.synapse.config.xml.Constants.STATISTICS_ATTRIB_NAME));
+                if (statistics != null) {
+                    String statisticsValue = statistics.getAttributeValue();
+                    if (statisticsValue != null) {
+                        if (org.apache.synapse.config.xml.Constants.STATISTICS_ENABLE.equals(
+                                statisticsValue)) {
+                            endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
+                        } else if (org.apache.synapse.config.xml.Constants.STATISTICS_DISABLE.equals(
+                                statisticsValue)) {
+                            endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                        }
+                    }
+                }
                 wsdlEndpoint.setEndpointDefinition(endpoint);
             } else {
                 handleException("WSDL is not specified for WSDL endpoint.");

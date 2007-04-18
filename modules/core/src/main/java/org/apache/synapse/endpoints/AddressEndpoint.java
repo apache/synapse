@@ -144,14 +144,28 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     public void send(MessageContext synCtx) {
 
         String endPointName = this.getName();
-
+        if(endPointName ==null) {
+            endPointName = Constants.ANONYMOUS_ENDPOINTS;
+        }
         // Setting Required property to collect the End Point statistics
-        boolean statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
-        if (endPointName != null && statisticsEnable) {
-            EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
-            boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-            endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
-            synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
+        boolean statisticsEnable =
+                (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
+        if (statisticsEnable) {
+            EndPointStatisticsStack endPointStatisticsStack = null;
+            Object statisticsStackObj =
+                    synCtx.getProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK);
+            if (statisticsStackObj == null) {
+                endPointStatisticsStack = new EndPointStatisticsStack();
+                synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK,
+                        endPointStatisticsStack);
+            } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
+                endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
+            }
+            if (endPointStatisticsStack != null) {
+                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+                endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
+                        !synCtx.isResponse(), statisticsEnable, isFault);
+            }
         }
 
         if (endpoint.getAddress() != null) {

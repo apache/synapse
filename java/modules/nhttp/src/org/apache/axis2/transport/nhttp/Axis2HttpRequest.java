@@ -23,6 +23,8 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.http.*;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.entity.BasicHttpEntity;
@@ -57,6 +59,10 @@ public class Axis2HttpRequest {
     private MessageContext msgContext = null;
     /** the Pipe which facilitates the serialization output to be written to the channel */
     private PipeImpl pipe = null;
+    /** The Axis2 MessageFormatter that will ensure proper serialization as per Axis2 semantics */
+    MessageFormatter messageFormatter = null;
+    /** The OM Output format holder */
+    OMOutputFormat format = null;
 
     public Axis2HttpRequest(EndpointReference epr, HttpHost httpHost, MessageContext msgContext) {
         this.epr = epr;
@@ -85,7 +91,7 @@ public class Axis2HttpRequest {
      * Create and return a new HttpPost request to the destination EPR
      * @return the HttpRequest to be sent out
      */
-    public HttpRequest getRequest() {
+    public HttpRequest getRequest() throws IOException {
         HttpPost httpRequest = new HttpPost(epr.getAddress());
         httpRequest.setEntity(new BasicHttpEntity());
 
@@ -125,9 +131,16 @@ public class Axis2HttpRequest {
                 soapAction);
         }
 
+        format = Util.getOMOutputFormat(msgContext);
+        try {
+            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        } catch (AxisFault axisFault) {
+            throw new IOException(
+                "Cannot find a suitable MessageFormatter : " + axisFault.getMessage());
+        }
         httpRequest.setHeader(
-            HTTP.CONTENT_TYPE, Util.getContentType(msgContext) +
-            "; charset=" + Util.getOMOutputFormat(msgContext).getCharSetEncoding());
+            HTTP.CONTENT_TYPE,
+            messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
         return httpRequest;
     }
@@ -150,16 +163,7 @@ public class Axis2HttpRequest {
 
         log.debug("start streaming outgoing http request");
         OutputStream out = Channels.newOutputStream(pipe.sink());
-        OMOutputFormat format = Util.getOMOutputFormat(msgContext);
-
-        try {
-            (msgContext.isDoingREST() ?
-                msgContext.getEnvelope().getBody().getFirstElement() : msgContext.getEnvelope())
-                .serializeAndConsume(out, format);
-        } catch (XMLStreamException e) {
-            handleException("Error serializing response message", e);
-        }
-
+        messageFormatter.writeTo(msgContext, format, out, false);
         try {
             out.flush();
             out.close();

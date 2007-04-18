@@ -61,28 +61,19 @@ public class Util {
     public static OMOutputFormat getOMOutputFormat(MessageContext msgContext) {
 
         OMOutputFormat format = new OMOutputFormat();
-        String charSetEnc = (String) msgContext.getProperty(
-            Constants.Configuration.CHARACTER_SET_ENCODING);
-
-        if (charSetEnc == null) {
-            OperationContext opctx = msgContext.getOperationContext();
-            if (opctx != null) {
-                charSetEnc = (String) opctx.getProperty(
-                    Constants.Configuration.CHARACTER_SET_ENCODING);
-            }
-        }
-
-        // if the charset encoding is still not found use the default
-        if (charSetEnc == null) {
-            charSetEnc = MessageContext.DEFAULT_CHAR_SET_ENCODING;
-        }
-        format.setCharSetEncoding(charSetEnc);
-
         msgContext.setDoingMTOM(HTTPTransportUtils.doWriteMTOM(msgContext));
         msgContext.setDoingSwA(HTTPTransportUtils.doWriteSwA(msgContext));
         msgContext.setDoingREST(HTTPTransportUtils.isDoingREST(msgContext));        
         format.setSOAP11(msgContext.isSOAP11());
         format.setDoOptimize(msgContext.isDoingMTOM());
+        format.setDoingSWA(msgContext.isDoingSwA());
+
+        format.setCharSetEncoding(HTTPTransportUtils.getCharSetEncoding(msgContext));
+        Object mimeBoundaryProperty = msgContext.getProperty(Constants.Configuration.MIME_BOUNDARY);
+        if (mimeBoundaryProperty != null) {
+            format.setMimeBoundary((String) mimeBoundaryProperty);
+        }
+
         return format;
     }
 

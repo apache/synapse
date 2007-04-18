@@ -22,6 +22,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.http.*;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.entity.BasicHttpEntity;
@@ -100,6 +101,28 @@ public class Axis2HttpRequest {
                     httpRequest.setHeader((String) header, (String) value);
                 }
             }
+        }
+
+        // if the message is SOAP 11 (for which a SOAPAction is *required*), and
+        // the msg context has a SOAPAction or a WSA-Action (give pref to SOAPAction)
+        // use that over any transport header that may be available
+        String soapAction = msgContext.getSoapAction();
+        if (soapAction == null) {
+            soapAction = msgContext.getWSAAction();
+        }
+        if (soapAction == null) {
+            msgContext.getAxisOperation().getInputAction();
+        }
+
+        if (msgContext.isSOAP11() && soapAction != null &&
+            soapAction.length() > 0) {
+            Header existingHeader =
+                httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
+            if (existingHeader != null) {
+                httpRequest.removeHeader(existingHeader);
+            }
+            httpRequest.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
+                soapAction);
         }
 
         httpRequest.setHeader(

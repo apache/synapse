@@ -203,4 +203,10 @@ public interface Constants {
 
     /** Property name to store the last endpoint through which the message has flowed */
     String PROCESSED_ENDPOINT = "processed_endpoint";
+    /**  Anonymous Endpoint key   */
+    String ANONYMOUS_ENDPOINTS = "AnonymousEndpoints";
+    /** Anonymous Sequence  key   */
+    String ANONYMOUS_SEQUENCES = "AnonymousSequences";
+    /** Anonymous ProxyServices key   */
+    String ANONYMOUS_PROXYSERVICES = "AnonymousProxyServices";
 }

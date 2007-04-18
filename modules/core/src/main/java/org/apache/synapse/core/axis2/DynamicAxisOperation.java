@@ -196,7 +196,10 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             // e.g. sometimes the transport sender may listen for a syncronous reply
 			if (msgctx.getProperty(MessageContext.TRANSPORT_IN) != null) {
 
-                responseMessageContext.setOperationContext(msgctx.getOperationContext());
+                responseMessageContext.setOperationContext(msgctx.getOperationContext());                
+                responseMessageContext.setAxisMessage(
+                    msgctx.getOperationContext().getAxisOperation().
+                    getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
                 responseMessageContext.setAxisService(msgctx.getAxisService());
 
                 // set properties on responseMessageContext

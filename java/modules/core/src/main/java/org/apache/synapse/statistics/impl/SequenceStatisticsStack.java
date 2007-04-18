@@ -22,6 +22,7 @@ import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.StatisticsCollector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * The data structure to hold statistics related to Sequences
@@ -35,34 +36,65 @@ public class SequenceStatisticsStack implements StatisticsStack {
 
     /**
      * To put a statistics
-     * @param sequenceName          - The name of the sequence
+     *
+     * @param sequenceName       - The name of the sequence
      * @param initTime
      * @param isInFlow
      * @param isStatisticsEnable
      * @param isFault
      */
-    public void put(String sequenceName, long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault) {
-        sequenceStatisticsList.add(new SequenceStatistics(sequenceName, initTime, isInFlow, isStatisticsEnable,isFault));
+    public void put(String sequenceName, long initTime, boolean isInFlow,
+                    boolean isStatisticsEnable, boolean isFault) {
+        sequenceStatisticsList.add(new SequenceStatistics(sequenceName, initTime,
+                isInFlow, isStatisticsEnable, isFault));
     }
-   /**
+
+    /**
      * This method used to report the latest  statistics to the StatisticsCollector
+     *
      * @param statisticsCollector
      * @param isFault
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-       int top = sequenceStatisticsList.size();
-       if (top > 0) {
-           popSequenceStatistics(sequenceStatisticsList.size() - 1, statisticsCollector);
-       }
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                            boolean isFault) {
+        int top = sequenceStatisticsList.size();
+        if (top > 0) {
+            popSequenceStatistics(sequenceStatisticsList.size() - 1, statisticsCollector);
+        }
     }
+
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                            boolean isFault, String name) {
+        if (!sequenceStatisticsList.isEmpty()) {
+            for (Iterator seqIterator = sequenceStatisticsList.iterator();
+                 seqIterator.hasNext();) {
+                SequenceStatistics sequenceStatistics =
+                        (SequenceStatistics) seqIterator.next();
+                if (sequenceStatistics != null) {
+                    if (sequenceStatistics.isStatisticsEnable &&
+                            sequenceStatistics.sequenceName != null &&
+                            sequenceStatistics.sequenceName.equals(name)
+                            ) {
+                        statisticsCollector.reportForSequence(sequenceStatistics.sequenceName,
+                                !sequenceStatistics.isInFlow, sequenceStatistics.initTime,
+                                System.currentTimeMillis(), sequenceStatistics.isFault);
+                    }
+                    sequenceStatisticsList.remove(sequenceStatistics);
+                }
+            }
+        }
+    }
+
     /**
      * This method  used to unreported all statistics to the StatisticsCollector
+     *
      * @param statisticsCollector
      * @param isFault
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-        int i = sequenceStatisticsList.size()-1;
-        for (; i >=0; i--) {
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                               boolean isFault) {
+        int i = sequenceStatisticsList.size() - 1;
+        for (; i >= 0; i--) {
             popSequenceStatistics(i, statisticsCollector);
         }
     }
@@ -74,11 +106,14 @@ public class SequenceStatisticsStack implements StatisticsStack {
      */
     private void popSequenceStatistics(int index, StatisticsCollector statisticsCollector) {
         if (index >= 0) {
-            SequenceStatistics sequenceStatistics = (SequenceStatistics) sequenceStatisticsList.get(index);
+            SequenceStatistics sequenceStatistics =
+                    (SequenceStatistics) sequenceStatisticsList.get(index);
             if (sequenceStatistics != null) {
-                if (sequenceStatistics.isStatisticsEnable && sequenceStatistics.sequenceName != null)
-                {
-                    statisticsCollector.reportForSequence(sequenceStatistics.sequenceName, !sequenceStatistics.isInFlow, sequenceStatistics.initTime, System.currentTimeMillis(), sequenceStatistics.isFault);
+                if (sequenceStatistics.isStatisticsEnable &&
+                        sequenceStatistics.sequenceName != null) {
+                    statisticsCollector.reportForSequence(sequenceStatistics.sequenceName,
+                            !sequenceStatistics.isInFlow, sequenceStatistics.initTime,
+                            System.currentTimeMillis(), sequenceStatistics.isFault);
                 }
                 sequenceStatisticsList.remove(index);
             }
@@ -101,7 +136,8 @@ public class SequenceStatisticsStack implements StatisticsStack {
         /** To indicate whether this is fault or not*/
         private boolean isFault;
 
-        public SequenceStatistics(String sequenceName, long initTime, boolean inFlow, boolean statisticsEnable,boolean isFault) {
+        public SequenceStatistics(String sequenceName, long initTime, boolean inFlow,
+                                  boolean statisticsEnable, boolean isFault) {
             this.sequenceName = sequenceName;
             this.initTime = initTime;
             isInFlow = inFlow;

@@ -46,8 +46,10 @@ public class StatisticsCollector {
      * @param outTime        - The processing end time
      * @param isFault        - A boolean value that indicate whether falut has occured or not
      */
-    public void reportForEndPoint(String keyOfStatistic, boolean isResponse, long inTime, long outTime, boolean isFault) {
-        StatisticsHolder statisticsHolder = (StatisticsHolder) endpointStatistics.get(keyOfStatistic);
+    public void reportForEndPoint(String keyOfStatistic, boolean isResponse, long inTime,
+                                  long outTime, boolean isFault) {
+        StatisticsHolder statisticsHolder =
+                (StatisticsHolder) endpointStatistics.get(keyOfStatistic);
         if (statisticsHolder == null) {
             statisticsHolder = new StatisticsHolder();
             statisticsHolder.setKey(keyOfStatistic);
@@ -67,8 +69,10 @@ public class StatisticsCollector {
      * @param outTime        - The processing end time
      * @param isFault        - A boolean value that indicate whether falut has occured or not
      */
-    public void reportForProxyService(String keyOfStatistic, boolean isResponse, long inTime, long outTime, boolean isFault) {
-        StatisticsHolder statisticsHolder = (StatisticsHolder) proxyServicesStatistics.get(keyOfStatistic);
+    public void reportForProxyService(String keyOfStatistic, boolean isResponse, long inTime,
+                                      long outTime, boolean isFault) {
+        StatisticsHolder statisticsHolder =
+                (StatisticsHolder) proxyServicesStatistics.get(keyOfStatistic);
         if (statisticsHolder == null) {
             statisticsHolder = new StatisticsHolder();
             statisticsHolder.setKey(keyOfStatistic);
@@ -87,8 +91,10 @@ public class StatisticsCollector {
      * @param outTime        - The processing end time
      * @param isFault        - A boolean value that indicate whether falut has occured or not
      */
-    public void reportForSequence(String keyOfStatistic, boolean isResponse, long inTime, long outTime, boolean isFault) {
-        StatisticsHolder statisticsHolder = (StatisticsHolder) sequenceStatistics.get(keyOfStatistic);
+    public void reportForSequence(String keyOfStatistic, boolean isResponse, long inTime,
+                                  long outTime, boolean isFault) {
+        StatisticsHolder statisticsHolder =
+                (StatisticsHolder) sequenceStatistics.get(keyOfStatistic);
         if (statisticsHolder == null) {
             statisticsHolder = new StatisticsHolder();
             statisticsHolder.setKey(keyOfStatistic);

@@ -91,8 +91,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
      *
      * @param response         the Axis2 MessageContext that has been received and has to be handled
      * @param synapseOutMsgCtx the corresponding (outgoing) Synapse MessageContext for the above
-     *                         Axis2 MC, that holds Synapse specific information such as the error handler stack and
-     *                         local properties etc.
+     *                         Axis2 MC, that holds Synapse specific information such as the error
+     *                         handler stack and local properties etc.
      */
     private void handleMessage(MessageContext response,
                                org.apache.synapse.MessageContext synapseOutMsgCtx) {
@@ -104,13 +104,11 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
             if (faultStack != null && !faultStack.isEmpty()) {
-
                 SOAPFault fault = response.getEnvelope().getBody().getFault();
                 Exception e = fault.getException();
                 if (e == null) {
                     e = new Exception(fault.toString());
                 }
-
                 // set an error code to the message context, so that error sequences can filter
                 // using that property to determine the cause of error
                 synapseOutMsgCtx.setProperty("error-code", Constants.SENDING_FAULT);
@@ -126,7 +124,6 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             if (!faultStack.isEmpty() && faultStack.peek() instanceof Endpoint) {
                 faultStack.pop();
             }
-
             if (log.isDebugEnabled()) {
                 log.debug("Synapse received an asynchronous response message");
                 log.debug("Received To: " +
@@ -135,7 +132,6 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         (response.getSoapAction() != null ? response.getSoapAction() : "null"));
                 log.debug("Body : \n" + response.getEnvelope());
             }
-
             MessageContext axisOutMsgCtx =
                     ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext();
 
@@ -203,7 +199,6 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         for (int i = 0; i < relates.length; i++) {
             RelatesTo current = relates[i];
             boolean found = false;
-
             for (int j = 0; j < newRelates.length && j < insertPos; j++) {
                 if (newRelates[j].equals(current) ||
                         newRelates[j].getValue().equals(current.getValue())) {
@@ -211,7 +206,6 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                     break;
                 }
             }
-
             if (!found) {
                 newRelates[insertPos++] = current;
             }

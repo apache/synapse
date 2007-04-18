@@ -60,7 +60,7 @@ public class CreateSequenceRefusedInboundFaultTest extends SandeshaTestCase {
 	 * operation.
 	 * @throws Exception
 	 */
-	public void _testSOAP11CreateSequenceRefusedInboundFault () throws Exception {
+	public void testSOAP11CreateSequenceRefusedInboundFault () throws Exception {
 		runTest(false);
 	}
 

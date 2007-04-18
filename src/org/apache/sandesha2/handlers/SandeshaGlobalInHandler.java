@@ -40,6 +40,7 @@ import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
@@ -101,14 +102,28 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 					}
 				}
 			}
-
 		}
     
     // Check if this is an application message and if it is a duplicate
     RMMsgContext rmMsgCtx = MsgInitializer.initializeMessage(msgContext);
-    
+
     // Set the RMMMessageContext as a property on the message so we can retrieve it later
     msgContext.setProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT, rmMsgCtx);
+
+    
+    StorageManager storageManager = 
+      SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getConfigurationContext(), 
+          rmMsgCtx.getConfigurationContext().getAxisConfiguration());
+    
+    Transaction transaction = storageManager.getTransaction();
+    try {    	    
+	    //processing any incoming faults.     
+			//This is responsible for Sandesha2 specific 
+			FaultManager.processMessagesForFaults(rmMsgCtx);
+    }
+		finally {
+			transaction.commit();
+		}
 
     if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
       processApplicationMessage(rmMsgCtx);

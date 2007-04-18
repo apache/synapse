@@ -157,6 +157,8 @@ public class ProxyServiceFactory {
                 OMElement outSequenceElement = target.getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "outSequence"));
                 if (outSequenceElement != null) {
                     proxy.setTargetInLineOutSequence(mediatorFactory.createAnonymousSequence(outSequenceElement));
+                } else {
+                    handleException("Target for the proxy service must declare an out sequence");
                 }
             }
             OMAttribute faultSequence = target.getAttribute(new QName(Constants.NULL_NAMESPACE, "faultSequence"));

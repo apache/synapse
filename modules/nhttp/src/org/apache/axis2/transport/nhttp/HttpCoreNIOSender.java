@@ -291,8 +291,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         HttpResponse response = worker.getResponse();
 
         OMOutputFormat format = Util.getOMOutputFormat(msgContext);
-
-        response.setHeader(HTTP.CONTENT_TYPE, Util.getContentType(msgContext) + "; charset=" + format.getCharSetEncoding());
+        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        response.setHeader(
+            HTTP.CONTENT_TYPE,
+            messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
         // set any transport headers
         Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
@@ -309,9 +311,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         worker.getServiceHandler().commitResponse(worker.getConn(), response);
 
         OutputStream out = worker.getOutputStream();
-        format.setDoOptimize(msgContext.isDoingMTOM());
-        try {            
-            MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        try {
             messageFormatter.writeTo(msgContext, format, out, false);
             out.close();
         } catch (IOException e) {

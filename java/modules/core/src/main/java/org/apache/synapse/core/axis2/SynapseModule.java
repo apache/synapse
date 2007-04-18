@@ -76,8 +76,7 @@ public class SynapseModule implements Module {
             }
         } catch (UnknownHostException e) {
             log.warn("Unable to report hostname or IP address for tracing", e);
-        }
-
+        }   
         // Initializing the SynapseEnvironment and SynapseConfiguration
         log.info("Initializing the Synapse configuration ...");
         SynapseConfiguration synCfg = initializeSynapse(configurationContext);

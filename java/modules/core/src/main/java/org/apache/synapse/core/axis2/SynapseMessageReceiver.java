@@ -48,16 +48,19 @@ public class SynapseMessageReceiver implements MessageReceiver {
         }
 
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
-
         try {
-            StatisticsStack synapseServiceStack = (StatisticsStack) synCtx.getProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
+            StatisticsStack synapseServiceStack =
+                    (StatisticsStack) synCtx.getProperty(
+                            org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
             if (synapseServiceStack == null) {
                 synapseServiceStack = new ProxyServiceStatisticsStack();
-                synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK, synapseServiceStack);
+                synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK,
+                        synapseServiceStack);
             }
             String name = "SynapseService";
             boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-            synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(), true, isFault);
+            synapseServiceStack.put(name, System.currentTimeMillis(), !synCtx.isResponse(),
+                    true, isFault);
 
             // invoke synapse message mediation
             synCtx.getEnvironment().injectMessage(synCtx);

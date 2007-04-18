@@ -20,24 +20,21 @@ package org.apache.synapse.statistics.impl;
 
 import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.StatisticsCollector;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
- * The data structure to hold statistics related to the end points
+ * The data structure to hold statistics related to the endpoints
  *
  */
 
 public class EndPointStatisticsStack implements StatisticsStack {
 
-    /** The name of the endpoint */
-    private String endPointName;
-    /** The time which starts to collect statistics */
-    private long initTime;
-    /** To check whether IN message flow or not */
-    private boolean isInFlow;
-    /** To check whether statistics is enabled or not */
-    private boolean isStatisticsEnable;
-    /** To indicate whether this is fault or not*/
-    private boolean isFault;
+    /** list of endpoint statistics */
+    private ArrayList endpointStatistics;
+    /** To decide whether the reporting of the in flow statistics have been completed*/
+    private boolean isCompleteInFlowStatisicsReport = false;
+
     /**
      * To put statistics
      * @param key                   - The name of the End Point
@@ -46,12 +43,13 @@ public class EndPointStatisticsStack implements StatisticsStack {
      * @param isStatisticsEnable
      * @param isFault
      */
-    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable,boolean isFault) {
-        this.endPointName = key;
-        this.initTime = initTime;
-        this.isInFlow = isInFlow;
-        this.isStatisticsEnable = isStatisticsEnable;
-        this.isFault = isFault;
+    public void put(String key, long initTime, boolean isInFlow, boolean isStatisticsEnable,
+                    boolean isFault) {
+        if (endpointStatistics == null) {
+            endpointStatistics = new ArrayList();
+        }
+        endpointStatistics.add(
+                new EndPointStatistics(key, initTime, isInFlow, isStatisticsEnable, isFault));
     }
 
     /**
@@ -59,10 +57,66 @@ public class EndPointStatisticsStack implements StatisticsStack {
      * @param statisticsCollector
      * @param isFault
      */
-    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-        if (isStatisticsEnable && endPointName!=null) {
-            statisticsCollector.reportForEndPoint(endPointName, !isInFlow, initTime, System.currentTimeMillis(), isFault);
-            endPointName =null;
+
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                            boolean isFault) {
+        if (endpointStatistics != null && !endpointStatistics.isEmpty()) {
+            EndPointStatistics statistics =
+                    (EndPointStatistics) endpointStatistics.get(
+                            endpointStatistics.size() - 1);
+            if (statistics != null && statistics.isStatisticsEnable &&
+                    statistics.endPointName != null) {
+                if (statistics.inTimeForInFlow != -1) {
+                    long initTimeForOutFlow = System.currentTimeMillis();
+                    statisticsCollector.reportForEndPoint(statistics.endPointName,
+                            false, statistics.inTimeForInFlow,
+                            initTimeForOutFlow, isFault);
+                    statistics.inTimeForInFlow = -1;
+                    statistics.inTimeForOutFlow = initTimeForOutFlow;
+                } else if (statistics.inTimeForOutFlow != -1 &&
+                        isCompleteInFlowStatisicsReport) {
+                    statisticsCollector.reportForEndPoint(statistics.endPointName,
+                            true, statistics.inTimeForOutFlow,
+                            System.currentTimeMillis(), isFault);
+                    endpointStatistics.remove(statistics);
+                }
+            }
+        }
+    }
+
+    /**
+     * Report a particular statistics to the StatisticsCollector
+     * @param statisticsCollector
+     * @param isFault
+     * @param name
+     */
+    public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                            boolean isFault, String name) {
+        if (endpointStatistics != null && !endpointStatistics.isEmpty()) {
+            for (Iterator epIterator = endpointStatistics.iterator();
+                 epIterator.hasNext();) {
+                Object statisticsObj = epIterator.next();
+                if (statisticsObj instanceof EndPointStatistics) {
+                    EndPointStatistics statistics = (EndPointStatistics) statisticsObj;
+                    if (statistics.isStatisticsEnable && statistics.endPointName != null &&
+                            statistics.endPointName.equals(name)) {
+                        if (statistics.inTimeForInFlow != -1) {
+                            long initTimeForOutFlow = System.currentTimeMillis();
+                            statisticsCollector.reportForEndPoint(statistics.endPointName,
+                                    false, statistics.inTimeForInFlow,
+                                    initTimeForOutFlow, isFault);
+                            statistics.inTimeForInFlow = -1;
+                            statistics.inTimeForOutFlow = initTimeForOutFlow;
+                        } else if (statistics.inTimeForOutFlow != -1 &&
+                                isCompleteInFlowStatisicsReport) {
+                            statisticsCollector.reportForEndPoint(statistics.endPointName,
+                                    true, statistics.inTimeForOutFlow,
+                                    System.currentTimeMillis(), isFault);
+                            endpointStatistics.remove(statistics);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -70,7 +124,57 @@ public class EndPointStatisticsStack implements StatisticsStack {
      * This method  used to unreported all statistics to the StatisticsCollector
      * @param statisticsCollector
      */
-    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,boolean isFault) {
-        reportToStatisticsCollector(statisticsCollector,isFault);
+    public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,
+                                               boolean isFault) {
+        if (endpointStatistics != null && !endpointStatistics.isEmpty()) {
+            for (Iterator epIterator = endpointStatistics.iterator();
+                 epIterator.hasNext();) {
+                Object statisticsObj = epIterator.next();
+                if (statisticsObj instanceof EndPointStatistics) {
+                    EndPointStatistics statistics = (EndPointStatistics) statisticsObj;
+                    if (statistics.isStatisticsEnable && statistics.endPointName != null) {
+                        if (statistics.inTimeForInFlow != -1) {
+                            long initTimeForOutFlow = System.currentTimeMillis();
+                            statisticsCollector.reportForEndPoint(statistics.endPointName,
+                                    false, statistics.inTimeForInFlow,
+                                    initTimeForOutFlow, isFault);
+                            statistics.inTimeForInFlow = -1;
+                            statistics.inTimeForOutFlow = initTimeForOutFlow;
+                        } else if (statistics.inTimeForOutFlow != -1 &&
+                                isCompleteInFlowStatisicsReport) {
+                            statisticsCollector.reportForEndPoint(statistics.endPointName,
+                                    true, statistics.inTimeForOutFlow,
+                                    System.currentTimeMillis(), isFault);
+                            endpointStatistics.remove(statistics);
+                        }
+                    }
+                }
+            }
+        }
+        isCompleteInFlowStatisicsReport = true;
+    }
+
+    class EndPointStatistics {
+
+        /** The name of the endpoint    */
+        private String endPointName;
+         /** To check whether IN message flow or not   */
+        private boolean isStatisticsEnable;
+        /** To indicate whether this is fault or not  */
+        private boolean isFault;
+        /** The time which starts to collect statistics for IN flow */
+        private long inTimeForInFlow = -1;
+        /** The time which starts to collect statistics for OUT flow */
+        private long inTimeForOutFlow = -1;
+
+        public EndPointStatistics(String endPointName, long initTime, boolean inFlow,
+                                  boolean statisticsEnable, boolean fault) {
+            if (inFlow) {
+                this.endPointName = endPointName;
+                this.inTimeForInFlow = initTime;
+                isStatisticsEnable = statisticsEnable;
+                isFault = fault;
+            }
+        }
     }
 }

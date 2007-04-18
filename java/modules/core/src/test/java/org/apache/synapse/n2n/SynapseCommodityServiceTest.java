@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -130,8 +131,9 @@ public class SynapseCommodityServiceTest extends TestCase {
 
         assertNotNull(response);
 
-        OMElement returnEle = response.getFirstElement().getFirstElement().
-            getFirstChildWithName(new QName("return"));
+        AXIOMXPath xPath = new AXIOMXPath("//return");
+        xPath.addNamespace("ns","http://services.samples/xsd");
+        OMElement returnEle = (OMElement) xPath.selectSingleNode(response);
 
         assertNotNull(returnEle);
 

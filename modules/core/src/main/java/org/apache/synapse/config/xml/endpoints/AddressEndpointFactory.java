@@ -129,14 +129,27 @@ public class AddressEndpointFactory implements EndpointFactory {
                 org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "optimize"));
 
         EndpointDefinition endpoint = new EndpointDefinition();
-
+        OMAttribute statistics = elem.getAttribute(
+                new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,
+                        org.apache.synapse.config.xml.Constants.STATISTICS_ATTRIB_NAME));
+        if (statistics != null) {
+            String statisticsValue = statistics.getAttributeValue();
+            if (statisticsValue != null) {
+                if (org.apache.synapse.config.xml.Constants.STATISTICS_ENABLE.equals(
+                        statisticsValue)) {
+                    endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
+                } else if (org.apache.synapse.config.xml.Constants.STATISTICS_DISABLE.equals(
+                        statisticsValue)) {
+                    endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                }
+            }
+        }
         if (address != null) {
             endpoint.setAddress(address.getAttributeValue());
         } else {
             handleException("One of the 'address' or 'ref' attributes are required in an "
                     + "anonymous endpoint");
         }
-
         if (format != null)
         {
             String forceValue = format.getAttributeValue().trim().toLowerCase();
@@ -171,7 +184,6 @@ public class AddressEndpointFactory implements EndpointFactory {
                 }
             }
         }
-
         OMElement wsSec = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableSec"));
         if (wsSec != null) {
@@ -192,7 +204,6 @@ public class AddressEndpointFactory implements EndpointFactory {
                 endpoint.setWsRMPolicyKey(policy.getAttributeValue());
             }
         }
-
         // set the timeout configuration
         OMElement timeout = elem.getFirstChildWithName(new QName(
                 org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "timeout"));

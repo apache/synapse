@@ -81,18 +81,31 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
         String eprAddress = null;
         if (endpointDefinition.getAddress() != null) {
             eprAddress = endpointDefinition.getAddress().toString();
-
             String endPointName = this.getName();
-
-            // Setting Required property to collect the End Point statistics
-            boolean statisticsEnable = (org.apache.synapse.Constants.STATISTICS_ON == endpointDefinition.getStatisticsEnable());
-            if (endPointName != null && statisticsEnable) {
-                EndPointStatisticsStack endPointStatisticsStack = new EndPointStatisticsStack();
-                boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                endPointStatisticsStack.put(endPointName, System.currentTimeMillis(), !synCtx.isResponse(), statisticsEnable,isFault);
-                synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK, endPointStatisticsStack);
+            if (endPointName == null) {
+                endPointName = Constants.ANONYMOUS_ENDPOINTS;
             }
-
+            // Setting Required property to collect the End Point statistics
+            boolean statisticsEnable =
+                    (org.apache.synapse.Constants.STATISTICS_ON
+                            == endpointDefinition.getStatisticsEnable());
+            if (statisticsEnable) {
+                EndPointStatisticsStack endPointStatisticsStack = null;
+                Object statisticsStackObj =
+                        synCtx.getProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK);
+                if (statisticsStackObj == null) {
+                    endPointStatisticsStack = new EndPointStatisticsStack();
+                    synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK,
+                            endPointStatisticsStack);
+                } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
+                    endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
+                }
+                if (endPointStatisticsStack != null) {
+                    boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+                    endPointStatisticsStack.put(endPointName, System.currentTimeMillis(),
+                            !synCtx.isResponse(), statisticsEnable, isFault);
+                }
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Sending message to endpoint :: name = " +
                         endPointName + " resolved address = " + eprAddress);

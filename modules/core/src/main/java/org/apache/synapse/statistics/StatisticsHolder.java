@@ -44,7 +44,8 @@ public class StatisticsHolder {
      * @param outTime    - The processing end time
      * @param isFault    - A boolean value that indicate whether falut has occured or not
      */
-    public synchronized void update(boolean isResponse, long inTime, long outTime, boolean isFault) {
+    public synchronized void update(boolean isResponse, long inTime, long outTime,
+                                    boolean isFault) {
         if (isResponse) {
             if (outFlowStatistics == null) {
                 outFlowStatistics = new Statistics();

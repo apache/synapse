@@ -43,6 +43,8 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.OutTransportInfo;
 import org.apache.axis2.transport.TransportSender;
+import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.MessageFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
@@ -308,13 +310,10 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         OutputStream out = worker.getOutputStream();
         format.setDoOptimize(msgContext.isDoingMTOM());
-        try {
-            (msgContext.isDoingREST() ?
-                msgContext.getEnvelope().getBody().getFirstElement() : msgContext.getEnvelope())
-                .serializeAndConsume(out, format);
+        try {            
+            MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+            messageFormatter.writeTo(msgContext, format, out, false);
             out.close();
-        } catch (XMLStreamException e) {
-            handleException("Error serializing response message", e);
         } catch (IOException e) {
             handleException("IO Error sending response message", e);
         }

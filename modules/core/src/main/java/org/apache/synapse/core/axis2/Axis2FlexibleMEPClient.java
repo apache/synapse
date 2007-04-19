@@ -252,11 +252,13 @@ public class Axis2FlexibleMEPClient {
         // if the original request carries any attachments, copy them to the clone
         // as well, except for the soap part if any
         Attachments attachments = ori.getAttachmentMap();
-        String[] cIDs = attachments.getAllContentIDs();
-        String soapPart = attachments.getSOAPPartContentID();
-        for (int i=0; i<cIDs.length; i++) {
-            if (!cIDs[i].equals(soapPart)) {
-                newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
+        if (attachments != null && attachments.getAllContentIDs().length > 0) {
+            String[] cIDs = attachments.getAllContentIDs();
+            String soapPart = attachments.getSOAPPartContentID();
+            for (int i=0; i<cIDs.length; i++) {
+                if (!cIDs[i].equals(soapPart)) {
+                    newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
+                }
             }
         }
 

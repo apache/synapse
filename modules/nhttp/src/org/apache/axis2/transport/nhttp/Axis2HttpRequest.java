@@ -163,8 +163,16 @@ public class Axis2HttpRequest {
 
         log.debug("start streaming outgoing http request");
         OutputStream out = Channels.newOutputStream(pipe.sink());
-        messageFormatter.writeTo(msgContext, format, out, false);
-        try {
+
+        if (format == null) {
+            format = Util.getOMOutputFormat(msgContext);
+        }
+        if (messageFormatter == null) {
+            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        }
+
+        messageFormatter.writeTo(msgContext, format, out, true);
+            try {
             out.flush();
             out.close();
         } catch (IOException e) {

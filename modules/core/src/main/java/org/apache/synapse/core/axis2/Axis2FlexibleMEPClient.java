@@ -44,6 +44,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.attachments.Attachments;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -93,7 +94,18 @@ public class Axis2FlexibleMEPClient {
             wsAddressingEnabled = endpoint.isAddressingOn() || wsSecurityEnabled || wsRMEnabled;
         }
 
-        log.debug("sending [add = "+wsAddressingEnabled+"] [sec = "+wsSecurityEnabled + "] [ rm = "+wsRMEnabled+"] [ to "+synapseOutMessageContext.getTo()+"]");
+        if (log.isDebugEnabled()) {
+            log.debug(
+                "sending [add = " + wsAddressingEnabled +
+                "] [sec = " + wsSecurityEnabled +
+                "] [rm = " + wsRMEnabled +
+                (endpoint != null ?
+                    "] [ mtom = " + endpoint.isUseMTOM() +
+                    "] [ swa = " + endpoint.isUseSwa() +
+                    "] [ force soap=" + endpoint.isForceSOAP() +
+                    "; pox=" + endpoint.isForcePOX() : "") +
+                "] [ to " + synapseOutMessageContext.getTo() + "]");
+        }
 
         // save the original message context wihout altering it, so we can tie the response
         MessageContext originalInMsgCtx = ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();
@@ -124,13 +136,15 @@ public class Axis2FlexibleMEPClient {
                 axisOutMsgCtx.setProperty(
                         org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
                         org.apache.axis2.Constants.VALUE_TRUE);
+                axisOutMsgCtx.setDoingMTOM(true);
 
             } else if (endpoint.isUseSwa()) {
                 axisOutMsgCtx.setDoingSwA(true);
                 // fix / workaround for AXIS2-1798
                 axisOutMsgCtx.setProperty(
-                        org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                        org.apache.axis2.Constants.Configuration.ENABLE_SWA,
                         org.apache.axis2.Constants.VALUE_TRUE);
+                axisOutMsgCtx.setDoingSwA(true);
             }
 
             if (endpoint.isUseSeparateListener()) {
@@ -233,6 +247,19 @@ public class Axis2FlexibleMEPClient {
 
         newMC.setDoingREST(ori.isDoingREST());
         newMC.setDoingMTOM(ori.isDoingMTOM());
+        newMC.setDoingSwA(ori.isDoingSwA());
+
+        // if the original request carries any attachments, copy them to the clone
+        // as well, except for the soap part if any
+        Attachments attachments = ori.getAttachmentMap();
+        String[] cIDs = attachments.getAllContentIDs();
+        String soapPart = attachments.getSOAPPartContentID();
+        for (int i=0; i<cIDs.length; i++) {
+            if (!cIDs[i].equals(soapPart)) {
+                newMC.addAttachment(cIDs[i], attachments.getDataHandler(cIDs[i]));
+            }
+        }
+
         newMC.setServerSide(false);
 
         // set SOAP envelope on the message context, removing WS-A headers

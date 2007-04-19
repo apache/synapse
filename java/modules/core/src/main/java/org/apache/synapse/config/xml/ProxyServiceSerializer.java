@@ -106,7 +106,7 @@ public class ProxyServiceSerializer {
             OMElement epElement = serializer.serializeEndpoint(inLineEndpoint);
             target.addChild(epElement);            
             proxy.addChild(target);
-        } else {
+        }
             String inSeq = service.getTargetInSequence();
             String outSeq = service.getTargetOutSequence();
             String faultSeq = service.getTargetFaultSequence();
@@ -148,7 +148,7 @@ public class ProxyServiceSerializer {
                 }
             }
 
-        }
+        
 
         String wsdlKey = service.getWSDLKey();
         URI wsdlUri = service.getWsdlURI();

@@ -16,34 +16,28 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package samples.services;
 
-public class PlaceOrder {
-    String symbol;
-    int quantity;
-    double price;
+public class GetMarketActivityResponse {
 
-    public String getSymbol() {
-        return symbol;
+    GetQuoteResponse[] quotes = null;
+
+    public GetMarketActivityResponse() {
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public GetMarketActivityResponse(String[] symbols) {
+        quotes = new GetQuoteResponse[symbols.length];
+        for (int i=0; i<symbols.length; i++) {
+            quotes[i] = new GetQuoteResponse(symbols[i]);
+        }
     }
 
-    public int getQuantity() {
-        return quantity;
+    public GetQuoteResponse[] getQuotes() {
+        return quotes;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
+    public void setQuotes(GetQuoteResponse[] quotes) {
+        this.quotes = quotes;
     }
 }

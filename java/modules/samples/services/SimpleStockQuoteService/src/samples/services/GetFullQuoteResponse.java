@@ -18,21 +18,27 @@
  */
 package samples.services;
 
-public class GetQuote {
-    String symbol;
+public class GetFullQuoteResponse {
 
-    public GetQuote() {
+    private static final int COUNT = 365;
+    TradingDay[] tradeHistory = null;
+
+    public GetFullQuoteResponse() {
     }
 
-    public GetQuote(String symbol) {
-        this.symbol = symbol;
+    public GetFullQuoteResponse(String symbol) {
+        tradeHistory = new TradingDay[COUNT];
+        for (int i=0; i<COUNT; i++) {
+            tradeHistory[i] = new TradingDay(i, new GetQuoteResponse(symbol));
+        }
     }
 
-    public String getSymbol() {
-        return symbol;
+    public TradingDay[] getTradeHistory() {
+        return tradeHistory;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public void setTradeHistory(TradingDay[] tradeHistory) {
+        this.tradeHistory = tradeHistory;
     }
+
 }

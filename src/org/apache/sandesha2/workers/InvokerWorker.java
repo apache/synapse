@@ -96,17 +96,22 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					msgToInvoke.setPaused(false);
 					engine.resumeReceive(msgToInvoke);
 				}
+				
+				if(transaction!=null){
+					transaction.commit();
+					transaction = storageManager.getTransaction();
+				}
 
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception :", e);
-
+				if(transaction!=null){
+					transaction.rollback();
+					transaction = storageManager.getTransaction();
+				}
 				handleFault(msgToInvoke, e);
 			}
 
-
-
-			
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -134,7 +139,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					return;
 				}
 			}
-			
 			
 			if(!ignoreNextMsg){
 				// updating the next msg to invoke

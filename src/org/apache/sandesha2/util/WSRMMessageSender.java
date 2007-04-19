@@ -70,10 +70,11 @@ public class WSRMMessageSender  {
 		internalSequenceID = 
 			(String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
 		
+		toAddress = rmMsgCtx.getTo().getAddress();
+		sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+		
 		if(internalSequenceID==null)
 		{
-			toAddress = rmMsgCtx.getTo().getAddress();
-			sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
 			internalSequenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);			
 		}
 

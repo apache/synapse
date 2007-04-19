@@ -152,6 +152,19 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             // If request is REST assume that the response is REST too
             response.setDoingREST(axisOutMsgCtx.isDoingREST());
+            if (axisOutMsgCtx.isDoingMTOM()) {
+                response.setDoingMTOM(true);
+                response.setProperty(
+                        org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+                        org.apache.axis2.Constants.VALUE_TRUE);
+            }
+            if (axisOutMsgCtx.isDoingSwA()) {
+                response.setDoingSwA(true);
+                response.setProperty(
+                        org.apache.axis2.Constants.Configuration.ENABLE_SWA,
+                        org.apache.axis2.Constants.VALUE_TRUE);
+            }
+
             if (axisOutMsgCtx.getMessageID() != null) {
                 response.setRelationships(
                         new RelatesTo[]{new RelatesTo(axisOutMsgCtx.getMessageID())});

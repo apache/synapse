@@ -235,6 +235,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             headers.remove(HTTP.SERVER_DIRECTIVE);
             headers.remove(HTTP.CONTENT_TYPE);
             headers.remove(HTTP.CONTENT_LEN);
+            headers.remove(HTTP.USER_AGENT);
         }
     }
 
@@ -312,7 +313,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         OutputStream out = worker.getOutputStream();
         try {
-            messageFormatter.writeTo(msgContext, format, out, false);
+            messageFormatter.writeTo(msgContext, format, out, true);
             out.close();
         } catch (IOException e) {
             handleException("IO Error sending response message", e);

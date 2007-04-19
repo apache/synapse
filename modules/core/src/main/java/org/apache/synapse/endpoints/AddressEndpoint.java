@@ -171,7 +171,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         if (endpoint.getAddress() != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Sending message to endpoint :: name = " +
-                        endPointName + " resolved address = " + endpoint.getAddress().toString());
+                        endPointName + " resolved address = " + endpoint.getAddress());
                 log.debug("Sending To: " + (synCtx.getTo() != null ?
                         synCtx.getTo().getAddress() : "null"));
                 log.debug("SOAPAction: " + (synCtx.getSoapAction() != null ?

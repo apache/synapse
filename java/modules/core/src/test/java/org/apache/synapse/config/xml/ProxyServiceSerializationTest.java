@@ -38,7 +38,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
     }
 
     public void testProxyServiceSerializationSenarioTwo() throws Exception {
-        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" startOnLoad=\"true\" name=\"name\"  transports=\"http\"><description>description</description><target endpoint=\"epr\" /><publishWSDL key=\"key\"></publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
+        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" startOnLoad=\"true\" name=\"name\"  transports=\"http\"><description>description</description><target endpoint=\"epr\" outSequence=\"out\"/><publishWSDL key=\"key\"></publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
@@ -46,7 +46,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
     }
 
     public void testProxyServiceSerializationSenarioThree() throws Exception {
-        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" name=\"name\" startOnLoad=\"true\"  transports=\"http\"><description>description</description><target><inSequence onError=\"ref\"><send/></inSequence></target><publishWSDL  key=\"key\"></publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
+        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" name=\"name\" startOnLoad=\"true\"  transports=\"http\"><description>description</description><target><inSequence onError=\"ref\"><send/></inSequence><outSequence><send/></outSequence></target><publishWSDL  key=\"key\"></publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);
@@ -62,7 +62,7 @@ public class ProxyServiceSerializationTest extends AbstractTestCase {
 //        assertTrue(comparator.compare(resultOM, inputOM));
 //    }
     public void testProxyServiceSerializationSenarioFive() throws Exception {
-        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" startOnLoad=\"true\" name=\"name\"  transports=\"http\"><description>description</description><target><endpoint><address uri=\"http://www.example.com/testepr\"/></endpoint></target><publishWSDL uri=\"http://uri\"></publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
+        String inputXml = "<proxy xmlns=\"http://ws.apache.org/ns/synapse\" startOnLoad=\"true\" name=\"name\"  transports=\"http\"><description>description</description><target><endpoint><address uri=\"http://www.example.com/testepr\"/></endpoint><outSequence><send/></outSequence></target><publishWSDL uri=\"http://uri\"></publishWSDL><policy key=\"key\"/><parameter name=\"para\">text</parameter></proxy>";
         OMElement inputOM = createOMElement(inputXml);
         ProxyService proxy = ProxyServiceFactory.createProxy(inputOM);
         OMElement resultOM = ProxyServiceSerializer.serializeProxy(null, proxy);     

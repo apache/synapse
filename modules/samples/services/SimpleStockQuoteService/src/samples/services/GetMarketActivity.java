@@ -16,21 +16,24 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package samples.services;
-import java.util.Date;
 
-public class SimpleStockQuoteService {
+public class GetMarketActivity {
+    String[] symbols;
 
-    // in-out
-    public GetQuoteResponse getQuote(GetQuote request) {
-        System.out.println(new Date() + " SimpleStockQuoteService 1 :: Generating quote for : " + request.getSymbol());
-        return new GetQuoteResponse(request.getSymbol());
+    public GetMarketActivity() {
     }
 
-    // in only
-    public void placeOrder(PlaceOrder order) {
-        System.out.println(new Date() + " SimpleStockQuoteService 1 :: Accepted order for : " +
-            order.getQuantity() + " stocks of " + order.getSymbol() +
-            " at $ " + order.getPrice());
+    public GetMarketActivity(String[] symbols) {
+        this.symbols = symbols;
+    }
+
+    public String[] getSymbols() {
+        return symbols;
+    }
+
+    public void setSymbols(String[] symbols) {
+        this.symbols = symbols;
     }
 }

@@ -16,15 +16,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package samples.services;
 
-public class GetQuote {
+public class GetFullQuote {
     String symbol;
 
-    public GetQuote() {
+    public GetFullQuote() {
     }
 
-    public GetQuote(String symbol) {
+    public GetFullQuote(String symbol) {
         this.symbol = symbol;
     }
 

@@ -16,34 +16,31 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package samples.services;
 
-public class PlaceOrder {
-    String symbol;
-    int quantity;
-    double price;
+public class TradingDay {
+    int day = 0;
+    GetQuoteResponse quote = null;
 
-    public String getSymbol() {
-        return symbol;
+    public TradingDay(int day, GetQuoteResponse quote) {
+        this.day = day;
+        this.quote = quote;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public int getDay() {
+        return day;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public void setDay(int day) {
+        this.day = day;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public GetQuoteResponse getQuote() {
+        return quote;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
+    public void setQuote(GetQuoteResponse quote) {
+        this.quote = quote;
     }
 }

@@ -51,18 +51,19 @@
     </target>
 
     <target name="build-service" depends="compile-all">
-        <property name="SSQ.dir" value="${temp.dir}/MTOMSampleService"/>
+        <property name="SSQ.dir" value="${temp.dir}/SecureStockQuoteService"/>
         <mkdir dir="${SSQ.dir}"/>
 
         <mkdir dir="${SSQ.dir}/META-INF"/>
         <copy file="conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml"/>
+        <copy file="store.jks" tofile="${SSQ.dir}/store.jks"/>
         <copy toDir="${SSQ.dir}">
             <fileset dir="${classes}">
                 <include name="**/*.class"/>
             </fileset>
         </copy>
 
-        <jar destfile="${services}/MTOMSampleService.aar">
+        <jar destfile="${services}/SecureStockQuoteService.aar">
             <fileset dir="${SSQ.dir}"/>
         </jar>
     </target>

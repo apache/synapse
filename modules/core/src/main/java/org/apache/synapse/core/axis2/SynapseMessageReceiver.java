@@ -40,10 +40,17 @@ public class SynapseMessageReceiver implements MessageReceiver {
 
     public void receive(org.apache.axis2.context.MessageContext mc) throws AxisFault {
 
-        log.debug("Synapse received a new message for message mediation...");
-        log.debug("Received To: " + (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
-        log.debug("SOAPAction: " + (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
         if (log.isDebugEnabled()) {
+            log.debug("Synapse received a new message for message mediation...");
+            log.debug("Received To: " + (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
+            log.debug("SOAPAction: " + (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
+            log.debug("WSA-Action: " + (mc.getWSAAction() != null ? mc.getWSAAction() : "null"));
+            String[] cids = mc.getAttachmentMap().getAllContentIDs();
+            if (cids != null && cids.length > 0) {
+                for (int i=0; i<cids.length; i++) {
+                    log.debug("Attachment : " + cids[i]);
+                }
+            }
             log.debug("Body : \n" + mc.getEnvelope());
         }
 

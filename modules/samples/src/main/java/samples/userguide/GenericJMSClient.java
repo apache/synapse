@@ -46,7 +46,7 @@ public class GenericJMSClient {
             app.sendTextMessage(dest, param);
         } else if ("binary".equalsIgnoreCase(type)) {
             app.sendBytesMessage(dest, getBytesFromFile(param));
-        } else if ("xml".equalsIgnoreCase(type)) {
+        } else if ("pox".equalsIgnoreCase(type)) {
             app.sendTextMessage(dest, 
                 "<m:placeOrder xmlns:m=\"http://services.samples/xsd\">\n" +
                 "    <m:order>\n" +

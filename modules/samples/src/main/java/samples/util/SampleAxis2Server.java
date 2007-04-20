@@ -42,7 +42,7 @@ public class SampleAxis2Server {
 
     int port = -1;
 
-    public static int DEFAULT_PORT = 8080;
+    public static int DEFAULT_PORT = 9000;
 
 
     /**
@@ -85,13 +85,13 @@ public class SampleAxis2Server {
 		log.info("[SimpleAxisServer] Starting");
 		if (repoOption != null) {
 			repoLocation = repoOption.getOptionValue();
-			System.out.println("[SimpleAxisServer] Using the Axis2 Repository"
+			System.out.println("[SimpleAxisServer] Using the Axis2 Repository : "
 					+ new File(repoLocation).getAbsolutePath());
 		}
 		if (confOption != null) {
 			confLocation = confOption.getOptionValue();
 			System.out
-					.println("[SimpleAxisServer] Using the Axis2 Configuration File"
+					.println("[SimpleAxisServer] Using the Axis2 Configuration File : "
 							+ new File(confLocation).getAbsolutePath());
 		}
 
@@ -123,11 +123,11 @@ public class SampleAxis2Server {
                     new Integer(port);
                     trsIn.getParameter("port").setValue(port);
                 } catch (NumberFormatException e) {
-                    log.error("Given port is not a valid integer. Using 9001 for port.");
-                    trsIn.getParameter("port").setValue("9001");
+                    log.error("Given port is not a valid integer. Using 9000 for port.");
+                    trsIn.getParameter("port").setValue("9000");
                 }
             } else {
-                trsIn.getParameter("port").setValue("9001");
+                trsIn.getParameter("port").setValue("9000");
             }
         }
 

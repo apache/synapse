@@ -17,25 +17,23 @@
  *  under the License.
  */
 
-package samples.userguide;
+package samples.services;
 
-import samples.common.Util;
+public class GetFullQuote {
+    String symbol;
 
-public class CustomStockQuoteClient {
+    public GetFullQuote() {
+    }
 
-    public static void main(String[] args) {
+    public GetFullQuote(String symbol) {
+        this.symbol = symbol;
+    }
 
-        String symbol = "IBM";
-        String xurl   = "http://localhost:9000/axis2/services/SimpleStockQuoteService";
-        String turl   = "http://localhost:8080";
-        String repo   = "client_repo";
-        String sAction= "urn:getQuote";
+    public String getSymbol() {
+        return symbol;
+    }
 
-        if (args.length > 0) symbol = args[0];
-        if (args.length > 1) xurl   = args[1];
-        if (args.length > 2) turl   = args[2];
-        if (args.length > 3) repo   = args[3];
-
-        Util.testCustomQuote(symbol, sAction, xurl, turl, repo);
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 }

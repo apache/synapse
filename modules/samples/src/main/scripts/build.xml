@@ -19,90 +19,62 @@
 
 <project name="samples" default="help" basedir=".">
     <target name="help">
-        <echo>
-            This script requires Ant 1.5 or higher
+    <echo>
+    ant stockquote
+        Creates and sends a stock quote request. Could execute in 'smart client', 'proxy' and
+        'gateway' modes by specifying WSA, transport and HTTP proxy endpoints/URLs. Optionally
+        a policy (security) could be applied to the requests. The required stock symbol and
+        operation could be specified as follows:
 
-            usage:
-            ant -help
-            display ant help screen
-            ant help
-            display this message
-            ant clean
-            delete the build directory
-            ant compile
-            build the samples
+        examples:
+        ant stockquote
 
-            These client samples are able to send stock quote and order placement messages
+        ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
+            [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
+            [-Daddurl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
+            [-Dtrourl=http://localhost:8080] [-Dprxurl=http://localhost:8080]
+            [-Drepository=client_repo]
+            [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
 
-            ant stockquote
-            This client could be used to act as a 'smart client', by specifying a
-            WS-Addressing EPR directed to the real endpoint, and the transport endpoint
-            set differently
+        Mode :
+            quote          - send a quote request for a single stock
+            customquote    - send a quote request in a custom format
+            fullquote      - get quote reports for a period (i.e. 365 days of the year)
+            placeorder     - place an order for stocks using a one way request
+            marketactivity - get a market activity report (i.e. quotes for multiple symbols)
 
-            examples:
-            ant stockquote
-            ant stockquote [-Dsymbol=IBM]
-            [-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-            [-Dtransporturl=http://localhost:8080] [-Drepository=client_repo]
-            [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
+    ant jmsclient
+        A client which could post a raw JMS text or binary message to a given destination.
 
-            ant proxystockquote
-            A client that could act as a HTTP proxy client
+        examples:
+        ant jmsclient [-Djms_payload="24.34 100 IBM"]
+        ant jmsclient [-Djms_type=pox] [-Djms_dest=dynamicQueues/JMSPoxProxy] [-Djms_payload=MSFT]
+        ant jmsclient [-Djms_type=binary] [-Djms_dest=dynamicQueues/JMSFileUploadProxy]
+            [-Djms_payload=./../../repository/conf/sample/resources/mtom/asf-logo.gif]
 
-            examples:
-            ant proxystockquote
-            ant proxystockquote [-Dsymbol=IBM]
-            [-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-            [-Dtransporturl=http://localhost:8080]
+    ant optimizeclient
+        A client that could send binary content using MTOM and SwA optimizations
 
-            ant dumbstockquote
-            A client that could directly invoke the service on a given endpoint. i.e. as a 'gateway'
-
-            examples:
-            ant dumbstockquote
-            ant dumbstockquote [-Dsymbol=IBM]
-            [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
-            [-Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml]
-
-            ant customquote
-            A client which could send out a stock quote request in a custom format. It is
-            expected to transform this message to a standard request, and the response back as
-            a custom response as expected by this client
-
-            examples:
-            ant customquote
-            ant customquote [-Dsymbol=IBM]
-            [-Durl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
-            [-Dtransporturl=http://localhost:8080]
-
-            ant placeorder
-            A client which could send out a one way message using the Axis2 ServiceClient's
-            fireAndForget() API
-
-            examples:
-            ant placeorder
-            ant placeorder
-            [-Dsymbol=IBM] [-Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy]
-
-            ant jmsclient
-            A client which could post a JMS text or binary message to a given destination.
-
-            examples
-            ant jmsclient
-            [-Ddest=dynamicQueues/JMSTextProxy] [-Dtype=text|binary|xml]
-            [-Dpayload="24.34 100 IBM | MSFT" | "repository\conf\sample\resources\mtom\asf-logo.gif"]
-        </echo>
+        examples:
+        ant optimizeclient [-Dopt_mode=mtom | swa]
+            [-Dopt_url=http://localhost:8080/axis2/services/MTOMSwASampleService]
+            [-Dopt_file=./../../repository/conf/sample/resources/mtom/asf-logo.gif]
+    </echo>
     </target>
 
     <property name="symbol" value="IBM"/>
-    <property name="url" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    <property name="transporturl" value="http://localhost:8080"/>
-    <property name="gatewayurl" value="http://localhost:8080/StockQuote"/>
+    <property name="mode" value="quote"/>
+    <property name="addurl" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    <property name="trpurl" value="http://localhost:8080"/>
+    <property name="prxurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="client_repo"/>
-    <property name="secpolicy" value=""/>
-    <property name="dest" value="dynamicQueues/JMSTextProxy"/>
-    <property name="type" value="text"/> <!-- or "binary" -->
-    <property name="payload" value=""/>
+    <property name="policy" value=""/>
+    <property name="jms_dest" value="dynamicQueues/JMSTextProxy"/>
+    <property name="jms_type" value="text"/>
+    <property name="jms_payload" value=""/>
+    <property name="opt_mode" value="mtom"/>
+    <property name="opt_url" value="http://localhost:8080/axis2/services/MTOMSwASampleService"/>
+    <property name="opt_file" value="./../../repository/conf/sample/resources/mtom/asf-logo.gif"/>
 
     <property name="class.dir" value="target/classes"/>
 
@@ -121,46 +93,30 @@
         <java classname="samples.userguide.StockQuoteClient"
               classpathref="javac.classpath" fork="true">
             <arg value="${symbol}"/>
-            <arg value="${url}"/>
-            <arg value="${transporturl}"/>
+            <arg value="${mode}"/>
+            <arg value="${addurl}"/>
+            <arg value="${trpurl}"/>
+            <arg value="${prxurl}"/>
             <arg value="${repository}"/>
-            <arg value="${secpolicy}"/>
+            <arg value="${policy}"/>
         </java>
     </target>
 
-    <target name="proxystockquote" depends="compile">
-        <java classname="samples.userguide.ProxyStockQuoteClient"
+    <target name="jmsclient" depends="compile">
+        <java classname="samples.userguide.GenericJMSClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${url}"/>
-            <arg value="${transporturl}"/>
+            <arg value="${jms_dest}"/>
+            <arg value="${jms_type}"/>
+            <arg value="${jms_payload}"/>
         </java>
     </target>
 
-    <target name="dumbstockquote" depends="compile">
-        <java classname="samples.userguide.DumbStockQuoteClient"
+    <target name="optimizeclient" depends="compile">
+        <java classname="samples.userguide.MTOMSwAClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${gatewayurl}"/>
-            <arg value="${repository}"/>
-            <arg value="${secpolicy}"/>
-        </java>
-    </target>
-
-    <target name="customquote" depends="compile">
-        <java classname="samples.userguide.CustomStockQuoteClient"
-              classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${url}"/>
-            <arg value="${transporturl}"/>
-        </java>
-    </target>
-
-    <target name="placeorder" depends="compile">
-        <java classname="samples.userguide.PlaceOrderClient"
-              classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${gatewayurl}"/>
+            <arg value="${opt_mode}"/>
+            <arg value="${opt_url}"/>
+            <arg value="${opt_file}"/>
         </java>
     </target>
 
@@ -183,15 +139,6 @@
             <sysproperty key="msg" value="${msg}"/>
             <sysproperty key="t" value="${t}"/>
             <sysproperty key="session" value="${session}"/>            
-        </java>
-    </target>
-
-    <target name="jmsclient" depends="compile">
-        <java classname="samples.userguide.GenericJMSClient"
-              classpathref="javac.classpath" fork="true">
-            <arg value="${dest}"/>
-            <arg value="${type}"/>
-            <arg value="${payload}"/>
         </java>
     </target>
 

@@ -21,13 +21,13 @@
 <service name="SecureStockQuoteService">
 	<module ref="rampart"/>
 	
-	<messageReceivers>
-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only" 
-				class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />
-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out" 
-				class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
-	</messageReceivers>
-	<parameter locked="false" name="ServiceClass">samples.services.SimpleStockQuoteService</parameter>
+    <messageReceivers>
+    <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+            class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />
+    <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+            class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
+    </messageReceivers>
+    <parameter locked="false" name="ServiceClass">samples.services.SimpleStockQuoteService</parameter>
 
 	<wsp:Policy wsu:Id="SigEncr" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
 		<wsp:ExactlyOne>

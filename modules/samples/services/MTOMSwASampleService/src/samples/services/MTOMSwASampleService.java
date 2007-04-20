@@ -71,6 +71,12 @@ public class MTOMSwASampleService {
         response.addChild(image);
         payload.addChild(response);
 
+        MessageContext outMsgCtx = MessageContext.getCurrentMessageContext()
+            .getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+        outMsgCtx.setProperty(
+            org.apache.axis2.Constants.Configuration.ENABLE_MTOM,
+            org.apache.axis2.Constants.VALUE_TRUE);
+
         return payload;
     }
 
@@ -93,6 +99,9 @@ public class MTOMSwASampleService {
 
         MessageContext outMsgCtx = msgCtx.getOperationContext().
             getMessageContext(WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+        outMsgCtx.setProperty(
+            org.apache.axis2.Constants.Configuration.ENABLE_SWA,
+            org.apache.axis2.Constants.VALUE_TRUE);
 
         OMFactory factory = request.getOMFactory();
         OMNamespace ns = factory.createOMNamespace("http://www.apache-synapse.org/test", "m0");
@@ -108,5 +117,26 @@ public class MTOMSwASampleService {
         payload.addChild(response);
 
         return payload;
+    }
+
+    public void oneWayUploadUsingMTOM(OMElement element) throws Exception {
+
+        OMText binaryNode = (OMText) element.getFirstOMChild();
+        DataHandler dataHandler = (DataHandler) binaryNode.getDataHandler();
+        InputStream is = dataHandler.getInputStream();
+
+        File tempFile = File.createTempFile("mtom-", ".gif");
+        FileOutputStream fos = new FileOutputStream(tempFile);
+        BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER);
+
+        byte data[] = new byte[BUFFER];
+        int count;
+        while ((count = is.read(data, 0, BUFFER)) != -1) {
+            dest.write(data, 0, count);
+        }
+
+        dest.flush();
+        dest.close();
+        System.out.println("Wrote to file : " + tempFile.getAbsolutePath());
     }
 }

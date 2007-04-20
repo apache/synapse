@@ -28,7 +28,7 @@
 
         <!-- define a reuseable endpoint definition and use it within config -->
         <endpoint name="stockquote">
-            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
         </endpoint>
 
     </definitions>

@@ -26,12 +26,12 @@
         <sequence name="proxy_1">
             <send>
                 <endpoint>
-                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
                 </endpoint>
             </send>
         </sequence>
 
-        <endpoint name="proxy_2_endpoint" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+        <endpoint name="proxy_2_endpoint" address="http://localhost:9000/soap/SimpleStockQuoteService"/>
 
     </definitions>
 

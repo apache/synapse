@@ -215,7 +215,7 @@ public class LoadbalanceFailoverClient {
 
     private SOAPEnvelope buildSoapEnvelope(String clientID, String value) {
 
-        String targetEPR = "http://localhost:9000/axis2/services/Service1";
+        String targetEPR = "http://localhost:9000/soap/Service1";
         String opration = "sampleOperation";
 
         SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();

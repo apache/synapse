@@ -35,7 +35,7 @@
         ]]></script>
         <send>
             <endpoint>
-                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
             </endpoint>
         </send>
     </sequence>
@@ -44,7 +44,7 @@
         <header name="Action" value="urn:oneWayUploadUsingMTOM"/>
         <send>
             <endpoint>
-                <address uri="http://localhost:9000/axis2/services/MTOMSwASampleService" optimize="mtom"/>
+                <address uri="http://localhost:9000/soap/MTOMSwASampleService" optimize="mtom"/>
             </endpoint>
         </send>
     </sequence>
@@ -53,7 +53,7 @@
         <header name="Action" value="urn:placeOrder"/>
         <send>
             <endpoint>
-                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService" force="soap"/>
             </endpoint>
         </send>
     </sequence>

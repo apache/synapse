@@ -43,7 +43,7 @@ public class MTOMSwAClient {
     
     public static void main(String[] args) throws Exception {
 
-        String targetEPR = "http://localhost:8080/axis2/services/MTOMSwASampleService";
+        String targetEPR = "http://localhost:8080/soap/MTOMSwASampleService";
         String fileName = "./../../repository/conf/sample/resources/mtom/asf-logo.gif";
         String mode = "mtom";
 

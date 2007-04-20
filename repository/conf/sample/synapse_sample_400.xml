@@ -76,7 +76,7 @@
             </throttle:throttle>
             <send>
                 <endpoint>
-                    <address uri="http://localhost:8082/axis2/services/SimpleStockQuoteService"/>
+                    <address uri="http://localhost:8082/soap/SimpleStockQuoteService"/>
                 </endpoint>
             </send>
         </in>

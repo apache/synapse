@@ -21,7 +21,7 @@
 
     <sequence name="commodityQuote">
         <!-- set the To address to the real endpoint -->
-        <header name="To" value="http://127.0.0.1:10101/axis2/services/Services"/>
+        <header name="To" value="http://127.0.0.1:10101/soap/Services"/>
         <header name="Action" value="urn:commodity"/>    
     </sequence>
 

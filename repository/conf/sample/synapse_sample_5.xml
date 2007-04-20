@@ -24,12 +24,12 @@
 
         <!-- define an endpoint for the stock quote service -->
         <endpoint name="simple">
-            <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
         </endpoint>
 
         <!-- define a non-existent endpoint to test error handling -->
         <endpoint name="bogus">
-            <address uri="http://localhost:9009/axis2/services/NonExistentStockQuoteService"/>
+            <address uri="http://localhost:9009/soap/NonExistentStockQuoteService"/>
         </endpoint>
 
         <!-- demonstrate the specification of an error handler sequence for a sequence -->

@@ -23,7 +23,7 @@
     <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
 
     <endpoint name="secure">
-        <address uri="http://localhost:9000/axis2/services/SecureStockQuoteService3">
+        <address uri="http://localhost:9000/soap/SecureStockQuoteService3">
             <enableSec policy="sec_policy"/>
             <enableAddressing/>
         </address>

@@ -50,17 +50,17 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "<endpoint>" +
                     "<loadbalance>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9001/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9001/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9002/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9002/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9003/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9003/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
@@ -90,7 +90,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/axis2/services/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
+                "http://localhost:9001/soap/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
     }
 
     public void testSimpleFailoverSendSerialization() {
@@ -99,17 +99,17 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "<endpoint>" +
                     "<failover>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9001/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9001/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9002/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9002/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9003/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9003/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
@@ -139,7 +139,7 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
 
         AddressEndpoint addressEndpoint = (AddressEndpoint) addresses.get(0);
         assertTrue("URI of address endpoint is not serialized properly",
-                "http://localhost:9001/axis2/services/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
+                "http://localhost:9001/soap/Service1".equals(addressEndpoint.getEndpoint().getAddress()));
     }
 
     public void testNestedLoadbalanceFailoverSendSerialization() {
@@ -148,19 +148,19 @@ public class SendMediatorSerializationTest extends AbstractTestCase {
                 "<endpoint>" +
                     "<loadbalance>" +
                         "<endpoint>" +
-                            "<address uri=\"http://localhost:9001/axis2/services/Service1\">" +
+                            "<address uri=\"http://localhost:9001/soap/Service1\">" +
                                 "<enableAddressing/>" +
                             "</address>" +
                         "</endpoint>" +
                         "<endpoint>" +
                             "<failover>" +
                                 "<endpoint>" +
-                                    "<address uri=\"http://localhost:9002/axis2/services/Service1\">" +
+                                    "<address uri=\"http://localhost:9002/soap/Service1\">" +
                                         "<enableAddressing/>" +
                                     "</address>" +
                                 "</endpoint>" +
                                 "<endpoint>" +
-                                    "<address uri=\"http://localhost:9003/axis2/services/Service1\">" +
+                                    "<address uri=\"http://localhost:9003/soap/Service1\">" +
                                         "<enableAddressing/>" +
                                     "</address>" +
                                 "</endpoint>" +

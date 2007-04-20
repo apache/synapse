@@ -35,7 +35,7 @@
         <in>
             <send>
                 <endpoint>
-                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
                 </endpoint>
             </send>
         </in>

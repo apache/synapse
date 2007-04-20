@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -133,6 +134,56 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		configContext.getAxisConfiguration().addTargetResolver(
 				new TargetResolver() {
 					public void resolveTarget(MessageContext messageContext) {
+						
+						//if Sandesha2 is not engaged we can set the property straight away 
+						
+						boolean engaged = false;
+						
+						//checking weather the module is engaged at the System level
+						AxisConfiguration axisConfiguration = messageContext.getConfigurationContext().getAxisConfiguration();
+						if (axisConfiguration!=null) {
+							Collection modules = axisConfiguration.getEngagedModules();
+							for (Iterator iter = modules.iterator();iter.hasNext();) {
+								String moduleName = (String) iter.next();
+								if (moduleName!=null && moduleName.startsWith (Sandesha2Constants.MODULE_NAME)) {
+									engaged = true;
+								}
+							}
+						}
+						
+						//checking weather the module is engaged at the Service level
+						AxisService service = messageContext.getAxisService();
+						if (service!=null) {
+							Collection modules = service.getEngagedModules();
+							for (Iterator iter = modules.iterator();iter.hasNext();) {
+								AxisModule module = (AxisModule) iter.next();
+								String name = module.getName();
+								if (name!=null && name.startsWith (Sandesha2Constants.MODULE_NAME)) {
+									engaged = true;
+								}
+							}
+						}
+
+						//checking weather the module is engaged at the Operation level
+						AxisOperation operation = messageContext.getAxisOperation();
+						if (operation!=null) {
+							Collection modules = operation.getEngagedModules();
+							for (Iterator iter = modules.iterator();iter.hasNext();) {
+								AxisModule module = (AxisModule) iter.next();
+								String name = module.getName();
+								if (name!=null && name.startsWith (Sandesha2Constants.MODULE_NAME)) {
+									engaged = true;
+								}
+							}
+						}
+						
+						//if the module is not engaed we mark the message as unreliable.
+						if (!engaged) {
+							if(log.isDebugEnabled()) log.debug("Unsetting USE_ASYNC_OPERATIONS for unreliable message");
+							messageContext.setProperty(Constants.Configuration.USE_ASYNC_OPERATIONS, Boolean.FALSE);
+						}
+						
+						//Even when Sandesha2 is engaged this may be marked as unreliable.
 						if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::resolveTarget");
 						if(SandeshaUtil.isMessageUnreliable(messageContext)) {
 							if(log.isDebugEnabled()) log.debug("Unsetting USE_ASYNC_OPERATIONS for unreliable message");

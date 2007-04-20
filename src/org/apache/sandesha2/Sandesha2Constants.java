@@ -471,6 +471,8 @@ public interface Sandesha2Constants {
 		
 	}
 	
+	static final String MODULE_NAME = "sandesha2";
+	
 	static final String IN_HANDLER_NAME = "SandeshaInHandler";
 
 	static final String OUT_HANDLER_NAME = "SandeshaOutHandler";

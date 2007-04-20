@@ -27,7 +27,7 @@
                     xmlns:m0="http://services.samples/xsd">
                 <!-- set the message header for the 'To' EPR to the supplied value -->
                 <header name="To"
-                        value="http://localhost:9000/axis2/services/SimpleStockQuoteService1"/>
+                        value="http://localhost:9000/soap/SimpleStockQuoteService1"/>
                 <send/>
             </filter>
 

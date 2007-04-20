@@ -33,12 +33,12 @@ maintain session specific data, such data have to replicated among the failover 
                         <endpoint>
                             <failover>
                                 <endpoint>
-                                    <address uri="http://localhost:9001/axis2/services/LBService2">
+                                    <address uri="http://localhost:9001/soap/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>
                                 <endpoint>
-                                    <address uri="http://localhost:9002/axis2/services/LBService2">
+                                    <address uri="http://localhost:9002/soap/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>
@@ -47,12 +47,12 @@ maintain session specific data, such data have to replicated among the failover 
                         <endpoint>
                             <failover>
                                 <endpoint>
-                                    <address uri="http://localhost:9003/axis2/services/LBService2">
+                                    <address uri="http://localhost:9003/soap/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>
                                 <endpoint>
-                                    <address uri="http://localhost:9004/axis2/services/LBService2">
+                                    <address uri="http://localhost:9004/soap/LBService2">
                                         <enableAddressing/>
                                     </address>
                                 </endpoint>

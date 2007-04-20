@@ -17,66 +17,61 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- demonstrate JMS raw Text / POX message support -->
-    <definitions>
-        <sequence name="text_proxy">
-            <header name="Action" value="urn:placeOrder"/>
-            <script.js><![CDATA[
-               var args = mc.getPayloadXML().toString().split(" ");
-               mc.setPayloadXML(
-                <m:placeOrder xmlns:m="http://services.samples/xsd">
-                    <m:order>
-                        <m:price>{args[0]}</m:price>
-                        <m:quantity>{args[1]}</m:quantity>
-                        <m:symbol>{args[2]}</m:symbol>
-                    </m:order>
-                </m:placeOrder>);
-            ]]></script.js>
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-                </endpoint>
-            </send>
-        </sequence>
+    <sequence name="text_proxy">
+        <header name="Action" value="urn:placeOrder"/>
+        <script language="js"><![CDATA[
+            var args = mc.getPayloadXML().toString().split(" ");
+            mc.setPayloadXML(
+            <m:placeOrder xmlns:m="http://services.samples/xsd">
+                <m:order>
+                    <m:price>{args[0]}</m:price>
+                    <m:quantity>{args[1]}</m:quantity>
+                    <m:symbol>{args[2]}</m:symbol>
+                </m:order>
+            </m:placeOrder>);
+        ]]></script>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </sequence>
 
-        <sequence name="mtom_proxy">
-            <header name="Action" value="urn:uploadFileUsingMTOM"/>
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/axis2/services/MTOMSampleService" optimize="mtom"/>
-                </endpoint>
-            </send>
-        </sequence>
+    <sequence name="mtom_proxy">
+        <header name="Action" value="urn:oneWayUploadUsingMTOM"/>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/axis2/services/MTOMSwASampleService" optimize="mtom"/>
+            </endpoint>
+        </send>
+    </sequence>
 
-        <sequence name="pox_proxy">
-            <header name="Action" value="urn:placeOrder"/>
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/>
-                </endpoint>
-            </send>
-        </sequence>
-    </definitions>
+    <sequence name="pox_proxy">
+        <header name="Action" value="urn:placeOrder"/>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/>
+            </endpoint>
+        </send>
+    </sequence>
 
-    <proxies>
-        <proxy name="JMSFileUploadProxy" transports="jms">
-            <target inSequence="mtom_proxy"/>
-            <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}element</parameter>
-        </proxy>
-        <proxy name="JMSTextProxy" transports="jms">
-            <target inSequence="text_proxy"/>
-            <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}text</parameter>
-        </proxy>
-        <proxy name="JMSPoxProxy" transports="jms">
-            <target inSequence="pox_proxy"/>
-        </proxy>
-    </proxies>
+	<sequence name="out">
+		<send/>
+	</sequence>
 
-    <rules>
-    	<log level="full"/>
-    	<drop/>
-    </rules>
+    <proxy name="JMSFileUploadProxy" transports="jms">
+        <target inSequence="mtom_proxy" outSequence="out"/>
+        <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}element</parameter>
+    </proxy>
+    <proxy name="JMSTextProxy" transports="jms">
+        <target inSequence="text_proxy" outSequence="out"/>
+        <parameter name="transport.jms.Wrapper">{http://services.samples/xsd}text</parameter>
+    </proxy>
+    <proxy name="JMSPoxProxy" transports="jms">
+        <target inSequence="pox_proxy" outSequence="out"/>
+    </proxy>
 
-</synapse>
+</definitions>

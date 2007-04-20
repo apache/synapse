@@ -130,6 +130,14 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         (response.getTo() != null ? response.getTo().getAddress() : "null"));
                 log.debug("SOAPAction: " +
                         (response.getSoapAction() != null ? response.getSoapAction() : "null"));
+                log.debug("WSA-Action: " +
+                        (response.getWSAAction() != null ? response.getWSAAction() : "null"));
+                String[] cids = response.getAttachmentMap().getAllContentIDs();
+                if (cids != null && cids.length > 0) {
+                    for (int i = 0; i < cids.length; i++) {
+                        log.debug("Attachment : " + cids[i]);
+                    }
+                }
                 log.debug("Body : \n" + response.getEnvelope());
             }
             MessageContext axisOutMsgCtx =

@@ -48,6 +48,13 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             log.debug("Proxy Service " + name + " received a new message...");
             log.debug("Message To: " + (mc.getTo() != null ? mc.getTo().getAddress() : "null"));
             log.debug("SOAPAction: " + (mc.getSoapAction() != null ? mc.getSoapAction() : "null"));
+            log.debug("WSA-Action: " + (mc.getWSAAction() != null ? mc.getWSAAction() : "null"));
+            String[] cids = mc.getAttachmentMap().getAllContentIDs();
+            if (cids != null && cids.length > 0) {
+                for (int i=0; i<cids.length; i++) {
+                    log.debug("Attachment : " + cids[i]);
+                }
+            }
             log.debug("Body : \n" + mc.getEnvelope());
         }
 

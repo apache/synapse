@@ -31,7 +31,7 @@
 
         ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
             [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
-            [-Daddurl=http://localhost:9000/axis2/services/SimpleStockQuoteService]
+            [-Daddurl=http://localhost:9000/soap/SimpleStockQuoteService]
             [-Dtrourl=http://localhost:8080] [-Dprxurl=http://localhost:8080]
             [-Drepository=client_repo]
             [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
@@ -57,14 +57,14 @@
 
         examples:
         ant optimizeclient [-Dopt_mode=mtom | swa]
-            [-Dopt_url=http://localhost:8080/axis2/services/MTOMSwASampleService]
+            [-Dopt_url=http://localhost:8080/soap/MTOMSwASampleService]
             [-Dopt_file=./../../repository/conf/sample/resources/mtom/asf-logo.gif]
     </echo>
     </target>
 
     <property name="symbol" value="IBM"/>
     <property name="mode" value="quote"/>
-    <property name="addurl" value="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+    <property name="addurl" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
     <property name="trpurl" value="http://localhost:8080"/>
     <property name="prxurl" value="http://localhost:8080/StockQuote"/>
     <property name="repository" value="client_repo"/>
@@ -73,7 +73,7 @@
     <property name="jms_type" value="text"/>
     <property name="jms_payload" value=""/>
     <property name="opt_mode" value="mtom"/>
-    <property name="opt_url" value="http://localhost:8080/axis2/services/MTOMSwASampleService"/>
+    <property name="opt_url" value="http://localhost:8080/soap/MTOMSwASampleService"/>
     <property name="opt_file" value="./../../repository/conf/sample/resources/mtom/asf-logo.gif"/>
 
     <property name="class.dir" value="target/classes"/>

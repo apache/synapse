@@ -1,11 +1,19 @@
-POST /axis2/services/StockQuoteProxy HTTP/1.1
-SOAPAction: "urn:getQuote"
-User-Agent: Axis2
-Host: 127.0.0.1:8081
-Transfer-Encoding: chunked
-Content-Type: text/xml; charset=UTF-8
-
-14ab
+POST /soap/StockQuoteProxy HTTP/1.1
+
+SOAPAction: "urn:getQuote"
+
+User-Agent: Axis2
+
+Host: 127.0.0.1:8081
+
+Transfer-Encoding: chunked
+
+Content-Type: text/xml; charset=UTF-8
+
+
+
+14ab
+
 <?xml version='1.0' encoding='UTF-8'?>
    <soapenv:Envelope xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
       <soapenv:Header>
@@ -65,6 +73,9 @@ Content-Type: text/xml; charset=UTF-8
             </xenc:CipherData>
          </xenc:EncryptedData>
       </soapenv:Body>
-   </soapenv:Envelope>
-0
-
+   </soapenv:Envelope>
+
+0
+
+
+

@@ -52,7 +52,7 @@ public class StockQuoteClient {
         // defaults
         String symbol    = "IBM";
         String mode      = "quote";
-        String addUrl    = "http://localhost:9000/axis2/services/SimpleStockQuoteService";
+        String addUrl    = "http://localhost:9000/soap/SimpleStockQuoteService";
         String trpUrl    = "http://localhost:8080";
         String prxUrl    = null;
         String repo      = "client_repo";

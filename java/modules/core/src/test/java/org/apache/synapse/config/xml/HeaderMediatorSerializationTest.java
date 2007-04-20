@@ -35,7 +35,7 @@ public class HeaderMediatorSerializationTest extends AbstractTestCase {
     }
 
     public void testHeaderMediatorSerializationSenarioOne() throws Exception {
-        String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"To\" value=\"http://127.0.0.1:10001/axis2/services/Services\"/>";
+        String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"To\" value=\"http://127.0.0.1:10001/soap/Services\"/>";
         assertTrue(serialization(inputXml, headerMediatorFactory, headerMediatorSerializer));
         assertTrue(serialization(inputXml, headerMediatorSerializer));
     }

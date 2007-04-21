@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ContextFactory;
@@ -28,6 +29,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.http.server.AxisHttpResponseImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -201,12 +203,11 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 					// attaching the this outgoing terminate message as the
 					// response to the incoming terminate message.
 					message.setTransportOut(terminateSeqMsg.getTransportOut());
-					message.setProperty(MessageContext.TRANSPORT_OUT,
-							terminateSeqMsg
-									.getProperty(MessageContext.TRANSPORT_OUT));
+					message.setProperty(MessageContext.TRANSPORT_OUT,terminateSeqMsg.getProperty(MessageContext.TRANSPORT_OUT));
+					message.setProperty(Constants.OUT_TRANSPORT_INFO, terminateSeqMsg.getProperty(Constants.OUT_TRANSPORT_INFO));
+	                
+					terminateSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 					
-					terminateSeqMsg.getOperationContext().setProperty(
-							org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
 					AxisEngine engine = new AxisEngine(context);
 					try {							
 						engine.send(message);

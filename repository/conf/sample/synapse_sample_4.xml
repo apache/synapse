@@ -33,11 +33,15 @@
         <log level="custom">
             <property name="text" value="An unexpected error occured for stock SUN"/>
             <property name="message" expression="get-property('ERROR_MESSAGE')"/>
+            <!--<property name="detail" expression="get-property('ERROR_DETAIL')"/>-->
         </log>
-		<drop/>
+        <makefault>
+            <code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+            <reason expression="get-property('ERROR_MESSAGE')"/>
+        </makefault>
+        <drop/>
     </sequence>
 
-    <!-- default message handling sequence used by Synapse - named 'main' -->
     <sequence name="main">
         <in>
             <switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd">

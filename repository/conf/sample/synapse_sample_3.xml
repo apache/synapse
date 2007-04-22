@@ -19,10 +19,8 @@
 
 <!-- illustration of local registry entry definitions, and reusable endpoints and sequences -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-
     <!-- define a string resource entry to the local registry -->
     <localEntry key="version">0.1</localEntry>
-
     <!-- define a reuseable endpoint definition -->
     <endpoint name="simple">
         <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
@@ -30,14 +28,12 @@
 
     <!-- define a reusable sequence -->
     <sequence name="stockquote">
-
         <!-- log the message using the custom log level. illustrates custom properties for log -->
         <log level="custom">
             <property name="Text" value="Sending quote request"/>
             <property name="version" expression="get-property('version')"/>
             <property name="direction" expression="get-property('direction')"/>
         </log>
-
         <!-- send message to real endpoint referenced by key "simple" endpoint definition -->
         <send>
             <endpoint key="simple"/>
@@ -50,9 +46,7 @@
             <sequence key="stockquote"/>
         </in>
         <out>
-            <!-- Send the messages where they have been sent (i.e. implicit To EPR) -->
             <send/>
         </out>
     </sequence>
-
 </definitions>

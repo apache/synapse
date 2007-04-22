@@ -19,19 +19,14 @@
 
 <!-- simple content based routing of messages -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- simple filtering of messages with XPath and regex matches -->
+    <!-- filtering of messages with XPath and regex matches -->
     <filter source="get-property('To')" regex=".*/StockQuote.*">
-
-        <!-- route the message to the SimpleStockQuoteService1 service EPR -->
         <send>
             <endpoint>
                 <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
             </endpoint>
         </send>
+        <drop/>
     </filter>
-
-    <!-- send any other messages without change -->
     <send/>
-
 </definitions> 

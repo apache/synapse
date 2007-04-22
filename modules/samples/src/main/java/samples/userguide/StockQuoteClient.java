@@ -50,21 +50,21 @@ public class StockQuoteClient {
     public static void main(String[] args) {
 
         // defaults
-        String symbol    = "IBM";
-        String mode      = "quote";
-        String addUrl    = "http://localhost:9000/soap/SimpleStockQuoteService";
-        String trpUrl    = "http://localhost:8080";
+        String symbol    = null;
+        String mode      = null;
+        String addUrl    = null;
+        String trpUrl    = null;
         String prxUrl    = null;
-        String repo      = "client_repo";
+        String repo      = null;
         String svcPolicy = null;
 
-        if (args.length > 0) symbol    = args[0];
-        if (args.length > 1) mode      = args[1];
-        if (args.length > 2) addUrl    = args[2];
-        if (args.length > 3) trpUrl    = args[3];
-        if (args.length > 4) prxUrl    = args[4];
-        if (args.length > 5) repo      = args[5];
-        if (args.length > 6) svcPolicy = args[6];
+        if (args.length > 0 && args[0].length()>0) symbol    = args[0];
+        if (args.length > 1 && args[1].length()>0) mode      = args[1];
+        if (args.length > 2 && args[2].length()>0) addUrl    = args[2];
+        if (args.length > 3 && args[3].length()>0) trpUrl    = args[3];
+        if (args.length > 4 && args[4].length()>0) prxUrl    = args[4];
+        if (args.length > 5 && args[5].length()>0) repo      = args[5];
+        if (args.length > 6 && args[6].length()>0) svcPolicy = args[6];
 
         double price = 0; int quantity = 0;
 

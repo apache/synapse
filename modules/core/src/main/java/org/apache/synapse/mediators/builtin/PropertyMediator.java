@@ -33,7 +33,7 @@ import java.util.Set;
 
 /**
  * The property mediator would save(or remove) a named property as a local property of the Synapse Message Context
- * or as a property of the Axis2 Configuration Context or as a Transport Header.
+ * or as a property of the Axis2 Message Context or as a Transport Header.
  * Properties set this way could be extracted through the XPath extension function "synapse:get-property(scope,prop-name)"
  */
 
@@ -56,7 +56,7 @@ public class PropertyMediator extends AbstractMediator {
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
-     * Sets or  a property into the current (local) Synapse Context or into the Axis Configuration Context
+     * Sets or  a property into the current (local) Synapse Context or into the Axis Message Context
      * or into Transports Header
      * And Removes above properties from the corresspounding locations
      *
@@ -64,10 +64,10 @@ public class PropertyMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext smc) {
-        log.debug("Set-Entry mediator :: mediate()");
+        log.debug("Set-Property mediator :: mediate()");
         boolean shouldTrace = shouldTrace(smc.getTracingState());
         if (shouldTrace) {
-            trace.trace("Start : Entry mediator");
+            trace.trace("Start : Property mediator");
         }
         if (action == ACTION_SET) {
             String resultValue = (this.value != null ? this.value : Axis2MessageContext.getStringValue(
@@ -75,7 +75,7 @@ public class PropertyMediator extends AbstractMediator {
             log.debug("Setting : " + name +
                     " property (scope:" + (scope == null ? "default" : scope) + ") = " + resultValue);
             if (shouldTrace) {
-                trace.trace("Entry Name : " + name +                                                                    
+                trace.trace("Property Name : " + name +
                         " (scope:" + (scope == null ? "default" : scope) + ") set to " +
                         (value != null ? " resultValue = " + value :
                                 " result of expression " + expression + " = " + resultValue));
@@ -121,7 +121,7 @@ public class PropertyMediator extends AbstractMediator {
         } else {
             log.debug("Removing : " + name +
                     " property (scope:" + (scope == null ? "default" : scope) + ") ");
-            trace.trace("Remove - Entry Name : " + name +
+            trace.trace("Remove - Property Name : " + name +
                     " (scope:" + (scope == null ? "default" : scope) + ")");
             if (scope == null) {
                 //Removing property from the  Synapse Context
@@ -137,11 +137,11 @@ public class PropertyMediator extends AbstractMediator {
                 }
             } else if (Constants.SCOPE_AXIS2.equals(scope)
                     && smc instanceof Axis2MessageContext) {
-                //Removing property from the  Axis2 Configuration Context
+                //Removing property from the  Axis2 Message Context
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
-                Map pros = axis2MessageCtx.getConfigurationContext().getProperties();
+                Map pros = axis2MessageCtx.getProperties();
                 if (pros != null) {
                     pros.remove(name);
                 }
@@ -167,7 +167,7 @@ public class PropertyMediator extends AbstractMediator {
             }
         }
         if (shouldTrace) {
-            trace.trace("End : Entry mediator");
+            trace.trace("End : Property mediator");
         }
         return true;
     }

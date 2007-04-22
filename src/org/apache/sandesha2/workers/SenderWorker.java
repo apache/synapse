@@ -1,6 +1,7 @@
 package org.apache.sandesha2.workers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -201,6 +202,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				transaction = null;
 			}
 
+			msgCtx.getOptions().setTimeOutInMilliSeconds(1000000);
+			
 			try {
 				AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
 				InvocationResponse response = InvocationResponse.CONTINUE;
@@ -465,9 +468,34 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// create the responseMessageContext
 
 			MessageContext responseMessageContext = new MessageContext();
+
+			OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
+			responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, requestMsgOpCtx
+							.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));
+			responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx
+							.getProperty(Constants.Configuration.CONTENT_TYPE));
+			responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE, requestMsgOpCtx
+					.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
+
+            //If the response MsgCtx was not available Axis2 would hv put the transport info into a 
+            //HashMap, getting the data from it.
+			HashMap transportInfoMap = (HashMap) msgCtx.getProperty(Constants.Configuration.TRANSPORT_INFO_MAP);
+			if (transportInfoMap != null) {
+				responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, 
+								transportInfoMap.get(Constants.Configuration.CONTENT_TYPE));
+				responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
+						transportInfoMap.get(Constants.Configuration.CHARACTER_SET_ENCODING));
+			}
 			
 			//setting the message as serverSide will let it go through the MessageReceiver (may be callback MR).
 			responseMessageContext.setServerSide(true);
+			
+			if (responseMessageContext.getSoapAction()==null) {
+				//if there is no SOAP action in the response message, Axis2 will wrongly identify it as a REST message
+				//This happens because we set serverSide to True in a previous step.
+				//So we have to add a empty SOAPAction here.
+				responseMessageContext.setSoapAction("");
+			}
 			
 			responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
 			responseMessageContext.setTransportIn(msgCtx.getTransportIn());
@@ -480,20 +508,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			responseMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY,
 					msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY));
-
-			// copying required properties from op. context to the response msg
-			// ctx.
-			
-			// copying required properties from request op. context to the response msg
-			// ctx.
-			
-			OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
-			responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE, requestMsgOpCtx
-							.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
-			responseMessageContext.setProperty(HTTPConstants.CHAR_SET_ENCODING, requestMsgOpCtx
-							.getProperty(HTTPConstants.CHAR_SET_ENCODING));
-			responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx
-							.getProperty(Constants.Configuration.CONTENT_TYPE));
 
 			// If request is REST we assume the responseMessageContext is REST,
 			// so set the variable

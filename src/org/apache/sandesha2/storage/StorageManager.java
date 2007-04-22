@@ -58,6 +58,9 @@ public abstract class StorageManager {
 		
 		thread = getPollingManager();
 		if(thread != null) thread.stopRunning();
+		
+		//removing the reference to the configuration context
+		context=null;
 	}
 	
 	public abstract void initStorage (AxisModule moduleDesc) throws SandeshaStorageException;

@@ -221,7 +221,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			Iterator ops = service.getOperations();
 			while(ops.hasNext()) {
 				AxisOperation op = (AxisOperation) ops.next();
-				log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecifMEPConstant());
+				log.debug("Examining operation " + op.getName() + ", mep " + op.getMessageExchangePattern());
 
 				String name = null;
 				QName qName = op.getName();

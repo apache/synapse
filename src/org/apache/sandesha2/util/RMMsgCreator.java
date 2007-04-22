@@ -282,6 +282,8 @@ public class RMMsgCreator {
 		// no need for an incoming transport for a terminate
 		// message. If this is put, sender will look for an response.
 		terminateMessage.setProperty(MessageContext.TRANSPORT_IN, null); 
+
+		terminateMessage.setTo(new EndpointReference (rmsBean.getToEPR()));
 		
 		// Ensure the correct token is used to secure the terminate sequence
 		secureOutboundMessage(rmsBean, terminateMessage);

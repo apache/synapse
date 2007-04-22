@@ -138,11 +138,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 				}
 			}
 				
-			// Server-side, when we are suspend the outbound flow we may still be connected to an
-			// inbound transport. If we are then they don't see the InvocationResponse that we
-			// return, so we need to set a flag on the operation context too.
+			//we need the incoming thread to wait when suspending.
+			//Hence adding the boolean property.
+			//Should be done only to the server side
 			OperationContext opCtx = msgCtx.getOperationContext();
-			if(opCtx != null && returnValue == InvocationResponse.SUSPEND) {
+			if(msgCtx.isServerSide() && opCtx != null && returnValue == InvocationResponse.SUSPEND) {
 				if(log.isDebugEnabled()) log.debug("Setting HOLD_RESPONSE property");
 				opCtx.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
 			}

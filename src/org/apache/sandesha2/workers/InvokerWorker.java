@@ -3,9 +3,11 @@ package org.apache.sandesha2.workers;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -109,7 +111,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					transaction.rollback();
 					transaction = storageManager.getTransaction();
 				}
-				handleFault(msgToInvoke, e);
+				handleFault(rmMsg, e);
 			}
 
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
@@ -180,7 +182,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		messageContext.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, Sandesha2Constants.VALUE_TRUE);
 	}
 
-	private void handleFault(MessageContext inMsgContext, Exception e) {
+	private void handleFault(RMMsgContext inRMMsgContext, Exception e) {
+		MessageContext inMsgContext = inRMMsgContext.getMessageContext();
 		AxisEngine engine = new AxisEngine(inMsgContext.getConfigurationContext());
 		try {					
 			MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(inMsgContext, e);
@@ -188,7 +191,21 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			faultContext.setProperty(Constants.Configuration.CONTENT_TYPE, inMsgContext
 					.getProperty(Constants.Configuration.CONTENT_TYPE));
 
-			engine.sendFault(faultContext);
+			EndpointReference faultEPR = inRMMsgContext.getFaultTo();
+			if (faultEPR==null)
+				faultEPR = inRMMsgContext.getReplyTo();
+			
+			//we handler the WSRM Anon InOut scenario differently here
+			if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(inRMMsgContext.getRMSpecVersion())
+					&& (faultEPR==null || faultEPR.hasAnonymousAddress())) {
+				RequestResponseTransport requestResponseTransport = (RequestResponseTransport) inRMMsgContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+				
+				//this will cause the fault to be thrown out of thread waiting on this transport object.
+				AxisFault fault = new AxisFault ("Sandesha2 got a fault when doing the invocation", faultContext);
+				requestResponseTransport.signalFaultReady(fault);
+			} else	
+				engine.sendFault(faultContext);
+			
 		} catch (AxisFault e1) {
 			if (log.isErrorEnabled())
 				log.error("Unable to send fault message ", e1);

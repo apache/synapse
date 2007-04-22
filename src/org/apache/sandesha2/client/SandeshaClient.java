@@ -31,6 +31,7 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -472,17 +473,30 @@ public class SandeshaClient {
 
 		String oldAction = options.getAction();
 
-		SOAPEnvelope terminateEnvelope = configureTerminateSequence(options, serviceContext.getConfigurationContext());
-		OMElement terminateBody = terminateEnvelope.getBody().getFirstChildWithName(
-				new QName(rmNamespaceValue, Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
-
+		//in WSRM 1.0 we are adding another application msg with the LastMessage tag, instead of sending a terminate here.
+		//Actual terminate will be sent once all the messages upto this get acked
+		
 		try {
-			//to inform the Sandesha2 out handler.
-			serviceClient.fireAndForget (terminateBody);				
+			if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmSpecVersion)) {
+				SOAPEnvelope terminateEnvelope = configureTerminateSequence(options, serviceContext
+						.getConfigurationContext());
+				OMElement terminateBody = terminateEnvelope.getBody().getFirstChildWithName(
+						new QName(rmNamespaceValue,
+								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
+
+				// to inform the Sandesha2 out handler.
+				serviceClient.fireAndForget(terminateBody);
+
+			} else {
+				options.setAction(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_LAST_MESSAGE);
+				options.setProperty(SandeshaClientConstants.LAST_MESSAGE, Constants.VALUE_TRUE);
+				serviceClient.fireAndForget(null);
+
+			}
+			
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.couldNotSendTerminate,
-					e.toString());
+					SandeshaMessageKeys.couldNotSendTerminate, e.toString());
 			throw new SandeshaException(message, e);
 		} finally {
 			options.setAction(oldAction);

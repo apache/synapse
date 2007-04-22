@@ -32,8 +32,8 @@
         ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
             [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
             [-Daddurl=http://localhost:9000/soap/SimpleStockQuoteService]
-            [-Dtrourl=http://localhost:8080] [-Dprxurl=http://localhost:8080]
-            [-Drepository=client_repo]
+            [-Dtrourl=http://localhost:8080]
+            [-Dprxurl=http://localhost:8080]
             [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
 
         Mode :
@@ -47,7 +47,7 @@
         A client which could post a raw JMS text or binary message to a given destination.
 
         examples:
-        ant jmsclient [-Djms_payload="24.34 100 IBM"]
+        ant jmsclient [-Djms_type=text] [-Djms_dest=dynamicQueues/JMSTextProxy][-Djms_payload="24.34 100 IBM"]
         ant jmsclient [-Djms_type=pox] [-Djms_dest=dynamicQueues/JMSPoxProxy] [-Djms_payload=MSFT]
         ant jmsclient [-Djms_type=binary] [-Djms_dest=dynamicQueues/JMSFileUploadProxy]
             [-Djms_payload=./../../repository/conf/sample/resources/mtom/asf-logo.gif]
@@ -64,13 +64,13 @@
 
     <property name="symbol" value="IBM"/>
     <property name="mode" value="quote"/>
-    <property name="addurl" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
-    <property name="trpurl" value="http://localhost:8080"/>
-    <property name="prxurl" value="http://localhost:8080/StockQuote"/>
+    <property name="addurl" value=""/>
+    <property name="trpurl" value=""/>
+    <property name="prxurl" value=""/>
     <property name="repository" value="client_repo"/>
     <property name="policy" value=""/>
-    <property name="jms_dest" value="dynamicQueues/JMSTextProxy"/>
-    <property name="jms_type" value="text"/>
+    <property name="jms_dest" value=""/>
+    <property name="jms_type" value=""/>
     <property name="jms_payload" value=""/>
     <property name="opt_mode" value="mtom"/>
     <property name="opt_url" value="http://localhost:8080/soap/MTOMSwASampleService"/>
@@ -99,6 +99,20 @@
             <arg value="${prxurl}"/>
             <arg value="${repository}"/>
             <arg value="${policy}"/>
+        </java>
+    </target>
+
+    <!-- a simple smoke test -->
+    <target name="smoke" depends="compile">
+        <java classname="samples.userguide.StockQuoteClient"
+              classpathref="javac.classpath" fork="true">
+            <arg value="IBM"/>
+            <arg value="quote"/>
+            <arg value="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            <arg value="http://localhost:8080"/>
+            <arg value=""/>
+            <arg value="${repository}"/>
+            <arg value=""/>
         </java>
     </target>
 

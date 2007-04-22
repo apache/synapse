@@ -288,6 +288,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     private void sendAsyncResponse(MessageContext msgContext) throws AxisFault {
 
+        // remove unwanted HTTP headers (if any from the current message)
+        removeUnwantedHeaders(msgContext);
+        
         ServerWorker worker = (ServerWorker) msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
         HttpResponse response = worker.getResponse();
 

@@ -32,7 +32,7 @@
         ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
             [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
             [-Daddurl=http://localhost:9000/soap/SimpleStockQuoteService]
-            [-Dtrourl=http://localhost:8080]
+            [-Dtrpurl=http://localhost:8080]
             [-Dprxurl=http://localhost:8080]
             [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
 

@@ -219,13 +219,12 @@ public class SynapseConfiguration {
             if (entry.isDynamic()) {
                 if (entry.isCached() && !entry.isExpired()) {
                     return entry.getValue();
+                } else if (registry != null) {
+                    o = registry.getResource(entry);
                 }
             } else {
                 return entry.getValue();
             }
-        }
-        if (registry != null) {
-            o = registry.getResource(new Entry(key));
         }
         return o;
     }
@@ -236,7 +235,14 @@ public class SynapseConfiguration {
      * @return its value
      */
     public Entry getEntryDefinition(String key) {
-        return (Entry) localRegistry.get(key);
+        Entry entry = (Entry) localRegistry.get(key);
+        if (entry == null) {
+            // this is not a local definition
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+            addEntry(key, entry);
+        }
+        return entry;
     }
 
     /**

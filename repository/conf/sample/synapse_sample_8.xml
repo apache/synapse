@@ -16,56 +16,28 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
+<!-- introduction to URL source properties, registry based properties and the XSLT mediator -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- introduction to URL source properties, registry based properties and the XSLT mediator -->
-
-    <!-- the SimpleURLRegistry allows access to a URL based resource store such as the -->
-    <!-- file system (file://) or a web server (http://) -->
+    <!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) -->
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
         <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
-        <parameter name="root">file:./../../repository/</parameter>
+        <parameter name="root">file:repository/conf/sample/resources/</parameter>
         <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
         <parameter name="cachableDuration">15000</parameter>
     </registry>
 
+    <!-- define the request processing XSLT resource as a static URL source -->
+    <localEntry key="xslt-key-req" src="file:repository/conf/sample/resources/transform/transform.xslt"/>
 
-    <definitions>
-
-        <!-- define a static property for the first XSLT resource as an URL source (could be any URL src) -->
-        <set-property name="xslt-key-req"
-                      src="file:repository/conf/sample/resources/transform/transform.xslt"/>
-
-        <!-- define a dynamic property for the second XSLT resource as a key reference to the registry -->
-        <!-- the key is just a unique identifier for a resource on the registry. It is treated as a string literal -->
-        <set-property name="xslt-key-resp" key="transform/transform_back.xslt"/>
-
-        <!-- define a reuseable endpoint definition and use it within config -->
-        <endpoint name="stockquote">
-            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-        </endpoint>
-
-    </definitions>
-
-    <rules>
-        <in>
-            <!-- transform the custom quote request into a standard quote requst expected by the service -->
-            <xslt key="xslt-key-req"/>
-
-            <!-- send message to real endpoint referenced by name "stockquote" and stop -->
-            <send>
-                <endpoint ref="stockquote"/>
-            </send>
-        </in>
-
-        <out>
-            <!-- transform the standard response back into the custom format the client expects -->
-            <xslt key="xslt-key-resp"/>
-
-            <!-- now send the custom response back to the client and stop -->
-            <send/>
-        </out>
-    </rules>
-
-</synapse> 
+    <in>
+        <!-- transform the custom quote request into a standard quote requst expected by the service -->
+        <xslt key="xslt-key-req"/>
+    </in>
+    <out>
+        <!-- transform the standard response back into the custom format the client expects -->
+	    <!-- the key is looked up in the remote registry and loaded as a 'dynamic' registry resource -->
+        <xslt key="transform/transform_back.xslt"/>
+    </out>
+	<send/>
+</definitions> 

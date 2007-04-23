@@ -19,36 +19,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
-  <meta content="text/html; charset=iso-8859-1">
   <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
   <title>Synapse Configuration Language</title>
 </head>
@@ -97,8 +67,7 @@ time.</p>
 
 <p>The &lt;localEntry&gt; element is used to declare registry entries that
 are local to the Synapse instance, as shown below</p>
-<pre>  &lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;
-</pre>
+<pre>  &lt;localEntry key="string" [src="url"]&gt;text | xml&lt;/localEntry&gt;</pre>
 
 <p>These entries are top level entries which are set globally for the entire
 system. Values of these entries can be retrieved via the extension XPath
@@ -117,8 +86,7 @@ same keys of the remote registry. </p>
 can be invoked later by name as a sequence of mediators.</p>
 <pre> &lt;sequence name="string" [onError="string"] [key="string"]&gt;
    mediator*
- &lt;/sequence&gt;
-</pre>
+ &lt;/sequence&gt;</pre>
 
 <p>If the configuration defines a sequence named "main" then it is considered
 as the main mediation sequence of Synapse. If such a sequence is not defined
@@ -157,14 +125,21 @@ load balanced endpoint or a fail-over endpoint as follows:</p>
 &lt;/endpoint&gt;</pre>
 
 <h4>Address Endpoint</h4>
-<p>An address-endpoint token refers to an endpoint address definition as follows:</p>
+
+<p>An address-endpoint token refers to an endpoint address definition as
+follows:</p>
 <pre>&lt;address uri="endpoint-address" format="soap|soap11|soap12|pox" [optimize="mtom|swa"]&gt;
   &lt;enableRM [policy="key"]/&gt;?
   &lt;enableSec [policy="key"]/&gt;?
   &lt;enableAddressing/&gt;?
+  &lt;timeout&gt;
+    &lt;duration&gt;timeout-duration&lt;duration&gt;
+    &lt;action&gt;discard|fault&lt;/action&gt;
+  &lt;/timeout&gt;?
 &lt;/address&gt;</pre>
 
 <h4>WSDL Endpoint</h4>
+
 <p>A wsdl-endpoint token refers to a WSDL endpoint definition as follows:</p>
 <pre>&lt;wsdl [uri="wsdl-uri"] [service="qname"] [port/endpoint="qname"]&gt;
   &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
@@ -172,22 +147,36 @@ load balanced endpoint or a fail-over endpoint as follows:</p>
   &lt;enableRM [policy="key"]/&gt;?
   &lt;enableSec [policy="key"]/&gt;?
   &lt;enableAddressing/&gt;?
+  &lt;timeout&gt;
+    &lt;duration&gt;timeout-duration&lt;/duration&gt;
+    &lt;action&gt;discard|fault&lt;/action&gt;
+  &lt;/timeout&gt;?
 &lt;/wsdl&gt;</pre>
-<p>The WSDL could be defined in-line within the endpoint definition or as a uri reference and the service &amp; port/endpoint specified if multiple options are present.</p>
+
+<p>The WSDL could be defined in-line within the endpoint definition or as a
+uri reference and the service &amp; port/endpoint specified if multiple
+options are present.</p>
 
 <h4>Load balanced Endpoint</h4>
-<p>A load-balanced-endpoint token refers to a load balancing configuration from which the destination endpoint would be selected depending on the evaluation of the current message against the load balacing algorithm</p>
+
+<p>A load-balanced-endpoint token refers to a load balancing configuration
+from which the destination endpoint would be selected depending on the
+evaluation of the current message against the load balacing algorithm</p>
 <pre>&lt;loadBalance policy="string"&gt;
   &lt;endpoint .../&gt;+
 &lt;/loadBalance&gt;</pre>
 
 <h4>Failover Endpoint</h4>
-<p>A fail-over-endpoint token refers to a fail-over configuration definition from which an endpoint is selected if the sending of a message to the endpoint results in a failure</p>
+
+<p>A fail-over-endpoint token refers to a fail-over configuration definition
+from which an endpoint is selected if the sending of a message to the
+endpoint results in a failure</p>
 <pre>&lt;failOver policy="string"&gt;
   &lt;endpoint .../&gt;+
 &lt;/failover&gt;</pre>
 
-<p>An endpoint definition must name the endpoint, and a dynamic endpoint lookup must specify the key for a definition.</p>
+<p>An endpoint definition must name the endpoint, and a dynamic endpoint
+lookup must specify the key for a definition.</p>
 
 <h3>Proxy service</h3>
 
@@ -485,8 +474,7 @@ in-line within the Synapse configuration.</p>
 
 <p>A script mediator using a entry (registry or local) is defined as
 follows:</p>
-<pre> &lt;script key="string" language="string" [function="script-function-name"]/&gt;
-</pre>
+<pre> &lt;script key="string" language="string" [function="script-function-name"]/&gt;</pre>
 
 <p>The property-key is a Synapse registry property containing a URL to the
 script source. Optional language attribute specifies the scripting language
@@ -501,8 +489,7 @@ value.</p>
 
 <p>An inline script mediator has the script source embedded in the config
 XML:</p>
-<pre> &lt;script language="string"&gt;...script source code...&lt;script/&gt;
-</pre>
+<pre> &lt;script language="string"&gt;...script source code...&lt;script/&gt;</pre>
 
 <p>where language is the script language name extension. For example,
 &lt;script language="js"&gt; indicates a JavaScript program, &lt;script
@@ -513,8 +500,7 @@ predefined in a script variable named 'mc'.</p>
 <p>An example of an inline mediator using JavaScript/E4X which returns false
 if the SOAP message body contains an element named 'symbol' which has a value
 of 'IBM' would be:</p>
-<pre> &lt;script language="js"&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script/&gt;
-</pre>
+<pre> &lt;script language="js"&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script/&gt;</pre>
 
 <p>The boolean response from the inlined mediator is either the response from
 the evaluation of the script statements or if that result is not a boolean

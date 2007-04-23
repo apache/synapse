@@ -274,7 +274,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {
-                    endpointDefinition.setTimeoutDuration(new Long(d).longValue());
+                    long timeoutSeconds = new Long(d).longValue();
+                    endpointDefinition.setTimeoutDuration(timeoutSeconds * 1000);
                 }
             }
 

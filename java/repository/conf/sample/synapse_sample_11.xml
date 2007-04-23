@@ -16,17 +16,10 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- a full registry based configuration -->
-
-    <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
-        <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
-        <parameter name="root">file:./../../repository/</parameter>
-        <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
+<!-- a full registry based configuration -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+	<registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
+        <parameter name="root">file:./repository/conf/sample/resources/</parameter>
         <parameter name="cachableDuration">15000</parameter>
     </registry>
-
-
-</synapse> 
+</definitions> 

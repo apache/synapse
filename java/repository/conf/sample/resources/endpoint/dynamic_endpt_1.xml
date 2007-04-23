@@ -1,1 +1,3 @@
-<endpoint xmlns="http://ws.apache.org/ns/synapse" name="simple"><address uri="http://localhost:9000/soap/SimpleStockQuoteService"/></endpoint>
+<endpoint xmlns="http://ws.apache.org/ns/synapse">
+    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+</endpoint>

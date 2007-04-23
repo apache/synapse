@@ -213,7 +213,8 @@ public class AddressEndpointFactory implements EndpointFactory {
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {
-                    endpoint.setTimeoutDuration(new Long(d).longValue());
+                    long timeoutSeconds = new Long(d).longValue();
+                    endpoint.setTimeoutDuration(timeoutSeconds * 1000);
                 }
             }
 

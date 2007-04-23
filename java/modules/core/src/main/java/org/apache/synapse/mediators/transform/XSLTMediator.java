@@ -60,7 +60,7 @@ public class XSLTMediator extends AbstractMediator {
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
-     * The property key/name which refers to the XSLT to be used for the transformation
+     * The resource key/name which refers to the XSLT to be used for the transformation
      */
     private String xsltKey = null;
 
@@ -114,7 +114,7 @@ public class XSLTMediator extends AbstractMediator {
             if (shouldTrace) {
                 trace.trace("Start : XSLT mediator");
             }
-            log.debug("Performing XSLT transformation against property with key : " + xsltKey);
+            log.debug("Performing XSLT transformation against resource with key : " + xsltKey);
             performXLST(synCtx, shouldTrace);
             if (shouldTrace) {
                 trace.trace("Start : XSLT mediator");
@@ -158,7 +158,7 @@ public class XSLTMediator extends AbstractMediator {
         // build transformer - if necessary
         Entry dp = msgCtx.getConfiguration().getEntryDefinition(xsltKey);
 
-        // if the xsltKey refers to a dynamic property
+        // if the xsltKey refers to a dynamic resource
         if (dp != null && dp.isDynamic()) {
             if (!dp.isCached() || dp.isExpired()) {
                 synchronized (transformerLock) {
@@ -173,7 +173,7 @@ public class XSLTMediator extends AbstractMediator {
                 }
             }
 
-            // if the property is not a DynamicProperty, we will create a transformer only once
+            // if the resource is not a dynamic, we will create a transformer only once
         } else {
             if (transformer == null) {
                 synchronized (transformerLock) {

@@ -111,7 +111,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                 }
                 // set an error code to the message context, so that error sequences can filter
                 // using that property to determine the cause of error
-                synapseOutMsgCtx.setProperty("error-code", Constants.SENDING_FAULT);
+                synapseOutMsgCtx.setProperty(Constants.ERROR_CODE, Constants.SENDING_FAULT);
 
                 ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
             }

@@ -81,7 +81,7 @@ public class TimeoutHandler extends TimerTask {
 
                             // add an error code to the message context, so that error sequences
                             // can identify the cause of error
-                            msgContext.setProperty("error-code", Constants.TIME_OUT);
+                            msgContext.setProperty(Constants.ERROR_CODE, Constants.TIME_OUT);
 
                             Stack faultStack = msgContext.getFaultStack();
 

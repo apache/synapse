@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm" xmlns:wsa="http://www.w3.org/2005/08/addressing">
+      <soapenv:Header>
+         <wsa:MessageID soapenv:mustUnderstand="1">uuid:88754b00-161a-11da-b6d6-8198de3c47c5</wsa:MessageID>
+         <wsa:To soapenv:mustUnderstand="1">http://127.0.0.1:9070/axis/services/RMService</wsa:To>
+         <wsa:Action soapenv:mustUnderstand="1">http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequenceResponse</wsa:Action>
+         <wsa:From soapenv:mustUnderstand="1">
+            <wsa:Address>http://localhost:8070/axis/services/TestService</wsa:Address>
+         </wsa:From>
+         <wsa:RelatesTo RelationshipType="http://schemas.xmlsoap.org/ws/2005/08/addressing" soapenv:mustUnderstand="1" xmlns:http="wsa">uuid:872e4c10-161a-11da-9ef7-bd9ad94438a3</wsa:RelatesTo>
+      </soapenv:Header>
+      <soapenv:Body>
+         <wsrm:CreateSequenceResponse>
+            <wsrm:Identifier>uuid:88754b00-161a-11da-b6d6-8198de3c47c5</wsrm:Identifier>
+            <wsrm:Accept>
+               <wsrm:AcksTo>
+                  <wsa:Address>http://localhost:8070/axis/services/TestService</wsa:Address>
+               </wsrm:AcksTo>
+            </wsrm:Accept>
+         </wsrm:CreateSequenceResponse>
+      </soapenv:Body>
+   </soapenv:Envelope>

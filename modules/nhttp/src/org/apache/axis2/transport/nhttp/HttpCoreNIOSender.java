@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -405,8 +406,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                         // this fault is NOT caused by the endpoint while processing. so we have to
                         // inform that this is a sending error (e.g. endpoint failure) and handle it
                         // differently at the message receiver.
-                        MessageContext nioFaultMessageContext = new AxisEngine
-                            (mc.getConfigurationContext()).createFaultMessageContext(mc, request.getException());
+
+                        Exception exception = request.getException();
+                        MessageContext nioFaultMessageContext =
+                            MessageContextBuilder.createFaultMessageContext(
+                                /** this is not a mistake I do NOT want getMessage()*/
+                                mc, new AxisFault(exception.toString(), exception));
                         nioFaultMessageContext.setProperty("sending_fault", Boolean.TRUE);
                         mr.receive(nioFaultMessageContext);
                         

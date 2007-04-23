@@ -16,31 +16,20 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- introduction dynamic endpoints -->
+<!-- introduction dynamic endpoints -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <registry provider="org.apache.synapse.registry.url.SimpleURLRegistry">
-        <!-- the root property of the simple URL registry helps resolve a resource URL as root + key -->
-        <parameter name="root">file:./../../repository/</parameter>
-		        <!-- all resources loaded from the URL registry would be cached for this number of milli seconds -->
+        <parameter name="root">file:repository/conf/sample/resources/</parameter>
         <parameter name="cachableDuration">15000</parameter>
     </registry>
 
-    <definitions>
-        <endpoint name="dynamic_endpoint" key="endpoint/dynamic_endpt_1.xml"/>
-    </definitions>
-
-    <rules>
-        <in>
-        	<send>
-        		<endpoint ref="dynamic_endpoint"/>
-        	</send>
-        </in>
-        <out>
-        	<send/>
-        </out>
-    </rules>
-
-</synapse> 
+    <in>
+        <send>
+            <endpoint key="endpoint/dynamic_endpt_1.xml"/>
+        </send>
+    </in>
+    <out>
+        <send/>
+    </out>
+</definitions>

@@ -138,7 +138,7 @@ example.</p>
 <ol>
   <li>Smart Client mode</li>
   <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
-  </pre>
+ </pre>
   <li>Using Synapse as a HTTP Proxy</li>
   <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8080/</pre>
   <pre></pre>
@@ -316,8 +316,7 @@ extension function.</p>
             &lt;send/&gt;
         &lt;/out&gt;
     &lt;/sequence&gt;
-&lt;/definitions&gt;
- </pre>
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Illustrates local registry entry definitions, reusable
 endpoints and sequences</strong></p>
@@ -427,8 +426,7 @@ sequence is 'main' and it does not specify an 'onError' attribute. Whenever
 Synapse cannot find an error handler, it looks up for a sequence named
 'fault'. Thus the 'fault' sequence can be seen executing, and writing the
 generic error message into the logs. </p>
-<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT
-</pre>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
 <pre>[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate() 
 [HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : bogus 
 [HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault 
@@ -440,8 +438,7 @@ generic error message into the logs. </p>
 invoked, and it specifies 'sunErrorHandler' as its error handler. Hence when
 the send fails, now you could see the proper error handler invocation and the
 custom error message as follows:</p>
-<pre>
-ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN
 
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate() 
 [HttpServerWorker-1] DEBUG SequenceMediator - Setting the onError handler for the sequence 
@@ -452,10 +449,71 @@ ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrp
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunErrorHandler&gt; :: mediate() 
 [HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate() 
 [HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate() 
-[HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured for stock SUN, message = Reference to non-existent endpoint for key : sunPort
-</pre>
+[HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured for stock SUN, message = Reference to non-existent endpoint for key : sunPort</pre>
 
-<h2><a name="Sample6">Sample 5:</a></h2>
+<h2>Sample 5:</h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="myFaultHandler"&gt;
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason expression="get-property('ERROR_MESSAGE')"/&gt;
+        &lt;/makefault&gt;
+
+        &lt;property name="RESPONSE" value="true"/&gt;
+        &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="main" onError="myFaultHandler"&gt;
+        &lt;in&gt;
+            &lt;switch source="//m0:getQuote/m0:request/m0:symbol"
+                    xmlns:m0="http://services.samples/xsd"&gt;
+                &lt;case regex="MSFT"&gt;
+                    &lt;send&gt;&lt;endpoint name="bogusHost"&gt;
+                            &lt;address uri="http://bogus:9000/soap/NonExistentStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;&lt;/send&gt;
+                &lt;/case&gt;
+                &lt;case regex="SUN"&gt;
+                    &lt;send&gt;&lt;endpoint name="bogusPort"&gt;
+                            &lt;address uri="http://localhost:9009/soap/NonExistentStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;&lt;/send&gt;
+                &lt;/case&gt;
+            &lt;/switch&gt;
+            &lt;drop/&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Makefault mediator and sending back error responses
+</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 4: i.e. synapse -sample 5<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p>When the MSFT stock quote is requested, an unknown host exception would be
+caused, and a connection refuxed exception would be caused for the SUN stock.
+This information is captured and returned back to the original client as a
+SOAP fault in this example.</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
+
+<p>Returns:</p>
+<pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;&lt;faultstring&gt;java.net.UnknownHostException: bogus&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
+
+<p>And</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+
+<p>Returns:</p>
+<pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;&lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
+
+<h2><a name="Sample6">Sample 6:</a></h2>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;!-- illustration of various mediators : header, in and out mediators --&gt;

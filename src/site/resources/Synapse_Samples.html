@@ -22,10 +22,13 @@
   <title></title>
   <style type="text/css">
   pre {
-    font-family: Georgia, "Times New Roman",Times, serif;
+    font-family: Georgia, "verdena",verdena, serif;
     font-size:10;
-    border-style:double;
-    color: darkblue;
+    border-style:solid 1px #333;
+    color: #000;
+        padding-left:10px;
+        padding-right:10px;
+        background-color: #cdcdcd;
   }
  </style>
 </head>
@@ -505,289 +508,189 @@ SOAP fault in this example.</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
 
 <p>Returns:</p>
-<pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;&lt;faultstring&gt;java.net.UnknownHostException: bogus&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
+<pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;
+&lt;faultstring&gt;java.net.UnknownHostException: bogus&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
 
 <p>And</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
 
 <p>Returns:</p>
-<pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;&lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
+<pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;
+&lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
 
 <h2><a name="Sample6">Sample 6:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+        &lt;header name="To" value="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+    &lt;/in&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt;</pre>
 
-    &lt;!-- illustration of various mediators : header, in and out mediators --&gt;
-    &lt;rules&gt;
-        &lt;!-- the in mediator applies only to 'incoming' messages (requests) into synapse --&gt;
-        &lt;in&gt;
-            &lt;filter source="//m0:getQuote/m0:request/m0:symbol" regex="IBM"
-                    xmlns:m0="http://services.samples/xsd"&gt;
-                &lt;!-- set the message header for the 'To' EPR to the supplied value --&gt;
-                &lt;header name="To"
-                        value="http://localhost:9000/axis2/services/SimpleStockQuoteService1"/&gt;
-                &lt;send/&gt;
-            &lt;/filter&gt;
-
-            &lt;!-- drop (i.e. abort processing of) any other messages --&gt;
-            &lt;drop/&gt;
-        &lt;/in&gt;
-
-        &lt;!-- the out mediator applies only to 'outgoing' messages (responses) from synapse --&gt;
-        &lt;out&gt;
-            &lt;!-- display a log message at the time a response passes through synapse --&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="message" value="sending back the response"/&gt;
-            &lt;/log&gt;
-
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-&lt;/synapse&gt; </pre>
-
-<p><strong>Objective: Introduction to header, in and out
-mediators</strong></p>
+<p><strong>Objective: Introduction to header, in (out) mediators</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
 Start the Synapse configuration numbered 6: i.e. synapse -sample 6<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService1 (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
-<p>In this example we use the same stockquote client which sets the 'To' EPR
-of the message to the SimpleStockQuoteService service. However, if this
-request is for the IBM stock, the configuration invokes the header mediator
-and sets the 'To' value to the SimpleStockQuoteService1. Hence if you request
-for the IBM stock, you should see the header mediator changing the
-WS-Addressing header in the log message, and on the Axis2 server console you
-would notice that the SimpleStockQuoteService1 service indeed received and
-processed the response. You will also see that the mediation rules now use
-the in and out mediators - which executes the mediators within them depending
-on whether the message is an incoming request from a client, or a response
-message being sent to a client from Synapse. The log message 'sending back
-the response' prints only during the processing of the response message.</p>
-
-<p>If a request is made for any other stock, Synapse is instructed to drop
-the message and hence the client will not receive any response. The drop
-mediator aborts further processing of a message and may be used to discard
-and reject unwanted messages.</p>
+<p>In this example we use the stockquote client in the dumb client mode,
+setting the 'To' EPR of the message to Synapse. Then the 'in' mediator
+processes the incoming messages, and manipulates the 'To' header to refer to
+the stock quote service on the sample Axis2 server. Thus it is now possible
+to request for a stock quote as follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/SimpleStockQuoteService</pre>
 
 <h2><a name="Sample7">Sample 7:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- introduction of static inline XML properties and the validation mediator --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- introduction of static inline XML properties and the validation mediator --&gt;
-    &lt;definitions&gt;
+    &lt;localEntry key="validate_schema"&gt;
+        &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                    xmlns="http://www.apache-synapse.org/test" elementFormDefault="qualified"
+                    attributeFormDefault="unqualified"
+                    targetNamespace="http://services.samples/xsd"&gt;
+            &lt;xs:element name="getQuote"&gt;
+                &lt;xs:complexType&gt;
+                    &lt;xs:sequence&gt;
+                        &lt;xs:element name="request"&gt;
+                            &lt;xs:complexType&gt;
+                                &lt;xs:sequence&gt;
+                                    &lt;xs:element name="stocksymbol" type="xs:string"/&gt;
+                                &lt;/xs:sequence&gt;
+                            &lt;/xs:complexType&gt;
+                        &lt;/xs:element&gt;
+                    &lt;/xs:sequence&gt;
+                &lt;/xs:complexType&gt;
+            &lt;/xs:element&gt;
+        &lt;/xs:schema&gt;
+    &lt;/localEntry&gt;
 
-        &lt;!-- define a static property for an XSD schema resource as an inline XML fragment --&gt;
-        &lt;set-property name="validate_schema"&gt;
-            &lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                       xmlns="http://www.apache-synapse.org/test" elementFormDefault="qualified"
-                       attributeFormDefault="unqualified"
-                       targetNamespace="http://services.samples/xsd"&gt;
-                &lt;xs:element name="getQuote"&gt;
-                    &lt;xs:complexType&gt;
-                        &lt;xs:sequence&gt;
-                            &lt;xs:element name="request"&gt;
-                                &lt;xs:complexType&gt;
-                                    &lt;xs:sequence&gt;
-                                        &lt;xs:element name="stocksymbol" type="xs:string"/&gt;
-                                    &lt;/xs:sequence&gt;
-                                &lt;/xs:complexType&gt;
-                            &lt;/xs:element&gt;
-                        &lt;/xs:sequence&gt;
-                    &lt;/xs:complexType&gt;
-                &lt;/xs:element&gt;
-            &lt;/xs:schema&gt;
-        &lt;/set-property&gt;
+    &lt;in&gt;
+        &lt;validate&gt;
+            &lt;schema key="validate_schema"/&gt;
+            &lt;on-fail&gt;
+                &lt;!-- if the request does not validate againt schema throw a fault --&gt;
+                &lt;makefault&gt;
+                    &lt;code value="tns:Receiver"
+                            xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                    &lt;reason value="Invalid custom quote request"/&gt;
+                &lt;/makefault&gt;
+                &lt;property name="RESPONSE" value="true"/&gt;
+                &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+            &lt;/on-fail&gt;
+        &lt;/validate&gt;
+    &lt;/in&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt; </pre>
 
-        &lt;endpoint name="stockquote"
-                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-
-        &lt;sequence name="customrequest"&gt;
-            &lt;!-- is this a valid custom request ? --&gt;
-            &lt;validate&gt;
-                &lt;schema key="validate_schema"/&gt;
-                &lt;on-fail&gt;
-                    &lt;!-- if the request does not validate againt schema throw a fault --&gt;
-                    &lt;makefault&gt;
-                        &lt;code value="tns:Receiver"
-                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
-                        &lt;reason value="Invalid custom quote request"/&gt;
-                    &lt;/makefault&gt;
-
-                    &lt;!-- send the fault and stop processing --&gt;
-                    &lt;send/&gt;
-                &lt;/on-fail&gt;
-            &lt;/validate&gt;
-
-            &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
-            &lt;send&gt;
-                &lt;endpoint ref="stockquote"/&gt;
-            &lt;/send&gt;
-        &lt;/sequence&gt;
-
-    &lt;/definitions&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;!-- is this a custom stock quote message? --&gt;
-            &lt;filter xpath="//m0:getQuote" xmlns:m0="http://services.samples/xsd"&gt;
-                &lt;sequence ref="customrequest"/&gt;
-            &lt;/filter&gt;
-        &lt;/in&gt;
-
-        &lt;!-- just let the message flow through --&gt;
-        &lt;send/&gt;
-
-    &lt;/rules&gt;
-&lt;/synapse&gt; </pre>
-
-<p><strong>Objective: Introduction to the extension mediators, static XML
-properties and the validate mediator</strong></p>
+<p><strong>Objective: Introduction to local (static) registry entries and the
+validate mediator</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Download Xerces2-j 2.8.0 or later, and copy the xml-apis.jar and
-xercesImpl.jar into the lib/endorsed folder<br>
 Start the Synapse configuration numbered 7: i.e. synapse -sample 7<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
-<p>The validate mediator is bundled as an extension mediator as it depends on
-the Xerces2-j parser for schema validation, to keep the core Synapse
-distribution compact. Hence to try this example you will first need to
-download the Xerces parser and place its jar files into the lib folder to
-make it available to the validate mediator.</p>
+<p>This example shows how a static XML fragment could be made available to
+the Synapse local registry. Resources defined to the local registry are
+static (i.e. never changes over the lifetime of the configuration) and may be
+specified as a source URL, inline-text or inline-xml. In this example the
+schema is made available under the key 'validate_schema'.</p>
 
-<p>This example shows how an XML fragment could be made available to Synapse
-as a property. Such a property is called an inline XML property and is static
-since its content never changes after initiation. Hence a Schema is made
-available to the configuration as a property named 'validate_schema'.</p>
+<p>The validate mediator by default operates on the first child element of
+the SOAP body. You may specify an XPath expression using the 'source'
+attribute to override this behaviour. The validate mediator now uses the
+'validate_schema' resource to validate the incoming message, and if the
+message is in error invokes on the 'on-fail' sequence of mediators.</p>
 
-<p>Synapse supports string, inline text, inline xml and URL source properties
-which are static properties. In addition it supports dynamic registry based
-properties as introduced later.</p>
-
-<p>In this example the request messages are filtered using a boolean XPath
-expression which checks if the request is a getQuote request. If so the
-'customsequence' sequence is invoked, which in-turn calls on the validate
-mediator passing it the property key 'validate_schema'. The validate mediator
-by default operates on the first child element of the SOAP body. You may
-specify an XPath expression using an attribute 'source' to override this
-behaviour. The validate mediator now uses the 'validate_schema' property to
-validate the incoming message, and if the message is in error invokes on the
-'on-fail' sequence of mediators.</p>
-
-<p>If you send a standard stockquote request using 'ant stockquote' you will
-now get a fault back with a message 'Invalid custom quote request' as the
-schema validation failed. This is because the schema used in the example
-expects a slightly different message than what is created by the stock quote
-client. (i.e. expects a 'stocksymbol' element instead of 'symbol' to specify
-thestock symbol)</p>
+<p>If you send a stockquote request using 'ant stockquote ..' you will now
+get a fault back with a message 'Invalid custom quote request' as the schema
+validation failed. This is because the schema used in the example expects a
+slightly different message than what is created by the stock quote client.
+(i.e. expects a 'stocksymbol' element instead of 'symbol' to specify thestock
+symbol)</p>
 
 <h2><a name="Sample8">Sample 8:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- introduction to static and dynamic registry resources and the XSLT mediator --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- introduction to URL source properties, registry based properties and the XSLT mediator --&gt;
-
-    &lt;!-- the SimpleURLRegistry allows access to a URL based resource store such as the --&gt;
-    &lt;!-- file system (file://) or a web server (http://) --&gt;
+    &lt;!-- the SimpleURLRegistry allows access to a URL based registry (e.g. file:/// or http://) --&gt;
     &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;!-- the root property of the simple URL registry helps resolve a resource URL as root + key --&gt;
-        &lt;property name="root" value="file:repository/conf/sample/resources/"/&gt;
+        &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
         &lt;!-- all resources loaded from the URL registry would be cached for this number of milli seconds --&gt;
-        &lt;property name="cachableDuration" value="15000"/&gt;
+        &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
     &lt;/registry&gt;
 
-    &lt;definitions&gt;
+    &lt;!-- define the request processing XSLT resource as a static URL source --&gt;
+    &lt;localEntry key="xslt-key-req" src="file:repository/conf/sample/resources/transform/transform.xslt"/&gt;
 
-        &lt;!-- define a static property for the first XSLT resource as an URL source (could be any URL src) --&gt;
-        &lt;set-property name="xslt-key-req"
-                      src="file:repository/conf/sample/resources/transform/transform.xslt"/&gt;
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
+        &lt;xslt key="xslt-key-req"/&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+    &lt;!-- the key is looked up in the remote registry and loaded as a 'dynamic' registry resource --&gt;
+        &lt;xslt key="transform/transform_back.xslt"/&gt;
+    &lt;/out&gt;
+&lt;send/&gt;
+&lt;/definitions&gt;</pre>
 
-        &lt;!-- define a dynamic property for the second XSLT resource as a key reference to the registry --&gt;
-        &lt;!-- the key is just a unique identifier for a resource on the registry. It is treated as a string literal --&gt;
-        &lt;set-property name="xslt-key-resp" key="transform/transform_back.xslt"/&gt;
-
-        &lt;!-- define a reuseable endpoint definition and use it within config --&gt;
-        &lt;endpoint name="stockquote"
-                  address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-
-    &lt;/definitions&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
-            &lt;xslt key="xslt-key-req"/&gt;
-
-            &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
-            &lt;send&gt;
-                &lt;endpoint ref="stockquote"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-            &lt;xslt key="xslt-key-resp"/&gt;
-
-            &lt;!-- now send the custom response back to the client and stop --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-&lt;/synapse&gt; </pre>
-
-<p><strong>Objective: Introduction to URL source properties, registry based
-properties and the XSLT mediator</strong></p>
+<p><strong>Objective: Introduction to static and dynamic registry resources
+and the XSLT mediator</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Download Xalan-J version 2.7.0 or later, and copy xalan.jar and
-serializer.jar into the Synapse lib folder. Copy xercesImpl.jar and
-xml-apis.jar (of Xerces-J) into the lib/endorsed folder.<br>
 Start the Synapse configuration numbered 8: i.e. synapse -sample 8<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
 <p>This example uses the XSLT mediator to perform transformations, and the
-xslt tranformation is specified as a property, similar to the way the a
-schema was specified to the validate mediator. The first resource
-'xslt-key-req' is specified by specifying its URL. The URL could be any valid
-URL, for e.g. http://someserver/path/resource.xslt or a file:// URL etc. The
-second resource 'xslt-key-resp' is specified using a 'key' attribute.</p>
+xslt tranformations are specified as registry resources. The first resource
+'xslt-key-req' is specified as a 'local' registry entry. Local entries do not
+place the resource on the registry, but simply makes it available to the
+local configuration. If a local entry is defined with a key that already
+exists in the remote registry, the local entry will have preference and hide
+the existence of the remote resource.</p>
 
 <p>In this example you will notice the new 'registry' definition. Synapse
-comes with a simple URL based registry called SimpleURLRegistry. During
-initialization of the registry, the SimpleURLRegistry expects to find a
-property named 'root', which specifies a prefix for the registry keys used
-later. When the SimpleURLRegistry is used, this root is prefixed to the
-property key to form the complete URL for the resource being looked up. The
-registry caches a resource once requested, and caches it internally for a
-specified duration. Once this period expires, it will reload the meta
-information about the resource and reload its cached copy if required, the
-next time the resource is requested.</p>
+comes with a simple URL based registry implementation SimpleURLRegistry.
+During initialization of the registry, the SimpleURLRegistry expects to find
+a property named 'root', which specifies a prefix for the registry keys used
+later. When the SimpleURLRegistry is used, this root is prefixed to the entry
+keys to form the complete URL for the resource being looked up. The registry
+caches a resource once requested, and caches it internally for a specified
+duration. Once this period expires, it will reload the meta information about
+the resource and reload its cached copy if necessary, the next time the
+resource is requested.</p>
 
 <p>Hence the second XSLT resource key 'transform/transform_back.xslt'
-concatenated with the 'root' of the SimpleUTLRegistry
+concatenated with the 'root' of the SimpleURLRegistry
 'file:repository/conf/sample/resources/' forms the complete URL of the
 resource as
 'file:repository/conf/sample/resources/transform/transform_back.xslt' and
-caches its value for a period of 15000 seconds.</p>
+caches its value for a period of 15000 ms.</p>
 
-<p>Execute the custom quote client as 'ant customquote' and check analyze the
-the Synapse debug log output as shown below</p>
-<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
-&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
-DEBUG XSLTMediator - Transformation result :
-&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
-&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
+<p>Execute the custom quote client as 'ant stockquote -Dmode=customquote ..'
+and analyze the the Synapse debug log output as shown below</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote
+</pre>
+<pre>[HttpServerWorker-1] DEBUG XSLTMediator - Performing XSLT transformation against property with key : xslt-key-req 
+[HttpServerWorker-1] DEBUG XSLTMediator - Transformation source : 
+    &lt;m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt; 
+[HttpServerWorker-1] DEBUG XSLTMediator - Transformation result : &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;</pre>
 
 <p>The incoming message is now transformed into a standard stock quote
 request as expected by the SimpleStockQuoteService deployed on the local
-Axis2 instance by the XSLT mediator. The XSLT mediator uses Xalan-J to
-perform the transformations, and hence the necessary Xalan-J and Xerces-J
-libraries needs to be made available to Synapse. The response from the
-SimpleStockQuoteService is converted into the custom format as expected by
-the client during the out message processing.</p>
+Axis2 instance, by the XSLT mediator. The XSLT mediator uses Xalan-J to
+perform the transformations. It is possible to configure the underlying
+transformation engine using properties where necessary. The response from the
+SimpleStockQuoteService is converted back into the custom format as expected
+by the client during the out message processing.</p>
 
 <p>During the response processing you could notice the SimpleURLRegistry
-fetching the resource as shown by the debug logs below</p>
-<pre>INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
+fetching the resource as shown by the log message below</p>
+<pre>[HttpClientWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
 
 <p>If you re-run the client again immidiately (i.e within 15 seconds of the
 first request) you will not see the resource being re-loaded by the registry
@@ -796,21 +699,24 @@ as the cached value would be still valid.</p>
 <p>However if you leave the system idle for 15 seconds or more and then retry
 the same request, you will now notice that the registry noticed the cache
 expiry and checked the meta information about the resource to check if the
-resource itself has changes and requires a fresh fetch from the source
-URL.</p>
-<pre>DEBUG AbstractRegistry - Cached object has expired for key : transform/transransform_back.xslt
-DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt
-DEBUG AbstractRegistry - Expired version number is same as current version in registry
-DEBUG AbstractRegistry - Renew cache lease for another 15s</pre>
+resource itself has changes and requires a fresh fetch from the source URL.
+If the meta data / version number indicates that a reload of the cached
+resource is not necessary (i.e. unless the resource itself actually changed)
+the updated meta information is used and the cache lease extended as
+appropriate.</p>
+<pre>[HttpClientWorker-1] DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt 
+[HttpClientWorker-1] DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt 
+[HttpClientWorker-1] DEBUG AbstractRegistry - Expired version number is same as current version in registry 
+[HttpClientWorker-1] DEBUG AbstractRegistry - Renew cache lease for another 15s </pre>
 
 <p>Now edit the
 repository/conf/sample/resources/transform/transform_back.xslt file and add a
 blank line at the end. Now when you run the client again, and if the cache is
 expired, the resource would be re-fetched from its URL by the registry and
 this can be seen by the following debug log messages</p>
-<pre>DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt
-DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt
-INFO SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt</pre>
+<pre>[HttpClientWorker-1] DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt 
+[HttpClientWorker-1] DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt 
+[HttpClientWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt </pre>
 
 <p>Thus the SimpleURLRegistry allows resource to be cached, and updates
 detected so that changes could be reloaded without restarting the Synapse

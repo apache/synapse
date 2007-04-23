@@ -16,74 +16,44 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
+<!-- introduction of static inline XML properties and the validation mediator -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+    <localEntry key="validate_schema">
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                    xmlns="http://www.apache-synapse.org/test" elementFormDefault="qualified"
+                    attributeFormDefault="unqualified"
+                    targetNamespace="http://services.samples/xsd">
+            <xs:element name="getQuote">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="request">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="stocksymbol" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </localEntry>
 
-    <!-- introduction of static inline XML properties and the validation mediator -->
-    <definitions>
-
-        <!-- define a static property for an XSD schema resource as an inline XML fragment -->
-        <set-property name="validate_schema">
-            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                       xmlns="http://www.apache-synapse.org/test" elementFormDefault="qualified"
-                       attributeFormDefault="unqualified"
-                       targetNamespace="http://services.samples/xsd">
-                <xs:element name="getQuote">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="request">
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element name="stocksymbol" type="xs:string"/>
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:schema>
-        </set-property>
-
-        <endpoint name="stockquote">
-            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-        </endpoint>
-
-        <sequence name="customrequest">
-            <!-- is this a valid custom request ? -->
-            <validate>
-                <schema key="validate_schema"/>
-                <on-fail>
-                    <!-- if the request does not validate againt schema throw a fault -->
-                    <makefault>
-                        <code value="tns:Receiver"
-                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
-                        <reason value="Invalid custom quote request"/>
-                    </makefault>
-
-                    <!-- send the fault and stop processing -->
-                    <send/>
-                </on-fail>
-            </validate>
-
-            <!-- send message to real endpoint referenced by name "stockquote" and stop -->
-            <send>
-                <endpoint ref="stockquote"/>
-            </send>
-        </sequence>
-
-    </definitions>
-
-    <rules>
-        <in>
-            <!-- is this a custom stock quote message? -->
-            <filter xpath="//m0:getQuote" xmlns:m0="http://services.samples/xsd">
-                <sequence ref="customrequest"/>
-            </filter>
-        </in>
-
-        <!-- just let the message flow through -->
-        <send/>
-
-    </rules>
-
-</synapse> 
+    <in>
+        <validate>
+            <schema key="validate_schema"/>
+            <on-fail>
+                <!-- if the request does not validate againt schema throw a fault -->
+                <makefault>
+                    <code value="tns:Receiver"
+                            xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+                    <reason value="Invalid custom quote request"/>
+                </makefault>
+				<property name="RESPONSE" value="true"/>
+		        <header name="To" expression="get-property('ReplyTo')"/>
+            </on-fail>
+        </validate>
+    </in>
+    <send/>
+</definitions>

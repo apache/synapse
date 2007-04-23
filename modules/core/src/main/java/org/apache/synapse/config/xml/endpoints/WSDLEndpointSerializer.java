@@ -154,7 +154,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             wsdlElement.addChild(timeout);
 
             OMElement duration = fac.createOMElement("duration", Constants.SYNAPSE_OMNAMESPACE);
-            duration.setText(Long.toString(endpointDefinition.getTimeoutDuration()));
+            duration.setText(Long.toString(endpointDefinition.getTimeoutDuration() / 1000));
             timeout.addChild(duration);
 
             OMElement action = fac.createOMElement("action", Constants.SYNAPSE_OMNAMESPACE);

@@ -87,9 +87,7 @@ echo Using JAVA_HOME    %JAVA_HOME%
 echo Using AXIS2_HOME   %AXIS2_HOME%
 
 cd %AXIS2_HOME%
-"%_JAVACMD%" %_PORT% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.endorsed.dirs=%AXIS2_ENDORSED%
-
-samples.util.SampleAxis2Server %AXIS2_CMD_LINE_ARGS%
+"%_JAVACMD%" %_PORT% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server %AXIS2_CMD_LINE_ARGS%
 goto end
 
 :end

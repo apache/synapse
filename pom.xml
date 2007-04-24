@@ -619,7 +619,7 @@
 
         <!-- Axis2 1.2 and its dependencies -->
         <axis2.version>1.2-SNAPSHOT</axis2.version>
-        <axiom.version>SNAPSHOT</axiom.version>
+        <axiom.version>1.2.4</axiom.version>
         <xml_schema.version>1.3.1</xml_schema.version>
         <xml_apis.version>1.3.03</xml_apis.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
@@ -631,9 +631,8 @@
         <addressing.version>1.2-SNAPSHOT</addressing.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <sandesha2.version>1.1</sandesha2.version>
-        <neethi.version>SNAPSHOT</neethi.version>
+        <neethi.version>2.0.1</neethi.version>
         <wss4j.version>SNAPSHOT</wss4j.version>
-        <xmlsec.version>1.3.0</xmlsec.version>
 
         <xerces.version>2.8.1</xerces.version>
         <xalan.version>2.7.0</xalan.version>

@@ -80,7 +80,7 @@ public class HttpCoreNIOListener implements TransportListener {
             log.error("Error starting the IOReactor", e);
         }
 
-        NHttpServiceHandler handler = new ServerHandler(cfgCtx, params);
+        NHttpServiceHandler handler = new ServerHandler(cfgCtx, params, sslContext != null);
         IOEventDispatch ioEventDispatch = getEventDispatch(
             handler, sslContext, sslIOSessionHandler, params);
 

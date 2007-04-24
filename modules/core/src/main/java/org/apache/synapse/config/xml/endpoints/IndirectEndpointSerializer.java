@@ -48,7 +48,7 @@ public class IndirectEndpointSerializer implements EndpointSerializer {
         IndirectEndpoint indirectEndpoint = (IndirectEndpoint) endpoint;
         String ref = indirectEndpoint.getKey();
         if (ref != null) {
-            endpointElement.addAttribute("ref", ref, null);
+            endpointElement.addAttribute("key", ref, null);
         }
 
         return endpointElement;

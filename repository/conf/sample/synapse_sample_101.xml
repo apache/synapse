@@ -16,39 +16,29 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
+<!-- using custom sequences for incoming and outgoing message mediation with proxy services -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- using custom sequences for incoming and outgoing message mediation with proxy services -->
-    <definitions>
-        <set-property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-
-        <sequence name="proxy_1">
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-                </endpoint>
-            </send>
-        </sequence>
-
-        <endpoint name="proxy_2_endpoint" address="http://localhost:9000/soap/SimpleStockQuoteService"/>
-
-    </definitions>
-
-    <proxies>
-        <proxy name="StockQuoteProxy1">
-            <wsdl key="proxy_wsdl"/>
-            <target inSequence="proxy_1"/>
-        </proxy>
-
-        <proxy name="StockQuoteProxy2">
-            <publishWSDL key="proxy_wsdl"/>
-            <target endpoint="proxy_2_endpoint"/>
-        </proxy>
-    </proxies>
-
-    <rules>
+    <sequence name="proxy_1">
+        <send>
+            <endpoint><address uri="http://localhost:9000/soap/SimpleStockQuoteService"/></endpoint>
+        </send>
+    </sequence>
+	<sequence name="out">
         <send/>
-    </rules>
+    </sequence>
+    <endpoint name="proxy_2_endpoint">
+		<address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+	</endpoint>
+    <localEntry key="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
 
-</synapse>
+    <proxy name="StockQuoteProxy1">
+        <publishWSDL key="proxy_wsdl"/>
+        <target inSequence="proxy_1" outSequence="out"/>
+    </proxy>
+
+    <proxy name="StockQuoteProxy2">
+        <publishWSDL key="proxy_wsdl"/>
+        <target endpoint="proxy_2_endpoint" outSequence="out"/>
+    </proxy>
+</definitions>

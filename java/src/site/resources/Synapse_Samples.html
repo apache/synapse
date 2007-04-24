@@ -21,15 +21,60 @@
   <meta http-equiv="content-type" content="">
   <title></title>
   <style type="text/css">
-  pre {
-    font-family: Georgia, "verdena",verdena, serif;
-    font-size:10;
-    border-style:solid 1px #333;
-    color: #000;
-        padding-left:10px;
-        padding-right:10px;
-        background-color: #cdcdcd;
-  }
+  
+pre {
+    padding: 0px;
+    margin-top: 5px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    text-align: left;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border: 1px dashed #3c78b5;
+    font-size: 11px;
+    font-family: Courier;
+    margin: 10px;
+    line-height: 13px;
+}  
+h1 {
+font-size: 24px;
+line-height: normal;
+font-weight: bold;
+background-color: #f0f0f0;
+color: #003366;
+ border-bottom: 1px solid #3c78b5;
+padding: 2px;
+margin: 36px 0px 4px 0px;
+}
+
+h2 {
+font-size: 18px;
+line-height: normal;
+font-weight: bold;
+background-color: #f0f0f0;
+ border-bottom: 1px solid #3c78b5;
+padding: 2px;
+margin: 27px 0px 4px 0px;
+}
+
+h3 {
+font-size: 14px;
+line-height: normal;
+font-weight: bold;
+background-color: #f0f0f0;
+padding: 2px;
+margin: 21px 0px 4px 0px;
+}
+
+h4 {
+font-size: 12px;
+line-height: normal;
+font-weight: bold;
+background-color: #f0f0f0;
+padding: 2px;
+margin: 18px 0px 4px 0px;
+}
  </style>
 </head>
 
@@ -140,11 +185,9 @@ delivered to its ultimate receiver.</strong></p>
 example.</p>
 <ol>
   <li>Smart Client mode</li>
-  <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
- </pre>
+  <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ </pre>
   <li>Using Synapse as a HTTP Proxy</li>
   <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8080/</pre>
-  <pre></pre>
   <li>Dumb Client</li>
 
   <p>See sample # 1</p>
@@ -363,15 +406,15 @@ to all messages that passes through Synapse.</p>
             &lt;property name="text" value="An unexpected error occured"/&gt;
             &lt;property name="message" expression="get-property('ERROR_MESSAGE')"/&gt;
         &lt;/log&gt;
-&lt;drop/&gt;
+        &lt;drop/&gt;
     &lt;/sequence&gt;
 
-&lt;sequence name="sunErrorHandler"&gt;
+    &lt;sequence name="sunErrorHandler"&gt;
         &lt;log level="custom"&gt;
             &lt;property name="text" value="An unexpected error occured for stock SUN"/&gt;
             &lt;property name="message" expression="get-property('ERROR_MESSAGE')"/&gt;
         &lt;/log&gt;
-&lt;drop/&gt;
+        &lt;drop/&gt;
     &lt;/sequence&gt;
 
     &lt;!-- default message handling sequence used by Synapse - named 'main' --&gt;
@@ -441,9 +484,8 @@ generic error message into the logs. </p>
 invoked, and it specifies 'sunErrorHandler' as its error handler. Hence when
 the send fails, now you could see the proper error handler invocation and the
 custom error message as follows:</p>
-<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN
-
-[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate() 
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
+<pre>[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate() 
 [HttpServerWorker-1] DEBUG SequenceMediator - Setting the onError handler for the sequence 
 [HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate() 
 [HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate() 
@@ -509,14 +551,14 @@ SOAP fault in this example.</p>
 
 <p>Returns:</p>
 <pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;
-&lt;faultstring&gt;java.net.UnknownHostException: bogus&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
+    &lt;faultstring&gt;java.net.UnknownHostException: bogus&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
 
 <p>And</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
 
 <p>Returns:</p>
 <pre>&lt;soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;faultcode&gt;soapenv:Client&lt;/faultcode&gt;
-&lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
+    &lt;faultstring&gt;java.net.ConnectException: Connection refused&lt;/faultstring&gt;&lt;detail /&gt;&lt;/soapenv:Fault&gt;</pre>
 
 <h2><a name="Sample6">Sample 6:</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -631,10 +673,10 @@ symbol)</p>
     &lt;/in&gt;
     &lt;out&gt;
         &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-    &lt;!-- the key is looked up in the remote registry and loaded as a 'dynamic' registry resource --&gt;
+        &lt;!-- the key is looked up in the remote registry and loaded as a 'dynamic' registry resource --&gt;
         &lt;xslt key="transform/transform_back.xslt"/&gt;
     &lt;/out&gt;
-&lt;send/&gt;
+    &lt;send/&gt;
 &lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Introduction to static and dynamic registry resources
@@ -720,8 +762,6 @@ this can be seen by the following debug log messages</p>
 <p>Thus the SimpleURLRegistry allows resource to be cached, and updates
 detected so that changes could be reloaded without restarting the Synapse
 instance.</p>
-
-<p></p>
 
 <h2><a name="Sample9">Sample 9:</a></h2>
 <pre>&lt;!-- introduction dynamic sequences --&gt;
@@ -828,7 +868,7 @@ port 9001.</p>
 <h2><a name="Sample11">Sample 11:</a></h2>
 <pre>&lt;!-- a full registry based configuration --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-&lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
+    &lt;registry provider="org.apache.synapse.registry.url.SimpleURLRegistry"&gt;
         &lt;parameter name="root"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;
         &lt;parameter name="cachableDuration"&gt;15000&lt;/parameter&gt;
     &lt;/registry&gt;
@@ -859,71 +899,9 @@ the key ''synapse.xml'. </p>
     &lt;send/&gt;
 &lt;/definitions&gt;</pre>
 
-<h2>Sample 12:</h2>
-<pre>&lt;!-- MTOM and SwA and message properties to correlate requests and responses --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-    &lt;in&gt;
-        &lt;filter source="get-property('Action')" regex="urn:uploadFileUsingMTOM"&gt;
-            &lt;property name="example" value="mtom"/&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;address uri="http://localhost:9001/soap/MTOMSwASampleService" optimize="mtom"/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/filter&gt;
-        &lt;filter source="get-property('Action')" regex="urn:uploadFileUsingSwA"&gt;
-            &lt;property name="example" value="swa"/&gt;
-            &lt;send&gt;
-                &lt;endpoint&gt;
-                    &lt;address uri="http://localhost:9001/soap/MTOMSwASampleService" optimize="swa"/&gt;
-                &lt;/endpoint&gt;
-            &lt;/send&gt;
-        &lt;/filter&gt;
-    &lt;/in&gt;
-    &lt;out&gt;
-        &lt;filter source="get-property('example')" regex="mtom"&gt;
-            &lt;property name="enableMTOM" value="true" scope="axis2"/&gt;
-        &lt;/filter&gt;
-        &lt;filter source="get-property('example')" regex="swa"&gt;
-            &lt;property name="enableSwA" value="true" scope="axis2"/&gt;
-        &lt;/filter&gt;
-        &lt;send/&gt;
-    &lt;/out&gt;
-&lt;/definitions&gt;</pre>
+<p></p>
 
-<p><strong>Objective: MTOM and SwA optimizations and request/response
-correlation</strong></p>
-
-<p><strong>Pre-Requisites:</strong><br>
-Start the Synapse configuration numbered 10: i.e. synapse -sample 10<br>
-Start the Axis2 server and deploy the MTOMSwASampleService if not already
-done</p>
-
-<p>Execute the 'ant optimizeclient' specifying MTOM optimization as
-follows:</p>
-<pre>ant optimizeclient -Dopt_mode=mtom</pre>
-
-<p>The configuration now sets a local message context property, and forwards
-the message to 'http://localhost:9000/soap/MTOMSwASampleService' optimizing
-bindary content as MTOM. By sending this message through TCPMon you would be
-able to see the actual message sent over the http transport if required. Thus
-during response processing, by checking the local message property Synapse
-could identify the past information about the current message context, and
-uses this knowledge to transform the response back to the client in the same
-format as the original request.</p>
-
-<p>When the client executes successfully, it will upload a file containging
-the ASF logo and receive its response back again and save it into a temporary
-file.</p>
-<pre>[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as MTOM</pre>
-<pre>[java] Saved response to file : /tmp/mtom-36877.gif</pre>
-
-<p>Next try SwA as:</p>
-<pre>ant optimizeclient -Dopt_mode=swa
-[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as SwA
-[java] Saved response to file : /tmp/swa-47549.gif</pre>
-
-<h1>WS-Security</h1>
+<h1>Endpoints</h1>
 
 <p><a name="WSSecurity" id="WSSecurity"></a></p>
 
@@ -932,8 +910,7 @@ file.</p>
 
     &lt;!-- Connecting to endpoints with WS-Security for outgoing messages --&gt;
     &lt;definitions&gt;
-    &lt;set-property name="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
-    
+    &lt;set-property name="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;    
         &lt;endpoint name="secure" address="http://localhost:9000/axis2/services/SecureStockQuoteService3"&gt;
         &lt;enableSec policy="sec_policy"/&gt;
         &lt;enableAddressing/&gt;
@@ -990,9 +967,73 @@ and the response is delivered back to the client as it expects.</p>
 
 <p></p>
 
-<p></p>
+<h2>Sample 51:</h2>
+<pre>&lt;!-- MTOM and SwA and message properties to correlate requests and responses --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+        &lt;filter source="get-property('Action')" regex="urn:uploadFileUsingMTOM"&gt;
+            &lt;property name="example" value="mtom"/&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri="http://localhost:9001/soap/MTOMSwASampleService" optimize="mtom"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/filter&gt;
+        &lt;filter source="get-property('Action')" regex="urn:uploadFileUsingSwA"&gt;
+            &lt;property name="example" value="swa"/&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;address uri="http://localhost:9001/soap/MTOMSwASampleService" optimize="swa"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/filter&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;filter source="get-property('example')" regex="mtom"&gt;
+            &lt;property name="enableMTOM" value="true" scope="axis2"/&gt;
+        &lt;/filter&gt;
+        &lt;filter source="get-property('example')" regex="swa"&gt;
+            &lt;property name="enableSwA" value="true" scope="axis2"/&gt;
+        &lt;/filter&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt;</pre>
 
-<p></p>
+<p><strong>Objective: MTOM and SwA optimizations and request/response
+correlation</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 10: i.e. synapse -sample 51<br>
+Start the Axis2 server and deploy the MTOMSwASampleService if not already
+done</p>
+
+<p>Execute the 'ant optimizeclient' specifying MTOM optimization as
+follows:</p>
+<pre>ant optimizeclient -Dopt_mode=mtom</pre>
+
+<p>The configuration now sets a local message context property, and forwards
+the message to 'http://localhost:9000/soap/MTOMSwASampleService' optimizing
+bindary content as MTOM. By sending this message through TCPMon you would be
+able to see the actual message sent over the http transport if required. Thus
+during response processing, by checking the local message property Synapse
+could identify the past information about the current message context, and
+uses this knowledge to transform the response back to the client in the same
+format as the original request.</p>
+
+<p>When the client executes successfully, it will upload a file containging
+the ASF logo and receive its response back again and save it into a temporary
+file.</p>
+<pre>[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as MTOM</pre>
+<pre>[java] Saved response to file : /tmp/mtom-36877.gif</pre>
+
+<p>Next try SwA as:</p>
+<pre>ant optimizeclient -Dopt_mode=swa
+[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as SwA
+[java] Saved response to file : /tmp/swa-47549.gif</pre>
+
+<p>By using TCPMon and sending the message through it, one can inspect that
+the requests and responses sent are indeed MTOM optimized or sent as http
+attachments.</p>
 
 <h1><a name="ProxyServices">Proxy services</a></h1>
 

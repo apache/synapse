@@ -21,7 +21,13 @@
   <meta http-equiv="content-type" content="">
   <title></title>
   <style type="text/css">
-  
+p {
+font-family: Verdana, arial, sans-serif;
+font-size: 11px;
+line-height: 16px;
+color: #000000;
+font-weight: normal;
+}  
 pre {
     padding: 0px;
     margin-top: 5px;
@@ -188,7 +194,7 @@ example.</p>
   <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ </pre>
   <li>Using Synapse as a HTTP Proxy</li>
   <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dprxurl=http://localhost:8080/</pre>
-  <li>Dumb Client</li>
+  <li>Gateway mode / Dumb Client</li>
 
   <p>See sample # 1</p>
 </ol>
@@ -1027,208 +1033,252 @@ file.</p>
 <pre>[java] Saved response to file : /tmp/mtom-36877.gif</pre>
 
 <p>Next try SwA as:</p>
-<pre>ant optimizeclient -Dopt_mode=swa
-[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as SwA
+<pre>ant optimizeclient -Dopt_mode=swa</pre>
+<pre>[java] Sending file : ./../../repository/conf/sample/resources/mtom/asf-logo.gif as SwA
 [java] Saved response to file : /tmp/swa-47549.gif</pre>
 
 <p>By using TCPMon and sending the message through it, one can inspect that
 the requests and responses sent are indeed MTOM optimized or sent as http
-attachments.</p>
+attachments as follows:</p>
+<pre>POST http://localhost:9001/soap/MTOMSwASampleService HTTP/1.1
+Host: 127.0.0.1
+SOAPAction: urn:uploadFileUsingMTOM
+Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353; type="application/xop+xml"; 
+start="&lt;0.urn:uuid:B94996494E1DD5F9B51177413845354@apache.org&gt;"; start-info="text/xml"; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: Keep-Alive
+User-Agent: Synapse-HttpComponents-NIO
 
-<h1><a name="ProxyServices">Proxy services</a></h1>
+--MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353241
+Content-Type: application/xop+xml; charset=UTF-8; type="text/xml"
+Content-Transfer-Encoding: binary
+Content-ID: 
+   &lt;0.urn:uuid:B94996494E1DD5F9B51177413845354@apache.org&gt;221b1
+      &lt;?xml version='1.0' encoding='UTF-8'?&gt;
+         &lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+            &lt;soapenv:Body&gt;
+               &lt;m0:uploadFileUsingMTOM xmlns:m0="http://www.apache-synapse.org/test"&gt;
+                  &lt;m0:request&gt;
+                     &lt;m0:image&gt;
+                        &lt;xop:Include href="cid:1.urn:uuid:78F94BC50B68D76FB41177413845003@apache.org" xmlns:xop="http://www.w3.org/2004/08/xop/include" /&gt;
+                     &lt;/m0:image&gt;
+                  &lt;/m0:request&gt;
+               &lt;/m0:uploadFileUsingMTOM&gt;
+            &lt;/soapenv:Body&gt;
+         &lt;/soapenv:Envelope&gt;
+--MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353217
+Content-Type: image/gif
+Content-Transfer-Encoding: binary
+Content-ID: 
+         &lt;1.urn:uuid:78F94BC50B68D76FB41177413845003@apache.org&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
+<pre>POST http://localhost:9001/soap/MTOMSwASampleService HTTP/1.1
+Host: 127.0.0.1
+SOAPAction: urn:uploadFileUsingSwA
+Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177414170491; type="text/xml"; 
+start="&lt;0.urn:uuid:B94996494E1DD5F9B51177414170492@apache.org&gt;"; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: Keep-Alive
+User-Agent: Synapse-HttpComponents-NIO
+
+--MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177414170491225
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Content-ID: 
+   &lt;0.urn:uuid:B94996494E1DD5F9B51177414170492@apache.org&gt;22159
+      &lt;?xml version='1.0' encoding='UTF-8'?&gt;
+         &lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+            &lt;soapenv:Body&gt;
+               &lt;m0:uploadFileUsingSwA xmlns:m0="http://www.apache-synapse.org/test"&gt;
+                  &lt;m0:request&gt;
+                     &lt;m0:imageId&gt;urn:uuid:15FD2DA2584A32BF7C1177414169826&lt;/m0:imageId&gt;
+                  &lt;/m0:request&gt;
+               &lt;/m0:uploadFileUsingSwA&gt;
+            &lt;/soapenv:Body&gt;
+         &lt;/soapenv:Envelope&gt;22--34MIMEBoundaryurn_uuid_B94996494E1DD5F9B511774141704912
+17
+Content-Type: image/gif
+Content-Transfer-Encoding: binary
+Content-ID: 
+         &lt;urn:uuid:15FD2DA2584A32BF7C1177414169826&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
+
+<h1><a name="ProxyServices1" id="ProxyServices1">Proxy services</a></h1>
 
 <h2><a name="Sample100">Sample 100:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- introduction to Synapse proxy services. A web service proxy is created and
-     hosted on Synapse based on the given WSDL and exposed over all available
-     transports for Synapse. If a proxy service should be exposed over only a sub set
-     of the available transports, use the transports attribute --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-    &lt;/definitions&gt;
-
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;publishWSDL key="proxy_wsdl"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-        &lt;send/&gt;
-        &lt;log&gt;
-            &lt;property name="position" value="Inside Main Mediator"/&gt;
-        &lt;/log&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
+<pre>&lt;!-- introduction to Synapse proxy services --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Introduction to Synapse proxy services</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
 Start the Synapse configuration numbered 100: i.e. synapse -sample 100<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p></p>
 
 <p>Once Synapse starts, you could go to
-http://localhost:8080/axis2/services/StockQuoteProxy?wsdl and view the WSDL
+http://localhost:8080/soap/StockQuoteProxy?wsdl and view the WSDL generated
 for the proxy service defined in the configuration. This WSDL is based on the
 source WSDL supplied in the proxy service definition, and is updated to
 reflect the proxy service EPR.</p>
 
 <p>Execute the stock quote client by requesting for a stock quote on the
 proxy service as follows:</p>
-<pre>ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy</pre>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy</pre>
 
-<p>You will now notice that the message is forwarded to the specified target
-endpoint and the request was routed to the SimpleStockQuoteService service on
-the local Axis2 instance. The response message is forwarded to the client
-with the help of the implicit parameters, as an outgoing sequence is not
-specified in this example either. The client should receive a stock quote
-reply from the proxy service. Also the client could get the WSDL for the
-proxy service by requesting for
-http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
+<p>An 'inSequence' or 'endpoint' or both of these would decide how the
+message would be handled after the proxy service receives the message. In the
+above example, the request received is forwarded to the sample service hosted
+on Axis2. The 'outSequence' defines how the response is handled before it is
+sent back to the client. By default, a proxy service is exposed over all
+transports configured for Synapse, unless these are specifically mentioned
+through the 'transports' attribute.</p>
 
 <h2><a name="Sample101">Sample 101:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- using custom sequences for incoming and outgoing message mediation with proxy services --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- using custom sequences for incoming and outgoing message mediation with proxy services --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-
-        &lt;sequence name="proxy_1"&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/sequence&gt;
-
-        &lt;endpoint name="proxy_2_endpoint" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-
-    &lt;/definitions&gt;
-
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy1"&gt;
-            &lt;publishWSDL key="proxy_wsdl"/&gt;
-            &lt;target inSequence="proxy_1"/&gt;
-        &lt;/proxy&gt;
-
-        &lt;proxy name="StockQuoteProxy2"&gt;
-            &lt;publishWSDL key="proxy_wsdl"/&gt;
-            &lt;target endpoint="proxy_2_endpoint"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
+    &lt;sequence name="proxy_1"&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;&lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;&lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+    &lt;sequence name="out"&gt;
         &lt;send/&gt;
-    &lt;/rules&gt;
+    &lt;/sequence&gt;
+    &lt;endpoint name="proxy_2_endpoint"&gt;
+        &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+    &lt;/endpoint&gt;
+    &lt;localEntry key="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
 
-&lt;/synapse&gt;</pre>
+    &lt;proxy name="StockQuoteProxy1"&gt;
+        &lt;publishWSDL key="proxy_wsdl"/&gt;
+        &lt;target inSequence="proxy_1" outSequence="out"/&gt;
+    &lt;/proxy&gt;
+
+    &lt;proxy name="StockQuoteProxy2"&gt;
+        &lt;publishWSDL key="proxy_wsdl"/&gt;
+        &lt;target endpoint="proxy_2_endpoint" outSequence="out"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Using custom sequences and endpoints for message
 mediation with proxy services</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
 Start the Synapse configuration numbered 101: i.e. synapse -sample 101<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
-<p>This configuration creates two proxy services with different behaviour.
-The first proxy service 'StockQuoteProxy1' uses the sequence named 'proxy_1'
-as its main mediation sequence for messages it receives. The second proxy
-service 'StockQuoteProxy2' is set to directly forward messages that are
-received to the endpoint named 'proxy_2_endpoint' without any mediation.</p>
+<p></p>
+
+<p>This configuration creates two proxy services.. The first proxy service
+'StockQuoteProxy1' uses the sequence named 'proxy_1' to process incoming
+messages and the sequence named "out" to process outgoing responses. The
+second proxy service 'StockQuoteProxy2' is set to directly forward messages
+that are received to the endpoint named 'proxy_2_endpoint' without any
+mediation.</p>
 
 <p>You could send a stock quote request to each of these proxy services and
 receive the reply generated by the actual service hosted on the Axis2
-instance. Use the -Durl=&lt;EPR&gt; property when executing the client as per
-example 100, to request on the two proxy services.</p>
+instance. </p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy1</pre>
 
 <h2><a name="Sample102">Sample 102:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- switching from https to REST/POX --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy" transports="https"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9001/soap/SimpleStockQuoteService" format="pox"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 
-    &lt;!-- attaching service level WS-Security policies to proxy services --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-        &lt;set-property name="sec_policy"
-                      src="file:repository/conf/sample/resources/policy/policy_1.xml"/&gt;
-    &lt;/definitions&gt;
-
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;target&gt;
-                &lt;inSequence&gt;
-                    &lt;header name="wsse:Security" action="remove"
-                            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
-                    &lt;send&gt;
-                        &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-                    &lt;/send&gt;
-                &lt;/inSequence&gt;
-            &lt;/target&gt;
-            &lt;publishWSDL key="proxy_wsdl"/&gt;
-            &lt;policy key="sec_policy"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;header name="wsse:Security" action="remove"
-                    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
-
-<p><strong>Objective: Attaching service level WS-Security policies to proxy
-services</strong></p>
+<p><strong>Objective: Switching transports and from SOAP to
+REST/POX</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
 Start the Synapse configuration numbered 102: i.e. synapse -sample 102</p>
 
-<p>Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
-modules directories of both the sample Axis2 client and server:
-samples/axis2Client/client_repo/modules and
-samples/axis2Server/repository/modules. The Rampart module could be found at
-repository\modules and is not duplicated in the distributions due to its
-large file size.</p>
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
 
-<p>Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+<p></p>
 
-<p>To execute the sample use the stock quote client with the 'secpolicy' and
-'url' system properties passed in as follows:</p>
+<p>This configuration demonstrates how a proxy service could be exposed on a
+subset of available transports, and how it could switch from one transport to
+another. This example exposes the created proxy service only on https, and
+thus if the user tries to access it over http, would result in a fault.</p>
+<pre>ant stockquote -Dtrpurl=http://asankha:8080/soap/StockQuoteProxy
+...
+     [java] org.apache.axis2.AxisFault: The service cannot be found for the endpoint reference (EPR) /soap/StockQuoteProxy</pre>
 
-<p>e.g.</p>
-<pre>ant stockquote -Durl=http://localhost:8080/axis2/services/StockQuoteProxy -Dsecpolicy=..\..\repository\conf\sample\resources\policy\policy_1.xml</pre>
+<p></p>
 
-<p>The sample security policy policy_1.xml uses timestamps and username token
-tuhentication on the stock quote request. Following the debug logs on the
-Synapse server you could notice the presence of WS-Security headers on the
-incoming message. By requesting the WSDL of the proxy service you could also
-see that the supplied policy file has been attached to the specified WSDL as
-well.</p>
+<p>Accessing this over https causes the proxy service to access the
+SimpleStockQuoteService on the sample Axis2 server using REST/POX. This could
+be seen if the message exchange was captured using TCPMon as follows. The
+REST/POX response is now transformed back into a SOAP message and returned to
+the client.</p>
+<pre>POST http://localhost:9001/soap/SimpleStockQuoteService HTTP/1.1
+Host: 127.0.0.1
+SOAPAction: urn:getQuote
+Content-Type: application/xml; charset=UTF-8;action="urn:getQuote";
+Transfer-Encoding: chunked
+Connection: Keep-Alive
+User-Agent: Synapse-HttpComponents-NIO
 
-<p>e.g. http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
+75
+&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;
+   &lt;m0:request&gt;
+      &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+   &lt;/m0:request&gt;
+&lt;/m0:getQuote&gt;</pre>
+<pre>HTTP/1.1 200 OK
+Content-Type: application/xml; charset=UTF-8;action="http://services.samples/SimpleStockQuoteServicePortType/getQuoteResponse";
+Date: Tue, 24 Apr 2007 14:42:11 GMT
+Server: Synapse-HttpComponents-NIO
+Transfer-Encoding: chunked
+Connection: Keep-Alive
 
-<p>A proxy service with an attached policy - such as a WS-Security policy -
-ensures that messages which goes through mediation have satisfied the
-constraints as specified by the supplied policy. i.e. for example, if any
-WS-Security validations fail, the message will not reach Synapse mediation,
-but the client would get an appropriate error message from the Apache Rampart
-module directly.</p>
+2b3
+&lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
+   &lt;ns:return&gt;
+      &lt;ns:change&gt;3.7730036841862384&lt;/ns:change&gt;
+      &lt;ns:earnings&gt;-9.950236235550818&lt;/ns:earnings&gt;
+      &lt;ns:high&gt;-80.23868444613285&lt;/ns:high&gt;
+      &lt;ns:last&gt;80.50750970812187&lt;/ns:last&gt;
+      &lt;ns:lastTradeTimestamp&gt;Tue Apr 24 20:42:11 LKT 2007&lt;/ns:lastTradeTimestamp&gt;
+      &lt;ns:low&gt;-79.67368355714606&lt;/ns:low&gt;
+      &lt;ns:marketCap&gt;4.502043663670823E7&lt;/ns:marketCap&gt;
+      &lt;ns:name&gt;IBM Company&lt;/ns:name&gt;
+      &lt;ns:open&gt;-80.02229531286982&lt;/ns:open&gt;
+      &lt;ns:peRatio&gt;25.089295161182022&lt;/ns:peRatio&gt;
+      &lt;ns:percentageChange&gt;4.28842665653824&lt;/ns:percentageChange&gt;
+      &lt;ns:prevClose&gt;87.98107059692451&lt;/ns:prevClose&gt;
+      &lt;ns:symbol&gt;IBM&lt;/ns:symbol&gt;
+      &lt;ns:volume&gt;19941&lt;/ns:volume&gt;
+   &lt;/ns:return&gt;&lt;/ns:getQuoteResponse&gt;</pre>
 
-<p>The mediation shows the header mediator used to strip out the
-wsse:Security header from the current message before being forwarded to the
-SimpleStockQuoteService. Hence the message sent to the stock quote service
-EPR is without any WS-Security headers as can be seen from the log
-messages.</p>
+<p></p>
 
 <h2><a name="Sample103">Sample 103:</a></h2>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;

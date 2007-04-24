@@ -16,48 +16,17 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- attaching service level WS-Security policies to proxy services -->
-    <definitions>
-        <set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-        <set-property name="sec_policy"
-                      src="file:repository/conf/sample/resources/policy/policy_1.xml"/>
-    </definitions>
-
-    <proxies>
-        <proxy name="StockQuoteProxy">
-            <target>
-                <inSequence>
-                    <header name="wsse:Security" action="remove"
-                            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
-                    <send>
-                        <endpoint>
-                            <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-                        </endpoint>
-                    </send>
-                </inSequence>
-            </target>
-            <publishWSDL key="proxy_wsdl"/>
-            <policy key="sec_policy"/>
-        </proxy>
-    </proxies>
-
-    <rules>
-        <in>
-            <header name="wsse:Security" action="remove"
-                    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-                </endpoint>
-            </send>
-        </in>
-        <out>
-            <send/>
-        </out>
-    </rules>
-
-</synapse>
+<!-- switching from https to REST/POX -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+    <proxy name="StockQuoteProxy" transports="https">
+        <target>
+            <endpoint>
+                <address uri="http://localhost:9001/soap/SimpleStockQuoteService" format="pox"/>
+            </endpoint>
+			<outSequence>
+				<send/>
+			</outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
+</definitions>

@@ -17,29 +17,17 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- introduction to Synapse proxy services. A web service proxy is created and
-     hosted on Synapse based on the given WSDL and exposed over all available
-     transports for Synapse. If a proxy service should be exposed over only a sub set
-     of the available transports, use the transports attribute -->
-
-    <proxies>
-        <proxy name="StockQuoteProxy">
-            <target>
-                <endpoint>
-                    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-                </endpoint>
-            </target>
-            <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-        </proxy>
-    </proxies>
-
-    <rules>
-        <log>
-            <property name="position" value="Main rules In mediator"/>
-        </log>
-        <send/>
-    </rules>
-
-</synapse>
+<!-- introduction to Synapse proxy services -->
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+    <proxy name="StockQuoteProxy">
+        <target>
+            <endpoint>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            </endpoint>
+			<outSequence>
+				<send/>
+			</outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
+</definitions>

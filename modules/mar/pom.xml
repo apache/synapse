@@ -4,7 +4,7 @@
 
     <parent>
 	<groupId>org.apache.sandesha2</groupId>
-	<artifactId>sandesha2</artifactId>
+	<artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
     
@@ -59,7 +59,7 @@
                 </configuration>
             </plugin>
 	    <plugin>
-        	<groupId>org.apache.axis2.maven2</groupId>
+        	<groupId>org.apache.axis2</groupId>
         	<artifactId>axis2-mar-maven-plugin</artifactId>
         	<version>SNAPSHOT</version>
         	<extensions>true</extensions>
@@ -75,7 +75,7 @@
     <dependencies>
     	<dependency>
             <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2-core</artifactId>
+            <artifactId>sandesha2</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
     </dependencies>

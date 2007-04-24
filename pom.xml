@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
-    <artifactId>sandesha2</artifactId>
+    <artifactId>sandesha2-parent</artifactId>
     <packaging>pom</packaging>
     <description>
 Sandesha2 is an implementation of WS-ReliableMessaging specification published IBM, Microsoft, BEA and TIBCO. Sandesha2 was built on top of Axis2. So by using Sandesha2 you can add reliable messaging capability to the web services you have hosted using Axis2. You can also use Sandesha2 with Axis2 client to interact with already hosted web services in a reliable manner. Please see sandesha2 user guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 work internally.
@@ -171,12 +171,22 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${rampart.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart-trust</artifactId>
+            <version>${rampart.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rampart</groupId>
+            <artifactId>rampart-policy</artifactId>
+            <version>${rampart.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${axis2.version}</version>
         </dependency>
 
 
@@ -417,6 +427,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
     </modules>
 
     <properties>
+	<rampart.version>SNAPSHOT</rampart.version>
         <axis2.version>SNAPSHOT</axis2.version>
 
         <axiom.version>SNAPSHOT</axiom.version>

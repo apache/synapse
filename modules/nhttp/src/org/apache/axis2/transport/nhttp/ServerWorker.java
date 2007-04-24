@@ -61,6 +61,8 @@ public class ServerWorker implements Runnable {
     private ServerHandler serverHandler = null;
     /** the underlying http connection */
     private NHttpServerConnection conn = null;
+    /** is this https? */
+    private boolean isHttps = false;
     /** the http request */
     private HttpRequest request = null;
     /** the http response message (which the this would be creating) */
@@ -89,12 +91,14 @@ public class ServerWorker implements Runnable {
      * @param os the output stream to write the response body if one is applicable
      */
     public ServerWorker(final ConfigurationContext cfgCtx, final NHttpServerConnection conn,
+        final boolean isHttps,
         final ServerHandler serverHandler,
         final HttpRequest request, final InputStream is,
         final HttpResponse response, final OutputStream os) {
 
         this.cfgCtx = cfgCtx;
         this.conn = conn;
+        this.isHttps = isHttps;
         this.serverHandler = serverHandler;
         this.request = request;
         this.response = response;
@@ -114,7 +118,19 @@ public class ServerWorker implements Runnable {
         MessageContext msgContext = new MessageContext();
         msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.TRUE);
         msgContext.setConfigurationContext(cfgCtx);
-        msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
+        if (isHttps) {
+            msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
+                .getTransportOut("https"));
+            msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
+                .getTransportIn("https"));
+            msgContext.setIncomingTransportName("https");
+        } else {
+            msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
+                .getTransportOut(Constants.TRANSPORT_HTTP));
+            msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
+                .getTransportIn(Constants.TRANSPORT_HTTP));
+            msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
+        }
         msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
         msgContext.setServiceGroupContextId(UUIDGenerator.getUUID());
         msgContext.setServerSide(true);
@@ -135,11 +151,6 @@ public class ServerWorker implements Runnable {
                 msgContext.setProperty(MessageContext.REMOTE_ADDR, remoteAddr.getHostAddress());
             }
         }
-
-        msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
-            .getTransportOut(Constants.TRANSPORT_HTTP));
-        msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
-            .getTransportIn(Constants.TRANSPORT_HTTP));
 
         return msgContext;
     }

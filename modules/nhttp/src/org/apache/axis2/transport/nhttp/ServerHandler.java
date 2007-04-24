@@ -67,6 +67,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
+    /** is this https? */
+    private boolean isHttps = false;
 
     /** the thread pool to process requests */
     private Executor workerPool = null;
@@ -78,10 +80,12 @@ public class ServerHandler implements NHttpServiceHandler {
     private static final String REQUEST_BUFFER = "request-buffer";
     private static final String RESPONSE_BUFFER = "response-buffer";
 
-    public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params) {
+    public ServerHandler(final ConfigurationContext cfgCtx, final HttpParams params,
+        final boolean isHttps) {
         super();
         this.cfgCtx = cfgCtx;
         this.params = params;
+        this.isHttps = isHttps;
         this.responseFactory = new DefaultHttpResponseFactory();
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
@@ -128,7 +132,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
             // hand off processing of the request to a thread off the pool
             workerPool.execute(
-                new ServerWorker(cfgCtx, conn, this,
+                new ServerWorker(cfgCtx, conn, isHttps, this,
                     request, Channels.newInputStream(requestPipe.source()),
                     response, Channels.newOutputStream(responsePipe.sink())));
 

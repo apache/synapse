@@ -93,11 +93,19 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             </excludes>
             <resources>
                 <resource>
-                    <directory>test-resources</directory>
+                    <directory>modules/tests/test-resources</directory>
                     <includes>
                         <include>**/*.xml</include>
+                        <include>**/*.properties</include>
                     </includes>
                 </resource>
+                <resource>
+                    <directory>modules/core/src/main/resources</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                    </includes>
+                </resource>
+
             </resources>
         </unitTest>
     </build>

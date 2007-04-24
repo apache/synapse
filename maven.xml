@@ -54,11 +54,17 @@
 		
 	   <!-- Copying the policy Assertion files-->
        <copy todir="${build.classes.dir}">
-		 <fileset dir="${dir.config}/rmpolicy/">
+	  <fileset dir="${dir.config}/rmpolicy/">
     	      <include name="**/*" /> 
-    	 </fileset>
-	   </copy>
-		
+    	  </fileset>
+       </copy>
+<!--
+       <copy todir="modules/tests/test-resources">
+	  <fileset dir="modules/core/src/main/resources/">
+    	      <include name="**/*.properties" /> 
+    	  </fileset>
+	</copy>		
+-->
     </preGoal>
     
     <goal name="mar" prereqs="java:compile">
@@ -71,9 +77,10 @@
     	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
     	<ant:mkdir dir="${metainf.path}" />
     	<ant:copy file="${basedir}/modules/mar/module.xml" todir="${metainf.path}" />
-        <!-- For the client side -->
+
+		<!-- For the client side -->
         <copy todir="${build.temp.dir}/module">
-            <fileset dir="${basedir}/target/classes" >
+            <fileset dir="${basedir}/modules/core/target/classes" >
             	<include name="**/*.class"/>
             	<include name="**/*.properties" /> 
             </fileset>
@@ -92,10 +99,10 @@
     	<ant:mkdir dir="${jar.temp.path}" />
 
         <copy todir="${jar.temp.path}">
-            <fileset dir="${basedir}/target/classes" >
+            <fileset dir="${basedir}/modules/core/target/classes" >
             	<include name="**/*.class"/>
             </fileset>
-            <fileset dir="${basedir}/target/classes" >
+            <fileset dir="${basedir}/modules/core/target/classes" >
             	<include name="**/*.properties" /> 
             </fileset>
         </copy>
@@ -104,9 +111,9 @@
         
         <copy file="${maven.build.dir}/${jar.name}" 
             toDir="${maven.repo.local}/${pom.groupId}/jars"/>
-        <!--
+
         <delete dir="${build.temp.dir}" />
--->
+
     </goal>
 	
 	<goal name="policy:jar" prereqs="java:compile">
@@ -115,7 +122,7 @@
     	<ant:mkdir dir="${policy.jar.temp.path}" />
 
         <copy todir="${policy.jar.temp.path}">
-            <fileset dir="${basedir}/target/classes" >
+            <fileset dir="${basedir}/modules/core/target/classes" >
             	<include name="**/policy/**/*.class"/>
 				<include name="**/*Sandesha2Constants*.class"/>
 		            	<include name="**/*.properties" /> 
@@ -144,7 +151,7 @@
 
 		<!-- For the client side -->
         <copy todir="${build.temp.dir}/client">
-            <fileset dir="${basedir}/target/classes" >
+            <fileset dir="${basedir}/modules/core/target/classes" >
               <include name="**/sandesha2/client/*SandeshaClientConstants*.*" />
               <include name="**/sandesha2/client/*SandeshaListener*.*" />
               <include name="**/sandesha2/client/*SequenceReport*.*" />
@@ -319,13 +326,13 @@
 		<ant:copy file="${repo.rampart.mar}" toDir="${server.dist.path}/modules/" />
 	</goal>
 	
-    <goal name="sample:compile" prereqs="client:jar">
+    <goal name="sample:compile">
         <ant:mkdir dir="${basedir}/target/samples/classes" />
         <ant:mkdir dir="${basedir}/target/samples/services" />
         
         <ant:javac srcdir="${dir.samples}/src" destdir="${basedir}/target/samples/classes" debug="on">
             <ant:classpath refid="maven.dependency.classpath" />
-	    	<ant:classpath path="${basedir}/target/classes" />
+	    	<ant:classpath path="${basedir}/modules/core/target/classes" />
         </ant:javac>
     </goal>
 
@@ -380,7 +387,7 @@
         <ant:mkdir dir="${basedir}/target/interop/classes" />
         <ant:mkdir dir="${basedir}/target/interop/services" />
         
-        <ant:javac srcdir="${dir.interop}/src/main/java" destdir="${basedir}/target/interop/classes" debug="on">
+        <ant:javac srcdir="${dir.interop}/src" destdir="${basedir}/target/interop/classes" debug="on">
             <ant:classpath refid="maven.dependency.classpath" />
 	    	<ant:classpath path="${basedir}/target/classes" />
         </ant:javac>

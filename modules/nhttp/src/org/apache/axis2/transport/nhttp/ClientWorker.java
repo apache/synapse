@@ -131,10 +131,16 @@ public class ClientWorker implements Runnable {
                 responseMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
                     MessageContext.DEFAULT_CHAR_SET_ENCODING);
             }
+            // workaround for Axis2 TransportUtils.createSOAPMessage() issue, where a response
+            // of content type "text/xml" is thought to be REST if !MC.isServerSide(). This
+            // question is still under debate and due to the timelines, I am commiting this
+            // workaround as Axis2 1.2 is about to be released and Synapse 1.0
+            responseMsgCtx.setServerSide(false);
             envelope = TransportUtils.createSOAPMessage(
                 responseMsgCtx,
                 in,
                 contentType);
+            responseMsgCtx.setServerSide(true);
             responseMsgCtx.setEnvelope(envelope);
 
         } catch (AxisFault af) {

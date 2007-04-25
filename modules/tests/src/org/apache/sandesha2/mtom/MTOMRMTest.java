@@ -58,7 +58,7 @@ public class MTOMRMTest extends SandeshaTestCase {
 
 	private final String Attachment = "Attachment";
 
-	private final String SOURCE_IMAGE_FILE = "test-resources/mtom-image.jpg";
+	private final String SOURCE_IMAGE_FILE = "target/test-classes/mtom-image.jpg";
 
 	private final String DESTINATION_IMAGE_FILE = "target/mtom-image1.jpg";
 
@@ -76,7 +76,7 @@ public class MTOMRMTest extends SandeshaTestCase {
 
 	public void setUp() throws AxisFault {
 		String repoPath = "target" + File.separator + "repos" + File.separator + "server";
-		String axis2_xml = "test-resources" + File.separator + "server_mtom_axis2.xml";
+		String axis2_xml = "target" + File.separator + "test-classes" + File.separator + "server_mtom_axis2.xml";
 		ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
 				repoPath, axis2_xml);
 

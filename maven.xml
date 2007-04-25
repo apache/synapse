@@ -303,11 +303,8 @@
     <goal name="repo:create">
         <attainGoal name="server:create"/>
         <attainGoal name="client:create"/>
-<!--
-
         <attainGoal name="secure:create"/>
         <attainGoal name="serialize:create"/>
--->
     </goal>	
     
 	<goal name="server:create" prereqs="mar,sample:create">

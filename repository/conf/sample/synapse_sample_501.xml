@@ -1,15 +1,26 @@
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+<!-- introduction to inline script mediation -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-
-    <!-- Introduction to the script mediator using in-line scripts -->
-
-    <!-- define a reuseable endpoint definition and use it within config -->
-    <endpoint name="stockquote">
-	<address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
-    </endpoint>
-
     <in>
-            <!-- transform the custom quote request into a standard quote requst expected by the service -->
-            <script language="js"><![CDATA[
+        <!-- transform the custom quote request into a standard quote requst expected by the service -->
+        <script language="js"><![CDATA[
                var symbol = mc.getPayloadXML()..*::Code.toString();
                mc.setPayloadXML(
                   <m:getQuote xmlns:m="http://services.samples/xsd">
@@ -17,17 +28,16 @@
                         <m:symbol>{symbol}</m:symbol>
                      </m:request>
                   </m:getQuote>);
-            ]]></script>
-
-            <!-- send message to real endpoint referenced by name "stockquote" and stop -->
-            <send>
-                <endpoint key="stockquote"/>
-            </send>
-     </in>
-
-     <out>
-            <!-- transform the standard response back into the custom format the client expects -->
-            <script language="js"><![CDATA[
+        ]]></script>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </in>
+    <out>
+        <!-- transform the standard response back into the custom format the client expects -->
+        <script language="js"><![CDATA[
                var symbol = mc.getPayloadXML()..*::symbol.toString();
                var price = mc.getPayloadXML()..*::last.toString();
                mc.setPayloadXML(
@@ -36,10 +46,6 @@
                <m:Price>{price}</m:Price>
                   </m:CheckPriceResponse>);
             ]]></script>
-
-            <!-- now send the custom response back to the client and stop -->
-            <send/>
-     </out>
-    
-
-</definitions> 
+        <send/>
+    </out>
+</definitions>

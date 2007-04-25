@@ -23,7 +23,7 @@
 	<in>
         <send>
 			<endpoint name="secure">
-			    <address uri="http://localhost:9001/soap/SecureStockQuoteService">
+			    <address uri="http://localhost:9000/soap/SecureStockQuoteService">
 			        <enableSec policy="sec_policy"/>
 			        <enableAddressing/>
 			    </address>

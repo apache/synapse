@@ -43,30 +43,21 @@
     
     <goal name="all:jar" prereqs="mar,jar,client:jar,policy:jar" />
         
-    <goal name="default">
-        <attainGoal name="clean"/>
-        <attainGoal name="build:all"/>
+    <goal name="default" prereqs="clean,build:all">
     </goal>
     
     <!-- Befor running the tests the repo should be created-->
     <preGoal name="test:test">
-       <attainGoal name="repo:create"/>
-		
-	   <!-- Copying the policy Assertion files-->
+
+       <!-- Copying the policy Assertion files-->
        <copy todir="${build.classes.dir}">
-	  <fileset dir="${dir.config}/rmpolicy/">
+		 <fileset dir="${dir.config}/rmpolicy/">
     	      <include name="**/*" /> 
-    	  </fileset>
+    	 </fileset>
        </copy>
-<!--
-       <copy todir="modules/tests/test-resources">
-	  <fileset dir="modules/core/src/main/resources/">
-    	      <include name="**/*.properties" /> 
-    	  </fileset>
-	</copy>		
--->
+		
     </preGoal>
-    
+
     <goal name="mar" prereqs="java:compile">
     	<copy todir="${maven.build.dir}/classes/">
     	 <fileset dir="${basedir}/modules/mar">
@@ -300,12 +291,8 @@
 		<delete dir="${build.temp.dir}"/>
 	</goal>
 
-    <goal name="repo:create">
-        <attainGoal name="server:create"/>
-        <attainGoal name="client:create"/>
-        <attainGoal name="secure:create"/>
-        <attainGoal name="serialize:create"/>
-    </goal>	
+    	<goal name="repo:create" prereqs="server:create,client:create,secure:create,serialize:create">
+    	</goal>	
     
 	<goal name="server:create" prereqs="mar,sample:create">
 		<ant:property name="server.dist.path" value="${build.repo.dir}/server"/>
@@ -418,12 +405,13 @@
 
 		
     </goal>
-
+<!--
     <preGoal name="test:test" > 
     	<attainGoal name="server:create"/>
    	<attainGoal name="client:create"/>   
     </preGoal>
-    
+    -->
+
     <goal name="server.copy.tomcat" prereqs="server:create">
         <property environment="env1"/>
         <property name="webapps" value="${env1.CATALINA_HOME}/webapps"/>

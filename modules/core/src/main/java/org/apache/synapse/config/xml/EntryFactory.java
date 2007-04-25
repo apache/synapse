@@ -54,7 +54,8 @@ public class EntryFactory implements XMLToObjectMapper {
             // are initialized at startup
             if (src != null) {
                 try {
-                    entry.setSrc(new URL(src));
+                    entry.setSrc(new URL(src.trim()));
+                    entry.setType(Entry.URL_SRC);
                     entry.setValue(
                         org.apache.synapse.config.Util.getObject(entry.getSrc()));
                 } catch (MalformedURLException e) {
@@ -70,7 +71,7 @@ public class EntryFactory implements XMLToObjectMapper {
                     entry.setValue(elemValue);
                 } else if (nodeValue != null && nodeValue instanceof OMText) {
                     entry.setType(Entry.INLINE_TEXT);
-                    entry.setValue(((OMText) nodeValue).getText());
+                    entry.setValue(((OMText) nodeValue).getText().trim());
                 }
             }
             return entry;

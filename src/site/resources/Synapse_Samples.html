@@ -1729,65 +1729,47 @@ the message as:</p>
 <h1><a name="ScriptMediators1" id="ScriptMediators1">Script mediators</a></h1>
 
 <p>Synapse supports Mediators implemented in a variety of scripting languages
-such as JavaScript, Python or Ruby.</p>
-
-<p>Implementing a Mediator with a script language can have advantages over
-using the built in Synapse Mediator types or implementing a custom Java class
-Mediator. Script Mediators have all the flexibility of a class Mediator with
-access to the Synapse MessageContext and SynapseEnvironment APIs, and the
-ease of use and dynamic nature of scripting languages allows rapid
-development and prototyping of custom mediators. An additional benefit of
-some scripting languages is that they have very simple and elegant XML
-manipulation capabilities, for example JavaScript E4X or Ruby REXML, so this
-makes them well suited for use in the Synapse mediation environment.</p>
+such as JavaScript, Python or Ruby. Implementing a Mediator with a script
+language can have advantages over using the built in Synapse Mediator types
+or implementing a custom Java class Mediator. Script Mediators have all the
+flexibility of a class Mediator with access to the Synapse MessageContext and
+SynapseEnvironment APIs, and the ease of use and dynamic nature of scripting
+languages allows rapid development and prototyping of custom mediators. An
+additional benefit of some scripting languages is that they have very simple
+and elegant XML manipulation capabilities, for example JavaScript E4X or Ruby
+REXML, so this makes them well suited for use in the Synapse mediation
+environment.</p>
 
 <h2><a name="ScriptSetup">Configuring Synapse for Script Mediator
 support</a></h2>
 
-<p>The Synapse Script Mediator is a Synapse extension so all its pre-reqs are
-not installed by default. Before you use script mediators you need to
-manually add the required jars to the Synapse lib directory and do any other
-installation that may be required by the individual scripting languages. This
-is detailed in the following sections. </p>
+<p>The Synapse Script Mediator is a Synapse extension, and thus all
+pre-requisites are not bundled by default with the Synapse distribution.
+Before you use some script mediators you may need to manually add the
+required jar files to the Synapse lib directory, and optionally perform other
+installation tasks as may be required by the individual scripting language.
+This is detailed in the following sections. </p>
 
 <h3><a name="ScriptSetupJavaScript">JavaScript support</a></h3>
 
-<p>For JavaScript/E4X support you need to copy the following jars to the
-Synapse lib directory:</p>
-<ul>
-  <li><a
-    href="http://repo1.maven.org/maven2/bsf/bsf/2.4.0/bsf-2.4.0.jar">Apache
-    BSF</a></li>
-  <li><a
-    href="http://repo1.maven.org/maven2/rhino/js/1.6R5/js-1.6R5.jar">Mozilla
-    Rhino</a></li>
-  <li><a
-    href="http://repo1.maven.org/maven2/xmlbeans/xbean/2.2.0/xbean-2.2.0.jar">XmlBeans
-    xbean</a></li>
-</ul>
-
-<p>(Note: You should be able to right click on those links and save the jars
-directly to your Synapse lib directory)</p>
+<p>The JavaScript/E4X support is enabled by default and comes ready-to-use
+with the Synapse distribution.</p>
 
 <h3><a name="ScriptSetupRuby">Ruby support</a></h3>
 
-<p>For Ruby support you need to copy the following jars to the Synapse lib
-directory:</p>
-<ul>
-  <li><a
-    href="http://repo1.maven.org/maven2/bsf/bsf/2.4.0/bsf-2.4.0.jar">Apache
-    BSF</a></li>
-  <li><a
-    href="http://repo1.maven.org/maven2/org/jruby/jruby/0.9.1/jruby-0.9.1.jar">JRuby</a></li>
-</ul>
+<p>For Ruby support you need to copy the following jar to the Synapse lib
+directory: <a
+href="http://repo1.maven.org/maven2/org/jruby/jruby/0.9.1/jruby-0.9.1.jar">JRuby</a></p>
 
-<p>(Note: You should be able to right click on those links and save the jars
-directly to your Synapse lib directory)</p>
+<p>(Note: You should be able to right click on the above link and save the
+jar directly to your Synapse lib directory)</p>
 
-<p>In addition to those jars, to use the REXML capabilities of Ruby requires
-a complete JRuby installation. Download and install JRuby from <a
+<p></p>
+
+<p>In addition to the above jar file, to use the REXML capabilities of Ruby
+requires a complete JRuby installation. Download and install JRuby from <a
 href="http://dist.codehaus.org/jruby/">JRuby Home</a>. Once installed you
-need to tell Synapse about the instalation by setting a system property when
+need to tell Synapse about the installation by setting a system property when
 starting Synapse. Right now this requires manually editing the Synapse
 startup script (this will be improved in a future Synapse release). Edit the
 bin\synapse.bat file and at the bottom find the line starting ""%_JAVACMD%"
@@ -1796,101 +1778,78 @@ JRuby install directory&gt;". Note the quote characters around the JRuby
 directory which are required. </p>
 
 <h2><a name="Sample500">Sample 500:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- Introduction to the script mediator --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/&gt;
 
-    &lt;!-- Introduction to the script mediator --&gt;
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
+        &lt;script language="js" key="stockquoteScript" function="transformRequest"/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+        &lt;script language="js" key="stockquoteScript" function="transformResponse"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
 
-    &lt;definitions&gt;
+<p></p>
+<pre>&lt;x&gt;&lt;![CDATA[
+  function transformRequest(mc) {
+     var symbol = mc.getPayloadXML()..*::Code.toString();
+     mc.setPayloadXML(
+        &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
+           &lt;m:request&gt;
+              &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+           &lt;/m:request&gt;
+        &lt;/m:getQuote&gt;);
+  }
 
-        &lt;!-- define a static property for the JavaScript source code file --&gt;
-        &lt;set-property name="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.js"/&gt;
-
-        &lt;!-- define a reuseable endpoint definition and use it within config --&gt;
-        &lt;endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-
-    &lt;/definitions&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
-            &lt;script key="stockquoteScript" function="transformRequest"/&gt;
-
-            &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
-            &lt;send&gt;
-                &lt;endpoint ref="stockquote"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-            &lt;script key="stockquoteScript" function="transformResponse"/&gt;
-
-            &lt;!-- now send the custom response back to the client and stop --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt; </pre>
+  function transformResponse(mc) {
+     var symbol = mc.getPayloadXML()..*::symbol.toString();
+     var price = mc.getPayloadXML()..*::last.toString();
+     mc.setPayloadXML(
+        &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
+   &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
+   &lt;m:Price&gt;{price}&lt;/m:Price&gt;
+        &lt;/m:CheckPriceResponse&gt;);
+  }
+]]&gt;&lt;/x&gt;</pre>
 
 <p><strong>Objective: Introduction to script mediators</strong></p>
 
-<p>This sample is similar to sample 8 but instead of using XSLT the
-transformation is done with JavaScript and E4X</p>
-
-<p>The Synapse config XML for this is <a
-href="../repository/conf/sample/synapse_sample_500.xml"
-type="text/txt">synapse_sample_500.xml</a> and the associated JavaScript
-program is <a
-href="../repository/conf/sample/resources/script/stockquoteTransform.js"
-type="text/txt">stockquoteTransform.js</a>.</p>
-
 <p><strong>Pre-Requisites:</strong></p>
 
-<p>This sample uses JavaScript/E4X so first setup support for this in Synapse
-as described at <a href="#ScriptSetupJavaScript">Configuring JavaScript</a>.
-</p>
-
 <p>Start the Synapse configuration numbered 500: i.e. synapse -sample 500<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
-<p>The JavaScript script is in a separate file which the Synapse xml
-references by using a static property named 'stockquoteScript'. The script
-has two functions, 'transformRequest' and 'transformResponse', and the
-Synapse xml script element uses the function attribute to specify which
-function to use for the in and out rules.</p>
+<p></p>
 
-<p>Execute the custom quote client as 'ant customquote' and check analyze the
-the Synapse debug log output as shown below</p>
-<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
-&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
-DEBUG XSLTMediator - Transformation result :
-&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
-&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
+<p>This sample is similar to sample 8 but instead of using XSLT the
+transformation is done with JavaScript and E4X. Note that the script source
+loaded from a resource must be specified within a CDATA tag within an XML
+element. The script used in this example has two functions,
+'transformRequest' and 'transformResponse', and the Synapse configuration
+uses the function attribute to specify which function should be invoked. Use
+the stock quote client as follows to issue a custom quote client:</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
 
-<p>The incoming message is now transformed into a standard stock quote
-request as expected by the SimpleStockQuoteService deployed on the local
-Axis2 instance by the JavaScript mediator. The JavaScript mediator uses E4X
-to perform the transformations. The response from the SimpleStockQuoteService
-is converted into the custom format as expected by the client during the out
-message processing.</p>
+<p>Synapse uses the script mediator and the specified Javascript function to
+convert the custom request to a standard quote request. Subsequently the
+response received is transformed back and sent back to the client.</p>
 
 <h2><a name="Sample501">Sample 501:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- Introduction to the script mediator using in-line scripts --&gt;
-
-    &lt;definitions&gt;
-
-        &lt;!-- define a reuseable endpoint definition and use it within config --&gt;
-        &lt;endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-
-    &lt;/definitions&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
-            &lt;script.js&gt;&lt;![CDATA[
+<pre>&lt;!-- introduction to inline script mediation --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote requst expected by the service --&gt;
+        &lt;script language="js"&gt;&lt;![CDATA[
                var symbol = mc.getPayloadXML()..*::Code.toString();
                mc.setPayloadXML(
                   &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
@@ -1898,17 +1857,16 @@ message processing.</p>
                         &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
                      &lt;/m:request&gt;
                   &lt;/m:getQuote&gt;);
-            ]]&gt;&lt;/script.js&gt;
-
-            &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
-            &lt;send&gt;
-                &lt;endpoint ref="stockquote"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-            &lt;script.js&gt;&lt;![CDATA[
+        ]]&gt;&lt;/script&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+        &lt;script language="js"&gt;&lt;![CDATA[
                var symbol = mc.getPayloadXML()..*::symbol.toString();
                var price = mc.getPayloadXML()..*::last.toString();
                mc.setPayloadXML(
@@ -1916,98 +1874,126 @@ message processing.</p>
                &lt;m:Code&gt;{symbol}&lt;/m:Code&gt;
                &lt;m:Price&gt;{price}&lt;/m:Price&gt;
                   &lt;/m:CheckPriceResponse&gt;);
-            ]]&gt;&lt;/script.js&gt;
+            ]]&gt;&lt;/script&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
 
-            &lt;!-- now send the custom response back to the client and stop --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt; </pre>
-
-<p><strong>Objective: Introduction to in-line script mediators</strong></p>
-
-<p>This sample is the same as sample 500 but instead of having the JavaScript
-source defined in a separate file it is defined in-line within the Synapse
-XML.</p>
-
-<p>The Synapse config XML for this is <a
-href="../repository/conf/sample/synapse_sample_501.xml"
-type="text/txt">synapse_sample_501.xml</a>.</p>
+<p><strong>Objective: Introduction to in-line script mediation</strong></p>
 
 <p><strong>Pre-Requisites:</strong></p>
 
-<p>This sample uses JavaScript/E4X so first setup support for this in Synapse
-as described at <a href="#ScriptSetupJavaScript">Configuring JavaScript</a>.
+<p>Start the Synapse configuration numbered 501: i.e. synapse -sample 501<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p></p>
+
+<p>This example is functionally equivalent to sample # 500 and sample # 8,
+and demonstrates in-line script mediation in Synapse. Use the stock quote
+client to send a custom quote as in example # 500 to test this example.</p>
+
+<p></p>
+
+<h2>Sample 502</h2>
+<pre>&lt;!-- accessing the Synapse APIs from scripting languages --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;in&gt;
+       &lt;!-- change the MessageContext into a response and set a response payload --&gt;
+       &lt;script language="js"&gt;&lt;![CDATA[
+          mc.setTo(mc.getReplyTo());
+          mc.setProperty("RESPONSE", "true");
+          mc.setPayloadXML(
+             &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
+                &lt;ns:return&gt;
+                   &lt;ns:last&gt;99.9&lt;/ns:last&gt;
+                &lt;/ns:return&gt;
+             &lt;/ns:getQuoteResponse&gt;);
+       ]]&gt;&lt;/script&gt;
+    &lt;/in&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: Accessing the Synapse APIs from scripting
+languages</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start the Synapse configuration numbered 502: i.e. bin/synapse -sample
+502<br>
 </p>
 
-<p>Start the Synapse configuration numbered 501: i.e. synapse -sample 501<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+<p></p>
 
-<p>Execute the custom quote client as 'ant customquote' and check analyze the
-the Synapse debug log output as shown below</p>
-<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
-&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
-DEBUG XSLTMediator - Transformation result :
-&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
-&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
-
-<p>The incoming message is now transformed into a standard stock quote
-request as expected by the SimpleStockQuoteService deployed on the local
-Axis2 instance by the JavaScript mediator. The JavaScript mediator uses E4X
-to perform the transformations. The response from the SimpleStockQuoteService
-is converted into the custom format as expected by the client during the out
-message processing.</p>
+<p>This example shows how an inline Javascript mediator script could access
+the Synapse message context API to set its 'To' EPR and to set a custom
+property to mark it as a response. Execute the stock quote client, and you
+will receive the response "99.9" as the last sale price as per the above
+script.</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ 
+...
+stockquote:
+     [java] Standard :: Stock price = $99.9</pre>
 
 <h2><a name="Sample503">Sample 503:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- Introduction to the script mediator with Ruby scripts--&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- Introduction to the script mediator with Ruby scripts--&gt;
+    &lt;localEntry key="stockquoteScript"&gt;
+        &lt;address src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/&gt;
+    &lt;/localEntry&gt;
 
-    &lt;definitions&gt;
+    &lt;in&gt;
+        &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
+        &lt;script language="rb" key="stockquoteScript" function="transformRequest"/&gt;
 
-        &lt;!-- define a static property for the JRuby source code file --&gt;
-        &lt;set-property name="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/&gt;
+        &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
+        &lt;send&gt;
+            &lt;endpoint name="stockquote"&gt;
+                &lt;address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;!-- transform the standard response back into the custom format the client expects --&gt;
+        &lt;script language="rb" key="stockquoteScript" function="transformResponse"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt; </pre>
+<pre>&lt;x&gt;&lt;![CDATA[
+require 'rexml/document'
+include REXML
 
-        &lt;!-- define a reuseable endpoint definition and use it within config --&gt;
-        &lt;endpoint name="stockquote" address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+def transformRequest(mc) 
+   newRequest= Document.new($REQUEST)
+   newRequest.root.elements[1].text = mc.getPayloadXML().root.elements[1].get_text
+   mc.setPayloadXML(newRequest)
+end
 
-    &lt;/definitions&gt;
+def transformResponse(mc) 
+   newResponse = Document.new($RESPONSE)
+   newResponse.root.elements[1].text = mc.getPayloadXML().root.elements[1].elements[1].get_text
+   newResponse.root.elements[2].text = mc.getPayloadXML().root.elements[1].elements[2].get_text
+   mc.setPayloadXML(newResponse)
+end
 
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
-            &lt;script key="stockquoteScript" function="transformRequest"/&gt;
+$REQUEST = &lt;&lt;EOF
+   &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
+      &lt;m:request&gt;
+         &lt;m:symbol&gt;&lt;/m:symbol&gt;
+      &lt;/m:request&gt;
+   &lt;/m:getQuote&gt;
+EOF
 
-            &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
-            &lt;send&gt;
-                &lt;endpoint ref="stockquote"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-
-        &lt;out&gt;
-            &lt;!-- transform the standard response back into the custom format the client expects --&gt;
-            &lt;script key="stockquoteScript" function="transformResponse"/&gt;
-
-            &lt;!-- now send the custom response back to the client and stop --&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt; </pre>
+$RESPONSE = &lt;&lt;EOF
+   &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
+      &lt;m:Code&gt;&lt;/m:Code&gt;
+      &lt;m:Price&gt;&lt;/m:Price&gt;
+   &lt;/m:CheckPriceResponse&gt;
+EOF
+]]&gt;&lt;/x&gt;</pre>
 
 <p><strong>Objective: Script mediators using Ruby</strong></p>
-
-<p>This sample is similar to sample 500 but instead of using JavaScript the
-script language is Ruby using the JRuby interpreter.</p>
-
-<p>The Synapse config XML for this is <a
-href="../repository/conf/sample/synapse_sample_503.xml"
-type="text/txt">synapse_sample_503.xml</a> and the associated JavaScript
-program is <a
-href="../repository/conf/sample/resources/script/stockquoteTransform.rb"
-type="text/txt">stockquoteTransform.rb</a>.</p>
 
 <p><strong>Pre-Requisites:</strong></p>
 
@@ -2016,28 +2002,16 @@ described at <a href="#ScriptSetupRuby">Configuring JRuby</a>. </p>
 
 <p>Start the Synapse configuration numbered 503: i.e. bin/synapse -sample
 503<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
-<p>The Ruby script is in a separate file which the Synapse xml references by
-using a static property named 'stockquoteScript'. The script has two
-functions, 'transformRequest' and 'transformResponse', and the Synapse xml
-script element uses the function attribute to specify which function to use
-for the in and out rules.</p>
+<p></p>
 
-<p>Execute the custom quote client as 'ant customquote' and check analyze the
-the Synapse debug log output as shown below</p>
-<pre>DEBUG XSLTMediator - Transformation source :&lt;m0:CheckPriceRequest xmlns:m0=http://www.apache-synapse.org/test&gt;
-&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
-DEBUG XSLTMediator - Transformation result :
-&lt;m:getQuote xmlns:m=http://services.samples/xsd&gt;
-&lt;m:request&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;</pre>
-
-<p>The incoming message is now transformed into a standard stock quote
-request as expected by the SimpleStockQuoteService deployed on the local
-Axis2 instance by the Ruby mediator. The Ruby mediator uses REXML to perform
-XML transformations. The response from the SimpleStockQuoteService is
-converted into the custom format as expected by the client during the out
-message processing.</p>
+<p>This sample is functionally equivalent to sample # 500 (#501 and #8) but
+instead uses a Ruby script using the JRuby interpreter. The script has two
+functions, 'transformRequest' and 'transformResponse', and the Synapse
+configuration specifies which function is to be invoked when used. Execute
+the stock quote client to send a custom stock quote as per example #500 and
+check the received stock quote response.</p>
 </body>
 </html>

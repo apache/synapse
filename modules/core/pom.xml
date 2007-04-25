@@ -12,7 +12,6 @@
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>sandesha2</artifactId>
     <packaging>jar</packaging>
-    <version>SNAPSHOT</version>
     <name>Sandesha - Core</name>
 
     <build>

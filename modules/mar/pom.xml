@@ -12,9 +12,7 @@
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>sandesha2-mar</artifactId>
     <packaging>mar</packaging>
-    <version>SNAPSHOT</version>
     <name>Sandesha - Mar</name>
-
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -63,7 +61,9 @@
         	<artifactId>axis2-mar-maven-plugin</artifactId>
         	<version>SNAPSHOT</version>
         	<extensions>true</extensions>
+		
         	<configuration>
+			<marName>sandesha2-${version}</marName>
        	  		<includeDependencies>false</includeDependencies>
 			<moduleXmlFile>module.xml</moduleXmlFile>
         	</configuration>

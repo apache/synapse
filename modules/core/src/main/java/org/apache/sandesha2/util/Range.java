@@ -33,8 +33,8 @@ public class Range implements Serializable{
 
 	private static final Log log = LogFactory.getLog(Range.class);
 	
-	long lowerValue;
-	long upperValue;
+	public long lowerValue;
+	public long upperValue;
 	
 	/**
 	 * Create a range for a single number

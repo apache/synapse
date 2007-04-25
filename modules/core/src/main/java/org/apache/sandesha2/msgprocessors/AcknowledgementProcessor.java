@@ -169,18 +169,22 @@ public class AcknowledgementProcessor {
 			AcknowledgementRange ackRange = (AcknowledgementRange) ackRangeIterator.next();
 			long lower = ackRange.getLowerValue();
 			long upper = ackRange.getUpperValue();
-			
-			// Quick check to see if the whole range is covered
-			if(!completedMessages.isRangeCompleted(new Range(lower, upper))) {
-				// We have new info, so take each message one at a time
-				for (long messageNo = lower; messageNo <= upper; messageNo++) {
-					if(!completedMessages.isMessageNumberInRanges(messageNo)) {
-						// We have a new message to consider
+			Range ackedRange = new Range(lower, upper);
+			// Quick check to see if the whole range is already covered
+			if(!completedMessages.isRangeCompleted(ackedRange)) {
+				//we now know that this range is complete so we update it. This should aggregate the
+				//ranges together and tell us which numbers are newly acked
+				Range[] newRanges = completedMessages.addRange(ackedRange).getRanges();
+				
+				// We now take each newly acked message in turn and see if we need to update a sender bean
+				for (int rangeIndex=0; rangeIndex < newRanges.length; rangeIndex++) {
+					//now work on each newly acked message in this range
+					for(long messageNo = newRanges[rangeIndex].lowerValue; messageNo<=newRanges[rangeIndex].upperValue; messageNo++){
+						
 						numberOfNewMessagesAcked++;
-						completedMessages.addRange(new Range(messageNo, messageNo));
-
 						SenderBean matcher = new SenderBean();
 						matcher.setSequenceID(outSequenceId);
+						
 						matcher.setMessageNumber(messageNo);
 						
 						SenderBean retransmitterBean = retransmitterMgr.findUnique(matcher);
@@ -212,9 +216,9 @@ public class AcknowledgementProcessor {
 								storageManager.removeMessageContext(storageKey);
 							}
 						}
-					}
-				}
-			}
+					}//end for
+				}//end for
+			} //end while
 		}
 
 		// updating the last activated time of the sequence.

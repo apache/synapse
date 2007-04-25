@@ -76,17 +76,28 @@ public class RangeString implements Serializable{
 	
 	
 	private Range getNextRangeBelow(long msgNumber){
-		//start at the specified index and work down the list of ranges
-		//util we find one
-		Iterator iterator = rangeMap.keySet().iterator();
 		
 		long cachedKey = -1;
-		while (iterator.hasNext()) {
-			long key = ((Long)iterator.next()).longValue();
+		//see if we get lucky on a first hit
+		if(rangeMap.containsKey(new Long(msgNumber))){
+			cachedKey = msgNumber;
+		}
+		else{
+			//start at the specified index and work down the list of ranges
+			//utill we find one
+			Iterator iterator = getSortedKeyList().iterator();
 			
-			if (key > cachedKey && key <= msgNumber) {
-				cachedKey = key;
-			}
+			while (iterator.hasNext()) {
+				long key = ((Long)iterator.next()).longValue();
+				
+				if (key > cachedKey && key <= msgNumber) {
+					cachedKey = key;
+				}
+				else if(key > msgNumber){
+					//we have gone beyond the required point, return with what we have
+					break;
+				}
+			}//end while			
 		}
 		
 		if (cachedKey != -1) {
@@ -100,34 +111,50 @@ public class RangeString implements Serializable{
 	}
 	
 	/**
-	 * If the passed in evelopeRange encompasses several ranges, these are 
-	 * removed from the map 
+	 * If the passed in evelopeRange encompasses several existing ranges between the start and end lookup points
+	 * then these are removed from the map. All other points are added to the ongoing newRangesAdded RangeString 
 	 * @param currentRange
 	 * @return
 	 */
-	private void cleanUpRangesEnveloped(Range envelopeRange){
-		//see if there are any ranges that start at some point between 
-		//immediately above the start of the envelope range up to 
-		//its end 
-		long startOfRangeLookup = envelopeRange.lowerValue + 1;
-		long endOfRangeLookup = envelopeRange.upperValue;
-		// Iterator over the available ranges.
-		Iterator ranges = rangeMap.keySet().iterator();
-		while (ranges.hasNext()) {
-			// Get the key
-			long key = ((Long)ranges.next()).longValue();
-			if (key >= startOfRangeLookup && key <= endOfRangeLookup) {
-				Range removedRange = (Range)rangeMap.get(new Long(key));
-				
-				if(removedRange!=null && removedRange.upperValue>envelopeRange.upperValue){
-					//this range started in our envelope but stretched out beyond it so we
-					//can absorb its upper value
-					envelopeRange.upperValue = removedRange.upperValue;
+	private void cleanUpRangesEnvelopedAndDiscoverNewRangesAdded(Range envelopeRange, long startOfRangeLookup, long endOfRangeLookup, RangeString newRangesAdded){
+		
+		boolean checkRequired = !rangeMap.isEmpty();
+		if(checkRequired){
+			for(long index = startOfRangeLookup; index<=endOfRangeLookup && index>0; index++ )
+			{
+				Long currentKey = new Long(index);
+				Range existingRange = (Range)rangeMap.get(currentKey);
+				if(existingRange!=null){
+					if( existingRange.upperValue>envelopeRange.upperValue){
+						//this range started in our envelope but stretched out beyond it so we
+						//can absorb its upper value
+						envelopeRange.upperValue = existingRange.upperValue;
+						//we are guaranteed that there are no other ranges present underneath this existing range
+						//as they would have been removed when it was first added. Therefore we can now jump our
+						//pointer so that the next range we look at is after the existing range
+						index = existingRange.upperValue; 
+					}
+					//Remove the current range from the HashMap.
+					rangeMap.remove(currentKey);
 				}
-				// Remove the current range from the HashMap.
-				ranges.remove();
-			}
+				else{
+					//This range has not been enveloped, and therefore this is a new Range added
+					if(newRangesAdded!=null){
+						newRangesAdded.addRange(new Range(index, index),
+																		false); //every range added will be new so there is no need for this
+					}
+				}		
+			}			
 		}
+		else{
+			//no check required - this must be a new range
+			if(newRangesAdded!=null){
+				newRangesAdded.addRange(new Range(startOfRangeLookup, endOfRangeLookup),
+																false); //every range added will be new so there is no need for this
+			}			
+		}
+
+
 	}
 	
 	/**
@@ -233,10 +260,40 @@ public class RangeString implements Serializable{
 		return returnList;
 	}
 	
-	public void addRange(Range r){
+	/**
+	 * Adds the Range into the existing RangeString
+	 * Any existing Ranges that are encompassed in this new Range are removed.
+	 * Any existing Ranges that are on either side of this Range (i.e. if this Range plugs a gap) are joined.
+	 * The method returns a RangeString consisting of all the Ranges that were added that were not present previously
+	 * i.e. all the new Ranges
+	 * @param r
+	 * @return
+	 */
+	public RangeString addRange(Range r){
+		return addRange(r, true);
+	}
+
+	/**
+	 * Adds the Range into the existing RangeString
+	 * Any existing Ranges that are encompassed in this new Range are removed.
+	 * Any existing Ranges that are on either side of this Range (i.e. if this Range plugs a gap) are joined.
+	 * If newRangeProcessingRequired is set, the method returns a RangeString 
+	 * consisting of all the Ranges that were added that were not present previously
+	 * i.e. all the new Ranges
+	 * @param r
+	 * @return
+	 */
+	private RangeString addRange(Range r, boolean newRangeProcessingRequired){
 		
 		Range finalRange = r; //we use this to keep track of the final range
 		//as we might aggregate this new range with existing ranges
+		
+		RangeString newRangesAdded = null;
+		if(newRangeProcessingRequired){
+			newRangesAdded = new RangeString(); //keep track of the ranges that have been newly filled
+		}
+		
+		long envelopCheckingStartPoint = r.lowerValue; //used to help remove existing ranges that have been enveloped 
 		
 		//first we try to aggregate existing ranges
 		boolean rangeAdded = false;
@@ -244,56 +301,78 @@ public class RangeString implements Serializable{
 		//see if there is a range below that we can extend up
 		Range below = getNextRangeBelow(indexKey);
 		if(below!=null){
-			if(below.upperValue == (r.lowerValue -1)){
-				//we can extend this range up
+			if(below.equals(r)){
+				//nothing to do
+				return newRangesAdded;
+			}
+			if(below.upperValue<r.upperValue && below.upperValue >= (r.lowerValue -1)){
+				long startingRange = below.upperValue + 1;
+				//we can extend this lower range up
 				below.upperValue = r.upperValue;
+
 				//we do not quit yet, as maybe this has plugged a gap between
 				//an upper range. But we should mark the range as added.
 				rangeAdded = true;
 				finalRange = below; //as below now encompasses both ranges agrregated together 
+				
+				//this action might have caused some existing ranges to be enveloped
+				//so cleanup anything existing between startingRange to r.upper
+				//add every other number to the newRanges string
+				cleanUpRangesEnvelopedAndDiscoverNewRangesAdded(finalRange, startingRange, r.upperValue, newRangesAdded);
+				envelopCheckingStartPoint = r.upperValue + 1;					
+				
 			}
-			else if(below.upperValue > r.lowerValue){
-				//the range below extends over this one - this range
+			else if(below.upperValue >= r.upperValue){
+				//the range below already covers this one - this range
 				//is already complete, so we do not need to add it at all.
-				return;
+				return newRangesAdded;
 			}
 		}
 		
 		//see if we can extend another range down
-		Range above = getRangeImmediatelyAbove(r);
+		Range above = getRangeImmediatelyAbove(finalRange);
 		if(above!=null){
-			//we can extend this down
-			//first remove it. Then we will either add it under its new key or 
-			//keep it removed
-			rangeMap.remove(new Long(above.lowerValue));
-			above.lowerValue = r.lowerValue; //extend down
+			//we can extend down. Since the lower ranges take precedence, the upper range will eventually be removed.
+			//Before that we might add it under a new, lower key
+			Long removeKey = new Long(above.lowerValue);
 			if(rangeAdded){
-				//we extend down and up - join two ranges together
-				//Sicne we have removed the upper, we simply do not add it again and set the
-				//below range to encompass both of them
-				below.upperValue = above.upperValue;
-				//NOTE: finalRange has already been set when extending up
+				//this means we extend up before. Now we are extending down to - join two ranges together.
+				
+				//Since we will later remove the upper, we simply set the below range to encompass both of them
+				finalRange.upperValue = above.upperValue;
+				//NOTE: finalRange is still what was 'below' when extending up
+				
+				//we need to check that there are no existing ranges from envelopCheckingStartPoint to above.lower
+				//Any non-existing ranges get added to the newRangesAdded string
+				cleanUpRangesEnvelopedAndDiscoverNewRangesAdded(finalRange, envelopCheckingStartPoint, above.lowerValue, newRangesAdded);
 			}
 			else{
 				//we did not extend up but we can extend down. 
-				//Add the upper range back under its new key
+				//Add the upper range under its new key NOTE: we will remove it from under the old key later
 				rangeAdded = true;				
+				//we need to check that there are no existing ranges from r.lower to above.lower
+				//Any non-existing ranges get added to the newRangesAdded string
+				cleanUpRangesEnvelopedAndDiscoverNewRangesAdded(above, r.lowerValue, r.upperValue, newRangesAdded);
+				
+				above.lowerValue = r.lowerValue; //extend down
 				rangeMap.put(new Long(above.lowerValue), above);
 				finalRange = above;
 			}
-
+			//finally we do the remove of the above range under its old key
+			rangeMap.remove(removeKey);
 		}
 		
 		if(!rangeAdded){
+			Long newIndex = new Long(r.lowerValue);
+			//A simple add.
+			//First cleanup and add from r.lower to r.upper
+			cleanUpRangesEnvelopedAndDiscoverNewRangesAdded(r, r.lowerValue, r.upperValue, newRangesAdded);
 			//if we got here and did not add a range then we need to 
 			//genuinely add a new range object
-			rangeMap.put(new Long(r.lowerValue), r);
+			rangeMap.put(new Long(r.lowerValue), r);				
 		}
 		
-		//finally, we go through the new range we have added to make sure it
-		//does not now encompass any smaller ranges that were there before (but
-		//that could not be extended up or down)
-		cleanUpRangesEnveloped(finalRange);
+		return newRangesAdded;
 		
 	}
 	

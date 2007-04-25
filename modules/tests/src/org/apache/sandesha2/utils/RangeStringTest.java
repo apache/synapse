@@ -70,19 +70,60 @@ public class RangeStringTest extends SandeshaTestCase{
 		String msgs = "[1,1][10,10]";
 		
 		RangeString rString = new RangeString(msgs);
-		rString.addRange(new Range(2,2)); //msg 2 arrives
-		rString.addRange(new Range(8,9)); //msgs 8 and 9 arrive
-		rString.addRange(new Range(6,6)); // msg 6 arrives
-		rString.addRange(new Range(3,5)); //msgs 3,4 and 5 arrive
-		rString.addRange(new Range(3,4)); //msgs 3,4 are duplicated
-		rString.addRange(new Range(7,7)); //finally msg 7
+		
+		//msg 2 arrives
+		{
+			Range ackedMsgRange = new Range(1,2);
+			Range[] newRanges = rString.addRange(ackedMsgRange).getRanges();
+			assertEquals(newRanges.length,1);
+			assertEquals(newRanges[0],new Range(2,2));
+		}
+		
+		//msgs 8 and 9 arrive
+		{
+			Range ackedMsgRange = new Range(8,9);
+			Range[] newRanges = rString.addRange(ackedMsgRange).getRanges();
+			assertEquals(newRanges.length,1);
+			assertEquals(newRanges[0],ackedMsgRange);
+		}
+		
+		// msg 6 arrives
+		{
+			Range ackedMsgRange = new Range(6,6);
+			Range[] newRanges = rString.addRange(ackedMsgRange).getRanges();
+			assertEquals(newRanges.length,1);
+			assertEquals(newRanges[0],ackedMsgRange);
+		}
+		
+		//msgs 3,4 and 5 arrive
+		{
+			Range ackedMsgRange = new Range(1,5);
+			Range[] newRanges = rString.addRange(ackedMsgRange).getRanges();
+			assertEquals(newRanges.length,1);
+			assertEquals(newRanges[0],new Range(3,5));
+		}
+		
+		//msgs 3,4 are duplicated
+		{
+			Range ackedMsgRange = new Range(3,4);
+			Range[] newRanges = rString.addRange(ackedMsgRange).getRanges();
+			assertEquals(newRanges.length,0); //no new information
+		}
+		
+		//finally msg 7
+		{
+			Range ackedMsgRange = new Range(7,7);
+			Range[] newRanges = rString.addRange(ackedMsgRange).getRanges();
+			assertEquals(newRanges.length,1);
+			assertEquals(newRanges[0],ackedMsgRange);
+		}
 		
 		//all msgs have now arrived
 		assertEquals("[1,10]", rString.toString());
 		
-		//all messages are duplicated
-		rString.addRange(new Range(1,10)); 
-		//cehck we handle duplicates
+		//all messages are duplicated - ensure this is detected
+		assertEquals(rString.addRange(new Range(1,10)).getRanges().length, 0);  
+		//check we handle duplicates i.e. the string is still correct
 		assertEquals("[1,10]", rString.toString());
 	}
 	

@@ -1202,7 +1202,7 @@ instance. </p>
     &lt;proxy name="StockQuoteProxy" transports="https"&gt;
         &lt;target&gt;
             &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9001/soap/SimpleStockQuoteService" format="pox"/&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="pox"/&gt;
             &lt;/endpoint&gt;
             &lt;outSequence&gt;
                 &lt;send/&gt;
@@ -1233,11 +1233,12 @@ thus if the user tries to access it over http, would result in a fault.</p>
 
 <p></p>
 
-<p>Accessing this over https causes the proxy service to access the
-SimpleStockQuoteService on the sample Axis2 server using REST/POX. This could
-be seen if the message exchange was captured using TCPMon as follows. The
-REST/POX response is now transformed back into a SOAP message and returned to
-the client.</p>
+<p>Accessing this over https (ant stockquote
+-Dtrpurl=http://asankha:8080/soap/StockQuoteProxy) causes the proxy service
+to access the SimpleStockQuoteService on the sample Axis2 server using
+REST/POX. This could be seen if the message exchange was captured using
+TCPMon as follows. The REST/POX response is now transformed back into a SOAP
+message and returned to the client.</p>
 <pre>POST http://localhost:9001/soap/SimpleStockQuoteService HTTP/1.1
 Host: 127.0.0.1
 SOAPAction: urn:getQuote

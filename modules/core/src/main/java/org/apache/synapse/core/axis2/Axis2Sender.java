@@ -29,6 +29,11 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.rampart.handler.WSSHandlerConstants;
 
 /**
  * This class helps the Axis2SynapseEnvironment implement the send method
@@ -72,6 +77,14 @@ public class Axis2Sender {
             }
             Axis2FlexibleMEPClient.removeAddressingHeaders(messageContext);
             messageContext.setMessageID(UUIDGenerator.getUUID());
+
+            // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
+            if (messageContext.isEngaged(WSSHandlerConstants.SECURITY_MODULE_NAME) &&
+                messageContext.getEnvelope().getHeader() == null) {
+                SOAPFactory fac = messageContext.isSOAP11() ?
+                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
+                fac.createSOAPHeader(messageContext.getEnvelope());
+            }
             ae.send(messageContext);
 
         } catch (AxisFault e) {

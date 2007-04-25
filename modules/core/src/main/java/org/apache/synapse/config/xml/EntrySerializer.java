@@ -29,6 +29,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import javax.xml.stream.XMLStreamConstants;
+import java.net.URL;
 
 public class EntrySerializer {
 
@@ -46,32 +47,32 @@ public class EntrySerializer {
      * @return OMElement representing the entry
      */
     public static OMElement serializeEntry(Entry entry, OMElement parent) {
-
         OMElement propertyElement = fac.createOMElement("localEntry", synNS);
         propertyElement.addAttribute(fac.createOMAttribute(
-                "key", nullNS, entry.getKey()));
-//	    propertyElement.addAttribute(fac.createOMAttribute(
-//                "type", nullNS, "" + entry.getType()));
-
-        if (entry.getType() == Entry.REMOTE_ENTRY) {
-            propertyElement.addAttribute(fac.createOMAttribute(
-                    "key", nullNS, entry.getKey()));
-        } else if (entry.getType() == Entry.URL_SRC) {
-            propertyElement.addAttribute(fac.createOMAttribute(
-                    "src", nullNS, entry.getSrc().toString()));
-//        } else if (entry.getType() == Entry.VALUE_TYPE) {
-//            propertyElement.addAttribute(fac.createOMAttribute(
-//                    "value", nullNS, (String) entry.getValue()));
-        } else if (entry.getType() == Entry.INLINE_XML) {
-            propertyElement.addChild((OMElement) entry.getValue());
-        } else if (entry.getType() == Entry.INLINE_TEXT) {
-            OMTextImpl textData = (OMTextImpl) fac.createOMText((String) entry.getValue());
-            textData.setType(XMLStreamConstants.CDATA);
-            propertyElement.addChild(textData);
+                "key", nullNS, entry.getKey().trim()));
+        int type = entry.getType();
+        if (type == Entry.URL_SRC) {
+            URL srcUrl = entry.getSrc();
+            if (srcUrl != null) {
+                propertyElement.addAttribute(fac.createOMAttribute(
+                        "src", nullNS, srcUrl.toString().trim()));
+            }
+        } else if (type == Entry.INLINE_XML) {
+            Object value = entry.getValue();
+            if (value != null && value instanceof OMElement) {
+                propertyElement.addChild((OMElement) value);
+            }
+        } else if (type == Entry.INLINE_TEXT) {
+            Object value = entry.getValue();
+            if (value != null && value instanceof String) {
+                OMTextImpl textData = (OMTextImpl) fac.createOMText(((String) value).trim());
+                textData.setType(XMLStreamConstants.CDATA);
+                propertyElement.addChild(textData);
+            }
         } else {
             handleException("Entry type undefined");
         }
-        if(parent != null) {
+        if (parent != null) {
             parent.addChild(propertyElement);
         }
         return propertyElement;

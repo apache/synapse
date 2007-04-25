@@ -26,9 +26,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -53,6 +55,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
+import org.apache.rampart.handler.WSSHandlerConstants;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -200,6 +203,12 @@ public class Axis2FlexibleMEPClient {
                 clientOptions.setProperty(
                     org.apache.synapse.config.xml.Constants.RAMPART_POLICY,
                     getPolicy(synapseOutMessageContext, wsSecPolicyKey));
+            }
+            // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
+            if (axisOutMsgCtx.getEnvelope().getHeader() == null) {
+                SOAPFactory fac = axisOutMsgCtx.isSOAP11() ?
+                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
+                fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());
             }
         }
         OperationClient mepClient = axisAnonymousOperation.createClient(

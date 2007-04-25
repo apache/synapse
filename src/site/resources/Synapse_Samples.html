@@ -909,69 +909,100 @@ the key ''synapse.xml'. </p>
 
 <h1>Endpoints</h1>
 
-<p><a name="WSSecurity" id="WSSecurity"></a></p>
-
 <h2><a name="Sample50">Sample 50:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;!-- Connecting to endpoints with WS-Security for outgoing messages --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
 
-    &lt;!-- Connecting to endpoints with WS-Security for outgoing messages --&gt;
-    &lt;definitions&gt;
-    &lt;set-property name="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;    
-        &lt;endpoint name="secure" address="http://localhost:9000/axis2/services/SecureStockQuoteService3"&gt;
-        &lt;enableSec policy="sec_policy"/&gt;
-        &lt;enableAddressing/&gt;
-        &lt;/endpoint&gt;
-    &lt;/definitions&gt;
-
-    &lt;rules&gt;
     &lt;in&gt;
-    &lt;header name="To" value="http://localhost:9000/axis2/services/SecureStockQuoteService3"/&gt;
         &lt;send&gt;
-        &lt;endpoint ref="secure"/&gt;
+            &lt;endpoint name="secure"&gt;
+                &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"&gt;
+                    &lt;enableSec policy="sec_policy"/&gt;
+                    &lt;enableAddressing/&gt;
+                &lt;/address&gt;
+            &lt;/endpoint&gt;
         &lt;/send&gt;
-      &lt;/in&gt;
-      &lt;out&gt;
-      &lt;header name="wsse:Security" action="remove"
-                    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
-      &lt;send/&gt;
-      &lt;/out&gt;
-    &lt;/rules&gt;
-&lt;/synapse&gt;</pre>
+    &lt;/in&gt;
+    &lt;out&gt;
+        &lt;header name="wsse:Security" action="remove"
+                xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
+        &lt;send/&gt;
+    &lt;/out&gt;
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Connecting to endpoints with WS-Security for outgoing
 messages</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Download and copy the BouncyCastle JAR file into your Synapse lib directory.
-(Note: the exact JAR you need to install depends on your JDK - for JDK 1.4 I
-have used bcprov-jdk13-132.jar)<br>
 </p>
 
-<p>To use the Apache Rampart module, you would also need to ensure that
-Xerces has been made available in the Synapse lib directory (e.g.
-xercesImpl-2.8.1.jar). You may also need the unlimited strength JDK policy
-files for your JDK to be installed (e.g. see
+<p>You may also need to download and install the unlimited strength policy
+files for your JDK before using Apache Rampart (e.g. see
 http://java.sun.com/j2se/1.4.2/download.html)</p>
-Start the Synapse configuration numbered 50: i.e. synapse -sample 50<br>
-Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
-modules directory of the sample Axis2 server
-samples/axis2Server/repository/modules. The Rampart module could be found at
-repository\modules and is not duplicated within the distributions due to its
-large file size.<br>
-Start the Axis2 server and deploy the SecureStockQuoteService3 (Refer steps
-above) 
+
+<p>Start the Synapse configuration numbered 50: i.e. synapse -sample 50<br>
+Start the Axis2 server and deploy the SecureStockQuoteService if not already
+done</p>
 
 <p></p>
 
 <p>Use the stock quote client to send a request without WS-Security. Synapse
-is configured to enable WS-Security policy 'policy_3.xml' to the outgoing
-message when sent to the SecureStockQuoteService3 service endpoint hosted on
-the Axis2 instance. The debug log messages on Synapse shows the encrypted
-message flowing to the service and the encrypted response being received by
-Synapse. The wsse:Security header is then removed from the decrypted message
-and the response is delivered back to the client as it expects.</p>
+is configured to enable WS-Security as per the policy specified by
+'policy_3.xml' for the outgoing messages to the SecureStockQuoteService
+endpoint hosted on the Axis2 instance. The debug log messages on Synapse
+shows the encrypted message flowing to the service and the encrypted response
+being received by Synapse. The wsse:Security header is then removed from the
+decrypted message and the response is delivered back to the client, as
+expected. You may execute the client as follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/</pre>
 
-<p></p>
+<p>The message sent by Synapse to the secure service can be seen as follows,
+when TCPMon is used.</p>
+<pre>POST http://localhost:9001/soap/SecureStockQuoteService HTTP/1.1
+Host: 127.0.0.1
+SOAPAction: urn:getQuote
+Content-Type: text/xml; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: Keep-Alive
+User-Agent: Synapse-HttpComponents-NIO
+
+800
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+   &lt;soapenv:Envelope xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:wsa="http://www.w3.org/2005/08/addressing" ..&gt;
+      &lt;soapenv:Header&gt;
+         &lt;wsse:Security ..&gt;
+            &lt;wsu:Timestamp ..&gt;
+               ...
+            &lt;/wsu:Timestamp&gt;
+            &lt;xenc:EncryptedKey..&gt;
+               ...
+            &lt;/xenc:EncryptedKey&gt;
+            &lt;wsse:BinarySecurityToken ...&gt;
+               &lt;ds:SignedInfo&gt;
+               ...
+               &lt;/ds:SignedInfo&gt;
+               &lt;ds:SignatureValue&gt;
+               ...
+               &lt;/ds:SignatureValue&gt;
+               &lt;ds:KeyInfo Id="KeyId-29551621"&gt;
+                  ...
+               &lt;/ds:KeyInfo&gt;
+            &lt;/ds:Signature&gt;
+         &lt;/wsse:Security&gt;
+         &lt;wsa:To&gt;http://localhost:9001/soap/SecureStockQuoteService&lt;/wsa:To&gt;
+         &lt;wsa:MessageID&gt;urn:uuid:1C4CE88B8A1A9C09D91177500753443&lt;/wsa:MessageID&gt;
+         &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+      &lt;/soapenv:Header&gt;
+      &lt;soapenv:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-3789605"&gt;
+         &lt;xenc:EncryptedData Id="EncDataId-3789605" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+            &lt;xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" /&gt;
+            &lt;xenc:CipherData&gt;               
+                &lt;xenc:CipherValue&gt;Layg0xQcnH....6UKm5nKU6Qqr&lt;/xenc:CipherValue&gt;
+            &lt;/xenc:CipherData&gt;
+         &lt;/xenc:EncryptedData&gt;
+      &lt;/soapenv:Body&gt;
+   &lt;/soapenv:Envelope&gt;0</pre>
 
 <h2>Sample 51:</h2>
 <pre>&lt;!-- MTOM and SwA and message properties to correlate requests and responses --&gt;
@@ -989,7 +1020,7 @@ and the response is delivered back to the client as it expects.</p>
             &lt;property name="example" value="swa"/&gt;
             &lt;send&gt;
                 &lt;endpoint&gt;
-                    &lt;address uri="http://localhost:9001/soap/MTOMSwASampleService" optimize="swa"/&gt;
+                    &lt;address uri="http://localhost:9000/soap/MTOMSwASampleService" optimize="swa"/&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
         &lt;/filter&gt;
@@ -1040,7 +1071,7 @@ file.</p>
 <p>By using TCPMon and sending the message through it, one can inspect that
 the requests and responses sent are indeed MTOM optimized or sent as http
 attachments as follows:</p>
-<pre>POST http://localhost:9001/soap/MTOMSwASampleService HTTP/1.1
+<pre>POST http://localhost:9000/soap/MTOMSwASampleService HTTP/1.1
 Host: 127.0.0.1
 SOAPAction: urn:uploadFileUsingMTOM
 Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353; type="application/xop+xml"; 
@@ -1071,7 +1102,7 @@ Content-Type: image/gif
 Content-Transfer-Encoding: binary
 Content-ID: 
          &lt;1.urn:uuid:78F94BC50B68D76FB41177413845003@apache.org&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
-<pre>POST http://localhost:9001/soap/MTOMSwASampleService HTTP/1.1
+<pre>POST http://localhost:9000/soap/MTOMSwASampleService HTTP/1.1
 Host: 127.0.0.1
 SOAPAction: urn:uploadFileUsingSwA
 Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177414170491; type="text/xml"; 
@@ -1239,7 +1270,7 @@ to access the SimpleStockQuoteService on the sample Axis2 server using
 REST/POX. This could be seen if the message exchange was captured using
 TCPMon as follows. The REST/POX response is now transformed back into a SOAP
 message and returned to the client.</p>
-<pre>POST http://localhost:9001/soap/SimpleStockQuoteService HTTP/1.1
+<pre>POST http://localhost:9000/soap/SimpleStockQuoteService HTTP/1.1
 Host: 127.0.0.1
 SOAPAction: urn:getQuote
 Content-Type: application/xml; charset=UTF-8;action="urn:getQuote";
@@ -1282,313 +1313,67 @@ Connection: Keep-Alive
 <p></p>
 
 <h2><a name="Sample103">Sample 103:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- attaching service level WS-Security policies to proxy services --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-        &lt;set-property name="sec_policy"
-                      src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
-    &lt;/definitions&gt;
-
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;target&gt;
-                &lt;inSequence&gt;
-                    &lt;header name="wsse:Security" action="remove"
-                            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
-                    &lt;send&gt;
-                        &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-                    &lt;/send&gt;
-                &lt;/inSequence&gt;
-            &lt;/target&gt;
-            &lt;publishWSDL key="proxy_wsdl"/&gt;
-            &lt;policy key="sec_policy"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;header name="wsse:Security" action="remove"
-                    xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
+<pre>&lt;!-- attaching service level WS-Security policies to proxy services --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;header name="wsse:Security" action="remove"
+                        xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+        &lt;policy key="sec_policy"/&gt;
+        &lt;enableSec/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Using WS-Security signing and encryption with proxy
 services through WS-Policy</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Download and copy the BouncyCastle JAR and the Xalan JAR file into your
-Synapse lib directory. (Note: the exact BouncyCastle JAR you need to install
-depends on your JDK - for JDK 1.4 I have used bcprov-jdk13-132.jar and the
-xalan-2.7.0.jar)<br>
-Start the Synapse configuration numbered 103: i.e. synapse -sample 103<br>
-Copy the Apache Rampart module (e.g. rampart-1.1-SNAPSHOT.mar) into the
-modules directory of the sample Axis2 client
-samples/axis2Client/client_repo/modules. The Rampart module could be found at
-repository\modules and is not duplicated within the distributions due to its
-large file size.<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
+You may also need to download and install the unlimited strength policy files
+for your JDK before using Apache Rampart (e.g. see
+http://java.sun.com/j2se/1.4.2/download.html)</p>
 
-<p>To execute the sample use the dumb stock quote client with the 'secpolicy'
-and 'gatewayurl' system properties passed in as follows:</p>
-
-<p>e.g.</p>
-<pre>ant dumbstockquote -Dsecpolicy=..\..\repository\conf\sample\resources\policy\client_policy_3.xml -Dgatewayurl=http://localhost:8080/axis2/services/StockQuoteProxy</pre>
-
-<p>The sample security policy client_policy_3.xml ensures signed and
-encrypted messages which request for the stock quotes. Following the debug
-logs on the Synapse server you could notice the presence of WS-Security
-headers on the incoming message. By requesting the WSDL of the proxy service
-you could also see that the supplied policy file has been attached to the
-specified WSDL as well.</p>
-
-<p>e.g. http://localhost:8080/axis2/services/StockQuoteProxy?wsdl</p>
-
-<p>By following through the Synapse log messages you could see that the proxy
-service received and decrypted the secured SOAP envelope. (If you sent the
-client request to Synapse through a TCP monitor you would be able to see the
-raw encrypted message in transit) and forwarded this to the simple stockquote
-service, and once the response was received, signed it and encrypted it
-before sending it back to the client.</p>
-
-<p>Using TCPMon, a sample request sent from the client to the WS-Security
-enabled proxy service has been captured as follows: <a
-href="sample_103_1.txt?content-type=text&amp;view=co">sample_103_1.txt</a></p>
-
-<p>Synapse removes the wsse:Security header from this message and forwards it
-to the endpoint. The response received is now signed and encrypted and sent
-back to the client as follows: <a
-href="sample_103_2.txt?content-type=text&amp;view=co">sample_103_2.txt</a></p>
-
-<h2><a name="Sample104">Sample 104:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- using custom sequences for incoming and outgoing message mediation with proxy services --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-
-        &lt;sequence name="proxy_in"&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/sequence&gt;
-
-        &lt;sequence name="proxy_out"&gt;
-            &lt;log level="custom"&gt;
-                &lt;property name="message" value="Executing inside the out sequence"/&gt;
-            &lt;/log&gt;
-            &lt;send/&gt;
-        &lt;/sequence&gt;
-
-    &lt;/definitions&gt;
-
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy"&gt;
-            &lt;publishWSDL key="proxy_wsdl"/&gt;
-            &lt;target inSequence="proxy_in" outSequence="proxy_out"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-        &lt;send/&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
-
-<p><strong>Objective: Using an explicit out sequence in proxy service level
-to mediate proxy response</strong></p>
-
-<p><strong>Pre-Requisites:</strong><br>
-Start the Synapse configuration numbered 104: i.e. synapse -sample 104 <br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)</p>
-
-<p>This configuration creates a proxy service with the name StockQuoteProxy.
-This proxy service specifies both inSequence and the outSequence for that
-service. This will add a proxy level out sequence to be used for the response
-message mediation of that particular proxy service.</p>
-
-<p>You could send a stock quote request to this proxy services and receive
-the reply generated by the actual service hosted on the Axis2 instance. Use
-the -Durl=&lt;EPR&gt; property when executing the client as per example 100,
-to request on this proxy service.</p>
-
-<p>You can observe the synapse log to see the response message mediation
-using the specified outSequence, unlike using MainMediator in the sample 100
-case. The log should be as follows</p>
-<pre>DEBUG SequenceMediator - Sequence mediator &lt;proxy_out&gt; :: mediate()
-DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
-DEBUG LogMediator - Log mediator :: mediate()
-INFO  LogMediator - message = Executing inside the out sequence</pre>
-
-<h2>Sample 105:</h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- demonstrate JMS raw Text / POX message support --&gt;
-    &lt;definitions&gt;
-        &lt;sequence name="text_proxy"&gt;
-            &lt;header name="Action" value="urn:placeOrder"/&gt;
-            &lt;script.js&gt;&lt;![CDATA[
-               var args = mc.getPayloadXML().toString().split(" ");
-               mc.setPayloadXML(
-                &lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
-                    &lt;m:order&gt;
-                        &lt;m:price&gt;{args[0]}&lt;/m:price&gt;
-                        &lt;m:quantity&gt;{args[1]}&lt;/m:quantity&gt;
-                        &lt;m:symbol&gt;{args[2]}&lt;/m:symbol&gt;
-                    &lt;/m:order&gt;
-                &lt;/m:placeOrder&gt;);
-            ]]&gt;&lt;/script.js&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/sequence&gt;
-
-        &lt;sequence name="mtom_proxy"&gt;
-            &lt;header name="Action" value="urn:uploadFileUsingMTOM"/&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/MTOMSampleService" optimize="mtom"/&gt;
-            &lt;/send&gt;
-        &lt;/sequence&gt;
-
-        &lt;sequence name="pox_proxy"&gt;
-            &lt;header name="Action" value="urn:placeOrder"/&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService" force="soap"/&gt;
-            &lt;/send&gt;
-        &lt;/sequence&gt;
-    &lt;/definitions&gt;
-
-    &lt;proxies&gt;
-        &lt;proxy name="JMSFileUploadProxy" transports="jms"&gt;
-            &lt;target inSequence="mtom_proxy"/&gt;
-            &lt;parameter name="transport.jms.Wrapper"&gt;{http://services.samples/xsd}element&lt;/parameter&gt;
-        &lt;/proxy&gt;
-        &lt;proxy name="JMSTextProxy" transports="jms"&gt;
-            &lt;target inSequence="text_proxy"/&gt;
-            &lt;parameter name="transport.jms.Wrapper"&gt;{http://services.samples/xsd}text&lt;/parameter&gt;
-        &lt;/proxy&gt;
-        &lt;proxy name="JMSPoxProxy" transports="jms"&gt;
-            &lt;target inSequence="pox_proxy"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-    &lt;log level="full"/&gt;
-    &lt;drop/&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
-
-<p><strong>Objective: Pure POX/Text and Binary JMS Proxy services - including
-MTOM</strong></p>
-
-<p><strong>Pre-Requisites:</strong><br>
-Configure JMS for Synapse (Refer notes above)<br>
-Configure the script mediator runtime (Refer notes below)<br>
-i.e. make bsf-2.4.0.jar, xbean-2.2.0.jar and js-1.6R2.jar available in lib
-folder)<br>
-Configure Synapse and the sample Axis2 server to use MTOM (i.e. set
-enableMTOM parameter to true)<br>
-Start the Synapse configuration numbered 105: i.e. synapse -sample 105<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService and the
-MTOMSampleService (Refer steps above)</p>
-
-<p>This configuration creates three JMS proxy services named
-JMSFileUploadProxy, JMSTextProxy and JMSPoxProxy exposed over JMS queues with
-the same names. The first part of this example demonstrates the pure text
-message support with JMS, where a user sends a text JMS message of the form
-"&lt;price&gt; &lt;qty&gt; &lt;symbol&gt;". Synapse converts this message
-into a SOAP message and sends this to the SimpleStockQuoteServices'
-placeOrder operation. The mediation uses the script mediator to transform the
-text message into a XML payload. The proxy service property named
-"transport.jms.Wrapper" defines the wrapper element QName, to be used when
-wrapping text/binary content into a SOAP envelope.</p>
+<p>Start the Synapse configuration numbered 103: i.e. synapse -sample 103<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
 
 <p></p>
 
-<p>Execute ' ant jmsclient -Dpayload="24.34 100 IBM"' which executes the
-first scenario. The client sends a JMS text message with the specified
-payload to the specified destination. Though the debug logs, you could see
-that Synapse received a text message over JMS and converted this to a SOAP
-message and sent it to the SimpleStockQuoteService as follows</p>
-<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSTextProxy received a new message...
-[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body :
-&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
-&lt;soapenv:Header /&gt;&lt;soapenv:Body&gt;&lt;axis2ns3:text xmlns:axis2ns3="http://services.samples/xsd"&gt;
-65.05119159089897 6079 IBM&lt;/axis2ns3:text&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
-..
-[JMSWorker-1] DEBUG SendMediator - Sending message to endpoint :: name = null 
-resolved address = http://localhost:9000/axis2/services/SimpleStockQuoteService
-&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
-&lt;soapenv:Header /&gt;&lt;soapenv:Body&gt;&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;&lt;m:order&gt;
-&lt;m:price&gt;65.05119159089897&lt;/m:price&gt;&lt;m:quantity&gt;6079&lt;/m:quantity&gt;&lt;m:symbol&gt;IBM&lt;/m:symbol&gt;&lt;/m:order&gt;&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope?</pre>
+<p>The proxy service expects to receive a signed and encrypted message as
+specified by the security policy. Please see Apache Rampart and Axis2
+documentation on the format of the policy file. The element 'engageSec'
+specifies that Apache Rampart should be engaged on this proxy service. Hence
+if Rampart rejects any request messages that does not conform to the
+specified policy, those messages will never reach the 'inSequence' to be
+processed. Since the proxy service is forwarding the received request to the
+simple stock quote service that does not use WS-Security, we are instructing
+Synapse to remove the wsse:Security header from the outgoing message. To
+execute the client, send a stock quote request to the proxy service, and sign
+and encrypt the request by specifying the client side security policy as
+follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
 
-<p>The next section uses the 'ant jmsclient -Dtype=binary
--Ddest=dynamicQueues/JMSFileUploadProxy
--Dpayload=.\..\..\repository\conf\sample\resources\mtom\asf-logo.gif" which
-sends a JMS bytes message to the defined destination with the content of the
-payload file as its body. Synapse receives the bytes message and creates a
-SOAP envelope. If the axis2.xml used by Synapse enables MTOM optimization
-(through the 'enableMTOM' parameter), then Synapse sends an MTOM optimized
-message to the endpoint as follows, else it encodes the content as Base64:</p>
-
-<p></p>
-<pre>POST /axis2/services/MTOMSampleService HTTP/1.1
-SOAPAction: "urn:uploadFileUsingMTOM"
-User-Agent: Axis2Host: 127.0.0.1
-Content-Length: 8528
-Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465; type="application/xop+xml"; 
-start="&lt;0.urn:uuid:3FE7ADC48E69671C2211646391275466@apache.org&gt;"; start-info="text/xml"; charset=UTF-8--MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465
-content-type: application/xop+xml;
- charset=UTF-8; type="text/xml";content-transfer-encoding: binarycontent-id:&lt;0.urn:uuid:3FE7ADC48E69671C2211646391275466@apache.org&gt;
-&lt;?xml version='1.0' encoding='UTF-8'?&gt;&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
-&lt;soapenv:Header&gt;...&lt;/soapenv:Header&gt;&lt;soapenv:Body&gt;&lt;axis2ns2:element 
-xmlns:axis2ns2="http://services.samples/xsd"&gt;&lt;xop:Include href="cid:1.urn:uuid:3FE7ADC48E69671C2211646391275464@apache.org" xmlns:xop="http://www.w3.org/2004/08/xop/include"
- /&gt;&lt;/axis2ns2:element&gt;
-&lt;/soapenv:Body&gt;
-&lt;/soapenv:Envelope&gt;--MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465content-type: application/octet-streamcontent-transfer-encoding: binarycontent-id:
-&lt;1.urn:uuid:3FE7ADC48E69671C2211646391275464@apache.org&gt;GIF89a&#x192;d.... ;--MIMEBoundaryurn_uuid_3FE7ADC48E69671C2211646391275465-</pre>
-
-<p>The final section of this example shows a POX JMS message received by
-Synapse and sent to the SimpleStockQuoteService as a SOAP message. Execute
-this scenario as 'ant jmsclient -Dtype=xml -Ddest=dynamicQueues/JMSPoxProxy
--Dpayload=MSFT' and notice that since the message received by Synapse is POX,
-you need to force a SOAP message out through the endpoint in-order for the
-SimpleStockQuoteService to properly receive its response. In this example
-Synapse wraps the received POX message in a SOAP envelope and processes it
-and routes it to the real endpoint.</p>
-
-<p></p>
-
-<p>// TODO - REST to WS sample</p>
-<pre>&lt;syn:synapse xmlns:syn="http://ws.apache.org/ns/synapse"&gt;
-    &lt;syn:proxies&gt;
-        &lt;syn:proxy name="StockQuoteProxy" startOnLoad="true"/&gt;
-    &lt;/syn:proxies&gt;
-    &lt;syn:rules&gt;
-        &lt;syn:in&gt;
-            &lt;syn:header name="Action" value="urn:getQuote"/&gt;
-            &lt;syn:send&gt;
-                &lt;syn:endpoint force="soap" address="http://localhost:9001/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/syn:send&gt;
-        &lt;/syn:in&gt;
-        &lt;syn:out&gt;
-            &lt;syn:send/&gt;
-        &lt;/syn:out&gt;
-    &lt;/syn:rules&gt;
-&lt;/syn:synapse&gt;</pre>
+<p>By following through the debug logs or TCPMon output, you could see that
+the request received by the proxy service was signed and encrypted. Also,
+looking up the WSDL of the proxy service by requesting the
+URLhttp://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
+policy attachment to the supplied base WSDL. When sending the message to the
+backend service, you could verify that the security headers were removed, and
+that the response received does not use WS-Security, but that the response
+being forwarded back to the client is signed and encrypted as expected by the
+client.</p>
 
 <h1><a name="Transports1" id="Transports1">Transports</a></h1>
 
@@ -1749,9 +1534,199 @@ server instance, which reports the acceptance of the order as follows:</p>
 
 <p>If you send your client request through TCPmon, you will notice that the
 SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
-Synapse in-turn replies to the client with a HTTP 202 acknowledgement.</p>
+Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
 
-<h1><a name="ScriptMediators">Script mediators</a></h1>
+<h2>Sample 113:</h2>
+<pre>&lt;!-- demonstrate JMS pure text, binary and POX message support --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="text_proxy"&gt;
+        &lt;header name="Action" value="urn:placeOrder"/&gt;
+        &lt;script language="js"&gt;&lt;![CDATA[
+            var args = mc.getPayloadXML().toString().split(" ");
+            mc.setPayloadXML(
+            &lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
+                &lt;m:order&gt;
+                    &lt;m:price&gt;{args[0]}&lt;/m:price&gt;
+                    &lt;m:quantity&gt;{args[1]}&lt;/m:quantity&gt;
+                    &lt;m:symbol&gt;{args[2]}&lt;/m:symbol&gt;
+                &lt;/m:order&gt;
+            &lt;/m:placeOrder&gt;);
+        ]]&gt;&lt;/script&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="mtom_proxy"&gt;
+        &lt;header name="Action" value="urn:oneWayUploadUsingMTOM"/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/MTOMSwASampleService" optimize="mtom"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="pox_proxy"&gt;
+        &lt;header name="Action" value="urn:placeOrder"/&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" force="soap"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="out"&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+    &lt;proxy name="JMSFileUploadProxy" transports="jms"&gt;
+        &lt;target inSequence="mtom_proxy" outSequence="out"/&gt;
+        &lt;parameter name="transport.jms.Wrapper"&gt;{http://services.samples/xsd}element&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    &lt;proxy name="JMSTextProxy" transports="jms"&gt;
+        &lt;target inSequence="text_proxy" outSequence="out"/&gt;
+        &lt;parameter name="transport.jms.Wrapper"&gt;{http://services.samples/xsd}text&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    &lt;proxy name="JMSPoxProxy" transports="jms"&gt;
+        &lt;target inSequence="pox_proxy" outSequence="out"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Pure POX/Text and Binary JMS Proxy services - including
+MTOM</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Configure JMS for Synapse (Refer notes)<br>
+Start the Synapse configuration numbered 105: i.e. synapse -sample 105<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService and the
+MTOMSwASampleService if not already done</p>
+
+<p></p>
+
+<p>This configuration creates three JMS proxy services named
+JMSFileUploadProxy, JMSTextProxy and JMSPoxProxy exposed over JMS queues with
+the same names as the services. The first part of this example demonstrates
+the pure text message support with JMS, where a user sends a space separated
+text JMS message of the form "&lt;price&gt; &lt;qty&gt; &lt;symbol&gt;".
+Synapse converts this message into a SOAP message and sends this to the
+SimpleStockQuoteServices' placeOrder operation. Synapse uses the script
+mediator to transform the text message into a XML payload using the
+Javascript support available to tokenize the string. The proxy service
+property named "transport.jms.Wrapper" defines a custom wrapper element
+QName, to be used when wrapping text/binary content into a SOAP envelope.</p>
+
+<p></p>
+
+<p>Execute JMS client as follows. This will post a pure text JMS message with
+the content defined (e.g. "12.33 1000 ACP") to the specified JMS destination
+- dynamicQueues/JMSTextProxy</p>
+<pre>ant jmsclient -Djms_type=text -Djms_payload="12.33 1000 ACP" -Djms_dest=dynamicQueues/JMSTextProxy</pre>
+
+<p>Following the debug logs, you could notice that Synapse received the JMS
+text message and transformed it into a SOAP payload as follows. Notice that
+the wrapper element "{http://services.samples/xsd}text" has been used to hold
+the text message content.</p>
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body : 
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+  &lt;soapenv:Body&gt;&lt;axis2ns1:text xmlns:axis2ns1="http://services.samples/xsd"&gt;12.33 1000 ACP&lt;/axis2ns1:text&gt;&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
+
+<p>Now, you could see how the script mediator created a stock quote request
+by tokenizing the text as follows, and sent the message to the placeOrder
+operation of the SimpleStockQuoteService.</p>
+<pre>[JMSWorker-1] DEBUG AddressEndpoint - Sending message to endpoint :: name = AnonymousEndpoints resolved address = http://localhost:9000/soap/SimpleStockQuoteService 
+[JMSWorker-1] DEBUG AddressEndpoint - SOAPAction: urn:placeOrder 
+[JMSWorker-1] DEBUG AddressEndpoint - WSA-Action: urn:placeOrder 
+[JMSWorker-1] DEBUG AddressEndpoint - Body : 
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;
+  &lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;&lt;m:order&gt;&lt;m:price&gt;12.33&lt;/m:price&gt;&lt;m:quantity&gt;1000&lt;/m:quantity&gt;&lt;m:symbol&gt;ACP&lt;/m:symbol&gt;&lt;/m:order&gt;
+&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</pre>
+
+<p>The sample Axis2 server would now accept the one way message and issue the
+following message:</p>
+<pre>Wed Apr 25 19:50:56 LKT 2007 samples.services.SimpleStockQuoteService :: Accepted order for : 1000 stocks of ACP at $ 12.33</pre>
+
+<p></p>
+
+<p>The next section of this example demonstrates how a pure binary JMS
+message could be received and processed through Synapse. The configuration
+creates a proxy service named 'JMSFileUploadProxy' that accepts binary
+messages and wraps them into a custom element
+'{http://services.samples/xsd}element'. The received message is then
+forwarded to the MTOMSwASampleService using the SOAP action
+'urn:oneWayUploadUsingMTOM' and optimizing binary conent using MTOM. To
+execute this sample, use the JMS client to publish a pure binary JMS message
+containing the file
+'./../../repository/conf/sample/resources/mtom/asf-logo.gif' to the JMS
+destination 'dynamicQueues/JMSFileUploadProxy' as follows:</p>
+<pre>ant jmsclient -Djms_type=binary -Djms_dest=dynamicQueues/JMSFileUploadProxy -Djms_payload=./../../repository/conf/sample/resources/mtom/asf-logo.gif</pre>
+
+<p>Examining the Synapse debug logs reveals that the binary content was
+received over JMS and wrapped with the specified element into a SOAP infoset
+as follows:</p>
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSFileUploadProxy received a new message... 
+...
+[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body : 
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+&lt;soapenv:Body&gt;&lt;axis2ns1:element xmlns:axis2ns1="http://services.samples/xsd"&gt;R0lGODlhgw...AAOw==&lt;/axis2ns1:element&gt;&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
+
+<p>Thereafter the message was sent as a MTOM optimized message as specified
+by the 'format=mtom' attribute of the endpoint, to the MTOMSwASampleService
+using the SOAP action 'urn:oneWayUploadUsingMTOM'. Once received by the
+sample service, it is saved into a temporary file and could be verified for
+correctness.</p>
+<pre>Wrote to file : /tmp/mtom-60319.gif</pre>
+
+<p></p>
+
+<p>The final section of this example shows how a POX JMS message received by
+Synapse is sent to the SimpleStockQuoteService as a SOAP message. Use the JMS
+client as follows to create a POX (Plain Old XML) message with a stock quote
+request payload (without a SOAP envelope), and send it to the JMS destination
+'dynamicQueues/JMSPoxProxy' as follows:</p>
+<pre>ant jmsclient -Djms_type=pox -Djms_dest=dynamicQueues/JMSPoxProxy -Djms_payload=MSFT</pre>
+
+<p>You can see that Synapse received the POX message and displays it as
+follows in the debug logs, and then converts it into a SOAP payload and sends
+to the SimpleStockQuoteService after setting the SOAP action as
+'urn:placeOrder'.</p>
+
+<p></p>
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSPoxProxy received a new message... 
+...
+[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body : 
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
+    &lt;m:order&gt;
+        &lt;m:price&gt;172.39703010684752&lt;/m:price&gt;
+        &lt;m:quantity&gt;19211&lt;/m:quantity&gt;
+        &lt;m:symbol&gt;MSFT&lt;/m:symbol&gt;
+    &lt;/m:order&gt;
+&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt; 
+[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Using the sequence named pox_proxy for message mediation 
+...
+[JMSWorker-1] DEBUG HeaderMediator - Setting header : Action to : urn:placeOrder 
+...
+[JMSWorker-1] DEBUG AddressEndpoint - Sending message to endpoint :: name = AnonymousEndpoints resolved address = http://localhost:9000/soap/SimpleStockQuoteService 
+[JMSWorker-1] DEBUG AddressEndpoint - SOAPAction: urn:placeOrder 
+[JMSWorker-1] DEBUG AddressEndpoint - Body : 
+&lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
+    &lt;m:order&gt;
+        &lt;m:price&gt;172.39703010684752&lt;/m:price&gt;
+        &lt;m:quantity&gt;19211&lt;/m:quantity&gt;
+        &lt;m:symbol&gt;MSFT&lt;/m:symbol&gt;
+    &lt;/m:order&gt;
+&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt; 
+[JMSWorker-1] DEBUG Axis2FlexibleMEPClient - sending [add = false] [sec = false] [rm = false] [ mtom = false] [ swa = false] [ force soap=true; pox=false] [ to null] </pre>
+
+<p>The sample Axis2 server displays a successful message on the receipt of
+the message as:</p>
+<pre>Wed Apr 25 20:24:50 LKT 2007 samples.services.SimpleStockQuoteService :: Accepted order for : 19211 stocks of MSFT at $ 172.39703010684752</pre>
+
+<h1><a name="ScriptMediators1" id="ScriptMediators1">Script mediators</a></h1>
 
 <p>Synapse supports Mediators implemented in a variety of scripting languages
 such as JavaScript, Python or Ruby.</p>

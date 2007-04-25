@@ -16,10 +16,9 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
+<!-- demonstrate JMS pure text, binary and POX message support -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- demonstrate JMS raw Text / POX message support -->
     <sequence name="text_proxy">
         <header name="Action" value="urn:placeOrder"/>
         <script language="js"><![CDATA[
@@ -53,7 +52,7 @@
         <header name="Action" value="urn:placeOrder"/>
         <send>
             <endpoint>
-                <address uri="http://localhost:9000/soap/SimpleStockQuoteService" force="soap"/>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap"/>
             </endpoint>
         </send>
     </sequence>
@@ -73,5 +72,4 @@
     <proxy name="JMSPoxProxy" transports="jms">
         <target inSequence="pox_proxy" outSequence="out"/>
     </proxy>
-
 </definitions>

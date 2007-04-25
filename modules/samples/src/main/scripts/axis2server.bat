@@ -47,7 +47,9 @@ goto end
 
 :checkJava
 set _JAVACMD=%JAVACMD%
-set _PORT=
+set _HTTPPORT=
+set _HTTPSPORT=
+set _SERVERNAME=
 
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
@@ -55,14 +57,28 @@ if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java.exe
 
 :setupArgs
 if ""%1""=="""" goto defaultParams
-if ""%1""==""-port"" goto port
+if ""%1""==""-http"" goto httpport
+if ""%1""==""-https"" goto httpsport
+if ""%1""==""-name"" goto servername
 shift
 goto setupArgs
 
 rem is a custom port specified
-:port
+:httpport
 shift
-set _PORT="-Dport=%1"
+set _HTTPPORT="-Dhttp_port=%1"
+shift
+goto setupArgs
+
+:httpsport
+shift
+set _HTTPSPORT="-Dhttps_port=%1"
+shift
+goto setupArgs
+
+:servername
+shift
+set _SERVERNAME="-Dserver_name=%1"
 shift
 goto setupArgs
 
@@ -87,7 +103,7 @@ echo Using JAVA_HOME    %JAVA_HOME%
 echo Using AXIS2_HOME   %AXIS2_HOME%
 
 cd %AXIS2_HOME%
-"%_JAVACMD%" %_PORT% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server %AXIS2_CMD_LINE_ARGS%
+"%_JAVACMD%" %_HTTPPORT% %_HTTPSPORT% %_SERVERNAME% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server %AXIS2_CMD_LINE_ARGS%
 goto end
 
 :end

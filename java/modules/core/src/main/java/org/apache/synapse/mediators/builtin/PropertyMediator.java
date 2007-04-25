@@ -83,14 +83,6 @@ public class PropertyMediator extends AbstractMediator {
             if (scope == null) {
                 //Setting property into the  Synapse Context
                 smc.setProperty(name, resultValue);
-
-                // do not commit response by default in the server process
-                if (Constants.RESPONSE.equals(name)) {
-                    org.apache.axis2.context.MessageContext axisMsgCtx =
-                    ((Axis2MessageContext) smc).getAxis2MessageContext();
-                        axisMsgCtx.getOperationContext().setProperty(
-                            org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
-                }
             } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
                 //Setting property into the  Synapse Context
                 smc.setProperty(name, resultValue);

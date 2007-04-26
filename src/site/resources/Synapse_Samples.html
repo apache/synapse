@@ -431,7 +431,7 @@ to all messages that passes through Synapse.</p>
                 &lt;/case&gt;
                 &lt;case regex="MSFT"&gt;
                     &lt;send&gt;
-                        &lt;endpoint key="bogus"/&gt;
+                        &lt;endpoint key=""/&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex="SUN"&gt;
@@ -518,14 +518,14 @@ custom error message as follows:</p>
             &lt;switch source="//m0:getQuote/m0:request/m0:symbol"
                     xmlns:m0="http://services.samples/xsd"&gt;
                 &lt;case regex="MSFT"&gt;
-                    &lt;send&gt;&lt;endpoint name="bogusHost"&gt;
-                            &lt;address uri="http://bogus:9000/soap/NonExistentStockQuoteService"/&gt;
-                    &lt;/endpoint&gt;&lt;/send&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;&lt;address uri="http://bogus:9000/soap/NonExistentStockQuoteService"/&gt;&lt;/endpoint&gt;
+                    &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex="SUN"&gt;
-                    &lt;send&gt;&lt;endpoint name="bogusPort"&gt;
-                            &lt;address uri="http://localhost:9009/soap/NonExistentStockQuoteService"/&gt;
-                    &lt;/endpoint&gt;&lt;/send&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;&lt;address uri="http://localhost:9009/soap/NonExistentStockQuoteService"/&gt;&lt;/endpoint&gt;
+                    &lt;/send&gt;
                 &lt;/case&gt;
             &lt;/switch&gt;
             &lt;drop/&gt;

@@ -65,6 +65,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					
 			//starting a transaction for the invocation work.
 			transaction = storageManager.getTransaction();
+			// Lock the RMD Bean just to avoid deadlocks
+			SandeshaUtil.getRMDBeanFromSequenceId(storageManager, invokerBean.getSequenceID());
 			// Depending on the transaction  support, the service will be invoked only once. 
 			// Therefore we delete the invoker bean and message now, ahead of time
 			invokerBeanMgr.delete(messageContextKey);

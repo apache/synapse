@@ -62,20 +62,19 @@
     </echo>
     </target>
 
-    <property name="symbol" value="IBM"/>
-    <property name="mode" value="quote"/>
+    <property name="symbol" value=""/>
+    <property name="mode" value=""/>
     <property name="addurl" value=""/>
     <property name="trpurl" value=""/>
     <property name="prxurl" value=""/>
-    <property name="repository" value="client_repo"/>
+    <property name="repository" value=""/>
     <property name="policy" value=""/>
     <property name="jms_dest" value=""/>
     <property name="jms_type" value=""/>
     <property name="jms_payload" value=""/>
-    <property name="opt_mode" value="mtom"/>
-    <property name="opt_url" value="http://localhost:8080/soap/MTOMSwASampleService"/>
-    <property name="opt_file" value="./../../repository/conf/sample/resources/mtom/asf-logo.gif"/>
-
+    <property name="opt_mode" value=""/>
+    <property name="opt_url" value=""/>
+    <property name="opt_file" value=""/>
     <property name="class.dir" value="target/classes"/>
 
     <path id="axis.classpath">
@@ -92,46 +91,43 @@
     <target name="stockquote" depends="compile">
         <java classname="samples.userguide.StockQuoteClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${symbol}"/>
-            <arg value="${mode}"/>
-            <arg value="${addurl}"/>
-            <arg value="${trpurl}"/>
-            <arg value="${prxurl}"/>
-            <arg value="${repository}"/>
-            <arg value="${policy}"/>
+            <sysproperty key="symbol" value="${symbol}"/>
+            <sysproperty key="mode"   value="${mode}"/>
+            <sysproperty key="addurl" value="${addurl}"/>
+            <sysproperty key="trpurl" value="${trpurl}"/>
+            <sysproperty key="prxurl" value="${prxurl}"/>
+            <sysproperty key="repository" value="${repository}"/>
+            <sysproperty key="policy" value="${policy}"/>
         </java>
     </target>
 
     <!-- a simple smoke test -->
     <target name="smoke" depends="compile">
+        <property name="addurl" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
+        <property name="trpurl" value="http://localhost:8080/"/>
         <java classname="samples.userguide.StockQuoteClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="IBM"/>
-            <arg value="quote"/>
-            <arg value="http://localhost:9000/soap/SimpleStockQuoteService"/>
-            <arg value="http://localhost:8080"/>
-            <arg value=""/>
-            <arg value="${repository}"/>
-            <arg value=""/>
+            <sysproperty key="addurl" value="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            <sysproperty key="trpurl" value="http://localhost:8080/"/>
         </java>
     </target>
 
     <target name="jmsclient" depends="compile">
         <java classname="samples.userguide.GenericJMSClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${jms_dest}"/>
-            <arg value="${jms_type}"/>
-            <arg value="${jms_payload}"/>
+            <sysproperty key="jms_dest"    value="${jms_dest}"/>
+            <sysproperty key="jms_type"    value="${jms_type}"/>
+            <sysproperty key="jms_payload" value="${jms_payload}"/>
         </java>
     </target>
 
     <target name="optimizeclient" depends="compile">
         <java classname="samples.userguide.MTOMSwAClient"
               classpathref="javac.classpath" fork="true">
-            <arg value="${opt_mode}"/>
-            <arg value="${opt_url}"/>
-            <arg value="${opt_file}"/>
-        </java>
+            <sysproperty key="opt_mode" value="${opt_mode}"/>
+            <sysproperty key="opt_url"  value="${opt_url}"/>
+            <sysproperty key="opt_file" value="${opt_file}"/>
+        </java>            
     </target>
 
     <target name="loadbalancefailover" depends="compile">

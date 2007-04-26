@@ -21,75 +21,103 @@
 <head>
   <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
   <title>Synapse Configuration Language</title>
-  <style type="text/css">
-p {
-font-family: Verdana, arial, sans-serif;
-font-size: 11px;
-line-height: 16px;
-color: #000000;
-font-weight: normal;
-}
-li {
-font-family: Verdana, arial, sans-serif;
-font-size: 11px;
-line-height: 16px;
-color: #000000;
-font-weight: normal;
-}  
-pre {
-    padding: 0px;
-    margin-top: 5px;
-    margin-left: 15px;
-    margin-bottom: 5px;
-    margin-right: 5px;
-    text-align: left;
-    background-color: #f0f0f0;
-    padding: 3px;
-    border: 1px dashed #3c78b5;
-    font-size: 11px;
-    font-family: Courier;
-    margin: 10px;
-    line-height: 13px;
-}  
-h1 {
-font-size: 24px;
-line-height: normal;
-font-weight: bold;
-background-color: #f0f0f0;
-color: #003366;
- border-bottom: 1px solid #3c78b5;
-padding: 2px;
-margin: 36px 0px 4px 0px;
-}
 
-h2 {
-font-size: 18px;
-line-height: normal;
-font-weight: bold;
-background-color: #f0f0f0;
- border-bottom: 1px solid #3c78b5;
-padding: 2px;
-margin: 27px 0px 4px 0px;
-}
-
-h3 {
-font-size: 14px;
-line-height: normal;
-font-weight: bold;
-background-color: #f0f0f0;
-padding: 2px;
-margin: 21px 0px 4px 0px;
-}
-
-h4 {
-font-size: 12px;
-line-height: normal;
-font-weight: bold;
-background-color: #f0f0f0;
-padding: 2px;
-margin: 18px 0px 4px 0px;
-}
- </style>
+<style type="text/css">
+    .command {
+        border: 1px dashed #3c78b5;
+        text-align: left;
+        background-color: #f0f0f0;
+        padding: 3px;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+    }
+    .consoleOutput {
+        border: 1px dashed #3c78b5;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+        background-color: #f0f0f0;
+        border-bottom: 1px dashed #3c78b5;
+        padding: 3px;
+        border-style: solid;
+    }
+    .info {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #090;
+        background-color: #dfd;
+        text-align:left;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    li {
+        font-family: Verdana, arial, sans-serif;
+        font-size: 11px;
+        line-height: 16px;
+        color: #000000;
+        font-weight: normal;
+    }
+    p {
+        font-family: Verdana, arial, sans-serif;
+        font-size: 11px;
+        line-height: 16px;
+        color: #000000;
+        font-weight: normal;
+    }
+    pre {
+        padding: 0px;
+        margin-top: 5px;
+        margin-left: 15px;
+        margin-bottom: 5px;
+        margin-right: 5px;
+        text-align: left;
+        background-color: #f0f0f0;
+        padding: 3px;
+        border: 1px dashed #3c78b5;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+    }
+    h1 {
+        font-size: 24px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        color: #003366;
+        border-bottom: 1px solid #3c78b5;
+        padding: 2px;
+        margin: 36px 0px 4px 0px;
+    }
+    h2 {
+        font-size: 18px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        border-bottom: 1px solid #3c78b5;
+        padding: 2px;
+        margin: 27px 0px 4px 0px;
+    }
+    h3 {
+        font-size: 14px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        padding: 2px;
+        margin: 21px 0px 4px 0px;
+    }
+    h4 {
+        font-size: 12px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        padding: 2px;
+        margin: 18px 0px 4px 0px;
+    }
+</style>
 </head>
 
 <body>
@@ -346,7 +374,7 @@ message stops.</p>
 <p>The log token refers to a &lt;log&gt; element which may be used to log
 messages being mediated:</p>
 <pre> &lt;log [level="string"] [separator="string"]&gt;
-   &lt;parameter name="string" (value="literal" | expression="xpath")/&gt;*
+   &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/log&gt;</pre>
 
 <p>The optional level attribute selects a pre-defined subset of properties to

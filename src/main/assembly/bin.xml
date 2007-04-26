@@ -94,6 +94,9 @@
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <includes>
                 <include>Synapse_Configuration_Language.html</include>
+                <include>Synapse_Samples.html</include>
+                <include>Synapse_Samples_Setup.html</include>
+                <include>Synapse_QuickStart.html</include>
                 <include>userguide.html</include>
                 <include>extending_synapse.html</include>
             </includes>

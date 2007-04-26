@@ -58,9 +58,9 @@ public class MTOMRMTest extends SandeshaTestCase {
 
 	private final String Attachment = "Attachment";
 
-	private final String SOURCE_IMAGE_FILE = "target/test-classes/mtom-image.jpg";
+	private final String SOURCE_IMAGE_FILE =  "modules"+File.separator+"tests" + "mtom-image.jpg";
 
-	private final String DESTINATION_IMAGE_FILE = "target/mtom-image1.jpg";
+	private final String DESTINATION_IMAGE_FILE = "target" + File.separator + "mtom-image1.jpg";
 
 	private final String PING_OPERATION_NAME = "ping";
 

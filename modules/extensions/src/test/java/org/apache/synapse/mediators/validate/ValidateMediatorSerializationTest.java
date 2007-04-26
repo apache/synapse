@@ -20,6 +20,8 @@
 package org.apache.synapse.mediators.validate;
 
 import org.apache.synapse.mediators.AbstractTestCase;
+import org.apache.synapse.config.xml.ValidateMediatorFactory;
+import org.apache.synapse.config.xml.ValidateMediatorSerializer;
 
 public class ValidateMediatorSerializationTest extends AbstractTestCase {
 

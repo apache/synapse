@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.validate.ValidateMediatorSerializer;
-import org.apache.synapse.mediators.transform.XSLTMediatorSerializer;
+import org.apache.synapse.config.xml.ValidateMediatorSerializer;
+import org.apache.synapse.config.xml.XSLTMediatorSerializer;
 import sun.misc.Service;
 
 import java.util.HashMap;

@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.validate;
+package org.apache.synapse.mediators.builtin;
 
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.xpath.AXIOMXPath;

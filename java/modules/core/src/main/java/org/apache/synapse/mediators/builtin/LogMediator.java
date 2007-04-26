@@ -139,7 +139,7 @@ public class LogMediator extends AbstractMediator {
 
     private String getFullLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
-        sb.append(getHeadersLogMessage(synCtx));
+        sb.append(getSimpleLogMessage(synCtx));
         if (synCtx.getEnvelope() != null)
             sb.append(separator + "Envelope: " + synCtx.getEnvelope());        
         return trimLeadingSeparator(sb);

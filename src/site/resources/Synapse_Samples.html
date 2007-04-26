@@ -21,7 +21,13 @@
   <meta http-equiv="content-type" content="">
   <title></title>
   <style type="text/css">
-p {
+li {
+font-family: Verdana, arial, sans-serif;
+font-size: 11px;
+line-height: 16px;
+color: #000000;
+font-weight: normal;
+}p {
 font-family: Verdana, arial, sans-serif;
 font-size: 11px;
 line-height: 16px;
@@ -91,81 +97,75 @@ margin: 18px 0px 4px 0px;
 
 <div class="section-content">
 <ul>
-  <li><a href="#Overview">Overview</a></li>
-  <li><a href="#Axis2Server">Starting the Axis2 Server</a></li>
+  <li><a href="Synapse_Samples_Setup.html#Overview">Overview</a></li>
   <li><a href="#MediationSamples">Message mediation samples</a> 
     <ul>
-      <li><a href="#Sample0">Sample 0: Introduction to Synapse - log a
-        message</a></li>
-      <li><a href="#Sample1">Sample 1: Content based routing</a></li>
-      <li><a href="#Sample2">Sample 2: Switch-case mediator and writing and
-        reading of message properties</a></li>
-      <li><a href="#Sample3">Sample 3: Simple properties, and reusable
-        endpoints and sequences</a></li>
-      <li><a href="#Sample4">Sample 4: Error handling with the try and
-        makefault mediators</a></li>
-      <li><a href="#Sample5">Sample 5: Error handling within a sequence using
-        the 'onError' sequence</a></li>
-      <li><a href="#Sample6">Sample 6: Header, in and out mediators</a></li>
-      <li><a href="#Sample7">Sample 7: Extension mediators, static XML
-        properties and the validate mediator</a></li>
-      <li><a href="#Sample8">Sample 8: URL source properties, registry based
-        properties and the XSLT mediator</a></li>
-      <li><a href="#Sample9">Sample 9: Dynamic sequences with a
-      Registry</a></li>
-      <li><a href="#Sample10">Sample 10: Dynamic endpoints with a
-      Registry</a></li>
-      <li><a href="#Sample11">Sample 11: A full registry based
-        configuration</a></li>
+      <li><a href="#Sample0">Sample 0: Introduction to Synapse</a></li>
+      <li><a href="#Sample1">Sample 1: Content based routing (CBR)</a></li>
+      <li><a href="#Sample2">Sample 2: CBR with the Switch-case mediator,
+        using message properties</a></li>
+      <li><a href="#Sample3">Sample 3: Local Registry entry definitions,
+        reusable endpoints and sequences</a></li>
+      <li><a href="#Sample4">Sample 4: Introduction to error handling</a></li>
+      <li><a href="#Sample5">Sample 5: Creating SOAP fault messages and
+        changing the direction of a message</a></li>
+      <li><a href="#Sample6">Sample 6: Manipulating SOAP headers, and
+        filtering incoming and outgoing messages</a></li>
+      <li><a href="#Sample7">Sample 7: Introduction to local Registry entries
+        and using Schema validation</a></li>
+      <li><a href="#Sample8">Sample 8: Introduction to static and dynamic
+        registry resources, and using XSLT transformations</a></li>
+      <li><a href="#Sample9">Sample 9: Introduction to dynamic sequences with
+        the Registry</a></li>
+      <li><a href="#Sample10">Sample 10: Introduction to dynamic endpoints
+        with the Registry</a></li>
+      <li><a href="#Sample11">Sample 11: A full registry based configuration,
+        and sharing a configuration between multiple instances</a></li>
     </ul>
   </li>
-  <li><a href="#WSSecurity">WS-Security</a> 
+  <li><a href="#Endpoints">Endpoints</a> 
     <ul>
-      <li><a href="#Sample50">Sample 50: Connecting to endpoints with
-        WS-Security</a></li>
+      <li><a href="#Sample50">Sample 50: Using WS-Security for outgoing
+        messages</a></li>
+      <li><a href="#Sample51">Sample 51: MTOM and SwA optimizations and
+        request/response correlation</a></li>
     </ul>
   </li>
   <li><a href="#ProxyServices">Synapse Proxy service samples</a> 
     <ul>
-      <li><a href="#Sample100">Sample 100: Introduction to Synapse proxy
-        services</a></li>
-      <li><a href="#Sample101">Sample 101: Custom sequences and endpoints for
-        message mediation with proxy services</a></li>
-      <li><a href="#Sample102">Sample 102: Attaching service level
-        WS-Security policies to proxy services</a></li>
-      <li><a href="#Sample103">Sample 103: Using WS-Security signing and
-        encryption with proxy services through WS-Policy</a></li>
-      <li><a href="#Sample104">Sample 104: Explicit out sequence in proxy
-        service level to mediate proxy response</a></li>
-      <li><a href="#Sample105">Sample 105: Pure POX/Text and Binary JMS Proxy
-        services - including MTOM</a></li>
+      <li><a href="#Sample100">Sample 100: Introduction to proxy
+      services</a></li>
+      <li><a href="#Sample101">Sample 101: Custom sequences and endpoints
+        with proxy services</a></li>
+      <li><a href="#Sample102">Sample 102: Switching transports and message
+        format from SOAP to REST/POX</a></li>
+      <li><a href="#Sample103">Sample 103: Using WS-Security with policy
+        attachments for proxy services</a></li>
     </ul>
   </li>
-  <li><a href="#ProxyServices">Transport samples</a> 
+  <li><a href="#Transport">Transport samples</a> 
     <ul>
       <li><a href="#Sample110">Sample 110: Introduction to switching
-        transports with proxy services</a></li>
-      <li><a href="#Sample111">Sample 111: Demonstrate switching from HTTP to
-        JMS</a></li>
+        transports - JMS to http/s</a></li>
+      <li><a href="#Sample111">Sample 111: Demonstrate switching from http/s
+        to JMS</a></li>
       <li><a href="#Sample112">Sample 112: Demonstrate one way messaging /
-        fireAndForget</a></li>
+        fireAndForget()</a></li>
+      <li><a href="#Sample113">Sample 113: Pure text/binary and POX message
+        support with JMS</a></li>
     </ul>
   </li>
   <li><a href="#ScriptMediators">Script Mediators</a> 
     <ul>
-      <li><a href="#ScriptSetup">Setting up Script Mediator support in
-        Synapse</a> 
-        <ul>
-          <li><a href="#ScriptSetupJavaScript">JavaScript</a></li>
-          <li><a href="#ScriptSetupRuby">Ruby</a></li>
-        </ul>
-      </li>
-    </ul>
-    <ul>
+      <li><a href="Synapse_Samples_Setup.html#ScriptSetup">Setting up Script
+        Mediators</a> </li>
       <li><a href="#Sample500">Sample 500: Introduction to script
         mediators</a></li>
-      <li><a href="#Sample501">Sample 501: In-line script mediators</a></li>
-      <li><a href="#Sample503">Sample 503: Ruby script mediators</a></li>
+      <li><a href="#Sample501">Sample 501: In-line script mediation</a></li>
+      <li><a href="#Sample502">Sample 502: Accessing Synapse message context
+        API methods</a></li>
+      <li><a href="#Sample503">Sample 503: Using Ruby scripts for
+        mediation</a></li>
     </ul>
   </li>
 </ul>
@@ -280,8 +280,6 @@ client.</p>
 <h2><a name="Sample2">Sample 2:</a></h2>
 <pre>&lt;!-- switch-case mediator and setting and reading of local properties on a message --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-
-    &lt;!-- introduction to switch-case-default mediator --&gt;
     &lt;switch source="//m0:getQuote/m0:request/m0:symbol" xmlns:m0="http://services.samples/xsd"&gt;
         &lt;case regex="IBM"&gt;
             &lt;!-- the property mediator sets a local property on the *current* message --&gt;
@@ -292,7 +290,7 @@ client.</p>
         &lt;/case&gt;
         &lt;default&gt;
             &lt;!-- it is possible to assign the result of an XPath expression as well --&gt;
-            &lt;set-property name="symbol"
+            &lt;property name="symbol"
                   expression="fn:concat('Normal Stock - ', //m0:getQuote/m0:request/m0:symbol)"
                   xmlns:m0="http://services.samples/xsd"/&gt;
         &lt;/default&gt;
@@ -308,7 +306,6 @@ client.</p>
 
     &lt;!-- Send the messages where they are destined to (i.e. the 'To' EPR of the message) --&gt;
     &lt;send/&gt;
-
 &lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Introduce switch-case mediator and writing and reading
@@ -402,7 +399,7 @@ to all messages that passes through Synapse.</p>
 [HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate() 
 [HttpServerWorker-1] DEBUG AddressEndpoint - Sending To: http://localhost:9000/soap/SimpleStockQuoteService </pre>
 
-<h2><a name="Sample41" id="Sample41">Sample 4:</a></h2>
+<h2><a name="Sample4">Sample 4:</a></h2>
 <pre>&lt;!-- introduction to error handling --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -502,7 +499,7 @@ custom error message as follows:</p>
 [HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate() 
 [HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured for stock SUN, message = Reference to non-existent endpoint for key : sunPort</pre>
 
-<h2>Sample 5:</h2>
+<h2><a name="Sample5">Sample 5:</a></h2>
 <pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="myFaultHandler"&gt;
@@ -545,12 +542,12 @@ custom error message as follows:</p>
 </strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Start the Synapse configuration numbered 4: i.e. synapse -sample 5<br>
+Start the Synapse configuration numbered 5: i.e. synapse -sample 5<br>
 Start the Axis2 server and deploy the SimpleStockQuoteService if not already
 done</p>
 
 <p>When the MSFT stock quote is requested, an unknown host exception would be
-caused, and a connection refuxed exception would be caused for the SUN stock.
+caused, and a connection refused exception would be caused for the SUN stock.
 This information is captured and returned back to the original client as a
 SOAP fault in this example.</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
@@ -907,7 +904,7 @@ the key ''synapse.xml'. </p>
 
 <p></p>
 
-<h1>Endpoints</h1>
+<h1><a name="Endpoints">Endpoints</a></h1>
 
 <h2><a name="Sample50">Sample 50:</a></h2>
 <pre>&lt;!-- Connecting to endpoints with WS-Security for outgoing messages --&gt;
@@ -1004,7 +1001,7 @@ User-Agent: Synapse-HttpComponents-NIO
       &lt;/soapenv:Body&gt;
    &lt;/soapenv:Envelope&gt;0</pre>
 
-<h2>Sample 51:</h2>
+<h2><a name="Sample51">Sample 51:</a></h2>
 <pre>&lt;!-- MTOM and SwA and message properties to correlate requests and responses --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;
@@ -1012,7 +1009,7 @@ User-Agent: Synapse-HttpComponents-NIO
             &lt;property name="example" value="mtom"/&gt;
             &lt;send&gt;
                 &lt;endpoint&gt;
-                    &lt;address uri="http://localhost:9001/soap/MTOMSwASampleService" optimize="mtom"/&gt;
+                    &lt;address uri="http://localhost:9000/soap/MTOMSwASampleService" optimize="mtom"/&gt;
                 &lt;/endpoint&gt;
             &lt;/send&gt;
         &lt;/filter&gt;
@@ -1132,7 +1129,7 @@ Content-Transfer-Encoding: binary
 Content-ID: 
          &lt;urn:uuid:15FD2DA2584A32BF7C1177414169826&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
 
-<h1><a name="ProxyServices1" id="ProxyServices1">Proxy services</a></h1>
+<h1><a name="ProxyServices" id="ProxyServices">Proxy services</a></h1>
 
 <h2><a name="Sample100">Sample 100:</a></h2>
 <pre>&lt;!-- introduction to Synapse proxy services --&gt;
@@ -1375,7 +1372,7 @@ that the response received does not use WS-Security, but that the response
 being forwarded back to the client is signed and encrypted as expected by the
 client.</p>
 
-<h1><a name="Transports1" id="Transports1">Transports</a></h1>
+<h1><a name="Transport">Transports</a></h1>
 
 <h2><a name="Sample110">Sample 110:</a></h2>
 <pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -1536,7 +1533,7 @@ server instance, which reports the acceptance of the order as follows:</p>
 SimpleStockQuoteService replies to Synapse with a HTTP 202 reply, and that
 Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
 
-<h2>Sample 113:</h2>
+<h2><a name="Sample113">Sample 113:</a></h2>
 <pre>&lt;!-- demonstrate JMS pure text, binary and POX message support --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -1726,7 +1723,7 @@ to the SimpleStockQuoteService after setting the SOAP action as
 the message as:</p>
 <pre>Wed Apr 25 20:24:50 LKT 2007 samples.services.SimpleStockQuoteService :: Accepted order for : 19211 stocks of MSFT at $ 172.39703010684752</pre>
 
-<h1><a name="ScriptMediators1" id="ScriptMediators1">Script mediators</a></h1>
+<h1><a name="ScriptMediators">Script mediators</a></h1>
 
 <p>Synapse supports Mediators implemented in a variety of scripting languages
 such as JavaScript, Python or Ruby. Implementing a Mediator with a script
@@ -1895,7 +1892,7 @@ client to send a custom quote as in example # 500 to test this example.</p>
 
 <p></p>
 
-<h2>Sample 502</h2>
+<h2><a name="Sample502">Sample 502</a></h2>
 <pre>&lt;!-- accessing the Synapse APIs from scripting languages --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;in&gt;

@@ -30,16 +30,20 @@ import java.io.IOException;
 
 public class GenericJMSClient {
 
+    private static String getProperty(String name, String def) {
+        String result = System.getProperty(name);
+        if (result == null || result.length() == 0) {
+            result = def;
+        }
+        return result;
+    }
+
     public static void main(String[] args) throws Exception {
 
-        String dest = "dynamicQueues/JMSTextProxy";
-        String type = "text"; // or binary
-        String param = getRandom(100, 0.9, true) + " " +
-            (int) getRandom(10000, 1.0, true) + " IBM";
-
-        if (args.length > 0) dest  = args[0];
-        if (args.length > 1) type  = args[1];
-        if (args.length > 2 && param.length() > 0) param = args[2];
+        String dest  = getProperty("jms_dest", "dynamicQueues/JMSTextProxy");
+        String type  = getProperty("jms_type", "text");
+        String param = getProperty("jms_payload",
+            getRandom(100, 0.9, true) + " " + (int) getRandom(10000, 1.0, true) + " IBM");
 
         GenericJMSClient app = new GenericJMSClient();
         if ("text".equalsIgnoreCase(type)) {

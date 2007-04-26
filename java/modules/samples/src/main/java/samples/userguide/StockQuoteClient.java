@@ -42,29 +42,27 @@ import java.net.URL;
  *     [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
  *     [-Daddressingurl=<url>] [-Dtransporturl=<url> | -Dproxyurl=<url>]
  * 
- * StockQuoteClient <symbol> <quote | customquote | fullquote | placeorder | marketactivity>
- *      <addurl> <trpurl> <prxurl> <repo> <policy>
  */
 public class StockQuoteClient {
+
+    private static String getProperty(String name, String def) {
+        String result = System.getProperty(name);
+        if (result == null || result.length() == 0) {
+            result = def;
+        }
+        return result;
+    }
 
     public static void main(String[] args) {
 
         // defaults
-        String symbol    = null;
-        String mode      = null;
-        String addUrl    = null;
-        String trpUrl    = null;
-        String prxUrl    = null;
-        String repo      = null;
-        String svcPolicy = null;
-
-        if (args.length > 0 && args[0].length()>0) symbol    = args[0];
-        if (args.length > 1 && args[1].length()>0) mode      = args[1];
-        if (args.length > 2 && args[2].length()>0) addUrl    = args[2];
-        if (args.length > 3 && args[3].length()>0) trpUrl    = args[3];
-        if (args.length > 4 && args[4].length()>0) prxUrl    = args[4];
-        if (args.length > 5 && args[5].length()>0) repo      = args[5];
-        if (args.length > 6 && args[6].length()>0) svcPolicy = args[6];
+        String symbol    = getProperty("symbol", "IBM");
+        String mode      = getProperty("mode", "quote");
+        String addUrl    = getProperty("addurl", null);
+        String trpUrl    = getProperty("trpurl", null);
+        String prxUrl    = getProperty("prxurl", null);
+        String repo      = getProperty("repository", "client_repo");
+        String svcPolicy = getProperty("policy", null);
 
         double price = 0; int quantity = 0;
 

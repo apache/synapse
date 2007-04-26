@@ -40,12 +40,20 @@ import java.io.*;
 public class MTOMSwAClient {
 
     private static final int BUFFER = 2048;
-    
+
+    private static String getProperty(String name, String def) {
+        String result = System.getProperty(name);
+        if (result == null || result.length() == 0) {
+            result = def;
+        }
+        return result;
+    }
+
     public static void main(String[] args) throws Exception {
 
-        String targetEPR = "http://localhost:8080/soap/MTOMSwASampleService";
-        String fileName = "./../../repository/conf/sample/resources/mtom/asf-logo.gif";
-        String mode = "mtom";
+        String targetEPR = getProperty("opt_url", "http://localhost:8080/soap/MTOMSwASampleService");
+        String fileName  = getProperty("opt_file", "./../../repository/conf/sample/resources/mtom/asf-logo.gif");
+        String mode      = getProperty("opt_mode", "mtom");
 
         if (args.length > 0) mode      = args[0];
         if (args.length > 1) targetEPR = args[1];

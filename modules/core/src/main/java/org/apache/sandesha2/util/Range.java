@@ -92,6 +92,17 @@ public class Range implements Serializable{
 		lowerValue = Long.parseLong(parts[0]);
 		upperValue = Long.parseLong(parts[1]);
 	}
+
+	public boolean equals(Object o){
+		boolean returnValue = false;
+		if(o instanceof Range){
+			Range testRange = (Range)o;
+			if(testRange.lowerValue== this.lowerValue && testRange.upperValue == this.upperValue){
+				returnValue = true;
+			}
+		}
+		return returnValue;
+	}
 	
 	
 	/**

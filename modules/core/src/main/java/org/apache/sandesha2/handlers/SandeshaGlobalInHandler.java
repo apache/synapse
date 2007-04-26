@@ -26,12 +26,14 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
@@ -64,6 +66,16 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaGlobalInHandler::invoke, " + msgContext.getEnvelope().getHeader());
+
+		// look at the service to see if RM is totally disabled. This allows the user to disable RM using
+		// a property on the service, even when Sandesha is engaged.
+		if (msgContext.getAxisService() != null) {
+			Parameter unreliableParam = msgContext.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
+				log.debug("Exit: SandeshaGlobalInHandler::invoke, Service has disabled RM " + InvocationResponse.CONTINUE);
+				return InvocationResponse.CONTINUE;
+			}
+		}
 
 		// The only work that this handler needs to do is identify messages which
 		// follow the WSRM 1.0 convention for sending 'LastMessage' when the sender

@@ -1,26 +1,43 @@
-Apache Synapse 0.91 Release Notes
+Apache Synapse 1.0 Release Notes
 
 1. Overview
-Apache Synapse is a highly flexible XML router and mediator that can be the basis of your SOA infrastructure. 
+The Synapse project is a robust, lightweight implementation of a highly scalable and distributed
+service mediation framework based on Web services and XML specifications.
 
 Apache Synapse graduated from the Apache Incubator on the 2nd of January 2007
 
 Please see http://ws.apache.org/synapse/
 
 2. Installation Prerequisites 
-Apache Synapse requires either JDK1.4 or JDK1.5 
+Apache Synapse requires a J2SE runtime of version 1.4.2 or later for runtime. However, to build
+Synapse from source, you will need JDK 1.5 or later and Apache Maven 2.0.6
 
-3. Building the Samples
-Please see the document docs/Synapse_Samples.html
+3. Quick start
+Please see the docs/Synapse_Quickstart.html guide
 
-4. Known Problems
-Incoming POX support does not work at this time.
+4. Building the Samples
+Please see the documents docs/Synapse_Samples.html and docs/Synapse_Samples_Setup.html
+
+3. Synapse configuration language
+Please see the document docs/Synapse_Configuration_Language.html
+
+4. Known Issues
 
 5. Reporting Problems
-Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find. You may also join the synapse-dev mailing list by
-sending email to synapse-dev-subscribe@ws.apache.org 
+Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find.
+You may also join the:
+    synapse-dev mailing  list by sending email to synapse-dev-subscribe@ws.apache.org
+    synapse-user mailing list by sending email to synapse-user-subscribe@ws.apache.org
 
 6. New features
+The 1.0 release
+    * Non blocking HTTP and HTTPS transport based on Apache HttpCore/NIO
+    * Enhanced Proxy services with in/out/fault sequences and endpoints, inline sequence and WSDL
+      support
+    * WSDL endpoints
+    * Load balancing and Failover endpoints
+    * Throttling mediator
+
 The 0.91 release adds support for:
     * WS-Reliable Messaging Sequence management
 The 0.90 release adds support for:

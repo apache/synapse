@@ -37,6 +37,10 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 
+import java.io.Writer;
+import java.io.StringWriter;
+import java.io.PrintWriter;
+
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
  * The ScriptMediator supports scripts specified in-line or those loaded through a registry
@@ -191,7 +195,9 @@ public class ScriptMediator extends AbstractMediator {
             }
 
         } catch (ScriptException e) {
-            handleException("Error executing inline " + language + " script", e);
+            handleException("The Script engine returned an error executing the " +
+                (key == null ? "inline " : "external ") + language + " script" +
+                (key != null? " : " + key : ""), e);
             returnValue = false;
         }
         return returnValue;

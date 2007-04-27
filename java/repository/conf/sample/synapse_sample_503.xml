@@ -19,10 +19,7 @@
 <!-- Introduction to the script mediator with Ruby scripts-->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <localEntry key="stockquoteScript">
-        <address src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>
-    </localEntry>
-
+    <localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/>
     <in>
         <!-- transform the custom quote request into a standard quote request expected by the service -->
         <script language="rb" key="stockquoteScript" function="transformRequest"/>
@@ -30,7 +27,7 @@
         <!-- send message to real endpoint referenced by name "stockquote" and stop -->
         <send>
             <endpoint name="stockquote">
-                <address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
             </endpoint>
         </send>
     </in>

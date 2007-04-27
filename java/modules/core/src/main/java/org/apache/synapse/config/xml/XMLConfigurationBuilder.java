@@ -62,7 +62,12 @@ public class XMLConfigurationBuilder {
             definitions = new StAXOMBuilder(is).getDocumentElement();
             definitions.build();
 
-            if (Constants.SYNAPSE_NAMESPACE.equals(definitions.getNamespace().getNamespaceURI())
+            OMNamespace namespace = definitions.getNamespace();
+            if(namespace == null){
+                handleException("No namespace is defined for definitions element");
+            }
+
+            if (Constants.SYNAPSE_NAMESPACE.equals(namespace.getNamespaceURI())
                 && Constants.DEFINITIONS_ELT.getLocalPart()
                     .equals(definitions.getQName().getLocalPart())) {
 

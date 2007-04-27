@@ -39,8 +39,8 @@ You could start Synapse using the bin/synapse.sh or bin/synapse.bat script, whic
 the configuration found in repository/conf/synapse.xml. To configure the underlying Axis2
 SOAP engine (e.g. to enable JMS) you need to configure the repository/conf/axis2.xml. To 
 configure logging levels and to turn on/off debug level logging, please configure the 
-lib/log4j.properties file, and set the line "log4j.category.org.apache.synapse=DEBUG" as
-"log4j.category.org.apache.synapse=INFO"
+lib/log4j.properties file, and set the line "log4j.category.org.apache.synapse=INFO" as
+"log4j.category.org.apache.synapse=DEBUG" to turn on debug logging.
 
 -------------------
 Documentation
@@ -71,7 +71,9 @@ and all other resources required to demonstrate various aspects of Synapse.
 -------------------
 Support
 ===================
- 
+
+Please refer to the release_notes.txt file for information on commons issues and the solutions.
+
 Any issues with this release can be reported to Apache Synapse mailing list or in the JIRA issue tracker.
 
 Mailing list subscription:

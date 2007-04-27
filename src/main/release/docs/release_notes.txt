@@ -1,48 +1,73 @@
 Apache Synapse 1.0 Release Notes
 
 1. Overview
-The Synapse project is a robust, lightweight implementation of a highly scalable and distributed
-service mediation framework based on Web services and XML specifications.
+    The Synapse project is a robust, lightweight implementation of a highly scalable and distributed
+    service mediation framework based on Web services and XML specifications.
 
-Apache Synapse graduated from the Apache Incubator on the 2nd of January 2007
-
-Please see http://ws.apache.org/synapse/
+    Apache Synapse graduated from the Apache Incubator on the 2nd of January 2007
+    Please see http://ws.apache.org/synapse/ for more information
 
 2. Installation Prerequisites 
-Apache Synapse requires a J2SE runtime of version 1.4.2 or later for runtime. However, to build
-Synapse from source, you will need JDK 1.5 or later and Apache Maven 2.0.6
+
+    Apache Synapse requires a J2SE runtime of version 1.4.2 or later for runtime. However if the
+    https (SSL) transport is being used, Synapse requires JDK 1.5 as it uses a NIO based https
+    implementation, that is only possible with a JDK 1.5 or later (refer to the Quick start guide
+    for information on how to disable https). To build Synapse from source, you will need JDK 1.5
+    or and Apache Maven 2.0.6
 
 3. Quick start
-Please see the docs/Synapse_Quickstart.html guide
+    Please see the docs/Synapse_Quickstart.html guide
 
 4. Building the Samples
-Please see the documents docs/Synapse_Samples.html and docs/Synapse_Samples_Setup.html
+    Please see the documents docs/Synapse_Samples.html and docs/Synapse_Samples_Setup.html
 
-3. Synapse configuration language
-Please see the document docs/Synapse_Configuration_Language.html
+5. Synapse configuration language
+    Please see the document docs/Synapse_Configuration_Language.html
 
-4. Known Issues
+6. Known Issues
 
-5. Reporting Problems
-Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find.
-You may also join the:
-    synapse-dev mailing  list by sending email to synapse-dev-subscribe@ws.apache.org
-    synapse-user mailing list by sending email to synapse-user-subscribe@ws.apache.org
+7. Frequently asked questions
 
-6. New features
-The 1.0 release
-    * Non blocking HTTP and HTTPS transport based on Apache HttpCore/NIO
-    * Enhanced Proxy services with in/out/fault sequences and endpoints, inline sequence and WSDL
-      support
-    * WSDL endpoints
-    * Load balancing and Failover endpoints
-    * Throttling mediator
+  * java.lang.UnsupportedClassVersionError: ... (Unsupported major.minor version 49.0)
+    This error would occur if you try to use the https transport (enabled by default) with a JDK
+    version earlier than 1.5. Refer the Quick start guide to find out how the https transport
+    could be disabled.
 
-The 0.91 release adds support for:
-    * WS-Reliable Messaging Sequence management
-The 0.90 release adds support for:
-	* WS-Security termination and initiation
-	* WS-ReliableMessaging termination and initiation 
-	* Support for dynamic reloading and remote reigstries
-	* Scripting mediators based on Apache BSF
-	* Refactored and cleaner synapse configuration xml
+  * How can I change the default logging level of Synapse?
+    Edit the lib/log4j.properties and set the line "log4j.category.org.apache.synapse=INFO" to
+    "log4j.category.org.apache.synapse=DEBUG" and restart Synapse.
+
+  * If you get an error related to WS-Security or when using it, check to ensure that your JDK
+    uses the "Unlimited Strength Jurisdiction Policy Files". These could be downloaded from
+    http://java.sun.com/javase/downloads/index_jdk5.jsp Refer to the associated documentation
+    for instructions on how to install it to your JDK.
+
+  * If you encounter issues with your JDK related to XML processing, try placing the Xerces jar
+    files xercesImpl-2.8.0.jar and xml-apis-1.3.03.jar in your <JDK>/jre/lib/endorsed/ directory.
+
+
+8. Reporting Problems
+
+    Please use Apache's JIRA system (http://issues.apache.org/jira/) to report issues you find.
+    You may also join the:
+        synapse-dev mailing  list by sending email to synapse-dev-subscribe@ws.apache.org
+        synapse-user mailing list by sending email to synapse-user-subscribe@ws.apache.org
+
+9. New features
+
+    The 1.0 release
+        * Non blocking HTTP and HTTPS transport based on Apache HttpCore/NIO
+        * Enhanced Proxy services with in/out/fault sequences and endpoints, inline sequence and WSDL
+          support
+        * WSDL endpoints
+        * Load balancing and Failover endpoints
+        * Throttling mediator
+
+    The 0.91 release adds support for:
+        * WS-Reliable Messaging Sequence management
+    The 0.90 release adds support for:
+        * WS-Security termination and initiation
+        * WS-ReliableMessaging termination and initiation
+        * Support for dynamic reloading and remote reigstries
+        * Scripting mediators based on Apache BSF
+        * Refactored and cleaner synapse configuration xml

@@ -20,10 +20,12 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <in>
-        <filter source="get-property('To')" regex=".*localhost:9000.*">
-            <!-- Log all messages passing through -->
-            <log level="full"/>
-
+        <!-- Log all messages passing through -->
+        <log level="full"/>
+        
+        <!-- ensure that the default configuration only sends if it is one of samples -->
+        <!-- Otherwise Synapse would be an open proxy by default (BAD!)               -->
+        <filter source="get-property('To')" regex="http://localhost:9000.*">
             <!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
             <send/>
         </filter>

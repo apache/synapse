@@ -110,6 +110,21 @@ set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/lib;%SYNAPSE_HOME%/repository/conf"
 FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
 set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
 
+rem use proper bouncy castle version for the JDK
+
+"%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.4" >NUL
+IF ERRORLEVEL 1 goto checkJdk15
+echo  Using Bouncy castle JAR for Java 1.4
+FOR %%C in ("%SYNAPSE_HOME%\lib\bcprov-jdk13*.jar") DO set SYNAPSE_CLASS_PATH="%%~fC";!SYNAPSE_CLASS_PATH!
+goto runServer
+
+:checkJdk15
+"%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.5" >NUL
+IF ERRORLEVEL 1 goto runServer
+echo  Using Bouncy castle JAR for Java 1.5
+FOR %%C in ("%SYNAPSE_HOME%\lib\bcprov-jdk15*.jar") DO set SYNAPSE_CLASS_PATH="%%~fC";!SYNAPSE_CLASS_PATH!
+
+:runServer
 rem if a sample configuration is not specified, use default
 if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\synapse.xml"
 

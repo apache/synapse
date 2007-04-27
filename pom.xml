@@ -487,9 +487,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <id>apache-repo</id>
             <name>Maven Central Repository</name>
             <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
-	    <!--
-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
-	    -->
         </repository>
 	<!--
         <snapshotRepository>

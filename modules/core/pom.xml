@@ -10,7 +10,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
-    <artifactId>sandesha2</artifactId>
+    <artifactId>sandesha2-core</artifactId>
     <packaging>jar</packaging>
     <name>Sandesha - Core</name>
 

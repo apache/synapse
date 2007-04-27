@@ -68,8 +68,9 @@ public class ClientHandler implements NHttpClientHandler {
     ConfigurationContext cfgCtx = null;
 
     private Executor workerPool = null;
-    private static final int WORKERS_MAX_THREADS = 40;
-    private static final long WORKER_KEEP_ALIVE = 100L;
+    private static final int WORKERS_CORE_THREADS = 40;
+    private static final int WORKERS_MAX_THREADS  = 40;
+    private static final long WORKER_KEEP_ALIVE   = 5L;
 
     private static final String REQUEST_BUFFER = "request-buffer";
     private static final String RESPONSE_BUFFER = "response-buffer";
@@ -93,7 +94,7 @@ public class ClientHandler implements NHttpClientHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
         workerPool = new ThreadPoolExecutor(
-            1, WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TimeUnit.SECONDS,
+            WORKERS_CORE_THREADS, WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TimeUnit.SECONDS,
             new LinkedBlockingQueue(),
             new DefaultThreadFactory(new ThreadGroup("Client Worker thread group"), "HttpClientWorker"));
     }

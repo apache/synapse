@@ -18,10 +18,7 @@
  */
 package org.apache.axis2.transport.nhttp;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.*;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.util.threadpool.DefaultThreadFactory;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
@@ -72,8 +69,9 @@ public class ServerHandler implements NHttpServiceHandler {
 
     /** the thread pool to process requests */
     private Executor workerPool = null;
-    private static final int WORKERS_MAX_THREADS = 40;
-    private static final long WORKER_KEEP_ALIVE = 100L;
+    private static final int WORKERS_CORE_THREADS = 40;
+    private static final int WORKERS_MAX_THREADS  = 40;
+    private static final long WORKER_KEEP_ALIVE   = 5L;
 
     private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
     private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
@@ -91,7 +89,7 @@ public class ServerHandler implements NHttpServiceHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
         this.workerPool = new ThreadPoolExecutor(
-            1, WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TimeUnit.SECONDS,
+            WORKERS_CORE_THREADS, WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TimeUnit.SECONDS,
             new LinkedBlockingQueue(),
             new DefaultThreadFactory(new ThreadGroup("Server Worker thread group"), "HttpServerWorker"));
     }
@@ -137,6 +135,9 @@ public class ServerHandler implements NHttpServiceHandler {
                     response, Channels.newOutputStream(responsePipe.sink())));
 
         } catch (IOException e) {
+            handleException("Error processing request received for : " +
+                request.getRequestLine().getUri(), e, conn);
+        } catch (RejectedExecutionException e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
         }

@@ -58,34 +58,29 @@
 		
     </preGoal>
 
-    <goal name="mar" prereqs="java:compile">
-    	<copy todir="${maven.build.dir}/classes/">
-    	 <fileset dir="${basedir}/modules/mar">
-    	  <include name="**/*.properties" /> 
-    	 </fileset>
-    	</copy>
-    	
-    	<ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
-    	<ant:mkdir dir="${metainf.path}" />
-    	<ant:copy file="${basedir}/modules/mar/module.xml" todir="${metainf.path}" />
 
-		<!-- For the client side -->
-        <copy todir="${build.temp.dir}/module">
-            <fileset dir="${basedir}/target/classes" >
-            	<include name="**/*.class"/>
-            </fileset>
-            <fileset dir="${basedir}/target/classes" >
-                <include name="**/*.properties" /> 
-            </fileset>
-        </copy>
-  
-        <ant:jar jarfile="${maven.build.dir}/${mar.name}" basedir="${build.temp.dir}/module" /> 
-        
-        <copy file="${maven.build.dir}/${mar.name}" 
-            tofile="${maven.repo.local}/${pom.groupId}/mars/${mar.name}"/>
-        
-        <delete dir="${build.temp.dir}" />
-    </goal>
+  <goal name="mar" prereqs="java:compile">
+       <ant:property name="metainf.path" value="${build.temp.dir}/module/META-INF" />
+       <ant:mkdir dir="${metainf.path}" />
+       <ant:copy file="${basedir}/modules/mar/module.xml" todir="${metainf.path}" />
+
+   		<!--copy the resource file -->
+       <copy todir="${maven.build.dir}/classes/">
+        <fileset dir="${basedir}/modules/core/src/main/resources">
+         <include name="**/*.properties" />          </fileset>
+       </copy>
+
+   		<!-- For the client side -->
+       <copy todir="${build.temp.dir}/module">
+
+           <fileset dir="${basedir}/target/classes" >
+               <include name="**/*.class"/>
+       <include name="**/*.properties" />
+           </fileset>
+       </copy>
+       <ant:jar jarfile="${maven.build.dir}/${mar.name}" basedir="${build.temp.dir}/module" />         <copy file="${maven.build.dir}/${mar.name}"             tofile="${maven.repo.local}/${pom.groupId}/mars/${mar.name}"/>
+   </goal> 
+
     
     <goal name="jar" prereqs="java:compile">
     	<ant:property name="jar.temp.path" value="${build.temp.dir}/jar" />

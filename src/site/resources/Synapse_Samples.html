@@ -20,8 +20,7 @@
 <head>
   <meta http-equiv="content-type" content="">
   <title></title>
-
-<style type="text/css">
+  <style type="text/css">
     .command {
         border: 1px dashed #3c78b5;
         text-align: left;
@@ -115,8 +114,7 @@
         background-color: #f0f0f0;
         padding: 2px;
         margin: 18px 0px 4px 0px;
-    }
-</style>
+    }</style>
 </head>
 
 <body>
@@ -1061,7 +1059,7 @@ User-Agent: Synapse-HttpComponents-NIO
 correlation</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Start the Synapse configuration numbered 10: i.e. synapse -sample 51<br>
+Start the Synapse configuration numbered 51: i.e. synapse -sample 51<br>
 Start the Axis2 server and deploy the MTOMSwASampleService if not already
 done</p>
 
@@ -1960,10 +1958,7 @@ stockquote:
 <pre>&lt;!-- Introduction to the script mediator with Ruby scripts--&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;localEntry key="stockquoteScript"&gt;
-        &lt;address src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/&gt;
-    &lt;/localEntry&gt;
-
+    &lt;localEntry key="stockquoteScript" src="file:repository/conf/sample/resources/script/stockquoteTransform.rb"/&gt;
     &lt;in&gt;
         &lt;!-- transform the custom quote request into a standard quote request expected by the service --&gt;
         &lt;script language="rb" key="stockquoteScript" function="transformRequest"/&gt;
@@ -1971,7 +1966,7 @@ stockquote:
         &lt;!-- send message to real endpoint referenced by name "stockquote" and stop --&gt;
         &lt;send&gt;
             &lt;endpoint name="stockquote"&gt;
-                &lt;address uri="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
     &lt;/in&gt;
@@ -1986,32 +1981,19 @@ require 'rexml/document'
 include REXML
 
 def transformRequest(mc) 
-   newRequest= Document.new($REQUEST)
-   newRequest.root.elements[1].text = mc.getPayloadXML().root.elements[1].get_text
+   newRequest= Document.new '&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;'&lt;&lt;
+      '&lt;m:request&gt;&lt;m:symbol&gt;&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;'
+   newRequest.root.elements[1].elements[1].text = mc.getPayloadXML().root.elements[1].get_text
    mc.setPayloadXML(newRequest)
 end
 
 def transformResponse(mc) 
-   newResponse = Document.new($RESPONSE)
+   newResponse = Document.new '&lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;&lt;m:Code&gt;' &lt;&lt;
+      '&lt;/m:Code&gt;&lt;m:Price&gt;&lt;/m:Price&gt;&lt;/m:CheckPriceResponse&gt;'
    newResponse.root.elements[1].text = mc.getPayloadXML().root.elements[1].elements[1].get_text
    newResponse.root.elements[2].text = mc.getPayloadXML().root.elements[1].elements[2].get_text
    mc.setPayloadXML(newResponse)
 end
-
-$REQUEST = &lt;&lt;EOF
-   &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
-      &lt;m:request&gt;
-         &lt;m:symbol&gt;&lt;/m:symbol&gt;
-      &lt;/m:request&gt;
-   &lt;/m:getQuote&gt;
-EOF
-
-$RESPONSE = &lt;&lt;EOF
-   &lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;
-      &lt;m:Code&gt;&lt;/m:Code&gt;
-      &lt;m:Price&gt;&lt;/m:Price&gt;
-   &lt;/m:CheckPriceResponse&gt;
-EOF
 ]]&gt;&lt;/x&gt;</pre>
 
 <p><strong>Objective: Script mediators using Ruby</strong></p>

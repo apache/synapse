@@ -1,32 +1,125 @@
 <!--
-~  Licensed to the Apache Software Foundation (ASF) under one
-~  or more contributor license agreements.  See the NOTICE file
-~  distributed with this work for additional information
-~  regarding copyright ownership.  The ASF licenses this file
-~  to you under the Apache License, Version 2.0 (the
-~  "License"); you may not use this file except in compliance
-~  with the License.  You may obtain a copy of the License at
+~ Licensed to the Apache Software Foundation (ASF) under one
+~ or more contributor license agreements. See the NOTICE file
+~ distributed with this work for additional information
+~ regarding copyright ownership. The ASF licenses this file
+~ to you under the Apache License, Version 2.0 (the
+~ "License"); you may not use this file except in compliance
+~ with the License. You may obtain a copy of the License at
 ~
-~   http://www.apache.org/licenses/LICENSE-2.0
+~ http://www.apache.org/licenses/LICENSE-2.0
 ~
-~  Unless required by applicable law or agreed to in writing,
-~  software distributed under the License is distributed on an
-~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-~  KIND, either express or implied.  See the License for the
-~  specific language governing permissions and limitations
-~  under the License.
+~ Unless required by applicable law or agreed to in writing,
+~ software distributed under the License is distributed on an
+~ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~ KIND, either express or implied. See the License for the
+~ specific language governing permissions and limitations
+~ under the License.
 -->
 <html>
 <head>
   <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
   <title>Extending Synapse</title>
+  <style type="text/css">
+    .command {
+        border: 1px dashed #3c78b5;
+        text-align: left;
+        background-color: #f0f0f0;
+        padding: 3px;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+    }
+    .consoleOutput {
+        border: 1px dashed #3c78b5;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+        background-color: #f0f0f0;
+        border-bottom: 1px dashed #3c78b5;
+        padding: 3px;
+        border-style: solid;
+    }
+    .info {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #090;
+        background-color: #dfd;
+        text-align:left;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    li {
+        font-family: Verdana, arial, sans-serif;
+        font-size: 11px;
+        line-height: 16px;
+        color: #000000;
+        font-weight: normal;
+    }
+    p {
+        font-family: Verdana, arial, sans-serif;
+        font-size: 11px;
+        line-height: 16px;
+        color: #000000;
+        font-weight: normal;
+    }
+    pre {
+        padding: 0px;
+        margin-top: 5px;
+        margin-left: 15px;
+        margin-bottom: 5px;
+        margin-right: 5px;
+        text-align: left;
+        background-color: #f0f0f0;
+        padding: 3px;
+        border: 1px dashed #3c78b5;
+        font-size: 11px;
+        font-family: Courier;
+        margin: 10px;
+        line-height: 13px;
+    }
+    h1 {
+        font-size: 24px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        color: #003366;
+        border-bottom: 1px solid #3c78b5;
+        padding: 2px;
+        margin: 36px 0px 4px 0px;
+    }
+    h2 {
+        font-size: 18px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        border-bottom: 1px solid #3c78b5;
+        padding: 2px;
+        margin: 27px 0px 4px 0px;
+    }
+    h3 {
+        font-size: 14px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        padding: 2px;
+        margin: 21px 0px 4px 0px;
+    }
+    h4 {
+        font-size: 12px;
+        line-height: normal;
+        font-weight: bold;
+        background-color: #f0f0f0;
+        padding: 2px;
+        margin: 18px 0px 4px 0px;
+    }</style>
 </head>
 
 <body>
 <h1>Extending Synapse<br>
 </h1>
-<br>
-
 
 <h2>Writing custom Mediator implementations</h2>
 
@@ -35,16 +128,16 @@ defined below. This essentially defines the per-message context passed
 through the chain of mediators, for each and every message received and
 processed by Synapse. Each message instance is wrapped within a
 MessageContext instance, and the message context is set with the references
-to the SynapseConfiguration and SynapseEnvironments to be used. The
-SynapseConfiguration holds the global configuration model that defines
-message mediation rules and common definitions to be used, while the
-environment gives access to the underlying SOAP implementation used. A
-typical mediator would need to manipulate the MessageContext by referring to
-the SynapseConfiguration. However it is strongly recommended that the
-SynapseConfiguration should not be updated by mediator instances as it is
-shared by all messages, and may be updated by Synapse administration or
-configuration modules. Mediator instances may store custom named properties
-into the MessageContext for later retrieval by successive mediators.<br>
+to the SynapseConfiguration and SynapseEnvironments. The SynapseConfiguration
+holds the global configuration model that defines mediation rules, local
+registry entries and other and configuration, while the environment gives
+access to the underlying SOAP implementation used - Axis2. A typical mediator
+would need to manipulate the MessageContext by referring to the
+SynapseConfiguration. However it is strongly recommended that the
+SynapseConfiguration is not updated by mediator instances as it is shared by
+all messages, and may be updated by Synapse administration or configuration
+modules. Mediator instances may store local message properties into the
+MessageContext for later retrieval by successive mediators.<br>
 </p>
 
 <h4><a
@@ -127,12 +220,10 @@ public interface MessageContext {
 
 <p>The MessageContext interface is based on the Axis2 <a>MessageContext</a>
 interface, and uses the Axis2 <a>EndpointReference</a> and SOAPEnvelope
-classes/interfaces.</p>
-
-<p>The purpose of this interface is to capture a message as it flows through
-the system. As you will see the messages are represented using the SOAP
-infoset. Binary messages can be embedded in the Envelope using the MTOM
-support built into Axis2's AXIOM object model.</p>
+classes/interfaces. The purpose of this interface is to capture a message as
+it flows through the system. As you will see the message payload is
+represented using the SOAP infoset. Binary messages can be embedded in the
+Envelope using MTOM or SwA attachments using the AXIOM object model.</p>
 
 <h4><a
 href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/Mediator.java?view=markup">Mediator
@@ -178,10 +269,12 @@ not be processed further. This is generally the exception as mediators are
 usually designed to co-operate to process the message onwards.</p>
 
 <h3>Leaf and Node Mediators, List mediators and Filter mediators</h3>
-Mediators may be Node mediators (i.e. these contain sub mediators) or Leaf
-mediators (mediators that does not hold any sub mediators). A Node mediator 
-must implement the org.apache.synapse.api.ListMediator interface listed
-below, or extend from the org.apache.synapse.mediators.AbstractListMediator. 
+
+<p>Mediators may be Node mediators (i.e. these that can contain child
+mediators) or Leaf mediators (mediators that does not hold any other child
+mediators). A Node mediator  must implement the
+org.apache.synapse.api.ListMediator interface listed below, or extend from
+the org.apache.synapse.mediators.AbstractListMediator. </p>
 
 <h4><a
 href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/ListMediator.java?view=markup">The
@@ -236,11 +329,12 @@ public interface ListMediator extends Mediator {
     */
     public List getList();
 }</pre>
-A ListMediator implementation should call super.mediate(synCtx) to process
+
+<p>A ListMediator implementation should call super.mediate(synCtx) to process
 its sub mediator sequence. A FilterMediator is a ListMediator which executes
-its sequence of sub mediators on successful outcome of a test condition.
+its sequence of sub mediators on successful outcome of a test condition. The
 Mediator instance which performs filtering should implement the
-FilterMediator interface.
+FilterMediator interface. </p>
 
 <h4><a
 href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/mediators/FilterMediator.java?view=markup">FilterMediator
@@ -267,7 +361,8 @@ public interface <span style="font-weight: bold;">FilterMediator </span>extends 
 }</pre>
 
 <h2>Writing custom Configuration implementations for mediators</h2>
-You may write your own custom configurator for the Mediator implementation
+
+<p>You may write your own custom configurator for the Mediator implementation
 you write without relying on the Class mediator or Spring extension for its
 initialization. You could thus write a MediatorFactory implementation which
 defines how to digest a custom XML configuration element to be used to create
@@ -280,19 +375,20 @@ Extensions below for more details and examples) and placed into the
 SYNAPSE_HOME/lib folder, so that the Synapse runtime could find and load the
 definition. Essentially this means that a custom JAR file must bundle your
 class implementing the Mediator interface, and the MediatorFactory
-implementation class and contain a text file by the name
-"org.apache.synapse.config.xml.MediatorFactory" which will contain the fully
-qualified name(s) of your MediatorFactory implementation class(es). You
-should also place any dependency JARs into the same lib folder so that the
-correct classpath references could be made. The MediatorFactory interface
-listing is given below, which you should implement, and its getTagQName()
-method must define the fully qualified element of interest for custom
-configuration. The Synapse initialization will call back to this
-MediatorFactory instance through the createMediator(OMElement elem) method
-passing in this XML element, so that an instance of the mediator could be
-created utilizing the custom XML specification and returned. See the
+implementation class and contain two text files named
+"org.apache.synapse.config.xml.MediatorFactory" and
+"org.apache.synapse.config.xml.MediatorSerializer" which will contain the
+fully qualified name(s) of your MediatorFactory and MediatorSerializer
+implementation classes. You should also place any dependency JARs into the
+same lib folder so that the correct classpath references could be made. The
+MediatorFactory interface listing is given below, which you should implement,
+and its getTagQName() method must define the fully qualified element of
+interest for custom configuration. The Synapse initialization will call back
+to this MediatorFactory instance through the createMediator(OMElement elem)
+method passing in this XML element, so that an instance of the mediator could
+be created utilizing the custom XML specification and returned. See the
 ValidateMediator and the ValidateMediatorFactory classes under
-modules/extensions in the Synapse source distribution for examples.
+modules/extensions in the Synapse source distribution for examples. </p>
 
 <h4><a
 href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactory.java?view=markup">The
@@ -325,45 +421,51 @@ public interface MediatorFactory {
 <h4><a
 href="http://svn.apache.org/viewvc/webservices/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
 MediatorSerializer interface</a></h4>
-<pre>/**</pre>
-<pre>* Interface which should be implemented by mediator serializers. Does the</pre>
-<pre>* reverse of the MediatorFactory</pre>
-<pre>*/</pre>
-<pre>public interface MediatorSerializer {</pre>
-<pre></pre>
-<pre>    /**</pre>
-<pre>    * Return the XML representation of this mediator</pre>
-<pre>    * @param m mediator to be serialized</pre>
-<pre>    * @param parent the OMElement to which the serialization should be attached</pre>
-<pre>    * @return the serialized mediator XML</pre>
-<pre>    */</pre>
-<pre>    public OMElement serializeMediator(OMElement parent, Mediator m);</pre>
-<pre></pre>
-<pre>    /**</pre>
-<pre>    * Return the class name of the mediator which can be serialized</pre>
-<pre>    * @return the class name</pre>
-<pre>    */</pre>
-<pre>    public String getMediatorClassName();</pre>
-<pre>}</pre>
+<pre>package org.apache.synapse.config.xml;
+
+import ...
+
+/**
+ * Interface which should be implemented by mediator serializers. Does the
+ * reverse of the MediatorFactory
+ */
+public interface MediatorSerializer {
+
+    /**
+     * Return the XML representation of this mediator
+     * @param m mediator to be serialized
+     * @param parent the OMElement to which the serialization should be attached
+     * @return the serialized mediator XML
+     */
+    public OMElement serializeMediator(OMElement parent, Mediator m);
+
+    /**
+     * Return the class name of the mediator which can be serialized
+     * @return the class name 
+     */
+    public String getMediatorClassName();
+}</pre>
 
 <h2>Configuring mediators</h2>
-Mediators could access properties defined into the Synapse configuration to
+
+<p>Mediators could access the Synapse registry to load resources and
 configure the local behaviour. Refer to the Spring mediator and Script
-mediator implementations for examples on how this could be achieved.
+mediator implementations for examples on how this could be achieved. </p>
 
 <h4>Loading of Extensions by the Synapse runtime</h4>
-Synapse loads available extensions from the runtime classpath using the <a
+
+<p>Synapse loads available extensions from the runtime classpath using the <a
 href="http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">J2SE
 Service Provider model</a>. This essentially iterates over the available JAR
 files, for  a META-INF/services directory within each file,  and looks for a
-text file with the name org.apache.synapse.config.xml.ExtensionFactory which
+text file with the name org.apache.synapse.config.xml.MediatorFactory which
 contains a list of fully qualified classname that implement the above
 interface, listing each class in a separate line. e.g. The built-in
-synapse-extensions.jar contains the following structure
+synapse-extensions.jar contains the following structure</p>
 <pre>synapse-extensions.jar
     /META-INF/services
-        org.apache.synapse.config.xml.ExtensionFactory
         org.apache.synapse.config.xml.MediatorFactory
+        org.apache.synapse.config.xml.MediatorSerializer
     /... the implementation classes as usual...</pre>
 </body>
 </html>

@@ -87,6 +87,24 @@ do
 done
 AXIS2_CLASSPATH="$JAVA_HOME/lib/tools.jar":"$AXIS2_CLASSPATH":"$CLASSPATH"
 
+# use proper bouncy castle version for the JDK
+jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`
+jdk_14=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.4`
+
+if [ "$jdk_15" ]; then
+    echo " Using Bouncy castle JAR for Java 1.5"
+    for f in $AXIS2_HOME/lib/bcprov-jdk15*.jar
+    do
+      AXIS2_CLASSPATH=$f:$AXIS2_CLASSPATH
+    done
+elif [ "$jdk_14" ]; then
+    echo " Using Bouncy castle JAR for Java 1.4"
+    for f in $AXIS2_HOME/lib/bcprov-jdk13*.jar
+    do
+      AXIS2_CLASSPATH=$f:$AXIS2_CLASSPATH
+    done
+fi
+
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
   JAVA_HOME=`cygpath --absolute --windows "$JAVA_HOME"`

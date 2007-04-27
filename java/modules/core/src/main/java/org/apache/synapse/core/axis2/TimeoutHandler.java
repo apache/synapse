@@ -44,7 +44,11 @@ import java.util.Stack;
  */
 public class TimeoutHandler extends TimerTask {
 
+    /** The callback map - already a Collections.synchronized() hash map */
     private Map callbackStore = null;
+    /** a lock to prevent concurrent execution while ensuring least overhead */
+    private Object lock = new Object();
+    private boolean alreadyExecuting = false;
 
     public TimeoutHandler(Map callbacks) {
         this.callbackStore = callbacks;
@@ -55,6 +59,18 @@ public class TimeoutHandler extends TimerTask {
      * the callback. If specified sends a fault message to the client about the timeout.
      */
     public void run() {
+        if (alreadyExecuting) return;
+
+        synchronized(lock) {
+            alreadyExecuting = true;
+            try {
+                processCallbacks();
+            } catch (Exception ignore) {}
+            alreadyExecuting = false;
+        }
+    }
+
+    private void processCallbacks() {
 
         // checks if callback store contains at least one entry before proceeding. otherwise getting
         // the time for doing nothing would be a inefficient task.

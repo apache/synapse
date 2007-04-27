@@ -19,11 +19,17 @@
 
 <!-- A simple Synapse configuration -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
-  
-  	<!-- Log all messages passing through -->
-  	<log level="full"/>
-  	
-  	<!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
-  	<send/>
 
+    <in>
+		<filter source="get-property('To')" regex=".*localhost.*">
+		  	<!-- Log all messages passing through -->
+		  	<log level="full"/>
+
+		  	<!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
+		  	<send/>
+	    </filter>
+	</in>
+	<out>
+		<send/>
+	</out>
 </definitions>

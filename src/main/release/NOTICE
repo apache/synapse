@@ -14,8 +14,9 @@ LICENSE file for details.
 
 COPYRIGHT NOTICES
 
-* Synapse binary is bundled with jaxen-1.1-beta-10.jar
+* Synapse binary is bundled with:
+ jaxen-1.1-beta-10.jar
      Copyright 2003-2006 The Werken Company. All Rights Reserved.
-
-
+ groovy-all-1.0.jar
+	 Copyright 2003 (C) James Strachan and Bob Mcwhirter. All Rights Reserved.
  

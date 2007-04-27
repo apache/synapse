@@ -330,28 +330,26 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
     private void sendUsingOutputStream(MessageContext msgContext) throws AxisFault {
         OMOutputFormat format = Util.getOMOutputFormat(msgContext);
-        OutputStream out =
-            (OutputStream) msgContext
-                .getProperty(MessageContext.TRANSPORT_OUT);
+        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        OutputStream out = (OutputStream) msgContext.getProperty(MessageContext.TRANSPORT_OUT);
 
         if (msgContext.isServerSide()) {
             OutTransportInfo transportInfo =
                 (OutTransportInfo) msgContext.getProperty(Constants.OUT_TRANSPORT_INFO);
 
             if (transportInfo != null) {
-                String encoding = Util.getContentType(msgContext) + "; charset=" + format.getCharSetEncoding();
-                transportInfo.setContentType(encoding);
+                transportInfo.setContentType(
+                messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
             } else {
                 throw new AxisFault(Constants.OUT_TRANSPORT_INFO + " has not been set");
             }
         }
 
         try {
-            (msgContext.isDoingREST() ?
-                msgContext.getEnvelope().getBody().getFirstElement() : msgContext.getEnvelope())
-                .serializeAndConsume(out, format);
-        } catch (XMLStreamException e) {
-            handleException("Error serializing response message", e);
+            messageFormatter.writeTo(msgContext, format, out, true);
+            out.close();
+        } catch (IOException e) {
+            handleException("IO Error sending response message", e);
         }
     }
 

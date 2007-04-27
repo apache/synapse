@@ -16,20 +16,19 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   -->
-
 <!-- A simple Synapse configuration -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <in>
-		<filter source="get-property('To')" regex=".*localhost.*">
-		  	<!-- Log all messages passing through -->
-		  	<log level="full"/>
+        <filter source="get-property('To')" regex=".*localhost:9000.*">
+            <!-- Log all messages passing through -->
+            <log level="full"/>
 
-		  	<!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
-		  	<send/>
-	    </filter>
-	</in>
-	<out>
-		<send/>
-	</out>
+            <!-- Send the messages where they have been sent (i.e. implicit "To" EPR) -->
+            <send/>
+        </filter>
+    </in>
+    <out>
+        <send/>
+    </out>
 </definitions>

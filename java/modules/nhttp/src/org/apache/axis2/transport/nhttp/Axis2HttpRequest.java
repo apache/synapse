@@ -68,6 +68,12 @@ public class Axis2HttpRequest {
         this.epr = epr;
         this.httpHost = httpHost;
         this.msgContext = msgContext;
+        this.format = Util.getOMOutputFormat(msgContext);
+        try {
+            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+        } catch (AxisFault axisFault) {
+            log.error("Cannot find a suitable MessageFormatter : " + axisFault.getMessage());
+        }
         try {
             this.pipe = new PipeImpl();
         } catch (IOException e) {
@@ -131,13 +137,7 @@ public class Axis2HttpRequest {
                 soapAction);
         }
 
-        format = Util.getOMOutputFormat(msgContext);
-        try {
-            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-        } catch (AxisFault axisFault) {
-            throw new IOException(
-                "Cannot find a suitable MessageFormatter : " + axisFault.getMessage());
-        }
+
         httpRequest.setHeader(
             HTTP.CONTENT_TYPE,
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
@@ -163,13 +163,6 @@ public class Axis2HttpRequest {
 
         log.debug("start streaming outgoing http request");
         OutputStream out = Channels.newOutputStream(pipe.sink());
-
-        if (format == null) {
-            format = Util.getOMOutputFormat(msgContext);
-        }
-        if (messageFormatter == null) {
-            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-        }
 
         messageFormatter.writeTo(msgContext, format, out, true);
             try {

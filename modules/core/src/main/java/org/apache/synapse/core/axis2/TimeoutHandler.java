@@ -74,40 +74,46 @@ public class TimeoutHandler extends TimerTask {
 
         // checks if callback store contains at least one entry before proceeding. otherwise getting
         // the time for doing nothing would be a inefficient task.
-        if (callbackStore.size() > 0) {
 
-            long currentTime = currentTime();
+        // we have to synchronize this on the callbackStore as iterators of thread safe collections
+        // are not thread safe. callbackStore can be modified concurrently by the SynapseCallbackReceiver.
+        synchronized(callbackStore) {
 
-            Iterator i = callbackStore.keySet().iterator();
+            if (callbackStore.size() > 0) {
 
-            while (i.hasNext()) {
-                Object key = i.next();
-                AsyncCallback callback = (AsyncCallback) callbackStore.get(key);
+                long currentTime = currentTime();
 
-                if (callback.getTimeOutAction() != Constants.NONE) {
+                Iterator i = callbackStore.keySet().iterator();
 
-                    if (callback.getTimeOutOn() <= currentTime) {
-                        callbackStore.remove(key);
+                while (i.hasNext()) {
+                    Object key = i.next();
+                    AsyncCallback callback = (AsyncCallback) callbackStore.get(key);
 
-                        if (callback.getTimeOutAction() == Constants.DISCARD_AND_FAULT) {
+                    if (callback.getTimeOutAction() != Constants.NONE) {
 
-                            // actiavte the fault sequence of the current sequence mediator
+                        if (callback.getTimeOutOn() <= currentTime) {
+                            callbackStore.remove(key);
 
-                            MessageContext msgContext = callback.getSynapseOutMsgCtx();
+                            if (callback.getTimeOutAction() == Constants.DISCARD_AND_FAULT) {
 
-                            // add an error code to the message context, so that error sequences
-                            // can identify the cause of error
-                            msgContext.setProperty(Constants.ERROR_CODE, Constants.TIME_OUT);
+                                // actiavte the fault sequence of the current sequence mediator
 
-                            Stack faultStack = msgContext.getFaultStack();
+                                MessageContext msgContext = callback.getSynapseOutMsgCtx();
 
-                            for (int j = 0; j < faultStack.size(); j++) {
-                                Object o = faultStack.pop();
-                                if (o instanceof MediatorFaultHandler) {
-                                    ((MediatorFaultHandler) o).handleFault(msgContext);
+                                // add an error code to the message context, so that error sequences
+                                // can identify the cause of error
+                                msgContext.setProperty(Constants.ERROR_CODE, Constants.TIME_OUT);
+
+                                Stack faultStack = msgContext.getFaultStack();
+
+                                for (int j = 0; j < faultStack.size(); j++) {
+                                    Object o = faultStack.pop();
+                                    if (o instanceof MediatorFaultHandler) {
+                                        ((MediatorFaultHandler) o).handleFault(msgContext);
+                                    }
                                 }
-                            }
 
+                            }
                         }
                     }
                 }

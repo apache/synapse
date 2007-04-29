@@ -114,7 +114,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         HttpParams params = getClientParameters();
         try {
-            ioReactor = new DefaultConnectingIOReactor(2, params);
+            ioReactor = new DefaultConnectingIOReactor(
+                NHttpConfiguration.getInstance().getClientIOWorkers(), params);
         } catch (IOException e) {
             log.error("Error starting the IOReactor", e);
         }
@@ -172,13 +173,19 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      * @return the applicable HTTP protocol parameters
      */
     private HttpParams getClientParameters() {
+        NHttpConfiguration cfg = NHttpConfiguration.getInstance();
         HttpParams params = new BasicHttpParams();
         params
-            .setIntParameter(HttpConnectionParams.SO_TIMEOUT, 30000)
-            .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT, 10000)
-            .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024)
-            .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK, false)
-            .setBooleanParameter(HttpConnectionParams.TCP_NODELAY, true)
+            .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
+                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 30000))
+            .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT,
+                cfg.getProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 10000))
+            .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
+                cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024))
+            .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK,
+                cfg.getProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, 0) == 1)
+            .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
+                cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
             .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO");
         return params;
     }

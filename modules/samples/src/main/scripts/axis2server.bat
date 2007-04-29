@@ -103,14 +103,14 @@ rem use proper bouncy castle version for the JDK
 "%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.4" >NUL
 IF ERRORLEVEL 1 goto checkJdk15
 echo  Using Bouncy castle JAR for Java 1.4
-FOR %%C in ("%AXIS2_HOME%\lib\bcprov-jdk13*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
+FOR %%C in ("%AXIS2_HOME%\..\..\lib\bcprov-jdk13*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
 goto runServer
 
 :checkJdk15
 "%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.5" >NUL
 IF ERRORLEVEL 1 goto runServer
 echo  Using Bouncy castle JAR for Java 1.5
-FOR %%C in ("%AXIS2_HOME%\lib\bcprov-jdk15*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
+FOR %%C in ("%AXIS2_HOME%\..\..\lib\bcprov-jdk15*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
 
 :runServer
 set AXIS2_ENDORSED=%AXIS2_HOME%\..\..\lib\endorsed

@@ -69,9 +69,6 @@ public class ServerHandler implements NHttpServiceHandler {
 
     /** the thread pool to process requests */
     private Executor workerPool = null;
-    private static final int WORKERS_CORE_THREADS = 40;
-    private static final int WORKERS_MAX_THREADS  = 40;
-    private static final long WORKER_KEEP_ALIVE   = 5L;
 
     private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
     private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
@@ -88,9 +85,13 @@ public class ServerHandler implements NHttpServiceHandler {
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
+        NHttpConfiguration cfg = NHttpConfiguration.getInstance();
         this.workerPool = new ThreadPoolExecutor(
-            WORKERS_CORE_THREADS, WORKERS_MAX_THREADS, WORKER_KEEP_ALIVE, TimeUnit.SECONDS,
-            new LinkedBlockingQueue(),
+            cfg.getServerCoreThreads(),
+            cfg.getServerMaxThreads(),
+            cfg.getServerKeepalive(), TimeUnit.SECONDS,
+            cfg.getServerQueueLen() == -1 ?
+                new LinkedBlockingQueue() : new LinkedBlockingQueue(cfg.getServerQueueLen()),
             new DefaultThreadFactory(new ThreadGroup("Server Worker thread group"), "HttpServerWorker"));
     }
 
@@ -137,7 +138,7 @@ public class ServerHandler implements NHttpServiceHandler {
         } catch (IOException e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
-        } catch (RejectedExecutionException e) {
+        } catch (Exception e) {
             handleException("Error processing request received for : " +
                 request.getRequestLine().getUri(), e, conn);
         }

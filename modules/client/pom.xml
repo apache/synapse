@@ -4,15 +4,15 @@
 
     <parent>
 	<groupId>org.apache.sandesha2</groupId>
-	<artifactId>sandesha2-parent</artifactId>
+		<artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
-    <artifactId>sandesha2-client</artifactId>
+    <artifactId>sandesha2-client-constants</artifactId>
     <packaging>jar</packaging>
-    <name>Sandesha - client</name>
+    <name>Sandesha2 - Client</name>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -23,7 +23,6 @@
             </resource>
         </resources>
         <plugins>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -36,7 +35,6 @@
                         <configuration>
                             <tasks>
 
-
                                 <!--copy sandesha client classes from core module-->
                                 <copy overwrite="yes"
                                       file="../core/target/classes/org/apache/sandesha2/client/SandeshaClientConstants.class"
@@ -48,7 +46,6 @@
                                       file="../core/target/classes/org/apache/sandesha2/client/SequenceReport.class"
                                       tofile="target/classes/org/apache/sandesha2/client/SequenceReport.class"/>
 
-                                
 
                             </tasks>
                         </configuration>

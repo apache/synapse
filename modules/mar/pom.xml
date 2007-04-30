@@ -3,16 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-	<groupId>org.apache.sandesha2</groupId>
-	<artifactId>sandesha2-parent</artifactId>
+		<groupId>org.apache.sandesha2</groupId>
+		<artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
-    <artifactId>sandesha2-mar</artifactId>
+    <artifactId>sandesha2</artifactId>
     <packaging>mar</packaging>
-    <name>Sandesha - Mar</name>
+    <name>Sandesha2 - Mar</name>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -22,8 +22,8 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+		
         <plugins>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -56,19 +56,19 @@
                     <target>1.4</target>
                 </configuration>
             </plugin>
-	    <plugin>
-        	<groupId>org.apache.axis2</groupId>
-        	<artifactId>axis2-mar-maven-plugin</artifactId>
-        	<version>SNAPSHOT</version>
-        	<extensions>true</extensions>
+	    	
+			<plugin>
+        		<groupId>org.apache.axis2</groupId>
+        		<artifactId>axis2-mar-maven-plugin</artifactId>
+        		<version>SNAPSHOT</version>
+        		<extensions>true</extensions>
 		
-        	<configuration>
-			<marName>sandesha2-${version}</marName>
-       	  		<includeDependencies>false</includeDependencies>
-			<moduleXmlFile>module.xml</moduleXmlFile>
-        	</configuration>
+        		<configuration>
+       	  			<includeDependencies>false</includeDependencies>
+					<moduleXmlFile>module.xml</moduleXmlFile>
+        		</configuration>
       	     </plugin> 
-           </plugins>
+        </plugins>
 
     </build>
     

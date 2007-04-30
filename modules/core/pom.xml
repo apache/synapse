@@ -3,16 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-	<groupId>org.apache.sandesha2</groupId>
-	<artifactId>sandesha2-parent</artifactId>
+		<groupId>org.apache.sandesha2</groupId>
+		<artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
-
+	
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>sandesha2-core</artifactId>
     <packaging>jar</packaging>
-    <name>Sandesha - Core</name>
+    <name>Sandesha2 - Core</name>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>

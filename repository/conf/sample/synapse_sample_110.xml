@@ -17,31 +17,22 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <!-- attaching service level WS-Security policies to proxy services -->
-    <definitions>
-        <set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-    </definitions>
 
-    <proxies>
-        <proxy name="StockQuoteProxy" transports="jms">
-            <wsdl key="proxy_wsdl"/>
-        </proxy>
-    </proxies>
+    <!--<property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>-->
 
-    <rules>
-        <in>
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
-                </endpoint>
-            </send>
-        </in>
-        <out>
-            <send/>
-        </out>
-    </rules>
+    <proxy name="StockQuoteProxy" transports="jms">
+        <target>
+            <endpoint>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            </endpoint>
+            <outSequence>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
 
-</synapse>
+</definitions>

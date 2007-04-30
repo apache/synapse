@@ -22,6 +22,9 @@ package org.apache.synapse.mediators.transform;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
@@ -89,8 +92,10 @@ public class HeaderMediator extends AbstractMediator {
                 } else if (Constants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(new EndpointReference(value));
                 } else {
-                    handleException("Unsupported header : " + qName.getLocalPart());
+                    addCustomHeader(synCtx);
                 }
+            } else {
+                addCustomHeader(synCtx);                
             }
 
         } else {
@@ -123,6 +128,18 @@ public class HeaderMediator extends AbstractMediator {
             trace.trace("End : Header mediator");
         }
         return true;
+    }
+
+    private void addCustomHeader(MessageContext synCtx) {
+        SOAPEnvelope env = synCtx.getEnvelope();
+            SOAPFactory fac = (SOAPFactory) env.getOMFactory();
+            SOAPHeader header = env.getHeader();
+            if (header == null) {
+                header = fac.createSOAPHeader(env);
+            }
+            SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
+                fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
+            hb.setText(value);
     }
 
     private void removeFromHeaderList(List headersList) {

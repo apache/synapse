@@ -408,6 +408,17 @@ could be set as a transport header property or an (underlying) Axis2 message
 context property. Using the property element with action specified as
 "remove" you can remove the message context properties if available.</p>
 
+<p>There are some well-defined properties that you can get/set:</p>
+<ul>
+    <li>RESPONSE - 'true' means the message is a response message</li>
+    <li>ERROR_MESSAGE - this is set to any error message</li>
+</ul>
+<p>There are also some Axis2 and module properties that are useful to set (with scope="axis2"):</p>
+<ul>
+    <li>Sandesha2RMSpecVersion - can be '1.0' or '1.1'</li>
+    <li>Sandesha2SequenceKey - can be an identifier specifying an Sandesha internal sequence key, and</li> 
+    <li>Sandesha2LastMessage - 'true' will make this the last message and terminate the sequence</li>
+</ul>
 
 <p></p>
 

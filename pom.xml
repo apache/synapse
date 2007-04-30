@@ -229,6 +229,11 @@
                 <artifactId>axis2-java2wsdl</artifactId>
                 <version>${axis2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-mtompolicy</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
 
             <!-- Rampart -->
             <dependency>
@@ -328,6 +333,10 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-java2wsdl</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-mtompolicy</artifactId>
+        </dependency>
 
         <!-- Neethi -->
         <dependency>
@@ -356,6 +365,10 @@
                     <groupId>org.apache.neethi</groupId>
                     <artifactId>neethi</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -374,6 +387,10 @@
                     <groupId>httpcomponents-httpcore</groupId>
                     <artifactId>jakarta-httpcore</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden</artifactId>
+                </exclusion>                
             </exclusions>
         </dependency>
         <dependency>
@@ -392,6 +409,10 @@
                     <groupId>httpcomponents-httpcore</groupId>
                     <artifactId>jakarta-httpcore</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden</artifactId>
+                </exclusion>                
             </exclusions>
         </dependency>
         <dependency>
@@ -411,7 +432,33 @@
                 <exclusion>
                     <groupId>httpcomponents-httpcore</groupId>
                     <artifactId>jakarta-httpcore</artifactId>
-                </exclusion>                
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-policy</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>httpcomponents-httpcore</groupId>
+                    <artifactId>jakarta-httpcore</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.woden</groupId>
+                    <artifactId>woden</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -631,7 +678,7 @@
         <jakarta.httpcore.nio.version>4.0-alpha4</jakarta.httpcore.nio.version>
 
         <!-- Axis2 1.2 and its dependencies -->
-        <axis2.version>1.2-SNAPSHOT</axis2.version>
+        <axis2.version>1.2</axis2.version>
         <axiom.version>1.2.4</axiom.version>
         <xml_schema.version>1.3.1</xml_schema.version>
         <xml_apis.version>1.3.03</xml_apis.version>
@@ -641,7 +688,7 @@
         <backport_util_concurrent.version>2.2</backport_util_concurrent.version>
 
         <!-- addressing, rampart, sandesha, neethi -->
-        <addressing.version>1.2-SNAPSHOT</addressing.version>
+        <addressing.version>1.2</addressing.version>
         <rampart.version>SNAPSHOT</rampart.version>
         <sandesha2.version>SNAPSHOT</sandesha2.version>
         <neethi.version>2.0.1</neethi.version>
@@ -655,7 +702,6 @@
         <!-- misc -->
         <junit.version>3.8.2</junit.version>
         <log4j.version>1.2.13</log4j.version>
-        <wso2commons.version>1.2-SNAPSHOT</wso2commons.version>
         <xmlunit.version>1.0</xmlunit.version>
 
         <!-- dependencies of Synapse extensions module -->

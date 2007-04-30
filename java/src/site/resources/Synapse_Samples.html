@@ -1397,32 +1397,21 @@ client.</p>
 <h1><a name="Transport">Transports</a></h1>
 
 <h2><a name="Sample110">Sample 110:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;    
 
-    &lt;!-- attaching service level WS-Security policies to proxy services --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-    &lt;/definitions&gt;
+    &lt;proxy name="StockQuoteProxy" transports="jms"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
 
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy" transports="jms"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint address="http://localhost:9000/axis2/services/SimpleStockQuoteService"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Introduction to switching transports with proxy
 services</strong></p>
@@ -1457,9 +1446,7 @@ service definition.</p>
 
 <p>Now lets send a stock quote request on JMS, using the dumb stock quote
 client as follows:</p>
-<pre>ant dumbstockquote -Dgatewayurl="jms:/StockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=
-QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.
-ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"</pre>
+<pre>ant jmsclient -Djms_type=pox -Djms_dest=dynamicQueues/StockQuoteProxy -Djms_payload=MSFT</pre>
 
 <p>On the Synapse debug log you will notice that the JMS listener received
 the request message as:</p>
@@ -1478,34 +1465,22 @@ and connection factory etc.</p>
 <pre>&lt;property name="transport.jms.Destination" value="dynamicTopics/something.TestTopic"/&gt;</pre>
 
 <h2><a name="Sample111">Sample 111:</a></h2>
-<pre>&lt;synapse xmlns="http://ws.apache.org/ns/synapse"&gt;
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
-    &lt;!-- attaching service level WS-Security policies to proxy services --&gt;
-    &lt;definitions&gt;
-        &lt;set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
-    &lt;/definitions&gt;
+    &lt;proxy name="StockQuoteProxy" transports="http"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;amp;
+                   java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
 
-    &lt;proxies&gt;
-        &lt;proxy name="StockQuoteProxy" transports="http"&gt;
-            &lt;wsdl key="proxy_wsdl"/&gt;
-        &lt;/proxy&gt;
-    &lt;/proxies&gt;
-
-    &lt;rules&gt;
-        &lt;in&gt;
-            &lt;send&gt;
-                &lt;endpoint address="jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=
-                           QueueConnectionFactory&amp;amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
-                           amp;java.naming.provider.url=tcp://localhost:61616"/&gt;
-            &lt;/send&gt;
-        &lt;/in&gt;
-        &lt;out&gt;
-            &lt;send/&gt;
-        &lt;/out&gt;
-    &lt;/rules&gt;
-
-&lt;/synapse&gt;</pre>
+&lt;/definitions&gt;</pre>
 
 <p><strong>Objective: Demonstrate switching from HTTP to JMS</strong></p>
 

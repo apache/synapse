@@ -1,0 +1,56 @@
+<assembly>
+    <id>bin</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>tar.gz</format>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <directory>../..</directory>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>LICENSE.txt</include>
+                <include>release-notes.html</include>
+                <include>README.txt</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../../modules/core/target</directory>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>sandesha2-core-${version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/client/target</directory>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>sandesha2-client-constants-${version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/policy/target</directory>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>sandesha2-policy-${version}.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/mar/target</directory>
+            <outputDirectory>sandesha2-${version}-bin</outputDirectory>
+            <includes>
+                <include>sandesha2-${version}.mar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../xdocs</directory>
+            <outputDirectory>sandesha2-${version}-bin/docs</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

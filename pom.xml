@@ -177,7 +177,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.2</version>
             </plugin>
-
         </plugins>
     </build>
 
@@ -428,6 +427,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
 		<module>modules/mar</module>
 		<module>modules/client</module>
 		<module>modules/policy</module>
+		<module>modules/distribution</module>
     </modules>
 
     <properties>

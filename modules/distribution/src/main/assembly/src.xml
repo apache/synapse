@@ -1,0 +1,41 @@
+<assembly>
+    <id>src</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>tar.gz</format>
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <directory>../..</directory>
+            <outputDirectory>sandesha2-${version}-src</outputDirectory>
+            <includes>
+                <include>config/**/*</include>
+                <include>modules/**/*</include>
+                <include>xdocs/**/*</include>
+                <include>**/pom.xml</include>
+
+		<!--root level files-->
+                <include>maven.xml</include>
+                <include>project.xml</include>
+                <include>LICENSE.txt</include>
+                <include>project.properties</include>
+                <include>README.txt</include>
+                <include>release-notes.html</include>
+            </includes>
+            <excludes>
+                <exclude>**/target</exclude>
+                <exclude>**/target/**/*</exclude>
+                <exclude>**/build</exclude>
+                <exclude>**/build/**/*</exclude>
+                <exclude>**/.settings</exclude>
+                <exclude>**/.classpath</exclude>
+                <exclude>**/.project</exclude>
+                <exclude>**/*.iml</exclude>
+                <exclude>**/.settings</exclude>
+                <exclude>**/.settings/**/*</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+</assembly>

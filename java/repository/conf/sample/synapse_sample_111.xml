@@ -17,31 +17,18 @@
   ~  under the License.
   -->
 
-<synapse xmlns="http://ws.apache.org/ns/synapse">
+<definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- attaching service level WS-Security policies to proxy services -->
-    <definitions>
-        <set-property name="proxy_wsdl"
-                      src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
-    </definitions>
+    <proxy name="StockQuoteProxy" transports="http">
+        <target>
+            <endpoint>
+                <address uri="jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"/>
+            </endpoint>
+            <outSequence>
+                <send/>
+            </outSequence>
+        </target>
+        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+    </proxy>
 
-    <proxies>
-        <proxy name="StockQuoteProxy" transports="http">
-            <wsdl key="proxy_wsdl"/>
-        </proxy>
-    </proxies>
-
-    <rules>
-        <in>
-            <send>
-                <endpoint>
-                    <address uri="jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"/>
-                </endpoint>
-            </send>
-        </in>
-        <out>
-            <send/>
-        </out>
-    </rules>
-
-</synapse>
+</definitions>

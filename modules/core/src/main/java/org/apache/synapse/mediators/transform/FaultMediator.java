@@ -154,6 +154,15 @@ public class FaultMediator extends AbstractMediator {
             log.error(msg);
             throw new SynapseException(af);
         }
+
+        if (synCtx.getFaultTo() != null) {
+            synCtx.setTo(synCtx.getFaultTo());
+        } else if (synCtx.getReplyTo() != null) {
+            synCtx.setTo(synCtx.getReplyTo());
+        } else {
+            synCtx.setTo(null);
+        }
+
         if (shouldTrace) {
             trace.trace("End : Fault mediator");
         }

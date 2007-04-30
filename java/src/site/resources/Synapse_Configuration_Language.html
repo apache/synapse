@@ -133,15 +133,15 @@ mechanism for mediators (see below for details).</p>
 
 <p>A Synapse configuration looks like the following at the top level:</p>
 <pre> &lt;definitions&gt;
-   &lt;registry provider="string"&gt;...&lt;/registry&gt;?
-   &lt;localEntry key="string"&gt;...&lt;/localEntry&gt;?
-   &lt;sequence name="string"&gt;...&lt;/sequence&gt;?
-   &lt;endpoint name="string"&gt;...&lt;/endpoint&gt;?
-   &lt;proxy name="string" ...&gt;...&lt;/proxy&gt;?
-   mediator*
+   &lt;<a href="#registry">registry</a> provider="string"&gt;...&lt;/registry&gt;?
+   &lt;<a href="#localEntry">localEntry</a> key="string"&gt;...&lt;/localEntry&gt;?
+   &lt;<a href="#sequence">sequence</a> name="string"&gt;...&lt;/sequence&gt;?
+   &lt;<a href="#endpoint">endpoint</a> name="string"&gt;...&lt;/endpoint&gt;?
+   &lt;<a href="#proxy">proxy</a> name="string" ...&gt;...&lt;/proxy&gt;?
+   <a href="#mediator">mediator</a>*
  &lt;/definitions&gt;</pre>
 
-<h2>Registry</h2>
+<a name="registry"/><h2>Registry</h2>
 
 <p>The &lt;registry&gt; element is used to define the remote registry which
 are referenced from within the configuration. The registry provider specifies
@@ -160,7 +160,7 @@ time.</p>
 
 <p></p>
 
-<h3>Local Entry</h3>
+<a name="localEntry"><h3>Local Entry</h3>
 
 <p>The &lt;localEntry&gt; element is used to declare registry entries that
 are local to the Synapse instance, as shown below</p>
@@ -177,7 +177,7 @@ same keys of the remote registry. </p>
 
 <p></p>
 
-<h2>Sequences</h2>
+<a name="sequence"/><h2>Sequences</h2>
 
 <p>A &lt;sequence&gt; element is used to define a sequence of mediators that
 can be invoked later by name as a sequence of mediators.</p>
@@ -212,16 +212,16 @@ dynamically be updated accordingly. </p>
 
 <p></p>
 
-<h2>Endpoints</h2>
+<a name="endpoint"/><h2>Endpoints</h2>
 
 <p>An &lt;endpoint&gt; element defines a destination for an outgoing message.
 An endpoint may be specified as an address endpoint, WSDL based endpoint, a
 load balanced endpoint or a fail-over endpoint as follows:</p>
 <pre>&lt;endpoint [name="string"] [key="string"]&gt;
-   address-endpoint   |   wsdl-endpoint   |   load-balanced-endpoint   |   fail-over-endpoint
+   <a href="#address-endpoint">address-endpoint</a>   |   <a href="#wsdl-endpoint">wsdl-endpoint</a>  |   <a href="#load-balanced-endpoint">load-balanced-endpoint</a>   |   <a href="#fail-over-endpoint">fail-over-endpoint</a>
 &lt;/endpoint&gt;</pre>
 
-<h4>Address Endpoint</h4>
+<a name="address-endpoint"/><h4>Address Endpoint</h4>
 
 <p>An address-endpoint token refers to an endpoint address definition as
 follows:</p>
@@ -235,7 +235,7 @@ follows:</p>
   &lt;/timeout&gt;?
 &lt;/address&gt;</pre>
 
-<h4>WSDL Endpoint</h4>
+<a name="wsdl-endpoint"/><h4>WSDL Endpoint</h4>
 
 <p>A wsdl-endpoint token refers to a WSDL endpoint definition as follows:</p>
 <pre>&lt;wsdl [uri="wsdl-uri"] [service="qname"] [port/endpoint="qname"]&gt;
@@ -254,7 +254,7 @@ follows:</p>
 uri reference and the service &amp; port/endpoint specified if multiple
 options are present.</p>
 
-<h4>Load balanced Endpoint</h4>
+<a name="load-balanced-endpoint"/><h4>Load balanced Endpoint</h4>
 
 <p>A load-balanced-endpoint token refers to a load balancing configuration
 from which the destination endpoint would be selected depending on the
@@ -263,7 +263,7 @@ evaluation of the current message against the load balacing algorithm</p>
   &lt;endpoint .../&gt;+
 &lt;/loadBalance&gt;</pre>
 
-<h4>Failover Endpoint</h4>
+<a name="fail-over-endpoint"/><h4>Failover Endpoint</h4>
 
 <p>A fail-over-endpoint token refers to a fail-over configuration definition
 from which an endpoint is selected if the sending of a message to the
@@ -275,7 +275,7 @@ endpoint results in a failure</p>
 <p>An endpoint definition must name the endpoint, and a dynamic endpoint
 lookup must specify the key for a definition.</p>
 
-<h2>Proxy service</h2>
+<a name="proxy"/><h2>Proxy service</h2>
 
 <p>A &lt;proxy&gt; element is used to define a Synapse Proxy service.</p>
 <pre> &lt;proxy name="string" [transports="(http |https |jms )+|all"]&gt;
@@ -317,10 +317,10 @@ be updated accordingly.</p>
 
 <p></p>
 
-<h2>Mediators</h2>
+<a name="mediator"/><h2>Mediators</h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre> send | drop | log | makefault | transform | header | filter | switch | class | validate | property | sequenceref | in | out </pre>
+<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#class">class</a> | <a href="#validate">validate</a> | <a href="#property">property</a> | <a href="#sequence">sequence ref</a> | <a href="#in">in</a>| <a href="#out">out</a></pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -329,7 +329,7 @@ mentioned previously.</p>
 
 <h3>Core Mediators</h3>
 
-<h4>Send</h4>
+<a name="send"><h4>Send</h4></a>
 
 <p>The send token represents a &lt;send&gt; element. The &lt;send&gt; element
 is used to send messages out of Synapse to some endpoint, and stop further
@@ -358,7 +358,7 @@ is used:</p>
 
 <p></p>
 
-<h4>Drop</h4>
+<a name="drop"><h4>Drop</h4></a>
 
 <p>The drop token refers to a &lt;drop&gt; element which is used to drop a
 message:</p>
@@ -369,7 +369,7 @@ message stops.</p>
 
 <p></p>
 
-<h4>Log</h4>
+<a name="log"/><h4>Log</h4>
 
 <p>The log token refers to a &lt;log&gt; element which may be used to log
 messages being mediated:</p>
@@ -395,7 +395,7 @@ logged. The default separator is the ',' comma.</p>
 
 <p></p>
 
-<h4>Property</h4>
+<a name="property"/><h4>Property</h4>
 <pre> &lt;property name="string" [action=set|remove] (value="literal" | expression="xpath") [scope=transport|axis2]/&gt;</pre>
 
 <p>The setproperty token refers to a &lt;property&gt; element which is a
@@ -406,19 +406,20 @@ and can be later retrieved through the synapse:get-property(prop-name)
 extension function. If a scope is specified for a property, the property
 could be set as a transport header property or an (underlying) Axis2 message
 context property. Using the property element with action specified as
-"remove" you can remove the message context properties if availabel.</p>
+"remove" you can remove the message context properties if available.</p>
+
 
 <p></p>
 
-<h4>Sequence</h4>
+<a name="sequence"/><h4>Sequence</h4>
 <pre> &lt;sequence key="name"/&gt;</pre>
 
-<p>A sequenceref token refers to a &lt;sequence&gt; element which is used to
+<p>A sequence ref token refers to a &lt;sequence&gt; element which is used to
 invoke a named sequence of mediators.</p>
 
 <p></p>
 
-<h4>Validate</h4>
+<a name="validate"/><h4>Validate</h4>
 <pre> &lt;validate [source="xpath"]&gt;
    &lt;parameter name="validation-feature-id" value="true|false"/&gt;*
    &lt;schema key="string"/&gt;+
@@ -442,7 +443,7 @@ core will remain simple and lightweight.</p>
 
 <h3>Message Transformations</h3>
 
-<h4>Fault</h4>
+<a name="makefault"/><h4>Makefault</h4>
 <pre> &lt;makefault [version="soap11|soap12"]&gt;
    &lt;code (value="literal" | expression="xpath")/&gt;
    &lt;reason (value="literal" | expression="xpath")&gt;
@@ -459,7 +460,7 @@ original message.</p>
 
 <p></p>
 
-<h4>XSLT</h4>
+<A name="xslt"><h4>XSLT</h4></a>
 <pre> &lt;xslt key="string" [source="xpath"]&gt;
    &lt;parameter name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/xslt&gt;</pre>
@@ -471,7 +472,7 @@ into the transformations through the &lt;parameter&gt; elements.</p>
 
 <p></p>
 
-<h4>Header</h4>
+<a name="header"/><h4>Header</h4>
 <pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
  &lt;header name="qname" action="remove"/&gt;</pre>
 
@@ -486,7 +487,7 @@ omitted, it defaults to a set-header.</p>
 
 <h3>Selection</h3>
 
-<h4>Filter</h4>
+<a name="filter"/><h4>Filter</h4>
 <pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
    mediator+
  &lt;/filter&gt;</pre>
@@ -498,7 +499,7 @@ filter mediator will execute the enclosed mediators in sequence.</p>
 
 <p></p>
 
-<h4>Switch</h4>
+<a name="switch"/><h4>Switch</h4>
 <pre> &lt;switch source="xpath"&gt;
    &lt;case regex="string"&gt;
      mediator+
@@ -513,7 +514,7 @@ expression into its string value, and match it against the given regular
 expressions. If the specified cases does not match and a default case exists,
 it will be executed.</p>
 
-<h4>In / Out</h4>
+<a name="in"/><a name="out"/><h4>In / Out</h4>
 <pre>&lt;in&gt;<br>  mediator+
 &lt;/in&gt;<br></pre>
 <pre>&lt;out&gt;
@@ -530,7 +531,7 @@ versa.</p>
 
 <h3>Extension mediator</h3>
 
-<h4>Class Mediator</h4>
+<a name="class"/><h4>Class Mediator</h4>
 <pre> &lt;class name="class-name"&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/class&gt; </pre>

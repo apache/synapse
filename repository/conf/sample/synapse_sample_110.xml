@@ -19,10 +19,6 @@
 
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
-    <!-- attaching service level WS-Security policies to proxy services -->
-
-    <!--<property name="proxy_wsdl" src="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>-->
-
     <proxy name="StockQuoteProxy" transports="jms">
         <target>
             <endpoint>

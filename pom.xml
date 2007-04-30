@@ -7,7 +7,7 @@
     <artifactId>sandesha2-parent</artifactId>
     <packaging>pom</packaging>
     <description>
-Sandesha2 is an implementation of WS-ReliableMessaging specification published IBM, Microsoft, BEA and TIBCO. Sandesha2 was built on top of Axis2. So by using Sandesha2 you can add reliable messaging capability to the web services you have hosted using Axis2. You can also use Sandesha2 with Axis2 client to interact with already hosted web services in a reliable manner. Please see sandesha2 user guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 work internally.
+Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache Axis2. By using Sandesha2 you can add reliable messaging capability to the Web services you have hosted in Axis2. You can also use Sandesha2 with Axis2 client to interact with already hosted web services in a reliable manner. Please see Sandesha2 user guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 works internally.
     </description>
     <version>SNAPSHOT</version>
     <name>Apache Sandesha</name>
@@ -27,7 +27,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
 
     <issueManagement>
         <system>JIRA</system>
-        <url>http://issues.apache.org/jira/browse/SAND</url>
+        <url>http://issues.apache.org/jira/browse/SANDESHA2</url>
     </issueManagement>
 
     <mailingLists>
@@ -66,11 +66,29 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <email>sanjiva AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
-        <developer>
+		<developer>
             <name>Sanka Samaranayaka</name>
             <id>sanka</id>
             <email>ssanka AT gmail.com</email>
             <organization>WSO2</organization>
+        </developer>
+        <developer>
+            <name>Andrew K Gatford</name>
+            <id>gatfora</id>
+            <email>GATFORA AT uk.ibm.com</email>
+            <organization>IBM</organization>
+        </developer>
+		<developer>
+            <name>Thomas McKiernan</name>
+            <id>mckierna</id>
+            <email>MCKIERNA AT uk.ibm.com</email>
+            <organization>IBM</organization>
+        </developer>
+		<developer>
+            <name>Matt Lovett</name>
+            <id>mlovett</id>
+            <email>MLOVETT AT uk.ibm.com</email>
+            <organization>IBM</organization>
         </developer>
     </developers>
 
@@ -79,7 +97,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/webservices/sandesha/trunk/java/</developerConnection>
         <url>http://svn.apache.org/repos/asf/webservices/sandesha/trunk</url>
     </scm>
-
 
     <repositories>
         <repository>
@@ -114,7 +131,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <url>http://ws.zones.apache.org/repository2</url>
         </repository>
     </repositories>
-
 
     <pluginRepositories>
         <pluginRepository>
@@ -168,6 +184,19 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
 
     <dependencies>
 
+		<!-- Axis2 -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-mtompolicy</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+		
+		<!-- Rampart -->
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
@@ -183,45 +212,25 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <artifactId>rampart-policy</artifactId>
             <version>${rampart.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
 
-
-
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-mtompolicy</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-
-        <!-- AIOM Dependencies -->
+        <!-- AXIOM -->
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
             <version>${axiom.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
             <version>${axiom.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-dom</artifactId>
             <version>${axiom.version}</version>
         </dependency>
 
-        <!-- Thrid party dependencies -->
+        <!-- Other third party dependencies -->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -282,7 +291,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <artifactId>mail</artifactId>
             <version>${javamail.version}</version>
         </dependency>
-
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
@@ -328,13 +336,11 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <artifactId>XmlSchema</artifactId>
             <version>${XmlSchema.version}</version>
         </dependency>
-
         <dependency>
             <groupId>annogen</groupId>
             <artifactId>annogen</artifactId>
             <version>${annogen.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant-nodeps</artifactId>
@@ -350,7 +356,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <artifactId>jakarta-httpcore</artifactId>
             <version>${jakarta.httpcore.version}</version>
         </dependency>
-
         <dependency>
             <groupId>opensaml</groupId>
             <artifactId>opensaml</artifactId>
@@ -383,7 +388,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${commons.fileupload.version}</version>
         </dependency>
     </dependencies>
-
 
     <profiles>
         <profile>
@@ -418,70 +422,55 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
     </profiles>
 
     <modules>
-	<!--<module>modules/samples</module>-->
-	<module>modules/interop</module>
+		<!--<module>modules/samples</module>-->
+		<module>modules/interop</module>
         <module>modules/core</module>
-	<module>modules/mar</module>
-	<module>modules/client</module>
-	<module>modules/policy</module>
+		<module>modules/mar</module>
+		<module>modules/client</module>
+		<module>modules/policy</module>
     </modules>
 
     <properties>
-	<rampart.version>SNAPSHOT</rampart.version>
+		<rampart.version>SNAPSHOT</rampart.version>
         <axis2.version>SNAPSHOT</axis2.version>
-
         <axiom.version>SNAPSHOT</axiom.version>
         <addressing.mar.version>SNAPSHOT</addressing.mar.version>
-
         <wss4j.version>SNAPSHOT</wss4j.version>
         <xmlsec.version>1.3.0</xmlsec.version>
-
         <opensaml.version>1.1</opensaml.version>
-
         <XmlSchema.version>SNAPSHOT</XmlSchema.version>
         <neethi.version>2.0</neethi.version>
-
         <xbean.version>2.1.0</xbean.version>
         <woden.version>1.0-incubating-SNAPSHOT</woden.version>
         <wsdl4j.version>1.6.1</wsdl4j.version>
         <annogen.version>0.1.0</annogen.version>
-
         <activation.version>1.1</activation.version>
         <javamail.version>1.4</javamail.version>
-
         <jaxen.version>1.1-beta-10</jaxen.version>
-
         <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>
         <stax.impl.artifactid>wstx-asl</stax.impl.artifactid>
         <stax.impl.version>3.2.0</stax.impl.version>
         <stax.api.version>1.0.1</stax.api.version>
         <xml.apis.version>1.3.03</xml.apis.version>
-
         <bcprov.jdk13.version>132</bcprov.jdk13.version>
         <bcprov.jdk15.version>132</bcprov.jdk15.version>
-
         <commons.codec.version>1.3</commons.codec.version>
         <commons.httpclient.version>3.0.1</commons.httpclient.version>
         <commons.logging.version>1.1</commons.logging.version>
         <backport_util_concurrent.version>2.1</backport_util_concurrent.version>
-
         <servletapi.version>2.3</servletapi.version>
-
         <junit.version>3.8.1</junit.version>
         <xmlunit.version>1.0</xmlunit.version>
         <log4j.version>1.2.13</log4j.version>
-
         <jakarta.httpcore.version>4.0-alpha3</jakarta.httpcore.version>
         <commons.collections.version>3.1</commons.collections.version>
         <commons.fileupload.version>1.1.1</commons.fileupload.version>
         <commons.discovery.version>0.2</commons.discovery.version>
-
         <ant.version>1.7.0</ant.version>
-
         <xalan.version>2.7.0</xalan.version>
         <xerces.version>2.8.1</xerces.version>
-
     </properties>
+	
     <distributionManagement>
         <repository>
             <id>apache-repo</id>
@@ -496,6 +485,5 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         </snapshotRepository>
 	-->
     </distributionManagement>
-
 
 </project>

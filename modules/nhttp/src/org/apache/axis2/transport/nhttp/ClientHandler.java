@@ -27,10 +27,12 @@ import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.protocol.*;
-import org.apache.axis2.util.threadpool.DefaultThreadFactory;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
+import org.apache.axis2.transport.nhttp.util.NativeWorkerPool;
+import org.apache.axis2.transport.nhttp.util.WorkerPool;
+import org.apache.axis2.transport.nhttp.util.WorkerPoolFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -38,15 +40,9 @@ import org.apache.axiom.soap.SOAP12Constants;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.nio.channels.Pipe;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.io.IOException;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * The client connection handler. An instance of this class is used by each IOReactor, to
@@ -67,7 +63,7 @@ public class ClientHandler implements NHttpClientHandler {
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
 
-    private Executor workerPool = null;
+    private WorkerPool workerPool = null;
 
     private static final String REQUEST_BUFFER = "request-buffer";
     private static final String RESPONSE_BUFFER = "response-buffer";
@@ -91,13 +87,12 @@ public class ClientHandler implements NHttpClientHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        workerPool = new ThreadPoolExecutor(
+        workerPool = WorkerPoolFactory.getWorkerPool(
             cfg.getClientCoreThreads(),
             cfg.getClientMaxThreads(),
-            cfg.getClientKeepalive(), TimeUnit.SECONDS,
-            cfg.getClientQueueLen() == -1 ?
-                new LinkedBlockingQueue() : new LinkedBlockingQueue(cfg.getServerQueueLen()),
-            new DefaultThreadFactory(new ThreadGroup("Client Worker thread group"), "HttpClientWorker"));
+            cfg.getClientKeepalive(),
+            cfg.getClientQueueLen(),
+            "Client Worker thread group", "HttpClientWorker");
     }
 
     public void requestReady(final NHttpClientConnection conn) {

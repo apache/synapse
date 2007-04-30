@@ -18,10 +18,11 @@
  */
 package org.apache.axis2.transport.nhttp;
 
-import edu.emory.mathcs.backport.java.util.concurrent.*;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.util.threadpool.DefaultThreadFactory;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
+import org.apache.axis2.transport.nhttp.util.NativeWorkerPool;
+import org.apache.axis2.transport.nhttp.util.WorkerPool;
+import org.apache.axis2.transport.nhttp.util.WorkerPoolFactory;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -40,7 +41,6 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.nio.channels.Pipe;
 import java.nio.channels.WritableByteChannel;
 import java.nio.channels.ReadableByteChannel;
 
@@ -68,7 +68,7 @@ public class ServerHandler implements NHttpServiceHandler {
     private boolean isHttps = false;
 
     /** the thread pool to process requests */
-    private Executor workerPool = null;
+    private WorkerPool workerPool = null;
 
     private static final String REQUEST_SINK_CHANNEL = "request-sink-channel";
     private static final String RESPONSE_SOURCE_CHANNEL = "response-source-channel";
@@ -86,13 +86,12 @@ public class ServerHandler implements NHttpServiceHandler {
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
-        this.workerPool = new ThreadPoolExecutor(
+        this.workerPool = WorkerPoolFactory.getWorkerPool(
             cfg.getServerCoreThreads(),
             cfg.getServerMaxThreads(),
-            cfg.getServerKeepalive(), TimeUnit.SECONDS,
-            cfg.getServerQueueLen() == -1 ?
-                new LinkedBlockingQueue() : new LinkedBlockingQueue(cfg.getServerQueueLen()),
-            new DefaultThreadFactory(new ThreadGroup("Server Worker thread group"), "HttpServerWorker"));
+            cfg.getServerKeepalive(),
+            cfg.getServerQueueLen(),
+            "Server Worker thread group", "HttpServerWorker");
     }
 
     /**

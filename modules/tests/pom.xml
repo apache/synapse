@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
+        <version>SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>sandesha2-tests</artifactId>
+    <packaging>jar</packaging>
+    <name>Sandesha2 - Test Suite</name>
+
+    <build>
+        <sourceDirectory>src/test/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <testResources>
+            <testResource>
+                <directory>test-resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.xsl</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.4</source>
+                    <target>1.4</target>
+                </configuration>
+            </plugin>
+			
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>create_test_repos</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <tasks>
+								<ant antfile="tests.build.xml" inheritAll="true" target="repo:create">
+									<property name="sandesha2.version" value="${sandesha2.version}"/>
+									<property name="build.dir" value="${project.build.directory}"/>
+									<property name="local.repo" value="${settings.localRepository}"/>
+									<property name="addressing.version" value="${axis2.version}"/>
+									<property name="rampart.version" value="${rampart.version}"/>
+								</ant>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+    
+	<properties>
+	    <test.property>2.8.1</test.property>
+    </properties>
+	
+    <dependencies>
+    	<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-core</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+    	<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-policy</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+		<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-samples</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+		<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

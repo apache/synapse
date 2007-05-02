@@ -79,7 +79,7 @@ public class SandeshaTestCase extends TestCase {
     public SandeshaTestCase(String name) {
         super(name);
         File baseDir = new File("");
-        String testRource = baseDir.getAbsolutePath() + File.separator + "modules" + File.separator + "tests" + File.separator + "test-resources";
+        String testRource = "target" + File.separator + "test-classes";
         resourceDir = new File(testRource).getPath();
         
         String propFileStr = resourceDir + File.separator + PROPERTY_FILE_NAME;

@@ -337,8 +337,8 @@
         
         <ant:mkdir dir="${dir.sample.userguide.temp}" />
         <ant:mkdir dir="${dir.sample.userguide.temp}/META-INF" />
-        <ant:copy file="${dir.samples}/conf/userguide/services.xml" todir="${dir.sample.userguide.temp}/META-INF" /> 
-        <!-- <ant:copy file="${dir.samples}/conf/userguide/RMSampleService.wsdl" todir="${dir.sample.userguide.temp}" /> --> 
+        <ant:copy file="${dir.samples}/src/main/resources/userguide/services.xml" todir="${dir.sample.userguide.temp}/META-INF" /> 
+        <!-- <ant:copy file="${dir.samples}/src/main/resources/userguide/RMSampleService.wsdl" todir="${dir.sample.userguide.temp}" /> --> 
         <ant:copy todir="${dir.sample.userguide.temp}" >
             <ant:fileset dir="${maven.build.dir}/samples/classes">
                 <ant:include name="sandesha2/samples/userguide/**/*Service*.class" />

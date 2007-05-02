@@ -1,0 +1,48 @@
+<project>
+
+	<target name="samples:setup">
+		<mkdir dir="target/aars" />
+		<mkdir dir="target/jars" />
+		<mkdir dir="target/temp" />
+	</target>
+	<target name="sample:userguide:create" depends="samples:setup">
+
+		<property name="dir.sample.userguide.temp" value="target/temp/userguide" />
+		<property name="dir.sample.userguide.clients.temp" value="target/temp/userguideclients" />	
+		<property name="dir.sample.userguide.clients.temp" value="target/temp/userguideclients" />	
+		<property name="userguide.service.aar.name" value="RMSampleService.aar" />
+		<property name="userguide.client.jar.name" value="UserguideSampleClients.jar" />
+        <property name="build.samples.clients.dir" value="target/sampleClients" />
+		
+		<mkdir dir="${dir.sample.userguide.temp}/META-INF" />
+		
+        <copy file="src/main/resources/userguide/services.xml" todir="${dir.sample.userguide.temp}/META-INF" /> 
+        <!-- <copy file="src/main/resources/userguide/RMSampleService.wsdl" todir="${dir.sample.userguide.temp}" /> -->
+        <copy todir="${dir.sample.userguide.temp}" >
+            <fileset dir="target/classes">
+                <include name="sandesha2/samples/userguide/**/*Service*.class" />
+            </fileset>
+        </copy>
+		
+        <mkdir dir="${dir.sample.userguide.clients.temp}" /> 
+        <copy todir="${dir.sample.userguide.clients.temp}" >
+            <fileset dir="target/classes">
+                <include name="sandesha2/samples/userguide/**/*Client*.class" />
+            </fileset>
+        </copy>
+        
+        <jar jarfile="target/aars/${userguide.service.aar.name}" basedir="${dir.sample.userguide.temp}" />
+    	<jar jarfile="target/jars/${userguide.client.jar.name}" basedir="${dir.sample.userguide.clients.temp}" />
+    	 
+		<mkdir dir="${build.samples.clients.dir}" />
+    	<copy todir="${build.samples.clients.dir}" >
+            <fileset dir="src/main/resources/userguide">
+                <include name="*.bat" />
+                <include name="*.sh" />
+                <include name="*.html" />
+            </fileset>
+        </copy>
+		
+	</target>
+
+</project>

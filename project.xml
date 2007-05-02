@@ -83,7 +83,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
     <build>
         <nagEmailAddress>sandesha-dev@ws.apache.org</nagEmailAddress>
         <sourceDirectory>modules/core/src/main/java</sourceDirectory>
-        <unitTestSourceDirectory>modules/tests/src</unitTestSourceDirectory>
+        <unitTestSourceDirectory>modules/tests/src/test/java</unitTestSourceDirectory>
 
         <unitTest>
             <includes>

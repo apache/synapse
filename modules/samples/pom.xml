@@ -1,0 +1,84 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.apache.sandesha2</groupId>
+        <artifactId>sandesha2-parent</artifactId>
+        <version>SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>sandesha2-samples</artifactId>
+    <packaging>jar</packaging>
+    <name>Sandesha2 - Samples</name>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/main/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.xsl</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.4</source>
+                    <target>1.4</target>
+                </configuration>
+            </plugin>
+			
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>create_samples</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+								<ant antfile="samples.build.xml" target="sample:userguide:create" />
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+    
+	<properties>
+	    <test.property>2.8.1</test.property>
+    </properties>
+	
+    <dependencies>
+    	<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-core</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+    	<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2-policy</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+		<dependency>
+            <groupId>org.apache.sandesha2</groupId>
+            <artifactId>sandesha2</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

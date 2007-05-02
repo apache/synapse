@@ -1,6 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
@@ -35,7 +34,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
             <name>Sandesha Developer List</name>
             <subscribe>sandesha-dev-subscribe@ws.apache.org</subscribe>
             <unsubscribe>sandesha-dev-unsubscribe@ws.apache.org</unsubscribe>
-            <archive></archive>
+            <archive/>
         </mailingList>
     </mailingLists>
     <inceptionYear>2005</inceptionYear>
@@ -91,6 +90,27 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
             <organization>IBM</organization>
         </developer>
     </developers>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <source>1.4</source>
+                    <target>1.4</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
+        </plugins>
+    </build>
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/webservices/sandesha/trunk/java/</connection>
@@ -158,28 +178,6 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
         </pluginRepository>
 
     </pluginRepositories>
-
-    <build>
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0</version>
-                <configuration>
-                    <source>1.4</source>
-                    <target>1.4</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>
-        </plugins>
-    </build>
-
 
     <dependencies>
 
@@ -421,16 +419,19 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
     </profiles>
 
     <modules>
-		<!--<module>modules/samples</module>-->
+		<module>modules/samples</module>
 		<module>modules/interop</module>
-        <module>modules/core</module>
+       	<module>modules/core</module>
 		<module>modules/mar</module>
 		<module>modules/client</module>
 		<module>modules/policy</module>
+		<module>modules/tests</module>
 		<module>modules/distribution</module>
-    </modules>
+  	</modules>
 
     <properties>
+		<sandesha2.version>SNAPSHOT</sandesha2.version>
+			
 		<rampart.version>SNAPSHOT</rampart.version>
         <axis2.version>SNAPSHOT</axis2.version>
         <axiom.version>SNAPSHOT</axiom.version>

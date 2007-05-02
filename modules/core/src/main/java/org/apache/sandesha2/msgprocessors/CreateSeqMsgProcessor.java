@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,6 +69,18 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
 
 		try {
+			if (createSeqRMMsg.getMessageContext().getAxisService() != null) {
+				Parameter unreliableParam = createSeqRMMsg.getMessageContext().getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+				if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
+					FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
+							SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, createSeqRMMsg.getMessageContext().getAxisService().getName()), 
+							new Exception());
+					
+					log.debug("Exit: CreateSeqMsgProcessor::processInMessage, Service has disabled RM " + false);
+					return false;
+				}
+			}
+			
 			CreateSequence createSeqPart = (CreateSequence) createSeqRMMsg
 					.getMessagePart(Sandesha2Constants.MessageParts.CREATE_SEQ);
 			if (createSeqPart == null) {

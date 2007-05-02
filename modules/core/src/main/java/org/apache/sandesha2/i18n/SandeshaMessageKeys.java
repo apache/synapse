@@ -106,6 +106,7 @@ public class SandeshaMessageKeys {
 	public static final String cannotDerriveRetransInterval="cannotDerriveRetransInterval";
 	public static final String cannotDerriveInactivityTimeout="cannotDerriveInactivityTimeout";
 	public static final String noCreateSeqParts="noCreateSeqParts";
+	public static final String reliableMessagingNotEnabled="reliableMessagingNotEnabled";
 	public static final String noAcceptPart="noAcceptPart";
 	public static final String noAcksToPartInCreateSequence="noAcksToPartInCreateSequence";
 	public static final String tempSeqIdNotSet="tempSeqIdNotSet";

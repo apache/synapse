@@ -21,8 +21,7 @@
 <head>
   <meta content="text/html; charset=iso-8859-1" http-equiv="content-type">
   <title>Synapse Configuration Language</title>
-
-<style type="text/css">
+  <style type="text/css">
     .command {
         border: 1px dashed #3c78b5;
         text-align: left;
@@ -116,8 +115,7 @@
         background-color: #f0f0f0;
         padding: 2px;
         margin: 18px 0px 4px 0px;
-    }
-</style>
+    }</style>
 </head>
 
 <body>
@@ -141,7 +139,7 @@ mechanism for mediators (see below for details).</p>
    <a href="#mediator">mediator</a>*
  &lt;/definitions&gt;</pre>
 
-<a name="registry"/><h2>Registry</h2>
+<h2><a name="registry">Registry</a></h2>
 
 <p>The &lt;registry&gt; element is used to define the remote registry which
 are referenced from within the configuration. The registry provider specifies
@@ -160,7 +158,7 @@ time.</p>
 
 <p></p>
 
-<a name="localEntry"><h3>Local Entry</h3>
+<h3><a name="localEntry">Local Entry</a></h3>
 
 <p>The &lt;localEntry&gt; element is used to declare registry entries that
 are local to the Synapse instance, as shown below</p>
@@ -177,7 +175,7 @@ same keys of the remote registry. </p>
 
 <p></p>
 
-<a name="sequence"/><h2>Sequences</h2>
+<h2><a name="sequence">Sequences</a></h2>
 
 <p>A &lt;sequence&gt; element is used to define a sequence of mediators that
 can be invoked later by name as a sequence of mediators.</p>
@@ -212,70 +210,125 @@ dynamically be updated accordingly. </p>
 
 <p></p>
 
-<a name="endpoint"/><h2>Endpoints</h2>
+<h2><a name="endpoint">Endpoints</a></h2>
 
 <p>An &lt;endpoint&gt; element defines a destination for an outgoing message.
 An endpoint may be specified as an address endpoint, WSDL based endpoint, a
 load balanced endpoint or a fail-over endpoint as follows:</p>
 <pre>&lt;endpoint [name="string"] [key="string"]&gt;
-   <a href="#address-endpoint">address-endpoint</a>   |   <a href="#wsdl-endpoint">wsdl-endpoint</a>  |   <a href="#load-balanced-endpoint">load-balanced-endpoint</a>   |   <a href="#fail-over-endpoint">fail-over-endpoint</a>
-&lt;/endpoint&gt;</pre>
+<a href="#address-endpoint">address-endpoint</a> | <a href="#wsdl-endpoint">wsdl-endpoint</a> | <a href="#load-balanced-endpoint">load-balanced-endpoint</a> | <a href="#fail-over-endpoint">fail-over-endpoint</a> &lt;/endpoint&gt; </pre>
 
-<a name="address-endpoint"/><h4>Address Endpoint</h4>
+<p>All above endpoint types can have a name attribute. Such named endpoints
+can be reffered by other endpoints, which only contain the key attribute. For
+example if there is an endpoint named as "foo", following endpoint can be
+used in any place, where "foo" has to be used.</p>
+<pre>&lt;endpoint key="foo"/&gt;</pre>
 
-<p>An address-endpoint token refers to an endpoint address definition as
-follows:</p>
+<h4><a name="address-endpoint">Address Endpoint</a></h4>
+
+<p>Address endpoint is an endpoint defined by specifying the EPR and other
+attributes of the endpoint directly in the configuration. uri attribute of
+the address element contains the EPR of the target endpoint. Message format
+for the endpoint and the method to optimize attachments can be specified in
+the format and optimize attributes respectively. Reliable messaging and
+security policies for the endpoint can be specified in the policy attribute
+of the enableRM and enableSec elements respectively. WS-Addressing can be
+engaged for the messaging going to the endpoint by the enableAddressing
+element. suspendDurationOnFailure attribute specifies the time duration in
+seconds to suspend this endpoint, if it is detected as failed. If this
+attribute is not specified, endpoint will never be recovered after a
+failure.</p>
+
+<p></p>
+
+<p>Address endpoints can timeout the responses if they failed to arrive
+Synapse in predefined time duration. This is done by the timeout elements.
+duration element inside the timeout element contains duration for the timeout
+in seconds. action element specifies the action to be performed once a
+timeout occurs. Allowed actions are discard and fault. If discard is
+specified, responses arriving after the timeout will be discarded without
+further processing. If fault is specified as the action, fault sequence
+applicable for the endpoint will be activated as soon as the timeout occurs
+and responses will not be processed after that.</p>
 <pre>&lt;address uri="endpoint-address" format="soap|soap11|soap12|pox" [optimize="mtom|swa"]&gt;
   &lt;enableRM [policy="key"]/&gt;?
   &lt;enableSec [policy="key"]/&gt;?
   &lt;enableAddressing/&gt;?
+  &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
   &lt;timeout&gt;
-    &lt;duration&gt;timeout-duration&lt;duration&gt;
+    &lt;duration&gt;timeout-duration&lt;/duration&gt;
     &lt;action&gt;discard|fault&lt;/action&gt;
   &lt;/timeout&gt;?
 &lt;/address&gt;</pre>
 
-<a name="wsdl-endpoint"/><h4>WSDL Endpoint</h4>
+<h4><a name="wsdl-endpoint">WSDL Endpoint</a></h4>
 
-<p>A wsdl-endpoint token refers to a WSDL endpoint definition as follows:</p>
-<pre>&lt;wsdl [uri="wsdl-uri"] [service="qname"] [port/endpoint="qname"]&gt;
+<p>WSDL endpoint is an endpoint based on a WSDL document. It can extract the
+target EPR from a given WSDL. Currently it only supports WSDL 1.1. WSDL
+document can be specifed either as an uri or as inline with the
+configuration. uri attribute can be set to specify the WSDL as an uri. WSDL
+can be specified inline as a child element of the wsdl element. Service and
+port name containing the target EPR has to be specified in service and port
+attributes respectively. enableRM, enableSec, enableAddressing,
+suspendDurationOnFailure and timeout elements are same as in the Address
+endpoint.</p>
+<pre>&lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
   &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
   &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
   &lt;enableRM [policy="key"]/&gt;?
   &lt;enableSec [policy="key"]/&gt;?
   &lt;enableAddressing/&gt;?
+  &lt;suspendDurationOnFailure&gt;suspend-duration&lt;/suspendDurationOnFailure&gt;?
   &lt;timeout&gt;
     &lt;duration&gt;timeout-duration&lt;/duration&gt;
     &lt;action&gt;discard|fault&lt;/action&gt;
   &lt;/timeout&gt;?
 &lt;/wsdl&gt;</pre>
 
-<p>The WSDL could be defined in-line within the endpoint definition or as a
-uri reference and the service &amp; port/endpoint specified if multiple
-options are present.</p>
+<h4><a name="load-balanced-endpoint">Load balanced Endpoint</a></h4>
 
-<a name="load-balanced-endpoint"/><h4>Load balanced Endpoint</h4>
+<p>Load balance endpoint distributes the messages (load) arriving at it among
+the set of listed endpoints by evaluating the load balancing policy and other
+parameters. policy attribute of the load balance element specifies the load
+balance policy (algorithm) to be used for selecting the target endpoint.
+Currently only the roundRobin policy is supported. failover attribute
+determines if the next endpoint should be selected once the currently
+selected endpoint has failed. Default is true. The set of endpoints among
+which the load is distributed can be listed under the loadBalance element.
+Those endpoints can belong to any endpoint type mentioned in this document.
+For example, failover endpoints can be listed inside the load balance
+endpoint to load balance between failover groups.</p>
 
-<p>A load-balanced-endpoint token refers to a load balancing configuration
-from which the destination endpoint would be selected depending on the
-evaluation of the current message against the load balacing algorithm</p>
-<pre>&lt;loadBalance policy="string"&gt;
+<p></p>
+
+<p>The optional session element makes the endpoint a session affinity based
+load balancing endpoint. If it is specified, sessions are bound to endpoints
+in the first message and all successive messages for those sessions are
+directed to their associated endpoints. http sessions are supported
+currently, which identifies sessions based on http cookies. failover
+attribute mentioned above is not applicable for session affinity based
+endpoints and it is always set to false. If it is required to have failover
+behavior in session affinity based load balance endpoints, list failover
+endpoints as the target endpoints.</p>
+<pre>&lt;session type="http"/&gt;?
+&lt;loadBalance [policy="roundRobin"] [failover="true|false"]&gt;
   &lt;endpoint .../&gt;+
 &lt;/loadBalance&gt;</pre>
 
-<a name="fail-over-endpoint"/><h4>Failover Endpoint</h4>
+<h4><a name="fail-over-endpoint">Failover Endpoint</a></h4>
 
-<p>A fail-over-endpoint token refers to a fail-over configuration definition
-from which an endpoint is selected if the sending of a message to the
-endpoint results in a failure</p>
-<pre>&lt;failOver policy="string"&gt;
+<p>Failover endpoints send messages to the listed endpoints with the
+following failover behavior. At the start, first listed endpoint is selected
+as the primary and all other endpoints are treated as backups. Incoming
+messages are always sent only to the primary endpoint. If the primary
+endpoint fails, next active endpoint is selected as the primary and failed
+endpoint is marked as incative. Thus it sends messages successfully as long
+as there is at least one active endpoint among the listed endpoints.</p>
+<pre>&lt;failOver&gt;
   &lt;endpoint .../&gt;+
 &lt;/failover&gt;</pre>
 
-<p>An endpoint definition must name the endpoint, and a dynamic endpoint
-lookup must specify the key for a definition.</p>
-
-<a name="proxy"/><h2>Proxy service</h2>
+<h2><a name="proxy">Proxy service</a></h2>
 
 <p>A &lt;proxy&gt; element is used to define a Synapse Proxy service.</p>
 <pre> &lt;proxy name="string" [transports="(http |https |jms )+|all"]&gt;
@@ -317,10 +370,17 @@ be updated accordingly.</p>
 
 <p></p>
 
-<a name="mediator"/><h2>Mediators</h2>
+<h2><a name="mediator">Mediators</a></h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a href="#header">header</a> | <a href="#filter">filter</a> | <a href="#switch">switch</a> | <a href="#class">class</a> | <a href="#validate">validate</a> | <a href="#property">property</a> | <a href="#sequence">sequence ref</a> | <a href="#in">in</a>| <a href="#out">out</a></pre>
+<pre><a href="#send">send</a> | </pre>
+<a href="#drop">drop</a> | <a href="#log">log</a> | <a
+href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a
+href="#header">header</a> | <a href="#filter">filter</a> | <a
+href="#switch">switch</a> | <a href="#class">class</a> | <a
+href="#validate">validate</a> | <a href="#property">property</a> | <a
+href="#sequence">sequence ref</a> | <a href="#in">in</a>| <a
+href="#out">out</a> 
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -329,7 +389,7 @@ mentioned previously.</p>
 
 <h3>Core Mediators</h3>
 
-<a name="send"><h4>Send</h4></a>
+<h4><a name="send">Send</a></h4>
 
 <p>The send token represents a &lt;send&gt; element. The &lt;send&gt; element
 is used to send messages out of Synapse to some endpoint, and stop further
@@ -358,7 +418,7 @@ is used:</p>
 
 <p></p>
 
-<a name="drop"><h4>Drop</h4></a>
+<h4><a name="drop">Drop</a></h4>
 
 <p>The drop token refers to a &lt;drop&gt; element which is used to drop a
 message:</p>
@@ -369,7 +429,7 @@ message stops.</p>
 
 <p></p>
 
-<a name="log"/><h4>Log</h4>
+<h4><a name="log">Log</a></h4>
 
 <p>The log token refers to a &lt;log&gt; element which may be used to log
 messages being mediated:</p>
@@ -395,7 +455,7 @@ logged. The default separator is the ',' comma.</p>
 
 <p></p>
 
-<a name="property"/><h4>Property</h4>
+<h4><a name="property">Property</a></h4>
 <pre> &lt;property name="string" [action=set|remove] (value="literal" | expression="xpath") [scope=transport|axis2]/&gt;</pre>
 
 <p>The setproperty token refers to a &lt;property&gt; element which is a
@@ -410,19 +470,23 @@ context property. Using the property element with action specified as
 
 <p>There are some well-defined properties that you can get/set:</p>
 <ul>
-    <li>RESPONSE - 'true' means the message is a response message</li>
-    <li>ERROR_MESSAGE - this is set to any error message</li>
+  <li>RESPONSE - 'true' means the message is a response message</li>
+  <li>ERROR_MESSAGE - this is set to any error message</li>
 </ul>
-<p>There are also some Axis2 and module properties that are useful to set (with scope="axis2"):</p>
+
+<p>There are also some Axis2 and module properties that are useful to set
+(with scope="axis2"):</p>
 <ul>
-    <li>Sandesha2RMSpecVersion - can be '1.0' or '1.1'</li>
-    <li>Sandesha2SequenceKey - can be an identifier specifying an Sandesha internal sequence key, and</li> 
-    <li>Sandesha2LastMessage - 'true' will make this the last message and terminate the sequence</li>
+  <li>Sandesha2RMSpecVersion - can be '1.0' or '1.1'</li>
+  <li>Sandesha2SequenceKey - can be an identifier specifying an Sandesha
+    internal sequence key, and</li>
+  <li>Sandesha2LastMessage - 'true' will make this the last message and
+    terminate the sequence</li>
 </ul>
 
 <p></p>
 
-<a name="sequence"/><h4>Sequence</h4>
+<h4><a name="sequence">Sequence</a></h4>
 <pre> &lt;sequence key="name"/&gt;</pre>
 
 <p>A sequence ref token refers to a &lt;sequence&gt; element which is used to
@@ -430,7 +494,7 @@ invoke a named sequence of mediators.</p>
 
 <p></p>
 
-<a name="validate"/><h4>Validate</h4>
+<h4><a name="validate">Validate</a></h4>
 <pre> &lt;validate [source="xpath"]&gt;
    &lt;parameter name="validation-feature-id" value="true|false"/&gt;*
    &lt;schema key="string"/&gt;+
@@ -454,7 +518,7 @@ core will remain simple and lightweight.</p>
 
 <h3>Message Transformations</h3>
 
-<a name="makefault"/><h4>Makefault</h4>
+<h4><a name="makefault">Makefault</a></h4>
 <pre> &lt;makefault [version="soap11|soap12"]&gt;
    &lt;code (value="literal" | expression="xpath")/&gt;
    &lt;reason (value="literal" | expression="xpath")&gt;
@@ -471,7 +535,7 @@ original message.</p>
 
 <p></p>
 
-<A name="xslt"><h4>XSLT</h4></a>
+<h4><a name="xslt">XSLT</a></h4>
 <pre> &lt;xslt key="string" [source="xpath"]&gt;
    &lt;parameter name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/xslt&gt;</pre>
@@ -483,7 +547,7 @@ into the transformations through the &lt;parameter&gt; elements.</p>
 
 <p></p>
 
-<a name="header"/><h4>Header</h4>
+<h4><a name="header">Header</a></h4>
 <pre> &lt;header name="qname" (value="literal" | expression="xpath") [action="set"]/&gt;
  &lt;header name="qname" action="remove"/&gt;</pre>
 
@@ -498,7 +562,7 @@ omitted, it defaults to a set-header.</p>
 
 <h3>Selection</h3>
 
-<a name="filter"/><h4>Filter</h4>
+<h4><a name="filter">Filter</a></h4>
 <pre> &lt;filter (source="xpath" regex="string") | xpath="xpath"&gt;
    mediator+
  &lt;/filter&gt;</pre>
@@ -510,7 +574,7 @@ filter mediator will execute the enclosed mediators in sequence.</p>
 
 <p></p>
 
-<a name="switch"/><h4>Switch</h4>
+<h4><a name="switch">Switch</a></h4>
 <pre> &lt;switch source="xpath"&gt;
    &lt;case regex="string"&gt;
      mediator+
@@ -524,8 +588,9 @@ filter mediator will execute the enclosed mediators in sequence.</p>
 expression into its string value, and match it against the given regular
 expressions. If the specified cases does not match and a default case exists,
 it will be executed.</p>
+<a name="in"></a> 
 
-<a name="in"/><a name="out"/><h4>In / Out</h4>
+<h4><a name="out">In / Out</a></h4>
 <pre>&lt;in&gt;<br>  mediator+
 &lt;/in&gt;<br></pre>
 <pre>&lt;out&gt;
@@ -542,7 +607,7 @@ versa.</p>
 
 <h3>Extension mediator</h3>
 
-<a name="class"/><h4>Class Mediator</h4>
+<h4><a name="class">Class Mediator</a></h4>
 <pre> &lt;class name="class-name"&gt;
    &lt;property name="string" (value="literal" | expression="xpath")/&gt;*
  &lt;/class&gt; </pre>
@@ -616,9 +681,10 @@ body contains an element named 'symbol' which has a value of 'IBM' would
 be:</p>
 <pre> &lt;script language="js"&gt;mc.getPayloadXML()..symbol != "IBM";&lt;script/&gt;</pre>
 
-<p>Synapse uses the Apache <a href="http://jakarta.apache.org/bsf/">Bean
-Scripting Framework</a> for the scripting language support, any script
-language supported by BSF may be used to implement a Synapse Mediator.</p>
+<p>Synapse uses the Apache </p>
+<a href="http://jakarta.apache.org/bsf/">Bean Scripting Framework</a> for the
+scripting language support, any script language supported by BSF may be used
+to implement a Synapse Mediator. 
 
 <p>Implementing a Mediator with a script language can have advantages over
 using the built in Synapse Mediator types or implementing a custom Java class

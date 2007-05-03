@@ -1745,34 +1745,8 @@ pre-requisites are not bundled by default with the Synapse distribution.
 Before you use some script mediators you may need to manually add the
 required jar files to the Synapse lib directory, and optionally perform other
 installation tasks as may be required by the individual scripting language.
-This is detailed in the following sections. </p>
-
-<h3><a name="ScriptSetupJavaScript">JavaScript support</a></h3>
-
-<p>The JavaScript/E4X support is enabled by default and comes ready-to-use
-with the Synapse distribution.</p>
-
-<h3><a name="ScriptSetupRuby">Ruby support</a></h3>
-
-<p>For Ruby support you need to copy the following jar to the Synapse lib
-directory: <a
-href="http://repo1.maven.org/maven2/org/jruby/jruby/0.9.1/jruby-0.9.1.jar">JRuby</a></p>
-
-<p>(Note: You should be able to right click on the above link and save the
-jar directly to your Synapse lib directory)</p>
-
-<p></p>
-
-<p>In addition to the above jar file, to use the REXML capabilities of Ruby
-requires a complete JRuby installation. Download and install JRuby from <a
-href="http://dist.codehaus.org/jruby/">JRuby Home</a>. Once installed you
-need to tell Synapse about the installation by setting a system property when
-starting Synapse. Right now this requires manually editing the Synapse
-startup script (this will be improved in a future Synapse release). Edit the
-bin\synapse.bat file and at the bottom find the line starting ""%_JAVACMD%"
-%_SYNAPSE_XML%" and insert the system property -Djruby.home="&lt;path to your
-JRuby install directory&gt;". Note the quote characters around the JRuby
-directory which are required. </p>
+This is detailed in the <a href="Synapse_Samples_Setup.html#script">Samples
+Setup guide</a>.</p>
 
 <h2><a name="Sample500">Sample 500:</a></h2>
 <pre>&lt;!-- Introduction to the script mediator --&gt;

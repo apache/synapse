@@ -115,11 +115,11 @@ public class WSDL11EndpointBuilder {
         }
 
         if (serviceName == null) {
-            handleException("Service is not specified.");
+            handleException("Service of the WSDL document is not specified.");
         }
 
         if (portName == null) {
-            handleException("Port is not specified.");
+            handleException("Port of the WSDL document is not specified.");
         }
 
 

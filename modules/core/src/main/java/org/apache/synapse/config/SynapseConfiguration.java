@@ -297,14 +297,25 @@ public class SynapseConfiguration {
         Object o = localRegistry.get(key);
         if (o != null && o instanceof Endpoint) {
             return (Endpoint) o;
-        } else if (registry != null) {
-            Entry entry = new Entry(key);
-            entry.setMapper(XMLToEndpointMapper.getInstance());                        
+        }
+
+        Entry entry = null;
+        if (o != null && o instanceof Entry) {
+            entry = (Entry) o;
+        } else {
+            entry = new Entry(key);
+            entry.setType(Entry.REMOTE_ENTRY);
+            entry.setMapper(XMLToEndpointMapper.getInstance());
+        }
+
+        if (registry != null) {
             o = registry.getResource(entry);
             if (o != null && o instanceof Endpoint) {
+                localRegistry.put(key, entry);
                 return (Endpoint) o;
             }
         }
+
         return null;
     }
 

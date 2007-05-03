@@ -52,8 +52,10 @@ public abstract class FaultHandler {
         if (synCtx.getProperty(Constants.ERROR_CODE) == null) {
             synCtx.setProperty(Constants.ERROR_CODE, "00000");
         }
-        // use only the first line as the message for multiline exception messages (Axis2 has these)
-        synCtx.setProperty(Constants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
+        if (synCtx.getProperty(Constants.ERROR_MESSAGE) == null) {
+            // use only the first line as the message for multiline exception messages (Axis2 has these)
+            synCtx.setProperty(Constants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
+        }
         synCtx.setProperty(Constants.ERROR_DETAIL, getStackTrace(e));
 
         try {

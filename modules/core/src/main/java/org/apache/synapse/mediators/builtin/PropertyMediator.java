@@ -64,7 +64,7 @@ public class PropertyMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext smc) {
-        log.debug("Set-Property mediator :: mediate()");
+        log.debug("Property mediator :: mediate()");
         boolean shouldTrace = shouldTrace(smc.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Property mediator");

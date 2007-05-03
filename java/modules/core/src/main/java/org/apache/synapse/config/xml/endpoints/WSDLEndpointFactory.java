@@ -42,6 +42,7 @@ import java.net.URL;
  * Creates an WSDL based endpoint from a XML configuration.
  *
  * <endpoint [name="name"]>
+ *    <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
  *    <wsdl uri="wsdl uri" service="service name" port="port name">
  *       .. extensibility ..
  *    </wsdl>
@@ -81,26 +82,27 @@ public class WSDLEndpointFactory implements EndpointFactory {
             }
         }
 
-        // set the suspend on fail duration.
-        OMElement suspendElement = epConfig.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "suspendOnFailDuration"));
-
-        if (suspendElement != null) {
-            String suspend = suspendElement.getText();
-
-            try {
-                long suspendDuration = Long.parseLong(suspend);
-                wsdlEndpoint.setSuspendOnFailDuration(suspendDuration);
-
-            } catch (NumberFormatException e) {
-                handleException("suspendOnFailDuration should be valid number.");
-            }
-        }
-
         OMElement wsdlElement = epConfig.getFirstChildWithName
                 (new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
 
         if (wsdlElement != null) {
+
+            // set the suspend on fail duration.
+            OMElement suspendElement = wsdlElement.getFirstChildWithName(new QName(
+                    Constants.SYNAPSE_NAMESPACE,
+                    org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE));
+
+            if (suspendElement != null) {
+                String suspend = suspendElement.getText();
+
+                try {
+                    long suspendDuration = Long.parseLong(suspend);
+                    wsdlEndpoint.setSuspendOnFailDuration(suspendDuration * 1000);
+
+                } catch (NumberFormatException e) {
+                    handleException("suspendDurationOnFailure should be valid number.");
+                }
+            }
 
             EndpointDefinition endpoint = null;
 

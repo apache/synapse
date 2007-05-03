@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
  * Creates AddressEndpoint using a XML configuration.
  *
  * <endpoint [name="name"]>
+ *   <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
  *   <address uri="url" [format="soap|pox"] [optimize="mtom|swa"]>
  *      .. extensibility ..
  *
@@ -43,7 +44,7 @@ import javax.xml.namespace.QName;
  *          <duration>duration in milliseconds</duration>
  *          <action>discard | fault</action>
  *      </timeout>
- * 
+ *
  *      <enableRM [policy="key"]/>+ <enableSec [policy="key"]/>+ <enableAddressing
  *      separateListener="true|false"/>+
  *   </address>
@@ -74,29 +75,29 @@ public class AddressEndpointFactory implements EndpointFactory {
             }
         }
 
-        // set the suspend on fail duration.
-        OMElement suspendElement = epConfig.getFirstChildWithName(new QName(
-                Constants.SYNAPSE_NAMESPACE,
-                org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE));
-
-        if (suspendElement != null) {
-            String suspend = suspendElement.getText();
-
-            try {
-                long suspendDuration = Long.parseLong(suspend);
-                addressEndpoint.setSuspendOnFailDuration(suspendDuration);
-
-            } catch (NumberFormatException e) {
-                handleException("suspendDuratiOnFailure should be valid number.");
-            }
-        }
-
         OMElement addressElement = epConfig.getFirstChildWithName
                 (new QName(Constants.SYNAPSE_NAMESPACE, "address"));
 
         if (addressElement != null) {
             EndpointDefinition endpoint = createEndpointDefinition(addressElement);
             addressEndpoint.setEndpoint(endpoint);
+
+            // set the suspend on fail duration.
+            OMElement suspendElement = addressElement.getFirstChildWithName(new QName(
+                    Constants.SYNAPSE_NAMESPACE,
+                    org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE));
+
+            if (suspendElement != null) {
+                String suspend = suspendElement.getText();
+
+                try {
+                    long suspendDuration = Long.parseLong(suspend);
+                    addressEndpoint.setSuspendOnFailDuration(suspendDuration * 1000);
+
+                } catch (NumberFormatException e) {
+                    handleException("suspendDuratiOnFailure should be valid number.");
+                }
+            }
         }
 
         return addressEndpoint;
@@ -233,7 +234,7 @@ public class AddressEndpointFactory implements EndpointFactory {
         }
 
         return endpoint;
-    }    
+    }
 
     private static void handleException(String msg) {
         log.error(msg);

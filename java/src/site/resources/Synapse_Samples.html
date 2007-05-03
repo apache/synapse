@@ -271,6 +271,7 @@ specifies Synapse as the http proxy. </p>
                 &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
+        &lt;drop/&gt;
     &lt;/filter&gt;
     &lt;send/&gt;
 &lt;/definitions&gt; </pre>
@@ -453,7 +454,7 @@ to all messages that passes through Synapse.</p>
                 &lt;/case&gt;
                 &lt;case regex="MSFT"&gt;
                     &lt;send&gt;
-                        &lt;endpoint key=""/&gt;
+                        &lt;endpoint key="bogus"/&gt;
                     &lt;/send&gt;
                 &lt;/case&gt;
                 &lt;case regex="SUN"&gt;
@@ -1277,16 +1278,16 @@ already done</p>
 subset of available transports, and how it could switch from one transport to
 another. This example exposes the created proxy service only on https, and
 thus if the user tries to access it over http, would result in a fault.</p>
-<pre>ant stockquote -Dtrpurl=http://asankha:8080/soap/StockQuoteProxy
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy
 ...
      [java] org.apache.axis2.AxisFault: The service cannot be found for the endpoint reference (EPR) /soap/StockQuoteProxy</pre>
 
 <p></p>
 
 <p>Accessing this over https (ant stockquote
--Dtrpurl=http://asankha:8080/soap/StockQuoteProxy) causes the proxy service
-to access the SimpleStockQuoteService on the sample Axis2 server using
-REST/POX. This could be seen if the message exchange was captured using
+-Dtrpurl=https://localhost:9002/soap/StockQuoteProxy) causes the proxy
+service to access the SimpleStockQuoteService on the sample Axis2 server
+using REST/POX. This could be seen if the message exchange was captured using
 TCPMon as follows. The REST/POX response is now transformed back into a SOAP
 message and returned to the client.</p>
 <pre>POST http://localhost:9000/soap/SimpleStockQuoteService HTTP/1.1
@@ -1521,9 +1522,11 @@ Start the Synapse configuration numbered 1: i.e. synapse -sample 1</p>
 
 <p>This example invokes the one-way 'placeOrder' operation on the
 SimpleStockQuoteService using the custom client which uses the Axis2
-ServiceClient.fireAndForget() API. To test this, use 'ant placeorder' and you
-will notice the one way message flowing through Synapse into the sample Axis2
-server instance, which reports the acceptance of the order as follows:</p>
+ServiceClient.fireAndForget() API. To test this, use 'ant
+-Dmode=placeorder...' and you will notice the one way message flowing through
+Synapse into the sample Axis2 server instance, which reports the acceptance
+of the order as follows:</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dmode=placeorder</pre>
 <pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
 
 <p>If you send your client request through TCPmon, you will notice that the
@@ -1567,7 +1570,7 @@ Synapse in-turn replies to the client with a HTTP 202 acknowledgement</p>
         &lt;header name="Action" value="urn:placeOrder"/&gt;
         &lt;send&gt;
             &lt;endpoint&gt;
-                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" force="soap"/&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap"/&gt;
             &lt;/endpoint&gt;
         &lt;/send&gt;
     &lt;/sequence&gt;

@@ -94,7 +94,7 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
                 log.debug("Evaluating regular expression : " + regex.pattern() + " against source : " + source);
                 String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
                 if (sourceString == null) {
-                    log.warn("Source String has been evaluated to Null");
+                    log.debug("Source String has been evaluated to Null");
                     return false;
                 }
                 if (shouldTrace(synCtx.getTracingState())) {

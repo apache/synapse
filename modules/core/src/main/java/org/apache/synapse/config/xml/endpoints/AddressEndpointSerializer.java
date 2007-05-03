@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * Serializes AddressEndpoint to XML.
  *
  * <endpoint [name="name"]>
+ *  <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
  *  <address uri="url">
  *
  *    .. extensibility ..
@@ -82,6 +83,10 @@ public class AddressEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
+        EndpointDefinition epAddress = addressEndpoint.getEndpoint();
+        OMElement addressElement = serializeEndpointDefinition(epAddress);
+        endpointElement.addChild(addressElement);
+
         long suspendDuration = addressEndpoint.getSuspendOnFailDuration();
         if (suspendDuration != Long.MAX_VALUE) {
             // user has set some value for this. let's serialize it.
@@ -90,13 +95,9 @@ public class AddressEndpointSerializer implements EndpointSerializer {
                     org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE,
                     Constants.SYNAPSE_OMNAMESPACE);
 
-            suspendElement.setText(Long.toString(suspendDuration));
-            endpointElement.addChild(suspendElement);
+            suspendElement.setText(Long.toString(suspendDuration / 1000));
+            addressElement.addChild(suspendElement);
         }
-
-        EndpointDefinition epAddress = addressEndpoint.getEndpoint();
-        OMElement addressElement = serializeEndpointDefinition(epAddress);
-        endpointElement.addChild(addressElement);
 
         return endpointElement;
     }

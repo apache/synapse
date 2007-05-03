@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * Serializes an WSDL based endpoint to an XML configuration.
  *
  * <endpoint [name="name"]>
+ *    <suspendDurationOnFailue>suspend-duration</suspendDurationOnFailue>
  *    <wsdl uri="wsdl uri" service="service name" port="port name">
  *       .. extensibility ..
  *    </wsdl>
@@ -60,16 +61,6 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        long suspendDuration = wsdlEndpoint.getSuspendOnFailDuration();
-        if (suspendDuration != Long.MAX_VALUE) {
-            // user has set some value for this. let's serialize it.
-
-            OMElement suspendElement = fac.createOMElement
-                    ("suspendOnFailDuration", Constants.SYNAPSE_OMNAMESPACE);
-            suspendElement.setText(Long.toString(suspendDuration));
-            endpointElement.addChild(suspendElement);
-        }
-
         OMElement wsdlElement = fac.createOMElement("wsdl", Constants.SYNAPSE_OMNAMESPACE);
         String serviceName = wsdlEndpoint.getServiceName();
         if (serviceName != null) {
@@ -91,6 +82,18 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             wsdlElement.addChild(wsdlDoc);
         }
 
+        long suspendDuration = wsdlEndpoint.getSuspendOnFailDuration();
+        if (suspendDuration != Long.MAX_VALUE) {
+            // user has set some value for this. let's serialize it.
+
+            OMElement suspendElement = fac.createOMElement(
+                    org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE,
+                    Constants.SYNAPSE_OMNAMESPACE);
+
+            suspendElement.setText(Long.toString(suspendDuration / 1000));
+            wsdlElement.addChild(suspendElement);
+        }
+
         // currently, we have to get QOS information from the endpoint definition and set them as
         // special elements under the wsdl element. in future, these information should be
         // extracted from the wsdl.
@@ -109,7 +112,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "pox"));
         } else if (endpointDefinition.isForceSOAP()) {
             wsdlElement.addAttribute(fac.createOMAttribute("format", null, "soap"));
-        }        
+        }
 
         int isEnableStatistics = endpointDefinition.getStatisticsEnable();
         String statisticsValue = null;

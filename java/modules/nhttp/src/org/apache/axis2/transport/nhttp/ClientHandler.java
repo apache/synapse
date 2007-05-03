@@ -33,10 +33,15 @@ import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.axis2.transport.nhttp.util.NativeWorkerPool;
 import org.apache.axis2.transport.nhttp.util.WorkerPool;
 import org.apache.axis2.transport.nhttp.util.WorkerPoolFactory;
+import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -271,6 +276,43 @@ public class ClientHandler implements NHttpClientHandler {
         switch (response.getStatusLine().getStatusCode()) {
             case HttpStatus.SC_ACCEPTED : {
                 log.debug("Received a 202 Accepted response");
+
+                // create a dummy message with an empty SOAP envelope and a property
+                // NhttpConstants.SC_ACCEPTED set to Boolean.TRUE to indicate this is a
+                // placeholder message for the transport to send a HTTP 202 to the
+                // client. Should / would be ignored by any transport other than
+                // nhttp. For example, JMS would not send a reply message for one-way
+                // operations.
+                MessageContext outMsgCtx =
+                    (MessageContext) context.getAttribute(OUTGOING_MESSAGE_CONTEXT);
+                MessageReceiver mr = outMsgCtx.getAxisOperation().getMessageReceiver();
+
+                try {
+                    MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
+                        getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+                    responseMsgCtx.setServerSide(true);
+                    responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
+                    responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN,
+                        outMsgCtx.getProperty(MessageContext.TRANSPORT_IN));
+                    responseMsgCtx.setTransportIn(outMsgCtx.getTransportIn());
+                    responseMsgCtx.setTransportOut(outMsgCtx.getTransportOut());
+
+                    responseMsgCtx.setAxisMessage(outMsgCtx.getAxisOperation().
+                        getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
+                    responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
+                    responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
+                    responseMsgCtx.setTo(null);
+
+                    responseMsgCtx.setEnvelope(
+                        ((SOAPFactory)outMsgCtx.getEnvelope().getOMFactory()).getDefaultEnvelope());
+                    responseMsgCtx.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+                    responseMsgCtx.setProperty(NhttpConstants.SC_ACCEPTED, Boolean.TRUE);
+                    mr.receive(responseMsgCtx);
+
+                } catch (org.apache.axis2.AxisFault af) {
+                    log.error("Unable to report back 202 Accepted state to the message receiver", af);
+                }
+
                 return;
             }
             case HttpStatus.SC_INTERNAL_SERVER_ERROR : {

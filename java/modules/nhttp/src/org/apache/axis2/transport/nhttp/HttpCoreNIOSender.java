@@ -50,6 +50,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.SSLIOSessionHandler;
 import org.apache.http.nio.NHttpClientConnection;
@@ -308,6 +309,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             HTTP.CONTENT_TYPE,
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
+        // if this is a dummy message to handle http 202 case with non-blocking IO
+        // set the status code to 202 and the message body to an empty byte array (see below)
+        if (Boolean.TRUE.equals(msgContext.getProperty(NhttpConstants.SC_ACCEPTED))) {
+            response.setStatusCode(HttpStatus.SC_ACCEPTED);
+        }
+
         // set any transport headers
         Map transportHeaders = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
         if (transportHeaders != null && !transportHeaders.values().isEmpty()) {
@@ -324,7 +331,12 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         OutputStream out = worker.getOutputStream();
         try {
-            messageFormatter.writeTo(msgContext, format, out, true);
+            if (!Boolean.TRUE.equals(msgContext.getProperty(NhttpConstants.SC_ACCEPTED))) {
+                messageFormatter.writeTo(msgContext, format, out, true);
+            } else {
+                // see comment above on the reasoning
+                out.write(new byte[0]);
+            }
             out.close();
         } catch (IOException e) {
             handleException("IO Error sending response message", e);
@@ -417,7 +429,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
                             MessageContextBuilder.createFaultMessageContext(
                                 /** this is not a mistake I do NOT want getMessage()*/
                                 mc, new AxisFault(exception.toString(), exception));
-                        nioFaultMessageContext.setProperty("sending_fault", Boolean.TRUE);
+                        nioFaultMessageContext.setProperty(NhttpConstants.SENDING_FAULT, Boolean.TRUE);
                         mr.receive(nioFaultMessageContext);
                         
                     } catch (AxisFault af) {

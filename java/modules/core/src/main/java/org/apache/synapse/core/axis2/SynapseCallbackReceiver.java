@@ -23,6 +23,7 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.transport.nhttp.NhttpConstants;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,7 +98,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
     private void handleMessage(MessageContext response,
                                org.apache.synapse.MessageContext synapseOutMsgCtx) {
 
-        Object o = response.getProperty("sending_fault");
+        Object o = response.getProperty(NhttpConstants.SENDING_FAULT);
         if (o != null && Boolean.TRUE.equals(o)) {
 
             // there is a sending fault. propagate the fault to fault handlers.

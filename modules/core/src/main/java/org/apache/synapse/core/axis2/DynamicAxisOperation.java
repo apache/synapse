@@ -35,7 +35,6 @@ import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.om.util.UUIDGenerator;
 
 import javax.xml.namespace.QName;
 

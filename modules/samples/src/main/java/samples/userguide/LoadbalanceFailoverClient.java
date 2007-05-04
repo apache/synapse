@@ -54,13 +54,13 @@ public class LoadbalanceFailoverClient {
         if (mode != null) {
             if (mode.equalsIgnoreCase("session")) {
                 new LoadbalanceFailoverClient().sessionfullClient();
-            } else if (mode.equalsIgnoreCase("simple")) {
+            } else if (mode.equalsIgnoreCase("simple") || mode.equalsIgnoreCase("")) {
                 new LoadbalanceFailoverClient().sessionlessClient();
             }
+        } else {
+            // default is simple client
+            new LoadbalanceFailoverClient().sessionlessClient();
         }
-
-        // default is simple client
-        new LoadbalanceFailoverClient().sessionlessClient();
     }
 
     private void sessionlessClient() {

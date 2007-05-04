@@ -373,14 +373,13 @@ be updated accordingly.</p>
 <h2><a name="mediator">Mediators</a></h2>
 
 <p>A mediator token refers to any of the following tokens:</p>
-<pre><a href="#send">send</a> | </pre>
-<a href="#drop">drop</a> | <a href="#log">log</a> | <a
+<pre><a href="#send">send</a> | <a href="#drop">drop</a> | <a href="#log">log</a> | <a
 href="#makefault">makefault</a> | <a href="#xslt">transform</a> | <a
 href="#header">header</a> | <a href="#filter">filter</a> | <a
 href="#switch">switch</a> | <a href="#class">class</a> | <a
 href="#validate">validate</a> | <a href="#property">property</a> | <a
-href="#sequence">sequence ref</a> | <a href="#in">in</a>| <a
-href="#out">out</a> 
+href="#sequence">sequence ref</a> | <a href="#in">in</a> | <a
+href="#out">out</a> | <a href="#rmsequence">RMSequence</a></pre>
 
 <p>In addition to the above, Synapse will be able to load mediators via the
 J2SE Service Provider model. Mediator extensions must implement the
@@ -604,6 +603,25 @@ it will be executed.</p>
 message if the message matches the direction of the mediator. Hence all
 incoming messages would pass through the "&lt;in&gt;" mediators and vice
 versa.</p>
+
+<p></p>
+
+<h3>WS-Reliable Messaging</h3>
+
+<h4><a name="rmsequence">RMSequence</a></h4>
+<pre> &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;</pre>
+
+<p>The &lt;RMSequence&gt; mediator can be used to create a sequence of 
+messages to communicate via WS-Reliable Messaging with an WS-RM enabled 
+endpoint (&lt;enableRM&gt;). The simple use case of this mediator is to specify 
+a single="true" property, because this means that only one message is involved in 
+the same sequence. However if multiple messages should be sent in the same sequence, 
+the correlation property should be used with a XPath expression that selects an 
+unique element value from the incoming message. With the result of the XPath 
+expression, Synapse can group messages together that belong to the same sequence. 
+To close the sequence neatly, for the last message of the sequence also an 
+XPath expression should be specified. With the version attribute the 
+WS-RM specification version to be used can be specified, 1.0 or 1.1. </p>
 
 <h3>Extension mediator</h3>
 

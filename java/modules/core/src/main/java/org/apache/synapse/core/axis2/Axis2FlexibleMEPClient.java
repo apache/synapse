@@ -45,7 +45,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.synapse.util.UUIDGenerator;
 import org.apache.axiom.attachments.Attachments;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -276,7 +276,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {
-                    long timeoutSeconds = new Long(d).longValue();
+                    long timeoutSeconds = new Long(d.trim()).longValue();
                     endpointDefinition.setTimeoutDuration(timeoutSeconds * 1000);
                 }
             }
@@ -286,9 +286,9 @@ public class WSDLEndpointFactory implements EndpointFactory {
             if (action != null) {
                 String a = action.getText();
                 if (a != null) {
-                    if (a.equalsIgnoreCase("discard")) {
+                    if ((a.trim()).equalsIgnoreCase("discard")) {
                         endpointDefinition.setTimeoutAction(Constants.DISCARD);
-                    } else if (a.equalsIgnoreCase("fault")) {
+                    } else if ((a.trim()).equalsIgnoreCase("fault")) {
                         endpointDefinition.setTimeoutAction(Constants.DISCARD_AND_FAULT);
                     }
                 }

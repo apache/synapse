@@ -214,7 +214,7 @@ public class AddressEndpointFactory implements EndpointFactory {
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {
-                    long timeoutSeconds = new Long(d).longValue();
+                    long timeoutSeconds = new Long(d.trim()).longValue();
                     endpoint.setTimeoutDuration(timeoutSeconds * 1000);
                 }
             }
@@ -224,9 +224,9 @@ public class AddressEndpointFactory implements EndpointFactory {
             if (action != null) {
                 String a = action.getText();
                 if (a != null) {
-                    if (a.equalsIgnoreCase("discard")) {
+                    if ((a.trim()).equalsIgnoreCase("discard")) {
                         endpoint.setTimeoutAction(Constants.DISCARD);
-                    } else if (a.equalsIgnoreCase("fault")) {
+                    } else if ((a.trim()).equalsIgnoreCase("fault")) {
                         endpoint.setTimeoutAction(Constants.DISCARD_AND_FAULT);
                     }
                 }

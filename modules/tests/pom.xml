@@ -61,7 +61,14 @@
                     </execution>
                 </executions>
             </plugin>
-
+			<plugin>
+    			<artifactId>maven-surefire-plugin</artifactId>
+    			<configuration>
+               		<includes>
+                 		<include>**/*Test.java</include>
+                	</includes>
+    			</configuration>
+			</plugin>
         </plugins>
     </build>
     
@@ -85,11 +92,13 @@
             <artifactId>sandesha2-samples</artifactId>
             <version>${pom.version}</version>
         </dependency>
-		<dependency>
+<!--		<dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2</artifactId>
             <version>${pom.version}</version>
         </dependency>
+-->
+
     </dependencies>
 
 </project>

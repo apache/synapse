@@ -74,11 +74,13 @@
             <artifactId>sandesha2-policy</artifactId>
             <version>${pom.version}</version>
         </dependency>
+		<!--
 		<dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2</artifactId>
             <version>${pom.version}</version>
         </dependency>
+		-->
     </dependencies>
 
 </project>

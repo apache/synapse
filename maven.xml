@@ -158,7 +158,7 @@
 		<ant:property name="client.dist.path" value="${build.repo.dir}/client"/>
 		<ant:mkdir dir="${client.dist.path}" />
 		<ant:mkdir dir="${client.dist.path}/modules" />
-		<ant:copy file="${dir.config}/client_axis2.xml" todir="${client.dist.path}" />
+		<ant:copy file="modules/tests/test-resources/client_axis2.xml" todir="${client.dist.path}" />
 		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${client.dist.path}/modules" />
 		
 		<!-- Copying addressing mar file--> 
@@ -296,7 +296,7 @@
 		<ant:mkdir dir="${server.dist.path}" />
 		<ant:mkdir dir="${server.dist.path}/modules" />
 		<ant:mkdir dir="${server.dist.path}/services" />
-		<ant:copy file="${basedir}/config/server_axis2.xml" todir="${server.dist.path}" />
+		<ant:copy file="modules/tests/test-resources/server_axis2.xml" todir="${server.dist.path}" />
 		<ant:copy file="${maven.build.dir}/${mar.name}" todir="${server.dist.path}/modules" /> 
         <ant:copy todir="${server.dist.path}/services" >
             <ant:fileset dir="${build.samples.services.dir}">
@@ -356,7 +356,7 @@
     	<ant:jar jarfile="${build.samples.clients.dir}/${userguide.client.jar.name}" basedir="${dir.sample.userguideclients.temp}" />
     	 
     	<ant:copy todir="${build.samples.clients.dir}" >
-            <ant:fileset dir="${dir.samples}/conf/userguide">
+            <ant:fileset dir="${dir.samples}/src/main/resources/userguide">
                 <ant:include name="*.bat" />
                 <ant:include name="*.sh" />
                 <ant:include name="*.html" />
@@ -455,7 +455,7 @@
         <ant:mkdir dir="${dir.temp.dist.bin}/samples/services"/>
         <ant:mkdir dir="${dir.temp.dist.bin}/docs/api"/>
     
-    	<ant:copy file="${dir.config}/client_axis2.xml" todir="${dir.temp.dist.bin}/samples/clients" />
+    	<ant:copy file="modules/tests/test-resources/client_axis2.xml" todir="${dir.temp.dist.bin}/samples/clients" />
     	        
         <ant:copy todir="${dir.temp.dist.bin}/docs/api">
             <ant:fileset dir="target/docs/apidocs/">

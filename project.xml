@@ -217,14 +217,14 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
             <version>${backport_util_concurrent.version}</version>
         </dependency>             
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-activation</artifactId>
-            <version>${geronimo.spec.activation.version}</version>
-        </dependency>    
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>${activation.version}</version>
+        </dependency>  
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-javamail</artifactId>
-            <version>${geronimo.spec.javamail.version}</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${javamail.version}</version>
         </dependency>
         <dependency>
             <groupId>${axis2.jar.groupid}</groupId>

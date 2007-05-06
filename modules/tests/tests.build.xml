@@ -17,7 +17,7 @@
 		<mkdir dir="${server.dist.path}/modules" />
 		<mkdir dir="${server.dist.path}/services" />
 		
-		<copy file="${basedir}/../../config/server_axis2.xml" todir="${server.dist.path}" />
+		<copy file="${basedir}/test-resources/server_axis2.xml" todir="${server.dist.path}" />
 		<copy file="${basedir}/../mar/target/sandesha2-${sandesha2.version}.mar" todir="${server.dist.path}/modules" /> 
 		
 		<copy todir="${server.dist.path}/services" >
@@ -43,7 +43,7 @@
 		<mkdir dir="${client.dist.path}" />
 		<mkdir dir="${client.dist.path}/modules" />
 		
-		<copy file="${basedir}/../../config/client_axis2.xml" todir="${client.dist.path}" />
+		<copy file="${basedir}/test-resources/client_axis2.xml" todir="${client.dist.path}" />
 		<copy file="${basedir}/../mar/target/sandesha2-${sandesha2.version}.mar" todir="${client.dist.path}/modules" />
 		
 		<!-- Copying dependent mar files --> 

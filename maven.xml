@@ -51,7 +51,7 @@
 
        <!-- Copying the policy Assertion files-->
        <copy todir="${build.classes.dir}">
-		 <fileset dir="${dir.config}/rmpolicy/">
+		 <fileset dir="modules/policy/src/main/resources/">
     	      <include name="**/*" /> 
     	 </fileset>
        </copy>
@@ -120,7 +120,7 @@
         </copy>
 
 		<copy todir="${policy.jar.temp.path}" >
-			<fileset dir="${dir.config}/rmpolicy" >
+			<fileset dir="modules/policy/src/main/resources/" >
             	<include name="**/*"/>
             </fileset>
 	    </copy>

@@ -48,7 +48,7 @@ public class RMSequenceMediator extends AbstractMediator {
     private String version = null;
 
     private static final String WSRM_SpecVersion_1_0 = "Spec_2005_02";
-    private static final String WSRM_SpecVersion_1_1 = "Spec_2006_08";
+    private static final String WSRM_SpecVersion_1_1 = "Spec_2007_02";
     // set sequence expiry time to 5 minutes
     private static final long SEQUENCE_EXPIRY_TIME = 300000;
     private static Map sequenceMap = Collections.synchronizedMap(new HashMap());

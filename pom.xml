@@ -785,6 +785,7 @@
         </developer>
         <developer>
             <name>Tijs Rademakers</name>
+		<id>tijs</id>
             <email>t.rademakers@chello.nl</email>
             <organization>Atos Origin</organization>
         </developer>

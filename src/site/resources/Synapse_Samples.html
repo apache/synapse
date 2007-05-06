@@ -156,6 +156,7 @@
         messages</a></li>
       <li><a href="#Sample51">Sample 51: MTOM and SwA optimizations and
         request/response correlation</a></li>
+      <li><a href="#Sample52">Sample 52: POX to SOAP conversion</a></li>
     </ul>
   </li>
   <li><a href="#ProxyServices">Synapse Proxy service samples</a> 
@@ -180,6 +181,7 @@
         fireAndForget()</a></li>
       <li><a href="#Sample113">Sample 113: Pure text/binary and POX message
         support with JMS</a></li>
+      <li><a href="#Sample114">Sample 114: One way bridging from JMS to http and replying with a 202 Accepted response</a></li>
     </ul>
   </li>
   <li><a href="#ScriptMediators">Script Mediators</a> 
@@ -418,8 +420,8 @@ local to the current message, local or remote registry entries, Axis2 message
 context properties as well as transport headers. The local entry definition
 for "version" defines a simple text/string registry entry for that is visible
 to all messages that passes through Synapse.</p>
-<pre>[HttpServerWorker-1] INFO  LogMediator - Text = Sending quote request, version = 0.1, direction = incoming 
-[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate() 
+<pre>[HttpServerWorker-1] INFO  LogMediator - Text = Sending quote request, version = 0.1, direction = incoming
+[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
 [HttpServerWorker-1] DEBUG AddressEndpoint - Sending To: http://localhost:9000/soap/SimpleStockQuoteService </pre>
 
 <h2><a name="Sample4">Sample 4:</a></h2>
@@ -499,11 +501,11 @@ Synapse cannot find an error handler, it looks up for a sequence named
 'fault'. Thus the 'fault' sequence can be seen executing, and writing the
 generic error message into the logs. </p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=MSFT</pre>
-<pre>[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate() 
-[HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : bogus 
-[HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault 
-[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;fault&gt; :: mediate() 
-[HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate() 
+<pre>[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
+[HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : bogus
+[HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault
+[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;fault&gt; :: mediate()
+[HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate()
 [HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured, message = Reference to non-existent endpoint for key : bogus</pre>
 
 <p>When the 'SUN' quote is requested, a custom sequence 'sunSequence' is
@@ -511,15 +513,15 @@ invoked, and it specifies 'sunErrorHandler' as its error handler. Hence when
 the send fails, now you could see the proper error handler invocation and the
 custom error message as follows:</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dsymbol=SUN</pre>
-<pre>[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate() 
-[HttpServerWorker-1] DEBUG SequenceMediator - Setting the onError handler for the sequence 
-[HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate() 
-[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate() 
-[HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : sunPort 
-[HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault 
-[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunErrorHandler&gt; :: mediate() 
-[HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate() 
-[HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate() 
+<pre>[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunSequence&gt; :: mediate()
+[HttpServerWorker-1] DEBUG SequenceMediator - Setting the onError handler for the sequence
+[HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
+[HttpServerWorker-1] DEBUG SendMediator - Send mediator :: mediate()
+[HttpServerWorker-1] ERROR IndirectEndpoint - Reference to non-existent endpoint for key : sunPort
+[HttpServerWorker-1] DEBUG MediatorFaultHandler - MediatorFaultHandler :: handleFault
+[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;sunErrorHandler&gt; :: mediate()
+[HttpServerWorker-1] DEBUG AbstractListMediator - Implicit Sequence &lt;SequenceMediator&gt; :: mediate()
+[HttpServerWorker-1] DEBUG LogMediator - Log mediator :: mediate()
 [HttpServerWorker-1] INFO  LogMediator - text = An unexpected error occured for stock SUN, message = Reference to non-existent endpoint for key : sunPort</pre>
 
 <h2><a name="Sample5">Sample 5:</a></h2>
@@ -742,9 +744,9 @@ caches its value for a period of 15000 ms.</p>
 <p>Execute the custom quote client as 'ant stockquote -Dmode=customquote ..'
 and analyze the the Synapse debug log output as shown below</p>
 <pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ -Dmode=customquote</pre>
-<pre>[HttpServerWorker-1] DEBUG XSLTMediator - Performing XSLT transformation against property with key : xslt-key-req 
-[HttpServerWorker-1] DEBUG XSLTMediator - Transformation source : 
-    &lt;m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt; 
+<pre>[HttpServerWorker-1] DEBUG XSLTMediator - Performing XSLT transformation against property with key : xslt-key-req
+[HttpServerWorker-1] DEBUG XSLTMediator - Transformation source :
+    &lt;m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;&lt;m0:Code&gt;IBM&lt;/m0:Code&gt;&lt;/m0:CheckPriceRequest&gt;
 [HttpServerWorker-1] DEBUG XSLTMediator - Transformation result : &lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;</pre>
 
 <p>The incoming message is now transformed into a standard stock quote
@@ -771,9 +773,9 @@ If the meta data / version number indicates that a reload of the cached
 resource is not necessary (i.e. unless the resource itself actually changed)
 the updated meta information is used and the cache lease extended as
 appropriate.</p>
-<pre>[HttpClientWorker-1] DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt 
-[HttpClientWorker-1] DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt 
-[HttpClientWorker-1] DEBUG AbstractRegistry - Expired version number is same as current version in registry 
+<pre>[HttpClientWorker-1] DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt
+[HttpClientWorker-1] DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt
+[HttpClientWorker-1] DEBUG AbstractRegistry - Expired version number is same as current version in registry
 [HttpClientWorker-1] DEBUG AbstractRegistry - Renew cache lease for another 15s </pre>
 
 <p>Now edit the
@@ -781,8 +783,8 @@ repository/conf/sample/resources/transform/transform_back.xslt file and add a
 blank line at the end. Now when you run the client again, and if the cache is
 expired, the resource would be re-fetched from its URL by the registry and
 this can be seen by the following debug log messages</p>
-<pre>[HttpClientWorker-1] DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt 
-[HttpClientWorker-1] DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt 
+<pre>[HttpClientWorker-1] DEBUG AbstractRegistry - Cached object has expired for key : transform/transform_back.xslt
+[HttpClientWorker-1] DEBUG SimpleURLRegistry - Perform RegistryEntry lookup for key : transform/transform_back.xslt
 [HttpClientWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : transform/transform_back.xslt </pre>
 
 <p>Thus the SimpleURLRegistry allows resource to be cached, and updates
@@ -821,9 +823,9 @@ sequence definition if necessary and re-cache it again.</p>
 <p>Once Synapse is started, execute the stock quote client as 'ant
 stockquote..'. You will notice that that Synapse fetches the definition of
 the sequence from the registry and executes its rules as follows:</p>
-<pre>[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml 
+<pre>[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
-[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate() 
+[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
 ...
 [HttpServerWorker-1] INFO  LogMediator - message = *** Test Message 1 ***</pre>
 
@@ -837,9 +839,9 @@ within 15 seconds of loading the resource for the first time) However, after
 15 seconds have elapsed since the original caching of the sequence, you will
 notice that the new sequence is loaded and executed by Synapse from the
 following log messages:</p>
-<pre>[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml 
+<pre>[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
-[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate() 
+[HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()
 ...
 [HttpServerWorker-1] INFO  LogMediator - message = *** Test Message 2 ***</pre>
 
@@ -918,7 +920,7 @@ the key ''synapse.xml'. </p>
 
 <p>The actual synapse.xml loaded is:</p>
 <pre>&lt;!-- a registry based Synapse configuration --&gt;
-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;    
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
     &lt;log level="custom"&gt;
         &lt;property name="message" value="This is a dynamic Synapse configuration $$$"/&gt;
     &lt;/log&gt;
@@ -1017,7 +1019,7 @@ User-Agent: Synapse-HttpComponents-NIO
       &lt;soapenv:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Id-3789605"&gt;
          &lt;xenc:EncryptedData Id="EncDataId-3789605" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
             &lt;xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" /&gt;
-            &lt;xenc:CipherData&gt;               
+            &lt;xenc:CipherData&gt;
                 &lt;xenc:CipherValue&gt;Layg0xQcnH....6UKm5nKU6Qqr&lt;/xenc:CipherValue&gt;
             &lt;/xenc:CipherData&gt;
          &lt;/xenc:EncryptedData&gt;
@@ -1094,7 +1096,7 @@ attachments as follows:</p>
 <pre>POST http://localhost:9000/soap/MTOMSwASampleService HTTP/1.1
 Host: 127.0.0.1
 SOAPAction: urn:uploadFileUsingMTOM
-Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353; type="application/xop+xml"; 
+Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353; type="application/xop+xml";
 start="&lt;0.urn:uuid:B94996494E1DD5F9B51177413845354@apache.org&gt;"; start-info="text/xml"; charset=UTF-8
 Transfer-Encoding: chunked
 Connection: Keep-Alive
@@ -1103,7 +1105,7 @@ User-Agent: Synapse-HttpComponents-NIO
 --MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353241
 Content-Type: application/xop+xml; charset=UTF-8; type="text/xml"
 Content-Transfer-Encoding: binary
-Content-ID: 
+Content-ID:
    &lt;0.urn:uuid:B94996494E1DD5F9B51177413845354@apache.org&gt;221b1
       &lt;?xml version='1.0' encoding='UTF-8'?&gt;
          &lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
@@ -1120,12 +1122,12 @@ Content-ID:
 --MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177413845353217
 Content-Type: image/gif
 Content-Transfer-Encoding: binary
-Content-ID: 
+Content-ID:
          &lt;1.urn:uuid:78F94BC50B68D76FB41177413845003@apache.org&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
 <pre>POST http://localhost:9000/soap/MTOMSwASampleService HTTP/1.1
 Host: 127.0.0.1
 SOAPAction: urn:uploadFileUsingSwA
-Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177414170491; type="text/xml"; 
+Content-Type: multipart/related; boundary=MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177414170491; type="text/xml";
 start="&lt;0.urn:uuid:B94996494E1DD5F9B51177414170492@apache.org&gt;"; charset=UTF-8
 Transfer-Encoding: chunked
 Connection: Keep-Alive
@@ -1134,7 +1136,7 @@ User-Agent: Synapse-HttpComponents-NIO
 --MIMEBoundaryurn_uuid_B94996494E1DD5F9B51177414170491225
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-ID: 
+Content-ID:
    &lt;0.urn:uuid:B94996494E1DD5F9B51177414170492@apache.org&gt;22159
       &lt;?xml version='1.0' encoding='UTF-8'?&gt;
          &lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
@@ -1149,8 +1151,51 @@ Content-ID:
 17
 Content-Type: image/gif
 Content-Transfer-Encoding: binary
-Content-ID: 
+Content-ID:
          &lt;urn:uuid:15FD2DA2584A32BF7C1177414169826&gt;22800GIF89a... &lt;&lt; binary content &gt;&gt;</pre>
+
+<h2><a name="Sample52">Sample 52:</a></h2>
+<pre>&lt;!-- POX to SOAP conversion --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;!-- filtering of messages with XPath and regex matches --&gt;
+    &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
+        &lt;send&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService" format="soap"/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+        &lt;drop/&gt;
+    &lt;/filter&gt;
+    &lt;send/&gt;
+&lt;/definitions&gt; </pre>
+
+<p><strong>Objective: POX to SOAP conversion</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Synapse configuration numbered 52: i.e. synapse -sample 52\</p>
+
+<p>Start the Axis2 server and deploy the SimpleStockQuoteService if not
+already done</p>
+
+<p>Execute the 'ant stockquote' specifying that the request should be a REST
+request as follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8081/soap/StockQuote -Drest=true</pre>
+
+<p>This example shows a http REST request (as shown below) being transformed
+into a SOAP request and forwarded to the stock quote service. </p>
+<pre>POST /soap/StockQuote HTTP/1.1
+Content-Type: application/xml; charset=UTF-8;action="urn:getQuote";
+SOAPAction: urn:getQuote
+User-Agent: Axis2
+Host: 127.0.0.1
+Transfer-Encoding: chunked
+
+75
+&lt;m0:getQuote xmlns:m0="http://services.samples/xsd"&gt;
+   &lt;m0:request&gt;
+      &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+   &lt;/m0:request&gt;
+&lt;/m0:getQuote&gt;0</pre>
 
 <h1><a name="ProxyServices" id="ProxyServices">Proxy services</a></h1>
 
@@ -1398,7 +1443,7 @@ client.</p>
 <h1><a name="Transport">Transports</a></h1>
 
 <h2><a name="Sample110">Sample 110:</a></h2>
-<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;    
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;proxy name="StockQuoteProxy" transports="jms"&gt;
         &lt;target&gt;
@@ -1641,7 +1686,7 @@ the content defined (e.g. "12.33 1000 ACP") to the specified JMS destination
 text message and transformed it into a SOAP payload as follows. Notice that
 the wrapper element "{http://services.samples/xsd}text" has been used to hold
 the text message content.</p>
-<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body : 
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body :
 &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
   &lt;soapenv:Body&gt;&lt;axis2ns1:text xmlns:axis2ns1="http://services.samples/xsd"&gt;12.33 1000 ACP&lt;/axis2ns1:text&gt;&lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</pre>
@@ -1649,10 +1694,10 @@ the text message content.</p>
 <p>Now, you could see how the script mediator created a stock quote request
 by tokenizing the text as follows, and sent the message to the placeOrder
 operation of the SimpleStockQuoteService.</p>
-<pre>[JMSWorker-1] DEBUG AddressEndpoint - Sending message to endpoint :: name = AnonymousEndpoints resolved address = http://localhost:9000/soap/SimpleStockQuoteService 
-[JMSWorker-1] DEBUG AddressEndpoint - SOAPAction: urn:placeOrder 
-[JMSWorker-1] DEBUG AddressEndpoint - WSA-Action: urn:placeOrder 
-[JMSWorker-1] DEBUG AddressEndpoint - Body : 
+<pre>[JMSWorker-1] DEBUG AddressEndpoint - Sending message to endpoint :: name = AnonymousEndpoints resolved address = http://localhost:9000/soap/SimpleStockQuoteService
+[JMSWorker-1] DEBUG AddressEndpoint - SOAPAction: urn:placeOrder
+[JMSWorker-1] DEBUG AddressEndpoint - WSA-Action: urn:placeOrder
+[JMSWorker-1] DEBUG AddressEndpoint - Body :
 &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;
   &lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;&lt;m:order&gt;&lt;m:price&gt;12.33&lt;/m:price&gt;&lt;m:quantity&gt;1000&lt;/m:quantity&gt;&lt;m:symbol&gt;ACP&lt;/m:symbol&gt;&lt;/m:order&gt;
 &lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</pre>
@@ -1679,9 +1724,9 @@ destination 'dynamicQueues/JMSFileUploadProxy' as follows:</p>
 <p>Examining the Synapse debug logs reveals that the binary content was
 received over JMS and wrapped with the specified element into a SOAP infoset
 as follows:</p>
-<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSFileUploadProxy received a new message... 
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSFileUploadProxy received a new message...
 ...
-[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body : 
+[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body :
 &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
 &lt;soapenv:Body&gt;&lt;axis2ns1:element xmlns:axis2ns1="http://services.samples/xsd"&gt;R0lGODlhgw...AAOw==&lt;/axis2ns1:element&gt;&lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</pre>
@@ -1708,35 +1753,105 @@ to the SimpleStockQuoteService after setting the SOAP action as
 'urn:placeOrder'.</p>
 
 <p></p>
-<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSPoxProxy received a new message... 
+<pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Proxy Service JMSPoxProxy received a new message...
 ...
-[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body : 
+[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Body :
 &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
     &lt;m:order&gt;
         &lt;m:price&gt;172.39703010684752&lt;/m:price&gt;
         &lt;m:quantity&gt;19211&lt;/m:quantity&gt;
         &lt;m:symbol&gt;MSFT&lt;/m:symbol&gt;
     &lt;/m:order&gt;
-&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt; 
-[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Using the sequence named pox_proxy for message mediation 
+&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+[JMSWorker-1] DEBUG ProxyServiceMessageReceiver - Using the sequence named pox_proxy for message mediation
 ...
-[JMSWorker-1] DEBUG HeaderMediator - Setting header : Action to : urn:placeOrder 
+[JMSWorker-1] DEBUG HeaderMediator - Setting header : Action to : urn:placeOrder
 ...
-[JMSWorker-1] DEBUG AddressEndpoint - Sending message to endpoint :: name = AnonymousEndpoints resolved address = http://localhost:9000/soap/SimpleStockQuoteService 
-[JMSWorker-1] DEBUG AddressEndpoint - SOAPAction: urn:placeOrder 
-[JMSWorker-1] DEBUG AddressEndpoint - Body : 
+[JMSWorker-1] DEBUG AddressEndpoint - Sending message to endpoint :: name = AnonymousEndpoints resolved address = http://localhost:9000/soap/SimpleStockQuoteService
+[JMSWorker-1] DEBUG AddressEndpoint - SOAPAction: urn:placeOrder
+[JMSWorker-1] DEBUG AddressEndpoint - Body :
 &lt;?xml version='1.0' encoding='utf-8'?&gt;&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;&lt;soapenv:Body&gt;&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
     &lt;m:order&gt;
         &lt;m:price&gt;172.39703010684752&lt;/m:price&gt;
         &lt;m:quantity&gt;19211&lt;/m:quantity&gt;
         &lt;m:symbol&gt;MSFT&lt;/m:symbol&gt;
     &lt;/m:order&gt;
-&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt; 
+&lt;/m:placeOrder&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
 [JMSWorker-1] DEBUG Axis2FlexibleMEPClient - sending [add = false] [sec = false] [rm = false] [ mtom = false] [ swa = false] [ force soap=true; pox=false] [ to null] </pre>
 
 <p>The sample Axis2 server displays a successful message on the receipt of
 the message as:</p>
 <pre>Wed Apr 25 20:24:50 LKT 2007 samples.services.SimpleStockQuoteService :: Accepted order for : 19211 stocks of MSFT at $ 172.39703010684752</pre>
+
+<h2><a name="Sample114">Sample 114:</a></h2>
+<pre>&lt;!-- one-way message bridging between JMS to HTTP and sending a 202 Accepted --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;proxy name="JMStoHTTPStockQuoteProxy" transports="jms"&gt;
+        &lt;target&gt;
+            &lt;endpoint&gt;
+                &lt;address uri="http://localhost:9001/soap/SimpleStockQuoteService"/&gt;
+            &lt;/endpoint&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+    &lt;proxy name="OneWayProxy" transports="http"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;log level="full"/&gt;
+                &lt;property name="RESPONSE" value="true"/&gt;
+                &lt;header name="To" value="http://www.w3.org/2005/08/addressing/anonymous"/&gt;
+                &lt;property name="SC_ACCEPTED" value="true" scope="axis2"/&gt;
+                &lt;send/&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate one way message bridging from JMS to http
+and replying with a http 202 Accepted response</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+Start the Axis2 server and deploy the SimpleStockQuoteService if not already
+done</p>
+
+<p>Start the Synapse configuration numbered 114: i.e. synapse -sample 114</p>
+
+<p></p>
+
+<p>This example invokes the one-way 'placeOrder' operation on the
+SimpleStockQuoteService using the Axis2 ServiceClient.fireAndForget() API at
+the client. To test this, use 'ant -Dmode=placeorder...' and you will notice
+the one way JMS message flowing through Synapse into the sample Axis2 server
+instance over http, and Axis2 acknowledging it with a http 202 Accepted
+response.</p>
+<pre>ant stockquote -Dmode=placeorder -Dtrpurl="jms:/JMStoHTTPStockQuoteProxy?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;java.naming.provider.url=tcp://localhost:61616"</pre>
+<pre>SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733</pre>
+
+<p>The second example shows how Synapse could be made to respond with a http
+202 Accepted response to a request received. The proxy service simply logs
+the message received and acknowledges it. On the Synapse console you could
+see the logged message, and if TCPMon was used at the client, you would see
+the 202 Accepted response sent back to the client from Synapse</p>
+<pre>ant stockquote -Dmode=placeorder -Dtrpurl=http://asankha:8080/soap/OneWayProxy</pre>
+<pre>HTTP/1.1 202 Accepted
+Content-Type: text/xml; charset=UTF-8
+Host: 127.0.0.1
+SOAPAction: "urn:placeOrder"
+Date: Sun, 06 May 2007 17:20:19 GMT
+Server: Synapse-HttpComponents-NIO
+Transfer-Encoding: chunked
+
+0</pre>
 
 <h1><a name="ScriptMediators">Script mediators</a></h1>
 
@@ -1916,7 +2031,7 @@ the Synapse message context API to set its 'To' EPR and to set a custom
 property to mark it as a response. Execute the stock quote client, and you
 will receive the response "99.9" as the last sale price as per the above
 script.</p>
-<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/ 
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/
 ...
 stockquote:
      [java] Standard :: Stock price = $99.9</pre>
@@ -1947,14 +2062,14 @@ stockquote:
 require 'rexml/document'
 include REXML
 
-def transformRequest(mc) 
+def transformRequest(mc)
    newRequest= Document.new '&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;'&lt;&lt;
       '&lt;m:request&gt;&lt;m:symbol&gt;&lt;/m:symbol&gt;&lt;/m:request&gt;&lt;/m:getQuote&gt;'
    newRequest.root.elements[1].elements[1].text = mc.getPayloadXML().root.elements[1].get_text
    mc.setPayloadXML(newRequest)
 end
 
-def transformResponse(mc) 
+def transformResponse(mc)
    newResponse = Document.new '&lt;m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"&gt;&lt;m:Code&gt;' &lt;&lt;
       '&lt;/m:Code&gt;&lt;m:Price&gt;&lt;/m:Price&gt;&lt;/m:CheckPriceResponse&gt;'
    newResponse.root.elements[1].text = mc.getPayloadXML().root.elements[1].elements[1].get_text

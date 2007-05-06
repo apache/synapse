@@ -1441,9 +1441,9 @@ transport listener configuration found at repository/conf/axis2.xml as</p>
 <pre>&lt;transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener"&gt; ...</pre>
 
 <p>Once you start the Synapse configuration and request for the WSDL of the
-proxy service you will notice that its exposed only on the JMS transport.
-This is because the configuration specified this requirement in the proxy
-service definition.</p>
+proxy service (http://localhost:8080/soap/StockQuoteProxy?wsdl) you will
+notice that its exposed only on the JMS transport. This is because the
+configuration specified this requirement in the proxy service definition.</p>
 
 <p>Now lets send a stock quote request on JMS, using the dumb stock quote
 client as follows:</p>
@@ -1453,9 +1453,14 @@ client as follows:</p>
 the request message as:</p>
 <pre>[JMSWorker-1] DEBUG ProxyServiceMessageReceiver -Proxy Service StockQuoteProxy received a new message...</pre>
 
-<p>Synapse forwarded this message to the HTTP EPR of the simple stock quote
-service hosted on the sample Axis2 server, and returned the reply back to the
-client through a JMS temporary queue.</p>
+<p>Now if you examine the console running the sample Axis2 server, you will
+see a message indicating that the server has accepted an order as follows:</p>
+<pre>Accepted order for : 16517 stocks of MSFT at $ 169.14622538721846</pre>
+
+<p>In this sample, client sends the request message to the proxy service
+exposed in JMS in Synsape. Synapse forwards this message to the HTTP EPR of
+the simple stock quote service hosted on the sample Axis2 server, and returns
+the reply back to the client through a JMS temporary queue.</p>
 
 <p>Note: It is possible to instruct a JMS proxy service to listen to an
 already existing destination without creating a new one. To do this, use the
@@ -1486,29 +1491,39 @@ and connection factory etc.</p>
 <p><strong>Objective: Demonstrate switching from HTTP to JMS</strong></p>
 
 <p><strong>Pre-Requisites:</strong><br>
-Download, install and start a JMS server, and configure Synapse to listen on
-JMS (refer notes below)<br>
-Configure sample Axis2 server for JMS (refer notes above)<br>
-Start the Axis2 server and deploy the SimpleStockQuoteService (Refer steps
-above)<br>
-Configure JMS transport for Synapse (refer notes above - sample 110)<br>
+Download, install and start a JMS server</p>
+
+<p>Configure sample Axis2 server for JMS (refer notes above)<br>
+Start the Axis2 server and deploy the SimpleStockQuoteService (see below)<br>
+Configure the Synase JMS transport (refer notes above - sample 110)<br>
 Start the Synapse configuration numbered 111: i.e. synapse -sample 111</p>
 
 <p>To switch from HTTP to JMS, edit the
 samples/axis2Server/repository/conf/axis2.xml for the sample Axis2 server and
-enable JMS (refer notes above), and restart the server. You should now see
-that the simple stock quote service is available over JMS as well at an
-address as the one shown below, by looking at the WSDL of the service.</p>
+enable JMS (refer notes above), and restart the server. Now you can see that
+the simple stock quote service is available in both JMS and HTTP in the
+sample Axis2 server. To see this, point your browser to the WSDL of the
+service at http://localhost:9000/soap/SimpleStockQuoteService?wsdl. JMS URL
+for the service is mentioned as below:</p>
 <pre>jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=
 QueueConnectionFactory&amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;
 java.naming.provider.url=tcp://localhost:61616</pre>
 
+<p>You may also notice that the simple stock quote proxy service exposed in
+Synapse is now available only in HTTP as we have specified transport for that
+service as HTTP. To observe this, access the WSDL of stock quote proxy
+service at http://localhost:8080/soap/StockQuoteProxy?wsdl.</p>
+
 <p>This Synapse configuration creates a proxy service over HTTP and forwards
 received messages to the above EPR using JMS, and sends back the response to
 the client over HTTP once the simple stock quote service responds with the
-stock quote reply over JMS to the Synapse server.</p>
+stock quote reply over JMS to the Synapse server. To test this, send a place
+order request to Synapse using HTTP as follows:</p>
+<pre>ant stockquote -Daddurl=http://localhost:8080/soap/StockQuoteProxy -Dmode=placeorder -Dsymbol=MSFT</pre>
 
-<p></p>
+<p>The sample Axis2 server console will print a message indicating that it
+has accepted the order as follows:</p>
+<pre>Accepted order for : 18406 stocks of MSFT at $ 83.58806051152119</pre>
 
 <h2><a name="Sample112">Sample 112:</a></h2>
 

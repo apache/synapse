@@ -37,11 +37,7 @@ import samples.common.StockQuoteHandler;
 import java.net.URL;
 
 /**
- * ant stockquote
- *     [-Dsymbol=<sym>] [-Drepository=<repo>] [-Dpolicy=<policy>]
- *     [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
- *     [-Daddressingurl=<url>] [-Dtransporturl=<url> | -Dproxyurl=<url>]
- * 
+ * See build.xml for options 
  */
 public class StockQuoteClient {
 
@@ -63,6 +59,7 @@ public class StockQuoteClient {
         String prxUrl    = getProperty("prxurl", null);
         String repo      = getProperty("repository", "client_repo");
         String svcPolicy = getProperty("policy", null);
+        String rest      = getProperty("rest", null);
 
         double price = 0; int quantity = 0;
 
@@ -127,7 +124,10 @@ public class StockQuoteClient {
                     RampartMessageData.KEY_RAMPART_POLICY, loadPolicy(svcPolicy));
             }
 
-            
+            if (Boolean.parseBoolean(rest)) {
+                options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
+            }
+
             serviceClient.setOptions(options);
 
             if ("placeorder".equals(mode)) {

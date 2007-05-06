@@ -35,6 +35,7 @@ public class UUIDGenerator {
     private static long incrementingValue = 0;
 
     private static Random myRand = null;
+    private static boolean useNano = false;
 
     /**
      * MD5 a random string with localhost/date etc will return 128 bits construct a string of 18
@@ -50,20 +51,26 @@ public class UUIDGenerator {
         if (++incrementingValue >= Long.MAX_VALUE) {
             incrementingValue = 0;
         }
-        
-        try {
-            if (System.class.getMethod("nanoTime", new Class[0]) != null) {
-                return baseUUID + (System.nanoTime() + incrementingValue) +
-                    Integer.toString(myRand.nextInt());
-            }
-        } catch (NoSuchMethodException ignore) {}
 
-        return baseUUID + (System.currentTimeMillis() + incrementingValue +
-            Integer.toString(myRand.nextInt()));
+        if (useNano) {
+            return baseUUID + (System.nanoTime() + incrementingValue) +
+                Integer.toString(myRand.nextInt());
+        } else {
+
+            return baseUUID + (System.currentTimeMillis() + incrementingValue +
+                Integer.toString(myRand.nextInt()));
+        }
 
     }
 
     protected static String getInitialUUID() {
+
+        try {
+            if (System.class.getMethod("nanoTime", new Class[0]) != null) {
+                useNano = true;
+            }
+        } catch (NoSuchMethodException ignore) {}
+
         if (myRand == null) {
             myRand = new Random();
         }

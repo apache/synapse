@@ -34,6 +34,7 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.util.MessageContextBuilder;
+import org.apache.axis2.util.Utils;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
@@ -311,7 +312,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // if this is a dummy message to handle http 202 case with non-blocking IO
         // set the status code to 202 and the message body to an empty byte array (see below)
-        if (Boolean.TRUE.equals(msgContext.getProperty(NhttpConstants.SC_ACCEPTED))) {
+        if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED)) {
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
         }
 
@@ -331,7 +332,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         OutputStream out = worker.getOutputStream();
         try {
-            if (!Boolean.TRUE.equals(msgContext.getProperty(NhttpConstants.SC_ACCEPTED))) {
+            if (!Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED)) {
                 messageFormatter.writeTo(msgContext, format, out, true);
             } else {
                 // see comment above on the reasoning

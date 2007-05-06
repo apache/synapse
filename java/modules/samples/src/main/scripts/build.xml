@@ -34,6 +34,7 @@
             [-Daddurl=http://localhost:9000/soap/SimpleStockQuoteService]
             [-Dtrpurl=http://localhost:8080]
             [-Dprxurl=http://localhost:8080]
+            [-Drest=true]
             [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
 
         Mode :
@@ -71,6 +72,7 @@
     <property name="prxurl" value=""/>
     <property name="repository" value=""/>
     <property name="policy" value=""/>
+    <property name="rest" value=""/>
     <property name="jms_dest" value=""/>
     <property name="jms_type" value=""/>
     <property name="jms_payload" value=""/>
@@ -100,6 +102,7 @@
             <sysproperty key="prxurl" value="${prxurl}"/>
             <sysproperty key="repository" value="${repository}"/>
             <sysproperty key="policy" value="${policy}"/>
+            <sysproperty key="rest" value="${rest}"/>
         </java>
     </target>
 

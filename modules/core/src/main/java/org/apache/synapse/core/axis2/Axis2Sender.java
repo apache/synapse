@@ -20,6 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.util.Utils;
 import org.apache.axis2.transport.nhttp.NhttpConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
@@ -64,7 +65,7 @@ public class Axis2Sender {
 
         // if this is a dummy 202 Accepted message meant only for the http/s transports
         // prevent it from going into any other transport sender
-        if (Boolean.TRUE.equals(messageContext.getProperty(NhttpConstants.SC_ACCEPTED)) &&
+        if (Utils.isExplicitlyTrue(messageContext, NhttpConstants.SC_ACCEPTED) &&
             messageContext.getTransportOut() != null &&
             !messageContext.getTransportOut().getName().startsWith("http")) {
                 return;

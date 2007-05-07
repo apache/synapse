@@ -106,10 +106,10 @@ public class RMScenariosTest extends SandeshaTestCase {
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
 		runEcho(clientOptions, false, false, true,true,false);
 		
-		// Test sync echo with an offer, and the 1.0 spec. In this case the offer is automatic
-		clientOptions = new Options();
-		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
-		runEcho(clientOptions, false, false, true,false,false);
+//		// Test sync echo with an offer, and the 1.0 spec. In this case the offer is automatic
+//		clientOptions = new Options();
+//		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
+//		runEcho(clientOptions, false, false, true,false,false);
 		
 		// Test sync echo with no offer, and the 1.1 spec
 		clientOptions = new Options();

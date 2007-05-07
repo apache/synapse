@@ -1197,6 +1197,219 @@ Transfer-Encoding: chunked
    &lt;/m0:request&gt;
 &lt;/m0:getQuote&gt;0</pre>
 
+<h2>Sample 54: </h2>
+<pre>&lt;!-- demontrates simple session less load balancing between 3 endpoints --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the simple load balancing among set of
+endpoints</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 54. (i.e. synapse -sample 54)</p>
+
+<p>Deploy the LoadbalanceFailoverService by switching to &lt;synapse
+installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverServer
+directory and running ant.</p>
+
+<p>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and
+9003 and give some unique names to each server.</p>
+
+<p>Example commands to run sample Axis2 servers in Linux is listed below:</p>
+<pre>axis2Server.sh -http 9001 -https 9005 -name MyServer1
+axis2Server.sh -http 9002 -https 9006 -name MyServer2
+axis2Server.sh -http 9003 -https 9007 -name MyServer3</pre>
+
+<p>Now we are done with setting up the environment for load balance sample.
+Start the load balance and failover client using the following command:</p>
+<pre>ant loadbalancefailover -Di=100</pre>
+
+<p>This client sends 100 requests to the LoadbalanceFailoverService through
+Synapse. Synapse will distribute the load among the three endpoints mentioned
+in the configuration in round robin manner. LoadbalanceFailoverService
+appends the name of the server to the response, so that client can determine
+which server has processed the message. If you examine the console output of
+the client, you can see that requests are processed by three servers as
+follows:</p>
+<pre>[java] Request: 1 ==&gt; Response from server: MyServer1
+[java] Request: 2 ==&gt; Response from server: MyServer2
+[java] Request: 3 ==&gt; Response from server: MyServer3
+[java] Request: 4 ==&gt; Response from server: MyServer1
+[java] Request: 5 ==&gt; Response from server: MyServer2
+[java] Request: 6 ==&gt; Response from server: MyServer3
+[java] Request: 7 ==&gt; Response from server: MyServer1
+...</pre>
+
+<p>Now run the client without the -Di=100 parameter to send infinite
+requests. While running the client shutdown the server named MyServer1. You
+can observe that requests are only distributed among MyServer2 and MyServer3
+after shutting down MyServer1. Console output before and after shutting down
+MyServer1 is listed below (MyServer1 was shutdown after request 63):</p>
+<pre>...
+[java] Request: 61 ==&gt; Response from server: MyServer1
+[java] Request: 62 ==&gt; Response from server: MyServer2
+[java] Request: 63 ==&gt; Response from server: MyServer3
+[java] Request: 64 ==&gt; Response from server: MyServer2
+[java] Request: 65 ==&gt; Response from server: MyServer3
+[java] Request: 66 ==&gt; Response from server: MyServer2
+[java] Request: 67 ==&gt; Response from server: MyServer3
+...</pre>
+
+<p>Now restart MyServer1. You can observe that requets will be again sent to
+all three servers roughly after 60 seconds. This is because we have specified
+&lt;suspendDurationOnFailure&gt; as 60 seconds in the configuration.
+Therefore, load balance endpoint will suspend any failed child endpoint only
+for 60 seconds after detecting the failure. </p>
+
+<h2>Sample 55:</h2>
+<pre>&lt;!-- Demontrates failover sending among 3 endpoints. --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;failover&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                                &lt;suspendDurationOnFailure&gt;60&lt;/suspendDurationOnFailure&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/failover&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the failover sending</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 55 (i.e. synapse -sample 55)</p>
+
+<p>Deploy the LoadbalanceFailoverService and start three instances of sample
+Axis2 server as mentioned in sample 54.</p>
+
+<p></p>
+
+<p>Above configuration sends messages with the failover behavior. Initially
+the server at port 9001 is treated as primary and other two are treated as
+back ups. Messages are always directed only to the primary server. If the
+primary server has failed, next listed server is selected as the primary.
+Thus, messages are sent successfully as long as there is at least one active
+server. To test this, run the loadbalancefailover client to send infinite
+requests as follows:</p>
+<pre>ant loadbalancefailover</pre>
+
+<p>You can see that all requests are processed by MyServer1. Now shutdown
+MyServer1 and inspect the console output of the client. You will observe that
+all subsequent requests are processed by MyServer2.</p>
+
+<p>The console output with MyServer1 shutdown after request 127 is listed
+below:</p>
+<pre>...
+[java] Request: 125 ==&gt; Response from server: MyServer1
+[java] Request: 126 ==&gt; Response from server: MyServer1
+[java] Request: 127 ==&gt; Response from server: MyServer1
+[java] Request: 128 ==&gt; Response from server: MyServer2
+[java] Request: 129 ==&gt; Response from server: MyServer2
+[java] Request: 130 ==&gt; Response from server: MyServer2
+...</pre>
+
+<p>You can keep on shutting down servers like this. Client will get a
+response till you shutdown all listed servers. Once all servers are shutdown,
+the error sequence is activated and a fault message is sent to the client as
+follows:</p>
+<pre>[java] COULDN'T SEND THE MESSAGE TO THE SERVER.</pre>
+
+<p>Once a server is detected as failed, it will be added to the active
+servers list again after 60 seconds (specified in
+&lt;suspendDurationOnFailure&gt; in the configuration). Therefore, if you
+have restarted any of the stopped servers and shutdown all other servers,
+messages will be directed to the newly started server.</p>
+
 <h1><a name="ProxyServices" id="ProxyServices">Proxy services</a></h1>
 
 <h2><a name="Sample100">Sample 100:</a></h2>

@@ -118,7 +118,7 @@ public class SynapseModule implements Module {
         String config = System.getProperty(Constants.SYNAPSE_XML);
 
         if (config != null) {
-            log.info("System property '" + Constants.SYNAPSE_XML +
+            log.debug("System property '" + Constants.SYNAPSE_XML +
                 "' specifies synapse configuration as " + config);
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {

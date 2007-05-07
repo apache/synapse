@@ -157,6 +157,8 @@
       <li><a href="#Sample51">Sample 51: MTOM and SwA optimizations and
         request/response correlation</a></li>
       <li><a href="#Sample52">Sample 52: POX to SOAP conversion</a></li>
+      <li><a href="#Sample54">Sample 54: Load balancing</a></li>
+      <li><a href="#Sample55">Sample 55: Failover</a></li>
     </ul>
   </li>
   <li><a href="#ProxyServices">Synapse Proxy service samples</a> 
@@ -1201,7 +1203,7 @@ Transfer-Encoding: chunked
    &lt;/m0:request&gt;
 &lt;/m0:getQuote&gt;0</pre>
 
-<h2>Sample 54: </h2>
+<h2><a name="Sample54">Sample 54:</a></h2>
 <pre>&lt;!-- demontrates simple session less load balancing between 3 endpoints --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
@@ -1314,7 +1316,7 @@ all three servers roughly after 60 seconds. This is because we have specified
 Therefore, load balance endpoint will suspend any failed child endpoint only
 for 60 seconds after detecting the failure. </p>
 
-<h2>Sample 55:</h2>
+<h2><a name="Sample55">Sample 55:</a></h2>
 <pre>&lt;!-- Demontrates failover sending among 3 endpoints. --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 

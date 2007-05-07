@@ -33,9 +33,7 @@
                     <configuration>
                         <descriptors>
                             <descriptor>src/main/assembly/bin.xml</descriptor>
-			    <!--uncomment the following & comment above line to create source distribution.
                             <descriptor>src/main/assembly/src.xml</descriptor>
-			    -->
                         </descriptors>
                         <finalName>sandesha2-${version}</finalName>
                     </configuration>

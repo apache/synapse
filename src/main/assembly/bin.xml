@@ -188,13 +188,6 @@
                 <include>synapse-nhttp-${synapse.version}.jar</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>src/main/release/docs</directory>
-            <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
-            <includes>
-                <include>endorsed_libs.txt</include>
-            </includes>
-        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
@@ -212,7 +205,16 @@
                 <exclude>commons-discovery:commons-discovery:jar</exclude>
                 <exclude>commons-io:commons-io:jar</exclude>
                 <exclude>org.apache.geronimo.specs:geronimo-javamail:jar</exclude>
+                <exclude>xml-apis:xml-apis:jar</exclude>
+                <exclude>xerces:xercesImpl:jar</exclude>                
             </excludes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
+            <includes>
+                <include>xml-apis:xml-apis:jar</include>
+                <include>xerces:xercesImpl:jar</include>
+            </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>

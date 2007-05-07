@@ -17,30 +17,33 @@
   ~  under the License.
   -->
 
-<!-- demontrates simple session less load balancing between 3 endpoints -->
+<!-- Demontrates failover sending among 3 endpoints. -->
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <sequence name="main" onError="errorHandler">
         <in>
             <send>
                 <endpoint>
-                    <loadbalance>
+                    <failover>
                         <endpoint>
                             <address uri="http://localhost:9001/soap/LBService1">
                                 <enableAddressing/>
+                                <suspendDurationOnFailure>60</suspendDurationOnFailure>
                             </address>
                         </endpoint>
                         <endpoint>
                             <address uri="http://localhost:9002/soap/LBService1">
                                 <enableAddressing/>
+                                <suspendDurationOnFailure>60</suspendDurationOnFailure>
                             </address>
                         </endpoint>
                         <endpoint>
                             <address uri="http://localhost:9003/soap/LBService1">
                                 <enableAddressing/>
+                                <suspendDurationOnFailure>60</suspendDurationOnFailure>
                             </address>
                         </endpoint>
-                    </loadbalance>
+                    </failover>
                 </endpoint>
             </send>
         </in>

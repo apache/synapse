@@ -30,10 +30,7 @@ if "%OS%"=="Windows_NT" @setlocal
 if "%OS%"=="WINNT" @setlocal
 
 rem %~dp0 is expanded pathname of the current script under NT
-set DEFAULT_AXIS2_HOME=%~dp0
-
-if "%AXIS2_HOME%"=="" set AXIS2_HOME=%DEFAULT_AXIS2_HOME%
-set DEFAULT_AXIS2_HOME=
+if "%AXIS2_HOME%"=="" set AXIS2_HOME=%~dps0
 
 rem find AXIS2_HOME if it does not exist due to either an invalid value passed
 rem by the user or the %0 problem on Windows 9x
@@ -56,7 +53,7 @@ if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java.exe
 
 :setupArgs
-if ""%1""=="""" goto defaultParams
+if ""%1""=="""" goto runAxis2
 if ""%1""==""-http"" goto httpport
 if ""%1""==""-https"" goto httpsport
 if ""%1""==""-name"" goto servername
@@ -81,10 +78,6 @@ shift
 set _SERVERNAME="-Dserver_name=%1"
 shift
 goto setupArgs
-
-:defaultParams
-set AXIS2_CMD_LINE_ARGS=-repo "%AXIS2_HOME%\repository" -conf "%AXIS2_HOME%\repository\conf\axis2.xml"
-goto runAxis2
 
 :noJavaHome
 if "%_JAVACMD%" == "" set _JAVACMD=java.exe
@@ -118,7 +111,7 @@ echo Using JAVA_HOME    %JAVA_HOME%
 echo Using AXIS2_HOME   %AXIS2_HOME%
 
 cd %AXIS2_HOME%
-"%_JAVACMD%" %_HTTPPORT% %_HTTPSPORT% %_SERVERNAME% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server %AXIS2_CMD_LINE_ARGS%
+"%_JAVACMD%" %_HTTPPORT% %_HTTPSPORT% %_SERVERNAME% %JAVA_OPTS% -cp "%AXIS2_CLASS_PATH%" -Djava.endorsed.dirs="%AXIS2_ENDORSED%" samples.util.SampleAxis2Server -repo "%AXIS2_HOME%\repository" -conf "%AXIS2_HOME%\repository\conf\axis2.xml"
 goto end
 
 :end

@@ -18,26 +18,6 @@
 
     <build>
     <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.1</version>
-            <executions>
-                <execution>
-                    <id>distribution-package</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                    <configuration>
-                        <descriptors>
-                            <descriptor>src/main/assembly/src.xml</descriptor>
-                        </descriptors>
-                        <finalName>sandesha2-${version}-src</finalName>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
 
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -53,8 +33,11 @@
                     <configuration>
                         <descriptors>
                             <descriptor>src/main/assembly/bin.xml</descriptor>
+			    <!--uncomment the following & comment above line to create source distribution.
+                            <descriptor>src/main/assembly/src.xml</descriptor>
+			    -->
                         </descriptors>
-                        <finalName>sandesha2-${version}-bin</finalName>
+                        <finalName>sandesha2-${version}</finalName>
                     </configuration>
                 </execution>
             </executions>

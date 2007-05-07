@@ -52,5 +52,62 @@
                 <include>**/*</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>../../modules/samples/target/classes</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/classes</outputDirectory>
+            <includes>
+                <include>**/*.class</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/samples/src/main/resources/userguide</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/clients</outputDirectory>
+	    <excludes>
+		<exclude>services.xml</exclude>
+	    </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/tests/test-resources</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/clients</outputDirectory>
+            <includes>
+                <include>client_axis2.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/samples/target/aars</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/services</outputDirectory>
+            <includes>
+                <include>RMSampleService.aar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../../modules/samples/target/jars</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/clients</outputDirectory>
+            <includes>
+                <include>UserguideSampleClients.jar</include>
+            </includes>
+        </fileSet>
+	<!-- Work-a-round to create empty folders -->
+        <fileSet>
+	    <directory>../../modules/distribution/src/main/assembly</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/clients/lib</outputDirectory>
+            <includes>
+                <include>lib.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+	    <directory>../../modules/distribution/src/main/assembly</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/clients/modules</outputDirectory>
+            <includes>
+                <include>modules.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+	    <directory>../../modules/distribution/src/main/assembly</directory>
+            <outputDirectory>sandesha2-${version}-bin/samples/clients/services</outputDirectory>
+            <includes>
+                <include>services.txt</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>

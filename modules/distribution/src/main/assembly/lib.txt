@@ -1,0 +1,1 @@
+This is the lib folder. Copy library files here.

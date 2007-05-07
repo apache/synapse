@@ -21,10 +21,7 @@ if "%OS%"=="Windows_NT" @setlocal
 if "%OS%"=="WINNT" @setlocal
 
 rem %~dp0 is expanded pathname of the current script under NT
-set DEFAULT_SYNAPSE_HOME=%~dp0..
-
-if "%SYNAPSE_HOME%"=="" set SYNAPSE_HOME=%DEFAULT_SYNAPSE_HOME%
-set DEFAULT_SYNAPSE_HOME=
+set SYNAPSE_HOME=%~dps0..
 
 set _USE_CLASSPATH=yes
 set _SYNAPSE_XML=
@@ -40,13 +37,8 @@ if ""%1""==""-sample"" goto synapseSample
 if ""%1""==""-noclasspath"" goto clearclasspath
 if ""%1""==""-xdebug"" goto xdebug
 if ""%1""==""-port"" goto port
-set SYNAPSE_CMD_LINE_ARGS=%SYNAPSE_CMD_LINE_ARGS% %1
 shift
 goto setupArgs
-
-set SYNAPSE_CMD_LINE_ARGS=%1
-if ""%1""=="""" goto doneStart
-shift
 
 rem here is there is a -noclasspath in the options
 :clearclasspath
@@ -91,13 +83,7 @@ set _JAVACMD=%JAVACMD%
 
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
-if "%_JAVACMD%" == "" set _JAVACMD=%JAVA_HOME%\bin\java.exe
-if  "%SYNAPSE_CMD_LINE_ARGS%" == "" goto defaultParams
-
-goto runSynapse
-
-:defaultParams
-set SYNAPSE_CMD_LINE_ARGS="%SYNAPSE_HOME%\repository"
+if "%_JAVACMD%" == "" set _JAVACMD="%JAVA_HOME%\bin\java.exe"
 goto runSynapse
 
 :noJavaHome
@@ -106,7 +92,7 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 :runSynapse
 rem set the classes by looping through the libs
 setlocal EnableDelayedExpansion
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/lib;%SYNAPSE_HOME%/repository/conf"
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/lib";"%SYNAPSE_HOME%/repository/conf"
 FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
 set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
 
@@ -137,7 +123,7 @@ echo Using SYNAPSE_HOME:    %SYNAPSE_HOME%
 echo Using JAVA_HOME:       %JAVA_HOME%
 echo Using SYNAPSE_XML:     %_SYNAPSE_XML%
 
-"%_JAVACMD%" %_PORT% %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer %SYNAPSE_CMD_LINE_ARGS%
+"%_JAVACMD%" %_PORT% %_SYNAPSE_XML% -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer "%SYNAPSE_HOME%\repository"
 goto end
 
 :end

@@ -62,8 +62,8 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
     }
 
     public void exception(final NHttpServerConnection conn, final IOException ex) {
-        if (ex.getMessage().contains("Connection reset") ||
-            ex.getMessage().contains("forcibly closed")) {
+        if (ex.getMessage().indexOf("Connection reset") != -1 ||
+            ex.getMessage().indexOf("forcibly closed")  != -1) {
             this.log.warn("HTTP connection " + conn + ": " + ex.getMessage());
         } else {
             this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);

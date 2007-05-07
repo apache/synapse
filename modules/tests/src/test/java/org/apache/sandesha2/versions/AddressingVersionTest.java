@@ -32,7 +32,7 @@ import org.apache.sandesha2.client.SequenceReport;
 
 public class AddressingVersionTest extends SandeshaTestCase {
 
-	private static boolean serverStarted = false;
+	private boolean serverStarted = false;
 
 	public AddressingVersionTest () {
 		super ("AddressingVersionTest");
@@ -50,8 +50,8 @@ public class AddressingVersionTest extends SandeshaTestCase {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 	
 	public void testAddressingFinal() throws Exception  {

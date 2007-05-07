@@ -51,8 +51,8 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 		super.setUp();
 	}
 	
-	public void tearDown() {
-		
+	public void tearDown() throws Exception {
+		super.tearDown();
 	}
 	
 	/**

@@ -121,8 +121,9 @@ public class SandeshaTestCase extends TestCase {
 	}
 
 	public void tearDown () throws Exception {
-		if (httpServer!=null)
+		if (httpServer!=null) {
 			httpServer.stop();
+		}
 		
 		Thread.sleep(300);
 	}

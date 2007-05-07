@@ -30,10 +30,10 @@ public class PropertyLoaderTest extends TestCase {
 	SandeshaPolicyBean propertyBean = null;
 	
 	public void setUp () {
-		String fileName =  "modules" + File.separator + "tests" + File.separator + "test-resources" + File.separator + "sandesha2.properties";
+		String fileName =  "target" + File.separator + "test-classes" + File.separator + "sandesha2.properties";
 		File file= new File (fileName);
 		if (!file.exists()) {
-			fail("'target/test-classes/sandesha2.properties' not found");
+			fail("sandesha2.properties file was not found");
 		}
 		
 		try {

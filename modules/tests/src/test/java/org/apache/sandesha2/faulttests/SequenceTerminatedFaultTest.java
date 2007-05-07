@@ -66,7 +66,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 	
 	private static ConfigurationContext serverConfigContext;
 	
-	private static boolean serverStarted = false;
+	private boolean serverStarted = false;
 	
 	public SequenceTerminatedFaultTest() {
 		super("SequenceTerminatedFaultTest");
@@ -80,7 +80,8 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		serverStarted = true;
 	}
 
-	public void tearDown () {
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 
 	/**

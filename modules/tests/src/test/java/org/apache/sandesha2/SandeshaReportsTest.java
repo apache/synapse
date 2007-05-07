@@ -35,7 +35,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class SandeshaReportsTest extends SandeshaTestCase {
 
-	private static boolean startedServer = false;
+	private boolean startedServer = false;
 
 	public SandeshaReportsTest () {
 		super ("SandeshaReportsTest");
@@ -55,8 +55,8 @@ public class SandeshaReportsTest extends SandeshaTestCase {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 	
 	public void testSequenceReports () throws Exception  {

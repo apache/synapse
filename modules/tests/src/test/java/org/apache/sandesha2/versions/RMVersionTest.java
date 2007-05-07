@@ -32,7 +32,7 @@ import org.apache.sandesha2.client.SequenceReport;
 
 public class RMVersionTest extends SandeshaTestCase {
 
-	private static boolean serverStarted = false;
+	private boolean serverStarted = false;
 
 	public RMVersionTest () {
 		super ("RMVersionTest");
@@ -50,8 +50,8 @@ public class RMVersionTest extends SandeshaTestCase {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 
 	public void testRMSubmission () throws Exception  {

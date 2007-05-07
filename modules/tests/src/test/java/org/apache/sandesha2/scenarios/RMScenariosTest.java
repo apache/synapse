@@ -40,8 +40,8 @@ import org.apache.sandesha2.versions.RMVersionTest;
 
 public class RMScenariosTest extends SandeshaTestCase {
 
-	private static boolean serverStarted = false; 
-	private static ConfigurationContext configContext = null;
+	private boolean serverStarted = false; 
+	private ConfigurationContext configContext = null;
 
 	protected String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 	
@@ -72,31 +72,31 @@ public class RMScenariosTest extends SandeshaTestCase {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 
 	public void testPing() throws Exception  {
 		// Run a ping test with sync acks
-		runPing(false);
+		runPing(false, false);
 		
 		// Run a ping test with async acks
-		runPing(true);
+		runPing(true, true);
 	}
 
 	public void testAsyncEcho() throws Exception {
 		// Test async echo with sync acks
 		Options clientOptions = new Options();
-		runEcho(clientOptions, true, false, false,true);
+		runEcho(clientOptions, true, false, false,true,false);
 		
 		// Test async echo with async acks
 		clientOptions = new Options();
-		runEcho(clientOptions, true, true, false,true);
+		runEcho(clientOptions, true, true, false,true,false);
 		
 		// Test async echo with async acks and offer
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
-		runEcho(clientOptions, true, true, false,true);
+		runEcho(clientOptions, true, true, false,true,true);
 	}
 		
 	public void testSyncEcho() throws Exception {
@@ -104,20 +104,20 @@ public class RMScenariosTest extends SandeshaTestCase {
 		Options clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,SandeshaUtil.getUUID());
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		runEcho(clientOptions, false, false, true,true);
+		runEcho(clientOptions, false, false, true,true,false);
 		
-//		// Test sync echo with an offer, and the 1.0 spec. In this case the offer is automatic
+		// Test sync echo with an offer, and the 1.0 spec. In this case the offer is automatic
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_0);
-		runEcho(clientOptions, false, false, true,false);
-//		
-//		// Test sync echo with no offer, and the 1.1 spec
+		runEcho(clientOptions, false, false, true,false,false);
+		
+		// Test sync echo with no offer, and the 1.1 spec
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		runEcho(clientOptions, false, false, true,true);
+		runEcho(clientOptions, false, false, true,true,true);
 	}
 
-	public void runPing(boolean asyncAcks) throws Exception {
+	public void runPing(boolean asyncAcks, boolean stopListener) throws Exception {
 		
 		Options clientOptions = new Options();
 
@@ -162,10 +162,14 @@ public class RMScenariosTest extends SandeshaTestCase {
 
 		if(lastError != null) throw lastError;
 
+		if (stopListener)
+			configContext.getListenerManager().stop();
+		
 		serviceClient.cleanup();
+
 	}
 
-	public void runEcho(Options clientOptions, boolean asyncReply, boolean asyncAcks, boolean explicitTermination, boolean checkInboundTermination) throws Exception {
+	public void runEcho(Options clientOptions, boolean asyncReply, boolean asyncAcks, boolean explicitTermination, boolean checkInboundTermination, boolean stopListener) throws Exception {
 		
 		String sequenceKey = SandeshaUtil.getUUID();
 
@@ -271,6 +275,9 @@ public class RMScenariosTest extends SandeshaTestCase {
 			}
 		}
 		if(lastError != null) throw lastError;
+		
+		if (stopListener)
+			configContext.getListenerManager().stop();
 		
 		serviceClient.cleanup();
 	}

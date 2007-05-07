@@ -34,7 +34,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 
 public class CreateSequenceRefusedInboundFaultTest extends SandeshaTestCase {
 	
-	private static boolean startedServer = false;
+	private boolean startedServer = false;
 	
 	public CreateSequenceRefusedInboundFaultTest() {
 		super("CreateSequenceRefusedInboundFaultTest");
@@ -51,8 +51,8 @@ public class CreateSequenceRefusedInboundFaultTest extends SandeshaTestCase {
 		}
 	}
 	
-	public void tearDown() {
-		
+	public void tearDown()throws Exception {
+		super.tearDown();
 	}
 	
 	/** Test removed for the moment as RM 1.0 faults are not processed by the chain.

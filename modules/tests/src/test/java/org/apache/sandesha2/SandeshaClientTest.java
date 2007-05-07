@@ -39,7 +39,7 @@ public class SandeshaClientTest extends SandeshaTestCase {
 
 	String server_repoPath = "target" + File.separator + "repos" + File.separator + "server";
 	String server_axis2_xml = "target" + File.separator + "repos" + File.separator + "server" + File.separator + "server_axis2.xml";
-	private static boolean startedServer = false;
+	private boolean startedServer = false;
 
 	public SandeshaClientTest () {
 		super ("SandeshaClientTest");
@@ -57,8 +57,8 @@ public class SandeshaClientTest extends SandeshaTestCase {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 
 	public void testCreateSequenceWithOffer () throws Exception {

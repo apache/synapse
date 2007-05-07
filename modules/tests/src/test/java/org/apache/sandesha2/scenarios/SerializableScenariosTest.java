@@ -40,6 +40,6 @@ public class SerializableScenariosTest extends RMScenariosTest {
         Boolean.TRUE.toString());
     
     // Run the echo test
-    runEcho(clientOptions, true, true, false, true);
+    runEcho(clientOptions, true, true, false, true,true);
   }
 }

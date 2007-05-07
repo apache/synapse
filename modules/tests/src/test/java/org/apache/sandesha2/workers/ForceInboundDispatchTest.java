@@ -24,7 +24,7 @@ import org.apache.sandesha2.util.SandeshaUtil;
 public class ForceInboundDispatchTest extends SandeshaTestCase  {
 
 	private static ConfigurationContext serverConfigCtx = null;
-	private static boolean startedServer = false;
+	private boolean startedServer = false;
 	
 	public ForceInboundDispatchTest () {
         super ("ForceDispatchTest");
@@ -42,8 +42,8 @@ public class ForceInboundDispatchTest extends SandeshaTestCase  {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 
 	public void testForceInvoke () throws AxisFault,InterruptedException  {

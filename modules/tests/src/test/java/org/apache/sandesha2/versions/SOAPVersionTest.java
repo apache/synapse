@@ -33,7 +33,7 @@ import org.apache.sandesha2.client.SequenceReport;
 
 public class SOAPVersionTest extends SandeshaTestCase {
 
-	private static boolean serverStarted = false;
+	private boolean serverStarted = false;
 
 	public SOAPVersionTest () {
 		super ("SOAPVersionTest");
@@ -51,8 +51,8 @@ public class SOAPVersionTest extends SandeshaTestCase {
 	/**
 	 * Override the teardown processing
 	 */
-	public void tearDown () {
-	
+	public void tearDown () throws Exception {
+		super.tearDown();
 	}
 	
 	public void testSOAP11 () throws Exception  {

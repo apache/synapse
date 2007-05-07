@@ -181,7 +181,8 @@
         fireAndForget()</a></li>
       <li><a href="#Sample113">Sample 113: Pure text/binary and POX message
         support with JMS</a></li>
-      <li><a href="#Sample114">Sample 114: One way bridging from JMS to http and replying with a 202 Accepted response</a></li>
+      <li><a href="#Sample114">Sample 114: One way bridging from JMS to http
+        and replying with a 202 Accepted response</a></li>
     </ul>
   </li>
   <li><a href="#ScriptMediators">Script Mediators</a> 
@@ -409,6 +410,7 @@ Execute the 'ant stockquote ..' request again, and following through the
 mediation logs you will now notice that the sequence named "main" executed.
 Then for the incoming message flow the &lt;in&gt; mediator executes, and it
 calls into the sequence named "stockquote"</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
 <pre>DEBUG SequenceMediator - Sequence mediator &lt;main&gt; :: mediate()<br>DEBUG InMediator - In mediator mediate()<br>DEBUG SequenceMediator - Sequence mediator &lt;stockquote&gt; :: mediate()</pre>
 
 <p>As the "stockquote" sequence executes, the log mediator dumps a simple
@@ -679,6 +681,7 @@ validation failed. This is because the schema used in the example expects a
 slightly different message than what is created by the stock quote client.
 (i.e. expects a 'stocksymbol' element instead of 'symbol' to specify thestock
 symbol)</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
 
 <h2><a name="Sample8">Sample 8:</a></h2>
 <pre>&lt;!-- introduction to static and dynamic registry resources and the XSLT mediator --&gt;
@@ -823,6 +826,7 @@ sequence definition if necessary and re-cache it again.</p>
 <p>Once Synapse is started, execute the stock quote client as 'ant
 stockquote..'. You will notice that that Synapse fetches the definition of
 the sequence from the registry and executes its rules as follows:</p>
+<pre>ant stockquote -Daddurl=http://localhost:9000/soap/SimpleStockQuoteService -Dtrpurl=http://localhost:8080/</pre>
 <pre>[HttpServerWorker-1] INFO  SimpleURLRegistry - ==&gt; Repository fetch of resource with key : sequence/dynamic_seq_1.xml
 ...
 [HttpServerWorker-1] DEBUG SequenceMediator - Sequence mediator &lt;dynamic_sequence&gt; :: mediate()

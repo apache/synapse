@@ -35,9 +35,10 @@ import org.apache.neethi.Policy;
 import samples.common.StockQuoteHandler;
 
 import java.net.URL;
+import java.io.File;
 
 /**
- * See build.xml for options 
+ * See build.xml for options
  */
 public class StockQuoteClient {
 
@@ -60,8 +61,10 @@ public class StockQuoteClient {
         String repo      = getProperty("repository", "client_repo");
         String svcPolicy = getProperty("policy", null);
         String rest      = getProperty("rest", null);
+        String wsrm      = getProperty("wsrm", null);
 
         double price = 0; int quantity = 0;
+		ConfigurationContext configContext = null;
 
         try {
             Options options = new Options();
@@ -69,9 +72,10 @@ public class StockQuoteClient {
             ServiceClient serviceClient = null;
 
             if (repo != null && !"null".equals(repo)) {
-                ConfigurationContext configContext =
+                configContext =
                     ConfigurationContextFactory.
-                        createConfigurationContextFromFileSystem(repo, null);
+                        createConfigurationContextFromFileSystem(repo,
+                            repo+ File.separator + "conf" + File.separator + "axis2.xml");
                 serviceClient = new ServiceClient(configContext, null);
             } else {
                 serviceClient = new ServiceClient();
@@ -118,6 +122,7 @@ public class StockQuoteClient {
 
             // apply any service policies if any
             if (svcPolicy != null && !"null".equals(svcPolicy) && svcPolicy.length() > 0) {
+                System.out.println("Using WS-Security");
                 serviceClient.engageModule("addressing");
                 serviceClient.engageModule("rampart");
                 options.setProperty(
@@ -125,7 +130,13 @@ public class StockQuoteClient {
             }
 
             if (Boolean.parseBoolean(rest)) {
+                System.out.println("Sending as REST");
                 options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
+            }
+            if (Boolean.parseBoolean(wsrm)) {
+                System.out.println("Using WS-RM");
+                serviceClient.engageModule("sandesha2");
+                options.setProperty("Sandesha2LastMessage", "true");
             }
 
             serviceClient.setOptions(options);
@@ -149,7 +160,12 @@ public class StockQuoteClient {
                         StockQuoteHandler.parseFullQuoteResponse(result));
                 } else if ("marketactivity".equals(mode)) {
                     System.out.println("Activity :: Average price = $" +
-                        StockQuoteHandler.parseMarketActivityResponse(result));   
+                        StockQuoteHandler.parseMarketActivityResponse(result));
+                }
+                if (Boolean.parseBoolean(wsrm)) {
+                    configContext.getListenerManager().stop();
+					serviceClient.cleanup();
+					System.exit(0);
                 }
             }
 

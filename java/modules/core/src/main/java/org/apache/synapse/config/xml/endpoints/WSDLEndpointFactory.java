@@ -288,8 +288,18 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 if (a != null) {
                     if ((a.trim()).equalsIgnoreCase("discard")) {
                         endpointDefinition.setTimeoutAction(Constants.DISCARD);
+
+                        // set timeout duration to 30 seconds, if it is not set explicitly
+                        if (endpointDefinition.getTimeoutDuration() == 0) {
+                            endpointDefinition.setTimeoutDuration(30000);
+                        }
                     } else if ((a.trim()).equalsIgnoreCase("fault")) {
                         endpointDefinition.setTimeoutAction(Constants.DISCARD_AND_FAULT);
+
+                        // set timeout duration to 30 seconds, if it is not set explicitly
+                        if (endpointDefinition.getTimeoutDuration() == 0) {
+                            endpointDefinition.setTimeoutDuration(30000);
+                        }
                     }
                 }
             }

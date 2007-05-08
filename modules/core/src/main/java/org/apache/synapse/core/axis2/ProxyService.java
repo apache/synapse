@@ -348,7 +348,12 @@ public class ProxyService {
             axisCfg.addService(proxyService);
             this.setRunning(true);
         } catch (AxisFault axisFault) {
-            handleException("Unable to start the Proxy Service");
+            try {
+                if (axisCfg.getService(proxyService.getName()) != null) {
+                    axisCfg.removeService(proxyService.getName());
+                }
+            } catch (AxisFault ignore) {}
+            handleException("Error adding Proxy service to the Axis2 engine");
         }
 
         // todo: need to remove this and engage modules by looking at policies

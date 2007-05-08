@@ -54,11 +54,11 @@ public class EndpointDefinition {
 
     /**
      * timeout duration for waiting for a response. if the user has set some timeout action and
-     * the timeout duration is not set, default is set to 30 seconds. note that if the user has
+     * the timeout duration is not set, default is set to 0 seconds. note that if the user has
      * not set any timeout configuration, default timeout action is set to NONE, which won't do
      * anything for timeouts.
     */
-    private long timeoutDuration = 30000;
+    private long timeoutDuration = 0;
 
     /** action to perform when a timeout occurs (NONE | DISCARD | DISCARD_AND_FAULT) **/
     private int timeoutAction = Constants.NONE;

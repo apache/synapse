@@ -35,6 +35,7 @@
             [-Dtrpurl=http://localhost:8080]
             [-Dprxurl=http://localhost:8080]
             [-Drest=true]
+            [-Dwsrm=true]
             [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]
 
         Mode :
@@ -73,6 +74,7 @@
     <property name="repository" value=""/>
     <property name="policy" value=""/>
     <property name="rest" value=""/>
+    <property name="wsrm" value=""/>
     <property name="jms_dest" value=""/>
     <property name="jms_type" value=""/>
     <property name="jms_payload" value=""/>
@@ -103,6 +105,7 @@
             <sysproperty key="repository" value="${repository}"/>
             <sysproperty key="policy" value="${policy}"/>
             <sysproperty key="rest" value="${rest}"/>
+            <sysproperty key="wsrm" value="${wsrm}"/>
         </java>
     </target>
 

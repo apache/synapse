@@ -56,7 +56,7 @@
 
         <mkdir dir="${RSQ.dir}/META-INF"/>
         <copy file="conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml"/>
-        <copy file="wsdl/SimpleStockQuoteService.wsdl" tofile="${RSQ.dir}/META-INF/service.wsdl"/>
+        <copy file="wsdl/ReliableStockQuoteService.wsdl" tofile="${RSQ.dir}/META-INF/service.wsdl"/>
         <copy toDir="${RSQ.dir}">
             <fileset dir="${classes}">
                 <include name="**/*.class"/>

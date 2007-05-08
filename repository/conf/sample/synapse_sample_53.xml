@@ -20,17 +20,21 @@
 <definitions xmlns="http://ws.apache.org/ns/synapse">
 
     <in>
-        <RMSequence single="true" version="1.1"/>
+        <RMSequence single="true" version="1.0"/>
         <send>
         	<endpoint name="reliable">
-			<address uri="http://localhost:8500/soap/ReliableStockQuoteService">
-				<enableRM/>
-				<enableAddressing/>
-			</address>
+    			<address uri="http://localhost:9000/soap/ReliableStockQuoteService">
+	    			<enableRM/>
+		    		<enableAddressing/>
+			    </address>
             </endpoint>
         </send>
     </in>
     <out>
+        <header name="wsrm:SequenceAcknowledgement" action="remove"
+                xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm"/>
+        <header name="wsrm:Sequence" action="remove"
+                xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm"/>
         <send/>
     </out>
 

@@ -226,8 +226,18 @@ public class AddressEndpointFactory implements EndpointFactory {
                 if (a != null) {
                     if ((a.trim()).equalsIgnoreCase("discard")) {
                         endpoint.setTimeoutAction(Constants.DISCARD);
+
+                        // set timeout duration to 30 seconds, if it is not set explicitly
+                        if (endpoint.getTimeoutDuration() == 0) {
+                            endpoint.setTimeoutDuration(30000);
+                        }
                     } else if ((a.trim()).equalsIgnoreCase("fault")) {
                         endpoint.setTimeoutAction(Constants.DISCARD_AND_FAULT);
+
+                        // set timeout duration to 30 seconds, if it is not set explicitly
+                        if (endpoint.getTimeoutDuration() == 0) {
+                            endpoint.setTimeoutDuration(30000);
+                        }
                     }
                 }
             }

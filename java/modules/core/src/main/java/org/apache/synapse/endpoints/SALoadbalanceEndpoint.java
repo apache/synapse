@@ -192,7 +192,7 @@ public class SALoadbalanceEndpoint implements Endpoint {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     public LoadbalanceAlgorithm getAlgorithm() {

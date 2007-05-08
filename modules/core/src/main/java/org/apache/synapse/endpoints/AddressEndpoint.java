@@ -89,7 +89,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.trim();
     }
 
     /**

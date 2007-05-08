@@ -159,7 +159,7 @@ receive and display the last sale price for a stock symbol. </p>
 <pre>ant stockquote [-Dsymbol=IBM|MSFT|SUN|..]
   [-Dmode=quote | customquote | fullquote | placeorder | marketactivity]
   [-Daddurl=http://localhost:9000/soap/SimpleStockQuoteService]
-  [-Dtrourl=http://localhost:8080] [-Dprxurl=http://localhost:8080]
+  [-Dtrpurl=http://localhost:8080] [-Dprxurl=http://localhost:8080]
   [-Dpolicy=../../repository/conf/sample/resources/policy/policy_1.xml]</pre>
 
 <p>The client is able to operate in the following modes, and send the
@@ -168,28 +168,28 @@ payloads listed below as SOAP messages:</p>
   <li>quote - send a quote request for a single stock as follows. The
     response contains the last sales price for the stock which would be
     displayed 
-    <pre>&lt;m:GetQuote xmlns:m="http://services.samples/xsd"&gt;
+    <pre>&lt;m:getQuote xmlns:m="http://services.samples/xsd"&gt;
   &lt;m:request&gt;
     &lt;m:symbol&gt;IBM&lt;/m:symbol&gt;
   &lt;/m:request&gt;
-&lt;/m:GetQuote&gt;</pre>
+&lt;/m:getQuote&gt;</pre>
   </li>
   <li>customquote - send a quote request in a custom format. Synapse would
     transform this custom request into the standard stock quote request
     format and send it to the service. Upon receipt of the response, it would
     be transformed again to a custom response format and returned to the
     client, which will then display the last sales price. 
-    <pre>&lt;m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;
+    <pre>&lt;m0:checkPriceRequest xmlns:m0="http://www.apache-synapse.org/test"&gt;
   &lt;m0:Code&gt;symbol&lt;/m0:Code&gt;
-&lt;/m0:CheckPriceRequest&gt;</pre>
+&lt;/m0:checkPriceRequest&gt;</pre>
   </li>
   <li>fullquote - get quote reports for the stock over a number of days (i.e.
     last 100 days of the year). 
-    <pre>&lt;m:GetFullQuote xmlns:m="http://services.samples/xsd"&gt;
+    <pre>&lt;m:getFullQuote xmlns:m="http://services.samples/xsd"&gt;
   &lt;m:request&gt;
     &lt;m:symbol&gt;IBM&lt;/m:symbol&gt;
   &lt;/m:request&gt;
-&lt;/m:GetFullQuote&gt;</pre>
+&lt;/m:getFullQuote&gt;</pre>
   </li>
   <li>placeorder - place an order for stocks using a one way request 
     <pre>&lt;m:placeOrder xmlns:m="http://services.samples/xsd"&gt;
@@ -443,7 +443,7 @@ with the Synapse distribution.</p>
 <p>For Ruby support you need to download JRuby and copy files in its 'lib'
 folder into the Synapse 'lib' folder (this includes all jar files as well as
 the 'ruby' subfolder). JRuby ver 0.9.9 can be downloaded from <a
-href="http://dist.codehaus.org/jruby/jruby-bin-0.9.9.tar.gz">here</a>.</p>
+href="http://dist.codehaus.org/jruby">here</a>.</p>
 
 <p></p>
 </body>

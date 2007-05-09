@@ -55,7 +55,7 @@
             <outputDirectory>synapse-${synapse.version}/repository</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>repository/conf</directory>
+            <directory>repository/conf/sample/resources/misc/client</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/conf</outputDirectory>
             <includes>
                 <include>axis2.xml</include>
@@ -69,7 +69,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>repository/conf/sample/resources/misc</directory>
+            <directory>repository/conf/sample/resources/misc/server</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/conf</outputDirectory>
             <includes>
                 <include>axis2.xml</include>

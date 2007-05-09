@@ -128,18 +128,6 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			internalSequenceId = SandeshaUtil.getOutgoingSideInternalSequenceID(inboundSequence);
-
-			// Deciding whether this is the last message. We assume it is if it relates to
-			// a message which arrived with the LastMessage flag on it.
-			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);			
-			// Get the last in message
-			String lastRequestId = rmdBean.getLastInMessageId();
-			RelatesTo relatesTo = msgContext.getRelatesTo();
-			if(relatesTo != null && lastRequestId != null &&
-					lastRequestId.equals(relatesTo.getValue())) {
-				lastMessage = true;
-			}
-
 		} else {
 			// set the internal sequence id for the client side.
 			EndpointReference toEPR = msgContext.getTo();
@@ -259,7 +247,19 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		} else { // This is the first message (systemMessageNumber = -1)
 			messageNumber = 1;
 		}
-		
+
+		if (serverSide) {
+			// Deciding whether this is the last message. We assume it is if it relates to
+			// a message which arrived with the LastMessage flag on it.
+			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);			
+			// Get the last in message
+			String lastRequestId = rmdBean.getLastInMessageId();
+			RelatesTo relatesTo = msgContext.getRelatesTo();
+			if(relatesTo != null && lastRequestId != null &&
+					lastRequestId.equals(relatesTo.getValue())) {
+				lastMessage = true;
+			}
+		}
 		if (lastMessage) {
 			rmsBean.setLastOutMessage(messageNumber);
 			// Update the rmsBean

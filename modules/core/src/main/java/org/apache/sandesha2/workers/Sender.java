@@ -93,6 +93,7 @@ public class Sender extends SandeshaThread {
 
 			transaction = storageManager.getTransaction();
 
+			String rmVersion = null;
 			// Check that the sequence is still valid
 			boolean found = false;
 			if(entry.isRmSource()) {
@@ -106,13 +107,18 @@ public class Sender extends SandeshaThread {
 						SequenceManager.finalizeTimedOutSequence(rms.getInternalSequenceID(), null, storageManager);
 					else
 						found = true;
+					rmVersion = rms.getRMVersion();
 				}
+				
 			} else {
 				RMDBean matcher = new RMDBean();
 				matcher.setSequenceID(sequenceId);
 				matcher.setTerminated(false);
 				RMDBean rmd = storageManager.getRMDBeanMgr().findUnique(matcher);
-				if(rmd != null) found = true;
+				if(rmd != null) {
+					found = true;
+					rmVersion = rmd.getRMVersion();
+				}
 			}
 			if (!found) {
 				stopThreadForSequence(sequenceId, entry.isRmSource());
@@ -155,7 +161,7 @@ public class Sender extends SandeshaThread {
 			}
 
 			// start a worker which will work on this messages.
-			SenderWorker worker = new SenderWorker(context, senderBean);
+			SenderWorker worker = new SenderWorker(context, senderBean, rmVersion);
 			worker.setLock(getWorkerLock());
 			worker.setWorkId(workId);
 			threadPool.execute(worker);

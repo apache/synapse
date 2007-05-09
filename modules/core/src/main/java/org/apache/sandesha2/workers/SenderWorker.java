@@ -58,10 +58,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	private ConfigurationContext configurationContext = null;
 	private SenderBean senderBean = null;
 	private RMMsgContext messageToSend = null;
+	private String rmVersion = null;
 	
-	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean) {
+	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean, String rmVersion) {
 		this.configurationContext = configurationContext;
 		this.senderBean = senderBean;
+		this.rmVersion = rmVersion; 
 	}
 	
 	public void setMessage(RMMsgContext msg) {
@@ -385,8 +387,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		Identifier id = null;
 
 		if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
-			RMSequenceBean bean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, senderBean.getSequenceID());
-			String namespace = SpecSpecificConstants.getRMNamespaceValue(bean.getRMVersion());
+			String namespace = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			if(sequence == null) {
 				sequence = new Sequence(namespace);
@@ -396,7 +397,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				sequence.setMessageNumber(msgNumber);
 
 				if(senderBean.isLastMessage() &&
-				   SpecSpecificConstants.isLastMessageIndicatorRequired(bean.getRMVersion())) {
+				   SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion)) {
 					sequence.setLastMessage(new LastMessage(namespace));
 				}
 				

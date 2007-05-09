@@ -163,7 +163,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//  1. A message being sent by the Sender thread.
 		//  2. A message being sent as a reply to an MakeConnection.
-		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage);
+		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, returnRMMsg.getRMSpecVersion());
 		worker.setMessage(returnRMMsg);
 		worker.run();
 		

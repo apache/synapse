@@ -48,6 +48,9 @@ public interface Constants {
     /** The system property used to specify/override the synapse configuration XML location */
     String SYNAPSE_XML = "synapse.xml";
 
+    /** a message context property set to hold the relates to for POX responses */
+    String RELATES_TO_FOR_POX = "RelatesToForPox";
+
     /** If the message context contains a Boolean.TRUE with this key, WS-A would be turned on send */
     String OUTFLOW_ADDRESSING_ON = "OUTFLOW_ADDRESSING_ON";
 

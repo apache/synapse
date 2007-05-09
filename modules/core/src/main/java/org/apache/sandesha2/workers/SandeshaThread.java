@@ -16,6 +16,8 @@
  */
 package org.apache.sandesha2.workers;
 
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 
 import org.apache.axis2.context.ConfigurationContext;

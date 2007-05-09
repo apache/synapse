@@ -65,6 +65,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.sandesha2.Sandesha2Constants;
 
 /**
  * NIO transport sender for Axis2 based on HttpCore and NIO extensions
@@ -312,7 +313,9 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         // if this is a dummy message to handle http 202 case with non-blocking IO
         // set the status code to 202 and the message body to an empty byte array (see below)
-        if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED)) {
+        if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED) &&
+                msgContext.getProperty(
+                    Sandesha2Constants.MessageContextProperties.SEQUENCE_ID) == null) {
             response.setStatusCode(HttpStatus.SC_ACCEPTED);
         }
 
@@ -332,11 +335,13 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
 
         OutputStream out = worker.getOutputStream();
         try {
-            if (!Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED)) {
-                messageFormatter.writeTo(msgContext, format, out, true);
-            } else {
+            if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED) &&
+                msgContext.getProperty(
+                    Sandesha2Constants.MessageContextProperties.SEQUENCE_ID) == null) {
                 // see comment above on the reasoning
                 out.write(new byte[0]);
+            } else {
+                messageFormatter.writeTo(msgContext, format, out, true);
             }
             out.close();
         } catch (IOException e) {

@@ -35,6 +35,7 @@ import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.synapse.Constants;
 
 import javax.xml.namespace.QName;
 
@@ -184,7 +185,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
             // envelope does not contain addressing headers
             MessageContext responseMessageContext = new MessageContext();
             responseMessageContext.setMessageID(msgctx.getMessageID());
-            responseMessageContext.addRelatesTo(new RelatesTo(msgctx.getMessageID()));
+            responseMessageContext.setProperty(Constants.RELATES_TO_FOR_POX, msgctx.getMessageID());
             responseMessageContext.setOptions(options);
 			addMessageContext(responseMessageContext);
 

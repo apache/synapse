@@ -69,6 +69,9 @@ public class EntrySerializer {
                 textData.setType(XMLStreamConstants.CDATA);
                 propertyElement.addChild(textData);
             }
+        } else if (type == Entry.REMOTE_ENTRY) {
+            // nothing to serialize
+            return null;
         } else {
             handleException("Entry type undefined");
         }

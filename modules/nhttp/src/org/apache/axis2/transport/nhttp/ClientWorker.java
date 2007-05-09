@@ -82,9 +82,21 @@ public class ClientWorker implements Runnable {
             return;
         }
 
-        if (responseMsgCtx == null) {
-            log.error("Error getting IN message context from the operation context");
+        // this conditional block is to support Sandesha, as it uses an out-in mep, but without
+        // creating the message context to write the response and adding it into the operation
+        // context, as it may get a 202 accepted or 200. So if the operation is complete ignore
+        // this message, else, create a new message context and handle this
+        if (responseMsgCtx == null && outMsgCtx.getOperationContext().isComplete()) {
+            log.debug("Error getting IN message context from the operation context. " +
+                "Possibly an RM terminate sequence message");
+            return;
+
         } else {
+            if (responseMsgCtx == null) {
+                responseMsgCtx = new MessageContext();
+                responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
+            }
+
             responseMsgCtx.setServerSide(true);
             responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
             responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN, outMsgCtx
@@ -107,8 +119,6 @@ public class ClientWorker implements Runnable {
                 getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
             responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
             responseMsgCtx.setConfigurationContext(outMsgCtx.getConfigurationContext());
-            //responseMsgCtx.getOptions().setRelationships(
-            //    new RelatesTo[] { new RelatesTo(outMsgCtx.getMessageID()) });
             responseMsgCtx.setTo(null);
         }
     }
@@ -117,6 +127,12 @@ public class ClientWorker implements Runnable {
      * Process the received response through Axis2
      */
     public void run() {
+        // to support Sandesha.. if there isn't a response message context, we cannot read any
+        // response and populate it with the soap envelope
+        if (responseMsgCtx == null) {
+            return;
+        }
+
         SOAPEnvelope envelope = null;
         try {
             String contentType = response.getFirstHeader(HTTP.CONTENT_TYPE).getValue();

@@ -23,6 +23,7 @@ import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.util.Utils;
 import org.apache.axis2.transport.nhttp.NhttpConstants;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.commons.logging.Log;
@@ -32,6 +33,7 @@ import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.axiom.soap.SOAPFault;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 
 import java.util.*;
 
@@ -61,18 +63,25 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
     public void receive(MessageContext messageCtx) throws AxisFault {
 
+        String messageID = null;
+
         if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
-            String messageID = messageCtx.getOptions().getRelatesTo().getValue();
+            messageID = messageCtx.getOptions().getRelatesTo().getValue();
+        } else if (messageCtx.getProperty(SandeshaClientConstants.SEQUENCE_KEY) == null) {
+            messageID = (String) messageCtx.getProperty(Constants.RELATES_TO_FOR_POX);
+        }
+
+        if (messageID != null) {
             Callback callback = (Callback) callbackStore.remove(messageID);
 
             RelatesTo[] relates = messageCtx.getRelationships();
-            if (relates.length > 1) {
+            if (relates != null && relates.length > 1) {
                 // we set a relates to to the response message so that if WSA is not used, we
                 // could still link back to the original message. But if WSA was used, this
                 // gets duplicated, and we should remove it
                 removeDuplicateRelatesTo(messageCtx, relates);
             }
-
+            
             if (callback != null) {
                 handleMessage(messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());
             } else {
@@ -81,7 +90,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         messageID + " But a callback has not been registered to process this response");
             }
 
-        } else {
+        } else if (!Utils.isExplicitlyTrue(messageCtx, NhttpConstants.SC_ACCEPTED)){
             // TODO invoke a generic synapse error handler for this message
             log.warn("Synapse received a response message without a message Id");
         }

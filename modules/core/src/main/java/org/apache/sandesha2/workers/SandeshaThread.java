@@ -167,7 +167,18 @@ public abstract class SandeshaThread extends Thread{
 			super.start();
 			
 			// Set the SandeshaThread to have the same context classloader as the application
-			this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+			try{
+				AccessController.doPrivileged(new PrivilegedExceptionAction() {
+					public Object run() throws Exception {
+						SandeshaThread.this.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+						return null;
+					}
+				});				
+			}
+			catch(Exception e){
+				log.error(e);
+				throw new RuntimeException(e);
+			}
 		} else {
 			if(log.isDebugEnabled()) log.debug("Waking thread");
 			wakeThread();

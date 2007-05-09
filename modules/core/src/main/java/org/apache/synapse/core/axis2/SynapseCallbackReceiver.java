@@ -26,6 +26,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.transport.nhttp.NhttpConstants;
 import org.apache.axis2.addressing.RelatesTo;
+import org.apache.axis2.addressing.AddressingConstants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
@@ -199,7 +201,8 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                             synapseOutMsgCtx.getEnvironment());
 
             synapseInMessageContext.setResponse(true);
-            synapseInMessageContext.setTo(null);
+            synapseInMessageContext.setTo(
+                new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 
             // set the properties of the original MC to the new MC
             Iterator iter = synapseOutMsgCtx.getPropertyKeySet().iterator();

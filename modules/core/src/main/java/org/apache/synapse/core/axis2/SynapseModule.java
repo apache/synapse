@@ -94,6 +94,12 @@ public class SynapseModule implements Module {
         synapseService.setExposedTransports(transports);
         axisCfg.addService(synapseService);
 
+        log.info("Initializing Sandesha 2...");
+        AxisModule sandeshaAxisModule = configurationContext.getAxisConfiguration().
+            getModule(Constants.SANDESHA2_MODULE_NAME);
+        Module sandesha2 = sandeshaAxisModule.getModule();
+        sandesha2.init(configurationContext, sandeshaAxisModule);
+
         log.info("Deploying Proxy services...");
         Iterator iter = synCfg.getProxyServices().iterator();
         while (iter.hasNext()) {

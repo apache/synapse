@@ -20,6 +20,7 @@ package org.apache.sandesha2.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -870,7 +871,7 @@ public class SandeshaUtil {
 		
 		try {
 			ByteArrayInputStream stream = new ByteArrayInputStream(
-					elementString.getBytes());
+					elementString.getBytes("UTF8"));
 			StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(
 					XMLInputFactory.newInstance().createXMLStreamReader(stream),
 					null);
@@ -878,6 +879,8 @@ public class SandeshaUtil {
 
 			newMsg.setEnvelope(envelope);
 		} catch (XMLStreamException e) {
+			throw AxisFault.makeFault(e);
+		} catch (UnsupportedEncodingException e) {
 			throw AxisFault.makeFault(e);
 		}
 		

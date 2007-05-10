@@ -157,6 +157,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					senderBeanMgr.update(bean);
 				}
 				
+				// Commit the update
+				if(transaction != null && transaction.isActive()) transaction.commit();
+				transaction = null;
+				
 				if (log.isDebugEnabled())
 					log.debug("Exit: SenderWorker::run, no response transport for anonymous message");
 				return;

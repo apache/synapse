@@ -66,6 +66,8 @@
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>log4j.properties</include>
+                <include>identity.jks</include>
+                <include>trust.jks</include>
             </includes>
         </fileSet>
         <fileSet>

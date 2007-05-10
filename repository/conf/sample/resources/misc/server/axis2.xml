@@ -139,7 +139,7 @@
     	<parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
-                <Location>keystore.jks</Location>
+                <Location>identity.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
                 <KeyPassword>password</KeyPassword>
@@ -147,7 +147,7 @@
         </parameter>
         <parameter name="truststore" locked="false">
             <TrustStore>
-                <Location>keystore.jks</Location>
+                <Location>trust.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>
@@ -190,7 +190,7 @@
         <parameter name="non-blocking" locked="false">true</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
-                <Location>keystore.jks</Location>
+                <Location>identity.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
                 <KeyPassword>password</KeyPassword>
@@ -198,7 +198,7 @@
         </parameter>
         <parameter name="truststore" locked="false">
             <TrustStore>
-                <Location>keystore.jks</Location>
+                <Location>trust.jks</Location>
                 <Type>JKS</Type>
                 <Password>password</Password>
             </TrustStore>

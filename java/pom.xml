@@ -441,6 +441,14 @@
                     <groupId>org.apache.woden</groupId>
                     <artifactId>woden</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-security</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -458,6 +466,14 @@
                 <exclusion>
                     <groupId>org.apache.woden</groupId>
                     <artifactId>woden</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xml-security</groupId>
+                    <artifactId>xmlsec</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

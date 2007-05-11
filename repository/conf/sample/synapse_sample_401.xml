@@ -31,17 +31,36 @@
 
     <sequence name="main">
         <in>
-            <throttle:throttle>
+            <throttle:throttle onReject="onRejectSequence" onAccept="onAcceptSequence">
                 <policy key="thottlePolicy"/>
             </throttle:throttle>
-            <send>
-                <endpoint>
-                    <address uri="http://localhost:8082/soap/SimpleStockQuoteService"/>
-                </endpoint>
-            </send>
         </in>
         <out>
             <send/>
         </out>
+    </sequence>
+    <sequence name="onAcceptSequence">
+        <log level="custom">
+            <property name="text" value="**Access Accept**"/>
+        </log>
+        <send>
+            <endpoint>
+                <address uri="http://localhost:9000/soap/SimpleStockQuoteService"/>
+            </endpoint>
+        </send>
+    </sequence>
+    <sequence name="onRejectSequence">
+        <log level="custom">
+            <property name="text" value="**Access Denied**"/>
+        </log>
+        <makefault>
+            <code value="tns:Receiver"
+                  xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/>
+            <reason value="**Access Denied**"/>
+        </makefault>
+        <property name="RESPONSE" value="true"/>
+        <header name="To" expression="get-property('ReplyTo')"/>
+        <send/>
+        <drop/>
     </sequence>
 </definitions>

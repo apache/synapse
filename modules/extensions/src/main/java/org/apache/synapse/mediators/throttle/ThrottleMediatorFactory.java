@@ -24,6 +24,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.SequenceMediatorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
@@ -69,6 +70,37 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         initMediator(throttleMediator,elem);
+        SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
+        OMAttribute onReject = elem.getAttribute(
+                new QName(Constants.NULL_NAMESPACE, Constants.ONREJECT));
+        if (onReject != null) {
+            String onRejectValue = onReject.getAttributeValue();
+            if (onRejectValue != null) {
+                throttleMediator.setOnReject(onRejectValue.trim());
+            }
+        } else {
+            OMElement onRejectMediatorElement = elem.getFirstChildWithName(
+                    new QName(Constants.SYNAPSE_NAMESPACE, Constants.ONREJECT));
+            if (onRejectMediatorElement != null) {
+                throttleMediator.setOnRejectMediator(mediatorFactory.createAnonymousSequence(
+                        onRejectMediatorElement));
+            }
+        }
+        OMAttribute onAccept = elem.getAttribute(
+                new QName(Constants.NULL_NAMESPACE, Constants.ONACCEPT));
+        if (onAccept != null) {
+            String onAcceptValue = onAccept.getAttributeValue();
+            if (onAcceptValue != null) {
+                throttleMediator.setOnAccept(onAcceptValue);
+            }
+        } else {
+            OMElement onAcceptMediatorElement = elem.getFirstChildWithName(
+                    new QName(Constants.SYNAPSE_NAMESPACE, Constants.ONACCEPT));
+            if (onAcceptMediatorElement != null) {
+                throttleMediator.setOnAcceptMediator(mediatorFactory.createAnonymousSequence(
+                        onAcceptMediatorElement));
+            }
+        }
         return throttleMediator;
     }
 

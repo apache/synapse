@@ -311,6 +311,11 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             HTTP.CONTENT_TYPE,
             messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
 
+        // return http 500 when a SOAP fault is returned
+        if (msgContext.getEnvelope().getBody().hasFault()) {
+            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        }
+
         // if this is a dummy message to handle http 202 case with non-blocking IO
         // set the status code to 202 and the message body to an empty byte array (see below)
         if (Utils.isExplicitlyTrue(msgContext, NhttpConstants.SC_ACCEPTED) &&

@@ -25,6 +25,7 @@ import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -48,6 +49,14 @@ public class ThrottleMediator extends AbstractMediator {
     private OMElement inLinePolicy = null;
     /** The throttle - hold runtime + configuration data of throttle  */
     Throttle throttle = null;
+    /** The reference to the sequence which will execute when access deny*/
+    private String onReject = null;
+    /** The in-line sequence which will execute when access deny*/
+    private Mediator onRejectMediator = null;
+    /** The reference to the sequence which will execute when access accept */
+    private String onAccept  = null;
+    /** The in-line sequence which will execute when access accept */
+    private Mediator onAcceptMediator = null;
 
     public boolean mediate(MessageContext synCtx) {
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
@@ -74,10 +83,9 @@ public class ThrottleMediator extends AbstractMediator {
      * @return boolean which indicate whether this caller can or not access
      */
     protected boolean canAccess(MessageContext synContext, boolean shouldTrace) {
-
+        boolean canAccess = true;
         if (throttle == null) {
-            log.info("Can not find a throttle");
-            return true;
+            log.debug("Can not find a throttle");
         }
         org.apache.axis2.context.MessageContext axis2MessageContext
                 = ((Axis2MessageContext) synContext).getAxis2MessageContext();
@@ -89,7 +97,7 @@ public class ThrottleMediator extends AbstractMediator {
                 trace.trace("The IP Address of the caller is cannnot find- The Throttling will" +
                         "not occur");
             }
-            log.info("The IP address of the caller can not find - Currently only support caller-IP base"
+            log.debug("The IP address of the caller can not find - Currently only support caller-IP base"
                     + "access control - Thottling will not happen ");
             return true;
         } else {
@@ -99,26 +107,51 @@ public class ThrottleMediator extends AbstractMediator {
             ThrottleContext throttleContext
                     = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
             if (throttleContext == null) {
-                log.info("Can not find a configuartion for the IP Based Throttle");
+                log.debug("Can not find a configuartion for the IP Based Throttle");
                 return true;
             }
             try {
                 AccessController accessControler = AccessControllerFactory.createAccessControler(
                         ThrottleConstants.IP_BASE);
-                boolean canAccess = accessControler.canAccess(throttleContext, remoteIP);
+                canAccess = accessControler.canAccess(throttleContext, remoteIP);
                 if (!canAccess) {
                     String msg = "Access has currently been denied by" +
                             " the IP_BASE throttle for the IP :\t" + remoteIP;
                     if (shouldTrace) {
                         trace.trace(msg);
                     }
-                    log.info(msg);
+                    log.debug(msg);
                 }
-                return canAccess;
             }
             catch (ThrottleException e) {
-                handleException("Error occur during throttling ",e);
+                handleException("Error occur during throttling ", e);
+            }
+        }
+        if (canAccess) {
+            if (onAccept != null) {
+                Mediator mediator = synContext.getSequence(onAccept);
+                if (mediator != null) {
+                    return mediator.mediate(synContext);
+                } else {
+                    return true;
+                }
+            } else if (onAcceptMediator != null) {
+                return onAcceptMediator.mediate(synContext);
+            } else {
                 return true;
+            }
+        } else {
+            if (onReject != null) {
+                Mediator mediator = synContext.getSequence(onReject);
+                if (mediator != null) {
+                    return mediator.mediate(synContext);
+                } else {
+                    return false;
+                }
+            } else if (onRejectMediator != null) {
+                return onRejectMediator.mediate(synContext);
+            } else {
+                return false;
             }
         }
     }
@@ -186,7 +219,7 @@ public class ThrottleMediator extends AbstractMediator {
      */
     protected void createThrottleMetaData(OMElement policyOmElement) {
         try {
-            log.info("Creating a new throttle configuration by parsing the Policy");
+            log.debug("Creating a new throttle configuration by parsing the Policy");
             throttle = ThrottlePolicyProcessor
                     .processPoclicy(PolicyEngine.getPolicy(policyOmElement));
         }
@@ -201,7 +234,7 @@ public class ThrottleMediator extends AbstractMediator {
     }
 
     private void handleException(String msg, Exception e) {
-        log.info(msg);
+        log.debug(msg);
         log.error(e);
         throw new SynapseException(msg);
     }
@@ -244,5 +277,37 @@ public class ThrottleMediator extends AbstractMediator {
      */
     public void setInLinePolicy(OMElement inLinePolicy) {
         this.inLinePolicy = inLinePolicy;
+    }
+
+    public String getOnReject() {
+        return onReject;
+    }
+
+    public void setOnReject(String onReject) {
+        this.onReject = onReject;
+    }
+
+    public Mediator getOnRejectMediator() {
+        return onRejectMediator;
+    }
+
+    public void setOnRejectMediator(Mediator onRejectMediator) {
+        this.onRejectMediator = onRejectMediator;
+    }
+
+    public String getOnAccept() {
+        return onAccept;
+    }
+
+    public void setOnAccept(String onAccept) {
+        this.onAccept = onAccept;
+    }
+
+    public Mediator getOnAcceptMediator() {
+        return onAcceptMediator;
+    }
+
+    public void setOnAcceptMediator(Mediator onAcceptMediator) {
+        this.onAcceptMediator = onAcceptMediator;
     }
 }

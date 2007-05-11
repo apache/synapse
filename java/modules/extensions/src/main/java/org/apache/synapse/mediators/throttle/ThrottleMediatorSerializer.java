@@ -25,8 +25,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.SequenceMediatorSerializer;
 
 /**
  * The Serializer for Throttle Mediator  saving throttle instance
@@ -58,7 +60,33 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
                 throttle.addChild(policy);
             }
         }
-        finalizeSerialization(throttle, throttleMediator);           
+        finalizeSerialization(throttle, throttleMediator);
+        String onReject = throttleMediator.getOnReject();
+        if (onReject != null) {
+            throttle.addAttribute(fac.createOMAttribute(Constants.ONREJECT, nullNS, onReject));
+        } else {
+            Mediator mediator = throttleMediator.getOnRejectMediator();
+            SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
+            if (mediator != null && mediator instanceof SequenceMediator) {
+                OMElement element = serializer.serializeAnonymousSequence(null,
+                        (SequenceMediator) mediator);
+                element.setLocalName(Constants.ONREJECT);
+                throttle.addChild(element);
+            }
+        }
+        String onAccept = throttleMediator.getOnAccept();
+        if (onAccept != null) {
+            throttle.addAttribute(fac.createOMAttribute(Constants.ONACCEPT, nullNS, onAccept));
+        } else {
+            Mediator mediator = throttleMediator.getOnAcceptMediator();
+            SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
+            if (mediator != null && mediator instanceof SequenceMediator) {
+                OMElement element = serializer.serializeAnonymousSequence(null,
+                        (SequenceMediator) mediator);
+                element.setLocalName(Constants.ONACCEPT);
+                throttle.addChild(element);
+            }
+        }
         if (parent != null) {
             parent.addChild(throttle);
         }

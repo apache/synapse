@@ -98,4 +98,6 @@ public interface Constants {
     String DISPATCHER_ELEMENT       = "dispatcher";
     QName ATT_KEY_Q = new QName(NULL_NAMESPACE, "key");
     QName ATT_ADDRESS_Q = new QName(NULL_NAMESPACE, "address");
+    String ONREJECT = "onReject";
+    String ONACCEPT = "onAccept";
 }

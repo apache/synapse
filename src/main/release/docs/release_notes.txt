@@ -24,7 +24,20 @@ Apache Synapse 1.0 Release Notes
 5. Synapse configuration language
     Please see the document docs/Synapse_Configuration_Language.html
 
-6. Known Issues
+6. Known Issues and limitations
+  * http://issues.apache.org/jira/browse/SYNAPSE-99
+    When makefault version is set to soap12 the fault detail gets printed twice
+
+    This is caused by an underlying bug in the Axiom code that has already been fixed. However,
+    to include this into Synapse requires a new release of Axiom
+
+  * http://issues.apache.org/jira/browse/SYNAPSE-91
+    Address endpoint format soap11 and soap12 cannot be specified
+
+  * https://issues.apache.org/jira/browse/SYNAPSE-100
+    Synapse could be improved to support WS-RM 1.1
+
+  * The non-blocking https transport does not work with a JDK version below 1.5
 
 7. Frequently asked questions
 

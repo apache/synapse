@@ -391,6 +391,9 @@ public class SandeshaUtil {
 
 			newMessageContext.setAxisOperation(operation);
 
+			//The message created will basically be used as a outMessage, so setting the AxisMessage accordingly
+			newMessageContext.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
+			
 			OperationContext operationContext = new OperationContext(operation, newMessageContext.getServiceContext());
 			newMessageContext.setOperationContext(operationContext);
 			operationContext.addMessageContext(newMessageContext);

@@ -37,6 +37,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
@@ -68,6 +69,8 @@ public class SequenceProcessor {
 	public InvocationResponse processSequenceHeader(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::processSequenceHeader");
+		System.out.println("*********** ResponseWritten1" + rmMsgCtx.getProperty(Constants.RESPONSE_WRITTEN));
+		
 		InvocationResponse result = InvocationResponse.CONTINUE;
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		if(sequence != null) {
@@ -313,12 +316,16 @@ public class SequenceProcessor {
 		
 		// If this message matches the WSRM 1.0 pattern for an empty last message (e.g.
 		// the sender wanted to signal the last message, but didn't have an application
-		// message to send) then we do not need to send the message on to the application.
-		if(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_LAST_MESSAGE.equals(msgCtx.getWSAAction()) ||
-		   Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_LAST_MESSAGE.equals(msgCtx.getSoapAction())) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: SequenceProcessor::processReliableMessage, got WSRM 1.0 lastmessage, aborting");
-			return InvocationResponse.ABORT;
+		// message to send) then we direct it to the RMMessageReceiver.
+		//This is not done when LastMsg is a response - it is sent throuth the normal response flow.
+		if((Sandesha2Constants.SPEC_2005_02.Actions.ACTION_LAST_MESSAGE.equals(msgCtx.getWSAAction()) ||
+		   Sandesha2Constants.SPEC_2005_02.Actions.SOAP_ACTION_LAST_MESSAGE.equals(msgCtx.getSoapAction()))) 
+		{
+			if (rmMsgCtx.getRelatesTo()==null) {
+				if (log.isDebugEnabled())
+					log.debug("Exit: SequenceProcessor::processReliableMessage, got WSRM 1.0 lastmessage");
+				msgCtx.getAxisOperation().setMessageReceiver(new RMMessageReceiver ());
+			}
 		}
 		
 		// If the storage manager has an invoker, then they may be implementing inOrder, or

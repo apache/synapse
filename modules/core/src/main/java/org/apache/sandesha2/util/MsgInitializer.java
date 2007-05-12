@@ -147,11 +147,13 @@ public class MsgInitializer {
 		if (elements.getMakeConnection() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
 					elements.getMakeConnection());
+			rmNamespace = elements.getMakeConnection().getNamespaceValue();
 		}
 		
 		if (elements.getMessagePending() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MESSAGE_PENDING,
 					elements.getMessagePending());
+			rmNamespace = elements.getMessagePending().getNamespaceValue();
 		}
 		
 		if (elements.getSequenceFault() != null) {

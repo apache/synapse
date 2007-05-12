@@ -28,12 +28,14 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgprocessors.LastMessageProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.wsrm.Sequence;
 
 /**
 *Currently this is a dummy Msg Receiver.
@@ -72,6 +74,13 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 				msgProcessor.processInMessage(rmMsgCtx);
 
+				//If message is a LastMessage then we deligate the processing to the LastMessageProcessor
+				Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+				if (sequence!=null && sequence.getLastMessage()!=null) {
+					LastMessageProcessor lastMsgProcessor = new LastMessageProcessor ();
+					lastMsgProcessor.processLastMessage(rmMsgCtx);
+				}
+				
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception caught during processInMessage", e);

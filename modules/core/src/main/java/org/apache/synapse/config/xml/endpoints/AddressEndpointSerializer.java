@@ -111,7 +111,11 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         } else if (endpt.isForceSOAP()) {
             address.addAttribute(fac.createOMAttribute("format", null, "soap"));
         }
-
+        if (endpt.isUseSwa()) {
+            address.addAttribute(fac.createOMAttribute("optimize", null, "swa"));
+        } else if (endpt.isUseMTOM()) {
+            address.addAttribute(fac.createOMAttribute("optimize", null, "mtom"));
+        }
         if (endpt.getAddress() != null) {
             address.addAttribute(fac.createOMAttribute(
                     "uri", null, endpt.getAddress()));

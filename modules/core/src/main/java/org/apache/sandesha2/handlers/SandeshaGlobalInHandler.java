@@ -127,23 +127,17 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getConfigurationContext(), 
           rmMsgCtx.getConfigurationContext().getAxisConfiguration());
     
-    Transaction transaction = storageManager.getTransaction();
-    try {    	    
-	    //processing any incoming faults.     
-			//This is responsible for Sandesha2 specific 
-			FaultManager.processMessagesForFaults(rmMsgCtx);
-    }
-		finally {
-			transaction.commit();
-		}
+		//processing any incoming faults.     
+    //This is responsible for Sandesha2 specific 
+    InvocationResponse response = FaultManager.processMessagesForFaults(rmMsgCtx, storageManager);
 
     if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
       processApplicationMessage(rmMsgCtx);
     }
     
 		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaGlobalInHandler::invoke " + InvocationResponse.CONTINUE);
-		return InvocationResponse.CONTINUE;
+			log.debug("Exit: SandeshaGlobalInHandler::invoke " + response);
+		return response;
 	}
 	
   private static void processApplicationMessage(RMMsgContext rmMsgCtx) throws AxisFault {

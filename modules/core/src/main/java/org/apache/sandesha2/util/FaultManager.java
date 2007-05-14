@@ -44,6 +44,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -59,6 +60,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
@@ -516,8 +518,11 @@ public class FaultManager {
 		
 	}
 	
-	private static void manageIncomingFault (AxisFault fault, RMMsgContext rmMsgCtx, SOAPFault faultPart) throws AxisFault {
+	private static InvocationResponse manageIncomingFault (AxisFault fault, RMMsgContext rmMsgCtx, SOAPFault faultPart) throws AxisFault {
 	
+		if (log.isDebugEnabled())
+			log.debug("Enter: FaultManager::manageIncomingFault");
+		InvocationResponse response = InvocationResponse.CONTINUE;
 		if (log.isErrorEnabled())
 			log.error(fault);
 		
@@ -573,23 +578,46 @@ public class FaultManager {
 				Sandesha2Constants.SOAPFaults.Subcodes.SEQUENCE_TERMINATED.equals(soapFaultSubcode) ) {
 			processSequenceUnknownFault(rmMsgCtx, fault, identifier);
 		}
+		
+		// If the operation is an Sandesha In Only operation, or the fault is a recognised fault,
+		// then stop the message from being processed further.
+		// To configure the actions for Sandesha to drop, add them to the module.xml under
+		// Sandesha2InOnly operation.
+		if (isRMFault(soapFaultSubcode))
+			response = InvocationResponse.ABORT;
+		
+		if (log.isDebugEnabled())
+			log.debug("Exit: FaultManager::manageIncomingFault, " + response);
+		return response;
 	}
 	
-	public static void processMessagesForFaults (RMMsgContext rmMsgCtx) throws AxisFault {
+	public static InvocationResponse processMessagesForFaults (RMMsgContext rmMsgCtx, StorageManager storageManager) throws AxisFault {
+		
+		InvocationResponse response = InvocationResponse.CONTINUE;
 		
 		SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
 		if (envelope==null) 
-			return;
+			return response;
 		
 		SOAPFault faultPart = envelope.getBody().getFault();
 
 		if (faultPart != null) {
+			Transaction transaction = null;
+			
+			try {
+				transaction = storageManager.getTransaction();
+				// constructing the fault
+				AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
+				response = manageIncomingFault (axisFault, rmMsgCtx, faultPart);
 
-			// constructing the fault
-			AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
-			manageIncomingFault (axisFault, rmMsgCtx, faultPart);
+				if(transaction != null && transaction.isActive()) transaction.commit();
+				transaction = null;
+			} finally {
+				if (transaction != null && transaction.isActive())
+					transaction.rollback();
+			}
 		}
-
+		return response;
 	}
 
 	

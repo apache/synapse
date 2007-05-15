@@ -112,7 +112,7 @@ public class SpringMediator extends AbstractMediator {
         xbdr.setValidating(false);
         xbdr.loadBeanDefinitions(new InputStreamResource(
             Util.getStreamSource(
-                    synCtx.getConfiguration().getEntry(configKey)).getInputStream()));
+                    synCtx.getEntry(configKey)).getInputStream()));
         appContext.refresh();
         this.appContext = appContext;
     }

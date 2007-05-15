@@ -147,8 +147,13 @@ public class Axis2MessageContext implements MessageContext {
             return ((Entry) o).getValue();
         } else {
             Object e = getConfiguration().getEntry(key);
-            localEntries.put(key, e);
-            return e;
+            if (e != null) {
+                localEntries.put(key, e);
+                return e;
+            } else {
+                getConfiguration().getEntryDefinition(key);
+                return getConfiguration().getEntry(key);
+            }
         }
     }
 

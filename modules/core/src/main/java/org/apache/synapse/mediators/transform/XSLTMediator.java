@@ -165,7 +165,7 @@ public class XSLTMediator extends AbstractMediator {
                     try {
                         transformer = TransformerFactory.newInstance().
                                 newTransformer(Util.getStreamSource(
-                                        msgCtx.getConfiguration().getEntry(xsltKey)
+                                        msgCtx.getEntry(xsltKey)
                                 ));
                     } catch (TransformerConfigurationException e) {
                         handleException("Error creating XSLT transformer using : " + xsltKey, e);
@@ -181,7 +181,7 @@ public class XSLTMediator extends AbstractMediator {
                         transformer = TransformerFactory.newInstance().
                                 newTransformer(
                                         Util.getStreamSource(
-                                                msgCtx.getConfiguration().getEntry(xsltKey)));
+                                                msgCtx.getEntry(xsltKey)));
                     } catch (TransformerConfigurationException e) {
                         handleException("Error creating XSLT transformer using : " + xsltKey, e);
                     }

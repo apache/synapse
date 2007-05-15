@@ -150,11 +150,11 @@
     <wsdl:service name="SimpleStockQuoteService">
         <wsdl:port name="SimpleStockQuoteServiceSOAP11port_http"
                    binding="axis2:SimpleStockQuoteServiceSOAP11Binding">
-            <soap:address location="http://10.0.0.4:9000/soap/SimpleStockQuoteService"/>
+            <soap:address location="http://localhost:9000/soap/SimpleStockQuoteService"/>
         </wsdl:port>
         <wsdl:port name="SimpleStockQuoteServiceSOAP12port_http"
                    binding="axis2:SimpleStockQuoteServiceSOAP12Binding">
-            <soap12:address location="http://10.0.0.4:9000/soap/SimpleStockQuoteService"/>
+            <soap12:address location="http://localhost:9000/soap/SimpleStockQuoteService"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

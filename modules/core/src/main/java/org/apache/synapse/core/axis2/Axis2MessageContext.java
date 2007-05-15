@@ -380,10 +380,12 @@ public class Axis2MessageContext implements MessageContext {
                 // set function context into XPath
                 SimpleFunctionContext fc = new XPathFunctionContext();
                 fc.registerFunction(Constants.SYNAPSE_NAMESPACE, "get-property", getPropertyFunc);
+                fc.registerFunction(null, "get-property", getPropertyFunc);
                 xpath.setFunctionContext(fc);
 
                 // register namespace for XPath extension function
                 xpath.addNamespace("synapse", Constants.SYNAPSE_NAMESPACE);
+                xpath.addNamespace("syn", Constants.SYNAPSE_NAMESPACE);
 
             } catch (JaxenException je) {
                 handleException("Error setting up the Synapse XPath " +

@@ -307,7 +307,7 @@ public class Axis2FlexibleMEPClient {
      * @return the Policy object with the given name, from the configuration
      */
     private static Policy getPolicy(org.apache.synapse.MessageContext synCtx, String propertyKey) {
-        Object property = synCtx.getConfiguration().getEntry(propertyKey);
+        Object property = synCtx.getEntry(propertyKey);
         if (property != null && property instanceof OMElement) {
             return PolicyEngine.getPolicy((OMElement) property);
         } else {

@@ -23,14 +23,14 @@ public class SimpleStockQuoteService {
 
     // in-out
     public GetQuoteResponse getQuote(GetQuote request) {
-        System.out.println(new Date() + " " + this.getClass().getName() +
+        System.out.println(new Date() + " " + "SecureStockQuoteService" +
             " :: Generating quote for : " + request.getSymbol());
         return new GetQuoteResponse(request.getSymbol());
     }
 
     // in-out large response
     public GetFullQuoteResponse getFullQuote(GetFullQuote request) {
-        System.out.println(new Date() + " " + this.getClass().getName() +
+        System.out.println(new Date() + " " + "SecureStockQuoteService" +
             " :: Full quote for : " + request.getSymbol());
         return new GetFullQuoteResponse(request.getSymbol());
     }
@@ -47,14 +47,14 @@ public class SimpleStockQuoteService {
             }
         }
         sb.append("]");
-        System.out.println(new Date() + " " + this.getClass().getName() +
+        System.out.println(new Date() + " " + "SecureStockQuoteService" +
             " :: Generating Market activity report for : "  + sb.toString());
         return new GetMarketActivityResponse(request.getSymbols());
     }
 
     // in only
     public void placeOrder(PlaceOrder order) {
-        System.out.println(new Date() + " " + this.getClass().getName() +
+        System.out.println(new Date() + " " + "SecureStockQuoteService" +
             "  :: Accepted order for : " + order.getQuantity() +
             " stocks of " + order.getSymbol() + " at $ " + order.getPrice());
     }

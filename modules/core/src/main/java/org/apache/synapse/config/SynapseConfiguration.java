@@ -173,17 +173,10 @@ public class SynapseConfiguration {
 
         if (entry.getType() == Entry.URL_SRC) {
             try {
-                URLConnection urlc = entry.getSrc().openConnection();
-                XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(
-                    urlc.getInputStream());
-                StAXOMBuilder builder = new StAXOMBuilder(parser);
-                entry.setValue(builder.getDocumentElement());
+                entry.setValue(Util.getOMElementFromURL(entry.getSrc().toString()));
                 localRegistry.put(key, entry);
-
             } catch (IOException e) {
                 handleException("Can not read from source URL : " + entry.getSrc());
-            } catch (XMLStreamException e) {
-                handleException("Source URL : " + entry.getSrc() + " refers to an invalid XML");
             }
         } else {
             localRegistry.put(key, entry);

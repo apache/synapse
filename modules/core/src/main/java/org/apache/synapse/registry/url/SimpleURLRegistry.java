@@ -83,6 +83,8 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         try {
             URL url = new URL(getRoot() + key);
             URLConnection urlc = url.openConnection();
+            urlc.setReadTimeout(30000);
+            urlc.setRequestProperty("Connection", "Close");
 
             URLRegistryEntry wre = new URLRegistryEntry();
             wre.setKey(key);

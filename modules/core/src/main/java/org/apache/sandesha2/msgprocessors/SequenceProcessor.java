@@ -247,9 +247,27 @@ public class SequenceProcessor {
 		
 		// If the message is a reply to an outbound message then we can update the RMSBean that
 		// matches.
-		String outboundSequence = bean.getOutboundInternalSequence();
-		if(outboundSequence != null) {
-			RMSBean outBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, outboundSequence);
+		EndpointReference toEPR = msgCtx.getTo();
+		if(toEPR == null || toEPR.hasAnonymousAddress()) {
+			RMSBean outBean = null;
+
+			// Look for the correct outbound sequence by checking the anon uuid (if there is one)
+			String toAddress = (toEPR == null) ? null : toEPR.getAddress();
+			if(SandeshaUtil.isWSRMAnonymous(toAddress)) {
+				RMSBean finderBean = new RMSBean();
+				finderBean.setAnonymousUUID(toAddress);
+				outBean = storageManager.getRMSBeanMgr().findUnique(finderBean);
+			}
+			
+			// Fall back to the sequence that may have been offered at sequence creation time
+			if(outBean == null) {
+				String outboundSequence = bean.getOutboundInternalSequence();
+				if(outboundSequence != null) {
+					outBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, outboundSequence);
+				}
+			}
+			
+			// Update the reply count
 			if(outBean != null && outBean.getExpectedReplies() > 0 ) {
 				outBean.setExpectedReplies(outBean.getExpectedReplies() - 1);
 				RMSBeanMgr outMgr = storageManager.getRMSBeanMgr();

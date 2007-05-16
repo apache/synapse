@@ -309,15 +309,18 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 
 			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
-				long expectedReplies = rmsBean.getExpectedReplies();
-				rmsBean.setExpectedReplies(expectedReplies + 1);
+				// We only match up requests and replies when we are doing sync interactions
+				EndpointReference replyTo = msgContext.getReplyTo();
+				if(replyTo == null || replyTo.hasAnonymousAddress()) {
+					long expectedReplies = rmsBean.getExpectedReplies();
+					rmsBean.setExpectedReplies(expectedReplies + 1);
+				}
 
 				// If we support the RM anonymous URI then rewrite the ws-a anon to use the RM equivalent.
 				//(do should be done only for WSRM 1.1)
 				
 				if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmMsgCtx.getRMSpecVersion())) {
-					EndpointReference oldEndpoint = msgContext.getReplyTo();
-					String oldAddress = (oldEndpoint == null) ? null : oldEndpoint.getAddress();
+					String oldAddress = (replyTo == null) ? null : replyTo.getAddress();
 					EndpointReference newReplyTo = SandeshaUtil.rewriteEPR(rmsBean, msgContext
 							.getReplyTo(), configContext);
 					String newAddress = (newReplyTo == null) ? null : newReplyTo.getAddress();

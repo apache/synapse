@@ -196,23 +196,7 @@ public class ProxyService {
         } else if (wsdlURI != null) {
             try {
                 URL url = wsdlURI.toURL();
-                if (url != null) {
-                    URLConnection urlc = url.openConnection();
-                    try {
-                        if (urlc != null) {
-                            XMLStreamReader parser = XMLInputFactory.newInstance().
-                                    createXMLStreamReader(urlc.getInputStream());
-                            StAXOMBuilder builder = new StAXOMBuilder(parser);
-                            wsdlElement = builder.getDocumentElement();
-                            // detach from URL connection and keep in memory
-                            // TODO remove this
-                            wsdlElement.build();
-                        }
-                    } catch (XMLStreamException e) {
-                        log.warn("Content at URL : " + url + " is non XML..");
-                    }
-
-                }
+                wsdlElement = Util.getOMElementFromURL(url.toString());
             } catch (MalformedURLException e) {
                 handleException("Malformed URI for wsdl", e);
             } catch (IOException e) {

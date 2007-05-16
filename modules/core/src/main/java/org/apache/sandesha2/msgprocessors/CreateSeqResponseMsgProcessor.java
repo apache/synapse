@@ -34,6 +34,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -129,14 +130,16 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		
 		rmsBean.setSequenceID(newOutSequenceId);
 
-		// We must poll for any reply-to that uses the anonymous URI. If it is a ws-a reply to then
-		// the create must include an offer (or this client cannot be identified). If the reply-to
-		// is the RM anon URI template then the offer is not required.
+		// We should poll for any reply-to that uses the anonymous URI, when MakeConnection
+		// is enabled.
 		if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(createSeqResponseRMMsgCtx.getRMSpecVersion())) {
-			String acksTo = rmsBean.getAcksToEPR();
-			EndpointReference reference = new EndpointReference(acksTo);
-			if(acksTo == null || reference.hasAnonymousAddress()) {
-				rmsBean.setPollingMode(true);
+			SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configCtx.getAxisConfiguration());
+			if(policy.isEnableMakeConnection()) {
+				String acksTo = rmsBean.getAcksToEPR();
+				EndpointReference reference = new EndpointReference(acksTo);
+				if(acksTo == null || reference.hasAnonymousAddress()) {
+					rmsBean.setPollingMode(true);
+				}
 			}
 		}
 

@@ -40,6 +40,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -134,20 +135,32 @@ public class RMMsgCreator {
 		
 		CreateSequence createSequencePart = new CreateSequence(rmNamespaceValue);
 
+		// Check if this service includes 2-way operations
+		boolean twoWayService = false;
+		AxisService service = applicationMsgContext.getAxisService();
+		if(service != null) {
+			Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
+			if(p != null && p.getValue() != null) {
+				twoWayService = ((Boolean) p.getValue()).booleanValue();
+			}
+		}
+		
 		// Adding sequence offer - if present. We send an offer if the client has assigned an
 		// id, or if we are using WS-RM 1.0 and the service contains out-in MEPs
 		boolean autoOffer = false;
 		if(Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmNamespaceValue)) {
-			AxisService service = applicationMsgContext.getAxisService();
-			if(service != null) {
-				Parameter p = service.getParameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS);
-				if(p != null && p.getValue() != null) {
-					autoOffer = ((Boolean) p.getValue()).booleanValue();
-				}
+			autoOffer = twoWayService;
+		} else {
+			// We also do some checking at this point to see if MakeConection is required to
+			// enable WS-RM 1.1, and write a warning to the log if it has been disabled.
+			SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(context.getAxisConfiguration());
+			if(twoWayService && !policy.isEnableMakeConnection()) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionWarning);
+				log.warn(message);
 			}
 		}
+
 		String offeredSequenceId = (String) applicationMsgContext.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
-			
 		if(autoOffer ||
 		   (offeredSequenceId != null && offeredSequenceId.length() > 0))  {
 			

@@ -179,32 +179,7 @@ public class SequenceManager {
 		}
 		
 		// Finding the spec version
-		String specVersion = null;
-		if (firstAplicationMsgCtx.isServerSide()) {
-			// in the server side, get the RM version from the request sequence.
-			if(inboundBean == null || inboundBean.getRMVersion() == null) {
-				String beanInfo = (inboundBean == null) ? "null" : inboundBean.toString();
-				String message = SandeshaMessageHelper.getMessage(
-						SandeshaMessageKeys.cannotChooseSpecLevel, inboundSequence, beanInfo );
-				SandeshaException e = new SandeshaException(message);
-				if(log.isDebugEnabled()) log.debug("Throwing", e);
-				throw e;
-			}
-
-			specVersion = inboundBean.getRMVersion();
-		} else {
-			// in the client side, user will set the RM version.
-			specVersion = (String) firstAplicationMsgCtx.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
-			
-			// If the spec version is null, look in the axis operation to see value has been set
-			Parameter opLevel = firstAplicationMsgCtx.getAxisOperation().getParameter(SandeshaClientConstants.RM_SPEC_VERSION);
-			if (specVersion == null && opLevel != null)	specVersion = (String) opLevel.getValue();						
-		}
-
-		if (specVersion == null)
-			// TODO change the default to v1_1
-			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); 
-		
+		String specVersion = getSpecVersion(firstAplicationMsgCtx, storageManager);
 		rmsBean.setRMVersion(specVersion);
 
 		// Set up the To EPR
@@ -341,4 +316,44 @@ public class SequenceManager {
 		}
 	}
 
+	public static String getSpecVersion(MessageContext applicationMessage, StorageManager storageManager)
+	throws SandeshaException
+	{
+		String specVersion = null;
+		if (applicationMessage.isServerSide()) {
+			String inboundSequence = null;
+			RMDBean inboundBean = null;
+			if(applicationMessage.isServerSide()) {
+				inboundSequence = (String) applicationMessage.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_SEQUENCE_ID);
+				if(inboundSequence != null) {
+					inboundBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);
+				}
+			}
+
+			// in the server side, get the RM version from the request sequence.
+			if(inboundBean == null || inboundBean.getRMVersion() == null) {
+				String beanInfo = (inboundBean == null) ? "null" : inboundBean.toString();
+				String message = SandeshaMessageHelper.getMessage(
+						SandeshaMessageKeys.cannotChooseSpecLevel, inboundSequence, beanInfo );
+				SandeshaException e = new SandeshaException(message);
+				if(log.isDebugEnabled()) log.debug("Throwing", e);
+				throw e;
+			}
+
+			specVersion = inboundBean.getRMVersion();
+		} else {
+			// in the client side, user will set the RM version.
+			specVersion = (String) applicationMessage.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+			
+			// If the spec version is null, look in the axis operation to see value has been set
+			Parameter opLevel = applicationMessage.getAxisOperation().getParameter(SandeshaClientConstants.RM_SPEC_VERSION);
+			if (specVersion == null && opLevel != null)	specVersion = (String) opLevel.getValue();						
+		}
+
+		if (specVersion == null)
+			// TODO change the default to v1_1
+			specVersion = SpecSpecificConstants.getDefaultSpecVersion(); 
+
+		return specVersion;
+	}
 }

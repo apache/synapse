@@ -36,12 +36,11 @@ import org.apache.sandesha2.client.SandeshaClient;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SequenceReport;
 import org.apache.sandesha2.util.SandeshaUtil;
-import org.apache.sandesha2.versions.RMVersionTest;
 
 public class RMScenariosTest extends SandeshaTestCase {
 
 	private boolean serverStarted = false; 
-	private ConfigurationContext configContext = null;
+	protected ConfigurationContext configContext = null;
 
 	protected String to = "http://127.0.0.1:" + serverPort + "/axis2/services/RMSampleService";
 	

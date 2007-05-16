@@ -36,6 +36,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.client.SandeshaListener;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
@@ -190,6 +191,32 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		//see if the sequence is timed out
 		if(rmsBean != null && rmsBean.isTimedOut()){
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotSendMsgAsSequenceTimedout, internalSequenceId));
+		}
+		
+		// If the call application is a 2-way MEP, and uses a anonymous replyTo, and the
+		// RM 1.1 spec level, then we must have MakeConnection enabled. We check that here,
+		// before we start creating a new Sequence.
+		if(!serverSide) {
+			AxisOperation op = msgContext.getAxisOperation();
+			int mep = WSDLConstants.MEP_CONSTANT_INVALID;
+			if(op != null) {
+				mep = op.getAxisSpecifMEPConstant();
+			}
+			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				String specVersion = null;
+				if(rmsBean == null) {
+					specVersion = SequenceManager.getSpecVersion(msgContext, storageManager);
+				} else {
+					specVersion = rmsBean.getRMVersion();
+				}
+				if(specVersion == Sandesha2Constants.SPEC_VERSIONS.v1_1) {
+					SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(configContext.getAxisConfiguration());
+					if(!policy.isEnableMakeConnection()) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.makeConnectionDisabled);
+						throw new SandeshaException(message);
+					}
+				}
+			}
 		}
 
 		//setting the reference msg store key.

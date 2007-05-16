@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URI;
+import java.net.MalformedURLException;
 
 public class Util {
 
@@ -134,6 +135,35 @@ public class Util {
 
         } catch (IOException e) {
             handleException("Error connecting to URL : " + url, e);
+        }
+        return null;
+    }
+
+    /**
+     * Return an OMElement from a URL source
+     * @param url a URL string
+     * @return an OMElement of the resource
+     * @throws IOException for invalid URL's or IO errors
+     */
+    public static OMElement getOMElementFromURL(String url) throws IOException {
+        URLConnection conn = new URL(url).openConnection();
+        conn.setReadTimeout(30000);
+        conn.setRequestProperty("Connection", "close"); // if http is being used
+        InputStream urlInStream = conn.getInputStream();
+
+        if (urlInStream != null) {
+            try {
+                StAXOMBuilder builder = new StAXOMBuilder(urlInStream);
+                OMElement doc = builder.getDocumentElement();
+                doc.build();
+                return doc;
+            } catch (XMLStreamException e) {
+                log.error("Error parsing resource at URL : " + url + " as XML", e);
+            } finally {
+                try {
+                    urlInStream.close();
+                } catch (IOException ignore) {}
+            }
         }
         return null;
     }

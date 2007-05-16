@@ -34,9 +34,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.synapse.config.Util;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
+import java.net.URLConnection;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * Creates an WSDL based endpoint from a XML configuration.
@@ -127,12 +131,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 wsdlEndpoint.setWsdlURI(wsdlURI.trim());
 
                 try {
-                    URL wsdlURL = new URL(wsdlURI);
-                    StAXOMBuilder OMBuilder = new StAXOMBuilder
-                            (wsdlURL.openConnection().getInputStream());
-
-                    OMElement docElement = OMBuilder.getDocumentElement();
-                    String ns = docElement.getNamespace().getNamespaceURI();
+                    String ns = Util.getOMElementFromURL(new URL(wsdlURI).toString())
+                        .getNamespace().getNamespaceURI();
 
                     if (org.apache.axis2.namespace.Constants.NS_URI_WSDL11.equals(ns)) {
                         endpoint = new WSDL11EndpointBuilder().

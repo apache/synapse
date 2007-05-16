@@ -425,7 +425,7 @@
         <!-- Sandesha -->
         <dependency>
             <groupId>org.apache.sandesha2</groupId>
-            <artifactId>sandesha2-mar</artifactId>
+            <artifactId>sandesha2</artifactId>
             <version>${sandesha2.version}</version>
             <type>mar</type>
             <exclusions>

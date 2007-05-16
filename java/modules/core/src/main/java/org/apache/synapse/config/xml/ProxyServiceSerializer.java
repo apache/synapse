@@ -198,12 +198,12 @@ public class ProxyServiceSerializer {
             }
         }
 
-//        if (service.isWsRMEnabled()) {
-//            proxy.addChild(fac.createOMElement("enableRM", synNS));
-//        }
-//        if (service.isWsSecEnabled()) {
-//            proxy.addChild(fac.createOMElement("enableSec", synNS));
-//        }
+        if (service.isWsRMEnabled()) {
+            proxy.addChild(fac.createOMElement("enableRM", synNS));
+        }
+        if (service.isWsSecEnabled()) {
+            proxy.addChild(fac.createOMElement("enableSec", synNS));
+        }
 
         int isEnableStatistics = service.getStatisticsEnable();
         String statisticsValue = null;

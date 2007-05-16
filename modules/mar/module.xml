@@ -42,6 +42,9 @@
         <!-- namespaces for the 2005-02 spec -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/SequenceAcknowledgement</actionMapping>
 
+        <!--  For interopability purposes. Some WSRM implementations tend to send this as the LastMessage -->
+        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage</actionMapping>
+
         <!-- namespaces for the 2007-02 spec -->
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/SequenceAcknowledgement</actionMapping>        
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/fault</actionMapping>
@@ -58,9 +61,6 @@
         
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/AckRequested</actionMapping>
         
-		<!--  For interoparability perposes. Some WSRM implementations tend to send this as the LastMessage -->
-        <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/LastMessage</actionMapping>
-		
         <!-- namespaces for the 2007-02 spec -->
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/CreateSequence</actionMapping>
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/CloseSequence</actionMapping>

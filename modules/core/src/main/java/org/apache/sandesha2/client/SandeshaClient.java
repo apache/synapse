@@ -490,9 +490,7 @@ public class SandeshaClient {
 			} else {
 				options.setAction(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_LAST_MESSAGE);
 				options.setProperty(SandeshaClientConstants.LAST_MESSAGE, Constants.VALUE_TRUE);
-			
-				//the server should also reply with a last message
-				serviceClient.sendReceive (null);
+				serviceClient.fireAndForget(null);
 			}
 			
 		} catch (AxisFault e) {

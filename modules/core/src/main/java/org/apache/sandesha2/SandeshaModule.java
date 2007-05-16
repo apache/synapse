@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisDescription;
@@ -226,7 +227,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 				String name = null;
 				QName qName = op.getName();
 				if(qName != null) name = qName.getLocalPart();
-				if(name != null && name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX))
+				if((name != null && name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) ||
+				   ServiceClient.ANON_OUT_IN_OP.equals(qName))
 					break;
 
 				// If we get to here then we must have one of the user's operations, so
@@ -238,14 +240,15 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 				}
 			}
 		} else if(axisDescription instanceof AxisOperation) {
-				AxisOperation op = (AxisOperation) axisDescription;
-				log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecifMEPConstant());
-	
-				String name = null;
-				QName qName = op.getName();
-				if(qName != null) name = qName.getLocalPart();
-				if(name != null && !name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) {
-	
+			AxisOperation op = (AxisOperation) axisDescription;
+			log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecifMEPConstant());
+
+			String name = null;
+			QName qName = op.getName();
+			if(qName != null) name = qName.getLocalPart();
+			if((name != null && !name.startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) &&
+			   !ServiceClient.ANON_OUT_IN_OP.equals(qName)) {
+
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
 				if(op.getAxisSpecifMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {

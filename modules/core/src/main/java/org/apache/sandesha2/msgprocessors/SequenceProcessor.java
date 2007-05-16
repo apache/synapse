@@ -69,7 +69,6 @@ public class SequenceProcessor {
 	public InvocationResponse processSequenceHeader(RMMsgContext rmMsgCtx) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::processSequenceHeader");
-		System.out.println("*********** ResponseWritten1" + rmMsgCtx.getProperty(Constants.RESPONSE_WRITTEN));
 		
 		InvocationResponse result = InvocationResponse.CONTINUE;
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);

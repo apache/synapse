@@ -271,9 +271,9 @@
             </handler>
         </phase>
         <!--  System pre defined phases       -->
-        <phase name="RMPhase"/>
         <!--   After Postdispatch phase module author or or service author can add any phase he want      -->
         <phase name="OperationInPhase"/>
+        <phase name="RMPhase"/>
     </phaseOrder>
     <phaseOrder type="OutFlow">
         <!--      user can add his own phases to this area  -->
@@ -323,8 +323,8 @@
             </handler>
         </phase>
         <!--      user can add his own phases to this area  -->
-        <phase name="RMPhase"/>
         <phase name="OperationInFaultPhase"/>
+        <phase name="RMPhase"/>
     </phaseOrder>
     <phaseOrder type="OutFaultFlow">
         <!--      user can add his own phases to this area  -->

@@ -32,7 +32,7 @@ import java.util.List;
 public class EndPointStatisticsStack implements StatisticsStack {
 
     /** list of endpoint statistics */
-    private ArrayList endpointStatistics;
+    private List endpointStatistics;
     /** To decide whether the reporting of the in flow statistics have been completed*/
     private boolean isCompleteInFlowStatisicsReport = false;
 
@@ -94,13 +94,9 @@ public class EndPointStatisticsStack implements StatisticsStack {
     public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
                                             boolean isFault, String name) {
         if (endpointStatistics != null && !endpointStatistics.isEmpty()) {
-
             List tobeRemoved = new ArrayList();
-
             for (Iterator epIterator = endpointStatistics.iterator();
                  epIterator.hasNext();) {
-                System.out.println(Thread.currentThread().getName());
-                Thread.dumpStack();
                 Object statisticsObj = epIterator.next();
                 if (statisticsObj instanceof EndPointStatistics) {
                     EndPointStatistics statistics = (EndPointStatistics) statisticsObj;
@@ -123,7 +119,6 @@ public class EndPointStatisticsStack implements StatisticsStack {
                     }
                 }
             }
-
             endpointStatistics.removeAll(tobeRemoved);
         }
     }
@@ -135,6 +130,7 @@ public class EndPointStatisticsStack implements StatisticsStack {
     public void reportAllToStatisticsCollector(StatisticsCollector statisticsCollector,
                                                boolean isFault) {
         if (endpointStatistics != null && !endpointStatistics.isEmpty()) {
+            List tobeRemoved = new ArrayList();
             for (Iterator epIterator = endpointStatistics.iterator();
                  epIterator.hasNext();) {
                 Object statisticsObj = epIterator.next();
@@ -153,11 +149,12 @@ public class EndPointStatisticsStack implements StatisticsStack {
                             statisticsCollector.reportForEndPoint(statistics.endPointName,
                                     true, statistics.inTimeForOutFlow,
                                     System.currentTimeMillis(), isFault);
-                            endpointStatistics.remove(statistics);
+                            tobeRemoved.add(statistics);
                         }
                     }
                 }
             }
+            endpointStatistics.removeAll(tobeRemoved);
         }
         isCompleteInFlowStatisicsReport = true;
     }

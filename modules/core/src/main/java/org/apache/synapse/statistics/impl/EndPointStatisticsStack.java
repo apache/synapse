@@ -22,6 +22,7 @@ import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.StatisticsCollector;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The data structure to hold statistics related to the endpoints
@@ -93,8 +94,13 @@ public class EndPointStatisticsStack implements StatisticsStack {
     public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
                                             boolean isFault, String name) {
         if (endpointStatistics != null && !endpointStatistics.isEmpty()) {
+
+            List tobeRemoved = new ArrayList();
+
             for (Iterator epIterator = endpointStatistics.iterator();
                  epIterator.hasNext();) {
+                System.out.println(Thread.currentThread().getName());
+                Thread.dumpStack();
                 Object statisticsObj = epIterator.next();
                 if (statisticsObj instanceof EndPointStatistics) {
                     EndPointStatistics statistics = (EndPointStatistics) statisticsObj;
@@ -112,11 +118,13 @@ public class EndPointStatisticsStack implements StatisticsStack {
                             statisticsCollector.reportForEndPoint(statistics.endPointName,
                                     true, statistics.inTimeForOutFlow,
                                     System.currentTimeMillis(), isFault);
-                            endpointStatistics.remove(statistics);
+                            tobeRemoved.add(statistics);
                         }
                     }
                 }
             }
+
+            endpointStatistics.removeAll(tobeRemoved);
         }
     }
 
@@ -175,6 +183,22 @@ public class EndPointStatisticsStack implements StatisticsStack {
                 isStatisticsEnable = statisticsEnable;
                 isFault = fault;
             }
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            EndPointStatistics that = (EndPointStatistics) o;
+
+            if (endPointName != null ? !endPointName.equals(that.endPointName) : that.endPointName != null)
+                return false;
+
+            return true;
+        }
+
+        public int hashCode() {
+            return (endPointName != null ? endPointName.hashCode() : 0);
         }
     }
 }

@@ -2317,5 +2317,180 @@ functions, 'transformRequest' and 'transformResponse', and the Synapse
 configuration specifies which function is to be invoked when used. Execute
 the stock quote client to send a custom stock quote as per example #500 and
 check the received stock quote response.</p>
+
+<p></p>
+
+<h2>Sample 600</h2>
+
+<p></p>
+<pre>&lt;!-- Demonstrate the use of class mediator --&gt;        
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="fault"&gt;
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="Mediation failed."/&gt;
+        &lt;/makefault&gt;
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="main" onError="fault"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint name="stockquote"&gt;
+                    &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;class name="samples.mediators.DiscountQuoteMediator"&gt;
+                &lt;property name="discountFactor" value="10"/&gt;
+                &lt;property name="bonusFor" value="5"/&gt;
+            &lt;/class&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p></p>
+
+<p><strong>Objective: Demonstrate the use of Class mediator to extend the
+mediation functionality</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Make sure the synapse-samples-1.0.jar is in your class path (by default
+this jar is placed in the lib directory when installing Synapse).</p>
+
+<p>Start Synapse with the sample configuration 600 (i.e. synapse -sample
+600)</p>
+
+<p>Start the sample Axis2 server and deploy the SimpleStockQuoteService.</p>
+
+<p></p>
+
+<p>In this configuration, Synapse hands over the request message to the
+specified endpoint, which sends it to the Axis2 server running on port
+9000.</p>
+
+<p>But the response message is passed through the class mediator before
+sending it back to the client. Two parameters named "discountFactor"</p>
+
+<p>and "bonusFor" are passed to the instance mediator implementation class
+(i.e. samples.mediators.DiscountQuoteMediator) before each</p>
+
+<p>invocation. Code of the mediator implementation class is shown below.</p>
+<pre>package samples.mediators;
+
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.Mediator;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.xml.namespace.QName;
+
+public class DiscountQuoteMediator implements Mediator {
+
+    private static final Log log = LogFactory.getLog(DiscountQuoteMediator.class);
+
+    private String discountFactor="10";
+
+    private String bonusFor="10";
+
+    private int bonusCount=0;
+
+    public DiscountQuoteMediator(){}
+
+    public boolean mediate(MessageContext mc) {
+
+        String price= mc.getEnvelope().getBody().getFirstElement().getFirstElement().
+                getFirstChildWithName(new QName("http://services.samples/xsd","last")).getText();
+
+        //converting String properties into integers
+        int discount=Integer.parseInt(discountFactor);
+        int bonusNo=Integer.parseInt(bonusFor);
+        double currentPrice=Double.parseDouble(price);
+
+        //discounting factor is deducted from current price form every response
+        Double lastPrice = new Double(currentPrice - currentPrice * discount / 100);
+
+        //Special discount of 5% offers for the first responses as set in the bonusFor property
+        if (bonusCount &lt;= bonusNo) {
+            lastPrice = new Double(lastPrice.doubleValue() - lastPrice.doubleValue() * 0.05);
+            bonusCount++;
+        }
+
+        String discountedPrice = lastPrice.toString();
+
+        mc.getEnvelope().getBody().getFirstElement().getFirstElement().getFirstChildWithName
+                (new QName("http://services.samples/xsd","last")).setText(discountedPrice);
+
+        System.out.println("Quote value discounted.");
+        System.out.println("Original price: " + price);
+        System.out.println("Discounted price: " + discountedPrice);
+
+        return true;
+    }
+
+    public String getType() {
+        return null;
+    }
+
+    public void setTraceState(int traceState) {
+        traceState = 0;
+    }
+
+    public int getTraceState() {
+        return 0;
+    }
+
+    public void setDiscountFactor(String discount) {
+        discountFactor=discount;
+    }
+
+    public String getDiscountFactor() {
+        return discountFactor;
+    }
+
+    public void setBonusFor(String bonus){
+        bonusFor=bonus;
+    }
+
+    public String getBonusFor(){
+        return bonusFor;
+    }
+}</pre>
+
+<p>All classes specified for the Class mediatoe should implement the Mediator
+interface, which contains the mediate(...) method. mediate(...) method of the
+above class is invoked for each response message mediated through the main
+sequence, with the message context of the current message as the parameter.
+All the details of the message including the SOAP headers, SOAP body and
+properties of the context hierachy can be accessed from the message context.
+In this sample, the body of the message is retrieved and discount percentage
+is substracted from the quote price. If the</p>
+
+<p>quote request number is lesser than the number specified in the "bonusFor"
+property in the configuration, a special discount is given.</p>
+
+<p></p>
+
+<p>Now run the client using the following command.</p>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+
+<p>You will see the below output in the client console with the discounted
+quote value.</p>
+<pre>[java] Standard :: Stock price = $138.77458254967408</pre>
+
+<p>Now check the console running Synapse. You will see the original value and
+the discounted value for the requested quote as follows.</p>
+<pre>Quote value discounted.
+Original price: 162.30945327447262
+Discounted price: 138.77458254967408</pre>
 </body>
 </html>

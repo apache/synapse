@@ -23,6 +23,7 @@ import org.apache.synapse.statistics.StatisticsCollector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * The data structure to hold statistics related to Sequences
@@ -32,7 +33,7 @@ import java.util.Iterator;
 public class SequenceStatisticsStack implements StatisticsStack {
 
     /** The list to hols SequenceStatistics */
-    private ArrayList sequenceStatisticsList = new ArrayList();
+    private List sequenceStatisticsList = new ArrayList();
 
     /**
      * To put a statistics
@@ -66,6 +67,7 @@ public class SequenceStatisticsStack implements StatisticsStack {
     public void reportToStatisticsCollector(StatisticsCollector statisticsCollector,
                                             boolean isFault, String name) {
         if (!sequenceStatisticsList.isEmpty()) {
+            List tobeRemoved = new ArrayList();
             for (Iterator seqIterator = sequenceStatisticsList.iterator();
                  seqIterator.hasNext();) {
                 SequenceStatistics sequenceStatistics =
@@ -79,9 +81,10 @@ public class SequenceStatisticsStack implements StatisticsStack {
                                 !sequenceStatistics.isInFlow, sequenceStatistics.initTime,
                                 System.currentTimeMillis(), sequenceStatistics.isFault);
                     }
-                    sequenceStatisticsList.remove(sequenceStatistics);
+                    tobeRemoved.add(sequenceStatistics);
                 }
             }
+            sequenceStatisticsList.removeAll(tobeRemoved);
         }
     }
 
@@ -143,6 +146,21 @@ public class SequenceStatisticsStack implements StatisticsStack {
             isInFlow = inFlow;
             isStatisticsEnable = statisticsEnable;
             this.isFault = isFault;
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final SequenceStatistics that = (SequenceStatistics) o;
+
+            if (!sequenceName.equals(that.sequenceName)) return false;
+
+            return true;
+        }
+
+        public int hashCode() {
+            return sequenceName.hashCode();
         }
     }
 

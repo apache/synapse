@@ -100,8 +100,10 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 String suspend = suspendElement.getText();
 
                 try {
-                    long suspendDuration = Long.parseLong(suspend);
-                    wsdlEndpoint.setSuspendOnFailDuration(suspendDuration * 1000);
+                    if (suspend != null) {
+                        long suspendDuration = Long.parseLong(suspend.trim());
+                        wsdlEndpoint.setSuspendOnFailDuration(suspendDuration * 1000);
+                    }
 
                 } catch (NumberFormatException e) {
                     handleException("suspendDurationOnFailure should be valid number.");

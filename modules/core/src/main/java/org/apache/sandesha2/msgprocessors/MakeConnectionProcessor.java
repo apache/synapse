@@ -21,9 +21,11 @@ import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.workers.SenderWorker;
 import org.apache.sandesha2.wsrm.Address;
 import org.apache.sandesha2.wsrm.Identifier;
@@ -142,6 +144,21 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		if(pending) addMessagePendingHeader(returnMessage, namespace);
 		
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
+		if(returnRMMsg.getRMNamespaceValue()==null){
+			//this is the case when a stored application response msg was not sucecsfully returned 
+			//on the sending transport's backchannel. Since the msg was stored without a sequence header
+			//we need to lookup the namespace using the RMS bean
+			if(log.isDebugEnabled()) log.debug("Looking up rmNamespace from RMS bean");
+			String sequenceID = matchingMessage.getSequenceID();
+			if(sequenceID!=null){
+				RMSBean rmsBean = new RMSBean();
+				rmsBean.setSequenceID(sequenceID);
+				rmsBean = storageManager.getRMSBeanMgr().findUnique(rmsBean);
+				if(rmsBean!=null){
+					returnRMMsg.setRMNamespaceValue(SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion()));
+				}
+			}
+		}
 		setTransportProperties (returnMessage, pollMessage);
 		
 		// Link the response to the request

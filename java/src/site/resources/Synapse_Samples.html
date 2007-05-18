@@ -159,6 +159,7 @@
       <li><a href="#Sample52">Sample 52: POX to SOAP conversion</a></li>
       <li><a href="#Sample54">Sample 54: Load balancing</a></li>
       <li><a href="#Sample55">Sample 55: Failover</a></li>
+      <li><a href="#Sample60">Sample 60: WSDL endpoint</a></li>
     </ul>
   </li>
   <li><a href="#ProxyServices">Synapse Proxy service samples</a> 
@@ -187,7 +188,7 @@
         and replying with a 202 Accepted response</a></li>
     </ul>
   </li>
-  <li><a href="#ScriptMediators">Script Mediators</a> 
+  <li><a href="#ExtensionMediators">Extension Mediators</a> 
     <ul>
       <li><a href="Synapse_Samples_Setup.html#ScriptSetup">Setting up Script
         Mediators</a> </li>
@@ -198,6 +199,8 @@
         API methods</a></li>
       <li><a href="#Sample503">Sample 503: Using Ruby scripts for
         mediation</a></li>
+      <li><a href="#Sample600">Sample 600: Class mediator - Writting your own
+        mediation in Java</a></li>
     </ul>
   </li>
 </ul>
@@ -1416,6 +1419,62 @@ servers list again after 60 seconds (specified in
 have restarted any of the stopped servers and shutdown all other servers,
 messages will be directed to the newly started server.</p>
 
+<h2><a name="Sample60">Sample 60:</a></h2>
+<pre>&lt;!-- demonstrates wsdl endpoint --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;!-- get epr from the given wsdl --&gt;
+                &lt;endpoint&gt;
+                    &lt;wsdl uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl" service="SimpleStockQuoteService" port="SimpleStockQuoteServiceSOAP11port_http"/&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the use of WSDL endpoints</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start the Synapse configuration numbered 60 (i.e. synapse -sample 60).</p>
+
+<p>Deploy the SimpleStockQuoteService and start the sample Axis2 server.</p>
+
+<p>This sample uses a WSDL endpoint inside the send mediator. WSDL endpoints
+can extract endpoint's address from the given WSDL. As WSDL documents can
+have many services and many ports inside each service, the service and port
+of the required endpoint has to be specified. As with address endpoints, QoS
+parameters for the endpoint can be specified inline in the configuration. An
+excerpt taken from the sample_proxy_1.wsdl containing the specified service
+and port is listed below.</p>
+<pre>&lt;wsdl:service name="SimpleStockQuoteService"&gt;
+    &lt;wsdl:port name="SimpleStockQuoteServiceSOAP11port_http"
+               binding="axis2:SimpleStockQuoteServiceSOAP11Binding"&gt;
+        &lt;soap:address location="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+    &lt;/wsdl:port&gt;
+    &lt;wsdl:port name="SimpleStockQuoteServiceSOAP12port_http"
+               binding="axis2:SimpleStockQuoteServiceSOAP12Binding"&gt;
+        &lt;soap12:address location="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+    &lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;</pre>
+
+<p>Specified service and port refers to the endpoint address
+"http://localhost:9000/soap/SimpleStockQuoteService" according to the above
+WSDL. Now run the client using the below command.</p>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+
+<p>Client will print the quote price for IBM received from the server running
+on port 9000. Observe the Axis2 console and the Synapse console to verify
+this behavoir.</p>
+
 <h1><a name="ProxyServices" id="ProxyServices">Proxy services</a></h1>
 
 <h2><a name="Sample100">Sample 100:</a></h2>
@@ -2072,7 +2131,7 @@ Transfer-Encoding: chunked
 
 0</pre>
 
-<h1><a name="ScriptMediators">Script mediators</a></h1>
+<h1><a name="ExtensionMediators">Extension mediators</a></h1>
 
 <p>Synapse supports Mediators implemented in a variety of scripting languages
 such as JavaScript, Python or Ruby. Implementing a Mediator with a script
@@ -2320,7 +2379,7 @@ check the received stock quote response.</p>
 
 <p></p>
 
-<h2>Sample 600</h2>
+<h2><a name="Sample600">Sample 600</a></h2>
 
 <p></p>
 <pre>&lt;!-- Demonstrate the use of class mediator --&gt;        

@@ -53,9 +53,9 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
 
     /**
      * Leaf level endpoints will be suspended for the specified time by this variable, after a
-     * failure. If this is not explicitly set, endpoints will be suspended forever.
+     * failure. If this is not explicitly set, it is set to -1, which causes endpoints to suspended forever.
      */
-    private long suspendOnFailDuration = Long.MAX_VALUE;
+    private long suspendOnFailDuration = -1;
 
     /**
      * Time to recover a failed endpoint. Value of this is calculated when endpoint is set as
@@ -224,7 +224,11 @@ public class WSDLEndpoint extends FaultHandler implements Endpoint {
     public void setActive(boolean active, MessageContext synMessageContext) {
 
         if (!active) {
-            recoverOn = System.currentTimeMillis() + suspendOnFailDuration;
+            if (suspendOnFailDuration != -1) {
+                recoverOn = System.currentTimeMillis() + suspendOnFailDuration;
+            } else {
+                recoverOn = Long.MAX_VALUE;
+            }
         }
 
         this.active = active;

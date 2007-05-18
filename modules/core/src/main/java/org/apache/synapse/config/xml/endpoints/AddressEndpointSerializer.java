@@ -88,7 +88,7 @@ public class AddressEndpointSerializer implements EndpointSerializer {
         endpointElement.addChild(addressElement);
 
         long suspendDuration = addressEndpoint.getSuspendOnFailDuration();
-        if (suspendDuration != Long.MAX_VALUE) {
+        if (suspendDuration != -1) {
             // user has set some value for this. let's serialize it.
 
             OMElement suspendElement = fac.createOMElement(

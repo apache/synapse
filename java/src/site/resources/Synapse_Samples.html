@@ -1267,7 +1267,7 @@ endpoints</strong></p>
 <p>Start Synapse with sample configuration 54. (i.e. synapse -sample 54)</p>
 
 <p>Deploy the LoadbalanceFailoverService by switching to &lt;synapse
-installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverServer
+installation directory&gt;/samples/axis2Server/src/LoadbalanceFailoverService
 directory and running ant.</p>
 
 <p>Start three instances of sample Axis2 server on HTTP ports 9001, 9002 and
@@ -1418,6 +1418,232 @@ servers list again after 60 seconds (specified in
 &lt;suspendDurationOnFailure&gt; in the configuration). Therefore, if you
 have restarted any of the stopped servers and shutdown all other servers,
 messages will be directed to the newly started server.</p>
+
+<p></p>
+
+<p>Sample 56:</p>
+<pre>&lt;!-- Demontrates session affinity load balancing between 3 endpoints. We are using client
+ initiated session for this sample. --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;!-- specify the session as the simple client session provided by Synapse for
+                    testing purpose --&gt;
+                    <strong>&lt;session type="simpleClientSession"/&gt;</strong>
+
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                &lt;enableAddressing/&gt;
+                            &lt;/address&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the load balancing with session affinity
+using client initiated sessions</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 54 (i.e. synapse 54).</p>
+
+<p>Deploy the LoadbalanceFailoverService and start three instances of the
+sample Axis2 server as in sample 54. </p>
+
+<p></p>
+
+<p>Above configuration is same as the load balancing configuration in sample
+54, except that the session type is specified as "simpleClientSession". This
+is a client initiated session, which means that the client generates the
+session identifier and send it to with each request. In this sample session
+type, client adds a SOAP header named ClientID containing the identifier of
+the client. Synapse binds this ID with a server on the first request and
+sends all seccessive requests containing that ID to the same server. Now
+switch to samples/axis2Client directory and run the client using the
+following command to check this in action.</p>
+<pre>ant loadbalancefailover -Dmode=session</pre>
+
+<p>In the session mode, client continuesly sends requests with three diferent
+client (session) IDs. One ID is selected among these three IDs for each
+request randomly. Then client prints the session ID with the responded server
+for each request. Client output for the first 10 requests are shown below.</p>
+<pre>[java] Request: 1 Session number: 1 Response from server: MyServer3
+[java] Request: 2 Session number: 2 Response from server: MyServer2
+[java] Request: 3 Session number: 0 Response from server: MyServer1
+[java] Request: 4 Session number: 2 Response from server: MyServer2
+[java] Request: 5 Session number: 1 Response from server: MyServer3
+[java] Request: 6 Session number: 2 Response from server: MyServer2
+[java] Request: 7 Session number: 2 Response from server: MyServer2
+[java] Request: 8 Session number: 1 Response from server: MyServer3
+[java] Request: 9 Session number: 0 Response from server: MyServer1
+[java] Request: 10 Session number: 0 Response from server: MyServer1
+... </pre>
+
+<p>You can see that session number 0 is always directed to the server named
+MyServer1. That means session number 1 is bound to MyServer3. Similarly
+session 1 and 2 are bound to MyServer3 and MyServer2 respectively. </p>
+
+<h2>Sample 57:</h2>
+<pre>&lt;!-- Demontrates the session affinity load balancing between fail over endpoints. If endpoint servers
+maintain session specific data, such data have to replicated among the failover endpoints. --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+
+    &lt;sequence name="main" onError="errorHandler"&gt;
+        &lt;in&gt;
+            &lt;send&gt;
+                &lt;endpoint&gt;
+                    &lt;!-- specify the session as the simple client session provided by Synapse for
+                    testing purpose --&gt;
+                    <strong>&lt;session type="simpleClientSession"/&gt;</strong>
+
+                    &lt;loadbalance&gt;
+                        &lt;endpoint&gt;
+                            &lt;failover&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9001/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9002/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/failover&gt;
+                        &lt;/endpoint&gt;
+                        &lt;endpoint&gt;
+                            &lt;failover&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9003/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                                &lt;endpoint&gt;
+                                    &lt;address uri="http://localhost:9004/soap/LBService1"&gt;
+                                        &lt;enableAddressing/&gt;
+                                    &lt;/address&gt;
+                                &lt;/endpoint&gt;
+                            &lt;/failover&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/loadbalance&gt;
+                &lt;/endpoint&gt;
+            &lt;/send&gt;
+        &lt;/in&gt;
+
+        &lt;out&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit To EPR) --&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+
+    &lt;sequence name="errorHandler"&gt;
+
+        &lt;makefault&gt;
+            &lt;code value="tns:Receiver" xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+            &lt;reason value="COULDN'T SEND THE MESSAGE TO THE SERVER."/&gt;
+        &lt;/makefault&gt;
+
+        &lt;header name="To" action="remove"/&gt;
+        &lt;property name="RESPONSE" value="true"/&gt;
+
+        &lt;send/&gt;
+    &lt;/sequence&gt;
+
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Demonstrate the session affinity based load balancing
+with failover capability</strong></p>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Start Synapse with sample configuration 57 (i.e. synapse -sample 57).</p>
+
+<p>Deploy the LoadbalanceFailoverService and start four sample Axis2 servers
+on http ports 9001, 9002, 9003 and 9004 respectively (make sure to specify
+unconflicting https ports).</p>
+
+<p></p>
+
+<p>This configuration also uses "simpleClientSession" to bind sessions as in
+the previous sample. But failover endpoints are specified as the child
+endpoints of the load balance endpoint. Therefore sessions are bound to the
+failover endpoints. Session information has to be replicated among the
+servers listed under each failover endpoint using some clustering mechanism.
+Therefore, if one endpoint bound to a session failed, successive requets for
+that session will be directed to the next endpoint in that failover group.
+Run the client using the following command to observe this behavoir.</p>
+<pre>ant loadbalancefailover -Dmode=session</pre>
+
+<p>You can see a client output as shown below.</p>
+<pre>...
+[java] Request: 222 Session number: 0 Response from server: MyServer1
+[java] Request: 223 Session number: 0 Response from server: MyServer1
+[java] Request: 224 Session number: 1 Response from server: MyServer1
+[java] Request: 225 Session number: 2 Response from server: MyServer3
+[java] Request: 226 Session number: 0 Response from server: MyServer1
+[java] Request: 227 Session number: 1 Response from server: MyServer1
+[java] Request: 228 Session number: 2 Response from server: MyServer3
+[java] Request: 229 Session number: 1 Response from server: MyServer1
+[java] Request: 230 Session number: 1 Response from server: MyServer1
+[java] Request: 231 Session number: 2 Response from server: MyServer3
+...</pre>
+
+<p>Note that session 0 is always directed to MyServer1 and session 1 is
+directed to MyServer3. No requests are directed to MyServer2 and MyServer4 as
+they are kept as backups by failover endpoints. Now shutdown the server named
+MyServer1 while running the sample. You will observer that all successive
+requests for session 0 is now directed to MyServer2, which is the backup
+server for MyServer1's group. This is shown below, where MyServer1 was
+shutdown after the request 534.</p>
+<pre>...
+[java] Request: 529 Session number: 2 Response from server: MyServer3
+[java] Request: 530 Session number: 1 Response from server: MyServer1
+[java] Request: 531 Session number: 0 Response from server: MyServer1
+[java] Request: 532 Session number: 1 Response from server: MyServer1
+[java] Request: 533 Session number: 1 Response from server: MyServer1
+[java] Request: 534 Session number: 1 Response from server: MyServer1
+[java] Request: 535 Session number: 0 Response from server: MyServer2
+[java] Request: 536 Session number: 0 Response from server: MyServer2
+[java] Request: 537 Session number: 0 Response from server: MyServer2
+[java] Request: 538 Session number: 2 Response from server: MyServer3
+[java] Request: 539 Session number: 0 Response from server: MyServer2
+...</pre>
 
 <h2><a name="Sample60">Sample 60:</a></h2>
 <pre>&lt;!-- demonstrates wsdl endpoint --&gt;

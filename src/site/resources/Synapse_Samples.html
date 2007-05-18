@@ -159,6 +159,8 @@
       <li><a href="#Sample52">Sample 52: POX to SOAP conversion</a></li>
       <li><a href="#Sample54">Sample 54: Load balancing</a></li>
       <li><a href="#Sample55">Sample 55: Failover</a></li>
+      <li><a href="#Sample56">Sample 56: Load balancing with session affinity</a></li>
+      <li><a href="#Sample57">Sample 57: Load balancing with session affinity among failover groups</a></li>
       <li><a href="#Sample60">Sample 60: WSDL endpoint</a></li>
     </ul>
   </li>
@@ -1419,9 +1421,7 @@ servers list again after 60 seconds (specified in
 have restarted any of the stopped servers and shutdown all other servers,
 messages will be directed to the newly started server.</p>
 
-<p></p>
-
-<p>Sample 56:</p>
+<h2><a name="Sample56">Sample 56:</a></h2>
 <pre>&lt;!-- Demontrates session affinity load balancing between 3 endpoints. We are using client
  initiated session for this sample. --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
@@ -1519,7 +1519,7 @@ for each request. Client output for the first 10 requests are shown below.</p>
 MyServer1. That means session number 1 is bound to MyServer3. Similarly
 session 1 and 2 are bound to MyServer3 and MyServer2 respectively. </p>
 
-<h2>Sample 57:</h2>
+<h2><a name="Sample57">Sample 57:</a></h2>
 <pre>&lt;!-- Demontrates the session affinity load balancing between fail over endpoints. If endpoint servers
 maintain session specific data, such data have to replicated among the failover endpoints. --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;

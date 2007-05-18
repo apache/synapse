@@ -83,7 +83,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
 
         long suspendDuration = wsdlEndpoint.getSuspendOnFailDuration();
-        if (suspendDuration != Long.MAX_VALUE) {
+        if (suspendDuration != -1) {
             // user has set some value for this. let's serialize it.
 
             OMElement suspendElement = fac.createOMElement(

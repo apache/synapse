@@ -109,8 +109,8 @@ public class StatisticsCollector {
      *
      * @return all sequence statistics
      */
-    public Iterator getSequenceStatistics() {
-        return sequenceStatistics.values().iterator();
+    public Map getSequenceStatistics() {
+        return sequenceStatistics;
     }
 
     /**
@@ -118,8 +118,8 @@ public class StatisticsCollector {
      *
      * @return all proxy services statistics
      */
-    public Iterator getProxyServiceStatistics() {
-        return proxyServicesStatistics.values().iterator();
+    public Map getProxyServiceStatistics() {
+        return proxyServicesStatistics;
     }
 
     /**
@@ -127,7 +127,28 @@ public class StatisticsCollector {
      *
      * @return all endpoint statistics
      */
-    public Iterator getEndPointStatistics() {
-        return endpointStatistics.values().iterator();
+    public Map getEndPointStatistics() {
+        return endpointStatistics;
+    }
+
+    /**
+     * To reset the sequence statistics
+     */
+    public void resetSequenceStatistics() {
+        this.sequenceStatistics = Collections.synchronizedMap(new HashMap());
+    }
+
+    /**
+     * To reset the proxy service statistics
+     */
+    public void resetProxyServiceStatistics() {
+        this.proxyServicesStatistics = Collections.synchronizedMap(new HashMap());
+    }
+
+    /**
+     * To reset the endpoint statistics
+     */
+    public void resetEndPointStatistics() {
+        this.endpointStatistics = Collections.synchronizedMap(new HashMap());
     }
 }

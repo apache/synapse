@@ -147,7 +147,9 @@ public class MsgInitializer {
 		if (elements.getMakeConnection() != null) {
 			rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION,
 					elements.getMakeConnection());
-			rmNamespace = elements.getMakeConnection().getNamespaceValue();
+			String makeConnectionNamespace = elements.getMakeConnection().getNamespaceValue();
+			if (Sandesha2Constants.SPEC_2007_02.MC_NS_URI.equals(makeConnectionNamespace))
+				rmNamespace = Sandesha2Constants.SPEC_2007_02.NS_URI;
 		}
 		
 		if (elements.getMessagePending() != null) {

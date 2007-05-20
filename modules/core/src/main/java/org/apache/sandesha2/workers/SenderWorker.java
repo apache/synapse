@@ -16,6 +16,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.transport.RequestResponseTransport;
@@ -464,91 +465,88 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 		try {
 
-			boolean responsePresent = (msgCtx.getProperty(MessageContext.TRANSPORT_IN) != null);
-			if (!responsePresent) {
+			// create the responseMessageContext
+
+			MessageContext responseMessageContext = msgCtx.getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+			SOAPEnvelope resenvelope = null;
+			
+			boolean transportInPresent = (msgCtx.getProperty(MessageContext.TRANSPORT_IN) != null);
+			if (!transportInPresent && (responseMessageContext==null || responseMessageContext.getEnvelope()==null)) {
 				if(log.isDebugEnabled()) log.debug("Exit: SenderWorker::checkForSyncResponses, no response present");
 				return;
 			}
-
-			// create the responseMessageContext
-
-			MessageContext responseMessageContext = new MessageContext();
-
-			OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
-			responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, requestMsgOpCtx
-							.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));
-			responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx
-							.getProperty(Constants.Configuration.CONTENT_TYPE));
-			responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE, requestMsgOpCtx
-					.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
-
-            //If the response MsgCtx was not available Axis2 would hv put the transport info into a 
-            //HashMap, getting the data from it.
-			HashMap transportInfoMap = (HashMap) msgCtx.getProperty(Constants.Configuration.TRANSPORT_INFO_MAP);
-			if (transportInfoMap != null) {
-				responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, 
-								transportInfoMap.get(Constants.Configuration.CONTENT_TYPE));
-				responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
-						transportInfoMap.get(Constants.Configuration.CHARACTER_SET_ENCODING));
-			}
 			
-			//setting the message as serverSide will let it go through the MessageReceiver (may be callback MR).
-			responseMessageContext.setServerSide(true);
-			
-			if (responseMessageContext.getSoapAction()==null) {
-				//if there is no SOAP action in the response message, Axis2 will wrongly identify it as a REST message
-				//This happens because we set serverSide to True in a previous step.
-				//So we have to add a empty SOAPAction here.
-				responseMessageContext.setSoapAction("");
-			}
-			
-			responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
-			responseMessageContext.setTransportIn(msgCtx.getTransportIn());
-			responseMessageContext.setTransportOut(msgCtx.getTransportOut());
+			if (responseMessageContext==null || responseMessageContext.getEnvelope()==null) {
+				if (responseMessageContext==null)
+					responseMessageContext = new MessageContext();
 
-			responseMessageContext.setProperty(MessageContext.TRANSPORT_IN, msgCtx
-					.getProperty(MessageContext.TRANSPORT_IN));
-			responseMessageContext.setServiceContext(msgCtx.getServiceContext());
-			responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
+				OperationContext requestMsgOpCtx = msgCtx.getOperationContext();
+				responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, requestMsgOpCtx
+								.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));
+				responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, requestMsgOpCtx
+								.getProperty(Constants.Configuration.CONTENT_TYPE));
+				responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE, requestMsgOpCtx
+								.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
 
-			responseMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY,
-					msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY));
-
-			// If request is REST we assume the responseMessageContext is REST,
-			// so set the variable
-
-			responseMessageContext.setDoingREST(msgCtx.isDoingREST());
-
-			SOAPEnvelope resenvelope = null;
-			try {
-				// MessageContext is modified in TransportUtils.createSOAPMessage(). It might be used by axis.engine or handler.
-				// To catch the modification and pass it to engine or handler, resenvelope is created by responseMessageContext. 
-				resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
-			} catch (AxisFault e) {
-				//Cannot find a valid SOAP envelope.
-				if (log.isErrorEnabled() ) {
-					log.error (SandeshaMessageHelper
-							.getMessage(SandeshaMessageKeys.soapEnvNotSet));
-					log.error ("Caught exception", e);
+				//If the response MsgCtx was not available Axis2 would hv put the transport info into a 
+				//HashMap, getting the data from it.
+				HashMap transportInfoMap = (HashMap) msgCtx.getProperty(Constants.Configuration.TRANSPORT_INFO_MAP);
+				if (transportInfoMap != null) {
+					responseMessageContext.setProperty(Constants.Configuration.CONTENT_TYPE, 
+									transportInfoMap.get(Constants.Configuration.CONTENT_TYPE));
+					responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
+									transportInfoMap.get(Constants.Configuration.CHARACTER_SET_ENCODING));
 				}
-				
-				return;
-			}
+			
+				//setting the message as serverSide will let it go through the MessageReceiver (may be callback MR).
+				responseMessageContext.setServerSide(true);
+			
+				if (responseMessageContext.getSoapAction()==null) {
+					//if there is no SOAP action in the response message, Axis2 will wrongly identify it as a REST message
+					//This happens because we set serverSide to True in a previous step.
+					//So we have to add a empty SOAPAction here.
+					responseMessageContext.setSoapAction("");
+				}
+			
+				responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
+				responseMessageContext.setTransportIn(msgCtx.getTransportIn());
+				responseMessageContext.setTransportOut(msgCtx.getTransportOut());
 
-			if (resenvelope != null) {
-				if (log.isDebugEnabled())
-					log.debug("Response " + resenvelope.getHeader());
-				responseMessageContext.setEnvelope(resenvelope);
+				responseMessageContext.setProperty(MessageContext.TRANSPORT_IN, msgCtx
+						.getProperty(MessageContext.TRANSPORT_IN));
+				responseMessageContext.setServiceContext(msgCtx.getServiceContext());
+				responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
+
+				responseMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY,
+				msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.MAKECONNECTION_ENTRY));
+
+				// If request is REST we assume the responseMessageContext is REST,
+				// so set the variable
+
+				responseMessageContext.setDoingREST(msgCtx.isDoingREST());
+
+				resenvelope = responseMessageContext.getEnvelope();
+				try {
+					// MessageContext is modified in TransportUtils.createSOAPMessage(). It might be used by axis.engine or handler.
+					// To catch the modification and pass it to engine or handler, resenvelope is created by responseMessageContext. 
 				
+					if (resenvelope==null) {
+						//We try to build the response out of the transport stream.
+						resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
+						responseMessageContext.setEnvelope(resenvelope);
+					} else {
+						
+					}
+				} catch (AxisFault e) {
+					//Cannot find a valid SOAP envelope.
+					if (log.isErrorEnabled() ) {
+						log.error (SandeshaMessageHelper
+								.getMessage(SandeshaMessageKeys.soapEnvNotSet));
+					log.error ("Caught exception", e);
+					}
 				
-//				//If this message is an RM Control message it should not be assumed as an application message.
-//				//So dispatching etc should happen just like for a new message comming into the system.
-//				RMMsgContext responseRMMsg = MsgInitializer.initializeMessage(responseMessageContext);
-//				if (responseRMMsg.getMessageType()!=Sandesha2Constants.MessageTypes.UNKNOWN &&
-//					responseRMMsg.getMessageType()!=Sandesha2Constants.MessageTypes.APPLICATION	) {
-//					responseMessageContext.setAxisOperation(null);
-//					responseMessageContext.setOperationContext(null);
-//				}
+					return;
+				}
 				
 				//If addressing is disabled we will be adding this message simply as the application response of the request message.
 				Boolean addressingDisabled = (Boolean) msgCtx.getOptions().getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
@@ -569,6 +567,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					responseMessageContext.setOperationContext(responseMsgOpCtx);
 				}
 				
+				AxisOperation operation = msgCtx.getAxisOperation();
+				if (operation!=null && responseMessageContext.getAxisMessage()==null
+						&& (operation instanceof OutInAxisOperation))
+					responseMessageContext.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE));
+
 				RMMsgContext responseRMMessage = MsgInitializer.initializeMessage(responseMessageContext);
 				if (responseRMMessage.getMessageType()==Sandesha2Constants.MessageTypes.ACK) {
 					responseMessageContext.setAxisOperation(SpecSpecificConstants.getWSRMOperation
@@ -576,8 +579,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 					responseMessageContext.setOperationContext(null);
 				}
 				
-				AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
-
+			}
+			
+			AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
+			if (resenvelope!=null) {
+				//we proceed only if we hv found a valid envelope.
 				if (isFaultEnvelope(resenvelope)) {
 					engine.receiveFault(responseMessageContext);
 				} else {

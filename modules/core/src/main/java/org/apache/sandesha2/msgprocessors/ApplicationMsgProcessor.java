@@ -40,6 +40,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
@@ -72,7 +73,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		this.inboundMessageNumber = inboundMessageNumber;
 	}
 	
-	public boolean processInMessage(RMMsgContext rmMsgCtx) {
+	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: ApplicationMsgProcessor::processInMessage");
 			log.debug("Exit: ApplicationMsgProcessor::processInMessage");
@@ -287,11 +288,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				lastMessage = true;
 			}
 		}
-		if (lastMessage) {
-			rmsBean.setLastOutMessage(messageNumber);
-			// Update the rmsBean
-			storageManager.getRMSBeanMgr().update(rmsBean);
-		}
+		
+		if (lastMessage) 
+			rmsBean.setLastOutMessage(messageNumber);		
 
 		// set this as the response highest message.
 		rmsBean.setHighestOutMessageNumber(messageNumber);

@@ -72,30 +72,22 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());				
 				transaction = storageManager.getTransaction();
 
-				msgProcessor.processInMessage(rmMsgCtx);
+				msgProcessor.processInMessage(rmMsgCtx, transaction);
 
 				//If message is a LastMessage then we deligate the processing to the LastMessageProcessor
 				Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 				if (sequence!=null && sequence.getLastMessage()!=null) {
-					LastMessageProcessor lastMsgProcessor = new LastMessageProcessor ();
-					lastMsgProcessor.processLastMessage(rmMsgCtx);
+					LastMessageProcessor.processLastMessage(rmMsgCtx);
 				}
-				
+
+        if(transaction != null && transaction.isActive()) transaction.commit();
+        transaction = null;
+
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception caught during processInMessage", e);
 				// message should not be sent in a exception situation.
 				msgCtx.pause();
-	
-				if (transaction != null) {
-					try {
-						transaction.rollback();
-						transaction = null;
-					} catch (Exception e1) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
-						log.debug(message, e);
-					}
-				}
 	
 				if (!(e instanceof AxisFault)) {
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.inMsgError, e.toString());
@@ -104,12 +96,12 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 				
 				throw (AxisFault)e;
 			} finally {
-				if (transaction != null) {
+				if (transaction != null && transaction.isActive()) {
 					try {
-						transaction.commit();
-					} catch (Exception e) {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
-						log.debug(message, e);
+						transaction.rollback();
+					} catch (Exception e1) {
+						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
+						log.debug(message, e1);
 					}
 				}
 			}

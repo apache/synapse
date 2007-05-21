@@ -9,18 +9,15 @@ import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
-import org.apache.sandesha2.wsrm.Sequence;
 
 public class LastMessageProcessor  {
 
-	public boolean processLastMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public static void processLastMessage(RMMsgContext rmMsgCtx) throws AxisFault {
 		
 		if (!Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgCtx.getRMSpecVersion()))
-			return true;
+			return;
 		
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
-		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-		String sequenceId = sequence.getIdentifier().getIdentifier();
 		MessageContext outMessage = MessageContextBuilder.createOutMessageContext(msgContext);
 		
 		//add the SOAP envelope with body null
@@ -37,7 +34,6 @@ public class LastMessageProcessor  {
 		AxisEngine engine = new AxisEngine (rmMsgCtx.getConfigurationContext());
 		engine.send(outMessage);
 		
-		return true;
 	}
 
 }

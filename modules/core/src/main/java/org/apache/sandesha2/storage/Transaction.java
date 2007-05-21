@@ -23,9 +23,9 @@ package org.apache.sandesha2.storage;
 
 public interface Transaction {
 	
-	public void commit ();
+	public void commit () throws SandeshaStorageException;
 	
-	public void rollback ();
+	public void rollback () throws SandeshaStorageException;
 	
 	//indicates that the transaction has been started, but has not been committed or rolledbacked yet.
 	public boolean isActive ();

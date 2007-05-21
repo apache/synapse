@@ -152,9 +152,10 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
       SandeshaUtil.getSandeshaStorageManager(rmMsgCtx.getConfigurationContext(), 
           rmMsgCtx.getConfigurationContext().getAxisConfiguration());
     
-    Transaction transaction = storageManager.getTransaction();
+    Transaction transaction = null;
     
     try {
+      transaction = storageManager.getTransaction();
     
       // Check that both the Sequence header and message body have been secured properly
       RMDBeanMgr mgr = storageManager.getRMDBeanMgr();
@@ -219,11 +220,12 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
             rmMsgCtx.getMessageContext().getAxisService());
         rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
       }
-      transaction.commit();
+      
+      if(transaction != null && transaction.isActive()) transaction.commit();
       transaction = null;
     }
     finally {
-      if (transaction != null)
+      if (transaction != null && transaction.isActive())
         transaction.rollback();
     }
     if (log.isDebugEnabled())

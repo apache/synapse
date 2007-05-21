@@ -41,6 +41,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.FaultManager;
@@ -64,7 +65,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqMsgProcessor.class);
 
-	public boolean processInMessage(RMMsgContext createSeqRMMsg) throws AxisFault {
+	public boolean processInMessage(RMMsgContext createSeqRMMsg, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqMsgProcessor::processInMessage");
 
@@ -259,6 +260,10 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	
 			SandeshaUtil.startWorkersForSequence(context, rmdBean);
 
+			//
+			// We have done all of our updates, so commit the transaction
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			
 			AxisEngine engine = new AxisEngine(context);
 			try{
 				engine.send(outMessage);				

@@ -108,11 +108,12 @@ public class PollingManager extends SandeshaThread {
 
 		} catch (Exception e) {
 			if(log.isDebugEnabled()) log.debug("Exception", e);
-			if(t != null) {
+		} finally {
+			if(t != null && t.isActive()) {
 				try {
 					t.rollback();
 				} catch(Exception e2) {
-					if(log.isDebugEnabled()) log.debug("Exception during rollback", e);
+					if(log.isDebugEnabled()) log.debug("Exception during rollback", e2);
 				}
 			}
 		}

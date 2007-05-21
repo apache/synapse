@@ -46,6 +46,7 @@ public class InMemoryTransaction implements Transaction {
 	private InMemoryTransaction waitingForTran = null;
 	private boolean sentMessages = false;
 	private boolean receivedMessages = false;
+	private boolean active = true;
 	
 	InMemoryTransaction(InMemoryStorageManager manager, String threadName, int id) {
 		if(log.isDebugEnabled()) log.debug("Entry: InMemoryTransaction::<init>");
@@ -62,14 +63,16 @@ public class InMemoryTransaction implements Transaction {
 			SandeshaThread invoker = manager.getInvoker();
 			if(invoker != null) invoker.wakeThread();
 		}
+		active = false;
 	}
 
 	public void rollback() {
 		releaseLocks();
+		active = false;
 	}
 	
 	public boolean isActive () {
-		return !enlistedBeans.isEmpty();
+		return active;
 	}
 
 	public void enlist(RMBean bean) throws SandeshaStorageException {

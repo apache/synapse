@@ -29,6 +29,7 @@ import org.apache.sandesha2.polling.PollingManager;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -43,7 +44,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(TerminateSeqResponseMsgProcessor.class);
 	
-	public boolean processInMessage(RMMsgContext terminateResRMMsg)
+	public boolean processInMessage(RMMsgContext terminateResRMMsg, Transaction transaction)
 			throws AxisFault { 
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processInMessage");
 		

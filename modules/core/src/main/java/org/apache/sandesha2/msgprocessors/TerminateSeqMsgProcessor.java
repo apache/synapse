@@ -29,7 +29,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.transport.http.server.AxisHttpResponseImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -40,6 +39,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -64,7 +64,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 	private static final Log log = LogFactory.getLog(TerminateSeqMsgProcessor.class);
 
-	public boolean processInMessage(RMMsgContext terminateSeqRMMsg) throws AxisFault {
+	public boolean processInMessage(RMMsgContext terminateSeqRMMsg, Transaction transaction) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::processInMessage");
@@ -150,12 +150,15 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 
 		//sending the terminate sequence response
 		if (terminateSequenceResponse != null) {
+			//
+			// As we have processed the input and prepared the response we can commit the
+			// transaction now.
+			if(transaction != null && transaction.isActive()) transaction.commit();
 			
 			MessageContext outMessage = terminateSequenceResponse.getMessageContext();
 			EndpointReference toEPR = outMessage.getTo();
 			
-			AxisEngine engine = new AxisEngine(terminateSeqMsg
-					.getConfigurationContext());
+			AxisEngine engine = new AxisEngine(terminateSeqMsg.getConfigurationContext());
 						
 			outMessage.setServerSide(true);
 						
@@ -308,7 +311,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 							throw new SandeshaException (message);
 						}
 						
-						RMMsgContext referenceRMMsg = MsgInitializer.initializeMessage(referenceMessage);
+						//RMMsgContext referenceRMMsg = MsgInitializer.initializeMessage(referenceMessage);
 									
 					}
 				}

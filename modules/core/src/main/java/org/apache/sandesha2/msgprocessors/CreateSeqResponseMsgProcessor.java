@@ -38,6 +38,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
@@ -57,7 +58,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 	private static final Log log = LogFactory.getLog(CreateSeqResponseMsgProcessor.class);
 
-	public boolean processInMessage(RMMsgContext createSeqResponseRMMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext createSeqResponseRMMsgCtx, Transaction transaction) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processInMessage");

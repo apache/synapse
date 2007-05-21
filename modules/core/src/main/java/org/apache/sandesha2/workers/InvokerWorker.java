@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
@@ -105,17 +106,15 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					transaction.commit();
 					transaction = storageManager.getTransaction();
 				}
-
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception :", e);
-				if(transaction!=null){
-					transaction.rollback();
-					transaction = storageManager.getTransaction();
-				}
+
 				handleFault(rmMsg, e);
 			}
 
+
+			
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -158,18 +157,25 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				rMDBean.setNextMsgNoToProcess(nextMsgNo);
 				storageManager.getRMDBeanMgr().update(rMDBean);
 			}
+			
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			transaction = null;
+			
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.toString(), e);
-			if(transaction != null) {
-				transaction.rollback();
-				transaction = null;
-			}
 		} finally {
-			if (transaction!=null) transaction.commit();
-			
 			if (workId !=null && lock!=null) {
 				lock.removeWork(workId);
+			}
+
+			if (transaction!=null && transaction.isActive()) {
+				try {
+					transaction.rollback();
+				} catch (SandeshaStorageException e) {
+					if (log.isWarnEnabled())
+						log.warn("Caught exception rolling back transaction", e);
+				}
 			}
 		}
 		

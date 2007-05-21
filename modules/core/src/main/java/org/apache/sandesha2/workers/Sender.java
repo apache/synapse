@@ -174,6 +174,9 @@ public class Sender extends SandeshaThread {
 			// If we got to here then we found work to do on the sequence, so we should
 			// remember not to sleep at the end of the list of sequences.
 			processedMessage = true;
+			
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			transaction = null;
 
 		} catch (Exception e) {
 
@@ -184,28 +187,16 @@ public class Sender extends SandeshaThread {
 			//TODO rollback only if a SandeshaStorageException.
 			//This allows the other Exceptions to be used within the Normal flow.
 			
-			if (transaction != null) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e.toString());
+			log.debug(message, e);
+		} finally {
+			if (transaction != null && transaction.isActive()) {
 				try {
 					transaction.rollback();
 					transaction = null;
-				} catch (Exception e1) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1
-							.toString());
-					log.debug(message, e1);
-				}
-			}
-
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendMsgError, e.toString());
-
-			log.debug(message, e);
-		} finally {
-			if (transaction != null) {
-				try {
-					transaction.commit();
-					transaction = null;
 				} catch (Exception e) {
 					String message = SandeshaMessageHelper
-							.getMessage(SandeshaMessageKeys.commitError, e.toString());
+							.getMessage(SandeshaMessageKeys.rollbackError, e.toString());
 					log.debug(message, e);
 				}
 			}
@@ -228,9 +219,10 @@ public class Sender extends SandeshaThread {
 		RMSBean finderBean = new RMSBean();
 		finderBean.setTerminated(true);
 		
-		Transaction transaction = storageManager.getTransaction();
+		Transaction transaction = null;
 		
 		try {
+			transaction = storageManager.getTransaction();
 			
 			SandeshaPolicyBean propertyBean = 
 				SandeshaUtil.getPropertyBean(storageManager.getContext().getAxisConfiguration());			
@@ -301,11 +293,21 @@ public class Sender extends SandeshaThread {
 		    }
 			} 	    
 	    
-    } catch (SandeshaException e) {
-    	if (log.isErrorEnabled())
-    		log.error(e);
-    } finally {
-			transaction.commit();
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			transaction = null;
+			
+		} catch (SandeshaException e) {
+			if (log.isErrorEnabled())
+				log.error(e);
+		} finally {
+			if(transaction != null && transaction.isActive()) {
+				try {
+					transaction.rollback();
+				} catch (SandeshaStorageException e) {
+					if (log.isDebugEnabled())
+						log.debug("Caught exception rolling back transaction", e);
+				}
+			}
 		}
 		
 		if (log.isDebugEnabled()) 

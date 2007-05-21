@@ -111,7 +111,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			MessageValidator.validateMessage(rmMsgCtx, storageManager);
 			
 			// commit the current transaction
-			transaction.commit();
+			if(transaction != null && transaction.isActive()) transaction.commit();
 			transaction = storageManager.getTransaction();
 
 			// Process Ack headers in the message
@@ -119,7 +119,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			ackProcessor.processAckHeaders(rmMsgCtx);
 
 			// commit the current transaction
-			transaction.commit();
+			if(transaction != null && transaction.isActive()) transaction.commit();
 			transaction = storageManager.getTransaction();
 
 			// Process Ack Request headers in the message
@@ -133,29 +133,23 @@ public class SandeshaInHandler extends AbstractHandler {
 			pendingProcessor.processMessagePendingHeaders(rmMsgCtx);
 
 			// commit the current transaction
-			transaction.commit();
+			if(transaction != null && transaction.isActive()) transaction.commit();
 			transaction = storageManager.getTransaction();
 
 			// Process the Sequence header, if there is one
 			SequenceProcessor seqProcessor = new SequenceProcessor();
-			returnValue = seqProcessor.processSequenceHeader(rmMsgCtx);
+			returnValue = seqProcessor.processSequenceHeader(rmMsgCtx, transaction);
 
+			// commit the current transaction
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			transaction = null;
+			
 		} catch (Exception e) {
 			if (log.isDebugEnabled()) 
 				log.debug("SandeshaInHandler::invoke Exception caught during processInMessage", e);
 			// message should not be sent in a exception situation.
 			msgCtx.pause();
 			returnValue = InvocationResponse.SUSPEND;
-			
-			if (transaction != null) {
-				try {
-					transaction.rollback();
-					transaction = null;
-				} catch (Exception e1) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e1.toString());
-					log.debug(message, e);
-				}
-			}
 			
 			// Rethrow the original exception if it is an AxisFault
 			if (e instanceof AxisFault)
@@ -166,15 +160,17 @@ public class SandeshaInHandler extends AbstractHandler {
 		} 
 		finally {
 			if (log.isDebugEnabled()) log.debug("SandeshaInHandler::invoke Doing final processing");
-			if (transaction != null) {
+			if (transaction != null && transaction.isActive()) {
 				try {
-					transaction.commit();
+					transaction.rollback();
+					transaction = null;
 				} catch (Exception e) {
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.commitError, e.toString());
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.rollbackError, e.toString());
 					log.debug(message, e);
 				}
 			}
 		}
+		
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaInHandler::invoke " + returnValue);
 		return returnValue;

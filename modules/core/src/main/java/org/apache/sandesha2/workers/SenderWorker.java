@@ -32,11 +32,11 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
+import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
-import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
@@ -185,14 +185,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// sending the message
 			boolean successfullySent = false;
 
-			// have to commit the transaction before sending. This may
-			// get changed when WS-AT is available.
-			if(transaction != null) {
-				transaction.commit();
-				transaction = null;
-				transaction = storageManager.getTransaction();
-			}
-
 			// Although not actually sent yet, update the send count to indicate an attempt
 			if (senderBean.isReSend()) {
 				SenderBean bean2 = senderBeanMgr.retrieve(senderBean.getMessageID());
@@ -271,11 +263,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				// Store the Exception as a sequence property to enable the client to lookup the last 
 				// exception time and timestamp.
 				
-				// Create a new Transaction
-				transaction = storageManager.getTransaction();
-			
 				try
 				{
+					// Create a new Transaction
+					transaction = storageManager.getTransaction();
 					
 					// Get the internal sequence id from the context
 					String internalSequenceId = (String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
@@ -300,7 +291,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				{
 					if (log.isErrorEnabled())
 						log.error(e1);
-					
+				} finally {
 					if (transaction != null) {
 						transaction.rollback();
 						transaction = null;
@@ -340,34 +331,45 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)
 					&&
 					 (Sandesha2Constants.SPEC_2005_02.NS_URI.equals(rmMsgCtx.getRMNamespaceValue()))) {
-				transaction = storageManager.getTransaction();
-				//terminate message sent using the SandeshaClient. Since the terminate message will simply get the
-				//InFlow of the reference message get called which could be zero sized (OutOnly operations).
-				
-				// terminate sending side if this is the WSRM 1.0 spec. 
-				// If the WSRM versoion is 1.1 termination will happen in the terminate sequence response message.
-				
-				TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
-						.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
-				String sequenceID = terminateSequence.getIdentifier().getIdentifier();
-
-				RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
-				TerminateManager.terminateSendingSide(rmsBean, storageManager);
-				
-				transaction.commit();
+				try {
+					transaction = storageManager.getTransaction();
+					//terminate message sent using the SandeshaClient. Since the terminate message will simply get the
+					//InFlow of the reference message get called which could be zero sized (OutOnly operations).
+					
+					// terminate sending side if this is the WSRM 1.0 spec. 
+					// If the WSRM versoion is 1.1 termination will happen in the terminate sequence response message.
+					
+					TerminateSequence terminateSequence = (TerminateSequence) rmMsgCtx
+							.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
+					String sequenceID = terminateSequence.getIdentifier().getIdentifier();
+	
+					RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, sequenceID);
+					TerminateManager.terminateSendingSide(rmsBean, storageManager);
+					
+					if(transaction != null && transaction.isActive()) transaction.commit();
+					transaction = null;
+				} finally {
+					if(transaction != null && transaction.isActive()) {
+						transaction.rollback();
+						transaction = null;
+					}
+				}
 			}
 
 		} catch (Exception e) {
-			if (log.isErrorEnabled()) log.error("Caught exception", e);
-			if (transaction!=null) {
-				transaction.rollback();
-				transaction = null;
-			}
+			if (log.isDebugEnabled()) log.debug("Caught exception", e);
 		} finally {
-			if (transaction!=null) transaction.commit();
-			
 			if (lock!=null && workId!=null) {
 				lock.removeWork(workId);
+			}
+
+			if (transaction!=null && transaction.isActive()) {
+				try {
+					transaction.rollback();
+				} catch (SandeshaStorageException e) {
+					if (log.isWarnEnabled())
+						log.warn("Caught exception rolling back transaction", e);
+				}
 			}
 		}
 		

@@ -42,6 +42,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.RMSBeanMgr;
@@ -66,7 +67,7 @@ public class SequenceProcessor {
 
 	private static final Log log = LogFactory.getLog(SequenceProcessor.class);
 
-	public InvocationResponse processSequenceHeader(RMMsgContext rmMsgCtx) throws AxisFault {
+	public InvocationResponse processSequenceHeader(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::processSequenceHeader");
 		
@@ -74,7 +75,7 @@ public class SequenceProcessor {
 		Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 		if(sequence != null) {
 			// This is a reliable message, so hand it on to the main routine
-			result = processReliableMessage(rmMsgCtx);
+			result = processReliableMessage(rmMsgCtx, transaction);
 		} else {
 			if (log.isDebugEnabled())
 				log.debug("Message does not contain a sequence header");
@@ -84,7 +85,7 @@ public class SequenceProcessor {
 		return result;
 	}
 	
-	public InvocationResponse processReliableMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public InvocationResponse processReliableMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SequenceProcessor::processReliableMessage");
 
@@ -214,12 +215,12 @@ public class SequenceProcessor {
 		
 			  SenderBean replyMessageBean = senderBeanMgr.findUnique(findSenderBean);
 			    
-			  // this is effectively a poll for the replyMessage, wo re-use the logic in the MakeConnection
+			  // this is effectively a poll for the replyMessage, so re-use the logic in the MakeConnection
 			  // processor. This will use this thread to re-send the reply, writing it into the transport.
 			  // As the reply is now written we do not want to continue processing, or suspend, so we abort.
 			  if(replyMessageBean != null) {
 			  	if(log.isDebugEnabled()) log.debug("Found matching reply for replayed message");
-			   	MakeConnectionProcessor.replyToPoll(rmMsgCtx, replyMessageBean, storageManager, false, null);
+			   	MakeConnectionProcessor.replyToPoll(rmMsgCtx, replyMessageBean, storageManager, false, null, transaction);
 					result = InvocationResponse.ABORT;
 					if (log.isDebugEnabled())
 						log.debug("Exit: SequenceProcessor::processReliableMessage, replayed message: " + result);
@@ -313,13 +314,14 @@ public class SequenceProcessor {
 		// - We have async acks
 		boolean backchannelFree = (replyTo != null && !replyTo.hasAnonymousAddress()) ||
 									WSDLConstants.MEP_CONSTANT_IN_ONLY == mep;
+		
+		boolean sendAck = false;
+		
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 		if (acksTo.hasAnonymousAddress() && backchannelFree) {
 			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
-			if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {
-				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
-				msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-				AcknowledgementManager.sendAckNow(ackRMMsgContext);
+			if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {				
+				sendAck = true;
 			}
 		} else if (!acksTo.hasAnonymousAddress()) {
 			SandeshaPolicyBean policyBean = SandeshaUtil.getPropertyBean (msgCtx.getAxisOperation());
@@ -365,6 +367,24 @@ public class SequenceProcessor {
 			// This will avoid performing application processing more than once.
 			rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
 
+		}
+
+		if (transaction != null && transaction.isActive()) 
+			transaction.commit();
+		
+		if (sendAck) {
+			try {
+				transaction = storageManager.getTransaction();
+				
+				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
+				msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);	
+				AcknowledgementManager.sendAckNow(ackRMMsgContext);
+				if (transaction != null && transaction.isActive()) transaction.commit();
+				transaction = null;
+			
+			} finally {
+				if (transaction != null && transaction.isActive()) transaction.rollback();
+			}
 		}
 		
 		if (log.isDebugEnabled())

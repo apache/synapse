@@ -95,11 +95,11 @@ public class Invoker extends SandeshaThread {
 				//invoke each bean in turn. 
 				//NOTE: here we are breaking ordering
 				while(stMapIt.hasNext()){
-					transaction = storageManager.getTransaction();
-					InvokerBean invoker = (InvokerBean)stMapIt.next();
-					
 					//invoke the app
 					try{
+						transaction = storageManager.getTransaction();
+						InvokerBean invoker = (InvokerBean)stMapIt.next();
+						
 						// start a new worker thread and let it do the invocation.
 						String workId = sequenceID + "::" + invoker.getMsgNo(); //creating a workId to uniquely identify the
 					   //piece of work that will be assigned to the Worker.
@@ -149,15 +149,15 @@ public class Invoker extends SandeshaThread {
 							rmdBeanMgr.update(rMDBean);
 						}
 						
+						if(transaction != null && transaction.isActive()) transaction.commit();
+						transaction = null;
 					}
 					catch(Exception e){
-						if(transaction != null) {
-							transaction.rollback();
-							transaction = null;
-						}
+						// Just log the error
+						if(log.isDebugEnabled()) log.debug("Exception", e);
 					} finally {
-						if(transaction != null) {
-							transaction.commit();
+						if(transaction != null && transaction.isActive()) {
+							transaction.rollback();
 							transaction = null;
 						}
 					}
@@ -327,30 +327,21 @@ public class Invoker extends SandeshaThread {
 				
 				processedMessage = true;
 			}
+			
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			transaction = null;
 		} catch (Exception e) {
-			if (transaction != null) {
-				try {
-					transaction.rollback();
-					transaction = null;
-				} catch (Exception e1) {
-					String message = SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.rollbackError, e1
-									.toString());
-					log.debug(message, e1);
-				}
-			}
 			String message = SandeshaMessageHelper
 					.getMessage(SandeshaMessageKeys.invokeMsgError);
-			log.debug(message, e);
+			if(log.isDebugEnabled()) log.debug(message, e);
 		} finally {
-			if (transaction != null) {
+			if (transaction != null && transaction.isActive()) {
 				try {
-					transaction.commit();
-					transaction = null;
+					transaction.rollback();
 				} catch (Exception e) {
 					String message = SandeshaMessageHelper.getMessage(
-							SandeshaMessageKeys.commitError, e.toString());
-					log.debug(message, e);
+							SandeshaMessageKeys.rollbackError, e.toString());
+					if(log.isDebugEnabled()) log.debug(message, e);
 				}
 			}
 		}
@@ -359,5 +350,5 @@ public class Invoker extends SandeshaThread {
 			log.debug("Exit: InOrderInvoker::internalRun");
 		return sleep;
 	}
-
+	
 }

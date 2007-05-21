@@ -602,19 +602,20 @@ public class FaultManager {
 		SOAPFault faultPart = envelope.getBody().getFault();
 
 		if (faultPart != null) {
-			Transaction transaction = null;
-			
-			try {
-				transaction = storageManager.getTransaction();
-				// constructing the fault
-				AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
-				response = manageIncomingFault (axisFault, rmMsgCtx, faultPart);
+	    Transaction transaction = null;
 
-				if(transaction != null && transaction.isActive()) transaction.commit();
-				transaction = null;
-			} finally {
-				if (transaction != null && transaction.isActive())
-					transaction.rollback();
+	    try {
+	    	transaction = storageManager.getTransaction();
+
+	    	// constructing the fault
+	    	AxisFault axisFault = getAxisFaultFromFromSOAPFault(faultPart);
+	    	response = manageIncomingFault (axisFault, rmMsgCtx, faultPart);
+	    	
+	    	if(transaction != null && transaction.isActive()) transaction.commit();
+	    	transaction = null;
+	    } finally {
+	    	if (transaction != null && transaction.isActive())
+	    		transaction.rollback();
 			}
 		}
 		return response;

@@ -37,6 +37,7 @@ import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
@@ -57,7 +58,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 
 	private static final Log log = LogFactory.getLog(CloseSequenceProcessor.class);
 
-	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: CloseSequenceProcessor::processInMessage");
 
@@ -120,6 +121,14 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		closeSequenceResponseMsg.setResponseWritten(true);
 
 		closeSeqResponseRMMsg.addSOAPEnvelope();
+		
+		//
+		// Now that we have generated the message we can commit the transaction
+		//
+		if(transaction != null && transaction.isActive()) {
+			transaction.commit();
+			transaction = null;
+		}
 
 		AxisEngine engine = new AxisEngine(closeSequenceMsg.getConfigurationContext());
 

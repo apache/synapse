@@ -19,6 +19,7 @@ package org.apache.sandesha2.msgprocessors;
 
 import org.apache.axis2.AxisFault;
 import org.apache.sandesha2.RMMsgContext;
+import org.apache.sandesha2.storage.Transaction;
 
 /**
  * The message processor interface.
@@ -31,7 +32,7 @@ public interface MsgProcessor {
 	 * @return true if the msg context has been paused
 	 * @throws AxisFault
 	 */
-	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault;
+	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault;
 	
 	/**
 	 * 

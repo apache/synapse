@@ -20,6 +20,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -47,7 +48,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 	 * A message is selected by the set of SenderBeans that are waiting to be sent.
 	 * This is processed using a SenderWorker. 
 	 */
-	public boolean processInMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processInMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::processInMessage " + rmMsgCtx.getSOAPEnvelope().getBody());
 
 		MakeConnection makeConnection = (MakeConnection) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.MAKE_CONNECTION);
@@ -110,7 +111,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			return false;
 		}
 		
-		replyToPoll(rmMsgCtx, senderBean, storageManager, pending, makeConnection.getNamespaceValue());
+		replyToPoll(rmMsgCtx, senderBean, storageManager, pending, makeConnection.getNamespaceValue(), transaction);
 		
 		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage");
 		return false;
@@ -120,7 +121,8 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			SenderBean matchingMessage,
 			StorageManager storageManager,
 			boolean pending,
-			String namespace)
+			String namespace,
+			Transaction transaction)
 	throws AxisFault
 	{
 		if(log.isDebugEnabled()) log.debug("Enter: MakeConnectionProcessor::replyToPoll");
@@ -175,6 +177,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		returnMessage.setOperationContext(context);
 		
 		returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
+		
+		//
+		// Commit the current transaction, so that the SenderWorker can do it's own locking
+		if(transaction != null && transaction.isActive()) transaction.commit();
 		
 		//running the MakeConnection through a SenderWorker.
 		//This will allow Sandesha2 to consider both of following senarios equally.

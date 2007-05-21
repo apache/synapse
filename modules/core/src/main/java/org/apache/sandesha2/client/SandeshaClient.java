@@ -173,14 +173,15 @@ public class SandeshaClient {
 
 			sequenceReport.setSequenceStatus(SequenceReport.SEQUENCE_STATUS_ESTABLISHED);
 			fillOutgoingSequenceInfo(sequenceReport, rMSBean, storageManager);
+			
+			if(reportTransaction != null && reportTransaction.isActive()) reportTransaction.commit();
+			reportTransaction = null;
 
 		} catch (Exception e) {
-			if (reportTransaction!=null) {
-				reportTransaction.rollback();
-				reportTransaction = null;
-			}
+			// Just log the exception
+			if(log.isDebugEnabled()) log.debug("Exception", e);
 		} finally {
-			if (reportTransaction!=null) reportTransaction.commit();
+			if (reportTransaction!=null && reportTransaction.isActive()) reportTransaction.rollback();
 		}
 
 		return sequenceReport;
@@ -276,14 +277,15 @@ public class SandeshaClient {
 				sandeshaReport.addToNoOfCompletedMessagesMap(sequenceID, sequenceReport.getCompletedMessages().size());
 				sandeshaReport.addToSequenceStatusMap(sequenceID, sequenceReport.getSequenceStatus());
 			}
+			
+			if(reportTransaction != null && reportTransaction.isActive()) reportTransaction.commit();
+			reportTransaction = null;
 
 		} catch (Exception e) {
-			if (reportTransaction!=null) {
-				reportTransaction.rollback();
-				reportTransaction = null;
-			}
+			// just log the error
+			if(log.isDebugEnabled()) log.debug("Exception", e);
 		} finally {
-			if (reportTransaction!=null) reportTransaction.commit();
+			if (reportTransaction!=null && reportTransaction.isActive()) reportTransaction.rollback();
 		}
 
 		return sandeshaReport;
@@ -381,9 +383,10 @@ public class SandeshaClient {
 		if (log.isTraceEnabled())
 			log.trace("Checking if sequence " + internalSequenceId + " previously terminated");
 		
-		Transaction tran = storageManager.getTransaction();
+		Transaction tran = null;
 		
 		try {
+			tran = storageManager.getTransaction();
 			
 			RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 			//see if the sequence is terminated
@@ -400,16 +403,14 @@ public class SandeshaClient {
 				// Delete the rmsBean
 				storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
 			}
-		
-		} catch (SandeshaException e) {
-			if(tran!=null)
-				tran.rollback();
-			tran = null;
 			
-			throw e;
-		} 
-		if(tran!=null)
-			tran.commit();
+			if(tran != null && tran.isActive()) tran.commit();
+			tran = null;
+		
+		} finally {
+			if(tran!=null && tran.isActive())
+				tran.rollback();
+		}
 	}
 	
 	/**
@@ -495,7 +496,8 @@ public class SandeshaClient {
 			
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.couldNotSendTerminate, e.toString());
+					SandeshaMessageKeys.couldNotSendTerminate,
+					e.toString());
 			throw new SandeshaException(message, e);
 		} finally {
 			options.setAction(oldAction);
@@ -692,7 +694,7 @@ public class SandeshaClient {
 		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(configurationContext,configurationContext.getAxisConfiguration());
 
 		// Get a transaction to retrieve the properties
-		Transaction transaction = storageManager.getTransaction();
+		Transaction transaction = null;
 		String sequenceID = null;
 		
 		try
@@ -880,13 +882,14 @@ public class SandeshaClient {
 				invoker.forceInvokeOfAllMessagesCurrentlyOnSequence(configContext, sequenceID, allowLaterDeliveryOfMissingMessages);			
 			}
 			
+			if(reportTransaction != null && reportTransaction.isActive()) reportTransaction.commit();
+			reportTransaction = null;
+
 		} catch (Exception e) {
-			if (reportTransaction!=null) {
-				reportTransaction.rollback();
-				reportTransaction = null;
-			}
+			// Just log the exception
+			if(log.isDebugEnabled()) log.debug("Exception", e);
 		} finally {
-			if(reportTransaction != null) reportTransaction.commit();
+			if(reportTransaction != null && reportTransaction.isActive()) reportTransaction.rollback();
 		}
 	}
 
@@ -1023,15 +1026,18 @@ public class SandeshaClient {
 
 			if(rmdBean.getSecurityTokenData() != null) sequenceReport.setSecureSequence(true);
 			
+			if (reportTransaction!=null && reportTransaction.isActive()) reportTransaction.commit();
+			reportTransaction = null;
+
 			return sequenceReport;
 
 		} catch (Exception e) {
-			if (reportTransaction!=null) {
-				reportTransaction.rollback();
-				reportTransaction = null;
-			}
+			// Just log the exception
+			if(log.isDebugEnabled()) log.debug("Exception", e);
 		} finally {
-			if (reportTransaction!=null) reportTransaction.commit();
+			if(reportTransaction != null && reportTransaction.isActive()) {
+				reportTransaction.rollback();
+			}
 		}
 
 		return null;
@@ -1365,14 +1371,15 @@ public class SandeshaClient {
 		String soapNamespaceURI = null;
 		
 		// Get the RMSBean for this sequence.
-		Transaction transaction = storageManager.getTransaction();
+		Transaction transaction = null;
 		
-		try {				
+		try {
+			transaction = storageManager.getTransaction();
 			RMSBean rmsBean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceID);
 			if (rmsBean.getSoapVersion() == Sandesha2Constants.SOAPVersion.v1_2)
 				soapNamespaceURI = SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI;
 		} finally {
-			transaction.commit();
+			if(transaction != null) transaction.commit();
 		}
 		
 		return soapNamespaceURI;

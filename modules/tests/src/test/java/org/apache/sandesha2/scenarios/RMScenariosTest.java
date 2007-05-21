@@ -116,7 +116,6 @@ public class RMScenariosTest extends SandeshaTestCase {
 		// Test sync echo with no offer, and the 1.1 spec
 		clientOptions = new Options();
 		clientOptions.setProperty(SandeshaClientConstants.RM_SPEC_VERSION,Sandesha2Constants.SPEC_VERSIONS.v1_1);
-		org.apache.log4j.BasicConfigurator.configure();
 		runEcho(clientOptions, false, false, true,true,true);
 	}
 

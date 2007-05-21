@@ -24,6 +24,7 @@ import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
+import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
@@ -70,6 +71,9 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		if (identifier!=null)
 			findSenderBean.setSequenceID(identifier.getIdentifier());
+		
+		// Set the time to send field to be now
+		findSenderBean.setTimeToSend(System.currentTimeMillis());
 		
 		//finding the beans that go with the criteria of the passed SenderBean
 		//The reSend flag is ignored for this selection, so there is no need to
@@ -178,6 +182,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		
 		returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
 		
+		// Update the senderBeans send time.
+		boolean continueSend = 
+			MessageRetransmissionAdjuster.adjustRetransmittion(returnRMMsg, matchingMessage, returnRMMsg.getConfigurationContext(), storageManager);
+		
 		//
 		// Commit the current transaction, so that the SenderWorker can do it's own locking
 		if(transaction != null && transaction.isActive()) transaction.commit();
@@ -186,9 +194,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//  1. A message being sent by the Sender thread.
 		//  2. A message being sent as a reply to an MakeConnection.
-		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, returnRMMsg.getRMSpecVersion());
-		worker.setMessage(returnRMMsg);
-		worker.run();
+		if (continueSend) {
+			SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, returnRMMsg.getRMSpecVersion());
+			worker.setMessage(returnRMMsg);
+			worker.run();
+		}
 		
 		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
 	}

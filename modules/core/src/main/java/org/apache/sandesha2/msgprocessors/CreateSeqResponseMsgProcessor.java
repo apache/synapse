@@ -150,6 +150,9 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 
 		// deleting the create sequence entry.
 		retransmitterMgr.delete(createSeqMsgId);
+		
+		// Remove the create sequence message
+		storageManager.removeMessageContext(rmsBean.getCreateSequenceMsgStoreKey());
 				
 		// processing for accept (offer has been sent)
 		Accept accept = createSeqResponsePart.getAccept();

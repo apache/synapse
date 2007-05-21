@@ -32,6 +32,8 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.rampart.RampartMessageData;
 import org.apache.neethi.PolicyEngine;
 import org.apache.neethi.Policy;
+import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.synapse.util.UUIDGenerator;
 import samples.common.StockQuoteHandler;
 
 import java.net.URL;
@@ -137,6 +139,7 @@ public class StockQuoteClient {
                 System.out.println("Using WS-RM");
                 serviceClient.engageModule("sandesha2");
                 options.setProperty("Sandesha2LastMessage", "true");
+                options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
             }
 
             serviceClient.setOptions(options);
@@ -149,6 +152,12 @@ public class StockQuoteClient {
 
             } else {
                 OMElement result = serviceClient.sendReceive(payload);
+
+                if (Boolean.parseBoolean(wsrm)) {
+                    // give some time for RM to terminate normally
+                    Thread.sleep(5000);
+                }
+
                 if("customquote".equals(mode)) {
                     System.out.println("Custom :: Stock price = $" +
                     StockQuoteHandler.parseCustomQuoteResponse(result));

@@ -198,7 +198,7 @@ public class AcknowledgementManager {
 
 		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.ACK,
-				referenceRMMessage.getRMSpecVersion(),
+				rmdBean.getRMVersion(),
 				referenceMsg.getAxisService());
 
 		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(referenceRMMessage, ackOperation);

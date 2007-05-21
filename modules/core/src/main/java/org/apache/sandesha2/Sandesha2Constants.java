@@ -490,6 +490,8 @@ public interface Sandesha2Constants {
 	int CLIENT_SLEEP_TIME = 10000;
 
 	int TERMINATE_DELAY = 100;
+	
+	static final int TRANSPORT_WAIT_TIME = 60000;
 
 	static final String TEMP_SEQUENCE_ID = "uuid:tempID";
 

@@ -230,4 +230,7 @@ public class SandeshaMessageKeys {
 	public final static String referenceMessageNotSetForSequence = "referenceMessageNotSetForSequence";
 	public final static String moduleNotSet = "moduleNotSet";
 	public final static String cannotSetPolicyBeanServiceNull = "cannotSetPolicyBeanServiceNull";
+	public final static String noPolling="noPolling";
+	public final static String freeingTransport="freeingTransport";
+
 }

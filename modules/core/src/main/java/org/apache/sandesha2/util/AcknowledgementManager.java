@@ -18,7 +18,9 @@
 package org.apache.sandesha2.util;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -108,6 +110,7 @@ public class AcknowledgementManager {
 		
 		// From here on, we must be dealing with a real address. Piggyback all sequences that have an
 		// acksTo that matches the To address, and that have an ackMessage queued up for sending.
+		Set acked = new HashSet();
 		SenderBean findBean = new SenderBean();
 		findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
 		findBean.setSend(true);
@@ -131,6 +134,30 @@ public class AcknowledgementManager {
 				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 				if(rmdBean != null && !rmdBean.isTerminated()) {
 					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, rmdBean);
+				}
+				acked.add(sequenceId);
+			}
+		}
+		
+		// As a special case, if this is a terminate sequence message then add in ack messages for
+		// any sequences that have an acksTo that matches the target address. This helps to ensure
+		// that request-response sequence pairs end cleanly.
+		if(rmMessageContext.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+			if(log.isDebugEnabled()) log.debug("Adding extra acks, as this is a terminate");
+			
+			RMDBean findRMDBean = new RMDBean();
+			findRMDBean.setAcksToEPR(target.getAddress());
+			findRMDBean.setTerminated(false);
+			Collection rmdBeans = storageManager.getRMDBeanMgr().find(findRMDBean);
+			Iterator sequences = rmdBeans.iterator();
+			while(sequences.hasNext()) {
+				RMDBean sequence = (RMDBean) sequences.next();
+				String sequenceId = sequence.getSequenceID();
+				
+				if(!acked.contains(sequenceId) && sequence.getHighestInMessageNumber() > 0) {
+					if(log.isDebugEnabled()) log.debug("Piggybacking ack for sequence: " + sequenceId);
+					RMMsgCreator.addAckMessage(rmMessageContext, sequenceId, sequence);
+					acked.add(sequenceId);
 				}
 			}
 		}

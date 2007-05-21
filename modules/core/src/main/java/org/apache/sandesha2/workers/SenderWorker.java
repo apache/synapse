@@ -386,7 +386,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		// Lock the message to enable retransmission update
 		senderBean = storageManager.getSenderBeanMgr().retrieve(senderBean.getMessageID());
-		
+
+		// Only continue if we find a SenderBean
+		if (senderBean == null)
+			return false;
+
 		boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(
 				rmMsgContext, senderBean, rmMsgContext.getConfigurationContext(), storageManager);
 		if(!continueSending) return false;

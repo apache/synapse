@@ -210,7 +210,11 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				
 				//this will cause the fault to be thrown out of thread waiting on this transport object.
 				AxisFault fault = new AxisFault ("Sandesha2 got a fault when doing the invocation", faultContext);
-				requestResponseTransport.signalFaultReady(fault);
+				if (requestResponseTransport!=null)
+					requestResponseTransport.signalFaultReady(fault);
+				else
+					engine.sendFault(faultContext);
+				
 			} else	
 				engine.sendFault(faultContext);
 			

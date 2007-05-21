@@ -76,7 +76,7 @@ public class SALoadbalanceEndpointSerializer implements EndpointSerializer {
 
         } else if (dispatcher instanceof SimpleClientSessionDispatcher) {
             OMElement sessionElement = fac.createOMElement("session", Constants.SYNAPSE_OMNAMESPACE);
-            sessionElement.addAttribute("type", "clientSession", null);
+            sessionElement.addAttribute("type", "simpleClientSession", null);
             endpointElement.addChild(sessionElement);
         }
 

@@ -27,6 +27,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.transport.http.HTTPTransportReceiver;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -152,6 +153,9 @@ public class ServerWorker implements Runnable {
             }
         }
 
+        // this is required to support Sandesha 2
+        msgContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL,
+                new HttpCoreRequestResponseTransport(msgContext));
         return msgContext;
     }
 

@@ -216,6 +216,7 @@ public class ProxyService {
                 try {
                     // detect version of the WSDL 1.1 or 2.0
                     if (wsdlNamespace != null) {
+                        boolean isWSDL11 = false;
                         WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
                         if (WSDL2Constants.WSDL_NAMESPACE.
                                 equals(wsdlNamespace.getNamespaceURI())) {
@@ -227,6 +228,7 @@ public class ProxyService {
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
                                     new WSDL11ToAxisServiceBuilder(wsdlInputStream, null, null);
+                            isWSDL11 = true;
                         } else {
                             handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");
                         }
@@ -237,6 +239,23 @@ public class ProxyService {
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
                         proxyService.setWsdlFound(true);
+
+                        if (isWSDL11) {
+                            // workaround to support WSDL 2.0 generation when only a WSDL 1.1
+                            // is supplied
+                            Collection endpoints = proxyService.getEndpoints().values();
+                            Iterator iter = endpoints.iterator();
+                            while (iter.hasNext()) {
+                                AxisEndpoint endpoint = (AxisEndpoint) iter.next();
+                                Iterator children = endpoint.getBinding().getChildren();
+                                while (children.hasNext()) {
+                                    AxisBindingOperation axisBindingOperation =
+                                        (AxisBindingOperation) children.next();
+                                    axisBindingOperation.setProperty(
+                                        WSDL2Constants.ATTR_WHTTP_IGNORE_UNCITED, new Boolean(false));
+                                }
+                            }
+                        }
 
                     } else {
                         handleException("Unknown WSDL format.. not WSDL 1.1 or WSDL 2.0");

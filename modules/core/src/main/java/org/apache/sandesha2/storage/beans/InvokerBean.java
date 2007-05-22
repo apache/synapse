@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import java.io.Serializable;
+
 /**
  * This bean is used at the receiving side (of both server and client)
  * There is one object for each application message to be invoked.
@@ -38,6 +40,12 @@ public class InvokerBean extends RMBean {
 	 * The sequence ID of the sequence the message belong to.
 	 */
 	private String sequenceID;
+	
+	/**
+	 * The runtime context that needs to be applied to the invoker thread before
+	 * the message is run through the invoker.
+	 */
+	private Serializable context;
 	
 	/**
 	 * Comment for <code>msgNo</code>
@@ -107,6 +115,14 @@ public class InvokerBean extends RMBean {
 	 */
 	public void setSequenceID(String sequenceId) {
 		this.sequenceID = sequenceId;
+	}
+	
+	public Serializable getContext() {
+		return context;
+	}
+
+	public void setContext(Serializable context) {
+		this.context = context;
 	}
 
 	public String toString() {

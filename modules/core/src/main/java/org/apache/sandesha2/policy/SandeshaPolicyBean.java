@@ -51,6 +51,8 @@ public class SandeshaPolicyBean implements Assertion {
     private String permanentStorageManagerClass = null;
 
     private String securityManagerClass = null;
+    
+    private String contextManagerClass = null;
 
     private long inactiveTimeoutValue;
     private boolean inactiveTimeoutValueSet = false;
@@ -203,7 +205,15 @@ public class SandeshaPolicyBean implements Assertion {
     public void setSecurityManagerClass(String className) {
         this.securityManagerClass = className;
     }
+    
+    public String getContextManagerClass() {
+    	return contextManagerClass;
+    }
 
+    public void setContextManagerClass(String className) {
+    	this.contextManagerClass = className;
+    }
+    
     public QName getName() {
         return Sandesha2Constants.Assertions.Q_ELEM__RMBEAN;
     }
@@ -320,6 +330,11 @@ public class SandeshaPolicyBean implements Assertion {
 			writer.writeCharacters(getSecurityManagerClass());
 			writer.writeEndElement();
 			
+			//<wsrm:ContextManager />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_CONTEXT_MGR.getLocalPart(), namespaceURI);
+			writer.writeCharacters(getContextManagerClass());
+			writer.writeEndElement();
+
 			// <wsrm:MakeConnection>
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_MAKE_CONNECTION.getLocalPart(), namespaceURI);
 			

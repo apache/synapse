@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.context.ContextManager;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
@@ -362,7 +363,12 @@ public class SequenceProcessor {
 			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
 			storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());
-			storageMapMgr.insert(new InvokerBean(key, msgNo, sequenceId));
+			InvokerBean invokerBean = new InvokerBean(key, msgNo, sequenceId);
+			
+			ContextManager contextMgr = SandeshaUtil.getContextManager(configCtx);
+			if(contextMgr != null) invokerBean.setContext(contextMgr.storeContext());
+
+			storageMapMgr.insert(invokerBean);
 
 			// This will avoid performing application processing more than once.
 			rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");

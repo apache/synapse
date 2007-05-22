@@ -65,6 +65,7 @@ import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.client.SandeshaClientConstants;
+import org.apache.sandesha2.context.ContextManager;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
@@ -764,6 +765,54 @@ public class SandeshaUtil {
 		}
 	}
 	
+	public static ContextManager getContextManager(ConfigurationContext context) throws SandeshaException {
+		ContextManager mgr = null;
+		AxisConfiguration config = context.getAxisConfiguration();
+		Parameter p = config.getParameter(Sandesha2Constants.CONTEXT_MANAGER);
+		if(p != null) mgr = (ContextManager) p.getValue();
+		if (mgr != null) return mgr;
+
+		try {
+			//Currently module policies are used to find the context impl. These cant be overriden
+			String securityManagerClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getContextManagerClass();
+			mgr = getContextManagerInstance(securityManagerClassStr,context);
+			p = new Parameter(Sandesha2Constants.CONTEXT_MANAGER,mgr);
+			config.addParameter(p);
+		} catch(AxisFault e) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitContextManager, e.toString());
+			throw new SandeshaException(message,e);
+		}
+		return mgr;
+	}
+
+	private static ContextManager getContextManagerInstance(String className,ConfigurationContext context) throws SandeshaException {
+		try {
+			ClassLoader classLoader = null;
+			AxisConfiguration config = context.getAxisConfiguration();
+			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
+			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
+
+			if (classLoader==null)
+				throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
+		    
+			Class c = classLoader.loadClass(className);
+			Class configContextClass = context.getClass();
+			
+			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
+			Object obj = constructor.newInstance(new Object[] {context});
+
+			if (!(obj instanceof ContextManager)) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.contextManagerMustImplement, className);
+				throw new SandeshaException(message);
+			}
+			return (ContextManager) obj;
+			
+		} catch (Exception e) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitContextManager, e.toString());
+			throw new SandeshaException(message,e);
+		}
+	}
+
 	public static boolean isWSRMAnonymous(String address) {
 		if (address!=null && address.startsWith(Sandesha2Constants.SPEC_2007_02.ANONYMOUS_URI_PREFIX))
 			return true;

@@ -66,7 +66,7 @@ public class PropertyManager {
 		loadMessageTypesToDrop(msgTypesToDrop, propertyBean);
 
 		propertyBean.setSecurityManagerClass(Sandesha2Constants.Properties.DefaultValues.SecurityManager);
-		
+		propertyBean.setContextManagerClass(Sandesha2Constants.Properties.DefaultValues.ContextManager);
 		propertyBean.setEnableMakeConnection(Sandesha2Constants.Properties.DefaultValues.EnableMakeConnection);
 		propertyBean.setEnableRMAnonURI(Sandesha2Constants.Properties.DefaultValues.EnableRMAnonURI);
 		propertyBean.setUseMessageSerialization(Sandesha2Constants.Properties.DefaultValues.UseMessageSerialization);
@@ -134,6 +134,10 @@ public class PropertyManager {
 			String securityManagerClassStr = properties
 			    .getProperty(Sandesha2Constants.Properties.SecurityManager);
 			loadSecurityManagerClass(securityManagerClassStr,propertyBean);
+			
+			String contextManagerClassStr = properties.getProperty(Sandesha2Constants.Properties.ContextManager);
+			loadContextManagerClass(contextManagerClassStr,propertyBean);
+
 		} catch (IOException e) {
 			throw new SandeshaException(e);
 		}
@@ -504,6 +508,13 @@ public class PropertyManager {
 		if (securityManagerClassStr != null) {
 			securityManagerClassStr = securityManagerClassStr.trim();
 			propertyBean.setSecurityManagerClass(securityManagerClassStr);
+		}
+	}
+
+	private static void loadContextManagerClass(String contextManagerClassStr, SandeshaPolicyBean propertyBean) {
+		if (contextManagerClassStr != null) {
+			contextManagerClassStr = contextManagerClassStr.trim();
+			propertyBean.setContextManagerClass(contextManagerClassStr);
 		}
 	}
 	

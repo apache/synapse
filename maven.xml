@@ -277,11 +277,14 @@
 		  </fileset>
 		</copy>
 
-		<!-- Switch on serialization in the module.xml file -->
+		<!-- Switch on serialization in the module.xml file, and use the unit test context plugin -->
 		<ant:unjar src="${maven.build.dir}/${mar.name}" dest="${serialize.temp.path}"/>
 		<ant:replace file="${serialize.temp.path}/META-INF/module.xml" 
 		  token="&lt;!-- &lt;sandesha2:UseMessageSerialization>true&lt;/sandesha2:UseMessageSerialization> -->"
 		  value="&lt;sandesha2:UseMessageSerialization>true&lt;/sandesha2:UseMessageSerialization>"/>
+		<ant:replace file="${serialize.temp.path}/META-INF/module.xml" 
+		  token="context.DummyContextManager"
+		  value="scenarios.UnitTestContextManager"/>
 		<ant:jar jarfile="${serialize.client.path}/modules/${test.module.name}.mar" basedir="${serialize.temp.path}"/>
 		<ant:jar jarfile="${serialize.server.path}/modules/${test.module.name}.mar" basedir="${serialize.temp.path}"/>
 		

@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.context.ContextManager;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
@@ -112,9 +113,14 @@ public class Invoker extends SandeshaThread {
 						worker.setLock(getWorkerLock());
 						worker.setWorkId(workId);
 						
-						//before we execute we need to set the 
+						// Wrap the invoker worker with the correct context, if needed.
+						Runnable work = worker;
+						ContextManager contextMgr = SandeshaUtil.getContextManager(context);
+						if(contextMgr != null) {
+							work = contextMgr.wrapWithContext(work, invoker.getContext());
+						}
 						
-						threadPool.execute(worker);
+						threadPool.execute(work);
 					
 						//adding the workId to the lock after assigning it to a thread makes sure 
 						//that all the workIds in the Lock are handled by threads.
@@ -319,7 +325,13 @@ public class Invoker extends SandeshaThread {
 				worker.setLock(getWorkerLock());
 				worker.setWorkId(workId);
 				
-				threadPool.execute(worker);
+				// Wrap the invoker worker with the correct context, if needed.
+				Runnable work = worker;
+				ContextManager contextMgr = SandeshaUtil.getContextManager(context);
+				if(contextMgr != null) {
+					work = contextMgr.wrapWithContext(work, bean.getContext());
+				}
+				threadPool.execute(work);
 				
 				//adding the workId to the lock after assigning it to a thread makes sure 
 				//that all the workIds in the Lock are handled by threads.

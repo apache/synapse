@@ -143,6 +143,10 @@ public class RMAssertionBuilder implements AssertionBuilder {
                 	}
                 	
                 }
+ 
+            }  else if (Sandesha2Constants.Assertions.ELEM_CONTEXT_MGR.equals(name)) {
+                propertyBean.setContextManagerClass (element.getText().trim());
+
             } else if(Sandesha2Constants.Assertions.ELEM_MAKE_CONNECTION.equals(name)) {
                 if (element!=null) {
                 	// Read the nested assertions

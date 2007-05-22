@@ -86,7 +86,7 @@ public class ValidateMediator extends AbstractListMediator {
      * A Map containing properties for the validate mediator - such as
      * features to be passed to the actual validator (Xerces)
      */
-    private Map properties = new HashMap();
+    private List properties = new ArrayList();
 
     /**
      * This is the actual Validator instance used to validate messages - probably
@@ -243,12 +243,11 @@ public class ValidateMediator extends AbstractListMediator {
             factory.setErrorHandler(errorHandler);
 
             // set any features on/off as requested
-            iter = properties.entrySet().iterator();
+            iter = properties.iterator();
             while (iter.hasNext()) {
-                Map.Entry entry = (Map.Entry) iter.next();
-                String value = (String) entry.getValue();
+                MediatorProperty prop = (MediatorProperty) iter.next();
                 factory.setFeature(
-                    (String) entry.getKey(), value != null && "true".equals(value));
+                    prop.getName(), prop.getValue() != null && "true".equals(prop.getValue()));
             }
 
             Schema schema = null;
@@ -322,7 +321,14 @@ public class ValidateMediator extends AbstractListMediator {
      * @return property string value (usually true|false)
      */
     public Object getProperty(String key) {
-        return properties.get(key);
+        Iterator iter = properties.iterator();
+        while (iter.hasNext()) {
+            MediatorProperty prop = (MediatorProperty) iter.next();
+            if (key.equals(prop.getName())) {
+                return prop.getValue();
+            }
+        }
+        return null;
     }
 
     /**
@@ -333,7 +339,10 @@ public class ValidateMediator extends AbstractListMediator {
      * @see #getProperty(String)
      */
     public void setProperty(String key, Object value) {
-        properties.put(key, value);
+        MediatorProperty prop = new MediatorProperty();
+        prop.setName(key);
+        prop.setValue(value.toString());
+        properties.add(prop);
     }
 
     /**
@@ -393,7 +402,7 @@ public class ValidateMediator extends AbstractListMediator {
      * Properties for the actual Xerces validator
      * @return properties to be passed to the Xerces validator
      */
-    public Map getProperties() {
+    public List getProperties() {
         return properties;
     }
 }

@@ -83,10 +83,11 @@ public class ThrottleMediator extends AbstractMediator {
      * @return boolean which indicate whether this caller can or not access
      */
     protected boolean canAccess(MessageContext synContext, boolean shouldTrace) {
-        boolean canAccess = true;
         if (throttle == null) {
             log.debug("Can not find a throttle");
+            return true;
         }
+        boolean canAccess = true;               
         org.apache.axis2.context.MessageContext axis2MessageContext
                 = ((Axis2MessageContext) synContext).getAxis2MessageContext();
         //IP based throttling
@@ -173,16 +174,16 @@ public class ThrottleMediator extends AbstractMediator {
         if (policyKey != null) {
             Entry entry = synContext.getConfiguration().getEntryDefinition(policyKey);
             if (entry == null) {
-                log.warn("Cant not find a Entry from the Entry key " + policyKey);
+                log.debug("Cant not find a Entry from the Entry key " + policyKey);
                 return;
             }
             Object entryValue = entry.getValue();
             if (entryValue == null) {
-                log.warn("Cant not find a Policy(Enrty value) from the Entry key " + policyKey);
+                log.debug("Cant not find a Policy(Enrty value) from the Entry key " + policyKey);
                 return;
             }
             if (!(entryValue instanceof OMElement)) {
-                log.warn("Entry value which is refered from the key " + policyKey + " is Incompatible " +
+                log.debug("Entry value which is refered from the key " + policyKey + " is Incompatible " +
                         "for the policy element");
                 return;
             }
@@ -195,7 +196,7 @@ public class ThrottleMediator extends AbstractMediator {
             policyOmElement = inLinePolicy;
         }
         if (policyOmElement == null) {
-            log.warn("Cant not find a Policy - Throttling will not occur");
+            log.debug("Cant not find a Policy - Throttling will not occur");
             return;
         }
         if (shouldTrace) {

@@ -97,7 +97,8 @@ public class AddressEndpointFactory implements EndpointFactory {
                     }
 
                 } catch (NumberFormatException e) {
-                    handleException("suspendDuratiOnFailure should be valid number.");
+                    handleException("The suspend duration should be specified as a valid number :: "
+                        + e.getMessage(), e);
                 }
             }
         }
@@ -216,8 +217,15 @@ public class AddressEndpointFactory implements EndpointFactory {
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {
-                    long timeoutSeconds = new Long(d.trim()).longValue();
-                    endpoint.setTimeoutDuration(timeoutSeconds * 1000);
+                    try {
+                        long timeoutSeconds = new Long(d.trim()).longValue();
+                        endpoint.setTimeoutDuration(timeoutSeconds * 1000);
+                        
+                    } catch (NumberFormatException e) {
+                        handleException(
+                            "The timeout seconds should be specified as a valid number :: "
+                            + e.getMessage(), e);
+                    }
                 }
             }
 

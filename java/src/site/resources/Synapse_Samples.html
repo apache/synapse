@@ -157,7 +157,8 @@
       <li><a href="#Sample51">Sample 51: MTOM and SwA optimizations and
         request/response correlation</a></li>
       <li><a href="#Sample52">Sample 52: POX to SOAP conversion</a></li>
-      <li><a href="#Sample53">Sample 53: Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</a></li>
+      <li><a href="#Sample53">Sample 53: Reliable message exchange between
+        Synapse and the back-end server using WS-ReliableMessaging</a></li>
       <li><a href="#Sample54">Sample 54: Load balancing</a></li>
       <li><a href="#Sample55">Sample 55: Failover</a></li>
       <li><a href="#Sample56">Sample 56: Load balancing with session
@@ -177,7 +178,8 @@
         format from SOAP to REST/POX</a></li>
       <li><a href="#Sample103">Sample 103: Using WS-Security with policy
         attachments for proxy services</a></li>
-      <li><a href="#Sample104">Sample 104: Reliable message exchange between the client and proxy services using WS-ReliableMessaging</a></li>
+      <li><a href="#Sample104">Sample 104: Reliable message exchange between
+        the client and proxy services using WS-ReliableMessaging</a></li>
     </ul>
   </li>
   <li><a href="#Transport">Transport samples</a> 
@@ -205,8 +207,14 @@
         API methods</a></li>
       <li><a href="#Sample503">Sample 503: Using Ruby scripts for
         mediation</a></li>
-      <li><a href="#Sample600">Sample 600: Class mediator - Writting your own
+      <li><a href="#Sample510">Sample 510: Class mediator - Writting your own
         mediation in Java</a></li>
+    </ul>
+  </li>
+  <li><a href="#AdvancedMediations">Advanced Mediations</a> 
+    <ul>
+      <li><a href="#Sample600">Sample 600: Throttle mediator - Restricting
+        requests based on policies</a></li>
     </ul>
   </li>
 </ul>
@@ -1236,7 +1244,7 @@ Transfer-Encoding: chunked
     &lt;/out&gt;
 
 &lt;/definitions&gt;</pre>
-<strong>Objective: Demontrate the message exchange between Synapse and the
+<strong>Objective: Demonstrate the message exchange between Synapse and the
 server using WS-ReliableMessaging (WS-RM)</strong> 
 
 <p><strong>Pre-Requisites:</strong></p>
@@ -1303,7 +1311,7 @@ message:</p>
 &lt;/soapenv:Body&gt;
 ...</pre>
 
-<p>Once the sequence is estabilished, Synapse sends the request to the server
+<p>Once the sequence is established, Synapse sends the request to the server
 with the pre-negotiated sequence ID.</p>
 <pre>&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing"
                   xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
@@ -1327,7 +1335,7 @@ with the pre-negotiated sequence ID.</p>
     &lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</pre>
 
-<p>Synapse keeps on sending above message till the server reponds with a
+<p>Synapse keeps on sending above message till the server responds with a
 valid response message with 200 OK HTTP header. If the server is not ready
 with a response, it will respond with 202 Accepted HTTP header for all
 requests. Once the server is ready with a response it will send the response
@@ -1355,7 +1363,7 @@ message with sequence ID as follows.</p>
         &lt;ns:getQuoteResponse xmlns:ns="http://services.samples/xsd"&gt;
 ...</pre>
 
-<p>Now both Synase and the server are done with the actual message exchange.
+<p>Now both Synapse and the server are done with the actual message exchange.
 Then Synapse sends a request to terminate the sequence as follows:</p>
 <pre>&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing"
                   xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
@@ -1376,8 +1384,8 @@ Then Synapse sends a request to terminate the sequence as follows:</p>
     &lt;/soapenv:Body&gt;
 &lt;/soapenv:Envelope&gt;</pre>
 
-<p>Server reponds to the sequence termination message, accepting to terminate
-the sequence as follows.</p>
+<p>Server responds to the sequence termination message, accepting to
+terminate the sequence as follows.</p>
 <pre>&lt;soapenv:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing"
                   xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
     &lt;soapenv:Header&gt;
@@ -1399,7 +1407,7 @@ most cases they will be exchanged in a single socket connection as HTTP
 Keep-Alive header is used.</p>
 
 <h2><a name="Sample54">Sample 54:</a></h2>
-<pre>&lt;!-- demontrates simple session less load balancing between 3 endpoints --&gt;
+<pre>&lt;!-- demonstrates simple session less load balancing between 3 endpoints --&gt;
 &lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
 
     &lt;sequence name="main" onError="errorHandler"&gt;
@@ -2158,8 +2166,8 @@ client.</p>
         &lt;enableRM/&gt;
     &lt;/proxy&gt;
 &lt;/definitions&gt;</pre>
-<strong>Objective: Demontrate the reliable message exchange between the
-client and Synapse using WS-ReliableMessaging (WS-RM)</strong>
+<strong>Objective: Demonstrate the reliable message exchange between the
+client and Synapse using WS-ReliableMessaging (WS-RM)</strong> 
 
 <p><strong>Pre-Requisites:</strong></p>
 
@@ -2179,7 +2187,7 @@ required as the reliable messaging is applicable only between the client and
 Synapse. Now start the client with WS-RM as follows:</p>
 <pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8081/soap/StockQuoteProxy -Dwsrm=true</pre>
 
-<p>In this case, client sends WS-RM enabled request to Synase where Synapse
+<p>In this case, client sends WS-RM enabled request to Synapse where Synapse
 sends normal request to the server. This can be observed by examining the
 wire level messages between the client and Synapse. These messages would be
 similar to the wire level messages shown in sample 53. Each message would
@@ -2848,7 +2856,7 @@ check the received stock quote response.</p>
 
 <p></p>
 
-<h2><a name="Sample600">Sample 600</a></h2>
+<h2><a name="Sample510">Sample 510</a></h2>
 
 <p></p>
 <pre>&lt;!-- Demonstrate the use of class mediator --&gt;        
@@ -3020,5 +3028,138 @@ the discounted value for the requested quote as follows.</p>
 <pre>Quote value discounted.
 Original price: 162.30945327447262
 Discounted price: 138.77458254967408</pre>
+
+<h1><a name="AdvancedMediations">Advanced mediations</a></h1>
+
+<h2><a name="Sample600">Sample 600</a></h2>
+<pre>&lt;definitions xmlns="http://ws.apache.org/ns/synapse"
+             xmlns:throttle="http://ws.apache.org/ns/synapse/throttle"&gt;
+    &lt;sequence name="main"&gt;
+        &lt;in&gt;
+            &lt;throttle:throttle&gt;
+                &lt;policy&gt;
+                    &lt;!-- define throttle policy --&gt;
+                    &lt;wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                                xmlns:throttle="http://www.wso2.org/products/wso2commons/throttle"&gt;
+                        &lt;throttle:ThrottleAssertion&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;Other&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;4&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;800000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;10000&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.200-192.168.8.222&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;8&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;800000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;10&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.201&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;200&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;600000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                            &lt;wsp:All&gt;
+                                &lt;throttle:ID throttle:type="IP"&gt;192.168.8.198&lt;/throttle:ID&gt;
+                                &lt;wsp:ExactlyOne&gt;
+                                    &lt;wsp:All&gt;
+                                        &lt;throttle:MaximumCount&gt;50&lt;/throttle:MaximumCount&gt;
+                                        &lt;throttle:UnitTime&gt;500000&lt;/throttle:UnitTime&gt;
+                                        &lt;throttle:ProhibitTimePeriod wsp:Optional="true"&gt;&lt;/throttle:ProhibitTimePeriod&gt;
+                                    &lt;/wsp:All&gt;
+                                    &lt;throttle:IsAllow&gt;true&lt;/throttle:IsAllow&gt;
+                                &lt;/wsp:ExactlyOne&gt;
+                            &lt;/wsp:All&gt;
+                        &lt;/throttle:ThrottleAssertion&gt;
+                    &lt;/wsp:Policy&gt;
+                &lt;/policy&gt;
+                &lt;onAccept&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Accept**"/&gt;
+                    &lt;/log&gt;
+                    &lt;send&gt;
+                        &lt;endpoint&gt;
+                            &lt;address uri="http://localhost:9000/soap/SimpleStockQuoteService"/&gt;
+                        &lt;/endpoint&gt;
+                    &lt;/send&gt;
+                &lt;/onAccept&gt;
+                &lt;onReject&gt;
+                    &lt;log level="custom"&gt;
+                        &lt;property name="text" value="**Access Denied**"/&gt;
+                    &lt;/log&gt;
+                    &lt;makefault&gt;
+                        &lt;code value="tns:Receiver"
+                              xmlns:tns="http://www.w3.org/2003/05/soap-envelope"/&gt;
+                        &lt;reason value="**Access Denied**"/&gt;
+                    &lt;/makefault&gt;
+                    &lt;property name="RESPONSE" value="true"/&gt;
+                    &lt;header name="To" expression="get-property('ReplyTo')"/&gt;
+                    &lt;send/&gt;
+                    &lt;drop/&gt;
+                &lt;/onReject&gt;
+            &lt;/throttle:throttle&gt;
+        &lt;/in&gt;
+        &lt;out&gt;
+            &lt;send/&gt;
+        &lt;/out&gt;
+    &lt;/sequence&gt;
+&lt;/definitions&gt;</pre>
+<strong>Objective: Demonstrate the use of throttle mediator for restricting
+request counts</strong>
+
+<p><strong>Pre-Requisites:</strong></p>
+
+<p>Deploy the SimpleStockQuoteService in sample Axis2 server and start it on
+port 9000.</p>
+
+<p>Start Synapse with the sample configuration 600 (i.e. synapse -sample
+600).</p>
+
+<p></p>
+
+<p>Above configuration specifies a throttle mediator inside the in mediator.
+Therefore, all request messages directed to the main sequence will be
+subjected to throttling. Throttle mediator has policy, onAccept and onReject
+tags at top level. Policy tag specifies the throttling policy to be applied
+for messages. It contains some IP address ranges and maximum number of
+messages to be allowed for those ranges within the time range given in
+"UnitTime" tag. "ProhibitTimePeriod" tag specifies the time period to
+prohibit further requests after the received request count exceeds the
+specified time. Now run the client 5 times repetitively using the below
+command to see how throttling works.</p>
+<pre>ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8080</pre>
+
+<p>For the first four requests you will get the quote prices for IBM as
+follows:</p>
+<pre>[java] Standard :: Stock price = $177.20143371883802</pre>
+
+<p>You will receive the following response for the fifth request:</p>
+<pre>[java] org.apache.axis2.AxisFault: **Access Denied**</pre>
+
+<p>Maximum number of requests within 800000 milliseconds is specified as 4
+for any server (including localhost) other than the explicitly specified
+ones. Therefore, our fifth request is denied by the throttle mediator. You
+can verify this by looking at the Synapse console.</p>
+<pre>[HttpServerWorker-1] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-2] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-3] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-4] INFO  LogMediator - text = **Access Accept**
+[HttpServerWorker-5] INFO  LogMediator - text = **Access Denied**</pre>
 </body>
 </html>

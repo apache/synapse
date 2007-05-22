@@ -30,8 +30,11 @@ end
 def transformResponse(mc)
   newResponse = Document.new '<m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"><m:Code>' <<
     '</m:Code><m:Price></m:Price></m:CheckPriceResponse>'
-  newResponse.root.elements[1].text = mc.getPayloadXML().root.elements[1].elements[1].get_text
-  newResponse.root.elements[2].text = mc.getPayloadXML().root.elements[1].elements[2].get_text
+  lastPrice=mc.getPayloadXML().root.elements[1].get_elements('ns:last')
+  code=mc.getPayloadXML().root.elements[1].get_elements('ns:symbol') 
+
+  newResponse.root.elements[1].text =code[0].get_text
+  newResponse.root.elements[2].text =lastPrice[0].get_text 
   mc.setPayloadXML(newResponse)
 end
 ]]></x>

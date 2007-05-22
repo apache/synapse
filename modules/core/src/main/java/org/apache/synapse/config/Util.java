@@ -158,8 +158,9 @@ public class Util {
                 OMElement doc = builder.getDocumentElement();
                 doc.build();
                 return doc;
-            } catch (XMLStreamException e) {
-                log.error("Error parsing resource at URL : " + url + " as XML", e);
+            } catch (Exception e) {
+                handleException("Error parsing resource at URL : " + url +
+                    " as XML", e);
             } finally {
                 try {
                     urlInStream.close();

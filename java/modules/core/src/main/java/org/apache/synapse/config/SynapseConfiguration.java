@@ -348,10 +348,13 @@ public class SynapseConfiguration {
             handleException("Unknown proxy service for name : " + name);
         } else {
             try {
-                if(getAxisConfiguration().getServiceForActivation(name).isActive()) {
-                    getAxisConfiguration().getService(name).setActive(false);
+                if(getAxisConfiguration().getServiceForActivation(name) != null) {
+                    if (getAxisConfiguration().getServiceForActivation(name).isActive()) {
+                        getAxisConfiguration().getService(name).setActive(false);
+                    } else {
+                        getAxisConfiguration().removeService(name);       
+                    }
                 }
-                getAxisConfiguration().removeService(name);
                 proxyServices.remove(name);
             } catch (AxisFault axisFault) {
                 handleException(axisFault.getMessage());

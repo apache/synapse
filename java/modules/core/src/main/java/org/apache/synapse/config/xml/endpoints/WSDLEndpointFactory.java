@@ -148,7 +148,8 @@ public class WSDLEndpointFactory implements EndpointFactory {
                     }
 
                 } catch (Exception e) {
-                    handleException("Couldn't create endpoint from the given WSDL URI.");
+                    handleException("Couldn't create endpoint from the given WSDL URI : "
+                        + e.getMessage(), e);
                 }
             }
 

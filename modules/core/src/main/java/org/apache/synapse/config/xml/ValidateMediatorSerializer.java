@@ -67,7 +67,7 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
             schema.addAttribute(fac.createOMAttribute("key", nullNS, key));
         }
 
-        serializeProperties(validate, mediator.getProperties().entrySet());
+        serializeProperties(validate, mediator.getProperties());
 
         OMElement onFail = fac.createOMElement("on-fail", synNS, validate);
         serializeChildren(onFail, mediator.getList());        

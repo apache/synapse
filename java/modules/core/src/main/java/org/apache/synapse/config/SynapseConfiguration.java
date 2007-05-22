@@ -357,9 +357,8 @@ public class SynapseConfiguration {
                 if(getAxisConfiguration().getServiceForActivation(name) != null) {
                     if (getAxisConfiguration().getServiceForActivation(name).isActive()) {
                         getAxisConfiguration().getService(name).setActive(false);
-                    } else {
-                        getAxisConfiguration().removeService(name);       
                     }
+                    getAxisConfiguration().removeService(name);
                 }
                 proxyServices.remove(name);
             } catch (AxisFault axisFault) {

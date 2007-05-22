@@ -147,7 +147,8 @@ public class Util {
      */
     public static OMElement getOMElementFromURL(String url) throws IOException {
         URLConnection conn = new URL(url).openConnection();
-        conn.setReadTimeout(30000);
+        conn.setReadTimeout(10000);
+        conn.setConnectTimeout(2000);
         conn.setRequestProperty("Connection", "close"); // if http is being used
         InputStream urlInStream = conn.getInputStream();
 

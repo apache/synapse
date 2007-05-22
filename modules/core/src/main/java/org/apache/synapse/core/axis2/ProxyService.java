@@ -340,7 +340,7 @@ public class ProxyService {
                     axisCfg.removeService(proxyService.getName());
                 }
             } catch (AxisFault ignore) {}
-            handleException("Error adding Proxy service to the Axis2 engine");
+            handleException("Error adding Proxy service to the Axis2 engine", axisFault);
         }
 
         // todo: need to remove this and engage modules by looking at policies

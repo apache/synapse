@@ -9,9 +9,7 @@
 		
 		<property name="build.repo.dir" value="${build.dir}/repos" />
 		<property name="server.dist.path" value="${build.repo.dir}/server" />
-		
 		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
-		<property name="repo.rampart.mar" value="${local.repo}/org/apache/rampart/rampart/${rampart.version}/rampart-${rampart.version}.mar" />
 			
 		<mkdir dir="${server.dist.path}" />
 		<mkdir dir="${server.dist.path}/modules" />
@@ -28,7 +26,6 @@
        
 		<!-- Copying dependent mar files --> 
         <copy file="${repo.addressing.mar}" toDir="${server.dist.path}/modules/" />
-		<copy file="${repo.rampart.mar}" toDir="${server.dist.path}/modules/" />
 		
 	</target>
 
@@ -36,9 +33,7 @@
 
 		<property name="build.repo.dir" value="${build.dir}/repos" />
 		<property name="client.dist.path" value="${build.repo.dir}/client" />
-		
 		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
-		<property name="repo.rampart.mar" value="${local.repo}/org/apache/rampart/rampart/${rampart.version}/rampart-${rampart.version}.mar" />
 			
 		<mkdir dir="${client.dist.path}" />
 		<mkdir dir="${client.dist.path}/modules" />
@@ -48,7 +43,6 @@
 		
 		<!-- Copying dependent mar files --> 
 		<copy file="${repo.addressing.mar}" toDir="${client.dist.path}/modules/" />    
-		<copy file="${repo.rampart.mar}" toDir="${client.dist.path}/modules/" />
 
 	</target>
 	
@@ -89,6 +83,11 @@
 		<property name="secure.client.path" value="${build.dir}/repos/secure-client"/>
 		<property name="secure.server.path" value="${build.dir}/repos/secure-server"/>
          
+		<property name="repo.addressing.mar" value="${local.repo}/org/apache/axis2/addressing/${addressing.version}/addressing-${addressing.version}.mar" />
+		<property name="repo.rampart.mar" value="${local.repo}/org/apache/rampart/rampart/${rampart.version}/rampart-${rampart.version}.mar" />
+		<property name="repo.rampart.core.jar" value="${local.repo}/org/apache/rampart/rampart-core/${rampart.version}/rampart-core-${rampart.version}.jar" />
+		<property name="repo.rampart.policy.jar" value="${local.repo}/org/apache/rampart/rampart-policy/${rampart.version}/rampart-policy-${rampart.version}.jar" />
+			
 		<property name="secure.temp.path" value="${build.dir}/temp/secure" />
 		<mkdir dir="${secure.temp.path}" />
 				
@@ -113,6 +112,14 @@
 		
 		<delete dir="${build.temp.dir}"/>
 
+		<copy file="${repo.rampart.mar}" toDir="${secure.client.path}/modules/" />
+		<copy file="${repo.rampart.core.jar}" toDir="${secure.client.path}/modules/" />
+		<copy file="${repo.rampart.policy.jar}" toDir="${secure.client.path}/modules/" />
+				
+		<copy file="${repo.rampart.mar}" toDir="${secure.server.path}/modules/" />
+		<copy file="${repo.rampart.core.jar}" toDir="${secure.server.path}/modules/" />
+		<copy file="${repo.rampart.policy.jar}" toDir="${secure.server.path}/modules/" />
+				
 	</target>
 
 </project>

@@ -7,11 +7,12 @@
 		<artifactId>sandesha2-parent</artifactId>
         <version>SNAPSHOT</version>
     </parent>
-
+	
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>sandesha2-interop</artifactId>
+    <groupId>org.apache.sandesha2</groupId>
+    <artifactId>sandesha2-rampart-integration</artifactId>
     <packaging>jar</packaging>
-    <name>Sandesha2 - Interop</name>
+    <name>Sandesha2 - Rampart Integration</name>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -32,16 +33,16 @@
             </plugin>
         </plugins>
     </build>
-   
-    <dependencies>
 
+	<dependencies>
+	
     	<dependency>
             <groupId>org.apache.sandesha2</groupId>
             <artifactId>sandesha2-core</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
-		
-		<!-- Rampart -->
+	
+			<!-- Rampart -->
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
@@ -59,11 +60,11 @@
             <artifactId>rampart-policy</artifactId>
             <version>${rampart.version}</version>
         </dependency>
-
+			
     </dependencies>
-
+	
 	<properties>
 		<rampart.version>SNAPSHOT</rampart.version>
-    </properties>
+     </properties>
 	 
 </project>

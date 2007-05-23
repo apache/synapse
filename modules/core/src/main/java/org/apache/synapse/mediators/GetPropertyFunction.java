@@ -104,23 +104,27 @@ public class GetPropertyFunction implements Function {
             return null;
         }
         if (Constants.SCOPE_DEFAULT.equals(scope)) {
-            Object result = synCtx.getProperty(key);
-            if (result != null) {
-                return result;
+
+            if (Constants.HEADER_TO.equals(key) && synCtx.getTo() != null) {
+                return synCtx.getTo().getAddress();
+            } else if (Constants.HEADER_FROM.equals(key) && synCtx.getFrom() != null) {
+                return synCtx.getFrom().getAddress();
+            } else if (Constants.HEADER_ACTION.equals(key) && synCtx.getWSAAction() != null) {
+                return synCtx.getWSAAction();
+            } else if (Constants.HEADER_FAULT.equals(key) && synCtx.getFaultTo() != null) {
+                return synCtx.getFaultTo().getAddress();
+            } else if (Constants.HEADER_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
+                return synCtx.getReplyTo().getAddress();
+            } else if (Constants.HEADER_MESSAGE_ID.equals(key) && synCtx.getMessageID() != null) {
+                return synCtx.getMessageID();
             } else {
-                if (Constants.HEADER_TO.equals(key) && synCtx.getTo() != null) {
-                    return synCtx.getTo().getAddress();
-                } else if (Constants.HEADER_FROM.equals(key) && synCtx.getFrom() != null) {
-                    return synCtx.getFrom().getAddress();
-                } else if (Constants.HEADER_ACTION.equals(key) && synCtx.getWSAAction() != null) {
-                    return synCtx.getWSAAction();
-                } else if (Constants.HEADER_FAULT.equals(key) && synCtx.getFaultTo() != null) {
-                    return synCtx.getFaultTo().getAddress();
-                } else if (Constants.HEADER_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
-                    return synCtx.getReplyTo().getAddress();
+                Object result = synCtx.getProperty(key);
+                if (result != null) {
+                    return result;
+                } else {
+                    return synCtx.getEntry(key);       
                 }
             }
-            return synCtx.getEntry(key);
 
         } else if (Constants.SCOPE_AXIS2.equals(scope) && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext

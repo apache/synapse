@@ -229,15 +229,15 @@ public class SynapseConfiguration {
      */
     public Entry getEntryDefinition(String key) {
         Object o = localRegistry.get(key);
-        if (o instanceof Entry) {
-            Entry entry = (Entry) o;
-            if (entry == null) {
+        if (o == null || o instanceof Entry) {
+            if (o == null) {
                 // this is not a local definition
-                entry = new Entry(key);
+                Entry entry = new Entry(key);
                 entry.setType(Entry.REMOTE_ENTRY);
                 addEntry(key, entry);
+                return entry;
             }
-            return entry;
+            return (Entry) o;
         } else {
             handleException("Invalid local registry entry : " + key);
             return null;

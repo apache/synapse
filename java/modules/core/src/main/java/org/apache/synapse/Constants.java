@@ -121,6 +121,8 @@ public interface Constants {
     String HEADER_ACTION = "Action";
     /** Refers the ReplyTo header */
     String HEADER_REPLY_TO = "ReplyTo";
+    /** Refers the MessageID header */
+    String HEADER_MESSAGE_ID = "MessageID";
 
     String RESPONSE = "RESPONSE";
 

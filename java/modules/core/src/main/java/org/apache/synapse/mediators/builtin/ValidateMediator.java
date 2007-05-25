@@ -240,6 +240,8 @@ public class ValidateMediator extends AbstractListMediator {
         try {
             // Create SchemaFactory and configure for the default schema language - XMLSchema
             SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
+            // Clear the previous state of the validation error
+            errorHandler.setValidationError(false);
             factory.setErrorHandler(errorHandler);
 
             // set any features on/off as requested
@@ -298,6 +300,14 @@ public class ValidateMediator extends AbstractListMediator {
 
         public SAXParseException getSaxParseException() {
             return saxParseException;
+        }
+
+        /**
+         * To set explicitly validation error condition 
+         * @param validationError
+         */
+        public void setValidationError(boolean validationError) {
+            this.validationError = validationError;
         }
     }
 

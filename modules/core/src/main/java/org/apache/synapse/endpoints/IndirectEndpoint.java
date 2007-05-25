@@ -21,6 +21,7 @@ package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.FaultHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,7 +57,17 @@ public class IndirectEndpoint implements Endpoint {
         if (endpoint.isActive(synMessageContext)) {
             endpoint.send(synMessageContext);
         } else {
-            parentEndpoint.onChildEndpointFail(this, synMessageContext);
+
+            // if this is a child of some other endpoint, inform parent about the failure.
+            // if not, inform to the next fault handler.
+            if (parentEndpoint != null) {
+                parentEndpoint.onChildEndpointFail(this, synMessageContext);
+            } else {
+                Object o = synMessageContext.getFaultStack().pop();
+                if (o != null) {
+                    ((FaultHandler) o).handleFault(synMessageContext);
+                }
+            }
         }
     }
 
@@ -114,8 +125,18 @@ public class IndirectEndpoint implements Endpoint {
         this.parentEndpoint = parentEndpoint;
     }
 
-    public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {
-        parentEndpoint.onChildEndpointFail(this, synMessageContext);
+    public void onChildEndpointFail(Endpoint endpoint, MessageContext synMessageContext) {        
+
+        // if this is a child of some other endpoint, inform parent about the failure.
+        // if not, inform to the next fault handler.
+        if (parentEndpoint != null) {
+            parentEndpoint.onChildEndpointFail(this, synMessageContext);
+        } else {
+            Object o = synMessageContext.getFaultStack().pop();
+            if (o != null) {
+                ((FaultHandler) o).handleFault(synMessageContext);
+            }
+        }
     }
 
     private void handleException(String msg) {

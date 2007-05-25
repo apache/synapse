@@ -22,10 +22,7 @@ package org.apache.synapse.core.axis2;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.FaultHandler;
+import org.apache.synapse.*;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
@@ -36,6 +33,7 @@ import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     private static final Log log = LogFactory.getLog(ProxyServiceMessageReceiver.class);
+    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
      * The name of the Proxy Service
@@ -51,7 +49,7 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
             log.debug("WSA-Action: " + (mc.getWSAAction() != null ? mc.getWSAAction() : "null"));
             String[] cids = mc.getAttachmentMap().getAllContentIDs();
             if (cids != null && cids.length > 0) {
-                for (int i=0; i<cids.length; i++) {
+                for (int i = 0; i < cids.length; i++) {
                     log.debug("Attachment : " + cids[i]);
                 }
             }
@@ -78,7 +76,11 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     synCtx.setProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK,
                             proxyServiceStatisticsStack);
                 }
-
+                boolean shouldTrace = (proxy.getTraceState() == Constants.TRACING_ON);
+                if (shouldTrace) {
+                    trace.trace("Proxy Service " + name + " received a new message...");
+                    trace.trace("Received Message :: " + mc.getEnvelope());
+                }
                 if (proxy.getTargetFaultSequence() != null) {
 
                     Mediator faultSequence = synCtx.getSequence(proxy.getTargetFaultSequence());
@@ -102,11 +104,14 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                 // Using inSequence for the incoming message mediation
                 if (proxy.getTargetInSequence() != null) {
-
                     Mediator inSequence = synCtx.getSequence(proxy.getTargetInSequence());
                     if (inSequence != null) {
-                        log.debug("Using the sequence named "
-                                + proxy.getTargetInSequence() + " for message mediation");
+                        String msg = "Using the sequence named "
+                                + proxy.getTargetInSequence() + " for message mediation";
+                        if (shouldTrace) {
+                            trace.trace(msg);
+                        }
+                        log.debug(msg);
                         inSequence.mediate(synCtx);
                     } else {
 
@@ -116,16 +121,24 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                                 "service specified by the name " + proxy.getTargetInSequence());
                     }
                 } else if (proxy.getTargetInLineInSequence() != null) {
-                    log.debug("Using the anonymous " +
-                            "in-sequence of the proxy service for message mediation");
+                    String msg = "Using the anonymous " +
+                            "in-sequence of the proxy service for message mediation";
+                    if (shouldTrace) {
+                        trace.trace(msg);
+                    }
+                    log.debug(msg);
                     proxy.getTargetInLineInSequence().mediate(synCtx);
                 }
 
                 if (proxy.getTargetEndpoint() != null) {
                     Endpoint endpoint = synCtx.getEndpoint(proxy.getTargetEndpoint());
                     if (endpoint != null) {
-                        log.debug("Forwarding message to the endpoint named "
-                                + proxy.getTargetEndpoint() + " after message mediation");
+                        String msg = "Forwarding message to the endpoint named "
+                                + proxy.getTargetEndpoint() + " after message mediation";
+                        if (shouldTrace) {
+                            trace.trace(msg);
+                        }
+                        log.debug(msg);
                         endpoint.send(synCtx);
                     } else {
 
@@ -135,8 +148,12 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                                 "proxy service specified by the name " + proxy.getTargetEndpoint());
                     }
                 } else if (proxy.getTargetInLineEndpoint() != null) {
-                    log.debug("Forwarding the message to the anonymous " +
-                            "endpoint of the proxy service after message mediation");
+                    String msg = "Forwarding the message to the anonymous " +
+                            "endpoint of the proxy service after message mediation";
+                    if (shouldTrace) {
+                        trace.trace(msg);
+                    }
+                    log.debug(msg);
                     proxy.getTargetInLineEndpoint().send(synCtx);
                 }
 

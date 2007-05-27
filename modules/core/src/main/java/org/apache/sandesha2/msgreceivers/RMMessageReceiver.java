@@ -74,14 +74,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 				msgProcessor.processInMessage(rmMsgCtx, transaction);
 
-				//If message is a LastMessage then we deligate the processing to the LastMessageProcessor
-				Sequence sequence = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
-				if (sequence!=null && sequence.getLastMessage()!=null) {
-					LastMessageProcessor.processLastMessage(rmMsgCtx);
-				}
-
-        if(transaction != null && transaction.isActive()) transaction.commit();
-        transaction = null;
+				if(transaction != null && transaction.isActive()) transaction.commit();
+					transaction = null;
 
 			} catch (Exception e) {
 				if (log.isDebugEnabled())

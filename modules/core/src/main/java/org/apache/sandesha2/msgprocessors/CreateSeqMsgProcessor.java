@@ -42,6 +42,7 @@ import org.apache.sandesha2.security.SecurityManager;
 import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.FaultManager;
@@ -214,6 +215,9 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 						rMSBean.setOfferedEndPoint(endpoint.getEPR().getAddress());
 					}
 		
+					rmdBean.setOutboundInternalSequence(outgoingSideInternalSequenceId);
+					RMDBeanMgr rmdBeanMgr = storageManager.getRMDBeanMgr();
+					rmdBeanMgr.update(rmdBean);
 	
 					// Store the inbound token (if any) with the new sequence
 					rMSBean.setSecurityTokenData(rmdBean.getSecurityTokenData());

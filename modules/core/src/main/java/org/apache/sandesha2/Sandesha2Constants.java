@@ -28,7 +28,6 @@ import org.apache.axis2.addressing.AddressingConstants;
 
 public interface Sandesha2Constants {
 
-	
 	public interface SPEC_VERSIONS {
 		String v1_0 = "Spec_2005_02";
 		String v1_1 = "Spec_2007_02";
@@ -563,6 +562,9 @@ public interface Sandesha2Constants {
 	static final QName RM_DUPLICATE_OPERATION = new QName(SANDESHA_OP_PREFIX + "Duplicate");
 	static final QName RM_IN_OUT_OPERATION    = new QName(SANDESHA_OP_PREFIX + "InOut");
 	static final QName RM_IN_ONLY_OPERATION   = new QName(SANDESHA_OP_PREFIX + "InOnly");
+	
+	static final String DEFAULT_RM_NAMESPACE = Sandesha2Constants.SPEC_2005_02.NS_URI;
+	static final String OUT_LAST_MESSAGE = "OutLastMessage";
 
 	static final String [] SPEC_NS_URIS = {
 			SPEC_2005_02.NS_URI,

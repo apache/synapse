@@ -51,6 +51,7 @@ public class RMMsgContext {
 	public RMMsgContext() {
 		rmMessageParts = new HashMap();
 		messageType = Sandesha2Constants.MessageTypes.UNKNOWN;
+		rmNamespaceValue = Sandesha2Constants.DEFAULT_RM_NAMESPACE;
 	}
 
 	public void setMessageContext(MessageContext msgCtx) {

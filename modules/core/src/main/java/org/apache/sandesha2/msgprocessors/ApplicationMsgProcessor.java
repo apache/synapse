@@ -29,6 +29,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.MessageValidator;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
@@ -88,6 +89,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
 
+		//validating the outgoing message
+		MessageValidator.validateOutgoingMessage(rmMsgCtx);
+		
 		// setting the Fault callback
 		SandeshaListener faultCallback = (SandeshaListener) msgContext.getOptions().getProperty(
 				SandeshaClientConstants.SANDESHA_LISTENER);
@@ -278,7 +282,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		if (serverSide) {
 			// Deciding whether this is the last message. We assume it is if it relates to
-			// a message which arrived with the LastMessage flag on it.
+			// a message which arrived with the LastMessage flag on it. 
 			RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequence);			
 			// Get the last in message
 			String lastRequestId = rmdBean.getLastInMessageId();
@@ -287,6 +291,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 					lastRequestId.equals(relatesTo.getValue())) {
 				lastMessage = true;
 			}
+			
+			//or a constant property may call it as the last msg
+			Boolean inboundLast = (Boolean) msgContext.getProperty(Sandesha2Constants.MessageContextProperties.INBOUND_LAST_MESSAGE); 
+			if (inboundLast!=null && inboundLast.booleanValue())
+				lastMessage = true;
 		}
 		
 		if (lastMessage) 
@@ -376,22 +385,20 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		}
 
 		EndpointReference toEPR = msgContext.getTo();
-		if (toEPR == null) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.toEPRNotValid, null);
-			log.debug(message);
-			throw new SandeshaException(message);
-		}
 
-		// setting default actions.
-		String to = toEPR.getAddress();
-		String operationName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
-		if (msgContext.getWSAAction() == null) {
-			msgContext.setWSAAction(to + "/" + operationName);
+		
+		if (toEPR != null) {
+			// setting default actions.
+			String to = toEPR.getAddress();
+			String operationName = msgContext.getOperationContext().getAxisOperation().getName().getLocalPart();
+			if (msgContext.getWSAAction() == null) {
+				msgContext.setWSAAction(to + "/" + operationName);
+			}
+			if (msgContext.getSoapAction() == null) {
+				msgContext.setSoapAction("\"" + to + "/" + operationName + "\"");
+			}
 		}
-		if (msgContext.getSoapAction() == null) {
-			msgContext.setSoapAction("\"" + to + "/" + operationName + "\"");
-		}
-
+		
 		// processing the response if not an dummy.
 		if (!dummyMessage)
 			processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager);

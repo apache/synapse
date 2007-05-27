@@ -408,7 +408,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				sequence.setMessageNumber(msgNumber);
 
 				if(senderBean.isLastMessage() &&
-				   SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion)) {
+				    SpecSpecificConstants.isLastMessageIndicatorRequired(rmVersion)) {
 					sequence.setLastMessage(new LastMessage(namespace));
 				}
 				

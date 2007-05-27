@@ -17,6 +17,11 @@
 
 package org.apache.sandesha2;
 
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.WSDL2Constants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
@@ -32,7 +37,7 @@ import org.apache.sandesha2.util.SpecSpecificConstants;
  */
 public class MessageValidator {
 
-	public static void validateMessage(RMMsgContext rmMsg,
+	public static void validateIncomingMessage(RMMsgContext rmMsg,
 			StorageManager storageManager) throws SandeshaException {
 
 		int type = rmMsg.getMessageType();
@@ -90,5 +95,33 @@ public class MessageValidator {
 
 		// TODO do validation based on states
 		
+	}
+	
+	public static void validateOutgoingMessage (RMMsgContext rmMsgContext) throws SandeshaException {
+		
+		MessageContext msgContext = rmMsgContext.getMessageContext();
+		if (!msgContext.isServerSide()) {
+			//validating messages from the client.
+			
+			//if sync InOut and NoOffer and RM 1.0 an exception should be thrown
+			String rmNamespace = rmMsgContext.getRMNamespaceValue();
+			String mep = msgContext.getAxisOperation().getMessageExchangePattern();
+			String offer = (String) msgContext.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
+			
+			EndpointReference replyTo = rmMsgContext.getMessageContext().getOptions().getReplyTo();
+			boolean anonReplyTo = false;
+			if (replyTo==null || replyTo.hasAnonymousAddress())
+				anonReplyTo = true;
+			
+			if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgContext.getRMSpecVersion()) &&
+				WSDL2Constants.MEP_URI_OUT_IN.equals(mep) &&
+				offer==null && anonReplyTo) {
+				
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.offerRequiredForAnon);
+				throw new SandeshaException(message);
+				
+			}
+			
+		}
 	}
 }

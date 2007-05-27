@@ -45,6 +45,8 @@ public class MsgProcessorFactory {
 			return new CloseSequenceProcessor();
 		case (Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG):
 			return new MakeConnectionProcessor ();
+		case (Sandesha2Constants.MessageTypes.LAST_MESSAGE):
+			return new LastMessageProcessor ();
 		default:
 			return null;
 		}

@@ -108,7 +108,7 @@ public class SandeshaInHandler extends AbstractHandler {
         rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
 			// validating the message
-			MessageValidator.validateMessage(rmMsgCtx, storageManager);
+			MessageValidator.validateIncomingMessage(rmMsgCtx, storageManager);
 			
 			// commit the current transaction
 			if(transaction != null && transaction.isActive()) transaction.commit();

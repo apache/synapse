@@ -131,7 +131,9 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
     //This is responsible for Sandesha2 specific 
     InvocationResponse response = FaultManager.processMessagesForFaults(rmMsgCtx, storageManager);
 
-    if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+    //both application msgs and lastMsg msgs will be processed in the same way here.
+    if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION ||
+    		rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.LAST_MESSAGE) {
       processApplicationMessage(rmMsgCtx);
     }
     

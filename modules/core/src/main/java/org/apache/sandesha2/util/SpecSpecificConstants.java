@@ -439,5 +439,17 @@ public class SpecSpecificConstants {
 		
 		return result;
   }
+	
+	public static boolean sendAckInBackChannel (int messageType) {
+		boolean result = true;
+		
+		switch (messageType) {
+			case Sandesha2Constants.MessageTypes.LAST_MESSAGE:
+				result = false;
+				break;
+		}
+		
+		return result;
+	}
 
 }

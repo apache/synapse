@@ -19,6 +19,7 @@ package org.apache.sandesha2.util;
 
 import java.util.Iterator;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.MessageContext;
@@ -30,6 +31,7 @@ import org.apache.sandesha2.wsrm.CloseSequence;
 import org.apache.sandesha2.wsrm.CloseSequenceResponse;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.CreateSequenceResponse;
+import org.apache.sandesha2.wsrm.LastMessage;
 import org.apache.sandesha2.wsrm.MakeConnection;
 import org.apache.sandesha2.wsrm.RMElements;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -163,7 +165,8 @@ public class MsgInitializer {
 					elements.getSequenceFault());
 		}
 
-		rmMsgContext.setRMNamespaceValue(rmNamespace);
+		if (rmNamespace!=null)
+			rmMsgContext.setRMNamespaceValue(rmNamespace);
 
 	}
 
@@ -213,7 +216,17 @@ public class MsgInitializer {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.TERMINATE_SEQ_RESPONSE);
 			sequenceID = terminateSequenceResponse.getIdentifier().getIdentifier();
 		} else if (rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE) != null) {
-			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+			
+			Sequence seq = (Sequence) rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
+			LastMessage lastMessage = seq.getLastMessage();
+			SOAPEnvelope envelope = rmMsgCtx.getSOAPEnvelope();
+			
+			if (lastMessage!=null && envelope.getBody().getFirstOMChild()==null) {
+				//the message is an empty body last message
+				rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.LAST_MESSAGE);
+			}else
+				rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+			
 			sequenceID = sequence.getIdentifier().getIdentifier();
 		} else if (sequenceAcknowledgementsIter.hasNext()) {
 			rmMsgCtx.setMessageType(Sandesha2Constants.MessageTypes.ACK);

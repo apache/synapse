@@ -152,7 +152,7 @@ public class RMSBean extends RMSequenceBean {
 	private static final int TERM_PAUSER_FOR_CS        = 0x00000002;
 	private static final int EXPECTED_REPLIES          = 0x00000020;
 	private static final int SOAP_VERSION_FLAG         = 0x00000200;
-
+	
   /**
    * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
    * for the response side, other wise PollingManager will pause the polling process in termination and we will never be able

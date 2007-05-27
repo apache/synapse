@@ -55,6 +55,7 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
 import org.apache.sandesha2.workers.SandeshaThread;
 import org.apache.sandesha2.wsrm.Sequence;
@@ -318,8 +319,9 @@ public class SequenceProcessor {
 		
 		boolean sendAck = false;
 		
+		boolean ackBackChannel = SpecSpecificConstants.sendAckInBackChannel (rmMsgCtx.getMessageType());
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
-		if (acksTo.hasAnonymousAddress() && backchannelFree) {
+		if (acksTo.hasAnonymousAddress() && backchannelFree && ackBackChannel) {
 			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
 			if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {				
 				sendAck = true;
@@ -355,7 +357,7 @@ public class SequenceProcessor {
 			// Whatever the MEP, we stop processing here and the invoker will do the real work. We only
 			// SUSPEND if we need to keep the backchannel open for the response... we may as well ABORT
 			// to let other cases end more quickly.
-			if(backchannelFree) {
+			if(backchannelFree && ackBackChannel) {
 				result = InvocationResponse.ABORT;
 			} else {
 				result = InvocationResponse.SUSPEND;

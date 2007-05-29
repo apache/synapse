@@ -34,7 +34,7 @@ public class NHttpConfiguration {
 
     // defaults
     private static final int WORKERS_CORE_THREADS  = 20;
-    private static final int WORKERS_MAX_THREADS   = 40;
+    private static final int WORKERS_MAX_THREADS   = 100;
     private static final int WORKER_KEEP_ALIVE     = 5;
     private static final int BLOCKING_QUEUE_LENGTH = -1;
     private static final int IO_WORKER_COUNT = 2;

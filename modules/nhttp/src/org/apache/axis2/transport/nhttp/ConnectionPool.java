@@ -41,26 +41,33 @@ public class ConnectionPool {
         String key = host + ":" + Integer.toString(port);
         List connections = (List) connMap.get(key);
 
-        if (connections == null) {
-            log.debug("No connections available for reuse");
+        if (connections == null || connections.isEmpty()) {
+            if (log.isDebugEnabled()) {
+                log.debug("No connections available for reuse");
+            }
             return null;
 
         } else {
             NHttpClientConnection conn = null;
 
-            while (!connections.isEmpty()) {
-                conn = (NHttpClientConnection) connections.remove(0);
+            synchronized (connections) {
+                while (!connections.isEmpty()) {
+                    conn = (NHttpClientConnection) connections.remove(0);
 
-                if (conn.isOpen()) {
-                    log.debug("A connection to host : " + host + " on port : " +
-                        port + " is available in the pool, and will be reused");
-                    return conn;
-                } else {
-                    log.debug("closing stale connection");
-                    try {
-                        conn.close();
-                    } catch (IOException ignore) {
-                        ignore.printStackTrace();
+                    if (conn.isOpen()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("A connection to host : " + host + " on port : " +
+                                port + " is available in the pool, and will be reused");
+                        }
+                        return conn;
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("closing stale connection");
+                        }
+                        try {
+                            conn.close();
+                        } catch (IOException ignore) {
+                        }
                     }
                 }
             }
@@ -76,8 +83,14 @@ public class ConnectionPool {
 
         List connections = (List) connMap.get(key);
         if (connections == null) {
-            connections = Collections.synchronizedList(new LinkedList());
-            connMap.put(key, connections);
+            synchronized(connMap) {
+                // use double locking to make sure
+                connections = (List) connMap.get(key);
+                if (connections == null) {
+                    connections = Collections.synchronizedList(new LinkedList());
+                    connMap.put(key, connections);
+                }
+            }
         }
 
         connections.add(conn);

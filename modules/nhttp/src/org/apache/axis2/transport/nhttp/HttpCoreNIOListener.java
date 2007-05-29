@@ -111,7 +111,7 @@ public class HttpCoreNIOListener implements TransportListener {
         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
         params
             .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
-                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 30000))
+                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 60000))
             .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
                 cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024))
             .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK,

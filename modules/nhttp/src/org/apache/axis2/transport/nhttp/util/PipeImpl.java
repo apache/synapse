@@ -49,11 +49,26 @@ public class PipeImpl {
     protected static boolean useNative;
 
     static {
-        if (!"/".equals(File.separator)) {
-            log.info("Using simulated buffered Pipes for event-driven to stream IO bridging");
-        } else {
-            log.info("Using native OS Pipes for event-driven to stream IO bridging");
+        // platfom default - Unix - native, Windows - Piped Streams
+        if ("/".equals(File.separator)) {
             useNative = true;
+        }
+
+        // has this been overridden?
+        String option = System.getProperty("native_pipes");
+        if (option != null) {
+            // if an option is specified, use it
+            if ("true".equals(option)) {
+                useNative = true;
+            } else if ("false".equals(option)) {
+                useNative = false;
+            }
+        }
+
+        if (useNative) {
+            log.info("Using native OS Pipes for event-driven to stream IO bridging");
+        } else {
+            log.info("Using simulated buffered Pipes for event-driven to stream IO bridging");
         }
     }
 

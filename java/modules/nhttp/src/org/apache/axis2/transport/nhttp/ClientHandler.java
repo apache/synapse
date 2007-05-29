@@ -67,6 +67,8 @@ public class ClientHandler implements NHttpClientHandler {
 
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
+    /** the nhttp configuration */
+    private NHttpConfiguration cfg = null;
 
     private WorkerPool workerPool = null;
 
@@ -91,7 +93,7 @@ public class ClientHandler implements NHttpClientHandler {
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
-        NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+        this.cfg = NHttpConfiguration.getInstance();
         workerPool = WorkerPoolFactory.getWorkerPool(
             cfg.getClientCoreThreads(),
             cfg.getClientMaxThreads(),
@@ -149,8 +151,8 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(HttpExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
 
             // allocate temporary buffers to process this request
-            context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(2048));
-            context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(2048));
+            context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
+            context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
 
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());

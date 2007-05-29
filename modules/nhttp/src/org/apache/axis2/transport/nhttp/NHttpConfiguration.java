@@ -38,6 +38,7 @@ public class NHttpConfiguration {
     private static final int WORKER_KEEP_ALIVE     = 5;
     private static final int BLOCKING_QUEUE_LENGTH = -1;
     private static final int IO_WORKER_COUNT = 2;
+    private static final int BUFFER_SIZE           = 2048;
 
     // server listener
     private static final String S_T_CORE     = "snd_t_core";
@@ -52,6 +53,9 @@ public class NHttpConfiguration {
     private static final String C_T_ALIVE    = "lst_alive_sec";
     private static final String C_T_QLEN     = "lst_qlen";
     private static final String C_IO_WORKERS = "lst_io_threads";
+
+    // general
+    private static final String G_BUFFER_SIZE  = "nhttp_buffer_size";
 
     private static final Log log = LogFactory.getLog(NHttpConfiguration.class);
     private static NHttpConfiguration _instance = new NHttpConfiguration();
@@ -106,6 +110,10 @@ public class NHttpConfiguration {
 
     public int getClientIOWorkers() {
         return getProperty(C_IO_WORKERS, IO_WORKER_COUNT);
+    }
+
+    public int getBufferZise() {
+        return getProperty(G_BUFFER_SIZE, BUFFER_SIZE);
     }
 
     /**

@@ -180,7 +180,7 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
         HttpParams params = new BasicHttpParams();
         params
             .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
-                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 30000))
+                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 60000))
             .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT,
                 cfg.getProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 10000))
             .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,

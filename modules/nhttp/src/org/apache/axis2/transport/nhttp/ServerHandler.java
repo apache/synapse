@@ -64,6 +64,8 @@ public class ServerHandler implements NHttpServiceHandler {
 
     /** the Axis2 configuration context */
     ConfigurationContext cfgCtx = null;
+    /** the nhttp configuration */
+    private NHttpConfiguration cfg = null;
     /** is this https? */
     private boolean isHttps = false;
 
@@ -85,7 +87,7 @@ public class ServerHandler implements NHttpServiceHandler {
         this.httpProcessor = getHttpProcessor();
         this.connStrategy = new DefaultConnectionReuseStrategy();
 
-        NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+        this.cfg = NHttpConfiguration.getInstance();
         this.workerPool = WorkerPoolFactory.getWorkerPool(
             cfg.getServerCoreThreads(),
             cfg.getServerMaxThreads(),
@@ -105,8 +107,8 @@ public class ServerHandler implements NHttpServiceHandler {
         context.setAttribute(HttpContext.HTTP_REQUEST, request);
 
         // allocate temporary buffers to process this request
-        context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(2048));
-        context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(2048));
+        context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
+        context.setAttribute(RESPONSE_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
 
         try {
             PipeImpl requestPipe  = new PipeImpl(); // the pipe used to process the request

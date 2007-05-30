@@ -18,7 +18,7 @@
 package org.apache.sandesha2.polling;
 
 import java.util.ArrayList;
-import java.util.HashMap
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.apache.axis2.AxisFault;

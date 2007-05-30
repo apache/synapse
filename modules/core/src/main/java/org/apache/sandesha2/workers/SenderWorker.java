@@ -35,12 +35,15 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
+import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.util.AcknowledgementManager;
 import org.apache.sandesha2.util.MessageRetransmissionAdjuster;
 import org.apache.sandesha2.util.MsgInitializer;
+import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SpecSpecificConstants;
 import org.apache.sandesha2.util.TerminateManager;
@@ -60,7 +63,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	private SenderBean senderBean = null;
 	private RMMsgContext messageToSend = null;
 	private String rmVersion = null;
+	private RMDBean incomingSequenceBean = null;
 	
+	public void setIncomingSequenceBean(RMDBean incomingSequenceBean) {
+		this.incomingSequenceBean = incomingSequenceBean;
+	}
+
 	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean, String rmVersion) {
 		this.configurationContext = configurationContext;
 		this.senderBean = senderBean;
@@ -134,16 +142,20 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			// or the message can't go anywhere. If there is nothing here then we leave the
 			// message in the sender queue, and a MakeConnection (or a retransmitted request)
 			// will hopefully pick it up soon.
-			RequestResponseTransport t = null;
 			Boolean makeConnection = (Boolean) msgCtx.getProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE);
 			EndpointReference toEPR = msgCtx.getTo();
 
 			MessageContext inMsg = null;
 			OperationContext op = msgCtx.getOperationContext();
-			if (op != null)
-				inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-			if (inMsg != null)
-				t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+			
+			RequestResponseTransport t = (RequestResponseTransport) msgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+			
+			if (t==null) {
+				if (op != null)
+					inMsg = op.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+				if (inMsg != null)
+					t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+			}
 
 			// If we are anonymous, and this is not a makeConnection, then we must have a transport waiting
 			if((toEPR==null || toEPR.hasAnonymousAddress()) &&
@@ -386,7 +398,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		// Lock the message to enable retransmission update
 		senderBean = storageManager.getSenderBeanMgr().retrieve(senderBean.getMessageID());
-
+		int messageType = senderBean.getMessageType();
+		
 		// Only continue if we find a SenderBean
 		if (senderBean == null)
 			return false;
@@ -397,7 +410,9 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		Identifier id = null;
 
-		if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
+		if(messageType == Sandesha2Constants.MessageTypes.APPLICATION ||
+		   messageType == Sandesha2Constants.MessageTypes.LAST_MESSAGE) {
+			
 			String namespace = SpecSpecificConstants.getRMNamespaceValue(rmVersion);
 			Sequence sequence = (Sequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
 			if(sequence == null) {
@@ -417,17 +432,18 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				sequence.setIdentifier(id);
 				
 				rmMsgContext.setMessagePart(Sandesha2Constants.MessageParts.SEQUENCE, sequence);
+				
 			}
 			
-		} else if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
+		} else if(messageType == Sandesha2Constants.MessageTypes.TERMINATE_SEQ) {
 			TerminateSequence terminate = (TerminateSequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.TERMINATE_SEQ);
 			id = terminate.getIdentifier();
 
-		} else if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
+		} else if(messageType == Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE) {
 			CloseSequence close = (CloseSequence) rmMsgContext.getMessagePart(Sandesha2Constants.MessageParts.CLOSE_SEQUENCE);
 			id = close.getIdentifier();
 		
-		} else if(senderBean.getMessageType() == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
+		} else if(messageType == Sandesha2Constants.MessageTypes.ACK_REQUEST) {
 			// The only time that we can have a message of this type is when we are sending a
 			// stand-alone ack request, and in that case we only expect to find a single ack
 			// request header in the message.
@@ -447,6 +463,36 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			// Write the changes back into the message context
 			rmMsgContext.addSOAPEnvelope();
+		}
+		
+		//if this is an sync WSRM 1.0 case we always have to add an ack
+		boolean ackPresent = false;
+		Iterator it = rmMsgContext.getMessageParts (Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
+		if (it.hasNext()) 
+			ackPresent = true;
+		
+		if (!ackPresent && rmMsgContext.getMessageContext().isServerSide() 
+				&&
+			(messageType==Sandesha2Constants.MessageTypes.APPLICATION || 
+		     messageType==Sandesha2Constants.MessageTypes.APPLICATION ||
+		     messageType==Sandesha2Constants.MessageTypes.UNKNOWN ||
+		     messageType==Sandesha2Constants.MessageTypes.LAST_MESSAGE)) {
+			
+			String inboundSequenceId = senderBean.getInboundSequenceId();
+			if (inboundSequenceId==null)
+				throw new SandeshaException ("InboundSequenceID is not set for the sequence:" + id);
+			
+			RMDBean findBean = new RMDBean ();
+			findBean.setSequenceID(inboundSequenceId);
+			
+			if (incomingSequenceBean==null) {
+				RMDBeanMgr rmdMgr = storageManager.getRMDBeanMgr();
+				incomingSequenceBean = rmdMgr.findUnique(findBean);
+			}
+			
+			if (incomingSequenceBean!=null) 
+				RMMsgCreator.addAckMessage(rmMsgContext, inboundSequenceId, incomingSequenceBean);
+			
 		}
 		
 		return true;

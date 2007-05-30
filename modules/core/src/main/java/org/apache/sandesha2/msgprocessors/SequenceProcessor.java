@@ -210,7 +210,12 @@ public class SequenceProcessor {
 
 			  SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 			  SenderBean findSenderBean = new SenderBean ();
-			  findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+			  
+			  if (rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.LAST_MESSAGE)
+				  findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.LAST_MESSAGE);
+			  else
+				  findSenderBean.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+			  
 			  findSenderBean.setInboundSequenceId(sequence.getIdentifier().getIdentifier());
 			  findSenderBean.setInboundMessageNumber(sequence.getMessageNumber().getMessageNumber());
 			  findSenderBean.setSend(true);
@@ -297,7 +302,10 @@ public class SequenceProcessor {
 				SenderBean sender = storageManager.getSenderBeanMgr().findUnique(matcher);
 				if(sender != null) {
 					if(log.isDebugEnabled()) log.debug("Deleting sender for sync-2-way message");
+					
 					storageManager.removeMessageContext(sender.getMessageContextRefKey());
+					
+					//this causes the request to be deleted even without an ack.
 					storageManager.getSenderBeanMgr().delete(messageId);
 					
 					// Try and terminate the corresponding outbound sequence

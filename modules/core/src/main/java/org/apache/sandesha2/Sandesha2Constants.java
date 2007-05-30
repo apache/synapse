@@ -269,9 +269,11 @@ public interface Sandesha2Constants {
 		
 		int LAST_MESSAGE = 12;
 
-    int DUPLICATE_MESSAGE = 13;
+		int DUPLICATE_MESSAGE = 13;
+		
+		int POLL_RESPONSE_MESSAGE = 14;
 
-		int MAX_MESSAGE_TYPE = 13;
+		int MAX_MESSAGE_TYPE = 14;
 	}
 
 	public interface MessageParts {

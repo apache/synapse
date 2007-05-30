@@ -459,44 +459,30 @@ public class FaultManager {
 		
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
-			reason.addSOAPText(reasonText);
-			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
-			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
-			reason.setText(data.getReason());
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
-			// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
-			MessageContext faultMessageContext = 
-				MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
+		reason.setText(data.getReason());
+		referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+		referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+		referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
+		// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
+		MessageContext faultMessageContext = 
+		MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
 
-			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
+		SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
 			
-			referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
+		referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 						
-			// Set the action
-			faultMessageContext.setWSAAction(
+		// Set the action
+		faultMessageContext.setWSAAction(
 					SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
 			
-			if (log.isDebugEnabled())
-				log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
-			// Send the message
-			AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
-			engine.sendFault(faultMessageContext);
+		if (log.isDebugEnabled())
+			log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
+		// Send the message
+		AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
+		engine.sendFault(faultMessageContext);
 			
-			return;
-		} else {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
-			throw new SandeshaException (message);
-		}
-		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
-	  fault.setFaultAction(SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
-		throw fault;		
-		
+		return;
 	}
 
 	public static boolean isRMFault (String faultSubcodeValue) {

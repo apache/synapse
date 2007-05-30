@@ -420,6 +420,9 @@ public class SandeshaUtil {
 			newMessageContext.setProperty(MessageContext.TRANSPORT_OUT, referenceMessage
 					.getProperty(MessageContext.TRANSPORT_OUT));
 			
+			newMessageContext.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, 
+					referenceMessage.getProperty(AddressingConstants.WS_ADDRESSING_VERSION));
+			
 			copyConfiguredProperties (referenceMessage,newMessageContext);
 
 			//copying the serverSide property

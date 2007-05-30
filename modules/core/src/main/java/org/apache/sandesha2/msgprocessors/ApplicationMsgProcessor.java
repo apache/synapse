@@ -530,7 +530,13 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		appMsgEntry.setMessageID(rmMsg.getMessageId());
 		appMsgEntry.setMessageNumber(messageNumber);
 		appMsgEntry.setLastMessage(lastMessage);
-		appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+		
+		SOAPEnvelope envelope = rmMsg.getSOAPEnvelope();
+		if (lastMessage && envelope!=null && envelope.getBody().getFirstOMChild()==null)
+			appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.LAST_MESSAGE);
+		else
+			appMsgEntry.setMessageType(Sandesha2Constants.MessageTypes.APPLICATION);
+		
 		appMsgEntry.setInboundSequenceId(inboundSequence);
 		appMsgEntry.setInboundMessageNumber(inboundMessageNumber);
 		if (outSequenceID == null) {

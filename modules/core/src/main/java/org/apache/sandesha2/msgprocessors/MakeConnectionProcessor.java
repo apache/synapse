@@ -11,7 +11,9 @@ import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.OutOnlyAxisOperation;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -168,7 +170,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		setTransportProperties (returnMessage, pollMessage);
 		
 		// Link the response to the request
-		OperationContext context = pollMessage.getMessageContext().getOperationContext();
+
+		AxisOperation operation = SpecSpecificConstants.getWSRMOperation(Sandesha2Constants.MessageTypes.POLL_RESPONSE_MESSAGE, pollMessage.getRMSpecVersion(), pollMessage.getMessageContext().getAxisService());
+		OperationContext context = new OperationContext (operation, pollMessage.getMessageContext().getServiceContext());
+		
 		if(context == null) {
 			AxisOperation oldOperation = returnMessage.getAxisOperation();
 
@@ -181,12 +186,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		returnMessage.setOperationContext(context);
 		
 		returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
+		returnMessage.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, pollMessage.getProperty(RequestResponseTransport.TRANSPORT_CONTROL));
 		
-		// Update the senderBeans send time.
-		boolean continueSend = 
-			MessageRetransmissionAdjuster.adjustRetransmittion(returnRMMsg, matchingMessage, returnRMMsg.getConfigurationContext(), storageManager);
+		//marking pollMessage as responsed
+		pollMessage.getMessageContext().getOperationContext().setProperty (Constants.RESPONSE_WRITTEN,Constants.VALUE_TRUE);
 		
-		//
 		// Commit the current transaction, so that the SenderWorker can do it's own locking
 		if(transaction != null && transaction.isActive()) transaction.commit();
 		
@@ -194,11 +198,10 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		//This will allow Sandesha2 to consider both of following senarios equally.
 		//  1. A message being sent by the Sender thread.
 		//  2. A message being sent as a reply to an MakeConnection.
-		if (continueSend) {
-			SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, returnRMMsg.getRMSpecVersion());
-			worker.setMessage(returnRMMsg);
-			worker.run();
-		}
+		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
+		worker.setMessage(returnRMMsg);
+		worker.run();
+
 		
 		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
 	}

@@ -150,7 +150,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		}
 		
 		if(pending) addMessagePendingHeader(returnMessage, namespace);
-		
+		boolean continueSending = true;
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
 		if(returnRMMsg.getRMNamespaceValue()==null){
 			//this is the case when a stored application response msg was not sucecsfully returned 
@@ -165,43 +165,52 @@ public class MakeConnectionProcessor implements MsgProcessor {
 				if(rmsBean!=null){
 					returnRMMsg.setRMNamespaceValue(SpecSpecificConstants.getRMNamespaceValue(rmsBean.getRMVersion()));
 				}
+				else{
+					//we will never be able to reply to this msg - at the moment the best bet is 
+					//to not process the reply anymore
+					if(log.isDebugEnabled()) log.debug("Could not find RMS bean for polled msg");
+					continueSending = false;
+					//also remove the sender bean so that we do not select this again
+					storageManager.getSenderBeanMgr().delete(matchingMessage.getMessageID());
+				}
 			}
 		}
-		setTransportProperties (returnMessage, pollMessage);
-		
-		// Link the response to the request
+		if(continueSending){
+			setTransportProperties (returnMessage, pollMessage);
+			
+			// Link the response to the request
 
-		AxisOperation operation = SpecSpecificConstants.getWSRMOperation(Sandesha2Constants.MessageTypes.POLL_RESPONSE_MESSAGE, pollMessage.getRMSpecVersion(), pollMessage.getMessageContext().getAxisService());
-		OperationContext context = new OperationContext (operation, pollMessage.getMessageContext().getServiceContext());
-		
-		if(context == null) {
-			AxisOperation oldOperation = returnMessage.getAxisOperation();
+			AxisOperation operation = SpecSpecificConstants.getWSRMOperation(Sandesha2Constants.MessageTypes.POLL_RESPONSE_MESSAGE, pollMessage.getRMSpecVersion(), pollMessage.getMessageContext().getAxisService());
+			OperationContext context = new OperationContext (operation, pollMessage.getMessageContext().getServiceContext());
+			
+			if(context == null) {
+				AxisOperation oldOperation = returnMessage.getAxisOperation();
 
-			context = ContextFactory.createOperationContext(oldOperation, returnMessage.getServiceContext()); //new OperationContext(oldOperation);
+				context = ContextFactory.createOperationContext(oldOperation, returnMessage.getServiceContext()); //new OperationContext(oldOperation);
 
-			context.addMessageContext(pollMessage.getMessageContext());
-			pollMessage.getMessageContext().setOperationContext(context);
+				context.addMessageContext(pollMessage.getMessageContext());
+				pollMessage.getMessageContext().setOperationContext(context);
+			}
+			context.addMessageContext(returnMessage);
+			returnMessage.setOperationContext(context);
+			
+			returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
+			returnMessage.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, pollMessage.getProperty(RequestResponseTransport.TRANSPORT_CONTROL));
+			
+			//marking pollMessage as responsed
+			pollMessage.getMessageContext().getOperationContext().setProperty (Constants.RESPONSE_WRITTEN,Constants.VALUE_TRUE);
+			
+			// Commit the current transaction, so that the SenderWorker can do it's own locking
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			
+			//running the MakeConnection through a SenderWorker.
+			//This will allow Sandesha2 to consider both of following senarios equally.
+			//  1. A message being sent by the Sender thread.
+			//  2. A message being sent as a reply to an MakeConnection.
+			SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
+			worker.setMessage(returnRMMsg);
+			worker.run();			
 		}
-		context.addMessageContext(returnMessage);
-		returnMessage.setOperationContext(context);
-		
-		returnMessage.setProperty(Sandesha2Constants.MAKE_CONNECTION_RESPONSE, Boolean.TRUE);
-		returnMessage.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, pollMessage.getProperty(RequestResponseTransport.TRANSPORT_CONTROL));
-		
-		//marking pollMessage as responsed
-		pollMessage.getMessageContext().getOperationContext().setProperty (Constants.RESPONSE_WRITTEN,Constants.VALUE_TRUE);
-		
-		// Commit the current transaction, so that the SenderWorker can do it's own locking
-		if(transaction != null && transaction.isActive()) transaction.commit();
-		
-		//running the MakeConnection through a SenderWorker.
-		//This will allow Sandesha2 to consider both of following senarios equally.
-		//  1. A message being sent by the Sender thread.
-		//  2. A message being sent as a reply to an MakeConnection.
-		SenderWorker worker = new SenderWorker (pollMessage.getConfigurationContext(), matchingMessage, pollMessage.getRMSpecVersion());
-		worker.setMessage(returnRMMsg);
-		worker.run();
-
 		
 		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::replyToPoll");
 	}

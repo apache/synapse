@@ -18,6 +18,7 @@
 package org.apache.sandesha2.polling;
 
 import java.util.ArrayList;
+import java.util.HashMap
 import java.util.LinkedList;
 
 import org.apache.axis2.AxisFault;
@@ -62,6 +63,8 @@ public class PollingManager extends SandeshaThread {
 	
 	private static final int POLLING_MANAGER_WAIT_TIME = 3000;
 	
+	private HashMap pollTimes = new HashMap();
+	
 	public PollingManager() {
 		super(POLLING_MANAGER_WAIT_TIME);
 	}
@@ -94,6 +97,16 @@ public class PollingManager extends SandeshaThread {
 				}
 	
 				entry = (SequenceEntry) allSequencesList.get(nextIndex++);
+				
+				long now = System.currentTimeMillis();
+				Long time = (Long) pollTimes.get(entry.getSequenceId());
+				if(time != null && (now - time.longValue()) < POLLING_MANAGER_WAIT_TIME) {
+					// We have polled for this sequence too recently, so skip over this one
+					if (log.isDebugEnabled()) log.debug("Exit: PollingManager::internalRun, skipping sequence, not sleeping");
+					return false;
+				}
+				pollTimes.put(entry.getSequenceId(), new Long(now));
+				
 			}
 			if(log.isDebugEnabled()) log.debug("Chose sequence " + entry.getSequenceId());
 

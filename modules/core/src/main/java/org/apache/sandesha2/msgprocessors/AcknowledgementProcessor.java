@@ -103,6 +103,8 @@ public class AcknowledgementProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementProcessor::processAckHeader " + soapHeader);
 		
+		boolean piggybackedAck = !(rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK);
+		
 		MessageContext msgCtx = rmMsgCtx.getMessageContext();
 		ConfigurationContext configCtx = msgCtx.getConfigurationContext();
 
@@ -119,12 +121,12 @@ public class AcknowledgementProcessor {
 			log.debug(message);
 			throw new SandeshaException(message);
 		}
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager, piggybackedAck)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence");
 			return;
 		}
-		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, outSequenceId, rmsBean)) {
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, outSequenceId, rmsBean, piggybackedAck)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Sequence terminated");
 			return;
@@ -142,13 +144,13 @@ public class AcknowledgementProcessor {
 		if(log.isDebugEnabled()) log.debug("Got Ack for RM Sequence: " + outSequenceId + ", internalSeqId: " + internalSequenceId);
 		Iterator ackRangeIterator = sequenceAck.getAcknowledgementRanges().iterator();
 
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, outSequenceId, storageManager, piggybackedAck)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Unknown sequence ");
 			return;
 		}
 		
-		if (FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, sequenceAck, storageManager, rmsBean)) {
+		if (FaultManager.checkForInvalidAcknowledgement(rmMsgCtx, sequenceAck, storageManager, rmsBean, piggybackedAck)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack range ");
 			return;
@@ -192,7 +194,7 @@ public class AcknowledgementProcessor {
 							// Check we haven't got an Ack for a message that hasn't been sent yet !
 							if (retransmitterBean.getSentCount() == 0) {
 								FaultManager.makeInvalidAcknowledgementFault(rmMsgCtx, sequenceAck, ackRange,
-										storageManager);
+										storageManager, piggybackedAck);
 								if (log.isDebugEnabled())
 									log.debug("Exit: AcknowledgementProcessor::processAckHeader, Invalid Ack");
 								return;

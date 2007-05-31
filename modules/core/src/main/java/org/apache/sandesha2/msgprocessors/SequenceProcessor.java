@@ -140,21 +140,21 @@ public class SequenceProcessor {
 			throw new SandeshaException(message);
 		}
 
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
 			return InvocationResponse.ABORT;
 		}
 
 		// throwing a fault if the sequence is terminated
-		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, bean)) {
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, bean, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Sequence terminated");
 			return InvocationResponse.ABORT;
 		}
 		
 		// throwing a fault if the sequence is closed.
-		if (FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean)) {
+		if (FaultManager.checkForSequenceClosed(rmMsgCtx, sequenceId, bean, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Sequence closed");
 			return InvocationResponse.ABORT;

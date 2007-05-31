@@ -42,6 +42,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.engine.Handler.InvocationResponse;
@@ -68,6 +69,7 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
+import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceFault;
 
@@ -152,7 +154,7 @@ public class FaultManager {
 	 * @throws SandeshaException
 	 */
 	public static boolean checkForUnknownSequence(RMMsgContext rmMessageContext, String sequenceID,
-			StorageManager storageManager) throws AxisFault {
+			StorageManager storageManager, boolean piggybackedMessage) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForUnknownSequence, " + sequenceID);
 
@@ -199,7 +201,9 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForUnknownSequence, Sequence unknown");
-			getOrSendFault(rmMessageContext, data);
+			
+			boolean faultThrowable = !piggybackedMessage;
+			getOrSendFault(rmMessageContext, data, faultThrowable);
 			return true;
 		}
 
@@ -217,7 +221,7 @@ public class FaultManager {
 	 * @throws SandeshaException
 	 */
 	public static boolean checkForInvalidAcknowledgement(RMMsgContext ackRMMessageContext, SequenceAcknowledgement sequenceAcknowledgement,
-			StorageManager storageManager, RMSBean rmsBean)
+			StorageManager storageManager, RMSBean rmsBean, boolean piggybackedMessage)
 			throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForInvalidAcknowledgement");
@@ -247,7 +251,7 @@ public class FaultManager {
 				
 			if (invalidAck) {
 				makeInvalidAcknowledgementFault(ackRMMessageContext, sequenceAcknowledgement, 
-						acknowledgementRange, storageManager);
+						acknowledgementRange, storageManager, piggybackedMessage);
 				return true;
 			}
 		}		
@@ -266,7 +270,7 @@ public class FaultManager {
 	 */
 	public static void makeInvalidAcknowledgementFault(RMMsgContext rmMsgCtx, 
 			SequenceAcknowledgement sequenceAcknowledgement, AcknowledgementRange acknowledgementRange,
-			StorageManager storageManager) throws AxisFault {
+			StorageManager storageManager, boolean piggybackedMessage) throws AxisFault {
 		FaultData data = new FaultData();
 		int SOAPVersion = SandeshaUtil.getSOAPVersion(rmMsgCtx.getMessageContext().getEnvelope());
 		if (SOAPVersion == Sandesha2Constants.SOAPVersion.v1_1)
@@ -294,7 +298,9 @@ public class FaultManager {
 							
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::checkForInvalidAcknowledgement, invalid ACK");
-		getOrSendFault(rmMsgCtx, data);
+		
+		boolean throwable = !piggybackedMessage;
+		getOrSendFault(rmMsgCtx, data, throwable);
   }
 
 	/**
@@ -337,7 +343,7 @@ public class FaultManager {
 
 		if (log.isDebugEnabled())
 			log.debug("Exit: FaultManager::makeCreateSequenceRefusedFault");
-		getOrSendFault(rmMessageContext, data);
+		getOrSendFault(rmMessageContext, data, true);
 	}
 	
 	/**
@@ -348,7 +354,8 @@ public class FaultManager {
 	 * @return
 	 * @throws AxisFault 
 	 */
-	public static boolean checkForSequenceTerminated(RMMsgContext referenceRMMessage, String sequenceID, RMSequenceBean bean) 
+	public static boolean checkForSequenceTerminated(RMMsgContext referenceRMMessage, String sequenceID, RMSequenceBean bean
+			, boolean piggybackedMessage) 
 	
 	throws AxisFault {
 		if (log.isDebugEnabled())
@@ -378,7 +385,9 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
-			getOrSendFault(referenceRMMessage, data);
+			
+			boolean throwable = !piggybackedMessage;
+			getOrSendFault(referenceRMMessage, data, throwable);
 			return true;
 		}
 
@@ -388,7 +397,7 @@ public class FaultManager {
   }
 
 	public static boolean checkForSequenceClosed(RMMsgContext referenceRMMessage, String sequenceID,
-			RMDBean rmdBean) throws AxisFault {
+			RMDBean rmdBean, boolean piggybackedMessage) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
 
@@ -416,7 +425,9 @@ public class FaultManager {
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
-			getOrSendFault(referenceRMMessage, data);
+			
+			boolean throwable = !piggybackedMessage;
+			getOrSendFault(referenceRMMessage, data,throwable);
 			return true;
 		}
 
@@ -431,11 +442,17 @@ public class FaultManager {
 	 * 
 	 * @param referenceRMMsgContext - Message in reference to which the fault will be generated.
 	 * @param data - data for the fault
+	 * @param throwable - This tells weather or not it is ok to throw the fault out. I.e. this should not be done when processing 
+	 * 					  piggybacked acks since this will stop the carrier message from being processed.
 	 * @return - The dummy fault to be thrown out.
 	 * 
 	 * @throws AxisFault
 	 */
-	public static void getOrSendFault(RMMsgContext referenceRMMsgContext, FaultData data) throws AxisFault {
+	public static void getOrSendFault(RMMsgContext referenceRMMsgContext, FaultData data, boolean throwable) throws AxisFault {
+
+		
+		
+		
 		SOAPFactory factory = (SOAPFactory) referenceRMMsgContext.getSOAPEnvelope().getOMFactory();
 		
 		SOAPFaultCode faultCode = factory.createSOAPFaultCode();
@@ -459,31 +476,66 @@ public class FaultManager {
 		
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
-		reason.setText(data.getReason());
-		referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
-		referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
-		referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
-		// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
-		MessageContext faultMessageContext = 
-		MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
+		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+			reason.addSOAPText(reasonText);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);
+			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+		} else if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals (SOAPNamespaceValue)) {
+			reason.setText(data.getReason());
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_DETAIL_LOCAL_NAME, detail);
+			referenceRMMsgContext.setProperty(SOAP11Constants.SOAP_FAULT_STRING_LOCAL_NAME, reason);
+			// Need to send this message as the Axis Layer doesn't set the "SequenceFault" header
+			MessageContext faultMessageContext = 
+				MessageContextBuilder.createFaultMessageContext(referenceRMMsgContext.getMessageContext(), null);
 
-		SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
+			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
 			
-		referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
+			referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
 					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 						
-		// Set the action
-		faultMessageContext.setWSAAction(
+			// Set the action
+			faultMessageContext.setWSAAction(
 					SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
 			
-		if (log.isDebugEnabled())
-			log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
-		// Send the message
-		AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
-		engine.sendFault(faultMessageContext);
+			if (log.isDebugEnabled())
+				log.debug("Sending fault message " + faultMessageContext.getEnvelope().getHeader());
+
+				// Sending the message
+				//having a surrounded try block will make sure that the error is logged here 
+				//and that this does not disturb the processing of a carrier message.
+				try {
+					AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
+					engine.sendFault(faultMessageContext);
+				} catch (Exception e) {
+					AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage(), e.getMessage());
+					log.error(message);
+				}
 			
-		return;
+			return;
+			
+		} else {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.unknownSoapVersion);
+			throw new SandeshaException (message);
+		}
+		
+		AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
+		fault.setFaultAction(SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
+		
+		//if this is throwable throwing it out, else we will log here.
+		
+		if (throwable)
+			throw fault;	
+		else
+			log.error("Sandesha2 got a fault when processing the message essage " + referenceRMMsgContext.getMessageId(), fault);
+		
 	}
+	
+	
+	
+
 
 	public static boolean isRMFault (String faultSubcodeValue) {
 		if (faultSubcodeValue==null)
@@ -653,7 +705,7 @@ public class FaultManager {
 			
 			data.setType(Sandesha2Constants.SOAPFaults.FaultType.MESSAGE_NUMBER_ROLLOVER);
 
-			getOrSendFault(rmMessageContext, data);
+			getOrSendFault(rmMessageContext, data, true);
 			
 			return true;
 		}

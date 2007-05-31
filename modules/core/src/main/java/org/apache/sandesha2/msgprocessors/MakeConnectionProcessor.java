@@ -127,7 +127,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			SenderBean matchingMessage,
 			StorageManager storageManager,
 			boolean pending,
-			String namespace,
+			String makeConnectionNamespace,
 			Transaction transaction)
 	throws AxisFault
 	{
@@ -149,7 +149,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			return;
 		}
 		
-		if(pending) addMessagePendingHeader(returnMessage, namespace);
+		if(pending) addMessagePendingHeader(returnMessage, makeConnectionNamespace);
 		boolean continueSending = true;
 		RMMsgContext returnRMMsg = MsgInitializer.initializeMessage(returnMessage);
 		if(returnRMMsg.getRMNamespaceValue()==null){

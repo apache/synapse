@@ -110,6 +110,8 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader " + soapHeader);
 
+		boolean piggybackedAckRequest = !(rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK_REQUEST);
+		
 		String sequenceId = ackRequested.getIdentifier().getIdentifier();
 
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
@@ -129,14 +131,14 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		}
 
 		// Check that the sequence requested exists
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, piggybackedAckRequest)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, Unknown sequence ");
 			return false;
 		}
 
 		// throwing a fault if the sequence is terminated
-		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean)) {
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean, piggybackedAckRequest)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, Sequence terminated");
 			return false;

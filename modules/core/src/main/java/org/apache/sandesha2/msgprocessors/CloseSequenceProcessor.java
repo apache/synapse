@@ -83,14 +83,14 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			secManager.checkProofOfPossession(token, body, msgCtx);
 		}
 
-		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: CloseSequenceProcessor::processInMessage, Unknown sequence " + sequenceId);
 			return false;
 		}
 		
 		// throwing a fault if the sequence is terminated
-		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean)) {
+		if (FaultManager.checkForSequenceTerminated(rmMsgCtx, sequenceId, rmdBean, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: CloseSequenceProcessor::processInMessage, Sequence terminated");
 			return false;

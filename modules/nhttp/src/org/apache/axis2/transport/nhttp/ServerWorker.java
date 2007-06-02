@@ -201,13 +201,14 @@ public class ServerWorker implements Runnable {
     private void processPost() {
 
         try {
+            Header contentType = request.getFirstHeader(HTTP.CONTENT_TYPE);
+            Header soapAction  = request.getFirstHeader(SOAPACTION);
+
             HTTPTransportUtils.processHTTPPostRequest(
                 msgContext, is,
                 os,
-                (request.getFirstHeader(HTTP.CONTENT_TYPE) != null ?
-                    request.getFirstHeader(HTTP.CONTENT_TYPE).getValue() : null),
-                (request.getFirstHeader(SOAPACTION) != null ?
-                    request.getFirstHeader(SOAPACTION).getValue() : null),
+                (contentType != null ? contentType.getValue() : null),
+                (soapAction != null  ? soapAction.getValue()  : null),
                 request.getRequestLine().getUri());
         } catch (AxisFault e) {
             handleException("Error processing POST request ", e);

@@ -164,7 +164,7 @@ public class Axis2HttpRequest {
         log.debug("start streaming outgoing http request");
         OutputStream out = Channels.newOutputStream(pipe.sink());
 
-        messageFormatter.writeTo(msgContext, format, out, true);
+        messageFormatter.writeTo(msgContext, format, out, false);
             try {
             out.flush();
             out.close();

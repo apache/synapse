@@ -355,6 +355,7 @@ public class SandeshaUtil {
 			MessageContext newMessageContext = new MessageContext();
 			newMessageContext.setConfigurationContext(configContext);
 			
+			Options oldOptions = referenceMessage.getOptions();
 			Options newOptions = new Options ();
 			
 			newMessageContext.setOptions(newOptions);
@@ -427,7 +428,11 @@ public class SandeshaUtil {
 
 			//copying the serverSide property
 			newMessageContext.setServerSide(referenceMessage.isServerSide());
-
+			
+			//this had to be set here to avoid a double invocation.
+			if (oldOptions!=null)
+				newOptions.setUseSeparateListener(oldOptions.isUseSeparateListener());
+			
 			return newMessageContext;
 
 		} catch (AxisFault e) {

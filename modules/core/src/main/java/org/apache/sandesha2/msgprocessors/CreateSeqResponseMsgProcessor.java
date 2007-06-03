@@ -173,6 +173,8 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			rMDBean.setNextMsgNoToProcess(1);
 			rMDBean.setOutboundInternalSequence(rmsBean.getInternalSequenceID());
 
+			rMDBean.setServiceName(createSeqResponseRMMsgCtx.getMessageContext().getAxisService().getName());
+			
 			//Storing the referenceMessage of the sending side sequence as the reference message
 			//of the receiving side as well.
 			//This can be used when creating new outgoing messages.

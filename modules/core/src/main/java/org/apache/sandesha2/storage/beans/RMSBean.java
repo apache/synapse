@@ -135,6 +135,7 @@ public class RMSBean extends RMSequenceBean {
 	 */
 	private int soapVersion;
 	
+	
 	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
@@ -165,6 +166,8 @@ public class RMSBean extends RMSequenceBean {
 	 * I.e. the user explicitly have to call for termination (using SandeshaClient).  
 	 */
 	private boolean avoidAutoTermination = false;
+
+	private String serviceName = null;
 	
 	public RMSBean() {
 	}
@@ -472,6 +475,14 @@ public class RMSBean extends RMSequenceBean {
 			match = false;
 
 		return match;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 }

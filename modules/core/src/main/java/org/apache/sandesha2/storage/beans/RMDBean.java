@@ -73,6 +73,8 @@ public class RMDBean extends RMSequenceBean {
 		
 	private long highestInMessageNumber = 0;
 	
+	private String serviceName = null;
+	
 	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
@@ -223,6 +225,14 @@ public class RMDBean extends RMSequenceBean {
 			equal = false;
 
 		return equal;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 

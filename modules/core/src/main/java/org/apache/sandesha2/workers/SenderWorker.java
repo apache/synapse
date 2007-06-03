@@ -521,12 +521,17 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			MessageContext responseMessageContext = msgCtx.getOperationContext().getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 			SOAPEnvelope resenvelope = null;
+			if (responseMessageContext!=null)
+				resenvelope = responseMessageContext.getEnvelope();
 			
 			boolean transportInPresent = (msgCtx.getProperty(MessageContext.TRANSPORT_IN) != null);
 			if (!transportInPresent && (responseMessageContext==null || responseMessageContext.getEnvelope()==null)) {
 				if(log.isDebugEnabled()) log.debug("Exit: SenderWorker::checkForSyncResponses, no response present");
 				return;
 			}
+			
+			//to find out weather the response was built by me.
+			boolean syncResponseBuilt = false;
 			
 			if (responseMessageContext==null || responseMessageContext.getEnvelope()==null) {
 				if (responseMessageContext==null)
@@ -548,16 +553,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 									transportInfoMap.get(Constants.Configuration.CONTENT_TYPE));
 					responseMessageContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
 									transportInfoMap.get(Constants.Configuration.CHARACTER_SET_ENCODING));
-				}
-			
-				//setting the message as serverSide will let it go through the MessageReceiver (may be callback MR).
-				responseMessageContext.setServerSide(true);
-			
-				if (responseMessageContext.getSoapAction()==null) {
-					//if there is no SOAP action in the response message, Axis2 will wrongly identify it as a REST message
-					//This happens because we set serverSide to True in a previous step.
-					//So we have to add a empty SOAPAction here.
-					responseMessageContext.setSoapAction("");
 				}
 			
 				responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
@@ -586,6 +581,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						//We try to build the response out of the transport stream.
 						resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
 						responseMessageContext.setEnvelope(resenvelope);
+						syncResponseBuilt = true;
 					} else {
 						
 					}
@@ -633,6 +629,23 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 			}
 			
+			//if the syncResponseWas not built here and the client was not expecting a sync response. We will not try to execute 
+			//here. Doing so will cause a double invocation for a async message. 
+			if (msgCtx.getOptions().isUseSeparateListener()==true &&  !syncResponseBuilt) {
+				return;
+			}
+			
+			
+			//setting the message as serverSide will let it go through the MessageReceiver (may be callback MR).
+			responseMessageContext.setServerSide(true);
+		
+			if (responseMessageContext.getSoapAction()==null) {
+				//if there is no SOAP action in the response message, Axis2 will wrongly identify it as a REST message
+				//This happens because we set serverSide to True in a previous step.
+				//So we have to add a empty SOAPAction here.
+				responseMessageContext.setSoapAction("");
+			}
+
 			AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 			if (resenvelope!=null) {
 				//we proceed only if we hv found a valid envelope.

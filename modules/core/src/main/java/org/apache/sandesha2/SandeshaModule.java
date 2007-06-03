@@ -51,6 +51,7 @@ import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
+import org.apache.sandesha2.workers.SandeshaThread;
 
 /**
  * The Module class of Sandesha2.
@@ -267,9 +268,26 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 	public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::shutdown, " + configurationContext);
-		SandeshaUtil.
-			getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration())
-				.shutdown();
+		StorageManager storageManager = SandeshaUtil.
+			getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration());
+
+		if (storageManager!=null) {
+			SandeshaThread sender = storageManager.getSender();
+			SandeshaThread invoker = storageManager.getInvoker();
+			SandeshaThread pollingManager = storageManager.getPollingManager();
+			
+			//stopping threads.
+			if (sender!=null)
+				sender.stopRunning();
+			if (invoker!=null)
+				invoker.stopRunning();
+			if (pollingManager!=null)
+				pollingManager.stopRunning();
+			
+			//shutting down the storage manager.
+			storageManager.shutdown();
+		}
+		
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::shutdown");
 	}
 

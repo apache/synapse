@@ -26,7 +26,7 @@
 
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
-    <version>1.0-RC2-SNAPSHOT</version>
+    <version>1.0</version>
 
     <name>Apache Synapse</name>
     <description>Apache Synapse</description>
@@ -291,6 +291,16 @@
                 <artifactId>wss4j</artifactId>
                 <version>${wss4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.santuario</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>${xmlsec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>opensaml</groupId>
+                <artifactId>opensaml</artifactId>
+                <version>${opensaml.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.sandesha2</groupId>
@@ -354,76 +364,26 @@
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-policy</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-mtompolicy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>httpcomponents-httpcore</groupId>
-                    <artifactId>jakarta-httpcore</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.neethi</groupId>
-                    <artifactId>neethi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.woden</groupId>
-                    <artifactId>woden</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-trust</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-mtompolicy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>httpcomponents-httpcore</groupId>
-                    <artifactId>jakarta-httpcore</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.woden</groupId>
-                    <artifactId>woden</artifactId>
-                </exclusion>                
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-mtompolicy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>httpcomponents-httpcore</groupId>
-                    <artifactId>jakarta-httpcore</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.woden</groupId>
-                    <artifactId>woden</artifactId>
-                </exclusion>                
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>opensaml</groupId>
+            <artifactId>opensaml</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.rampart</groupId>
@@ -727,7 +687,7 @@
 
     <properties>
         <!-- Synapse and related components -->
-        <synapse.version>1.0-RC2-SNAPSHOT</synapse.version>
+        <synapse.version>1.0</synapse.version>
         <jakarta.httpcore.nio.version>4.0-alpha4</jakarta.httpcore.nio.version>
 
         <!-- Axis2 1.2 and its dependencies -->
@@ -742,10 +702,12 @@
 
         <!-- addressing, rampart, sandesha, neethi -->
         <addressing.version>1.2</addressing.version>
-        <rampart.version>SNAPSHOT</rampart.version>
-        <sandesha2.version>SNAPSHOT</sandesha2.version>
+        <rampart.version>1.2</rampart.version>
+        <sandesha2.version>1.2</sandesha2.version>
         <neethi.version>2.0.1</neethi.version>
-        <wss4j.version>SNAPSHOT</wss4j.version>
+        <wss4j.version>1.5.2</wss4j.version>
+        <opensaml.version>1.1</opensaml.version>
+        <xmlsec.version>1.4.0</xmlsec.version>
         <bcprov.jdk13.version>132</bcprov.jdk13.version>
 
         <xerces.version>2.8.1</xerces.version>
@@ -758,7 +720,7 @@
         <xmlunit.version>1.0</xmlunit.version>
 
         <!-- dependencies of Synapse extensions module -->
-        <wso2commons.version>1.2-SNAPSHOT</wso2commons.version>
+        <wso2commons.version>1.2</wso2commons.version>
         <spring.version>1.2.6</spring.version>
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta1</bsf.version>

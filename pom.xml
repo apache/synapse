@@ -184,7 +184,13 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
 		<!-- Axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
+            <artifactId>axis2-kernel</artifactId>
+            <version>${axis2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-codegen</artifactId>
             <version>${axis2.version}</version>
         </dependency>
 		

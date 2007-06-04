@@ -35,6 +35,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.jaxen.JaxenException;
 
 public class RMSequenceMediator extends AbstractMediator {
@@ -85,6 +86,8 @@ public class RMSequenceMediator extends AbstractMediator {
             orgMessageCtx.getOptions().setProperty(
                 Constants.SANDESHA_SEQUENCE_KEY, sequenceID);
             orgMessageCtx.getOptions().setProperty(
+                SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
+            orgMessageCtx.getOptions().setProperty(
                 Constants.SANDESHA_LAST_MESSAGE, "true");
             return true;
         }
@@ -97,6 +100,11 @@ public class RMSequenceMediator extends AbstractMediator {
         boolean lastMessage = isLastMessage(smc);
         if (log.isDebugEnabled()) {
             log.debug("Is this message the last message in sequence: " + lastMessage);
+        }
+
+        if (!sequenceMap.containsKey(correlationValue)) {
+            orgMessageCtx.getOptions().setProperty(
+                SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());       
         }
 
         String sequenceID = retrieveSequenceID(correlationValue);

@@ -212,7 +212,7 @@
     <!-- ================================================= -->
     <!-- Comment this to disable Addressing -->
     <module ref="addressing"/>
-    <module ref="synapse-1.0-RC2"/>
+    <module ref="synapse-1.0"/>
 
     <!--Configuring module , providing parameters for modules whether they refer or not-->
     <!--<moduleConfig name="addressing">-->

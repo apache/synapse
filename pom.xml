@@ -813,12 +813,16 @@
         <developer>
             <name>Asankha Perera</name>
             <id>asankha</id>
-            <email>asankha AT wso2.com</email>
+            <email>asankha AT apache.com</email>
             <organization>WSO2</organization>
+            <url>http://www.apache.org/~asankha</url>
         </developer>
     </developers>
 
     <contributors>
+        <contributor>
+            <name>Oleg Kalnichevski</name>
+        </contributor>
         <contributor>
             <name>Kasun Samarasinghe</name>
         </contributor>
@@ -827,9 +831,6 @@
         </contributor>
         <contributor>
             <name>Sanjesh Pathak</name>
-        </contributor>
-        <contributor>
-            <name>Oleg Kalnichevski</name>
         </contributor>
         <contributor>
             <name>Dave Irving</name>

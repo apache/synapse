@@ -72,9 +72,15 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
 		if (msgContext.getAxisService() != null) {
 			Parameter unreliableParam = msgContext.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
 			if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
-				log.debug("Exit: SandeshaGlobalInHandler::invoke, Service has disabled RM " + InvocationResponse.CONTINUE);
+				if (log.isDebugEnabled())
+					log.debug("Exit: SandeshaGlobalInHandler::invoke, Service has disabled RM " + InvocationResponse.CONTINUE);
 				return InvocationResponse.CONTINUE;
 			}
+		} else if (msgContext.getConfigurationContext().getAxisConfiguration().getParameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN) == null) {
+			if (log.isDebugEnabled())
+				log.debug("Exit: SandeshaGlobalInHandler::invoke, No Property Bean found " + InvocationResponse.CONTINUE);
+			
+			return InvocationResponse.CONTINUE;						
 		}
 
 		// The only work that this handler needs to do is identify messages which

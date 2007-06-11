@@ -35,7 +35,6 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
-import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.RMSBean;
@@ -63,11 +62,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 	private SenderBean senderBean = null;
 	private RMMsgContext messageToSend = null;
 	private String rmVersion = null;
-	private RMDBean incomingSequenceBean = null;
-	
-	public void setIncomingSequenceBean(RMDBean incomingSequenceBean) {
-		this.incomingSequenceBean = incomingSequenceBean;
-	}
 
 	public SenderWorker (ConfigurationContext configurationContext, SenderBean senderBean, String rmVersion) {
 		this.configurationContext = configurationContext;
@@ -398,11 +392,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		// Lock the message to enable retransmission update
 		senderBean = storageManager.getSenderBeanMgr().retrieve(senderBean.getMessageID());
-		int messageType = senderBean.getMessageType();
 		
 		// Only continue if we find a SenderBean
 		if (senderBean == null)
 			return false;
+
+		int messageType = senderBean.getMessageType();
 
 		boolean continueSending = MessageRetransmissionAdjuster.adjustRetransmittion(
 				rmMsgContext, senderBean, rmMsgContext.getConfigurationContext(), storageManager);
@@ -482,13 +477,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if (inboundSequenceId==null)
 				throw new SandeshaException ("InboundSequenceID is not set for the sequence:" + id);
 			
-			RMDBean findBean = new RMDBean ();
-			findBean.setSequenceID(inboundSequenceId);
-			
-			if (incomingSequenceBean==null) {
-				RMDBeanMgr rmdMgr = storageManager.getRMDBeanMgr();
-				incomingSequenceBean = rmdMgr.findUnique(findBean);
-			}
+			RMDBean incomingSequenceBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, inboundSequenceId);
 			
 			if (incomingSequenceBean!=null) 
 				RMMsgCreator.addAckMessage(rmMsgContext, inboundSequenceId, incomingSequenceBean);

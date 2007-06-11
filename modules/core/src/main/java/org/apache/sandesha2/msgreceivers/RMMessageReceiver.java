@@ -21,17 +21,20 @@ package org.apache.sandesha2.msgreceivers;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.receivers.AbstractMessageReceiver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.msgprocessors.MsgProcessor;
 import org.apache.sandesha2.msgprocessors.MsgProcessorFactory;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
+import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
@@ -65,6 +68,22 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 		if(msgProcessor != null) {
 			Transaction transaction = null;
 			
+			if (msgCtx.getAxisService() != null) {
+				Parameter unreliableParam = msgCtx.getAxisService().getParameter(SandeshaClientConstants.UNRELIABLE_MESSAGE);
+				if (null != unreliableParam && "true".equals(unreliableParam.getValue())) {
+					
+					if (rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.CREATE_SEQ)
+						FaultManager.makeCreateSequenceRefusedFault(rmMsgCtx, 
+								SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, msgCtx.getAxisService().getName()), 
+								new Exception());
+					else
+						throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, msgCtx.getAxisService().getName()));
+					
+					log.debug("Exit: RMMessageReceiver::receive, Service has disabled RM ");
+					return;
+				}
+			}
+
 			try {
 				ConfigurationContext context = msgCtx.getConfigurationContext();
 				StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());				

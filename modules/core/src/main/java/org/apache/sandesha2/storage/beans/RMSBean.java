@@ -17,6 +17,7 @@
 
 package org.apache.sandesha2.storage.beans;
 
+import org.apache.sandesha2.util.Range;
 import org.apache.sandesha2.util.RangeString;
 
 /**
@@ -119,11 +120,6 @@ public class RMSBean extends RMSequenceBean {
 	private boolean sequenceClosedClient = false;
 
 	/**
-	 * The number of messages that were acked
-	 */
-	private long numberOfMessagesAcked = 0;
-
-	/**
 	 * The number of reply messages that we expect
 	 */
 	private long expectedReplies = 0;
@@ -134,8 +130,19 @@ public class RMSBean extends RMSequenceBean {
 	 * .NET interop requires all messages to be sent with the same SOAP version.
 	 */
 	private int soapVersion;
-	
-	
+
+	/**
+	 * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
+	 * for the response side, other wise PollingManager will pause the polling process in termination and we will never be able
+	 * to get the CS.
+	 */
+	private boolean terminationPauserForCS = false;
+  	/**
+	 * If this is set, the current sequence is not expected to auto terminate when all the acks are received.
+	 * I.e. the user explicitly have to call for termination (using SandeshaClient).  
+	 */
+	private boolean avoidAutoTermination = false;
+
 	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
@@ -154,24 +161,38 @@ public class RMSBean extends RMSequenceBean {
 	private static final int EXPECTED_REPLIES          = 0x00000020;
 	private static final int SOAP_VERSION_FLAG         = 0x00000200;
 	
-  /**
-   * In WSRM Anon URI scenario, we may not want to terminate a perticular sequence until the CreateSequence has been received
-   * for the response side, other wise PollingManager will pause the polling process in termination and we will never be able
-   * to get the CS.
-   */
-  private boolean terminationPauserForCS = false;
-  
-	/**
-	 * If this is set, the current sequence is not expected to auto terminate when all the acks are received.
-	 * I.e. the user explicitly have to call for termination (using SandeshaClient).  
-	 */
-	private boolean avoidAutoTermination = false;
-
-	private String serviceName = null;
-	
 	public RMSBean() {
 	}
 
+	/**
+	 * Constructor that copies all RMSBean values from the RMSBean supplied
+	 * @param beanToCopy
+	 */	
+	public RMSBean(RMSBean beanToCopy) {
+		super(beanToCopy);
+		 anonymousUUID = beanToCopy.getAnonymousUUID();
+		 clientCompletedMessages = new RangeString(beanToCopy.getClientCompletedMessages().toString());
+		 createSeqMsgID = beanToCopy.getCreateSeqMsgID();
+		 createSequenceMsgStoreKey = beanToCopy.getCreateSequenceMsgStoreKey();
+		 expectedReplies = beanToCopy.getExpectedReplies();
+		 highestOutMessageNumber = beanToCopy.getHighestOutMessageNumber();
+		 highestOutRelatesTo = beanToCopy.getHighestOutRelatesTo();
+		 internalSequenceID = beanToCopy.getInternalSequenceID();
+		 lastOutMessage = beanToCopy.getLastOutMessage();
+		 lastSendError = beanToCopy.getLastSendError();
+		 lastSendErrorTimestamp = beanToCopy.getLastSendErrorTimestamp();
+		 nextMessageNumber = beanToCopy.getNextMessageNumber();
+		 offeredEndPoint = beanToCopy.getOfferedEndPoint();
+		 offeredSequence = beanToCopy.getOfferedSequence();
+		 referenceMessageStoreKey = beanToCopy.getReferenceMessageStoreKey();
+		 sequenceClosedClient = beanToCopy.isSequenceClosedClient();
+		 soapVersion = beanToCopy.getSoapVersion();
+		 terminateAdded = beanToCopy.isTerminateAdded();
+		 terminationPauserForCS = beanToCopy.isTerminationPauserForCS();
+		 timedOut = beanToCopy.isTimedOut();
+		 transportTo = beanToCopy.getTransportTo();
+		 avoidAutoTermination = beanToCopy.isAvoidAutoTermination();		
+	}
 
 	public String getCreateSeqMsgID() {
 		return createSeqMsgID;
@@ -293,12 +314,17 @@ public class RMSBean extends RMSequenceBean {
   }
 	
 	public long getNumberOfMessagesAcked() {
+		long numberOfMessagesAcked = 0;
+		if (clientCompletedMessages != null) {
+			// Process this value based on the ClientCompletedMessages
+			Range ranges[] = clientCompletedMessages.getRanges();
+	
+			for (int rangeIndex=0; rangeIndex < ranges.length; rangeIndex++) {
+				Range range = ranges[rangeIndex];
+				numberOfMessagesAcked = range.upperValue - range.lowerValue + 1;
+			}
+		}
   	return numberOfMessagesAcked;
-  }
-
-	public void setNumberOfMessagesAcked(long numberOfMessagesAcked) {
-  	this.numberOfMessagesAcked = numberOfMessagesAcked;
-  	this.rmsFlags |= ACKED_MESSAGES_FLAG;
   }
 	
 	public String getTransportTo() {
@@ -384,7 +410,6 @@ public class RMSBean extends RMSequenceBean {
 		result.append("\nTerminatePauser  : "); result.append(terminationPauserForCS);
 		result.append("\nTimedOut         : "); result.append(timedOut);
 		result.append("\nClosedClient     : "); result.append(sequenceClosedClient);
-		result.append("\nNumAckedMsgs     : "); result.append(numberOfMessagesAcked);
 		result.append("\nExpectedReplies  : "); result.append(expectedReplies);
 		result.append("\nTransportTo      : "); result.append(transportTo);
 		result.append("\nOfferedEndPoint  : "); result.append(offeredEndPoint);
@@ -475,14 +500,6 @@ public class RMSBean extends RMSequenceBean {
 			match = false;
 
 		return match;
-	}
-
-	public String getServiceName() {
-		return serviceName;
-	}
-
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
 	}
 
 }

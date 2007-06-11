@@ -244,8 +244,6 @@ public class AcknowledgementProcessor {
 		// to break us)
 		if (numberOfNewMessagesAcked>0) {
 			rmsBean.setClientCompletedMessages(completedMessages);
-			long noOfMsgsAcked = rmsBean.getNumberOfMessagesAcked() + numberOfNewMessagesAcked;
-			rmsBean.setNumberOfMessagesAcked(noOfMsgsAcked);
 		}
 		
 		// Update the RMSBean

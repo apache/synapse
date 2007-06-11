@@ -291,7 +291,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::shutdown");
 	}
 
-    public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
+    public void applyPolicy(Policy policy, AxisDescription axisDescription) {
         // TODO 
         
     }

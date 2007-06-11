@@ -50,8 +50,7 @@ public class LastMessageProcessor  implements MsgProcessor {
 		return true;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
-		// TODO Auto-generated method stub
+	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
 		return false;
 	}
 

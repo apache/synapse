@@ -42,7 +42,6 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.engine.Handler.InvocationResponse;
@@ -69,7 +68,6 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.storage.beans.RMSequenceBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
 import org.apache.sandesha2.wsrm.AcknowledgementRange;
-import org.apache.sandesha2.wsrm.FaultCode;
 import org.apache.sandesha2.wsrm.SequenceAcknowledgement;
 import org.apache.sandesha2.wsrm.SequenceFault;
 

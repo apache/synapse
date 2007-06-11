@@ -72,9 +72,7 @@ public class RMDBean extends RMSequenceBean {
 	private long nextMsgNoToProcess;
 		
 	private long highestInMessageNumber = 0;
-	
-	private String serviceName = null;
-	
+		
 	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
@@ -85,6 +83,23 @@ public class RMDBean extends RMSequenceBean {
 	private static final int HIGHEST_IN_MSG_FLAG = 0x00000010;
 
 	public RMDBean() {
+	}
+
+	/**
+	 * Constructor that copies all RMDBean values from the RMDBean supplied
+	 * @param beanToCopy
+	 */
+	public RMDBean(RMDBean beanToCopy) {
+		super(beanToCopy);
+		highestInMessageId = beanToCopy.getHighestInMessageId();
+		highestInMessageNumber = beanToCopy.getHighestInMessageNumber();
+		lastInMessageId = beanToCopy.getLastInMessageId();
+		nextMsgNoToProcess = beanToCopy.getNextMsgNoToProcess();
+		outboundInternalSequence = beanToCopy.getOutboundInternalSequence();
+		outOfOrderRanges = beanToCopy.getOutOfOrderRanges();
+		referenceMessageKey = beanToCopy.getReferenceMessageKey();
+		serverCompletedMessages = new RangeString(beanToCopy.getServerCompletedMessages().toString());
+		toAddress = beanToCopy.getToAddress();
 	}
 
 	public RMDBean(String sequenceID, long nextNsgNo) {
@@ -226,14 +241,4 @@ public class RMDBean extends RMSequenceBean {
 
 		return equal;
 	}
-
-	public String getServiceName() {
-		return serviceName;
-	}
-
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
-
-
 }

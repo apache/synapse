@@ -19,7 +19,6 @@ package org.apache.sandesha2;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -104,7 +103,6 @@ public class MessageValidator {
 			//validating messages from the client.
 			
 			//if sync InOut and NoOffer and RM 1.0 an exception should be thrown
-			String rmNamespace = rmMsgContext.getRMNamespaceValue();
 			String mep = msgContext.getAxisOperation().getMessageExchangePattern();
 			String offer = (String) msgContext.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID);
 			

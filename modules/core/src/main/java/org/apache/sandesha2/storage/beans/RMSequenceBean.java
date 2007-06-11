@@ -64,6 +64,8 @@ public class RMSequenceBean extends RMBean {
 	 */
 	private boolean pollingMode=false;
 	
+	private String serviceName = null;
+
 	/**
 	 * Flags that are used to check if the primitive types on this bean
 	 * have been set. If a primitive type has not been set then it will
@@ -77,6 +79,24 @@ public class RMSequenceBean extends RMBean {
 
 	public RMSequenceBean() {
 
+	}
+	
+	/**
+	 * Constructor that copies all RMSBean values from the RMSBean supplied
+	 * @param beanToCopy
+	 */
+	public RMSequenceBean(RMSequenceBean beanToCopy) {
+		acksToEPR = beanToCopy.getAcksToEPR();
+		closed = beanToCopy.isClosed();
+		lastActivatedTime = beanToCopy.getLastActivatedTime();
+		pollingMode = beanToCopy.isPollingMode();
+		replyToEPR = beanToCopy.getReplyToEPR();
+		rMVersion = beanToCopy.getRMVersion();
+		securityTokenData = beanToCopy.getSecurityTokenData();		
+		sequenceID = beanToCopy.getSequenceID();
+		terminated = beanToCopy.isTerminated();
+		toEPR = beanToCopy.getToEPR(); 		
+		serviceName = beanToCopy.getServiceName();
 	}
 
 	public RMSequenceBean(String sequenceID) {
@@ -174,6 +194,14 @@ public class RMSequenceBean extends RMBean {
 		this.securityTokenData = securityTokenData;
 	}
 
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("\nSequence Id  : "); result.append(sequenceID);
@@ -185,6 +213,7 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nTerminated       : "); result.append(terminated);		
 		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);	
 		result.append("\nRMVersion        : "); result.append(rMVersion);	
+		result.append("\nServiceName        : "); result.append(serviceName);	
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		return result.toString();
 	}

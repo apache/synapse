@@ -24,6 +24,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+      <groupId>org.apache</groupId>
+      <artifactId>apache</artifactId>
+      <version>4</version>
+    </parent>
+
     <groupId>org.apache.synapse</groupId>
     <artifactId>Apache-Synapse</artifactId>
     <version>1.0</version>
@@ -630,16 +636,16 @@
     </reporting>
 
     <distributionManagement>
-        <repository>
+        <!--<repository>
           <id>apache-snapshots</id>
           <name>Maven Central Repository</name>
           <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</url>
-        </repository>
-        <!--<snapshotRepository>
+        </repository>-->
+        <repository>
           <id>apache-releases</id>
           <name>Apache Ibiblio rsync Repository</name>
           <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
-        </snapshotRepository>-->
+        </repository>
         <site>
             <id>website</id>
             <url>scpexe://people.apache.org/www/ws.apache.org/synapse</url>

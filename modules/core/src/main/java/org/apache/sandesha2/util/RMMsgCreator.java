@@ -31,6 +31,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -395,10 +396,22 @@ public class RMMsgCreator {
 				Sandesha2Constants.MessageParts.CLOSE_SEQUENCE_RESPONSE, action);
 	}
 
+	/**
+	 * This will create a response message context using the Axis2 Util methods (where things like relatesTo transformation will
+	 * happen). This will also  make sure that created out message is correctly secured using the Sequence Token Data of the sequence.
+	 * 
+	 * @param requestMsg The request message
+	 * @param rmSequenceBean 
+	 * @param part
+	 * @param messagePartId
+	 * @param action
+	 * @return
+	 * @throws AxisFault
+	 */
 	private static RMMsgContext createResponseMsg(RMMsgContext requestMsg, RMSequenceBean rmSequenceBean, IOMRMPart part, 
 			int messagePartId, String action) throws AxisFault {
 
-		MessageContext outMessage = Utils.createOutMessageContext(requestMsg.getMessageContext());
+		MessageContext outMessage = MessageContextBuilder.createOutMessageContext (requestMsg.getMessageContext());
 		RMMsgContext responseRMMsg = new RMMsgContext(outMessage);
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(requestMsg.getSOAPEnvelope()));
 
@@ -422,10 +435,10 @@ public class RMMsgCreator {
 	}
 
 	/**
-	 * Adds an ack message to the given application message.
+	 * Adds an Ack of specific sequence to the given application message.
 	 * 
-	 * @param applicationMsg
-	 * @param sequenceId
+	 * @param applicationMsg The Message to which the Ack will be added
+	 * @param sequenceId - The sequence to which we will be Acking
 	 * @throws SandeshaException
 	 */
 	public static void addAckMessage(RMMsgContext applicationMsg, String sequenceId, RMDBean rmdBean)
@@ -531,6 +544,14 @@ public class RMMsgCreator {
 		return makeConnectionRMMessageCtx;
 	}
 
+	/**
+	 * This will add necessary data to a out-bound message to make sure that is is correctly secured.
+	 * Security Token Data will be taken from the Sandesha2 security manager.
+	 * 
+	 * @param rmBean Sequence bean to identify the sequence. This could be an in-bound sequence or an out-bound sequence.
+	 * @param message - The message which will be secured.
+	 * @throws SandeshaException 
+	 */
 	public static void secureOutboundMessage(RMSequenceBean rmBean, MessageContext message)
 	throws SandeshaException
 	{

@@ -65,7 +65,9 @@ public class RMMsgContext {
 
 	/**
 	 * To add a new SOAP envelope to the message. The generated envelope will belong 
-	 * to the SOAP version of the MessageContext.
+	 * to the SOAP version of the MessageContext. We will be going through each MessagePart and adding it to the
+	 * envelope. In other words all the MessageParts that are available in the RMMsg will be added to the SOAP 
+	 * envelope after this.
 	 * 
 	 * @throws SandeshaException
 	 */

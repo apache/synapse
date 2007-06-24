@@ -24,8 +24,10 @@ import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.commons.logging.Log;
@@ -183,6 +185,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
         secManager.checkProofOfPossession(token, seqHeader, rmMsgCtx.getMessageContext());
         secManager.checkProofOfPossession(token, body, rmMsgCtx.getMessageContext());
       }
+      
+      MessageContext messageContext = rmMsgCtx.getMessageContext();
     
       if (bean != null) {
         
@@ -206,27 +210,54 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
           storageManager.getRMDBeanMgr().update(bean);
         }
         else {
+           
           if (log.isDebugEnabled())
-            log.debug("Detected duplicate message " + msgNo);
-          rmMsgCtx.getMessageContext().setRelationships(null);
+              log.debug("Detected duplicate message " + msgNo);
+            
+            // Add the duplicate RM AxisOperation to the message
+            
+            //If the service has not been found by this time, we cannot proceed.
+            AxisService service = rmMsgCtx.getMessageContext().getAxisService();
+            if (service==null)
+          	  throw new SandeshaException ("Duplicate message detected. But cant dispatch since the Service has not been found");
+            
+            AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
+                Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
+                Sandesha2Constants.SPEC_VERSIONS.v1_0,
+                service);
+            rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
+            
+            
+            /**
+             * Adding a MessageID here if this is a response message. If this is not added AddressingValidators will fail.
+             * This is becoz the DuplicateOperation I added here has a InOut operation. According to Addressing a InOut msg
+             * Must contain a MessageID.
+             */
+            
+            RelatesTo relatesTo = messageContext.getRelatesTo();
+            String messageID = messageContext.getOptions().getMessageId();
+            if (relatesTo!=null && messageID==null) {
+            	messageContext.getOptions().setMessageId (SandeshaUtil.getUUID());
+            }
+        }
+      } else {
+        
+        if (log.isDebugEnabled())
+            log.debug("Detected message for no sequence " + msgNo);
+          messageContext.setRelationships(null);
           // Add the duplicate RM AxisOperation to the message
+
+          //If the service has not been found by this time, we cannot proceed.
+          AxisService service = rmMsgCtx.getMessageContext().getAxisService();
+          if (service==null)
+        	  throw new SandeshaException ("Duplicate message detected. But cant dispatch since the Service has not been found");
+          
           AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
               Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
               Sandesha2Constants.SPEC_VERSIONS.v1_0,
-              rmMsgCtx.getMessageContext().getAxisService());
+              service);
           rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
-        }
-              
-      } else {
-        if (log.isDebugEnabled())
-          log.debug("Detected message for no sequence " + msgNo);
-        rmMsgCtx.getMessageContext().setRelationships(null);
-        // Add the duplicate RM AxisOperation to the message
-        AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
-            Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
-            Sandesha2Constants.SPEC_VERSIONS.v1_0,
-            rmMsgCtx.getMessageContext().getAxisService());
-        rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
+          
       }
       
       if(transaction != null && transaction.isActive()) transaction.commit();

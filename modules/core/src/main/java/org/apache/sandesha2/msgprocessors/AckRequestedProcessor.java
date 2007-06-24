@@ -36,6 +36,9 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.mail.MailBasedOutTransportInfo;
+import org.apache.axis2.util.MessageContextBuilder;
+import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -110,6 +113,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AckRequestedProcessor::processAckRequestedHeader " + soapHeader);
 
+		//checks weather the ack request was a piggybacked one.
 		boolean piggybackedAckRequest = !(rmMsgCtx.getMessageType()==Sandesha2Constants.MessageTypes.ACK_REQUEST);
 		
 		String sequenceId = ackRequested.getIdentifier().getIdentifier();
@@ -123,7 +127,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		// Check that the sender of this AckRequest holds the correct token
 		RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceId);
 
-		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {;
+		if(rmdBean != null && rmdBean.getSecurityTokenData() != null) {
 			SecurityManager secManager = SandeshaUtil.getSecurityManager(configurationContext);
 			SecurityToken token = secManager.recoverSecurityToken(rmdBean.getSecurityTokenData());
 			
@@ -151,22 +155,28 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		if (acksToStr == null)
 			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.acksToStrNotSet));
 
+		//Getting the operation for ack messages.
 		AxisOperation ackOperation = SpecSpecificConstants.getWSRMOperation(
 				Sandesha2Constants.MessageTypes.ACK,
 				rmdBean.getRMVersion(),
 				msgContext.getAxisService());
-		MessageContext ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(rmMsgCtx, ackOperation);
-
-		ackMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
-
+		
+		//creating the ack message. If the ackRequest was a standalone this will be a out (response) message 
+		MessageContext ackMsgCtx = null;
+//		if (piggybackedAckRequest)
+			ackMsgCtx = SandeshaUtil.createNewRelatedMessageContext(rmMsgCtx, ackOperation);
+//		else
+//			ackMsgCtx =MessageContextBuilder.createOutMessageContext (msgContext);
+			
+		//setting up the RMMsgContext
 		RMMsgContext ackRMMsgCtx = MsgInitializer.initializeMessage(ackMsgCtx);
 		ackRMMsgCtx.setRMNamespaceValue(rmMsgCtx.getRMNamespaceValue());
-
-		ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
-
+		
+		if (ackMsgCtx.getMessageID()==null)
+			ackMsgCtx.setMessageID(SandeshaUtil.getUUID());
+		
+		//adding the SOAP Envelope
 		SOAPFactory factory = SOAPAbstractFactory.getSOAPFactory(SandeshaUtil.getSOAPVersion(msgContext.getEnvelope()));
-
-		// Setting new envelope
 		SOAPEnvelope envelope = factory.getDefaultEnvelope();
 		try {
 			ackMsgCtx.setEnvelope(envelope);
@@ -177,13 +187,20 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		ackMsgCtx.setTo(acksTo);
 		ackMsgCtx.setReplyTo(msgContext.getTo());
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean);
+		
+		//this is not a client generated message. So set serverSide to true.
 		ackRMMsgCtx.getMessageContext().setServerSide(true);
 
 		if (acksTo.hasAnonymousAddress()) {
-
+			//If acksTo is anonymous we will be sending the ack here it self. Transport will use what ever mechanism to send the 
+			//message. (for e.g. HTTP will use the back channel)
+			
+			
 			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext().getConfigurationContext());
 
 			// setting CONTEXT_WRITTEN since acksto is anonymous
+			
+			//adding an OperationContext if one is not available. (for e.g. If we are in the SandeshaGlobalInHandler)
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
 				// operation context will be null when doing in a GLOBAL
 				// handler.
@@ -194,10 +211,15 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 				rmMsgCtx.getMessageContext().setOperationContext(opCtx);
 			}
 
+			//the response will be written here.
 			rmMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,
 					Constants.VALUE_TRUE);
 
+			//Marking that we did the acking here.
 			rmMsgCtx.getMessageContext().setProperty(Sandesha2Constants.ACK_WRITTEN, "true");
+
+			
+			MailBasedOutTransportInfo outTrnInfo = (MailBasedOutTransportInfo) ackRMMsgCtx.getMessageContext().getOptions().getProperty(Constants.OUT_TRANSPORT_INFO);
 
 			try {
 				engine.send(ackRMMsgCtx.getMessageContext());
@@ -206,8 +228,10 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			}
 
 		} else {
-
-			SenderBeanMgr retransmitterBeanMgr = storageManager.getSenderBeanMgr();
+			//If AcksTo is non-anonymous we will be adding a senderBean entry here. The sender is responsible 
+			//for sending it out.
+			
+			SenderBeanMgr senderBeanMgr = storageManager.getSenderBeanMgr();
 
 			String key = SandeshaUtil.getUUID();
 
@@ -217,7 +241,10 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			SenderBean ackBean = new SenderBean();
 			ackBean.setMessageContextRefKey(key);
 			ackBean.setMessageID(ackMsgCtx.getMessageID());
+			
+			//acks are sent only once.
 			ackBean.setReSend(false);
+			
 			ackBean.setSequenceID(sequenceId);
 			
 			EndpointReference to = ackMsgCtx.getTo();
@@ -228,35 +255,25 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			ackBean.setSend(true);
 
 			ackMsgCtx.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
-
 			ackBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-
-			// the internalSequenceId value of the retransmitter Table for the
-			// messages related to an incoming
-			// sequence is the actual sequence ID
-
-			// operation is the lowest level, Sandesha2 can be engaged.
-			SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisOperation());
+			SandeshaPolicyBean propertyBean = SandeshaUtil.getPropertyBean(msgContext.getAxisMessage());
 
 			long ackInterval = propertyBean.getAcknowledgementInterval();
 
-			// Ack will be sent as stand alone, only after the retransmitter
-			// interval.
+			// Ack will be sent as stand alone, only after the ackknowledgement interval
 			long timeToSend = System.currentTimeMillis() + ackInterval;
 
 			// removing old acks.
 			SenderBean findBean = new SenderBean();
 			findBean.setMessageType(Sandesha2Constants.MessageTypes.ACK);
-			findBean.setSend(true);
-			findBean.setReSend(false);
-			Collection coll = retransmitterBeanMgr.find(findBean);
+			Collection coll = senderBeanMgr.find(findBean);
 			Iterator it = coll.iterator();
 
 			if (it.hasNext()) {
 				SenderBean oldAckBean = (SenderBean) it.next();
-				// If there is an old ack. This ack will be sent in the old timeToSend.
+				// If there is an old Ack. This Ack will be sent in the old timeToSend.
 				timeToSend = oldAckBean.getTimeToSend(); 
-				retransmitterBeanMgr.delete(oldAckBean.getMessageID());
+				senderBeanMgr.delete(oldAckBean.getMessageID());
 			}
 
 			ackBean.setTimeToSend(timeToSend);
@@ -264,18 +281,19 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
 			// passing the message through sandesha2sender
-
 			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
 
-			// inserting the new ack.
-			retransmitterBeanMgr.insert(ackBean);
+			// inserting the new Ack.
+			senderBeanMgr.insert(ackBean);
 
 			msgContext.pause();
 
 			if (log.isDebugEnabled())
 				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader " + Boolean.TRUE);
-			return true;
+			
 		}
+		
+		//No need to suspend. Just proceed.
 		return false;
 	}
 	

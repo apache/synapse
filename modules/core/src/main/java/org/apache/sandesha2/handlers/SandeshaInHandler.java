@@ -102,10 +102,10 @@ public class SandeshaInHandler extends AbstractHandler {
 
 			RMMsgContext rmMsgCtx = null;
       
-      if (msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT) != null)
-        rmMsgCtx = (RMMsgContext)msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT);
-      else
-        rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
+			if (msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT) != null)
+				rmMsgCtx = (RMMsgContext)msgCtx.getProperty(Sandesha2Constants.MessageContextProperties.RM_MESSAGE_CONTEXT);
+			else
+				rmMsgCtx = MsgInitializer.initializeMessage(msgCtx);
 
 			// validating the message
 			MessageValidator.validateIncomingMessage(rmMsgCtx, storageManager);

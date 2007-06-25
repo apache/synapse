@@ -26,17 +26,15 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.http.*;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.HttpPost;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.channels.Pipe;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
@@ -98,7 +96,9 @@ public class Axis2HttpRequest {
      * @return the HttpRequest to be sent out
      */
     public HttpRequest getRequest() throws IOException {
-        HttpPost httpRequest = new HttpPost(epr.getAddress());
+        HttpEntityEnclosingRequest httpRequest = new BasicHttpEntityEnclosingRequest(
+                "POST", 
+                epr.getAddress());
         httpRequest.setEntity(new BasicHttpEntity());
 
         // set any transport headers

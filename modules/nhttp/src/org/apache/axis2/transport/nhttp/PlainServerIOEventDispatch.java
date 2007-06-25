@@ -23,6 +23,7 @@ import org.apache.http.impl.nio.DefaultNHttpServerConnection;
 import org.apache.http.nio.NHttpServiceHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 
 public class PlainServerIOEventDispatch implements IOEventDispatch {
@@ -47,9 +48,10 @@ public class PlainServerIOEventDispatch implements IOEventDispatch {
     
     public void connected(final IOSession session) {
         // Decorate I/O session with logging capabilities
-        DefaultNHttpServerConnection conn = new DefaultNHttpServerConnection(
+        LoggingNHttpServerConnection conn = new LoggingNHttpServerConnection(
                 new LoggingIOSession(session), 
                 new DefaultHttpRequestFactory(),
+                new HeapByteBufferAllocator(),
                 this.params); 
         session.setAttribute(NHTTP_CONN, conn);
         this.handler.connected(conn);

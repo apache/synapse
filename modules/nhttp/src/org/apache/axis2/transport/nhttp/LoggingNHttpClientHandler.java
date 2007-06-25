@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.nio.ContentDecoder;
@@ -36,6 +37,7 @@ import org.apache.http.nio.NHttpClientHandler;
 public class LoggingNHttpClientHandler implements NHttpClientHandler {
 
     private final Log log;
+    private final Log headerlog;
     private final NHttpClientHandler handler;
     
     public LoggingNHttpClientHandler(final NHttpClientHandler handler) {
@@ -45,6 +47,7 @@ public class LoggingNHttpClientHandler implements NHttpClientHandler {
         }
         this.handler = handler;
         this.log = LogFactory.getLog(handler.getClass());
+        this.headerlog = LogFactory.getLog("org.apache.axis2.transport.nhttp.headers");
     }
     
     public void connected(final NHttpClientConnection conn, final Object attachment) {
@@ -89,11 +92,18 @@ public class LoggingNHttpClientHandler implements NHttpClientHandler {
     }
 
     public void responseReceived(final NHttpClientConnection conn) {
+        HttpResponse response = conn.getHttpResponse();
         if (this.log.isDebugEnabled()) {
-            HttpResponse response = conn.getHttpResponse();
             this.log.debug("HTTP connection " + conn + ": " + response.getStatusLine());
         }
         this.handler.responseReceived(conn);
+        if (this.headerlog.isDebugEnabled()) {
+            this.headerlog.debug("<< " + response.getStatusLine().toString());
+            Header[] headers = response.getAllHeaders();
+            for (int i = 0; i < headers.length; i++) {
+                this.headerlog.debug("<< " + headers[i].toString());
+            }
+        }
     }
 
     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) {

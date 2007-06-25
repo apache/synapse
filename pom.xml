@@ -306,7 +306,7 @@
 
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>jakarta-httpcore</artifactId>
+                <artifactId>httpcore</artifactId>
                 <version>${jakarta.httpcore.nio.version}</version>
             </dependency>
 
@@ -585,17 +585,17 @@
         <!-- dependencies for nhttp transport -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>jakarta-httpcore</artifactId>
+            <artifactId>httpcore</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>jakarta-httpcore-nio</artifactId>
+            <artifactId>httpcore-nio</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>jakarta-httpcore-niossl</artifactId>
+            <artifactId>httpcore-niossl</artifactId>
             <version>${jakarta.httpcore.nio.version}</version>
         </dependency>
 
@@ -728,7 +728,7 @@
     <properties>
         <!-- Synapse and related components -->
         <synapse.version>SNAPSHOT</synapse.version>
-        <jakarta.httpcore.nio.version>4.0-alpha4</jakarta.httpcore.nio.version>
+        <jakarta.httpcore.nio.version>4.0-alpha5-SNAPSHOT</jakarta.httpcore.nio.version>
 
         <!-- Axis2 1.2 and its dependencies -->
         <axis2.version>1.2</axis2.version>

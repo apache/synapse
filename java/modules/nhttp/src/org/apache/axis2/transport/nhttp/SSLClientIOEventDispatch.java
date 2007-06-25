@@ -31,6 +31,7 @@ import org.apache.http.impl.nio.reactor.SSLMode;
 import org.apache.http.nio.NHttpClientHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.http.params.HttpParams;
 
 public class SSLClientIOEventDispatch implements IOEventDispatch {
@@ -81,6 +82,7 @@ public class SSLClientIOEventDispatch implements IOEventDispatch {
         DefaultNHttpClientConnection conn = new DefaultNHttpClientConnection(
                 new LoggingIOSession(sslSession), 
                 new DefaultHttpResponseFactory(),
+                new HeapByteBufferAllocator(),
                 this.params); 
         
         session.setAttribute(NHTTP_CONN, conn);
@@ -90,7 +92,7 @@ public class SSLClientIOEventDispatch implements IOEventDispatch {
         this.handler.connected(conn, attachment);
 
         try {
-            sslSession.initialize(SSLMode.CLIENT, this.params);
+            sslSession.bind(SSLMode.CLIENT, this.params);
         } catch (SSLException ex) {
             this.handler.exception(conn, ex);
             sslSession.shutdown();

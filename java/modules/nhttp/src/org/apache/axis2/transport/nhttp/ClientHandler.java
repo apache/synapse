@@ -23,6 +23,7 @@ import org.apache.http.nio.NHttpClientConnection;
 import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpParamsLinker;
 import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
@@ -30,7 +31,6 @@ import org.apache.http.protocol.*;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
-import org.apache.axis2.transport.nhttp.util.NativeWorkerPool;
 import org.apache.axis2.transport.nhttp.util.WorkerPool;
 import org.apache.axis2.transport.nhttp.util.WorkerPoolFactory;
 import org.apache.axis2.description.WSDL2Constants;
@@ -124,7 +124,7 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
 
             HttpRequest request = axis2Req.getRequest();
-            request.getParams().setDefaults(this.params);
+            HttpParamsLinker.link(request, this.params);
             this.httpProcessor.process(request, context);
 
             conn.submitRequest(request);
@@ -158,7 +158,7 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
 
             HttpRequest request = axis2Req.getRequest();
-            request.getParams().setDefaults(this.params);
+            HttpParamsLinker.link(request, this.params);
             this.httpProcessor.process(request, context);
 
             conn.submitRequest(request);
@@ -243,7 +243,6 @@ public class ClientHandler implements NHttpClientHandler {
      */
     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) {
         HttpContext context = conn.getContext();
-        HttpResponse response = conn.getHttpResponse();
 
         ReadableByteChannel source = (ReadableByteChannel) context.getAttribute(REQUEST_SOURCE_CHANNEL);
         ByteBuffer outbuf = (ByteBuffer) context.getAttribute(RESPONSE_BUFFER);

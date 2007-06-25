@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.nio.ContentDecoder;
@@ -36,6 +37,7 @@ import org.apache.http.nio.NHttpServiceHandler;
 public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
 
     private final Log log;
+    private final Log headerlog;
     private final NHttpServiceHandler handler;
     
     public LoggingNHttpServiceHandler(final NHttpServiceHandler handler) {
@@ -45,6 +47,7 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
         }
         this.handler = handler;
         this.log = LogFactory.getLog(handler.getClass());
+        this.headerlog = LogFactory.getLog("org.apache.axis2.transport.nhttp.headers");
     }
     
     public void connected(final NHttpServerConnection conn) {
@@ -62,31 +65,28 @@ public class LoggingNHttpServiceHandler implements NHttpServiceHandler {
     }
 
     public void exception(final NHttpServerConnection conn, final IOException ex) {
-        if (ex.getMessage().indexOf("Connection reset") != -1 ||
-            ex.getMessage().indexOf("forcibly closed")  != -1) {
-            this.log.warn("HTTP connection " + conn + ": " + ex.getMessage());
-        } else {
-            this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
-        }
+        this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
         this.handler.exception(conn, ex);
     }
 
     public void exception(final NHttpServerConnection conn, final HttpException ex) {
-        if (ex.getMessage().contains("Connection reset") ||
-            ex.getMessage().contains("forcibly closed")) {
-            this.log.warn("HTTP connection " + conn + ": " + ex.getMessage());
-        } else {
-            this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
-        }
+        this.log.error("HTTP connection " + conn + ": " + ex.getMessage(), ex);
         this.handler.exception(conn, ex);
     }
 
     public void requestReceived(final NHttpServerConnection conn) {
+        HttpRequest request = conn.getHttpRequest();
         if (this.log.isDebugEnabled()) {
-            HttpRequest request = conn.getHttpRequest();
             this.log.debug("HTTP connection " + conn + ": " + request.getRequestLine());
         }
         this.handler.requestReceived(conn);
+        if (this.headerlog.isDebugEnabled()) {
+            this.headerlog.debug(">> " + request.getRequestLine().toString());
+            Header[] headers = request.getAllHeaders();
+            for (int i = 0; i < headers.length; i++) {
+                this.headerlog.debug(">> " + headers[i].toString());
+            }
+        }
     }
 
     public void outputReady(final NHttpServerConnection conn, final ContentEncoder encoder) {

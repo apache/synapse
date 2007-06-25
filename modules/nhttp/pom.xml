@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.apache.synapse</groupId>
         <artifactId>Apache-Synapse</artifactId>
-        <version>1.0-RC2-SNAPSHOT</version>
+        <version>SNAPSHOT</version>
     </parent>
 
     <artifactId>synapse-nhttp</artifactId>

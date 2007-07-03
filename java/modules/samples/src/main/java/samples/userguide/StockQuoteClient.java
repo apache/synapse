@@ -178,6 +178,10 @@ public class StockQuoteClient {
                 }
             }
 
+            try {
+                configContext.terminate();
+            } catch (Exception ignore) {}
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -56,6 +56,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.rampart.handler.WSSHandlerConstants;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 
 /**
  * This is a simple client that handles both in only and in out
@@ -297,6 +298,10 @@ public class Axis2FlexibleMEPClient {
         if(oriOptions.getProperty(Constants.SANDESHA_SEQUENCE_KEY) != null) {
             targetOptions.setProperty(Constants.SANDESHA_SEQUENCE_KEY, 
                     oriOptions.getProperty(Constants.SANDESHA_SEQUENCE_KEY));
+        }
+        if(oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
+            targetOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,
+                    oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID));
         }
     }
     

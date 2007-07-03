@@ -203,24 +203,31 @@ public class InMemoryStorageManager extends StorageManager {
 				SerializedStorageEntry entry = (SerializedStorageEntry) storageMap.get(key);
 				
 				if(entry != null) {
-					ByteArrayInputStream stream = new ByteArrayInputStream(entry.data);
-					ObjectInputStream is = new ObjectInputStream(stream);
-					messageContext = (MessageContext) is.readObject();
-					messageContext.activate(entry.context);
-
-					OperationContext opCtx = messageContext.getOperationContext();
-					if(opCtx != null) {
-						MessageContext inMsgCtx = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-						if(inMsgCtx != null) {
-							inMsgCtx.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, entry.inTransportControl);
-							inMsgCtx.setProperty(MessageContext.TRANSPORT_OUT,               entry.inTransportOut);
-							inMsgCtx.setProperty(Constants.OUT_TRANSPORT_INFO,               entry.inTransportOutInfo);
+					if(entry.message != null) {
+						// We have the real message, so use that, but make sure that future users create
+						// their own copy.
+						messageContext = entry.message;
+						entry.message = null;
+					} else {
+						ByteArrayInputStream stream = new ByteArrayInputStream(entry.data);
+						ObjectInputStream is = new ObjectInputStream(stream);
+						messageContext = (MessageContext) is.readObject();
+						messageContext.activate(entry.context);
+	
+						OperationContext opCtx = messageContext.getOperationContext();
+						if(opCtx != null) {
+							MessageContext inMsgCtx = opCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+							if(inMsgCtx != null) {
+								inMsgCtx.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, entry.inTransportControl);
+								inMsgCtx.setProperty(MessageContext.TRANSPORT_OUT,               entry.inTransportOut);
+								inMsgCtx.setProperty(Constants.OUT_TRANSPORT_INFO,               entry.inTransportOutInfo);
+							}
 						}
+						
+						messageContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, entry.transportControl);
+						messageContext.setProperty(MessageContext.TRANSPORT_OUT,               entry.transportOut);
+						messageContext.setProperty(Constants.OUT_TRANSPORT_INFO,               entry.transportOutInfo);
 					}
-					
-					messageContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, entry.transportControl);
-					messageContext.setProperty(MessageContext.TRANSPORT_OUT,               entry.transportOut);
-					messageContext.setProperty(Constants.OUT_TRANSPORT_INFO,               entry.transportOutInfo);
 				}
 
 			} else {
@@ -256,12 +263,14 @@ public class InMemoryStorageManager extends StorageManager {
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				// Remove the MustUnderstand parts for serialized message
 
-        SandeshaUtil.removeMustUnderstand(msgContext.getEnvelope());
+				SandeshaUtil.removeMustUnderstand(msgContext.getEnvelope());
 				ObjectOutputStream s = new ObjectOutputStream(stream);
 				s.writeObject(msgContext);
 				s.close();
 				
 				SerializedStorageEntry entry = new SerializedStorageEntry();
+				// Store a reference to the real message, as well as serializing it
+				entry.message = msgContext;
 				entry.data = stream.toByteArray();
 				entry.context = msgContext.getConfigurationContext();
 				
@@ -324,6 +333,7 @@ public class InMemoryStorageManager extends StorageManager {
 	}
 
 	private class SerializedStorageEntry {
+		MessageContext       message;
 		byte[]               data;
 		ConfigurationContext context;
 		Object               transportControl;

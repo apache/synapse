@@ -267,29 +267,31 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 				// Store the Exception as a sequence property to enable the client to lookup the last 
 				// exception time and timestamp.
-				
 				try
 				{
-					// Create a new Transaction
-					transaction = storageManager.getTransaction();
-					
 					// Get the internal sequence id from the context
 					String internalSequenceId = (String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
+					if(internalSequenceId == null) internalSequenceId = senderBean.getInternalSequenceID();
 					
-					RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+					if(internalSequenceId != null) {
+						// Create a new Transaction
+						transaction = storageManager.getTransaction();
+						
+						RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
 					
-					if (bean != null) {						
-						bean.setLastSendError(e);
-						bean.setLastSendErrorTimestamp(System.currentTimeMillis());
-					}
-					
-					// Update the RMSBean
-					storageManager.getRMSBeanMgr().update(bean);
-					
-					// Commit the properties
-					if(transaction != null) {
-						transaction.commit();
-						transaction = null;
+						if (bean != null) {						
+							bean.setLastSendError(e);
+							bean.setLastSendErrorTimestamp(System.currentTimeMillis());
+
+							// Update the RMSBean
+							storageManager.getRMSBeanMgr().update(bean);
+						}
+						
+						// Commit the properties
+						if(transaction != null) {
+							transaction.commit();
+							transaction = null;
+						}
 					}
 				}
 				catch (Exception e1)

@@ -27,54 +27,57 @@
 <body>
   
 <section name="Apache Synapse">
-	<p>
-  The Synapse project is a robust, lightweight
-  implementation of a highly scalable and distributed service mediation
-  framework based on Web services and XML specifications.
-	</p>
+  <p>
+  Apache Synapse is a easy-to-use and lightweight XML and Web Services management and integration
+  broker that can form the basis of a Service Oriented Architecture (SOA) and Enterprise Service Bus (ESB)
+  </p>
+  <p>For more information, see:</p>
 
- 	<p>For more information, see:</p>
   <ul>
   <li><a href="Synapse_Configuration_Language.html">The Synapse Configuration Language</a></li>
+  <li><a href="Synapse_QuickStart.html">Quick Start Guide</a></li>
   <li><a href="Synapse_Samples.html">A Quick start with Synapse Samples</a></li>
-  <li><a href="Synapse_Extending.html">Extending Synapse</a></li>
-  <li><a href="Synapse_Userguide.html">The Synapse User Guide</a><a href="">(In Progress)</a></li>
-  
-  <li>The WS Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
-  <!--li>The Incubator Wiki <a href="http://wiki.apache.org/incubator/Synapse">http://wiki.apache.org/incubator/Synapse</a></li-->
-  <!--li>The Original proposal: <a href="http://wiki.apache.org/incubator/SynapseProposal">http://wiki.apache.org/incubator/SynapseProposal</a></li-->
+  <li><a href="Synapse_Extending.html">Extending Synapse</a></li>  
   <li>The Developer mailing list:  <a href="mailto:synapse-dev-subscribe@ws.apache.org">Subscribe</a></li>
   <li>The User mailing list:  <a href="mailto:synapse-user-subscribe@ws.apache.org">Subscribe</a></li>
+  <li>The WS Wiki <a href="http://wiki.apache.org/ws/Synapse">http://wiki.apache.org/ws/Synapse</a></li>
   </ul>
 </section>
 
 <section name="Introduction">
-	<p>Synapse is a mediation framework for Web Services. Synapse allows messages flowing through, into, or out of an organization to be mediated.</p>
-
-	<p>Synapse, incidentally, is pronounced "sine-apse", and not "sin-apse".  </p>
+<p>
+Apache Synapse is a easy-to-use and lightweight XML and Web Services management and integration
+broker that can form the basis of a Service Oriented Architecture (SOA) and Enterprise Service Bus (ESB)
+</p>
+<p>
+Apache Synapse offers a wide range of mediation capabilities, including support for a number of
+open standards, including XML, XSLT, XPath, SOAP, HTTP, JMS, Web Services Security, Web Services
+Reliable Messaging (WS-RM), SMTP and Web Services Addressing. Synapse supports a number of useful
+functions out-of-the-box without programming, but it also can be extended using popular programming
+languages such as Java, JavaScript, Ruby, and Groovy.
+</p>
 </section>
 	
 <section name="Status">
-	<p>Synapse has graduated from the incubator! Synapse was officially accepted as a sub-project of the Apache WS project on the 2nd January 2007.</p>
+	<p>Synapse graduated from the Apache Incubator on the 2nd of January 2007, and has been
+    officially accepted as a sub-project of the Apache Web Services project</p>
 	
-	<p>The latest release of Synapse is <a href="http://ws.apache.org/synapse/download/0.91/download.cgi">0.91</a>. Its key features are </p>
+	<p>The latest release of Synapse is <a href="http://ws.apache.org/synapse/download/1.0/download.cgi">1.0</a>. Its key features are </p>
 
 	<ul>
-	<li><p> A streamlined configuration model and a new XML syntax</p></li>
-	<li><p> Proxy Services (service mediation) and Message mediation</p></li>
-	<li><p> Concept of Endpoints </p></li>
-	<li><p> Integration of a Registry and dynamic refresh of resources as well as rules used to mediate </p></li>
-	<li><p> Support for http and JMS transports</p></li>
-	<li><p> Support for WS-Reliable Messaging and WS-Security through WS-Policies</p></li>
-	<li><p> Script mediator supporting all BSF scripting languages </p></li>
-	<li><p> Support for error handling and recovery </p></li>
-  <li><p> Support for WS-RM sequences </p></li>
-  <li><p> Many built in mediators </p></li>
-	<li><p> Maven 2 based build process</p></li>
-	<li><p> Many samples and a built-in Axis2 server to try out and experiment with samples (Samples includes WS-Security, JMS POX/Text messages, Script mediation and many more samples which can be run out of the box) </p></li>
-	<li><p> Enhanced documentation </p></li>
+        <li><p>Proxy services - facilitating transport, interface (WSDL/Schema/Policy), message format (SOAP/POX), QoS (WS-Security/RM) and optimization switching (MTOM/SwA)</p></li>
+        <li><p>Non-blocking http/s transports based on Apache <a target="_blank" href="http://jakarta.apache.org/httpcomponents/httpcore/">HttpCore</a> for ultrafast execution and support for thousands of connections</p></li>
+        <li><p>Built in Registry/Repository, facilitating dynamic updating and reloading of the configuration and associated resources (e.g. XSLTs, XSD, JS, ..)</p></li>
+        <li><p>Easily extended via custom Java class/Spring mediators, or BSF Scripting languages (Javascript, Ruby etc)</p></li>
+        <li><p>Load-balancing/Fail-over and Throttling support</p></li>
+        <li><p>WS-Security, WS-Reliable Messaging &amp; Throttling configurable via WS-Policies</p></li>
+        <li><p>JMS message support for binary, plain text and XML and SOAP payloads</p></li>
+        <li><p>Lightweight, XML and Web services centric messaging model</p></li>
+        <li><p>Configurations serialized into a file system for versioning/backup and restoration</p></li>
+        <li><p>Support for Error handling and timeouts, and recovery</p></li>
+    	<li><p> Many samples and a built-in Axis2 server to try out and experiment with samples (Samples includes WS-Security, JMS POX/Text messages, Script mediation and many more samples which can be run out of the box) </p></li>
+	    <li><p> Enhanced documentation</p></li>
 	</ul>
 </section>
-
 </body>
 </document>

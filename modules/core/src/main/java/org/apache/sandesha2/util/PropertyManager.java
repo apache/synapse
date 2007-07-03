@@ -291,7 +291,7 @@ public class PropertyManager {
         propertyBean = (SandeshaPolicyBean) assertion;
         
         if (propertyBean!=parentPropertyBean) {
-        	propertyBean.setParent(parentPropertyBean);
+        	if(parentPropertyBean != null) propertyBean.setParent(parentPropertyBean);
         	return propertyBean;
         } else {
         	//propertyBean and parent being the same object means that there is no policy in this level, this is simply the reflection of 

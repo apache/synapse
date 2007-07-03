@@ -49,8 +49,8 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 
 	private static final Log log = LogFactory.getLog(RMMessageReceiver.class);
 	
-	public final void receive(MessageContext msgCtx) throws AxisFault {
-		if(log.isDebugEnabled()) log.debug("Entry: RMMessageReceiver::receive");
+	public final void invokeBusinessLogic(MessageContext msgCtx) throws AxisFault {
+		if(log.isDebugEnabled()) log.debug("Entry: RMMessageReceiver::invokeBusinessLogic");
 		
     RMMsgContext rmMsgCtx = null;
     
@@ -79,7 +79,7 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 					else
 						throw new AxisFault(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.reliableMessagingNotEnabled, msgCtx.getAxisService().getName()));
 					
-					log.debug("Exit: RMMessageReceiver::receive, Service has disabled RM ");
+					log.debug("Exit: RMMessageReceiver::invokeBusinessLogic, Service has disabled RM ");
 					return;
 				}
 			}
@@ -118,6 +118,6 @@ public class RMMessageReceiver extends AbstractMessageReceiver {
 			}
 		}	
 
-		if(log.isDebugEnabled()) log.debug("Exit: RMMessageReceiver::receive");
+		if(log.isDebugEnabled()) log.debug("Exit: RMMessageReceiver::invokeBusinessLogic");
 	}
 }

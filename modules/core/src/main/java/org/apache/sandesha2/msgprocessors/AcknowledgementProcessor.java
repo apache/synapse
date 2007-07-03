@@ -207,7 +207,7 @@ public class AcknowledgementProcessor {
 								MessageContext applicationMessage = storageManager.retrieveMessageContext(storageKey, configCtx);
 								AxisOperation operation = applicationMessage.getAxisOperation();
 								if(operation!= null) {
-									int mep = operation.getAxisSpecifMEPConstant();
+									int mep = operation.getAxisSpecificMEPConstant();
 									syncResponseNeeded = (mep == WSDLConstants.MEP_CONSTANT_OUT_IN);
 								}
 							}

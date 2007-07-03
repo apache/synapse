@@ -363,7 +363,6 @@ public class RangeString implements Serializable{
 		}
 		
 		if(!rangeAdded){
-			Long newIndex = new Long(r.lowerValue);
 			//A simple add.
 			//First cleanup and add from r.lower to r.upper
 			cleanUpRangesEnvelopedAndDiscoverNewRangesAdded(r, r.lowerValue, r.upperValue, newRangesAdded);

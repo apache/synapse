@@ -39,10 +39,10 @@ import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.impl.llom.factory.OMXMLBuilderFactory;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axis2.client.async.AsyncResult;
-import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
@@ -78,7 +78,6 @@ public class SandeshaTestCase extends TestCase {
 	
     public SandeshaTestCase(String name) {
         super(name);
-        File baseDir = new File("");
         String testRource = "target" + File.separator + "test-classes";
         resourceDir = new File(testRource).getPath();
         
@@ -223,19 +222,19 @@ public class SandeshaTestCase extends TestCase {
     	operation.setMessageReceiver(messageReceiver);
     }
 
-	protected class TestCallback extends Callback {
+	protected class TestCallback implements AxisCallback {
 
 		String name = null;
 		boolean completed = false;
-		boolean errorRported = false;
+		boolean errorReported = false;
 		String resultStr;
 		
-		public boolean isCompleted() {
+		public boolean isComplete() {
 			return completed;
 		}
-
-		public boolean isErrorRported() {
-			return errorRported;
+		
+		public boolean isErrorReported() {
+			return errorReported;
 		}
 
 		public String getResult () {
@@ -246,17 +245,26 @@ public class SandeshaTestCase extends TestCase {
 			this.name = name;
 		}
 		
-		public void onComplete(AsyncResult result) {
-			SOAPBody body = result.getResponseEnvelope().getBody();
+		public void onComplete() {
+			completed = true;
+		}
+
+		public void onMessage(MessageContext result) {
+			SOAPBody body = result.getEnvelope().getBody();
 			OMElement contents = body.getFirstElement();
 			this.resultStr = checkEchoOMBlock(contents);
-			completed = true;
 			System.out.println("TestCallback got text: '" + resultStr + "'");
+		}
+		
+		public void onFault(MessageContext result) {
+			errorReported = true;
+			System.out.println("TestCallback got fault: " + result.getEnvelope());
 		}
 
 		public void onError (Exception e) {
+			errorReported = true;
+			System.out.println("TestCallback got exception");
 			e.printStackTrace();
-			errorRported = true;
 		}
 	}
 

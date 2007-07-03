@@ -5,15 +5,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFault;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.OutOnlyAxisOperation;
@@ -210,7 +209,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			msgCtx.getOptions().setTimeOutInMilliSeconds(1000000);
 			
 			try {
-				AxisEngine engine = new AxisEngine (msgCtx.getConfigurationContext());
 				InvocationResponse response = InvocationResponse.CONTINUE;
 				
 				SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation());
@@ -220,12 +218,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 							log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
 						msgCtx.setPaused(false);
 						msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
-						response = engine.resumeSend(msgCtx);
+						response = AxisEngine.resumeSend(msgCtx);
 					} else {
 						if (log.isDebugEnabled())
 							log.debug("Sending a message : " + msgCtx.getEnvelope().getHeader());
 						msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
-						engine.send(msgCtx);  // TODO check if this should return an invocation response
+						AxisEngine.send(msgCtx);  // TODO check if this should return an invocation response
 					}
 				} else {
 					// had to fully build the SOAP envelope to support
@@ -249,7 +247,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 					if (log.isDebugEnabled())
 						log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
-					response = engine.resumeSend(msgCtx);
+					response = AxisEngine.resumeSend(msgCtx);
 				}
 				if(log.isDebugEnabled()) log.debug("Engine resume returned " + response);
 				if(response != InvocationResponse.SUSPEND) {
@@ -266,6 +264,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 				if (log.isErrorEnabled())
 				  log.error(message, e);
+				
 				// Store the Exception as a sequence property to enable the client to lookup the last 
 				// exception time and timestamp.
 				
@@ -550,6 +549,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 				responseMessageContext.setProperty(MessageContext.TRANSPORT_IN, msgCtx
 						.getProperty(MessageContext.TRANSPORT_IN));
+				responseMessageContext.setOperationContext(msgCtx.getOperationContext());
 				responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 				responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
 
@@ -565,14 +565,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				try {
 					// MessageContext is modified in TransportUtils.createSOAPMessage(). It might be used by axis.engine or handler.
 					// To catch the modification and pass it to engine or handler, resenvelope is created by responseMessageContext. 
-				
 					if (resenvelope==null) {
 						//We try to build the response out of the transport stream.
 						resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
 						responseMessageContext.setEnvelope(resenvelope);
 						syncResponseBuilt = true;
-					} else {
-						
 					}
 				} catch (AxisFault e) {
 					//Cannot find a valid SOAP envelope.
@@ -597,7 +594,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 						ServiceContext serviceCtx = responseMessageContext.getServiceContext();
 						AxisOperation op = msgCtx.getAxisService().getOperation(Sandesha2Constants.RM_IN_ONLY_OPERATION);
-						responseMsgOpCtx = ContextFactory.createOperationContext (op, serviceCtx);					
+						responseMsgOpCtx = OperationContextFactory.createOperationContext (op.getAxisSpecificMEPConstant(), op, serviceCtx);					
 
 					}
 					
@@ -635,14 +632,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setSoapAction("");
 			}
 
-			AxisEngine engine = new AxisEngine(msgCtx.getConfigurationContext());
 			if (resenvelope!=null) {
-				//we proceed only if we hv found a valid envelope.
-				if (isFaultEnvelope(resenvelope)) {
-					engine.receiveFault(responseMessageContext);
-				} else {
-					engine.receive(responseMessageContext);
-				}
+				AxisEngine.receive(responseMessageContext);
 			}
 
 		} catch (Exception e) {
@@ -654,19 +645,4 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			log.debug("Exit: SenderWorker::checkForSyncResponses");
 	}
 	
-	private boolean isFaultEnvelope(SOAPEnvelope envelope) {
-		if (log.isDebugEnabled())
-			log.debug("Enter: SenderWorker::isFaultEnvelope, " + envelope.getBody().getFault());
-		SOAPFault fault = envelope.getBody().getFault();
-		if (fault != null) {
-			if (log.isDebugEnabled())
-				log.debug("Exit: SenderWorker::isFaultEnvelope, TRUE");
-			return true;
-		}
-
-		if (log.isDebugEnabled())
-			log.debug("Exit: SenderWorker::isFaultEnvelope, FALSE");
-		return false;
-	}
-
 }

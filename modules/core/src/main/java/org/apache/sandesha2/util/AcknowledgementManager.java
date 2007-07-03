@@ -25,12 +25,10 @@ import java.util.Set;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
@@ -323,7 +321,6 @@ public class AcknowledgementManager {
 		ackRMMsgContext.addSOAPEnvelope();
 		
 		MessageContext ackMsgContext = ackRMMsgContext.getMessageContext();
-		ConfigurationContext configContext = ackMsgContext.getConfigurationContext();
 		
 		// setting CONTEXT_WRITTEN since acksto is anonymous
 		if (ackRMMsgContext.getMessageContext().getOperationContext() == null) {
@@ -331,19 +328,13 @@ public class AcknowledgementManager {
 			// handler.
 			AxisOperation op = ackMsgContext.getAxisOperation();
 
-			OperationContext opCtx = ContextFactory.createOperationContext(op, ackRMMsgContext.getMessageContext().getServiceContext());
+			OperationContext opCtx = OperationContextFactory.createOperationContext(op.getAxisSpecificMEPConstant(), op, ackRMMsgContext.getMessageContext().getServiceContext());
 			ackRMMsgContext.getMessageContext().setOperationContext(opCtx);
 		}
 
-		ackRMMsgContext.getMessageContext().getOperationContext().setProperty(
-				org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-
-		ackRMMsgContext.getMessageContext().setProperty(Sandesha2Constants.ACK_WRITTEN, "true");
-
 		ackRMMsgContext.getMessageContext().setServerSide(true);
 		
-		AxisEngine engine = new AxisEngine(configContext);
-		engine.send(ackMsgContext);
+		AxisEngine.send(ackMsgContext);
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::sendAckNow");		

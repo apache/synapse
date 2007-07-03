@@ -205,7 +205,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			AxisOperation op = msgContext.getAxisOperation();
 			int mep = WSDLConstants.MEP_CONSTANT_INVALID;
 			if(op != null) {
-				mep = op.getAxisSpecifMEPConstant();
+				mep = op.getAxisSpecificMEPConstant();
 			}
 			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 				String specVersion = null;
@@ -317,7 +317,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			AxisOperation op = msgContext.getAxisOperation();
 			int mep = WSDLConstants.MEP_CONSTANT_INVALID;
 			if(op != null) {
-				mep = op.getAxisSpecifMEPConstant();
+				mep = op.getAxisSpecificMEPConstant();
 			}
 
 			if(mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {

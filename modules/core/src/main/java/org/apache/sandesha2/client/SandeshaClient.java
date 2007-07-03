@@ -35,7 +35,9 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
@@ -48,6 +50,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.msgreceivers.RMMessageReceiver;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.SandeshaStorageException;
 import org.apache.sandesha2.storage.StorageManager;
@@ -485,8 +488,38 @@ public class SandeshaClient {
 						new QName(rmNamespaceValue,
 								Sandesha2Constants.WSRM_COMMON.TERMINATE_SEQUENCE));
 
-				// to inform the Sandesha2 out handler.
-				serviceClient.fireAndForget(terminateBody);
+				// To inform the Sandesha2 out handler. The response to this call needs
+				// be routed to the Sandesha Message receiver
+				AxisCallback callback = new AxisCallback() {
+
+					public void onMessage(MessageContext msg) {
+						try {
+							RMMessageReceiver rm = new RMMessageReceiver();
+							rm.receive(msg);
+						} catch(Exception e) {
+							if(log.isErrorEnabled()) log.error("Exception on callback", e);
+						}
+					}
+
+					public void onFault(MessageContext msg) {
+						try {
+							RMMessageReceiver rm = new RMMessageReceiver();
+							rm.receive(msg);
+						} catch(Exception e) {
+							if(log.isErrorEnabled()) log.error("Exception on callback", e);
+						}
+					}
+
+					public void onError(Exception e) {
+						if(log.isErrorEnabled()) log.error("Exception on callback", e);
+					}
+
+					public void onComplete() {
+						// Nothing to do here
+					}
+					
+				};
+				serviceClient.sendReceiveNonBlocking(terminateBody, callback);
 
 			} else {
 				options.setAction(Sandesha2Constants.SPEC_2005_02.Actions.ACTION_LAST_MESSAGE);

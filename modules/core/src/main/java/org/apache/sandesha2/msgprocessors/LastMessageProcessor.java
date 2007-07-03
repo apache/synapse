@@ -28,6 +28,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.storage.StorageManager;
@@ -113,11 +114,9 @@ public class LastMessageProcessor  implements MsgProcessor {
 			//says that the inbound msg of this was a LastMessage - so the new msg will also be a LastMessage
 			outMessageContext.setProperty(Sandesha2Constants.MessageContextProperties.INBOUND_LAST_MESSAGE, Boolean.TRUE);
 			outMessageContext.setProperty(RequestResponseTransport.TRANSPORT_CONTROL, msgContext.getProperty(RequestResponseTransport.TRANSPORT_CONTROL));
-			msgContext.getOperationContext().setProperty (Constants.RESPONSE_WRITTEN,Constants.VALUE_TRUE);
 			
-			AxisEngine engine = new AxisEngine (rmMsgCtx.getConfigurationContext());
-			engine.send(outMessageContext);
-			
+			AxisEngine.send(outMessageContext);
+			TransportUtils.setResponseWritten(msgContext, true);
 		}
 		
 		

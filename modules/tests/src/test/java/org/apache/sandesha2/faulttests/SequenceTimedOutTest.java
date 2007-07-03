@@ -124,7 +124,7 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TIMED_OUT);
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 				
-				assertTrue(callback1.isErrorRported());
+				assertTrue(callback1.isErrorReported());
 				assertEquals(callback1.getResult(),null);
 				
 				lastError = null;
@@ -211,7 +211,7 @@ public class SequenceTimedOutTest extends SandeshaTestCase {
 				assertEquals(sequenceReport.getSequenceStatus(),SequenceReport.SEQUENCE_STATUS_TIMED_OUT);
 				assertEquals(sequenceReport.getSequenceDirection(),SequenceReport.SEQUENCE_DIRECTION_OUT);
 				
-				assertTrue(callback1.isErrorRported());
+				assertTrue(callback1.isErrorReported());
 				assertEquals(callback1.getResult(),null);
 				
 				lastError = null;

@@ -486,8 +486,6 @@ public interface Sandesha2Constants {
 
 	static final String APPLICATION_PROCESSING_DONE = "Sandesha2AppProcessingDone";
 
-	static final String ACK_WRITTEN = "AckWritten";
-
 	int INVOKER_SLEEP_TIME = 1000;
 
 	int SENDER_SLEEP_TIME = 500;

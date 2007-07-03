@@ -22,9 +22,9 @@ import java.util.Iterator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
@@ -104,8 +104,6 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		Iterator sequenceAckIter = ackRMMsgCtx
 				.getMessageParts(Sandesha2Constants.MessageParts.SEQ_ACKNOWLEDGEMENT);
 
-		MessageContext closeSequenceMsg = rmMsgCtx.getMessageContext();
-
 		RMMsgContext closeSeqResponseRMMsg = RMMsgCreator.createCloseSeqResponseMsg(rmMsgCtx, rmdBean);
 		MessageContext closeSequenceResponseMsg = closeSeqResponseRMMsg.getMessageContext();
 
@@ -130,10 +128,8 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 			transaction = null;
 		}
 
-		AxisEngine engine = new AxisEngine(closeSequenceMsg.getConfigurationContext());
-
 		try {
-			engine.send(closeSequenceResponseMsg);
+			AxisEngine.send(closeSequenceResponseMsg);
 		} catch (AxisFault e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendCloseResponse,
 					sequenceId, e.toString());
@@ -163,7 +159,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		getMsgContext().setAxisOperation(closeOperation);
 
 
-		OperationContext opcontext = ContextFactory.createOperationContext(closeOperation, getMsgContext().getServiceContext());
+		OperationContext opcontext = OperationContextFactory.createOperationContext(closeOperation.getAxisSpecificMEPConstant(), closeOperation, getMsgContext().getServiceContext());
 		opcontext.setParent(getMsgContext().getServiceContext());
 
 		getConfigurationContext().registerOperationContext(rmMsgCtx.getMessageId(),opcontext);

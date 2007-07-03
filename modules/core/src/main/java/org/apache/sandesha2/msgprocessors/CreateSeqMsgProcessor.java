@@ -28,6 +28,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -256,9 +257,8 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 			// We have done all of our updates, so commit the transaction
 			if(transaction != null && transaction.isActive()) transaction.commit();
 			
-			AxisEngine engine = new AxisEngine(context);
 			try{
-				engine.send(outMessage);				
+				AxisEngine.send(outMessage);				
 			}
 			catch(AxisFault e){
 				FaultManager.makeCreateSequenceRefusedFault(createSeqRMMsg, 
@@ -272,9 +272,7 @@ public class CreateSeqMsgProcessor implements MsgProcessor {
 	
 			EndpointReference replyTo = createSeqMsg.getReplyTo();
 			if(replyTo == null || replyTo.hasAnonymousAddress()) {
-				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-			} else {
-				createSeqMsg.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
+				TransportUtils.setResponseWritten(createSeqMsg, true);
 			}
 			
 	//		SequencePropertyBean findBean = new SequencePropertyBean ();

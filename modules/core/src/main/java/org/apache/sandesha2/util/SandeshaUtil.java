@@ -47,6 +47,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.ServiceGroupContext;
 import org.apache.axis2.description.AxisDescription;
@@ -386,7 +387,8 @@ public class SandeshaUtil {
 					newMessageContext.setServiceContext(referenceMessage.getServiceContext());
 					newMessageContext.setServiceContextID(referenceMessage.getServiceContextID());
 				} else {
-					ServiceContext serviceContext = new ServiceContext (referenceMessage.getAxisService(),newMessageContext.getServiceGroupContext());
+					ServiceGroupContext sgc = newMessageContext.getServiceGroupContext();
+					ServiceContext serviceContext = sgc.getServiceContext(referenceMessage.getAxisService());
 					newMessageContext.setServiceContext(serviceContext);
 				}
 			}
@@ -396,7 +398,7 @@ public class SandeshaUtil {
 			//The message created will basically be used as a outMessage, so setting the AxisMessage accordingly
 			newMessageContext.setAxisMessage(operation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
 			
-			OperationContext operationContext = new OperationContext(operation, newMessageContext.getServiceContext());
+			OperationContext operationContext = OperationContextFactory.createOperationContext(operation.getAxisSpecificMEPConstant(), operation, newMessageContext.getServiceContext());
 			newMessageContext.setOperationContext(operationContext);
 			operationContext.addMessageContext(newMessageContext);
 
@@ -854,10 +856,8 @@ public class SandeshaUtil {
 			msgContext.setTransportOut(sandesha2TransportOutDesc);
 	
 	 		// sending the message once through Sandesha2TransportSender.
-	 		AxisEngine engine = new AxisEngine(configurationContext);
-	
 			if (msgContext.isPaused())
-				engine.resumeSend(msgContext);
+				AxisEngine.resumeSend(msgContext);
 			else {
 				//this invocation has to be a blocking one.
 				
@@ -865,7 +865,7 @@ public class SandeshaUtil {
 				if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue())
 					msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
 				
-				engine.send(msgContext);
+				AxisEngine.send(msgContext);
 				
 				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
 			}

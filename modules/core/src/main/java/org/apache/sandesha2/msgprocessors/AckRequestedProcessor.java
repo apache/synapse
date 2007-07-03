@@ -27,18 +27,15 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.OperationContextFactory;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
-import org.apache.axis2.transport.mail.MailBasedOutTransportInfo;
-import org.apache.axis2.util.MessageContextBuilder;
-import org.apache.axis2.util.Utils;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -189,16 +186,13 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		RMMsgCreator.addAckMessage(ackRMMsgCtx, sequenceId, rmdBean);
 		
 		//this is not a client generated message. So set serverSide to true.
-		ackRMMsgCtx.getMessageContext().setServerSide(true);
+		ackMsgCtx.setServerSide(true);
 
 		if (acksTo.hasAnonymousAddress()) {
 			//If acksTo is anonymous we will be sending the ack here it self. Transport will use what ever mechanism to send the 
 			//message. (for e.g. HTTP will use the back channel)
-			
-			
-			AxisEngine engine = new AxisEngine(ackRMMsgCtx.getMessageContext().getConfigurationContext());
 
-			// setting CONTEXT_WRITTEN since acksto is anonymous
+			// setting "response written" since acksto is anonymous
 			
 			//adding an OperationContext if one is not available. (for e.g. If we are in the SandeshaGlobalInHandler)
 			if (rmMsgCtx.getMessageContext().getOperationContext() == null) {
@@ -206,23 +200,14 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 				// handler.
 				
 				ServiceContext serviceCtx = msgContext.getServiceContext();
-				OperationContext opCtx =  ContextFactory.createOperationContext(ackOperation, serviceCtx);
+				OperationContext opCtx =  OperationContextFactory.createOperationContext(ackOperation.getAxisSpecificMEPConstant(), ackOperation, serviceCtx);
 
 				rmMsgCtx.getMessageContext().setOperationContext(opCtx);
 			}
-
-			//the response will be written here.
-			rmMsgCtx.getMessageContext().getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN,
-					Constants.VALUE_TRUE);
-
-			//Marking that we did the acking here.
-			rmMsgCtx.getMessageContext().setProperty(Sandesha2Constants.ACK_WRITTEN, "true");
-
 			
-			MailBasedOutTransportInfo outTrnInfo = (MailBasedOutTransportInfo) ackRMMsgCtx.getMessageContext().getOptions().getProperty(Constants.OUT_TRANSPORT_INFO);
-
 			try {
-				engine.send(ackRMMsgCtx.getMessageContext());
+				AxisEngine.send(ackMsgCtx);
+				TransportUtils.setResponseWritten(ackMsgCtx, true);
 			} catch (AxisFault e1) {
 				throw new SandeshaException(e1.getMessage());
 			}
@@ -317,7 +302,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		getMsgContext().setAxisOperation(ackOperation);
 
 		ServiceContext serviceCtx = getMsgContext().getServiceContext();
-		OperationContext opcontext = ContextFactory.createOperationContext(ackOperation, serviceCtx);
+		OperationContext opcontext = OperationContextFactory.createOperationContext(ackOperation.getAxisSpecificMEPConstant(), ackOperation, serviceCtx);
 		opcontext.setParent(getMsgContext().getServiceContext());
 
 		getConfigurationContext().registerOperationContext(ackRequestRMMsg.getMessageId(), opcontext);

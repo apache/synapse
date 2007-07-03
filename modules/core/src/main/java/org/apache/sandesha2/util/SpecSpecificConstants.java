@@ -152,13 +152,7 @@ public class SpecSpecificConstants {
 			String message = "MakeConnection is not supported in this RM version";
 			throw new SandeshaException (message);
 		}
-		else if (Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(specVersion)) 
-			return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_MAKE_CONNECTION;
-		else {
-			throw new SandeshaException (SandeshaMessageHelper.getMessage(
-					SandeshaMessageKeys.unknownSpec,
-					specVersion));
-		}
+		return Sandesha2Constants.SPEC_2007_02.Actions.ACTION_MAKE_CONNECTION;
 	}
 	
 	public static String getCreateSequenceSOAPAction (String specVersion) throws SandeshaException {
@@ -338,7 +332,7 @@ public class SpecSpecificConstants {
 		// the correct operation as we make invocations. Because of this, the
 		// tables are opposites of one another.
 		AxisOperation result = null;
-		if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0)) {
+		if(Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmSpecLevel)) {
 			switch(messageType) {
 			case Sandesha2Constants.MessageTypes.CREATE_SEQ:
 				result = service.getOperation(Sandesha2Constants.RM_OUT_IN_OPERATION);
@@ -356,12 +350,11 @@ public class SpecSpecificConstants {
 				result = service.getOperation(Sandesha2Constants.RM_OUT_ONLY_OPERATION);
 				break;	
 			}
-		} else if(rmSpecLevel.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)) {
+		} else if(Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmSpecLevel)) {
 			switch(messageType) {
 			case Sandesha2Constants.MessageTypes.CREATE_SEQ:
 			case Sandesha2Constants.MessageTypes.CLOSE_SEQUENCE:
 			case Sandesha2Constants.MessageTypes.TERMINATE_SEQ:
-			case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
 				result = service.getOperation(Sandesha2Constants.RM_OUT_IN_OPERATION);
 				break;
 			case Sandesha2Constants.MessageTypes.ACK:
@@ -372,6 +365,11 @@ public class SpecSpecificConstants {
 				result = service.getOperation(Sandesha2Constants.RM_OUT_ONLY_OPERATION);
 				break;		
 			}
+		}
+		
+		// MakeConnection is defined in its own spec, not the RM spec.
+		if(messageType == Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG) {
+			result = service.getOperation(Sandesha2Constants.RM_OUT_IN_OPERATION);
 		}
 		
 		if(result == null) {

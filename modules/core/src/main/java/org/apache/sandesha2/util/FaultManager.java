@@ -35,8 +35,9 @@ import org.apache.axiom.soap.SOAPFaultSubCode;
 import org.apache.axiom.soap.SOAPFaultText;
 import org.apache.axiom.soap.SOAPFaultValue;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
+import org.apache.axis2.client.async.AxisCallback;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
@@ -45,6 +46,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.engine.Handler.InvocationResponse;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -357,7 +359,7 @@ public class FaultManager {
 	
 	throws AxisFault {
 		if (log.isDebugEnabled())
-			log.debug("Enter: FaultManager::checkForSequenceClosed, " + sequenceID);
+			log.debug("Enter: FaultManager::checkForSequenceTerminated, " + sequenceID);
 
 		if (bean.isTerminated()) {
 			MessageContext referenceMessage = referenceRMMessage.getMessageContext();
@@ -382,7 +384,7 @@ public class FaultManager {
 			data.setDetail(identifierElement);
 
 			if (log.isDebugEnabled())
-				log.debug("Exit: FaultManager::checkForSequenceClosed, sequence closed");
+				log.debug("Exit: FaultManager::checkForSequenceTerminated, sequence terminated");
 			
 			boolean throwable = !piggybackedMessage;
 			getOrSendFault(referenceRMMessage, data, throwable);
@@ -390,7 +392,7 @@ public class FaultManager {
 		}
 
 		if (log.isDebugEnabled())
-			log.debug("Exit: FaultManager::checkForSequenceClosed");
+			log.debug("Exit: FaultManager::checkForSequenceTerminated");
 		return false;
   }
 
@@ -490,9 +492,6 @@ public class FaultManager {
 
 			SOAPFaultEnvelopeCreator.addSOAPFaultEnvelope(faultMessageContext, Sandesha2Constants.SOAPVersion.v1_1, data, referenceRMMsgContext.getRMNamespaceValue());			
 			
-			referenceRMMsgContext.getMessageContext().getOperationContext().setProperty(
-					org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
-						
 			// Set the action
 			faultMessageContext.setWSAAction(
 					SpecSpecificConstants.getAddressingFaultAction(referenceRMMsgContext.getRMSpecVersion()));
@@ -504,8 +503,12 @@ public class FaultManager {
 				//having a surrounded try block will make sure that the error is logged here 
 				//and that this does not disturb the processing of a carrier message.
 				try {
-					AxisEngine engine = new AxisEngine(faultMessageContext.getConfigurationContext());
-					engine.sendFault(faultMessageContext);
+					AxisEngine.sendFault(faultMessageContext);
+					
+					EndpointReference destination = faultMessageContext.getTo();
+					if(destination == null || destination.hasAnonymousAddress()) {
+						TransportUtils.setResponseWritten(referenceRMMsgContext.getMessageContext(), true);
+					}
 				} catch (Exception e) {
 					AxisFault fault = new AxisFault(faultColdValue.getTextAsQName(), data.getReason(), "", "", data.getDetail());
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotSendFaultDueToException, fault.getMessage(), e.getMessage());
@@ -870,10 +873,12 @@ public class FaultManager {
         MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
         if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver))
         {
-          Callback callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
-          if (callback != null)
+          Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
+          if (callback instanceof Callback)
           {
-            callback.onError(fault);
+            ((Callback)callback).onError(fault);
+          } else if(callback instanceof AxisCallback) {
+        	((AxisCallback)callback).onError(fault);
           }
         }
       }

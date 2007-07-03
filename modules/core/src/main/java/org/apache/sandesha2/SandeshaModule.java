@@ -131,6 +131,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 		// Mark the config context so that we can run sync 2-way interations over
 		// RM, but at the same time switch it off for unreliable messages.
+		// We do a similar trick with the code that does an early HTTP 202 for
+		// messages that don't need their backchannel.
 		configContext.setProperty(Constants.Configuration.USE_ASYNC_OPERATIONS, Boolean.TRUE);
 		configContext.getAxisConfiguration().addTargetResolver(
 				new TargetResolver() {
@@ -145,7 +147,8 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 						if (axisConfiguration!=null) {
 							Collection modules = axisConfiguration.getEngagedModules();
 							for (Iterator iter = modules.iterator();iter.hasNext();) {
-								String moduleName = (String) iter.next();
+								AxisModule module = (AxisModule) iter.next();
+								String moduleName = module.getName();
 								if (moduleName!=null && moduleName.startsWith (Sandesha2Constants.MODULE_NAME)) {
 									engaged = true;
 								}
@@ -180,8 +183,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 						
 						//if the module is not engaed we mark the message as unreliable.
 						if (!engaged) {
-							if(log.isDebugEnabled()) log.debug("Unsetting USE_ASYNC_OPERATIONS for unreliable message");
+							if(log.isDebugEnabled()) log.debug("Unsetting USE_ASYNC_OPERATIONS and DISABLE_RESPONSE_ACK for unreliable message");
 							messageContext.setProperty(Constants.Configuration.USE_ASYNC_OPERATIONS, Boolean.FALSE);
+							messageContext.setProperty(Constants.Configuration.DISABLE_RESPONSE_ACK, Boolean.FALSE);
 						}
 						
 						//Even when Sandesha2 is engaged this may be marked as unreliable.
@@ -201,7 +205,9 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 	public void engageNotify(AxisDescription axisDescription) throws AxisFault {
 		if(log.isDebugEnabled()) log.debug("Entry: SandeshaModule::engageNotify, " + axisDescription);
 		
-		SandeshaPolicyBean parentPropertyBean = SandeshaUtil.getPropertyBean(axisDescription.getParent());
+		AxisDescription parent = axisDescription.getParent();
+		SandeshaPolicyBean parentPropertyBean = null;
+		if(parent != null) parentPropertyBean = SandeshaUtil.getPropertyBean(parent);
 		
 		SandeshaPolicyBean axisDescPropertyBean = PropertyManager.loadPropertiesFromAxisDescription(axisDescription,parentPropertyBean);
 		
@@ -233,7 +239,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
-				if(op.getAxisSpecifMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				if(op.getAxisSpecificMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 					Parameter p = new Parameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS, Boolean.TRUE);
 					service.addParameter(p);
 					break;
@@ -241,7 +247,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 			}
 		} else if(axisDescription instanceof AxisOperation) {
 			AxisOperation op = (AxisOperation) axisDescription;
-			log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecifMEPConstant());
+			log.debug("Examining operation " + op.getName() + ", mep " + op.getAxisSpecificMEPConstant());
 
 			String name = null;
 			QName qName = op.getName();
@@ -251,7 +257,7 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 
 				// If we get to here then we must have one of the user's operations, so
 				// check the MEP.
-				if(op.getAxisSpecifMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {
+				if(op.getAxisSpecificMEPConstant() == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 					Parameter p = new Parameter(Sandesha2Constants.SERVICE_CONTAINS_OUT_IN_MEPS, Boolean.TRUE);
 					op.getParent().addParameter(p);
 				}

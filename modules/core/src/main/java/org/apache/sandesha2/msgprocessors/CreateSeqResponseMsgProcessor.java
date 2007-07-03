@@ -129,6 +129,19 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		}
 		createSeqResponseRMMsgCtx.setProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID,internalSequenceId);
 		
+		// Check to see if we have already received a sequence id. If we have then this response is redundant,
+		// and we can forget about it.
+		// TODO: Should we terminate or close the extra sequence? We can only do that if the new sequence
+		// id is different from the one we got back the first time. For now it should be enough to just
+		// ignore it, and let it time out.
+		if(rmsBean.getSequenceID() != null) {
+			if(log.isDebugEnabled())
+				log.debug("Exit: CreateSeqResponseMsgProcessor::processInMessage, sequence id is already set. " +
+						"Existing id:" + rmsBean.getSequenceID() + ", new id:" + newOutSequenceId);
+			return false;
+		}
+
+		// Store the new sequence id
 		rmsBean.setSequenceID(newOutSequenceId);
 
 		// We should poll for any reply-to that uses the anonymous URI, when MakeConnection
@@ -144,11 +157,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			}
 		}
 
-		SenderBean createSequenceSenderBean = retransmitterMgr.retrieve(createSeqMsgId);
-		if (createSequenceSenderBean == null)
-			throw new SandeshaException(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.createSeqEntryNotFound));
-
-		// deleting the create sequence entry.
+		// deleting the create sequence sender bean entry.
 		retransmitterMgr.delete(createSeqMsgId);
 		
 		// Remove the create sequence message
@@ -245,9 +254,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 			retransmitterMgr.update(tempBean);
 		}
 
-		createSeqResponseRMMsgCtx.getMessageContext().getOperationContext().setProperty(
-				org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-
+		// TODO - does this do anything?
 		createSeqResponseRMMsgCtx.pause();
 
 		if (log.isDebugEnabled())

@@ -87,19 +87,18 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 						&& Sandesha2Constants.VALUE_TRUE.equals(postFaulureProperty))
 					postFailureInvocation = true;
 
-				AxisEngine engine = new AxisEngine(msgToInvoke.getConfigurationContext());
 				if (postFailureInvocation) {
 					makeMessageReadyForReinjection(msgToInvoke);
 					if (log.isDebugEnabled())
 						log.debug("Receiving message, key=" + messageContextKey + ", msgCtx="
 								+ msgToInvoke.getEnvelope().getHeader());
-					engine.receive(msgToInvoke);
+					AxisEngine.receive(msgToInvoke);
 				} else {
 					if (log.isDebugEnabled())
 						log.debug("Resuming message, key=" + messageContextKey + ", msgCtx="
 								+ msgToInvoke.getEnvelope().getHeader());
 					msgToInvoke.setPaused(false);
-					engine.resumeReceive(msgToInvoke);
+					AxisEngine.resumeReceive(msgToInvoke);
 				}
 				
 				if(transaction!=null){
@@ -192,7 +191,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 	private void handleFault(RMMsgContext inRMMsgContext, Exception e) {
 		MessageContext inMsgContext = inRMMsgContext.getMessageContext();
-		AxisEngine engine = new AxisEngine(inMsgContext.getConfigurationContext());
 		try {					
 			MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(inMsgContext, e);
 			// Copy some of the parameters to the new message context.
@@ -213,10 +211,10 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 				if (requestResponseTransport!=null)
 					requestResponseTransport.signalFaultReady(fault);
 				else
-					engine.sendFault(faultContext);
+					AxisEngine.sendFault(faultContext);
 				
 			} else	
-				engine.sendFault(faultContext);
+				AxisEngine.sendFault(faultContext);
 			
 		} catch (AxisFault e1) {
 			if (log.isErrorEnabled())

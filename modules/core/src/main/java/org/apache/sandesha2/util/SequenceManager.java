@@ -215,6 +215,12 @@ public class SequenceManager {
 
 		} else {
 			replyToEPR = firstAplicationMsgCtx.getReplyTo();
+			
+			// If the replyTo is the none URI, we need to rewrite it as the
+			// anon replyTo. Setting the value to null should have that effect.
+			if(replyToEPR != null && replyToEPR.hasNoneAddress()) {
+				replyToEPR = null;
+			}
 
 			// For client-side sequences there are 3 options:
 			// 1) An explict AcksTo, set via the client API

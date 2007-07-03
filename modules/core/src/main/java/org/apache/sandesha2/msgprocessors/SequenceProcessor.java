@@ -22,13 +22,13 @@ import javax.xml.namespace.QName;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -291,7 +291,7 @@ public class SequenceProcessor {
 		
 		// If we are doing sync 2-way over WSRM 1.0, then we may just have received one of
 		// the reply messages that we were looking for. If so we can remove the matching sender bean.
-		int mep = msgCtx.getAxisOperation().getAxisSpecifMEPConstant();
+		int mep = msgCtx.getAxisOperation().getAxisSpecificMEPConstant();
 		if(specVersion!=null && specVersion.equals(Sandesha2Constants.SPEC_VERSIONS.v1_0) &&
 				mep == WSDLConstants.MEP_CONSTANT_OUT_IN) {
 			RelatesTo relatesTo = msgCtx.getRelatesTo();
@@ -330,8 +330,8 @@ public class SequenceProcessor {
 		boolean ackBackChannel = SpecSpecificConstants.sendAckInBackChannel (rmMsgCtx.getMessageType());
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 		if (acksTo.hasAnonymousAddress() && backchannelFree && ackBackChannel) {
-			Object responseWritten = msgCtx.getOperationContext().getProperty(Constants.RESPONSE_WRITTEN);
-			if (responseWritten==null || !Constants.VALUE_TRUE.equals(responseWritten)) {				
+			boolean responseWritten = TransportUtils.isResponseWritten(msgCtx);
+			if (!responseWritten) {				
 				sendAck = true;
 			}
 		} else if (!acksTo.hasAnonymousAddress()) {
@@ -393,8 +393,8 @@ public class SequenceProcessor {
 				transaction = storageManager.getTransaction();
 				
 				RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
-				msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);	
 				AcknowledgementManager.sendAckNow(ackRMMsgContext);
+				TransportUtils.setResponseWritten(msgCtx, true);
 				if (transaction != null && transaction.isActive()) transaction.commit();
 				transaction = null;
 			
@@ -421,9 +421,8 @@ public class SequenceProcessor {
 					rmMsgCtx, rmdBean, sequenceId, storageManager, serverSide);
 
 			if (anonymousAcksTo) {
-				rmMsgCtx.getMessageContext().getOperationContext().
-					setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);
 				AcknowledgementManager.sendAckNow(ackRMMsgCtx);
+				TransportUtils.setResponseWritten(rmMsgCtx.getMessageContext(), true);
 			} else {				
 				long ackInterval = SandeshaUtil.getPropertyBean(
 						rmMsgCtx.getMessageContext().getAxisService())

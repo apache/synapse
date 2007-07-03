@@ -317,6 +317,7 @@ public class SequenceTerminatedFaultTest extends SandeshaTestCase {
 		Options clientOptions = new Options ();
 		clientOptions.setAction(pingAction);
 		clientOptions.setTo(new EndpointReference (to));
+		clientOptions.setFaultTo(new EndpointReference(AddressingConstants.Final.WSA_ANONYMOUS_URL));
 
 		String sequenceKey = SandeshaUtil.getUUID();
 		clientOptions.setProperty(SandeshaClientConstants.SEQUENCE_KEY,sequenceKey);

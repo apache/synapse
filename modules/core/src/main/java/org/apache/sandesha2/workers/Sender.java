@@ -25,6 +25,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.transport.RequestResponseTransport;
+import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.RequestResponseTransport.RequestResponseTransportStatus;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
@@ -422,11 +423,9 @@ public class Sender extends SandeshaThread {
 						RMMsgContext ackRMMsgCtx = AcknowledgementManager.generateAckMessage(
 								rmMsgCtx, inbound, inbound.getSequenceID(), storageManager, true);
 						AcknowledgementManager.sendAckNow(ackRMMsgCtx);
-						msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "true");
-						t.signalResponseReady();
+						TransportUtils.setResponseWritten(msgCtx, true);
 					} else {
-						msgCtx.getOperationContext().setProperty(org.apache.axis2.Constants.RESPONSE_WRITTEN, "false");
-						t.acknowledgeMessage(msgCtx);
+						TransportUtils.setResponseWritten(msgCtx, false);
 					}
 	
 					// Mark the bean so that we know the transport is missing, and reset the send time

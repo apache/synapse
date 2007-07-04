@@ -80,7 +80,11 @@
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 
-    <operation name="Sandesha2OperationDuplicate" mep="http://www.w3.org/2006/01/wsdl/in-out">
+		<operation name="Sandesha2OperationDuplicateInOnly" mep="http://www.w3.org/2006/01/wsdl/in-only">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+    </operation>
+
+    <operation name="Sandesha2OperationDuplicateInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
         <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
     </operation>
 

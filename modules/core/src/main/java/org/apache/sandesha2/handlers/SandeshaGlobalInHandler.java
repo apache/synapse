@@ -30,6 +30,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
@@ -221,24 +222,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
             if (service==null)
           	  throw new SandeshaException ("Duplicate message detected. But cant dispatch since the Service has not been found");
             
-            AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
-                Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
-                Sandesha2Constants.SPEC_VERSIONS.v1_0,
-                service);
-            rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
+            setupDuplicateOperation(rmMsgCtx);
             
-            
-            /**
-             * Adding a MessageID here if this is a response message. If this is not added AddressingValidators will fail.
-             * This is becoz the DuplicateOperation I added here has a InOut operation. According to Addressing a InOut msg
-             * Must contain a MessageID.
-             */
-            
-            RelatesTo relatesTo = messageContext.getRelatesTo();
-            String messageID = messageContext.getOptions().getMessageId();
-            if (relatesTo!=null && messageID==null) {
-            	messageContext.getOptions().setMessageId (SandeshaUtil.getUUID());
-            }
         }
       } else {
         
@@ -252,12 +237,7 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
           if (service==null)
         	  throw new SandeshaException ("Duplicate message detected. But cant dispatch since the Service has not been found");
           
-          AxisOperation duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
-              Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE,
-              Sandesha2Constants.SPEC_VERSIONS.v1_0,
-              service);
-          rmMsgCtx.getMessageContext().setAxisOperation(duplicateMessageOperation);
-          
+          setupDuplicateOperation(rmMsgCtx);   
       }
       
       if(transaction != null && transaction.isActive()) transaction.commit();
@@ -269,5 +249,53 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
     }
     if (log.isDebugEnabled())
       log.debug("Exit: SandeshaGlobalInHandler::processApplicationMessage");
+  }
+  
+  
+  /**
+   * Find the duplicate RM AxisOperation that is appropriate for the message - we need a
+   * different dup operation depending on whether the MEP is one way or two way.
+   */
+  private static void setupDuplicateOperation(RMMsgContext rmMsgCtx) throws SandeshaException {
+    if (log.isDebugEnabled()) log.debug("Enter: SandeshaGlobalInHandler::setupDuplicateOperation");
+
+    MessageContext ctx = rmMsgCtx.getMessageContext();
+    AxisOperation duplicateMessageOperation = null;
+    int mep = WSDLConstants.MEP_CONSTANT_IN_ONLY;
+    AxisOperation userOp = ctx.getAxisOperation();
+    if(userOp != null) mep = userOp.getAxisSpecificMEPConstant();
+    boolean inOut = false;
+
+    if(WSDLConstants.MEP_CONSTANT_IN_ONLY == mep ){
+      duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
+        Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE_IN_ONLY,
+        Sandesha2Constants.SPEC_VERSIONS.v1_0,
+        rmMsgCtx.getMessageContext().getAxisService());          	
+    } else {
+      duplicateMessageOperation = SpecSpecificConstants.getWSRMOperation(
+        Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE_IN_OUT,
+        Sandesha2Constants.SPEC_VERSIONS.v1_0,
+        rmMsgCtx.getMessageContext().getAxisService());      
+      	inOut = true;
+    }
+
+    ctx.setRelationships(null);
+    ctx.setAxisOperation(duplicateMessageOperation);
+    
+    if(inOut){
+      /**
+       * Adding a MessageID here if this is a response message. If this is not added AddressingValidators will fail.
+       * This is becoz the DuplicateOperation I added here has a InOut operation. According to Addressing a InOut msg
+       * Must contain a MessageID.
+       */
+      
+      RelatesTo relatesTo = rmMsgCtx.getRelatesTo();
+      String messageID = rmMsgCtx.getMessageContext().getOptions().getMessageId();
+      if (relatesTo!=null && messageID==null) {
+      	rmMsgCtx.getMessageContext().getOptions().setMessageId (SandeshaUtil.getUUID());
+      }
+    }
+
+    if (log.isDebugEnabled()) log.debug("Exit: SandeshaGlobalInHandler::setupDuplicateOperation");
   }
 }

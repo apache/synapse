@@ -269,11 +269,13 @@ public interface Sandesha2Constants {
 		
 		int LAST_MESSAGE = 12;
 
-		int DUPLICATE_MESSAGE = 13;
+		int DUPLICATE_MESSAGE_IN_ONLY = 13;
 		
-		int POLL_RESPONSE_MESSAGE = 14;
+		int DUPLICATE_MESSAGE_IN_OUT = 14;
+		
+		int POLL_RESPONSE_MESSAGE = 15;
 
-		int MAX_MESSAGE_TYPE = 14;
+		int MAX_MESSAGE_TYPE = 15;
 	}
 
 	public interface MessageParts {
@@ -559,7 +561,8 @@ public interface Sandesha2Constants {
 	static final String SANDESHA_OP_PREFIX    = "Sandesha2Operation";
 	static final QName RM_OUT_IN_OPERATION    = new QName(SANDESHA_OP_PREFIX + "OutIn");
 	static final QName RM_OUT_ONLY_OPERATION  = new QName(SANDESHA_OP_PREFIX + "OutOnly");
-	static final QName RM_DUPLICATE_OPERATION = new QName(SANDESHA_OP_PREFIX + "Duplicate");
+	static final QName RM_DUPLICATE_IN_ONLY_OPERATION = new QName(SANDESHA_OP_PREFIX + "DuplicateInOnly");
+	static final QName RM_DUPLICATE_IN_OUT_OPERATION = new QName(SANDESHA_OP_PREFIX + "DuplicateInOut");
 	static final QName RM_IN_OUT_OPERATION    = new QName(SANDESHA_OP_PREFIX + "InOut");
 	static final QName RM_IN_ONLY_OPERATION   = new QName(SANDESHA_OP_PREFIX + "InOnly");
 	

@@ -1035,6 +1035,27 @@ public class SandeshaUtil {
 	}
 	
 	
+	public static boolean isDuplicateInOnlyMessage(MessageContext msgContext)
+	{
+		AxisOperation operation = msgContext.getAxisOperation();
+		String localName = operation.getName().getLocalPart();
+		if(localName.equals(Sandesha2Constants.RM_DUPLICATE_IN_ONLY_OPERATION.getLocalPart())){
+			return true;
+		}
+		else return false;
+	}
+	
+	public static boolean isDuplicateInOutMessage(MessageContext msgContext)
+	{
+		AxisOperation operation = msgContext.getAxisOperation();
+		String localName = operation.getName().getLocalPart();
+		if(localName.equals(Sandesha2Constants.RM_DUPLICATE_IN_OUT_OPERATION.getLocalPart())){
+			return true;
+		}
+		else return false;
+	}	
+	
+	
 	public static SOAPEnvelope cloneEnvelope(SOAPEnvelope envelope) throws SandeshaException {
 		
 		// Now clone the env and set it in the message context

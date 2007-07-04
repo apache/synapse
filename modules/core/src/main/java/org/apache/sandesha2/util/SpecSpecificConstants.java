@@ -343,8 +343,11 @@ public class SpecSpecificConstants {
 			case Sandesha2Constants.MessageTypes.LAST_MESSAGE:
 				result = service.getOperation(Sandesha2Constants.RM_OUT_ONLY_OPERATION);
 				break;			
-			case Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE:
-				result = service.getOperation(Sandesha2Constants.RM_DUPLICATE_OPERATION);
+			case Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE_IN_ONLY:
+			  result = service.getOperation(Sandesha2Constants.RM_DUPLICATE_IN_ONLY_OPERATION);
+			  break;
+			case Sandesha2Constants.MessageTypes.DUPLICATE_MESSAGE_IN_OUT:
+				result = service.getOperation(Sandesha2Constants.RM_DUPLICATE_IN_OUT_OPERATION);
 				break;
 			case Sandesha2Constants.MessageTypes.POLL_RESPONSE_MESSAGE:
 				result = service.getOperation(Sandesha2Constants.RM_OUT_ONLY_OPERATION);

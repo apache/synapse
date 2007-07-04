@@ -17,6 +17,7 @@
 package org.apache.sandesha2.client;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *This report will contain details of a specific sequence.
@@ -75,7 +76,7 @@ public class SequenceReport {
 		this.sequenceID = sequenceID;
 	}
 	
-	public ArrayList getCompletedMessages () {
+	public List getCompletedMessages () {
 		return completedMessages;
 	}
 

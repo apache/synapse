@@ -18,6 +18,7 @@ package org.apache.sandesha2.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 
@@ -49,11 +50,11 @@ public class SandeshaReport {
 		return lng.longValue();
 	}
 
-	public ArrayList getIncomingSequenceList() {
+	public List getIncomingSequenceList() {
 		return incomingSequenceList;
 	}
 
-	public ArrayList getOutgoingSequenceList() {
+	public List getOutgoingSequenceList() {
 		return outgoingSequenceList;
 	}
 

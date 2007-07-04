@@ -212,10 +212,10 @@ public class SandeshaClient {
 	 * @return
 	 * @throws SandeshaException
 	 */
-	public static ArrayList getIncomingSequenceReports(ConfigurationContext configCtx) throws SandeshaException {
+	public static List getIncomingSequenceReports(ConfigurationContext configCtx) throws SandeshaException {
 
 		SandeshaReport report = getSandeshaReport(configCtx);
-		ArrayList incomingSequenceIDs = report.getIncomingSequenceList();
+		List incomingSequenceIDs = report.getIncomingSequenceList();
 		Iterator incomingSequenceIDIter = incomingSequenceIDs.iterator();
 
 		ArrayList incomingSequenceReports = new ArrayList();

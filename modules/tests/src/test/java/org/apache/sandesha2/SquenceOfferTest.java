@@ -18,6 +18,7 @@ package org.apache.sandesha2;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
@@ -101,7 +102,7 @@ public class SquenceOfferTest extends SandeshaTestCase {
 				
 				//checking weather the incomingSequenceReport has the offered sequence ID
 				SandeshaReport rmReport = SandeshaClient.getSandeshaReport(configContext);
-				ArrayList incomingSeqList = rmReport.getIncomingSequenceList();
+				List incomingSeqList = rmReport.getIncomingSequenceList();
 				assertEquals(incomingSeqList.size(),1);
 				assertEquals(incomingSeqList.get(0),offeredSequenceID);	
 	

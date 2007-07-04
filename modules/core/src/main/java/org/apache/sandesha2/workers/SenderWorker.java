@@ -208,6 +208,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 
 			msgCtx.getOptions().setTimeOutInMilliSeconds(1000000);
 			
+			boolean processResponseForFaults = false ;
 			try {
 				InvocationResponse response = InvocationResponse.CONTINUE;
 				
@@ -258,6 +259,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				}
 				
 				successfullySent = true;
+				
+			} catch (AxisFault e) {
+				//this is a possible SOAP 1.2 Fault. So letting it proceed.
+				
+				processResponseForFaults = true;
+				
 			} catch (Exception e) {
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.sendMsgError, e.toString());
@@ -332,7 +339,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			
 			transaction = null;
 
-			if (successfullySent && !msgCtx.isServerSide()) 
+			if ((processResponseForFaults || successfullySent) && !msgCtx.isServerSide()) 
 				checkForSyncResponses(msgCtx);
 			
 			if ((rmMsgCtx.getMessageType() == Sandesha2Constants.MessageTypes.TERMINATE_SEQ)

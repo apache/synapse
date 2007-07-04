@@ -265,6 +265,8 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 				processResponseForFaults = true;
 				
+				recordError(e, rmMsgCtx, storageManager);
+				
 			} catch (Exception e) {
 				String message = SandeshaMessageHelper.getMessage(
 						SandeshaMessageKeys.sendMsgError, e.toString());
@@ -272,45 +274,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				if (log.isErrorEnabled())
 				  log.error(message, e);
 				
-				// Store the Exception as a sequence property to enable the client to lookup the last 
-				// exception time and timestamp.
-				try
-				{
-					// Get the internal sequence id from the context
-					String internalSequenceId = (String)rmMsgCtx.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
-					if(internalSequenceId == null) internalSequenceId = senderBean.getInternalSequenceID();
-					
-					if(internalSequenceId != null) {
-						// Create a new Transaction
-						transaction = storageManager.getTransaction();
-						
-						RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
-					
-						if (bean != null) {						
-							bean.setLastSendError(e);
-							bean.setLastSendErrorTimestamp(System.currentTimeMillis());
-
-							// Update the RMSBean
-							storageManager.getRMSBeanMgr().update(bean);
-						}
-						
-						// Commit the properties
-						if(transaction != null) {
-							transaction.commit();
-							transaction = null;
-						}
-					}
-				}
-				catch (Exception e1)
-				{
-					if (log.isErrorEnabled())
-						log.error(e1);
-				} finally {
-					if (transaction != null) {
-						transaction.rollback();
-						transaction = null;
-					}
-				}
+				recordError(e, rmMsgCtx, storageManager);
 				
 			}
 			// Establish the transaction for post-send processing
@@ -652,6 +616,51 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: SenderWorker::checkForSyncResponses");
+	}
+	
+	private void recordError (Exception e, RMMsgContext outRMMsg, StorageManager storageManager) throws SandeshaStorageException {
+		// Store the Exception as a sequence property to enable the client to lookup the last 
+		// exception time and timestamp.
+		
+		Transaction transaction = null;
+		
+		try
+		{
+			// Get the internal sequence id from the context
+			String internalSequenceId = (String)outRMMsg.getProperty(Sandesha2Constants.MessageContextProperties.INTERNAL_SEQUENCE_ID);
+			if(internalSequenceId == null) internalSequenceId = senderBean.getInternalSequenceID();
+			
+			if(internalSequenceId != null) {
+				// Create a new Transaction
+				transaction = storageManager.getTransaction();
+				
+				RMSBean bean = SandeshaUtil.getRMSBeanFromInternalSequenceId(storageManager, internalSequenceId);
+			
+				if (bean != null) {						
+					bean.setLastSendError(e);
+					bean.setLastSendErrorTimestamp(System.currentTimeMillis());
+
+					// Update the RMSBean
+					storageManager.getRMSBeanMgr().update(bean);
+				}
+				
+				// Commit the properties
+				if(transaction != null) {
+					transaction.commit();
+					transaction = null;
+				}
+			}
+		}
+		catch (Exception e1)
+		{
+			if (log.isErrorEnabled())
+				log.error(e1);
+		} finally {
+			if (transaction != null) {
+				transaction.rollback();
+				transaction = null;
+			}
+		}
 	}
 	
 }

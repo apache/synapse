@@ -21,7 +21,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis2.modules.PolicyExtension;
+import org.apache.axis2.wsdl.codegen.CodeGenConfiguration;
+import org.apache.axis2.wsdl.codegen.extension.PolicyExtension;
 import org.apache.neethi.Policy;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,7 +47,10 @@ public class RMPolicyExtension implements PolicyExtension {
 
     public void addMethodsToStub(Document document, Element element, QName methodName, List assertions) {
         // TODO Auto-generated method stub
-        
     }
+
+	public void init(CodeGenConfiguration codeGenConfiguration) {
+		// TODO Auto-generated method stub
+	}
 
 }

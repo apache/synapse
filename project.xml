@@ -157,7 +157,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specification published I
         </dependency>
 	  <dependency>
             <groupId>httpcomponents-httpcore</groupId>
-            <artifactId>jakarta-httpcore</artifactId>
+            <artifactId>httpcore</artifactId>
             <version>${jakarta.httpcore.version}</version>
         </dependency>
         <dependency>

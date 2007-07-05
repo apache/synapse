@@ -17,6 +17,8 @@
 
 package org.apache.sandesha2.handlers;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
@@ -44,6 +46,7 @@ import org.apache.sandesha2.security.SecurityToken;
 import org.apache.sandesha2.storage.StorageManager;
 import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.RMDBeanMgr;
+import org.apache.sandesha2.storage.beans.InvokerBean;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.util.FaultManager;
 import org.apache.sandesha2.util.MsgInitializer;
@@ -215,6 +218,25 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
           if (log.isDebugEnabled())
               log.debug("Detected duplicate message " + msgNo);
             
+        	boolean isDuplicate = true;
+        	//still allow this msg if we have no corresponding invoker bean for it and we are inOrder
+        	boolean isInOrder = 
+        		SandeshaUtil.getDefaultPropertyBean(rmMsgCtx.getConfigurationContext().getAxisConfiguration()).isInOrder();
+        	if(isInOrder)
+        	{
+          	InvokerBean finderBean = new InvokerBean();
+          	finderBean.setMsgNo(msgNo);
+          	finderBean.setSequenceID(sequenceId);
+          	List invokerBeanList = storageManager.getInvokerBeanMgr().find(finderBean);
+          	if((invokerBeanList==null || invokerBeanList.size()==0) 
+          			&& bean.getNextMsgNoToProcess()<=msgNo){
+          		isDuplicate = false;
+              if (log.isDebugEnabled())
+                log.debug("Allowing completed message on sequence " + sequenceId + ", msgNo " + msgNo);
+          	}
+        	}
+        	
+        	if(isDuplicate){
             // Add the duplicate RM AxisOperation to the message
             
             //If the service has not been found by this time, we cannot proceed.
@@ -222,7 +244,8 @@ public class SandeshaGlobalInHandler extends AbstractHandler {
             if (service==null)
           	  throw new SandeshaException ("Duplicate message detected. But cant dispatch since the Service has not been found");
             
-            setupDuplicateOperation(rmMsgCtx);
+            setupDuplicateOperation(rmMsgCtx);        		
+        	}
             
         }
       } else {

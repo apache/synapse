@@ -34,6 +34,7 @@ import org.apache.synapse.config.xml.MediatorPropertyFactory;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 /**
  * Creates a XSLT mediator from the given XML
@@ -48,6 +49,9 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
+    public static final QName ATT_NAME_Q  = new QName(Constants.NULL_NAMESPACE, "name");
+       public static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
+
 
     public QName getTagQName() {
         return TAG_NAME;
@@ -79,8 +83,33 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(transformMediator,elem);
-
+        initMediator(transformMediator, elem);
+        // set the features 
+        Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "feature"));
+        while (iter.hasNext()) {
+            OMElement featureElem = (OMElement) iter.next();
+            OMAttribute attName = featureElem.getAttribute(ATT_NAME_Q);
+            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE_Q);
+            if (attName != null && attValue != null) {
+                String name = attName.getAttributeValue();
+                String value = attValue.getAttributeValue();
+                if (name != null && value != null) {
+                    if ("true".equals(value.trim())) {
+                        transformMediator.addFeature(name.trim(),
+                                true);
+                    } else if ("false".equals(value.trim())) {
+                        transformMediator.addFeature(name.trim(),
+                                false);
+                    } else {
+                        handleException("The feature must have value true or false");
+                    }
+                } else {
+                    handleException("The valid values for both of the name and value are need");
+                }
+            } else {
+                handleException("Both of the name and value attribute are required for a feature");
+            }
+        }
         transformMediator.addAllProperties(
             MediatorPropertyFactory.getMediatorProperties(elem));
 

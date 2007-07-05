@@ -50,10 +50,20 @@ public class SandeshaReport {
 		return lng.longValue();
 	}
 
+	/**
+	 * Gives all Incoming Sequences. Incoming Sequences are the Sequences to which this Endpoint works as a RMD.
+	 * 
+	 * @return A list of Strings. Each giving the SequenceID of an Incoming Sequence.
+	 */
 	public List getIncomingSequenceList() {
 		return incomingSequenceList;
 	}
 
+	/**
+	 * Gives all Outgoing Sequences. Outgoing Sequences are the Sequences to which this Endpoint works as a RMS.
+	 * 
+	 * @return A list of Strings. Each giving the SequenceID of an Outgoing Sequence.
+	 */
 	public List getOutgoingSequenceList() {
 		return outgoingSequenceList;
 	}

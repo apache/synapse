@@ -24,12 +24,15 @@ import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.mediators.TestUtils;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.transform.XSLTMediator;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.MessageContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.net.URL;
 
 public class XSLTMediatorTest extends TestCase {
@@ -60,7 +63,12 @@ public class XSLTMediatorTest extends TestCase {
 
         // set XSLT transformation URL
         transformMediator.setXsltKey("xslt-key");
-
+        List list = new ArrayList();
+        MediatorProperty mp = new MediatorProperty();
+        mp.setName("parama1");
+        mp.setValue("value1");
+        list.add(mp);
+        transformMediator.addAllProperties(list);
         Map props = new HashMap();
         Entry prop = new Entry();
         prop.setType(Entry.URL_SRC);

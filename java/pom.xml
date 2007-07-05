@@ -615,6 +615,28 @@
             <version>${bcprov.jdk15.version}</version>
         </dependency>
 
+        <!-- dependencies for xsltc in xalan -->
+        <dependency>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+            <version>${bcel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta-regexp</groupId>
+            <artifactId>jakarta-regexp</artifactId>
+            <version>${regexp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>java-cup</groupId>
+            <artifactId>java-cup</artifactId>
+            <version>${java-cup.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>JLex</groupId>
+            <artifactId>JLex</artifactId>
+            <version>${JLex.version}</version>
+        </dependency>
+        
     </dependencies>
 
     <reporting>
@@ -724,8 +746,13 @@
 
         <xerces.version>2.8.1</xerces.version>
         <xalan.version>2.7.0</xalan.version>
-        <js.version>1.6R5</js.version>        
+        <js.version>1.6R5</js.version>
 
+        <!-- xalan xsltc  -->
+        <bcel.version>5.2</bcel.version>
+        <regexp.version>1.4</regexp.version>
+        <java-cup.version>0.0</java-cup.version>
+        <JLex.version>0.0</JLex.version>
         <!-- misc -->
         <junit.version>3.8.2</junit.version>
         <log4j.version>1.2.13</log4j.version>

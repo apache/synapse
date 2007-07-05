@@ -25,7 +25,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
+import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <pre>
@@ -61,9 +67,24 @@ public class XSLTMediatorSerializer extends AbstractMediatorSerializer {
                 "source", nullNS, mediator.getSource().toString()));
             serializeNamespaces(xslt, mediator.getSource());
         }
-
         serializeProperties(xslt, mediator.getProperties());
-
+        List features = mediator.getFeatures();
+        if (!features.isEmpty()) {
+            for (Iterator iter = features.iterator(); iter.hasNext();) {
+                MediatorProperty mp = (MediatorProperty) iter.next();
+                OMElement prop = fac.createOMElement("feature", synNS, xslt);
+                if (mp.getName() != null) {
+                    prop.addAttribute(fac.createOMAttribute("name", nullNS, mp.getName()));
+                } else {
+                    handleException("The Feature name is missing");
+                }
+                if (mp.getValue() != null) {
+                    prop.addAttribute(fac.createOMAttribute("value", nullNS, mp.getValue()));
+                }  else {
+                    handleException("The Feature value is missing");
+                }
+            }
+        }
         if (parent != null) {
             parent.addChild(xslt);
         }

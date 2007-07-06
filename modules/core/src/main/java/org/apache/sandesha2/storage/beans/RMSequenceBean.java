@@ -37,7 +37,7 @@ public class RMSequenceBean extends RMBean {
 	
 	private String acksToEPR;
 	
-	private String rMVersion;
+	private String RMVersion;
 	
 	/**
 	 * Comment for <code>securityTokenData</code>
@@ -91,7 +91,7 @@ public class RMSequenceBean extends RMBean {
 		lastActivatedTime = beanToCopy.getLastActivatedTime();
 		pollingMode = beanToCopy.isPollingMode();
 		replyToEPR = beanToCopy.getReplyToEPR();
-		rMVersion = beanToCopy.getRMVersion();
+		RMVersion = beanToCopy.getRMVersion();
 		securityTokenData = beanToCopy.getSecurityTokenData();		
 		sequenceID = beanToCopy.getSequenceID();
 		terminated = beanToCopy.isTerminated();
@@ -174,17 +174,17 @@ public class RMSequenceBean extends RMBean {
   }
 
 	public void setLastActivatedTime(long lastActivatedTime) {
-  	this.lastActivatedTime = lastActivatedTime;
-  	this.flags |= LAST_ACTIVATED_TIME_FLAG;
-  }
+		this.lastActivatedTime = lastActivatedTime;
+		this.flags |= LAST_ACTIVATED_TIME_FLAG;
+	}
 
 	public String getRMVersion() {
-  	return rMVersion;
-  }
+		return RMVersion;
+	}
 
-	public void setRMVersion(String rmVersion) {
-  	this.rMVersion = rmVersion;
-  }
+	public void setRMVersion(String version) {
+		RMVersion = version;
+	}
 
 	public String getSecurityTokenData() {
 		return securityTokenData;
@@ -202,6 +202,14 @@ public class RMSequenceBean extends RMBean {
 		this.serviceName = serviceName;
 	}
 
+	public int getFlags() {
+		return flags;
+	}
+
+	public void setFlags(int flags) {
+		this.flags = flags;
+	}
+
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("\nSequence Id  : "); result.append(sequenceID);
@@ -212,7 +220,7 @@ public class RMSequenceBean extends RMBean {
 		result.append("\nClosed       : "); result.append(closed);		
 		result.append("\nTerminated       : "); result.append(terminated);		
 		result.append("\nLastActivatedTime: "); result.append(lastActivatedTime);	
-		result.append("\nRMVersion        : "); result.append(rMVersion);	
+		result.append("\nRMVersion        : "); result.append(RMVersion);	
 		result.append("\nServiceName        : "); result.append(serviceName);	
 		result.append("\nHas SecurityToken: "); result.append(securityTokenData != null && securityTokenData.length() > 0);
 		return result.toString();

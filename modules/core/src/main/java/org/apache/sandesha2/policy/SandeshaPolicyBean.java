@@ -30,6 +30,7 @@ import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
+import org.apache.sandesha2.util.PropertyManager;
 
 /**
  * Used to hold peoperties loaded from sandesha2.properties file or
@@ -92,7 +93,14 @@ public class SandeshaPolicyBean implements Assertion {
     private boolean enforceRM;
     private boolean enforceRMSet = false;
     
+    public SandeshaPolicyBean () {
+    	//we always set a PolicyBean from Constants as the default parent.
+		PropertyManager.loadPropertiesFromDefaultValues(this);
+
+    }
+    
 	public void setInactiveTimeoutInterval(long value, String measure) {
+		
         long timeOut = -1;
 
         if (measure == null) {

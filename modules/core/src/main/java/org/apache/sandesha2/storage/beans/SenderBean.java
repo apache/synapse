@@ -62,7 +62,7 @@ public class SenderBean extends RMBean {
 	 * If this sender bean is handling a response message, then we record the sequence id
 	 * of the inbound message that generated this response.
 	 */
-	private String inboundSequence;
+	private String inboundSequenceId;
 	
 	/**
 	 * Comment for <code>send</code>
@@ -264,11 +264,11 @@ public class SenderBean extends RMBean {
 	}
 
 	public String getInboundSequenceId() {
-		return inboundSequence;
+		return inboundSequenceId;
 	}
 
-	public void setInboundSequenceId(String inboundSequence) {
-		this.inboundSequence = inboundSequence;
+	public void setInboundSequenceId(String inboundSequenceId) {
+		this.inboundSequenceId = inboundSequenceId;
 	}
 
 	public boolean isTransportAvailable() {
@@ -278,6 +278,14 @@ public class SenderBean extends RMBean {
 	public void setTransportAvailable(boolean transportAvailable) {
 		this.transportAvailable = transportAvailable;
 		this.flags |= TRANSPORT_FLAG;
+	}
+	
+	public int getFlags() {
+		return flags;
+	}
+
+	public void setFlags(int flags) {
+		this.flags = flags;
 	}
 
 	public String toString() {

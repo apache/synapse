@@ -42,7 +42,7 @@ public class SenderBeanMgrTest extends SandeshaTestCase {
 
     public void setUp() throws Exception {
         AxisConfiguration axisConfig = new AxisConfiguration();
-        SandeshaPolicyBean propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+        SandeshaPolicyBean propertyBean = new SandeshaPolicyBean ();
         Parameter parameter = new Parameter ();
         parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
         parameter.setValue(propertyBean);

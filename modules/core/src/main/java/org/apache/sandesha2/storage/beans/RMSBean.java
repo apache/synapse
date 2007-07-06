@@ -27,6 +27,7 @@ import org.apache.sandesha2.util.RangeString;
 
 public class RMSBean extends RMSequenceBean {
 	
+	
 	private static final long serialVersionUID = 7051201094510208784L;
 
 	/**
@@ -394,6 +395,15 @@ public class RMSBean extends RMSequenceBean {
 		this.soapVersion = soapVersion;
 	}
 
+	public int getRmsFlags() {
+		return rmsFlags;
+	}
+
+	public void setRmsFlags(int rmsFlags) {
+		this.rmsFlags = rmsFlags;
+	}
+	
+	
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append(this.getClass().getName());

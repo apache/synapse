@@ -188,6 +188,13 @@ public class RMDBean extends RMSequenceBean {
 		this.outboundInternalSequence = outboundSequence;
 	}
 
+	public int getRmdFlags() {
+		return rmdFlags;
+	}
+
+	public void setRmdFlags(int rmdFlags) {
+		this.rmdFlags = rmdFlags;
+	}
 
 	public String toString() {
 		StringBuffer result = new StringBuffer();

@@ -42,8 +42,7 @@ import org.apache.sandesha2.policy.SandeshaPolicyBean;
 
 public class PropertyManager {
 
-	public static SandeshaPolicyBean loadPropertiesFromDefaultValues() throws SandeshaException {
-		SandeshaPolicyBean propertyBean = new SandeshaPolicyBean();
+	public static void loadPropertiesFromDefaultValues(SandeshaPolicyBean propertyBean) {
 		propertyBean.setAcknowledgementInterval(Sandesha2Constants.Properties.DefaultValues.AcknowledgementInterval);
 		propertyBean.setExponentialBackoff(Sandesha2Constants.Properties.DefaultValues.ExponentialBackoff);
 		propertyBean.setInactiveTimeoutInterval(Sandesha2Constants.Properties.DefaultValues.InactivityTimeout,
@@ -72,7 +71,6 @@ public class PropertyManager {
 		propertyBean.setUseMessageSerialization(Sandesha2Constants.Properties.DefaultValues.UseMessageSerialization);
 		propertyBean.setEnforceRM(Sandesha2Constants.Properties.DefaultValues.enforceRM);
 		
-		return propertyBean;
 	}
 
 	public static SandeshaPolicyBean loadPropertiesFromPropertyFile(InputStream in) throws SandeshaException {
@@ -476,27 +474,22 @@ public class PropertyManager {
 		}
 	}
 
-	private static void loadMessageTypesToDrop(String messageTypesToDrop, SandeshaPolicyBean propertyBean)
-			throws SandeshaException {
+	private static void loadMessageTypesToDrop(String messageTypesToDrop, SandeshaPolicyBean propertyBean) {
 
-		try {
-			if (messageTypesToDrop != null && !Sandesha2Constants.VALUE_NONE.equals(messageTypesToDrop)) {
-				messageTypesToDrop = messageTypesToDrop.trim();
-				messageTypesToDrop = "[" + messageTypesToDrop + "]";
-				ArrayList messageTypesLst = SandeshaUtil.getArrayListFromString(messageTypesToDrop);
+		if (messageTypesToDrop != null
+				&& !Sandesha2Constants.VALUE_NONE.equals(messageTypesToDrop)) {
+			messageTypesToDrop = messageTypesToDrop.trim();
+			messageTypesToDrop = "[" + messageTypesToDrop + "]";
+			ArrayList messageTypesLst = SandeshaUtil.getArrayListFromString(messageTypesToDrop);
 
-				Iterator itr = messageTypesLst.iterator();
-				while (itr.hasNext()) {
-					String typeStr = (String) itr.next();
-					Integer typeNo = new Integer(typeStr);
-					propertyBean.addMsgTypeToDrop(typeNo);
-				}
+			Iterator itr = messageTypesLst.iterator();
+			while (itr.hasNext()) {
+				String typeStr = (String) itr.next();
+				Integer typeNo = new Integer(typeStr);
+				propertyBean.addMsgTypeToDrop(typeNo);
 			}
-		} catch (NumberFormatException e) {
-			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.propertyInvalidValue,
-					Sandesha2Constants.Properties.MessageTypesToDrop);
-			throw new SandeshaException(message, e);
 		}
+
 	}
 
 	/**

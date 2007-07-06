@@ -519,7 +519,7 @@ public class SandeshaUtil {
 	}
 
 	//TODO change this method.
-	public static ArrayList getArrayListFromString(String str) throws SandeshaException {
+	public static ArrayList getArrayListFromString(String str) {
 
 		if (str == null || "".equals(str))
 			return new ArrayList();
@@ -529,7 +529,7 @@ public class SandeshaUtil {
 					SandeshaMessageKeys.invalidStringArray,
 					str);
 			log.debug(message);
-			throw new SandeshaException(message);
+			throw new IllegalArgumentException (message);
 		}
 
 		int length = str.length();
@@ -538,7 +538,7 @@ public class SandeshaUtil {
 			String message = SandeshaMessageHelper.getMessage(
 					SandeshaMessageKeys.invalidStringArray, str);
 			log.debug(message);
-			throw new SandeshaException(message);
+			throw new IllegalArgumentException(message);
 		}
 
 		ArrayList retArr = new ArrayList();

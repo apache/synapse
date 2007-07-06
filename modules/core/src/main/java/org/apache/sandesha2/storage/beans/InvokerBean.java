@@ -124,6 +124,14 @@ public class InvokerBean extends RMBean {
 	public void setContext(Serializable context) {
 		this.context = context;
 	}
+	
+	public int getFlags() {
+		return flags;
+	}
+
+	public void setFlags(int flags) {
+		this.flags = flags;
+	}
 
 	public String toString() {
 		StringBuffer result = new StringBuffer();

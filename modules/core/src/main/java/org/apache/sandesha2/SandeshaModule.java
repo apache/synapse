@@ -80,13 +80,13 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 		
 		// continueUncompletedSequences (storageManager,configCtx);
 
-		SandeshaPolicyBean constantPropertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+        SandeshaPolicyBean constantPropertyBean = new SandeshaPolicyBean ();
 		SandeshaPolicyBean propertyBean = PropertyManager.loadPropertiesFromModuleDescPolicy(module,constantPropertyBean);
 		
 		if (propertyBean==null) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.couldNotLoadModulePolicies);
 			log.error (message);
-			propertyBean = PropertyManager.loadPropertiesFromDefaultValues();
+			propertyBean = new SandeshaPolicyBean ();
 		} else {
 			if (log.isDebugEnabled()) {
 				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.modulePoliciesLoaded);

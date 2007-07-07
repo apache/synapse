@@ -111,7 +111,8 @@ public class MessageValidator {
 			if (replyTo==null || replyTo.hasAnonymousAddress())
 				anonReplyTo = true;
 			
-			if (Sandesha2Constants.SPEC_VERSIONS.v1_0.equals(rmMsgContext.getRMSpecVersion()) &&
+			//For RM 1.0 there must be an offer to get an Anon response.
+			if (!Sandesha2Constants.SPEC_VERSIONS.v1_1.equals(rmMsgContext.getRMSpecVersion()) &&
 				WSDL2Constants.MEP_URI_OUT_IN.equals(mep) &&
 				offer==null && anonReplyTo) {
 				

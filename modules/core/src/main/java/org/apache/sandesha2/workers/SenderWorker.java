@@ -519,10 +519,11 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setConfigurationContext(msgCtx.getConfigurationContext());
 				responseMessageContext.setTransportIn(msgCtx.getTransportIn());
 				responseMessageContext.setTransportOut(msgCtx.getTransportOut());
-
 				responseMessageContext.setProperty(MessageContext.TRANSPORT_IN, msgCtx
 						.getProperty(MessageContext.TRANSPORT_IN));
-				responseMessageContext.setOperationContext(msgCtx.getOperationContext());
+				
+				//we will not be setting the operation context here since this msgs may not be an application reply.
+				//we let other dispatchers find it.
 				responseMessageContext.setServiceContext(msgCtx.getServiceContext());
 				responseMessageContext.setServiceGroupContext(msgCtx.getServiceGroupContext());
 
@@ -556,7 +557,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				}
 				
 				//If addressing is disabled we will be adding this message simply as the application response of the request message.
-				Boolean addressingDisabled = (Boolean) msgCtx.getOptions().getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
+				Boolean addressingDisabled = (Boolean) msgCtx.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES);
 				if (addressingDisabled!=null && Boolean.TRUE.equals(addressingDisabled)) {
 					// If the AxisOperation object doesn't have a message receiver, it means that this was
 					// an out only op where we have added an ACK to the response.  Set the requestMsgOpCtx to

@@ -425,6 +425,8 @@ public class SandeshaUtil {
 			
 			newMessageContext.setProperty(AddressingConstants.WS_ADDRESSING_VERSION, 
 					referenceMessage.getProperty(AddressingConstants.WS_ADDRESSING_VERSION));
+			newMessageContext.setProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, 
+					referenceMessage.getProperty(AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES));
 			
 			copyConfiguredProperties (referenceMessage,newMessageContext);
 

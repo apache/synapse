@@ -1,7 +1,7 @@
 <module name="sandesha2" class="org.apache.sandesha2.SandeshaModule">
 
     <Description>
-        This module implements WS-ReliableMessaging for Axis2. This implements both the WSRM submitted spec and the new spec being developed under the OASIS WSRX group.
+        This module implements WS-ReliableMessaging for Axis2. This implements both the WSRM submitted spec and up to the version CD4 of the new WSRM 1.1 spec.
     </Description>
     
     <InFlow>

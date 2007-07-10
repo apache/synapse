@@ -74,6 +74,17 @@
             <artifactId>sandesha2-policy</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-activation_1.1_spec</artifactId>
+            <version>${geronimo.spec.activation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-javamail_1.4_spec</artifactId>
+            <version>${geronimo.spec.javamail.version}</version>
+        </dependency>
+        
     </dependencies>
 
 </project>

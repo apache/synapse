@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>sandesha2-parent</artifactId>
     <packaging>pom</packaging>
     <description>
-Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache Axis2. By using Sandesha2 you can add reliable messaging capability to the Web services you have hosted in Axis2. You can also use Sandesha2 with Axis2 client to interact with already hosted web services in a reliable manner. Please see Sandesha2 user guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 works internally.
+        Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache Axis2. By using Sandesha2 you
+        can add reliable messaging capability to the Web services you have hosted in Axis2. You can also use Sandesha2
+        with Axis2 client to interact with already hosted web services in a reliable manner. Please see Sandesha2 user
+        guide for more information on using Sandesha2. Read Sandesha2 Architecture guide to see how Sandesha2 works
+        internally.
     </description>
     <version>SNAPSHOT</version>
     <name>Apache Sandesha</name>
@@ -65,7 +70,7 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
             <email>sanjiva AT wso2.com</email>
             <organization>WSO2</organization>
         </developer>
-		<developer>
+        <developer>
             <name>Sanka Samaranayaka</name>
             <id>sanka</id>
             <email>ssanka AT gmail.com</email>
@@ -77,13 +82,13 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
             <email>GATFORA AT uk.ibm.com</email>
             <organization>IBM</organization>
         </developer>
-		<developer>
+        <developer>
             <name>Thomas McKiernan</name>
             <id>mckierna</id>
             <email>MCKIERNA AT uk.ibm.com</email>
             <organization>IBM</organization>
         </developer>
-		<developer>
+        <developer>
             <name>Matt Lovett</name>
             <id>mlovett</id>
             <email>MLOVETT AT uk.ibm.com</email>
@@ -114,7 +119,8 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/webservices/sandesha/trunk/java/</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/webservices/sandesha/trunk/java/</developerConnection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/webservices/sandesha/trunk/java/
+        </developerConnection>
         <url>http://svn.apache.org/repos/asf/webservices/sandesha/trunk</url>
     </scm>
 
@@ -181,7 +187,54 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
 
     <dependencies>
 
-		<!-- Axis2 -->
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-dom</artifactId>
+            <version>${axiom.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.neethi</groupId>
+            <artifactId>neethi</artifactId>
+            <version>${neethi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons.logging.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${stax.impl.groupid}</groupId>
+            <artifactId>${stax.impl.artifactid}</artifactId>
+            <version>${stax.impl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>${stax.api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Axis2 -->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
@@ -193,54 +246,64 @@ Sandesha2 is an implementation of WS-ReliableMessaging specifications for Apache
             <artifactId>axis2-codegen</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-		
-		<dependency>
+
+        <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
             <version>${axis2.version}</version>
-			<type>mar</type>
+            <type>mar</type>
         </dependency>
-		
+
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-mtompolicy</artifactId>
             <version>${axis2.version}</version>
         </dependency>
-		
+
     </dependencies>
 
     <modules>
-		<module>modules/core</module>
-		<module>modules/mar</module>
-		<module>modules/client</module>
-		<module>modules/policy</module>
-		<module>modules/rampart-integration</module>
-		<module>modules/tests</module>
-		<module>modules/samples</module>
-		<module>modules/interop</module>
-		<module>modules/distribution</module>
-  	</modules>
+        <module>modules/core</module>
+        <module>modules/mar</module>
+        <module>modules/client</module>
+        <module>modules/policy</module>
+        <module>modules/rampart-integration</module>
+        <module>modules/tests</module>
+        <module>modules/samples</module>
+        <module>modules/interop</module>
+        <module>modules/distribution</module>
+    </modules>
 
     <properties>
-	
-		<sandesha2.version>SNAPSHOT</sandesha2.version>
-		<axis2.version>SNAPSHOT</axis2.version>
-		
-     </properties>
-	
+
+        <sandesha2.version>SNAPSHOT</sandesha2.version>
+        <axis2.version>SNAPSHOT</axis2.version>
+        <axiom.version>SNAPSHOT</axiom.version>
+        <neethi.version>SNAPSHOT</neethi.version>
+        <commons.logging.version>1.1</commons.logging.version>
+        <stax.api.version>1.0.1</stax.api.version>
+        <stax.impl.artifactid>wstx-asl</stax.impl.artifactid>
+        <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>
+        <stax.impl.version>3.2.1</stax.impl.version>
+        <geronimo.spec.activation.version>1.0-M1</geronimo.spec.activation.version>
+        <geronimo.spec.javamail.version>1.0-M1</geronimo.spec.javamail.version>
+        <junit.version>3.8.2</junit.version>        
+
+    </properties>
+
     <distributionManagement>
         <repository>
             <id>apache-repo</id>
             <name>Maven Central Repository</name>
             <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
         </repository>
-	<!--
-        <snapshotRepository>
-            <id>apache-snapshots</id>
-            <name>Apache Development Repository</name>
-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
-        </snapshotRepository>
-	-->
+        <!--
+          <snapshotRepository>
+              <id>apache-snapshots</id>
+              <name>Apache Development Repository</name>
+              <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
+          </snapshotRepository>
+      -->
     </distributionManagement>
 
 </project>

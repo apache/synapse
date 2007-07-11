@@ -33,10 +33,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.jaxen.JaxenException;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -44,9 +41,11 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.XMLConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -64,11 +63,6 @@ public class ValidateMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(ValidateMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
-
-    /**
-     * Default schema language (http://www.w3.org/2001/XMLSchema) and validator feature ids.
-     */
-    private static final String DEFAULT_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
 
     /**
      * A list of property keys, referring to the schemas to be used for the validation
@@ -89,20 +83,15 @@ public class ValidateMediator extends AbstractListMediator {
     private List properties = new ArrayList();
 
     /**
-     * This is the actual Validator instance used to validate messages - probably
-     * by multiple threads. Always *USE* validatorLock to synchronize access to this
+     * This is the actual schema instance used to create a new schema
+     * This is a thred-safe instance.
      */
-    private Validator validator = null;
+    private Schema cachedSchema;
 
     /**
      * Lock used to ensure thread-safe creation and use of the above Validator
      */
     private final Object validatorLock = new Object();
-
-    /**
-     * This is the reference to the DefaultHandler instance
-     */
-    private final MyErrorHandler errorHandler = new MyErrorHandler();
 
     private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
         "//s12:Envelope/s12:Body/child::*[position()=1]";
@@ -135,7 +124,7 @@ public class ValidateMediator extends AbstractListMediator {
                 return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
             } else {
                 handleException("The evaluation of the XPath expression "
-                    + source + " must result in an OMNode");
+                        + source + " must result in an OMNode");
             }
         } catch (JaxenException e) {
             handleException("Error evaluating XPath " + source + " on message");
@@ -146,16 +135,17 @@ public class ValidateMediator extends AbstractListMediator {
     public boolean mediate(MessageContext synCtx) {
 
         log.debug("ValidateMediator - Validate mediator mediate()");
-        ByteArrayInputStream baisFromSource = null;
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Validate mediator");
         }
+        // Input source for the validation
+        Source validateSrc = null;
         try {
             // create a byte array output stream and serialize the source node into it
             ByteArrayOutputStream baosForSource = new ByteArrayOutputStream();
             XMLStreamWriter xsWriterForSource =
-                XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
+                    XMLOutputFactory.newInstance().createXMLStreamWriter(baosForSource);
 
             // serialize the validation target and get an input stream into it
             OMNode validateSource = getValidateSource(synCtx);
@@ -163,40 +153,86 @@ public class ValidateMediator extends AbstractListMediator {
                 trace.trace("Validate Source : " + validateSource.toString());
             }
             validateSource.serialize(xsWriterForSource);
-            baisFromSource = new ByteArrayInputStream(baosForSource.toByteArray());
-
+            ByteArrayInputStream baisFromSource = new ByteArrayInputStream(
+                    baosForSource.toByteArray());
+            XMLReader reader = XMLReaderFactory.createXMLReader();
+            validateSrc = new SAXSource(reader, new InputSource(baisFromSource));
         } catch (Exception e) {
             handleException("Error accessing source element for validation : " + source, e);
         }
 
-        try {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
-            SAXSource saxSrc = new SAXSource(reader, new InputSource(baisFromSource));
-
-            synchronized (validatorLock) {
-
-                // initialize schemas/Validator if required
-                initialize(synCtx);
-
-                // perform actual validation
-                validator.validate(saxSrc);
-
-                if (errorHandler.isValidationError()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(
-                            "Validation of element returned by XPath : " + source +
-                                " failed against the given schemas with Message : " +
-                                errorHandler.getSaxParseException().getMessage() +
-                                " Executing 'on-fail' sequence");
-                        log.debug("Failed message envelope : " + synCtx.getEnvelope());
-                    }
-                    // super.mediate() invokes the "on-fail" sequence of mediators
-                    if (shouldTrace) {
-                        trace.trace("Validation failed. Invoking the \"on-fail\" " +
-                            "sequence of mediators");
-                    }
-                    return super.mediate(synCtx);
+        // flag to check if we need to initialize/re-initialize the schema
+        boolean reCreate = false;
+        // if any of the schemas are not loaded or expired, load or re-load them
+        for (Iterator iter = schemaKeys.iterator(); iter.hasNext();) {
+            String propKey = (String) iter.next();
+            Entry dp = synCtx.getConfiguration().getEntryDefinition(propKey);
+            if (dp != null && dp.isDynamic()) {
+                if (!dp.isCached() || dp.isExpired()) {
+                    reCreate = true;       // request re-initialization of Validator
                 }
+            }
+        }
+
+        // This is the reference to the DefaultHandler instance
+        MyErrorHandler errorHandler = new MyErrorHandler();
+
+        // do not re-initialize schema unless required
+        synchronized (validatorLock) {
+            if (reCreate || cachedSchema == null) {
+                try {
+                    SchemaFactory factory = SchemaFactory.newInstance(
+                            XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    factory.setErrorHandler(errorHandler);
+                    // set any features on/off as requested
+                    for (Iterator iter = properties.iterator(); iter.hasNext();) {
+                        MediatorProperty prop = (MediatorProperty) iter.next();
+                        factory.setFeature(
+                                prop.getName(), prop.getValue() != null &&
+                                "true".equals(prop.getValue()));
+                    }
+                    StreamSource[] sources = new StreamSource[schemaKeys.size()];
+                    int i = 0;
+                    for (Iterator iterator = schemaKeys.iterator(); iterator.hasNext();) {
+                        String propName = (String) iterator.next();
+                        sources[i++] = Util.getStreamSource(synCtx.getEntry(propName));
+                    }
+                    cachedSchema = factory.newSchema(sources);
+                    if (errorHandler.isValidationError()) {
+                        //reset the errorhandler state
+                        errorHandler.setValidationError(false);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Error occured during creating new schema ");
+                        }
+                    }
+                } catch (SAXNotSupportedException e) {
+                    handleException("Error when setting a feature", e);
+                } catch (SAXException e) {
+                    handleException("Error when creating a new schema", e);
+                }
+            }
+        }
+        // no need to synchronized ,schema instance is tread-safe
+        try {
+            Validator validator = cachedSchema.newValidator();
+            validator.setErrorHandler(errorHandler);
+            // perform actual validation
+            validator.validate(validateSrc);
+            if (errorHandler.isValidationError()) {
+                if (log.isDebugEnabled()) {
+                    log.debug(
+                            "Validation of element returned by XPath : " + source +
+                                    " failed against the given schemas with Message : " +
+                                    errorHandler.getSaxParseException().getMessage() +
+                                    " Executing 'on-fail' sequence");
+                    log.debug("Failed message envelope : " + synCtx.getEnvelope());
+                }
+                // super.mediate() invokes the "on-fail" sequence of mediators
+                if (shouldTrace) {
+                    trace.trace("Validation failed. Invoking the \"on-fail\" " +
+                            "sequence of mediators");
+                }
+                return super.mediate(synCtx);
             }
         } catch (SAXException e) {
             handleException("Error validating " + source + " element" + e.getMessage(), e);
@@ -205,72 +241,11 @@ public class ValidateMediator extends AbstractListMediator {
         }
 
         log.debug("validation of element returned by the XPath expression : " + source +
-            " succeeded against the given schemas and the current message");
+                " succeeded against the given schemas and the current message");
         if (shouldTrace) {
             trace.trace("End : Validate mediator");
         }
         return true;
-    }
-
-    /**
-     * Perform actual initialization of this validate mediator instance - if required
-     */
-    private void initialize(MessageContext msgCtx) {
-
-        // flag to check if we need to initialize/re-initialize the schema Validator
-        boolean reCreate = false;
-
-        // if any of the schemas are not loaded or expired, load or re-load them
-        Iterator iter = schemaKeys.iterator();
-        while (iter.hasNext()) {
-            String propKey = (String) iter.next();
-            Entry dp = msgCtx.getConfiguration().getEntryDefinition(propKey);
-            if (dp != null && dp.isDynamic()) {
-                if (!dp.isCached() || dp.isExpired()) {
-                    reCreate = true;       // request re-initialization of Validator
-                }
-            }
-        }
-
-        // do not re-initialize Validator unless required
-        if (!reCreate && validator != null) {
-            return;
-        }
-
-        try {
-            // Create SchemaFactory and configure for the default schema language - XMLSchema
-            SchemaFactory factory = SchemaFactory.newInstance(DEFAULT_SCHEMA_LANGUAGE);
-            // Clear the previous state of the validation error
-            errorHandler.setValidationError(false);
-            factory.setErrorHandler(errorHandler);
-
-            // set any features on/off as requested
-            iter = properties.iterator();
-            while (iter.hasNext()) {
-                MediatorProperty prop = (MediatorProperty) iter.next();
-                factory.setFeature(
-                    prop.getName(), prop.getValue() != null && "true".equals(prop.getValue()));
-            }
-
-            Schema schema = null;
-
-            StreamSource[] sources = new StreamSource[schemaKeys.size()];
-            iter = schemaKeys.iterator();
-            int i = 0;
-            while (iter.hasNext()) {
-                String propName = (String) iter.next();
-                sources[i++] = Util.getStreamSource(msgCtx.getEntry(propName));
-            }
-            schema = factory.newSchema(sources);
-
-            // Setup validator and input source
-            // Features set for the SchemaFactory get propagated to Schema and Validator (JAXP 1.4)
-            validator = schema.newValidator();
-            validator.setErrorHandler(errorHandler);
-
-        } catch (SAXException e) {
-            handleException("Error creating Validator", e);
-        }
     }
 
     /**
@@ -301,9 +276,8 @@ public class ValidateMediator extends AbstractListMediator {
         public SAXParseException getSaxParseException() {
             return saxParseException;
         }
-
         /**
-         * To set explicitly validation error condition 
+         * To set explicitly validation error condition
          * @param validationError
          */
         public void setValidationError(boolean validationError) {
@@ -369,7 +343,7 @@ public class ValidateMediator extends AbstractListMediator {
                 setProperty(prop.getName(), prop.getValue());
             } else {
                 handleException("Attempt to set invalid property type. " +
-                    "Expected MediatorProperty type got " + o.getClass().getName());
+                        "Expected MediatorProperty type got " + o.getClass().getName());
             }
         }
     }

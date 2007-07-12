@@ -47,6 +47,9 @@ public class ValidateMediatorTest extends TestCase {
     private static final String HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID = 
         "http://apache.org/xml/features/honour-all-schemaLocations";
 
+    public static final String FEATURE_SECURE_PROCESSING =
+         "http://javax.xml.XMLConstants/feature/secure-processing";
+
     private static final String VALID_ENVELOPE_TWO_SCHEMAS =
             "<Outer xmlns=\"http://www.apache-synapse.org/test2\">" +
             "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
@@ -101,8 +104,8 @@ public class ValidateMediatorTest extends TestCase {
     private static final String CUSTOM_FEATURES_MEDIATOR_CONFIG = 
             "<validate xmlns=\"http://ws.apache.org/ns/synapse\">" +
             "   <schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
-            "   <property name=\"" + SCHEMA_FULL_CHECKING_FEATURE_ID + "\" value=\"false\"/>" +
-            "   <property name=\"" + HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID + "\" value=\"true\"/>" +
+            "   <feature name=\"" + SCHEMA_FULL_CHECKING_FEATURE_ID + "\" value=\"false\"/>" +
+            "   <feature name=\"" + HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID + "\" value=\"true\"/>" +
             "   <on-fail>" +
             "       <makefault>" +
             "           <code value=\"tns:Receiver\" xmlns:tns=\"http://www.w3.org/2003/05/soap-envelope\"/>" +
@@ -329,8 +332,8 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = (ValidateMediator)mf.createMediator(
             createOMElement(DEFAULT_FEATURES_MEDIATOR_CONFIG));
 
-        assertNull(validate.getProperty(SCHEMA_FULL_CHECKING_FEATURE_ID));
-        assertNull(validate.getProperty(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
+        assertNull(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID));
+        assertNull(validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
 
         makeValidInvocation(validate);
     }
@@ -341,10 +344,10 @@ public class ValidateMediatorTest extends TestCase {
         ValidateMediator validate = (ValidateMediator)mf.createMediator(
             createOMElement(CUSTOM_FEATURES_MEDIATOR_CONFIG));
 
-        assertNotNull(validate.getProperty(SCHEMA_FULL_CHECKING_FEATURE_ID));
-        assertFalse("true".equals((String)validate.getProperty(SCHEMA_FULL_CHECKING_FEATURE_ID)));
-        assertNotNull(validate.getProperty(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
-        assertTrue("true".equals((String)validate.getProperty(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID)));
+        assertNotNull(validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID));
+        assertFalse("true".equals((String)validate.getFeature(SCHEMA_FULL_CHECKING_FEATURE_ID)));
+        assertNotNull(validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID));
+        assertTrue("true".equals((String)validate.getFeature(HONOUR_ALL_SCHEMA_LOCATIONS_FEATURE_ID)));
 
         makeValidInvocation(validate);
     }

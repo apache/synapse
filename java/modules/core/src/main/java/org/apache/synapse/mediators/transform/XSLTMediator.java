@@ -218,8 +218,8 @@ public class XSLTMediator extends AbstractMediator {
                 reCreate = true;
             }
         }
-        if (reCreate || cachedTemplates == null) {
-            synchronized (transformerLock) {
+        synchronized (transformerLock) {
+            if (reCreate || cachedTemplates == null) {
                 try {
                     cachedTemplates = transFact.newTemplates(
                             Util.getStreamSource(

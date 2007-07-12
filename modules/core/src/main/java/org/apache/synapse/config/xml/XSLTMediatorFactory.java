@@ -50,7 +50,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
     private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
     public static final QName ATT_NAME_Q  = new QName(Constants.NULL_NAMESPACE, "name");
-       public static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
+    public static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
 
 
     public QName getTagQName() {

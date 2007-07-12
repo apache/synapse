@@ -25,10 +25,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
-import org.apache.synapse.config.xml.MediatorSerializer;
-import org.apache.synapse.config.xml.AbstractListMediatorSerializer;
+import org.apache.synapse.mediators.MediatorProperty;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * <validate [source="xpath"]>
@@ -52,25 +52,40 @@ public class ValidateMediatorSerializer extends AbstractListMediatorSerializer
 
         ValidateMediator mediator = (ValidateMediator) m;
         OMElement validate = fac.createOMElement("validate", synNS);
-        finalizeSerialization(validate,mediator);
+        finalizeSerialization(validate, mediator);
 
         if (mediator.getSource() != null) {
             validate.addAttribute(fac.createOMAttribute(
-                "source", nullNS, mediator.getSource().toString()));
+                    "source", nullNS, mediator.getSource().toString()));
             serializeNamespaces(validate, mediator.getSource());
         }
 
-        Iterator iter = mediator.getSchemaKeys().iterator();
-        while (iter.hasNext()) {
-            String key = (String) iter.next();
+        Iterator iterator = mediator.getSchemaKeys().iterator();
+        while (iterator.hasNext()) {
+            String key = (String) iterator.next();
             OMElement schema = fac.createOMElement("schema", synNS, validate);
             schema.addAttribute(fac.createOMAttribute("key", nullNS, key));
         }
 
-        serializeProperties(validate, mediator.getProperties());
-
+        List features = mediator.getFeatures();
+        if (!features.isEmpty()) {
+            for (Iterator iter = features.iterator(); iter.hasNext();) {
+                MediatorProperty mp = (MediatorProperty) iter.next();
+                OMElement feature = fac.createOMElement("feature", synNS, validate);
+                if (mp.getName() != null) {
+                    feature.addAttribute(fac.createOMAttribute("name", nullNS, mp.getName()));
+                } else {
+                    handleException("The Feature name is missing");
+                }
+                if (mp.getValue() != null) {
+                    feature.addAttribute(fac.createOMAttribute("value", nullNS, mp.getValue()));
+                } else {
+                    handleException("The Feature value is missing");
+                }
+            }
+        }
         OMElement onFail = fac.createOMElement("on-fail", synNS, validate);
-        serializeChildren(onFail, mediator.getList());        
+        serializeChildren(onFail, mediator.getList());
 
         if (parent != null) {
             parent.addChild(validate);

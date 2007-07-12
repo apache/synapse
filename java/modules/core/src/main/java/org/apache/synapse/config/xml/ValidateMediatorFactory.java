@@ -25,12 +25,8 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.OMElementUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
-import org.apache.synapse.config.xml.AbstractListMediatorFactory;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.config.xml.MediatorPropertyFactory;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -58,6 +54,8 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName SCHEMA_Q   = new QName(Constants.SYNAPSE_NAMESPACE, "schema");
     private static final QName KEY_Q      = new QName(Constants.NULL_NAMESPACE, "key");
     private static final QName SOURCE_Q   = new QName(Constants.NULL_NAMESPACE, "source");
+    public static final QName ATT_NAME_Q  = new QName(Constants.NULL_NAMESPACE, "name");
+    public static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -103,9 +101,9 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
         // process on-fail
         OMElement onFail = null;
-        Iterator iter = elem.getChildrenWithName(ON_FAIL_Q);
-        if (iter.hasNext()) {
-            onFail = (OMElement)iter.next();
+        Iterator iterator = elem.getChildrenWithName(ON_FAIL_Q);
+        if (iterator.hasNext()) {
+            onFail = (OMElement)iterator.next();
         }
 
         if (onFail != null && onFail.getChildElements().hasNext()) {
@@ -118,11 +116,32 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         initMediator(validateMediator,elem);
-
-        // process properties
-        validateMediator.addAllProperties(
-            MediatorPropertyFactory.getMediatorProperties(elem));
-
+        // set the features
+        Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "feature"));
+        while (iter.hasNext()) {
+            OMElement featureElem = (OMElement) iter.next();
+            OMAttribute attName = featureElem.getAttribute(ATT_NAME_Q);
+            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE_Q);
+            if (attName != null && attValue != null) {
+                String name = attName.getAttributeValue();
+                String value = attValue.getAttributeValue();
+                if (name != null && value != null) {
+                    if ("true".equals(value.trim())) {
+                        validateMediator.addFeature(name.trim(),
+                                true);
+                    } else if ("false".equals(value.trim())) {
+                        validateMediator.addFeature(name.trim(),
+                                false);
+                    } else {
+                        handleException("The feature must have value true or false");
+                    }
+                } else {
+                    handleException("The valid values for both of the name and value are need");
+                }
+            } else {
+                handleException("Both of the name and value attribute are required for a feature");
+            }
+        }
         return validateMediator;
     }
 

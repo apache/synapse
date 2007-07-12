@@ -182,7 +182,7 @@ public class ValidateMediator extends AbstractListMediator {
                 }
             }
         }
-        // no need to synchronized ,schema instance is tread-safe
+        // no need to synchronized ,schema instance is thread-safe
         try {
             Validator validator = cachedSchema.newValidator();
             validator.setErrorHandler(errorHandler);
@@ -246,9 +246,10 @@ public class ValidateMediator extends AbstractListMediator {
         public SAXParseException getSaxParseException() {
             return saxParseException;
         }
+        
         /**
          * To set explicitly validation error condition
-         * @param validationError
+         * @param validationError  is occur validation error?
          */
         public void setValidationError(boolean validationError) {
             this.validationError = validationError;
@@ -300,8 +301,7 @@ public class ValidateMediator extends AbstractListMediator {
      * @return property string value (usually true|false)
      */
     public Object getFeature(String key) {
-        Iterator iter = explicityFeatures.iterator();
-        while (iter.hasNext()) {
+        for (Iterator iter = explicityFeatures.iterator(); iter.hasNext();) {
             MediatorProperty prop = (MediatorProperty) iter.next();
             if (key.equals(prop.getName())) {
                 return prop.getValue();
@@ -315,7 +315,7 @@ public class ValidateMediator extends AbstractListMediator {
      *
      * @param  featureName The name of the feature
      * @param isFeatureEnable should this feature enable?(true|false)
-    * @see #getFeature(String)
+     * @see #getFeature(String)
      */
    public void addFeature(String featureName, boolean isFeatureEnable) {
         try {

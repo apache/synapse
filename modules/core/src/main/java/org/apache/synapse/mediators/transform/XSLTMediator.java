@@ -72,7 +72,7 @@ public class XSLTMediator extends AbstractMediator {
      * transformation process
      */
     public static final String FEATURE =
-        "http://ws.apache.org/ns/synapse/transform/dom/feature";
+        "http://ws.apache.org/ns/synapse/transform/feature/dom";
     /**
      * The resource key/name which refers to the XSLT to be used for the transformation
      */
@@ -114,7 +114,7 @@ public class XSLTMediator extends AbstractMediator {
     /**
      *  Is it need to use DOMSource and DOMResult?
      */
-    private boolean isDOMRequired = false;
+    private boolean isDOMRequired = true;
 
     public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
             "//s12:Envelope/s12:Body/child::*[position()=1]";

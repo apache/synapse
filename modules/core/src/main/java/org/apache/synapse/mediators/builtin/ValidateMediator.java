@@ -77,10 +77,9 @@ public class ValidateMediator extends AbstractListMediator {
     private AXIOMXPath source = null;
 
     /**
-     * A Map containing properties for the validate mediator - such as
-     * features to be passed to the actual validator (Xerces)
+     * A Map containing features to be passed to the actual validator (Xerces)
      */
-    private List properties = new ArrayList();
+    private List explicityFeatures = new ArrayList();
 
     /**
      * This is the actual schema instance used to create a new schema
@@ -92,6 +91,11 @@ public class ValidateMediator extends AbstractListMediator {
      * Lock used to ensure thread-safe creation and use of the above Validator
      */
     private final Object validatorLock = new Object();
+
+    /**
+     * The SchemaFactory for whcih used to create new schema instance
+     */
+    private  SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
     private static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
         "//s12:Envelope/s12:Body/child::*[position()=1]";
@@ -105,31 +109,6 @@ public class ValidateMediator extends AbstractListMediator {
         } catch (JaxenException e) {
             handleException("Error creating source XPath expression", e);
         }
-    }
-
-    /**
-     * Return the OMNode to be validated. If a source XPath is not specified, this will
-     * default to the first child of the SOAP body i.e. - //*:Envelope/*:Body/child::*
-     *
-     * @param synCtx the message context
-     * @return the OMNode against which validation should be performed
-     */
-    private OMNode getValidateSource(MessageContext synCtx) {
-
-        try {
-            Object o = source.evaluate(synCtx.getEnvelope());
-            if (o instanceof OMNode) {
-                return (OMNode) o;
-            } else if (o instanceof List && !((List) o).isEmpty()) {
-                return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
-            } else {
-                handleException("The evaluation of the XPath expression "
-                        + source + " must result in an OMNode");
-            }
-        } catch (JaxenException e) {
-            handleException("Error evaluating XPath " + source + " on message");
-        }
-        return null;
     }
 
     public boolean mediate(MessageContext synCtx) {
@@ -181,16 +160,7 @@ public class ValidateMediator extends AbstractListMediator {
         synchronized (validatorLock) {
             if (reCreate || cachedSchema == null) {
                 try {
-                    SchemaFactory factory = SchemaFactory.newInstance(
-                            XMLConstants.W3C_XML_SCHEMA_NS_URI);
                     factory.setErrorHandler(errorHandler);
-                    // set any features on/off as requested
-                    for (Iterator iter = properties.iterator(); iter.hasNext();) {
-                        MediatorProperty prop = (MediatorProperty) iter.next();
-                        factory.setFeature(
-                                prop.getName(), prop.getValue() != null &&
-                                "true".equals(prop.getValue()));
-                    }
                     StreamSource[] sources = new StreamSource[schemaKeys.size()];
                     int i = 0;
                     for (Iterator iterator = schemaKeys.iterator(); iterator.hasNext();) {
@@ -295,17 +265,42 @@ public class ValidateMediator extends AbstractListMediator {
         throw new SynapseException(msg, e);
     }
 
+    /**
+     * Return the OMNode to be validated. If a source XPath is not specified, this will
+     * default to the first child of the SOAP body i.e. - //*:Envelope/*:Body/child::*
+     *
+     * @param synCtx the message context
+     * @return the OMNode against which validation should be performed
+     */
+    private OMNode getValidateSource(MessageContext synCtx) {
+
+        try {
+            Object o = source.evaluate(synCtx.getEnvelope());
+            if (o instanceof OMNode) {
+                return (OMNode) o;
+            } else if (o instanceof List && !((List) o).isEmpty()) {
+                return (OMNode) ((List) o).get(0);  // Always fetches *only* the first
+            } else {
+                handleException("The evaluation of the XPath expression "
+                        + source + " must result in an OMNode");
+            }
+        } catch (JaxenException e) {
+            handleException("Error evaluating XPath " + source + " on message");
+        }
+        return null;
+    }
+
     // setters and getters
 
     /**
-     * Get a mediator property. The common use case is a feature for the
+     * Get a mediator feature. The common use case is a feature for the
      * underlying Xerces validator
      *
      * @param key property key / feature name
      * @return property string value (usually true|false)
      */
-    public Object getProperty(String key) {
-        Iterator iter = properties.iterator();
+    public Object getFeature(String key) {
+        Iterator iter = explicityFeatures.iterator();
         while (iter.hasNext()) {
             MediatorProperty prop = (MediatorProperty) iter.next();
             if (key.equals(prop.getName())) {
@@ -316,35 +311,27 @@ public class ValidateMediator extends AbstractListMediator {
     }
 
     /**
-     * Set a property for this mediator
+     * add a feature which need to set for the Schema Factory
      *
-     * @param key   the property key / feature name
-     * @param value property string value (usually true|false)
-     * @see #getProperty(String)
+     * @param  featureName The name of the feature
+     * @param isFeatureEnable should this feature enable?(true|false)
+    * @see #getFeature(String)
      */
-    public void setProperty(String key, Object value) {
-        MediatorProperty prop = new MediatorProperty();
-        prop.setName(key);
-        prop.setValue(value.toString());
-        properties.add(prop);
-    }
-
-    /**
-     * Add a list of 'MediatorProperty'ies to this mediator
-     *
-     * @param list a List of MediatorProperty objects
-     */
-    public void addAllProperties(List list) {
-        Iterator iter = list.iterator();
-        while (iter.hasNext()) {
-            Object o = iter.next();
-            if (o instanceof MediatorProperty) {
-                MediatorProperty prop = (MediatorProperty) o;
-                setProperty(prop.getName(), prop.getValue());
+   public void addFeature(String featureName, boolean isFeatureEnable) {
+        try {
+            MediatorProperty mp = new MediatorProperty();
+            mp.setName(featureName);
+            if (isFeatureEnable) {
+                mp.setValue("true");
             } else {
-                handleException("Attempt to set invalid property type. " +
-                        "Expected MediatorProperty type got " + o.getClass().getName());
+                mp.setValue("false");
             }
+            explicityFeatures.add(mp);
+            factory.setFeature(featureName, isFeatureEnable);             
+        } catch (SAXNotSupportedException e) {
+           handleException("Error setting a feature to Schema Factory " + e.getMessage(),e);
+        } catch (SAXNotRecognizedException e) {
+           handleException("Error setting a feature to Schema Factory " + e.getMessage(),e);
         }
     }
 
@@ -383,10 +370,10 @@ public class ValidateMediator extends AbstractListMediator {
     }
 
     /**
-     * Properties for the actual Xerces validator
-     * @return properties to be passed to the Xerces validator
+     * Features for the actual Xerces validator
+     * @return explicityFeatures to be passed to the Xerces validator
      */
-    public List getProperties() {
-        return properties;
+    public List getFeatures() {
+        return explicityFeatures;
     }
 }

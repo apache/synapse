@@ -1428,6 +1428,7 @@ public class SandeshaClient {
 					parameter = new Parameter ();
 					parameter.setName(Sandesha2Constants.SANDESHA_PROPERTY_BEAN);
 				} else {
+					parameter.setEditable(true); //if we don't do it here, Axis2 will not allow us to override the parameter value.
 					parent = (SandeshaPolicyBean) parameter.getValue();
 					policyBean.setParent(parent);
 				}

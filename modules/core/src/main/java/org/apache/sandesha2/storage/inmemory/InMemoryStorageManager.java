@@ -295,6 +295,13 @@ public class InMemoryStorageManager extends StorageManager {
 				StorageEntry entry = new StorageEntry();
 				entry.msgContext = msgContext;
 				entry.envelope = msgContext.getEnvelope();
+				
+				//building the full enveloper before storing.
+				SOAPEnvelope envelope = msgContext.getEnvelope();
+				envelope.buildWithAttachments();
+				
+				entry.envelope = envelope;
+				
 				storageMap.put(key,entry);
 			}
 		} catch(Exception e) {

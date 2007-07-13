@@ -282,6 +282,9 @@ public class Axis2FlexibleMEPClient {
         newMC.setProperty(MessageContext.TRANSPORT_HEADERS,
             ori.getProperty(MessageContext.TRANSPORT_HEADERS));
 
+        // copy axis properties from the original to the copy
+        newMC.setProperties(ori.getProperties());
+
         return newMC;
     }
     

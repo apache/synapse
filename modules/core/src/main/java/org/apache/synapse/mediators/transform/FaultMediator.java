@@ -129,15 +129,18 @@ public class FaultMediator extends AbstractMediator {
         setFaultDetail(factory, fault);
 
         // set the all headers of griginal SOAP Envelope to the Fault Envelope
-        Iterator iter = synCtx.getEnvelope().getHeader().examineAllHeaderBlocks();
-        if (iter.hasNext()) {
-            while (iter.hasNext()) {
-                Object o = iter.next();
-                if (o instanceof SOAPHeaderBlock) {
-                    SOAPHeaderBlock header = (SOAPHeaderBlock) o;
-                    faultEnvelope.getHeader().addChild(header);
-                } else if (o instanceof OMElement) {
-                    faultEnvelope.getHeader().addChild((OMElement) o);
+        SOAPHeader headers = synCtx.getEnvelope().getHeader();
+        if (headers != null) {
+            Iterator iter = headers.examineAllHeaderBlocks();
+            if (iter.hasNext()) {
+                while (iter.hasNext()) {
+                    Object o = iter.next();
+                    if (o instanceof SOAPHeaderBlock) {
+                        SOAPHeaderBlock header = (SOAPHeaderBlock) o;
+                        faultEnvelope.getHeader().addChild(header);
+                    } else if (o instanceof OMElement) {
+                        faultEnvelope.getHeader().addChild((OMElement) o);
+                    }
                 }
             }
         }

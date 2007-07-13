@@ -239,14 +239,23 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
      */
     private void removeUnwantedHeaders(MessageContext msgContext) {
         Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-        if (headers != null && !headers.isEmpty()) {
-            headers.remove(HTTP.CONN_DIRECTIVE);
-            headers.remove(HTTP.TRANSFER_ENCODING);
-            headers.remove(HTTP.DATE_DIRECTIVE);
-            headers.remove(HTTP.SERVER_DIRECTIVE);
-            headers.remove(HTTP.CONTENT_TYPE);
-            headers.remove(HTTP.CONTENT_LEN);
-            headers.remove(HTTP.USER_AGENT);
+
+        if (headers == null || headers.isEmpty()) {
+            return;
+        }
+
+        Iterator iter = headers.keySet().iterator();
+        while (iter.hasNext()) {
+            String headerName = (String) iter.next();
+            if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
+                HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
+                HTTP.DATE_DIRECTIVE.equalsIgnoreCase(headerName) ||
+                HTTP.SERVER_DIRECTIVE.equalsIgnoreCase(headerName) ||
+                HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
+                HTTP.CONTENT_LEN.equalsIgnoreCase(headerName) ||
+                HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {
+                iter.remove();
+            }
         }
     }
 

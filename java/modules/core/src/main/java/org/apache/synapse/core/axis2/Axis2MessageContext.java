@@ -21,6 +21,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.impl.llom.OMElementImpl;
@@ -454,17 +455,21 @@ public class Axis2MessageContext implements MessageContext {
         if (getMessageID() != null)
             sb.append(separator + "MessageID: " + getMessageID());
 
-        Iterator iter = getEnvelope().getHeader().examineAllHeaderBlocks();
-        if (iter.hasNext()) {
-            sb.append(separator + "Headers : ");
-            while (iter.hasNext()) {
-                Object o = iter.next();
-                if (o instanceof SOAPHeaderBlock) {
-                    SOAPHeaderBlock header = (SOAPHeaderBlock) o;
-                    sb.append(separator + header.getLocalName() + " : " + header.getText());
-                } else if (o instanceof OMElement) {
-                    OMElement headerElem = (OMElement) o;
-                    sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+
+        SOAPHeader headers = getEnvelope().getHeader();
+        if (headers != null) {
+            Iterator iter = headers.examineAllHeaderBlocks();
+            if (iter.hasNext()) {
+                sb.append(separator + "Headers : ");
+                while (iter.hasNext()) {
+                    Object o = iter.next();
+                    if (o instanceof SOAPHeaderBlock) {
+                        SOAPHeaderBlock header = (SOAPHeaderBlock) o;
+                        sb.append(separator + header.getLocalName() + " : " + header.getText());
+                    } else if (o instanceof OMElement) {
+                        OMElement headerElem = (OMElement) o;
+                        sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+                    }
                 }
             }
         }

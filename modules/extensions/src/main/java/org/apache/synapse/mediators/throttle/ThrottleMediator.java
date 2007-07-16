@@ -22,15 +22,15 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyEngine;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.wso2.throttle.factory.AccessControllerFactory;
 import org.wso2.throttle.*;
+import org.wso2.throttle.factory.AccessControllerFactory;
 
 
 /**
@@ -48,7 +48,7 @@ public class ThrottleMediator extends AbstractMediator {
     /** InLine policy object - XML   */
     private OMElement inLinePolicy = null;
     /** The throttle - hold runtime + configuration data of throttle  */
-    Throttle throttle = null;
+    private Throttle throttle = null;
     /** The reference to the sequence which will execute when access deny*/
     private String onReject = null;
     /** The in-line sequence which will execute when access deny*/

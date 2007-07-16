@@ -43,10 +43,11 @@ public class AttachmentConverter {
 	 * However if MTOM is ebabled then this method should help 
 	 */
 	public static void convertMTOM_TO_Base64(AXIOMXPath xpath, String mimeType, MessageContext synCtx) throws SynapseException{
-		
-		log.debug("Converting MTOM to Base64");
-		
-		// This should do the trick, however currently it has no effect
+        if (log.isDebugEnabled()) {
+            log.debug("Converting MTOM to Base64");
+        }
+
+        // This should do the trick, however currently it has no effect
 		// we need to manually turn off MTOM in axis2.xml
 		synCtx.setDoingMTOM(false);				
 	}
@@ -55,9 +56,11 @@ public class AttachmentConverter {
 	 * Even if MTOM is enabled we need to specify that the content needs to be optimized 
 	 */
 	public static void convertBase64_TO_MTOM(AXIOMXPath xpath, String mimeType, MessageContext synCtx) throws SynapseException{
-		log.debug("Converting Base64 to MTOM");
-		
-		SOAPBody soapBody = synCtx.getEnvelope().getBody();
+        if (log.isDebugEnabled()) {
+            log.debug("Converting Base64 to MTOM");
+        }
+
+        SOAPBody soapBody = synCtx.getEnvelope().getBody();
 		//OMElementUtils.addNameSpaces(xpath, soapBody.getFirstElement(), log);		
 		OMElement attachmentNode = getMatchingElement(xpath, soapBody);
 		

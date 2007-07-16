@@ -24,7 +24,6 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.util.TargetResolver;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.client.OperationClient;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.async.Callback;
@@ -157,7 +156,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 				// if dont do this , this guy will wait till its gets HTTP 202
 				// in the case
 				// HTTP
-				outMsgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING,
+				outMsgCtx.addFeature(MessageContext.TRANSPORT_NON_BLOCKING,
 						Boolean.TRUE);
 				AxisEngine engine = new AxisEngine(cfgCtx);
 				outMsgCtx.getConfigurationContext().registerOperationContext(

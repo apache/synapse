@@ -107,7 +107,9 @@ public class SynapseModule implements Module {
         while (iter.hasNext()) {
             ProxyService proxy = (ProxyService) iter.next();
             proxy.buildAxisService(synCfg, axisCfg);
-            log.debug("Deployed Proxy service : " + proxy.getName());
+            if (log.isDebugEnabled()) {
+                log.debug("Deployed Proxy service : " + proxy.getName());
+            }
             if (!proxy.isStartOnLoad()) {
                 proxy.stop(synCfg);
             }
@@ -126,8 +128,10 @@ public class SynapseModule implements Module {
         String config = System.getProperty(Constants.SYNAPSE_XML);
 
         if (config != null) {
-            log.debug("System property '" + Constants.SYNAPSE_XML +
-                "' specifies synapse configuration as " + config);
+            if (log.isDebugEnabled()) {
+                log.debug("System property '" + Constants.SYNAPSE_XML +
+                        "' specifies synapse configuration as " + config);
+            }
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
             log.warn("System property '" + Constants.SYNAPSE_XML +

@@ -136,7 +136,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             // there can always be only one instance of an Endpoint in the faultStack of a message
             // if the send was successful, so remove it before we proceed any further
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
-            if (!faultStack.isEmpty() && faultStack.peek() instanceof Endpoint) {
+            if (faultStack !=null && !faultStack.isEmpty() && faultStack.peek() instanceof Endpoint) {
                 faultStack.pop();
             }
             if (log.isDebugEnabled()) {

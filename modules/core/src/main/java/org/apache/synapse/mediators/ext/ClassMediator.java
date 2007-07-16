@@ -56,23 +56,32 @@ public class ClassMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        log.debug("Class mediator <" + clazz.getName() + ">:: mediate()");
+        if (log.isDebugEnabled()) {
+            log.debug("Class mediator <" + clazz.getName() + ">:: mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Class mediator");
         }
-        Mediator m ;
+        Mediator m = null;
         try {
             try {
                 m = (Mediator) clazz.newInstance();
             } catch (Exception e) {
-                String msg = "Error while creating an instance of the specified mediator class : " + clazz.getName();
-                if (shouldTrace)
+                String msg = "Error while creating an instance of the specified mediator class : " +
+                        clazz.getName();
+                if (shouldTrace) {
                     trace.trace(msg);
-                log.error(msg, e);
-                throw new SynapseException(msg, e);
+                }
+                handleException(msg, e);
             }
-
+            if (m == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("The instance of the specified mediator class : \" +\n" +
+                            clazz.getName() + "is null");
+                }
+                return true;
+            }
             setProperties(m, synCtx, shouldTrace);
             if (shouldTrace) {
                 trace.trace("Executing an instance of the specified class : " + clazz.getName());
@@ -105,7 +114,9 @@ public class ClassMediator extends AbstractMediator {
             try {
                 if (value != null) {
                     Method method = m.getClass().getMethod(mName, new Class[]{String.class});
-                    log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
+                    }
                     if (shouldTrace) {
                         trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
                     }
@@ -114,13 +125,18 @@ public class ClassMediator extends AbstractMediator {
             } catch (Exception e) {
                 String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
                     " mediator : " + m.getClass() + " : " + e.getMessage();
-                log.error(msg);
+
                 if (shouldTrace) {
                     trace.trace(msg);
                 }
-                throw new SynapseException(msg, e);
+                handleException(msg,e);
             }
         }
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 
     public void setClazz(Class clazz) {

@@ -52,8 +52,9 @@ public class SendMediator extends AbstractMediator {
      * @return false always as this is a leaf mediator
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Send mediator :: mediate()");
-
+        if (log.isDebugEnabled()) {
+            log.debug("Send mediator :: mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         try {
             if (shouldTrace) {

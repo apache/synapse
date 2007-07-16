@@ -41,11 +41,11 @@ public class AttachmentMediator extends AbstractMediator {
 	private int mode = 0;
 	private String mimeType;
 
-	public boolean mediate(MessageContext synCtx) {			
-		
-		log.debug("Attachment Mediator, ready to mediate");
-		
-		switch(mode) {
+	public boolean mediate(MessageContext synCtx) {
+        if (log.isDebugEnabled()) {
+            log.debug("Attachment Mediator, ready to mediate");
+        }
+        switch(mode) {
 		
 			case BASE64_TO_MTOM :
 				AttachmentConverter.convertBase64_TO_MTOM(attachmentPath, mimeType, synCtx);

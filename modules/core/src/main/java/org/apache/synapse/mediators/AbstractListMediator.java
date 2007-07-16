@@ -41,10 +41,11 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
 
     public boolean mediate(MessageContext synCtx) {
         try {
-            log.debug("Implicit Sequence <" + getType() + "> :: mediate()");
+            if (log.isDebugEnabled()) {
+                log.debug("Implicit Sequence <" + getType() + "> :: mediate()");
+            }
             saveAndSetTraceState(synCtx);
-            Iterator it = mediators.iterator();            
-            while (it.hasNext()) {
+            for (Iterator it = mediators.iterator(); it.hasNext();) {
                 Mediator m = (Mediator) it.next();
                 if (!m.mediate(synCtx)) {
                     return false;

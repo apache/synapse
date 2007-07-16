@@ -131,7 +131,9 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
             MediatorFactory mf = (MediatorFactory) it.next();
             QName tag = mf.getTagQName();
             factoryMap.put(tag, mf.getClass());
-            log.debug("Added MediatorFactory " + mf.getClass() + " to handle " + tag);
+            if (log.isDebugEnabled()) {
+                log.debug("Added MediatorFactory " + mf.getClass() + " to handle " + tag);
+            }
         }
     }
 
@@ -152,13 +154,17 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         } else {
             qName = new QName(localName);
         }
-        log.debug("getMediator(" + qName + ")");
+        if (log.isDebugEnabled()) {
+            log.debug("getMediator(" + qName + ")");
+        }
         Class cls = (Class) factoryMap.get(qName);
 
         if (cls == null && localName.indexOf('.') > -1) {
             String newLocalName = localName.substring(0, localName.indexOf('.'));
             qName = new QName(element.getNamespace().getNamespaceURI(), newLocalName);
-            log.debug("getMediator.2(" + qName + ")");
+            if (log.isDebugEnabled()) {
+                log.debug("getMediator.2(" + qName + ")");
+            }
             cls = (Class) factoryMap.get(qName);
         }
 

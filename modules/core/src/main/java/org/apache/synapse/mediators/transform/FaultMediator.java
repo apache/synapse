@@ -75,7 +75,9 @@ public class FaultMediator extends AbstractMediator {
     private String faultDetail = null;
 
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Fault mediator mediate()");
+        if (log.isDebugEnabled()) {
+            log.debug("Fault mediator mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         SOAPEnvelope envelop = synCtx.getEnvelope();
         if(shouldTrace) {
@@ -104,8 +106,9 @@ public class FaultMediator extends AbstractMediator {
     }
 
     private boolean makeSOAPFault(MessageContext synCtx, int soapVersion,boolean shouldTrace) {
-
-        log.debug("Creating a SOAP fault using SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2"));
+        if (log.isDebugEnabled()) {
+            log.debug("Creating a SOAP fault using SOAP " + (soapVersion == SOAP11 ? "1.1" : "1.2"));
+        }
         // get the correct SOAP factory to be used
         SOAPFactory factory = (
             soapVersion == SOAP11 ? OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory());
@@ -115,7 +118,7 @@ public class FaultMediator extends AbstractMediator {
         SOAPEnvelope faultEnvelope = factory.getDefaultFaultEnvelope();
         soapFaultDocument.addChild(faultEnvelope);
 
-        // create the fault element  if it is need 
+        // create the fault element  if it is need
         SOAPFault fault = faultEnvelope.getBody().getFault();
         if(fault == null){
             fault = factory.createSOAPFault();
@@ -129,11 +132,10 @@ public class FaultMediator extends AbstractMediator {
         setFaultDetail(factory, fault);
 
         // set the all headers of griginal SOAP Envelope to the Fault Envelope
-        SOAPHeader headers = synCtx.getEnvelope().getHeader();
-        if (headers != null) {
-            Iterator iter = headers.examineAllHeaderBlocks();
-            if (iter.hasNext()) {
-                while (iter.hasNext()) {
+        if (synCtx.getEnvelope() != null) {
+            SOAPHeader soapHeader = synCtx.getEnvelope().getHeader();
+            if (soapHeader != null) {
+                for (Iterator iter = soapHeader.examineAllHeaderBlocks(); iter.hasNext();) {
                     Object o = iter.next();
                     if (o instanceof SOAPHeaderBlock) {
                         SOAPHeaderBlock header = (SOAPHeaderBlock) o;
@@ -144,7 +146,9 @@ public class FaultMediator extends AbstractMediator {
                 }
             }
         }
-        log.debug("The fault message as : " + fault);
+        if (log.isDebugEnabled()) {
+            log.debug("The fault message as : " + fault);
+        }
         // overwrite current message envelope with new fault envelope
         try {
             if (shouldTrace) {
@@ -154,8 +158,7 @@ public class FaultMediator extends AbstractMediator {
             synCtx.setEnvelope(faultEnvelope);
         } catch (AxisFault af) {
             String msg = "Error replacing SOAP envelope with a fault envelope " + af.getMessage();
-            log.error(msg);
-            throw new SynapseException(af);
+            handleException(msg,af);
         }
 
         if (synCtx.getFaultTo() != null) {
@@ -282,10 +285,14 @@ public class FaultMediator extends AbstractMediator {
 
             } else {
                 String msg = "Invalid Fault code value for a SOAP 1.2 fault : " + faultCodeValue;
-                log.error(msg);
-                throw new SynapseException(msg);
+                handleException(msg);
             }
         }
+    }
+
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
     }
 
     public AXIOMXPath getFaultCodeExpr() {

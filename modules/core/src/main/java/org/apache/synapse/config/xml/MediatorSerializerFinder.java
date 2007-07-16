@@ -96,9 +96,9 @@ public class MediatorSerializerFinder {
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
     private void registerExtensions() {
-
-        log.debug("Registering mediator extensions found in the classpath : " + System.getProperty("java.class.path"));
-
+        if (log.isDebugEnabled()) {
+            log.debug("Registering mediator extensions found in the classpath : " + System.getProperty("java.class.path"));
+        }
         // register MediatorSerializer extensions
         Iterator it = Service.providers(MediatorSerializer.class);
         while (it.hasNext()) {
@@ -111,7 +111,9 @@ public class MediatorSerializerFinder {
             } catch (IllegalAccessException e) {
                 handleException("Error instantiating mediator serializer : " + ms);
             }
-            log.debug("Added MediatorSerializer " + ms.getClass().getName() + " to handle " + name);
+            if (log.isDebugEnabled()) {
+                log.debug("Added MediatorSerializer " + ms.getClass().getName() + " to handle " + name);
+            }
         }
     }
 

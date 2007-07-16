@@ -38,7 +38,7 @@ public class MediatorFaultHandler extends FaultHandler {
     private static final Log log = LogFactory.getLog(MediatorFaultHandler.class);
 
     /**
-     * Thsi holds the fault sequence for the mediator fault handler
+     * This holds the fault sequence for the mediator fault handler
      */
     private Mediator faultMediator = null;
 
@@ -60,8 +60,9 @@ public class MediatorFaultHandler extends FaultHandler {
      * @see org.apache.synapse.FaultHandler#handleFault(org.apache.synapse.MessageContext)
      */
     public void onFault(MessageContext synCtx) throws SynapseException {
-
-        log.debug("MediatorFaultHandler :: handleFault");
+        if (log.isDebugEnabled()) {
+            log.debug("MediatorFaultHandler :: handleFault");
+        }
         this.faultMediator.mediate(synCtx);
     }
 

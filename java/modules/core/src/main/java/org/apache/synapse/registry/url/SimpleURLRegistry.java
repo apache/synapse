@@ -78,8 +78,9 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
     public RegistryEntry getRegistryEntry(String key) {
-
-        log.debug("Perform RegistryEntry lookup for key : " + key);
+        if (log.isDebugEnabled()) {
+            log.debug("Perform RegistryEntry lookup for key : " + key);
+        }
         try {
             URL url = new URL(getRoot() + key);
             URLConnection urlc = url.openConnection();

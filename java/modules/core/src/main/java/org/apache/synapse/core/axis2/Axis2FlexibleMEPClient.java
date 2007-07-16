@@ -53,9 +53,7 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.rampart.handler.WSSHandlerConstants;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 
 /**

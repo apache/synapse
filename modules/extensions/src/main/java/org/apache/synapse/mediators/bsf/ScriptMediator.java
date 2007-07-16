@@ -19,14 +19,6 @@
 
 package org.apache.synapse.mediators.bsf;
 
-import javax.script.Bindings;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.bsf.xml.XMLHelper;
 import org.apache.commons.logging.Log;
@@ -37,9 +29,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 
-import java.io.Writer;
-import java.io.StringWriter;
-import java.io.PrintWriter;
+import javax.script.*;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
@@ -157,7 +147,7 @@ public class ScriptMediator extends AbstractMediator {
             trace.trace("Start : Script mediator # Language : " + language +
                     (key == null ? " inline script" : " script with key : " + key) +
                     " function : " + function);
-            trace.trace("Invoking inline script for current message : " + synCtx);
+            trace.trace("Invoking inline script for current message : " + synCtx.getEnvelope());
         }
 
         boolean returnValue;
@@ -171,7 +161,7 @@ public class ScriptMediator extends AbstractMediator {
         }
 
         if (shouldTrace) {
-            trace.trace("Result message after execution of script : " + synCtx);
+            trace.trace("Result message after execution of script : " + synCtx.getEnvelope());
             trace.trace("End : Script mediator " + returnValue);
         }
 

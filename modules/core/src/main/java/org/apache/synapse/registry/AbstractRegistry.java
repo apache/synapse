@@ -22,10 +22,10 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.Entry;
-import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -131,8 +131,10 @@ public abstract class AbstractRegistry implements Registry {
         }
 
         // increment cache expiry time as specified by the last getRegistryEntry() call
-        entry.setExpiryTime(System.currentTimeMillis() + re.getCachableDuration());
-        entry.setVersion(re.getVersion());
+        if (re != null) {
+            entry.setExpiryTime(System.currentTimeMillis() + re.getCachableDuration());
+            entry.setVersion(re.getVersion());
+        }
 
         return entry.getValue();
     }

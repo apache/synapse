@@ -162,7 +162,7 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             if(url.getProtocol().equals("file")) {
 
                 File file = new File(url.getFile());
-                if(file.isDirectory() == false) {
+                if(!file.isDirectory()) {
                     return null;
                 }
 

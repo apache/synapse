@@ -19,22 +19,23 @@
 
 package org.apache.synapse.mediators.transform;
 
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
+import org.apache.synapse.Constants;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.axis2.addressing.EndpointReference;
 
 import javax.xml.namespace.QName;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * The header mediator is able to set a given value as a SOAP header, or remove a given
@@ -129,12 +130,24 @@ public class HeaderMediator extends AbstractMediator {
                 } else if (Constants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(null);
                 } else {
-                    removeFromHeaderList(synCtx.getEnvelope().getHeader().
-                            getHeaderBlocksWithNSURI(""));
+                    SOAPEnvelope envelope = synCtx.getEnvelope();
+                    if (envelope != null) {
+                        SOAPHeader header = envelope.getHeader();
+                        if (header != null) {
+                            removeFromHeaderList(header.
+                                    getHeaderBlocksWithNSURI(""));
+                        }
+                    }
                 }
             } else {
-                removeFromHeaderList(synCtx.getEnvelope().getHeader().
-                        getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
+                SOAPEnvelope envelope = synCtx.getEnvelope();
+                if (envelope != null) {
+                    SOAPHeader header = envelope.getHeader();
+                    if (header != null) {
+                        removeFromHeaderList(header.
+                                getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
+                    }
+                }
             }
         }
         if (shouldTrace) {
@@ -145,23 +158,24 @@ public class HeaderMediator extends AbstractMediator {
 
     private void addCustomHeader(MessageContext synCtx) {
         SOAPEnvelope env = synCtx.getEnvelope();
-            SOAPFactory fac = (SOAPFactory) env.getOMFactory();
-            SOAPHeader header = env.getHeader();
-            if (header == null) {
-                header = fac.createSOAPHeader(env);
-            }
-            SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
+        if (env == null) {
+            return;
+        }
+        SOAPFactory fac = (SOAPFactory) env.getOMFactory();
+        SOAPHeader header = env.getHeader();
+        if (header == null) {
+            header = fac.createSOAPHeader(env);
+        }
+        SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
                 fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
-            hb.setText(value);
+        hb.setText(value);
     }
 
     private void removeFromHeaderList(List headersList) {
         if (headersList == null || headersList.isEmpty()) {
             return;
         }
-        
-        Iterator iter = headersList.iterator();
-        while (iter.hasNext()) {
+        for ( Iterator iter = headersList.iterator();iter.hasNext();) {
             Object o = iter.next();
             if (o instanceof SOAPHeaderBlock) {
                 SOAPHeaderBlock header = (SOAPHeaderBlock) o;
@@ -207,10 +221,5 @@ public class HeaderMediator extends AbstractMediator {
 
     public void setExpression(AXIOMXPath expression) {
         this.expression = expression;
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

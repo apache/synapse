@@ -21,8 +21,8 @@ package org.apache.synapse.mediators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -30,9 +30,9 @@ import org.jaxen.FunctionCallException;
 import org.jaxen.Navigator;
 import org.jaxen.function.StringFunction;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Implements the XPath extension function synapse:get-property(scope,prop-name)
@@ -62,7 +62,13 @@ public class GetPropertyFunction implements Function {
      * @throws FunctionCallException
      */
     public Object call(Context context, List args) throws FunctionCallException {
-
+        
+        if (args == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Property key value for lookup was not specified");
+            }
+            return null;
+        }
         int size = args.size();
         if (size == 0) {
             if (log.isDebugEnabled()) {

@@ -84,10 +84,12 @@ public class ThrottleMediator extends AbstractMediator {
      */
     protected boolean canAccess(MessageContext synContext, boolean shouldTrace) {
         if (throttle == null) {
-            log.debug("Can not find a throttle");
+            if (log.isDebugEnabled()) {
+                log.debug("Can not find a throttle");
+            }
             return true;
         }
-        boolean canAccess = true;               
+        boolean canAccess = true;
         org.apache.axis2.context.MessageContext axis2MessageContext
                 = ((Axis2MessageContext) synContext).getAxis2MessageContext();
         //IP based throttling
@@ -98,8 +100,10 @@ public class ThrottleMediator extends AbstractMediator {
                 trace.trace("The IP Address of the caller is cannnot find- The Throttling will" +
                         "not occur");
             }
-            log.debug("The IP address of the caller can not find - Currently only support caller-IP base"
-                    + "access control - Thottling will not happen ");
+            if (log.isDebugEnabled()) {
+                log.debug("The IP address of the caller can not find - Currently only support caller-IP base"
+                        + "access control - Thottling will not happen ");
+            }
             return true;
         } else {
             if (shouldTrace) {
@@ -108,7 +112,9 @@ public class ThrottleMediator extends AbstractMediator {
             ThrottleContext throttleContext
                     = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);
             if (throttleContext == null) {
-                log.debug("Can not find a configuartion for the IP Based Throttle");
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a configuartion for the IP Based Throttle");
+                }
                 return true;
             }
             try {
@@ -121,7 +127,9 @@ public class ThrottleMediator extends AbstractMediator {
                     if (shouldTrace) {
                         trace.trace(msg);
                     }
-                    log.debug(msg);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg);
+                    }
                 }
             }
             catch (ThrottleException e) {
@@ -174,17 +182,23 @@ public class ThrottleMediator extends AbstractMediator {
         if (policyKey != null) {
             Entry entry = synContext.getConfiguration().getEntryDefinition(policyKey);
             if (entry == null) {
-                log.debug("Cant not find a Entry from the Entry key " + policyKey);
+                if (log.isDebugEnabled()) {
+                    log.debug("Cant not find a Entry from the Entry key " + policyKey);
+                }
                 return;
             }
             Object entryValue = entry.getValue();
             if (entryValue == null) {
-                log.debug("Cant not find a Policy(Enrty value) from the Entry key " + policyKey);
+                if (log.isDebugEnabled()) {
+                    log.debug("Cant not find a Policy(Enrty value) from the Entry key " + policyKey);
+                }
                 return;
             }
             if (!(entryValue instanceof OMElement)) {
-                log.debug("Entry value which is refered from the key " + policyKey + " is Incompatible " +
-                        "for the policy element");
+                if (log.isDebugEnabled()) {
+                    log.debug("Entry value which is refered from the key " + policyKey + " is Incompatible " +
+                            "for the policy element");
+                }
                 return;
             }
             // if entry is dynamic, need to check wheather updated or not
@@ -196,7 +210,9 @@ public class ThrottleMediator extends AbstractMediator {
             policyOmElement = inLinePolicy;
         }
         if (policyOmElement == null) {
-            log.debug("Cant not find a Policy - Throttling will not occur");
+            if (log.isDebugEnabled()) {
+                log.debug("Cant not find a Policy - Throttling will not occur");
+            }
             return;
         }
         if (shouldTrace) {
@@ -220,7 +236,9 @@ public class ThrottleMediator extends AbstractMediator {
      */
     protected void createThrottleMetaData(OMElement policyOmElement) {
         try {
-            log.debug("Creating a new throttle configuration by parsing the Policy");
+            if (log.isDebugEnabled()) {
+                log.debug("Creating a new throttle configuration by parsing the Policy");
+            }
             throttle = ThrottlePolicyProcessor
                     .processPoclicy(PolicyEngine.getPolicy(policyOmElement));
         }
@@ -234,8 +252,7 @@ public class ThrottleMediator extends AbstractMediator {
         throw new SynapseException(msg);
     }
 
-    private void handleException(String msg, Exception e) {
-        log.debug(msg);
+    private void handleException(String msg, Exception e) {         
         log.error(e);
         throw new SynapseException(msg);
     }

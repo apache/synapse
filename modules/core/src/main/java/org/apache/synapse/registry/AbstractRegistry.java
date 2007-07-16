@@ -70,19 +70,24 @@ public abstract class AbstractRegistry implements Registry {
         // if we have cached it before, and now the cache has expired
         // get its *new* registry entry and compare versions and pick new cache duration
         } else if (entry.isExpired()) {
-
-            log.debug("Cached object has expired for key : " + entry.getKey());
+            if (log.isDebugEnabled()) {
+                log.debug("Cached object has expired for key : " + entry.getKey());
+            }
             re = getRegistryEntry(entry.getKey());
 
             if (re.getVersion() != Long.MIN_VALUE &&
                 re.getVersion() == entry.getVersion()) {
-                log.debug("Expired version number is same as current version in registry");
+                if (log.isDebugEnabled()) {
+                    log.debug("Expired version number is same as current version in registry");
+                }
 
                 // renew cache lease for another cachable duration (as returned by the
                 // new getRegistryEntry() call
                 entry.setExpiryTime(
                     System.currentTimeMillis() + re.getCachableDuration());
-                log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
+                if (log.isDebugEnabled()) {
+                    log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
+                }
 
                 // return cached object
                 return entry.getValue();
@@ -105,7 +110,7 @@ public abstract class AbstractRegistry implements Registry {
                 seq.setDynamic(true);
                 seq.setRegistryKey(entry.getKey());
             } else if (entry.getValue() instanceof Endpoint) {
-                Endpoint ep = (Endpoint) entry.getValue();                
+                Endpoint ep = (Endpoint) entry.getValue();
             }
 
         } else {

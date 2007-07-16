@@ -113,7 +113,9 @@ public class ValidateMediator extends AbstractListMediator {
 
     public boolean mediate(MessageContext synCtx) {
 
-        log.debug("ValidateMediator - Validate mediator mediate()");
+        if (log.isDebugEnabled()) {
+            log.debug("ValidateMediator - Validate mediator mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Validate mediator");
@@ -172,7 +174,7 @@ public class ValidateMediator extends AbstractListMediator {
                         //reset the errorhandler state
                         errorHandler.setValidationError(false);
                         if (log.isDebugEnabled()) {
-                            log.debug("Error occured during creating new schema ");
+                            log.debug("Error occured during creating a new schema ");
                         }
                     }
                 } catch (SAXNotSupportedException e) {
@@ -209,9 +211,10 @@ public class ValidateMediator extends AbstractListMediator {
         } catch (IOException e) {
             handleException("Error validating " + source + " element" + e.getMessage(), e);
         }
-
-        log.debug("validation of element returned by the XPath expression : " + source +
-                " succeeded against the given schemas and the current message");
+        if (log.isDebugEnabled()) {
+            log.debug("validation of element returned by the XPath expression : " + source +
+                    " succeeded against the given schemas and the current message");
+        }
         if (shouldTrace) {
             trace.trace("End : Validate mediator");
         }
@@ -219,7 +222,7 @@ public class ValidateMediator extends AbstractListMediator {
     }
 
     /**
-     * This class handles validation errors to be used for error reporting
+     * This class handles validation errors to be used for the error reporting
      */
     private class MyErrorHandler extends DefaultHandler {
 
@@ -329,9 +332,9 @@ public class ValidateMediator extends AbstractListMediator {
             explicityFeatures.add(mp);
             factory.setFeature(featureName, isFeatureEnable);             
         } catch (SAXNotSupportedException e) {
-           handleException("Error setting a feature to Schema Factory " + e.getMessage(),e);
+           handleException("Error setting a feature to the Schema Factory " + e.getMessage(),e);
         } catch (SAXNotRecognizedException e) {
-           handleException("Error setting a feature to Schema Factory " + e.getMessage(),e);
+           handleException("Error setting a feature to the Schema Factory " + e.getMessage(),e);
         }
     }
 

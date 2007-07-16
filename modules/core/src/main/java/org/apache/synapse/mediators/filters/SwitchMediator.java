@@ -59,22 +59,26 @@ public class SwitchMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        log.debug("Switch mediator :: mediate()");
+        if (log.isDebugEnabled()) {
+            log.debug("Switch mediator :: mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Switch mediator");
         }
         String sourceText = Axis2MessageContext.getStringValue(source, synCtx);
-        log.debug("Applying switch case regex patterns against evaluated source value : " + sourceText);
+        if (log.isDebugEnabled()) {
+            log.debug("Applying switch case regex patterns against evaluated source value : " +
+                    sourceText);
+        }
         try {
             saveAndSetTraceState(synCtx);
             if (shouldTrace) {
                 trace.trace("Source Value : " + sourceText);
                 trace.trace("Start Case mediator list");
             }
-            if (sourceText != null) {
-                Iterator iter = cases.iterator();
-                while (iter.hasNext()) {
+            if (sourceText != null && !cases.isEmpty()) {
+                for (Iterator iter = cases.iterator(); iter.hasNext();) {
                     SwitchCase swCase = (SwitchCase) iter.next();
                     if (swCase != null) {
                         if (swCase.matches(sourceText)) {
@@ -89,10 +93,14 @@ public class SwitchMediator extends AbstractMediator {
                     trace.trace("End Case mediator list");
                 }
             } else {
-                log.warn("Source has been evaluated to Null...Default Case will be run");
+                if (log.isDebugEnabled()) {
+                    log.debug("Source has been evaluated to Null...Default Case will be run");
+                }
             }
             if (defaultCase != null) {
-                log.debug("Executing default case");
+                if (log.isDebugEnabled()) {
+                    log.debug("Executing default case");
+                }
                 if (shouldTrace) {
                     trace.trace("Executing default case");
                 }
@@ -153,6 +161,10 @@ public class SwitchMediator extends AbstractMediator {
         return defaultCase;
     }
 
+    /**
+     * setting the default case ...which contains mediators to invoke when no case condition satisfy
+     * @param defaultCase
+     */
     public void setDefaultCase(SwitchCase defaultCase) {
         this.defaultCase = defaultCase;
     }

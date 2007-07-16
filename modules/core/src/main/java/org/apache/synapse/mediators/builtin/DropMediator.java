@@ -41,16 +41,19 @@ public class DropMediator extends AbstractMediator {
      * @return false always
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Drop mediator :: mediate()");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Drop mediator :: mediate()");
+        }
+        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Drop mediator");
+        }
         //If drop mediator is a child of a sequence
         // and if this sequence is a IN or OUT sequence of a proxy service
         StatisticsUtils.processProxyServiceStatistics(synCtx);
         //If this a sequence is not  a IN or OUT sequence of a proxy service
         StatisticsUtils.processAllSequenceStatistics(synCtx);
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Drop mediator");
-        }
         if (synCtx.getTo() == null) {
             if (shouldTrace) {
                 trace.trace("End : Drop mediator");

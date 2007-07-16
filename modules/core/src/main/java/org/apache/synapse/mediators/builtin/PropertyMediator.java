@@ -32,9 +32,11 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * The property mediator would save(or remove) a named property as a local property of the Synapse Message Context
- * or as a property of the Axis2 Message Context or as a Transport Header.
- * Properties set this way could be extracted through the XPath extension function "synapse:get-property(scope,prop-name)"
+ * The property mediator would save(or remove) a named property as a local property of
+ * the Synapse Message Context or as a property of the Axis2 Message Context or
+ * as a Transport Header.
+ * Properties set this way could be extracted through the XPath extension function
+ * "synapse:get-property(scope,prop-name)"
  */
 
 public class PropertyMediator extends AbstractMediator {
@@ -64,21 +66,26 @@ public class PropertyMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext smc) {
-        log.debug("Property mediator :: mediate()");
+        if (log.isDebugEnabled()) {
+            log.debug("Property mediator :: mediate()");
+        }
         boolean shouldTrace = shouldTrace(smc.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Property mediator");
         }
         if (action == ACTION_SET) {
-            String resultValue = (this.value != null ? this.value : Axis2MessageContext.getStringValue(
-                    expression, smc));
-            log.debug("Setting : " + name +
-                    " property (scope:" + (scope == null ? "default" : scope) + ") = " + resultValue);
+            String resultValue = (this.value != null ? this.value :
+                    Axis2MessageContext.getStringValue(expression, smc));
+            if (log.isDebugEnabled()) {
+                log.debug("Setting : " + name +
+                            " property (scope:" + (scope == null ? "default" : scope) + ") = " +
+                                   resultValue);
+            }
             if (shouldTrace) {
                 trace.trace("Property Name : " + name +
-                        " (scope:" + (scope == null ? "default" : scope) + ") set to " +
-                        (value != null ? " resultValue = " + value :
-                                " result of expression " + expression + " = " + resultValue));
+                              " (scope:" + (scope == null ? "default" : scope) + ") set to " +
+                                  (value != null ? " resultValue = " + value :
+                                      " result of expression " + expression + " = " + resultValue));
             }
             if (scope == null) {
                 //Setting property into the  Synapse Context
@@ -116,13 +123,20 @@ public class PropertyMediator extends AbstractMediator {
                 }
             } else {
                 String msg = "Unsupported scope : " + scope + " for property mediator";
+                if(shouldTrace){
+                    trace.trace(msg);
+                }
                 handleException(msg);
             }
         } else {
-            log.debug("Removing : " + name +
-                    " property (scope:" + (scope == null ? "default" : scope) + ") ");
-            trace.trace("Remove - Property Name : " + name +
-                    " (scope:" + (scope == null ? "default" : scope) + ")");
+            if (log.isDebugEnabled()) {
+                log.debug("Removing : " + name +
+                        " property (scope:" + (scope == null ? "default" : scope) + ") ");
+            }
+            if (shouldTrace) {
+                trace.trace("Remove - Property Name : " + name +
+                        " (scope:" + (scope == null ? "default" : scope) + ")");
+            }
             if (scope == null) {
                 //Removing property from the  Synapse Context
                 Set pros = smc.getPropertyKeySet();
@@ -163,6 +177,9 @@ public class PropertyMediator extends AbstractMediator {
 
             } else {
                 String msg = "Unsupported scope : " + scope + " for property mediator";
+                if (shouldTrace) {
+                    trace.trace(msg);
+                }
                 handleException(msg);
             }
         }

@@ -65,7 +65,9 @@ public class GetPropertyFunction implements Function {
 
         int size = args.size();
         if (size == 0) {
-            log.warn("Property key value for lookup was not specified");
+            if (log.isDebugEnabled()) {
+                log.debug("Property key value for lookup was not specified");
+            }
             return null;
         } else if (size == 1) {
             return evaluate(Constants.SCOPE_DEFAULT, args.get(0), context.getNavigator());
@@ -74,7 +76,9 @@ public class GetPropertyFunction implements Function {
         } else {
             String msg = "Invalid arguments for synapse:get-property(prop-name) 0r  " +
                     "synapse:get-property(scope,prop-name) XPath function ";
-            log.warn(msg);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
             throw new FunctionCallException(msg);
         }
     }
@@ -89,8 +93,10 @@ public class GetPropertyFunction implements Function {
      */
     public Object evaluate(Object scopeObject, Object keyObject, Navigator navigator) {
         if (synCtx == null) {
-            log.warn("Synapse context has not been set for the XPath extension function" +
-                    "'synapse:get-property(prop-name)'");
+            if (log.isDebugEnabled()) {
+                log.debug("Synapse context has not been set for the XPath extension function" +
+                        "'synapse:get-property(prop-name)'");
+            }
             return null;
 
         }
@@ -98,9 +104,11 @@ public class GetPropertyFunction implements Function {
         String key = StringFunction.evaluate(keyObject, navigator);
 
         if (key == null || "".equals(key)) {
-            log.warn("property-name should be provided when executing " +
-                    "synapse:get-property(scope,prop-name)" +
-                    " or synapse:get-property(prop-name) Xpath function");
+            if (log.isDebugEnabled()) {
+                log.debug("property-name should be provided when executing " +
+                        "synapse:get-property(scope,prop-name)" +
+                        " or synapse:get-property(prop-name) Xpath function");
+            }
             return null;
         }
         if (Constants.SCOPE_DEFAULT.equals(scope)) {
@@ -141,8 +149,10 @@ public class GetPropertyFunction implements Function {
                 return headersMap.get(key);
             }
         } else {
-            log.warn("Invalid scope : '" + scope + "' has been set for the " +
-                    "synapse:get-property(scope,prop-name) XPath function");
+            if (log.isDebugEnabled()) {
+                log.debug("Invalid scope : '" + scope + "' has been set for the " +
+                        "synapse:get-property(scope,prop-name) XPath function");
+            }
         }
         return null;
     }

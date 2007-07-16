@@ -66,24 +66,34 @@ public class HeaderMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Header mediator <" + (action == ACTION_SET ? "Set" : "Remove") + "> :: mediate()");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Header mediator <" + (action == ACTION_SET ? "Set" : "Remove") + "> :: mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if(shouldTrace) {
+        if (shouldTrace) {
             trace.trace("Start : Header mediator, action = " +
-                (action == ACTION_SET ? "set" : "remove"));
+                    (action == ACTION_SET ? "set" : "remove"));
+        }
+        if (qName == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Hadear Name is null");
+            }
+            return true;
         }
         if (action == ACTION_SET) {
             String value = (getValue() != null ? getValue() :
-                Axis2MessageContext.getStringValue(getExpression(), synCtx));
-
-            log.debug("Setting header : " + qName + " to : " + value);
-            if(shouldTrace) {
+                    Axis2MessageContext.getStringValue(getExpression(), synCtx));
+            if (log.isDebugEnabled()) {
+                log.debug("Setting header : " + qName + " to : " + value);
+            }
+            if (shouldTrace) {
                 trace.trace("Set Header : " + qName + " to : " + value);
             }
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
                 if (Constants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(new EndpointReference(value));
-                } else if (Constants.HEADER_FROM.equals(qName.getLocalPart())){
+                } else if (Constants.HEADER_FROM.equals(qName.getLocalPart())) {
                     synCtx.setFrom(new EndpointReference(value));
                 } else if (Constants.HEADER_ACTION.equals(qName.getLocalPart())) {
                     synCtx.setWSAAction(value);
@@ -95,11 +105,13 @@ public class HeaderMediator extends AbstractMediator {
                     addCustomHeader(synCtx);
                 }
             } else {
-                addCustomHeader(synCtx);                
+                addCustomHeader(synCtx);
             }
 
         } else {
-            log.debug("Removing header : " + qName + " from current message");
+            if (log.isDebugEnabled()) {
+                log.debug("Removing header : " + qName + " from current message");
+            }
 
             if (shouldTrace) {
                 trace.trace("Remove Header : " + qName);
@@ -108,7 +120,7 @@ public class HeaderMediator extends AbstractMediator {
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
                 if (Constants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(null);
-                } else if (Constants.HEADER_FROM.equals(qName.getLocalPart())){
+                } else if (Constants.HEADER_FROM.equals(qName.getLocalPart())) {
                     synCtx.setFrom(null);
                 } else if (Constants.HEADER_ACTION.equals(qName.getLocalPart())) {
                     synCtx.setWSAAction(null);
@@ -117,11 +129,12 @@ public class HeaderMediator extends AbstractMediator {
                 } else if (Constants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(null);
                 } else {
-                    removeFromHeaderList(synCtx.getEnvelope().getHeader().getHeaderBlocksWithNSURI(""));
-                }                
+                    removeFromHeaderList(synCtx.getEnvelope().getHeader().
+                            getHeaderBlocksWithNSURI(""));
+                }
             } else {
                 removeFromHeaderList(synCtx.getEnvelope().getHeader().
-                    getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
+                        getHeaderBlocksWithNSURI(qName.getNamespaceURI()));
             }
         }
         if (shouldTrace) {

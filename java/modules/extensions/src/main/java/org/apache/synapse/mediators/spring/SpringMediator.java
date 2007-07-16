@@ -106,7 +106,9 @@ public class SpringMediator extends AbstractMediator {
     }
 
     private synchronized void buildAppContext(MessageContext synCtx) {
-        log.debug("Creating Spring ApplicationContext from property key : " + configKey);
+        if (log.isDebugEnabled()) {
+            log.debug("Creating Spring ApplicationContext from property key : " + configKey);
+        }
         GenericApplicationContext appContext = new GenericApplicationContext();
         XmlBeanDefinitionReader xbdr = new XmlBeanDefinitionReader(appContext);
         xbdr.setValidating(false);

@@ -45,14 +45,19 @@ public class LogMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(LogMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+
+    /** Log levels ,according to the  log level ,the information going to log  will  be changed */
     public static final int CUSTOM = 0;
     public static final int SIMPLE = 1;
     public static final int HEADERS = 2;
     public static final int FULL = 3;
-    public static final String DEFAULT_SEP = ", ";
 
+    /** The default log level has set to SIMPLE */
     private int logLevel = SIMPLE;
+    /** The separator for which used to separate logging information */
+    public static final String DEFAULT_SEP = ", ";
     private String separator = DEFAULT_SEP;
+    /** The holder for the custom properties */
     private List properties = new ArrayList();
 
     /**
@@ -62,13 +67,18 @@ public class LogMediator extends AbstractMediator {
      * @return true always
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Log mediator :: mediate()");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Log mediator :: mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         if (shouldTrace) {
             trace.trace("Start : Log mediator");
         }
         String logMessage = getLogMessage(synCtx);
-        log.info(logMessage);
+        if (log.isInfoEnabled()) {
+            log.info(logMessage);
+        }
         if (shouldTrace) {
             trace.trace(logMessage);
             trace.trace("End : Log mediator");
@@ -119,17 +129,20 @@ public class LogMediator extends AbstractMediator {
 
     private String getHeadersLogMessage(MessageContext synCtx) {
         StringBuffer sb = new StringBuffer();
-        SOAPHeader header = synCtx.getEnvelope().getHeader();
-        if (header != null) {
-            Iterator iter = header.examineAllHeaderBlocks();
-            while (iter.hasNext()) {
-                Object o = iter.next();
-                if (o instanceof SOAPHeaderBlock) {
-                    SOAPHeaderBlock headerBlk = (SOAPHeaderBlock) o;
-                    sb.append(separator + headerBlk.getLocalName() + " : " + headerBlk.getText());
-                } else if (o instanceof OMElement) {
-                    OMElement headerElem = (OMElement) o;
-                    sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
+        if (synCtx.getEnvelope() != null) {
+            SOAPHeader header = synCtx.getEnvelope().getHeader();
+            if (header != null) {
+                for (Iterator iter = header.examineAllHeaderBlocks(); iter.hasNext();) {
+                    Object o = iter.next();
+                    if (o instanceof SOAPHeaderBlock) {
+                        SOAPHeaderBlock headerBlk = (SOAPHeaderBlock) o;
+                        sb.append(separator + headerBlk.getLocalName() + " : " +
+                                headerBlk.getText());
+                    } else if (o instanceof OMElement) {
+                        OMElement headerElem = (OMElement) o;
+                        sb.append(separator + headerElem.getLocalName() + " : " +
+                                headerElem.getText());
+                    }
                 }
             }
         }
@@ -147,11 +160,11 @@ public class LogMediator extends AbstractMediator {
 
     private void setCustomProperties(StringBuffer sb, MessageContext synCtx) {
         if (properties != null && !properties.isEmpty()) {
-            Iterator iter = properties.iterator();
-            while (iter.hasNext()) {
+            for (Iterator iter = properties.iterator(); iter.hasNext();) {
                 MediatorProperty prop = (MediatorProperty) iter.next();
                 sb.append(separator + prop.getName() + " = " +
-                        (prop.getValue() != null ? prop.getValue() : prop.getEvaluatedExpression(synCtx)));
+                        (prop.getValue() != null ? prop.getValue() :
+                                prop.getEvaluatedExpression(synCtx)));
             }
         }
     }

@@ -105,7 +105,9 @@ public class SwitchCase {
             return false;
         }
         boolean retVal = matcher.matches();
-        log.debug("Case : " + regex.pattern() + " evaluated to : " + retVal);
+        if (log.isDebugEnabled()) {
+            log.debug("Case : " + regex.pattern() + " evaluated to : " + retVal);
+        }
         return retVal;
     }
 }

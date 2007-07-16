@@ -25,12 +25,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -131,7 +130,7 @@ public class FaultMediator extends AbstractMediator {
         setFaultRole(factory, fault);
         setFaultDetail(factory, fault);
 
-        // set the all headers of griginal SOAP Envelope to the Fault Envelope
+        // set the all headers of original SOAP Envelope to the Fault Envelope
         if (synCtx.getEnvelope() != null) {
             SOAPHeader soapHeader = synCtx.getEnvelope().getHeader();
             if (soapHeader != null) {

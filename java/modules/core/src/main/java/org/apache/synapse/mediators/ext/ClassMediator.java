@@ -101,35 +101,37 @@ public class ClassMediator extends AbstractMediator {
      */
     private void setProperties(Mediator m, MessageContext synCtx, boolean shouldTrace) {
 
-        Iterator iter = properties.iterator();
-        while (iter.hasNext()) {
+        if (!properties.isEmpty()) {
+            for (Iterator iter = properties.iterator(); iter.hasNext();) {
 
-            MediatorProperty mProp = (MediatorProperty) iter.next();
+                MediatorProperty mProp = (MediatorProperty) iter.next();
 
-            String mName = "set" + Character.toUpperCase(mProp.getName().charAt(0)) + mProp.getName().substring(1);
-            String value = (mProp.getValue() != null ?
-                mProp.getValue() :
-                Axis2MessageContext.getStringValue(mProp.getExpression(), synCtx));
+                String mName = "set" + Character.toUpperCase(mProp.getName().charAt(0)) +
+                                            mProp.getName().substring(1);
+                String value = (mProp.getValue() != null ?
+                        mProp.getValue() :
+                        Axis2MessageContext.getStringValue(mProp.getExpression(), synCtx));
 
-            try {
-                if (value != null) {
-                    Method method = m.getClass().getMethod(mName, new Class[]{String.class});
-                    if (log.isDebugEnabled()) {
-                        log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
+                try {
+                    if (value != null) {
+                        Method method = m.getClass().getMethod(mName, new Class[]{String.class});
+                        if (log.isDebugEnabled()) {
+                            log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
+                        }
+                        if (shouldTrace) {
+                            trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
+                        }
+                        method.invoke(m, new Object[]{value});
                     }
+                } catch (Exception e) {
+                    String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
+                            " mediator : " + m.getClass() + " : " + e.getMessage();
+
                     if (shouldTrace) {
-                        trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
+                        trace.trace(msg);
                     }
-                    method.invoke(m, new Object[]{value});
+                    handleException(msg, e);
                 }
-            } catch (Exception e) {
-                String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
-                    " mediator : " + m.getClass() + " : " + e.getMessage();
-
-                if (shouldTrace) {
-                    trace.trace(msg);
-                }
-                handleException(msg,e);
             }
         }
     }

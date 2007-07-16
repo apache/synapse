@@ -48,7 +48,8 @@ public interface Registry {
 
     /**
      * Get the registry entry for the given key
-     * @return the registry key
+     * @param key the registry key
+     * @return The registry entry for the given key
      */
     public RegistryEntry getRegistryEntry(String key);
 

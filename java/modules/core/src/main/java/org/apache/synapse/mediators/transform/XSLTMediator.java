@@ -22,10 +22,10 @@ package org.apache.synapse.mediators.transform;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.dom.jaxp.DocumentBuilderFactoryImpl;
+import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -43,24 +43,29 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import java.util.*;
-import java.io.ByteArrayOutputStream;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * The XSLT mediator performs an XSLT transformation requested, using
  * the current message. The source attribute (if available) spcifies the source element
  * on which the transformation would be applied. It will default to the first child of
  * the messages' SOAP body, if it is omitted. Additional properties passed into this
- * mediator would become parameters for XSLT
+ * mediator would become parameters for XSLT.Additional features passed inot this mediator would
+ * become features except "http://ws.apache.org/ns/synapse/transform/feature/dom" for the Transformer Factory.
+ * The "http://ws.apache.org/ns/synapse/transform/feature/dom" feature is used to deciding swiching
+ * between DOM and Stream during the transformation process
  */
 public class XSLTMediator extends AbstractMediator {
 
@@ -347,7 +352,7 @@ public class XSLTMediator extends AbstractMediator {
     }
     
     /**
-     * to add a features which need to set to the TransformerFactory
+     * to add a feature which need to set to the TransformerFactory
      * @param  featureName The name of the feature
      * @param isFeatureEnable should this feature enable?
      */

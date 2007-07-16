@@ -149,12 +149,16 @@ public class XSLTMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
         try {
-            log.debug("XSLT mediator mediate()");
+            if (log.isDebugEnabled()) {
+                log.debug("XSLT mediator mediate()");
+            }
             boolean shouldTrace = shouldTrace(synCtx.getTracingState());
             if (shouldTrace) {
                 trace.trace("Start : XSLT mediator");
             }
-            log.debug("Performing XSLT transformation against resource with key : " + xsltKey);
+            if (log.isDebugEnabled()) {
+                log.debug("Performing XSLT transformation against resource with key : " + xsltKey);
+            }
             performXLST(synCtx, shouldTrace);
             if (shouldTrace) {
                 trace.trace("Start : XSLT mediator");

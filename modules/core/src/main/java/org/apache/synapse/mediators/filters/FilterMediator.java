@@ -50,18 +50,24 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Filter mediator mediate()");
 
+        if (log.isDebugEnabled()) {
+            log.debug("Filter mediator mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         try {
             if (shouldTrace) {
                 trace.trace("Start : Filter mediator ");
             }
             if (test(synCtx)) {
-                log.debug("Filter condition satisfied.. executing child mediators");
+                if (log.isDebugEnabled()) {
+                    log.debug("Filter condition satisfied.. executing child mediators");
+                }
                 return super.mediate(synCtx);
             } else {
-                log.debug("Filter condition failed.. will skip executing child mediators");
+                if (log.isDebugEnabled()) {
+                    log.debug("Filter condition failed.. will skip executing child mediators");
+                }
                 return true;
             }
         } finally {
@@ -83,18 +89,25 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
     public boolean test(MessageContext synCtx) {
         try {
             if (xpath != null) {
-                log.debug("Evaluating XPath expression : " + xpath);
+                if (log.isDebugEnabled()) {
+                    log.debug("Evaluating XPath expression : " + xpath);
+                }
                 if (shouldTrace(synCtx.getTracingState())) {
                     trace.trace("XPath expression : " + xpath + " evaluates to : " +
-                        xpath.booleanValueOf(synCtx.getEnvelope()));
+                            xpath.booleanValueOf(synCtx.getEnvelope()));
                 }
                 return xpath.booleanValueOf(synCtx.getEnvelope());
 
             } else if (source != null && regex != null) {
-                log.debug("Evaluating regular expression : " + regex.pattern() + " against source : " + source);
+                if (log.isDebugEnabled()) {
+                    log.debug("Evaluating regular expression : " + regex.pattern() +
+                            " against source : " + source);
+                }
                 String sourceString = Axis2MessageContext.getStringValue(source, synCtx);
                 if (sourceString == null) {
-                    log.debug("Source String has been evaluated to Null");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Source String has been evaluated to Null");
+                    }
                     return false;
                 }
                 if (shouldTrace(synCtx.getTracingState())) {
@@ -103,11 +116,12 @@ public class FilterMediator extends AbstractListMediator implements org.apache.s
                 }
                 Matcher matcher = regex.matcher(sourceString);
                 if (matcher == null) {
-                    log.warn("Can not find a Regex Pattren Matcher");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Can not find a Regex Pattren Matcher");
+                    }
                     return false;
                 }
                 return matcher.matches();
-
             } else {
                 log.error("Invalid configuration specified");
                 return false;

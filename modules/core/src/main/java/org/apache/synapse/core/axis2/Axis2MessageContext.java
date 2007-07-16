@@ -178,7 +178,7 @@ public class Axis2MessageContext implements MessageContext {
 
     /**
      * Constructor for the Axis2MessageContext inside Synapse
-     * 
+     *
      * @param axisMsgCtx MessageContext representing the relevant Axis MC
      * @param synCfg SynapseConfiguraion describing Synapse
      * @param synEnv SynapseEnvironment describing the environment of Synapse
@@ -455,21 +455,17 @@ public class Axis2MessageContext implements MessageContext {
         if (getMessageID() != null)
             sb.append(separator + "MessageID: " + getMessageID());
 
-
-        SOAPHeader headers = getEnvelope().getHeader();
-        if (headers != null) {
-            Iterator iter = headers.examineAllHeaderBlocks();
-            if (iter.hasNext()) {
-                sb.append(separator + "Headers : ");
-                while (iter.hasNext()) {
-                    Object o = iter.next();
-                    if (o instanceof SOAPHeaderBlock) {
-                        SOAPHeaderBlock header = (SOAPHeaderBlock) o;
-                        sb.append(separator + header.getLocalName() + " : " + header.getText());
-                    } else if (o instanceof OMElement) {
-                        OMElement headerElem = (OMElement) o;
-                        sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
-                    }
+        SOAPHeader soapHeader = getEnvelope().getHeader();
+        if (soapHeader != null) {
+            sb.append(separator + "Headers : ");
+            for (Iterator iter = soapHeader.examineAllHeaderBlocks(); iter.hasNext();) {
+                Object o = iter.next();
+                if (o instanceof SOAPHeaderBlock) {
+                    SOAPHeaderBlock headerBlock = (SOAPHeaderBlock) o;
+                    sb.append(separator + headerBlock.getLocalName() + " : " + headerBlock.getText());
+                } else if (o instanceof OMElement) {
+                    OMElement headerElem = (OMElement) o;
+                    sb.append(separator + headerElem.getLocalName() + " : " + headerElem.getText());
                 }
             }
         }

@@ -49,24 +49,29 @@ public class SynapseMediator extends AbstractListMediator {
      * @return as per standard mediate() semantics
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Synapse main mediator :: mediate()");
-        if(synCtx.isResponse()) {
-            StatisticsUtils.processAllSequenceStatistics(synCtx);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Synapse main mediator :: mediate()");
         }
-        StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
-                Constants.SEQUENCE_STATISTICS_STACK);
-        if (sequenceStack == null) {
-            sequenceStack = new SequenceStatisticsStack();
-            synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
-        }
-        String seqName = "MainSequence";
-        boolean isFault = synCtx.getEnvelope().getBody().hasFault();
-        sequenceStack.put(seqName, System.currentTimeMillis(), !synCtx.isResponse(), true, isFault);
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-         try {
+        try {
             if (shouldTrace) {
                 trace.trace("Start : Synapse main mediator");
             }
+            // If the message flow path is OUT, then process the satatistics
+            if (synCtx.isResponse()) {
+                StatisticsUtils.processAllSequenceStatistics(synCtx);
+            }
+            //put the required property for the collecttng statistics for the message mediation
+            StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
+                    Constants.SEQUENCE_STATISTICS_STACK);
+            if (sequenceStack == null) {
+                sequenceStack = new SequenceStatisticsStack();
+                synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK,sequenceStack);
+            }
+            String seqName = "MainSequence";
+            boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+            sequenceStack.put(seqName,System.currentTimeMillis(),!synCtx.isResponse(),true,isFault);
             return super.mediate(synCtx);
         } finally {
             if (shouldTrace) {

@@ -46,8 +46,11 @@ public class SequenceMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(SequenceMediator.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    /** The name of the this sequence */
     private String name = null;
+    /** The local registry key which is used to pick a sequnce definition*/
     private String key = null;
+    /** The name of the error handler which is used to handle error during the mediation */
     private String errorHandler = null;
     /** is this definition dynamic */
     private boolean dynamic = false;
@@ -69,10 +72,14 @@ public class SequenceMediator extends AbstractListMediator {
      * @return as per standard mediator result
      */
     public boolean mediate(MessageContext synCtx) {
-        
-        log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
-        
+
+        if (log.isDebugEnabled()) {
+            log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+        if (shouldTrace) {
+            trace.trace("Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
+        }
         if (key == null) {
             // Setting Required property to collect the sequence statistics
             boolean isStatisticsEnable
@@ -85,39 +92,44 @@ public class SequenceMediator extends AbstractListMediator {
                     synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
                 }
                 String seqName = (name == null ? Constants.ANONYMOUS_SEQUENCES : name);
-                boolean isFault =synCtx.getEnvelope().getBody().hasFault();
-                sequenceStack.put(seqName,System.currentTimeMillis(),
-                        !synCtx.isResponse(), isStatisticsEnable,isFault);
+                boolean isFault = synCtx.getEnvelope().getBody().hasFault();
+                sequenceStack.put(seqName, System.currentTimeMillis(),
+                        !synCtx.isResponse(), isStatisticsEnable, isFault);
             }
             try {
-                if (shouldTrace) {
-                    trace.trace("Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
-                }
-
+                // The Mediator for handling error which occur during the mediation through this
+                // sequence
+                Mediator errorHandlerMediator = null;
                 // push the errorHandler sequence into the current message as the fault handler
                 if (errorHandler != null) {
-                    log.debug("Setting the onError handler for the sequence");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Setting the onError handler which has named as " +
+                                errorHandler + " for the sequence ");
+                    }
+                    if (shouldTrace) {
+                        trace.trace("Setting the onError handler which has named as " +
+                                errorHandler + " for the sequence ");
+                    }
+                    errorHandlerMediator = synCtx.getSequence(errorHandler);
                     synCtx.pushFaultHandler(
-                        new MediatorFaultHandler(synCtx.getSequence(errorHandler)));
+                            new MediatorFaultHandler(errorHandlerMediator));
                 }
-
-                boolean ret = super.mediate(synCtx);
-
-                // pop our error handler from the fault stack before we exit, if we have pushed it
-                Stack faultStack = synCtx.getFaultStack();
-                if (errorHandler != null && !faultStack.isEmpty()) {
-                    Object o = faultStack.peek();
-                    if (o instanceof MediatorFaultHandler &&
-                        synCtx.getSequence(errorHandler).equals(
-                            ((MediatorFaultHandler) o).getFaultMediator())) {
-                        faultStack.pop();
+                boolean result = super.mediate(synCtx);
+                if (errorHandlerMediator != null) {
+                    // pop our error handler from the fault stack before we exit, if we have pushed it
+                    Stack faultStack = synCtx.getFaultStack();
+                    if (faultStack != null && !faultStack.isEmpty()) {
+                        Object o = faultStack.peek();
+                        if (o instanceof MediatorFaultHandler &&
+                                errorHandlerMediator.equals(
+                                        ((MediatorFaultHandler) o).getFaultMediator())) {
+                            faultStack.pop();
+                        }
                     }
                 }
-
-                return ret;
+                return result;
 
             } finally {
-
                 //If this sequence is finished it's task normally
                 if (isStatisticsEnable) {
                     StatisticsUtils.processSequenceStatistics(synCtx);
@@ -140,6 +152,9 @@ public class SequenceMediator extends AbstractListMediator {
                 if (shouldTrace) {
                     trace.trace("Executing sequence named " + key);
                 }
+                if (log.isDebugEnabled()) {
+                    log.debug("Executing sequence named " + key);
+                }
                 return m.mediate(synCtx);
             }
         }
@@ -151,26 +166,51 @@ public class SequenceMediator extends AbstractListMediator {
         throw new SynapseException(msg);
     }
 
+    /**
+     * To get the name of the sequence
+     * @return the name of the sequence
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * setting the name of the sequence
+     * @param name the name of the this sequence
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * To get the key which which is used to fick the sequence definition from the local registry
+     * @return  return the key which is used to fick the sequence definition from the local registry
+     */
     public String getKey() {
         return key;
     }
 
+    /**
+     * To set the local registry key in order to pick the sequence definition
+     * @param key the local registry key
+     */
     public void setKey(String key) {
         this.key = key;
     }
 
+    /**
+     *
+     * @return  Returns the errorhandler sequence name
+     */
     public String getErrorHandler() {
         return errorHandler;
     }
 
+    /**
+     *
+     * @param errorHandler to used handle error will appear during the
+     *        mediation through this sequence
+     */
     public void setErrorHandler(String errorHandler) {
         this.errorHandler = errorHandler;
     }
@@ -187,7 +227,7 @@ public class SequenceMediator extends AbstractListMediator {
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsEnable
+     * @param statisticsEnable  To indicate statistics collecting state
      */
     public void setStatisticsEnable(int statisticsEnable) {
         this.statisticsEnable = statisticsEnable;
@@ -218,8 +258,8 @@ public class SequenceMediator extends AbstractListMediator {
     }
 
     /**
-     * get the registry key used to load this sequence dynamically
-     * @param registryKey
+     * To get the registry key used to load this sequence dynamically
+     * @param registryKey  returns the registry key which point to this sequence
      */
     public void setRegistryKey(String registryKey) {
         this.registryKey = registryKey;

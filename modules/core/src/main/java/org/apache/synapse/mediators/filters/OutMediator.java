@@ -43,18 +43,24 @@ public class OutMediator extends AbstractListMediator implements org.apache.syna
      * @return true if filter condition fails. else returns as per List mediator semantics
      */
     public boolean mediate(MessageContext synCtx) {
-        log.debug("Out mediator mediate()");
+        
+        if (log.isDebugEnabled()) {
+            log.debug("Out mediator mediate()");
+        }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
         try {
             if (shouldTrace) {
                 trace.trace("Start : Out mediator");
             }
-            
             if (test(synCtx)) {
-                log.debug("Current message is outgoing.. executing child mediators");
+                if(log.isDebugEnabled()) {
+                    log.debug("Current message is outgoing.. executing child mediators");
+                }
                 return super.mediate(synCtx);
             } else {
-                log.debug("Current message is not outgoing.. skipping child mediators");
+                if(log.isDebugEnabled()) {
+                    log.debug("Current message is not outgoing.. skipping child mediators");
+                }
                 return true;
             }
         } finally {

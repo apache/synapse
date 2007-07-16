@@ -85,8 +85,10 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
                     Mediator faultSequence = synCtx.getSequence(proxy.getTargetFaultSequence());
                     if (faultSequence != null) {
-                        log.debug("Setting the fault-sequence of the " +
-                                "proxy service to MessageContext");
+                        if (log.isDebugEnabled()) {
+                            log.debug("Setting the fault-sequence of the " +
+                                    "proxy service to MessageContext");
+                        }
                         synCtx.pushFaultHandler(new MediatorFaultHandler(
                                 synCtx.getSequence(proxy.getTargetFaultSequence())));
                     } else {
@@ -97,7 +99,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                                 "specified by the name " + proxy.getTargetFaultSequence());
                     }
                 } else if (proxy.getTargetInLineFaultSequence() != null) {
-                    log.debug("Setting the anonymous fault-sequence of the proxy to context");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Setting the anonymous fault-sequence of the proxy to context");
+                    }
                     synCtx.pushFaultHandler(
                             new MediatorFaultHandler(proxy.getTargetInLineFaultSequence()));
                 }
@@ -111,7 +115,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         if (shouldTrace) {
                             trace.trace(msg);
                         }
-                        log.debug(msg);
+                        if (log.isDebugEnabled()) {
+                            log.debug(msg);
+                        }
                         inSequence.mediate(synCtx);
                     } else {
 
@@ -126,7 +132,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     if (shouldTrace) {
                         trace.trace(msg);
                     }
-                    log.debug(msg);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg);
+                    }
                     proxy.getTargetInLineInSequence().mediate(synCtx);
                 }
 
@@ -138,7 +146,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                         if (shouldTrace) {
                             trace.trace(msg);
                         }
-                        log.debug(msg);
+                        if (log.isDebugEnabled()) {
+                            log.debug(msg);
+                        }
                         endpoint.send(synCtx);
                     } else {
 
@@ -153,7 +163,9 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
                     if (shouldTrace) {
                         trace.trace(msg);
                     }
-                    log.debug(msg);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg);
+                    }
                     proxy.getTargetInLineEndpoint().send(synCtx);
                 }
 

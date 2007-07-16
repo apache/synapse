@@ -155,7 +155,9 @@ public class RMSequenceMediator extends AbstractMediator {
             throw new SynapseException("XPath error : " + e.getMessage());
         }
         if (node == null) {
-            log.debug("XPath expression did not return any node");
+            if (log.isDebugEnabled()) {
+                log.debug("XPath expression did not return any node");
+            }
             throw new SynapseException("XPath expression did not return any node");
         }
         return node.getText();

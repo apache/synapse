@@ -19,23 +19,25 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axis2.engine.MessageReceiver;
-import org.apache.axis2.client.async.Callback;
-import org.apache.axis2.context.MessageContext;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFault;
+import org.apache.axiom.soap.SOAPFaultReason;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.util.Utils;
-import org.apache.axis2.transport.nhttp.NhttpConstants;
-import org.apache.axis2.addressing.RelatesTo;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.addressing.RelatesTo;
+import org.apache.axis2.client.async.Callback;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.engine.MessageReceiver;
+import org.apache.axis2.transport.nhttp.NhttpConstants;
+import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.axiom.soap.SOAPFault;
-import org.apache.sandesha2.client.SandeshaClientConstants;
 
 import java.util.*;
 
@@ -116,19 +118,25 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             Stack faultStack = synapseOutMsgCtx.getFaultStack();
             if (faultStack != null && !faultStack.isEmpty()) {
-                SOAPFault fault = response.getEnvelope().getBody().getFault();
-                Exception e = fault.getException();
-                if (e == null) {
-                    e = new Exception(fault.toString());
+                SOAPEnvelope envelope = response.getEnvelope();
+                if (envelope != null) {
+                    SOAPFault fault = envelope.getBody().getFault();
+                    if (fault != null) {
+                        Exception e = fault.getException();
+                        if (e == null) {
+                            e = new Exception(fault.toString());
+                        }
+                        // set an error code to the message context, so that error sequences can filter
+                        // using that property to determine the cause of error
+                        synapseOutMsgCtx.setProperty(Constants.ERROR_CODE, Constants.SENDING_FAULT);
+                        SOAPFaultReason faultReason = fault.getReason();
+                        if (faultReason != null) {
+                            synapseOutMsgCtx.setProperty(Constants.ERROR_MESSAGE,
+                                    faultReason.getText());
+                        }
+                        ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
+                    }
                 }
-                // set an error code to the message context, so that error sequences can filter
-                // using that property to determine the cause of error
-                synapseOutMsgCtx.setProperty(Constants.ERROR_CODE, Constants.SENDING_FAULT);
-                if (fault != null && fault.getReason() != null) {
-                    synapseOutMsgCtx.setProperty(Constants.ERROR_MESSAGE, fault.getReason().getText());
-                }
-
-                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
             }
 
         } else {
@@ -217,9 +225,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             try {
                 synapseOutMsgCtx.getEnvironment().injectMessage(synapseInMessageContext);
             } catch (SynapseException syne) {
-                if (!synapseInMessageContext.getFaultStack().isEmpty()) {
-                    ((FaultHandler) synapseInMessageContext
-                            .getFaultStack().pop()).handleFault(synapseInMessageContext, syne);
+                Stack stack = synapseInMessageContext.getFaultStack();
+                if (stack != null &&
+                        !stack.isEmpty()) {
+                    ((FaultHandler) stack.pop()).handleFault(synapseInMessageContext, syne);
                 } else {
                     log.error("Synapse encountered an exception, " +
                             "No error handlers found - [Message Dropped]\n" + syne.getMessage());

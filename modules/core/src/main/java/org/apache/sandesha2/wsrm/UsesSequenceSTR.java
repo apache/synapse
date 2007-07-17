@@ -88,8 +88,6 @@ public class UsesSequenceSTR implements IOMRMPart {
 		// This header _must_ always be understood
 		sequenceAcknowledgementHeaderBlock.setMustUnderstand(true);
 
-		SOAPHeader.addChild(sequenceAcknowledgementHeaderBlock);
-
 		return header;
 	}
 

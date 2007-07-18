@@ -377,6 +377,10 @@ public class XSLTMediator extends AbstractMediator {
         }
     }
 
+    /**
+     *
+     * @return Returns the features explicitly  set to the TransformerFactory through this mediator
+     */
     public List getFeatures(){
         return explicityFeatures;
     }

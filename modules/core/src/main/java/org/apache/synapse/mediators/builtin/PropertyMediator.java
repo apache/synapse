@@ -22,13 +22,14 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.Constants;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
-import java.util.Map;
+
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,7 +59,7 @@ public class PropertyMediator extends AbstractMediator {
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
     /**
-     * Sets or  a property into the current (local) Synapse Context or into the Axis Message Context
+     * Sets a property into the current (local) Synapse Context or into the Axis Message Context
      * or into Transports Header
      * And Removes above properties from the corresspounding locations
      *

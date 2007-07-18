@@ -78,7 +78,6 @@ public class FaultMediator extends AbstractMediator {
             log.debug("Fault mediator mediate()");
         }
         boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        SOAPEnvelope envelop = synCtx.getEnvelope();
         if(shouldTrace) {
             trace.trace("Start : Fault mediator");
         }
@@ -88,6 +87,7 @@ public class FaultMediator extends AbstractMediator {
             case SOAP12:
                 return makeSOAPFault(synCtx, SOAP12,shouldTrace);
             default : {
+                SOAPEnvelope envelop = synCtx.getEnvelope();
                 if (envelop != null) {
                     if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
                         envelop.getNamespace().getNamespaceURI())) {

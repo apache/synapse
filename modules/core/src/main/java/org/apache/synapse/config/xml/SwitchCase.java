@@ -18,13 +18,13 @@
  */
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.mediators.AbstractListMediator;
-import org.apache.synapse.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A SwitchCase define a case element of Switch Mediator and It has a list mediator and
@@ -100,6 +100,10 @@ public class SwitchCase {
      * @return boolean value
      */
     public boolean matches(String value) {
+        if (regex == null) {
+            String msg = "The 'regex' is required for a switch case definition";
+            handleException(msg);
+        }
         Matcher matcher = regex.matcher(value);
         if(matcher == null){
             return false;
@@ -109,5 +113,10 @@ public class SwitchCase {
             log.debug("Case : " + regex.pattern() + " evaluated to : " + retVal);
         }
         return retVal;
+    }
+
+    private void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 }

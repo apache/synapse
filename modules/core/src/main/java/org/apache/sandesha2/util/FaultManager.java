@@ -558,7 +558,6 @@ public class FaultManager {
 	}
 	
 	private static InvocationResponse manageIncomingFault (AxisFault fault, RMMsgContext rmMsgCtx, SOAPFault faultPart) throws AxisFault {
-	
 		if (log.isDebugEnabled())
 			log.debug("Enter: FaultManager::manageIncomingFault");
 		InvocationResponse response = InvocationResponse.CONTINUE;
@@ -575,42 +574,41 @@ public class FaultManager {
 		
 		String soapFaultSubcode = null;
 		String identifier = null;
-		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
-			// Log the fault
-			if (faultPart.getCode() != null && 
-					faultPart.getCode().getSubCode() != null &&
-					faultPart.getCode().getSubCode().getValue() != null)
-				
-				soapFaultSubcode = faultPart.getCode().getSubCode().getValue().getTextAsQName().getLocalPart();
-			
-			// Get the identifier, if there is one.
-			SOAPFaultDetail detail = faultPart.getDetail();
-			if (detail != null)
-			{
-				OMElement identifierOM = detail.getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), 
-					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
-			  if (identifierOM != null)
-			  	identifier = identifierOM.getText();
-			}
-			
-		} else {
+		if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
 			// Need to get the sequence part from the Header.
 			try {
-	      SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT);
+				SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT);
 	      
-	      // If the sequence fault part is not null, then we have an RM specific fault.
-	      if (sequenceFault != null) {
-	      	soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode().getLocalPart();
-	      	
-	      	// Get the identifier - if there is one.
-	      	identifier = sequenceFault.getFaultCode().getDetail();
-	      }
-      } catch (SandeshaException e) {
-      	if (log.isDebugEnabled()) 
-      		log.debug("Unable to process SequenceFault", e);
-      }
+				// If the sequence fault part is not null, then we have an RM specific fault.
+				if (sequenceFault != null) {
+					soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode().getLocalPart();
+					// Get the identifier - if there is one.
+					identifier = sequenceFault.getFaultCode().getDetail();
+				} 
+	    		    	
+			} catch (SandeshaException e) {
+				if (log.isDebugEnabled()) 
+					log.debug("Unable to process SequenceFault", e);
+			}
 		}
+	
+		// If we haven't found a soapFaultSubcode at this point - look inside the AxisFault for the information.
+		if (soapFaultSubcode == null && faultPart.getCode() != null && 
+				faultPart.getCode().getSubCode() != null &&
+				faultPart.getCode().getSubCode().getValue() != null)
 		
+			soapFaultSubcode = faultPart.getCode().getSubCode().getValue().getTextAsQName().getLocalPart();
+		
+		// Get the identifier, if there is one.
+		SOAPFaultDetail detail = faultPart.getDetail();
+		if (detail != null)
+		{
+			OMElement identifierOM = detail.getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), 
+					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));
+			if (identifierOM != null)
+				identifier = identifierOM.getText();
+		}			
+
 		if (Sandesha2Constants.SOAPFaults.Subcodes.CREATE_SEQUENCE_REFUSED.equals(soapFaultSubcode)) {
 			processCreateSequenceRefusedFault(rmMsgCtx, fault);
 		} else if (Sandesha2Constants.SOAPFaults.Subcodes.UNKNOWN_SEQUENCE.equals(soapFaultSubcode) ||
@@ -710,8 +708,8 @@ public class FaultManager {
 			
 			return true;
 		}
-	  return false;
-  }
+		return false;
+	}
 	
 	/**
 	 * On receipt of a CreateSequenceRefused fault, terminate the sequence and notify any waiting

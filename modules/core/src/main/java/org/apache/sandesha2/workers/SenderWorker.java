@@ -183,8 +183,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			int messageType = senderBean.getMessageType();
 			
 			if (isAckPiggybackableMsgType(messageType)) {
+				// Commit the update
+				if(transaction != null && transaction.isActive()) transaction.commit();
+				transaction = storageManager.getTransaction();
+
 				// Piggyback ack messages based on the 'To' address of the message
-				AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager);
+				transaction = AcknowledgementManager.piggybackAcksIfPresent(rmMsgCtx, storageManager, transaction);
 			}
 
 			// sending the message

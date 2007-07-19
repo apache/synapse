@@ -39,6 +39,7 @@ import org.apache.sandesha2.SandeshaException;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
 import org.apache.sandesha2.i18n.SandeshaMessageKeys;
 import org.apache.sandesha2.storage.StorageManager;
+import org.apache.sandesha2.storage.Transaction;
 import org.apache.sandesha2.storage.beanmanagers.SenderBeanMgr;
 import org.apache.sandesha2.storage.beans.RMDBean;
 import org.apache.sandesha2.storage.beans.SenderBean;
@@ -58,7 +59,7 @@ public class AcknowledgementManager {
 	 * @param applicationRMMsgContext
 	 * @throws SandeshaException
 	 */
-	public static void piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager)
+	public static Transaction piggybackAcksIfPresent(RMMsgContext rmMessageContext, StorageManager storageManager, Transaction transaction)
 			throws SandeshaException {
 		if (log.isDebugEnabled())
 			log.debug("Enter: AcknowledgementManager::piggybackAcksIfPresent");
@@ -103,7 +104,7 @@ public class AcknowledgementManager {
 				}
 			}
 			if(log.isDebugEnabled()) log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent, anon");
-			return;
+			return transaction;
 		}
 		
 		// From here on, we must be dealing with a real address. Piggyback all sequences that have an
@@ -115,6 +116,12 @@ public class AcknowledgementManager {
 		findBean.setToAddress(target.getAddress());
 
 		Collection collection = retransmitterBeanMgr.find(findBean);
+		
+		if (transaction != null && transaction.isActive())
+			transaction.commit();
+		
+		transaction = storageManager.getTransaction();
+		
 		Iterator it = collection.iterator();
 		while (it.hasNext()) {
 			SenderBean ackBean = (SenderBean) it.next();
@@ -162,6 +169,7 @@ public class AcknowledgementManager {
 		
 		if (log.isDebugEnabled())
 			log.debug("Exit: AcknowledgementManager::piggybackAcksIfPresent");
+		return transaction;
 	}
 
 	/**

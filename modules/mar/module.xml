@@ -7,11 +7,11 @@
     <InFlow>
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
             <!-- Global In handler should come before addressing dispatching -->
-            <order phase="PreDispatch" before="AddressingBasedDispatcher" />
+            <order phase="Dispatch" before="AddressingBasedDispatcher" />
         </handler> 
         
        	<handler name="SequenceIDDispatcher" class="org.apache.sandesha2.handlers.SequenceIDDispatcher">
-            <order phase="PreDispatch" after="SandeshaGlobalInHandler" before="AddressingBasedDispatcher"  />
+            <order phase="Dispatch" after="SandeshaGlobalInHandler" before="AddressingBasedDispatcher"  />
         </handler> 
         
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">

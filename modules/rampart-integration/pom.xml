@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>SNAPSHOT</version>
+	    <version>${wss4j.version}</version>
         </dependency>
 
     	<dependency>
@@ -69,8 +69,9 @@
 			
     </dependencies>
 	
-	<properties>
-		<rampart.version>SNAPSHOT</rampart.version>
-     </properties>
+    <properties>
+	     <rampart.version>SNAPSHOT</rampart.version>
+	     <wss4j.version>SNAPSHOT</wss4j.version>
+    </properties>     
 	 
 </project>

@@ -50,13 +50,13 @@
         <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
-            <version>1.6.2</version>
+            <version>${wsdl4j.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>SNAPSHOT</version>
+	    <version>${wss4j.version}</version>
         </dependency>
 
         <dependency>
@@ -91,8 +91,10 @@
 
     </dependencies>
 
-	<properties>
-		<rampart.version>SNAPSHOT</rampart.version>
+    <properties>
+	<rampart.version>SNAPSHOT</rampart.version>
+	<wss4j.version>SNAPSHOT</wss4j.version>
+	<wsdl4j.version>1.6.2</wsdl4j.version>
     </properties>
 	 
 </project>

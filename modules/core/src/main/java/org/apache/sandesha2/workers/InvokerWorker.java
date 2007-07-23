@@ -54,18 +54,10 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			transaction = storageManager.getTransaction();
 			
 			InvokerBean invokerBean = invokerBeanMgr.retrieve(messageContextKey);
-			
+
 			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 
-			// ending the transaction before invocation.
-			if(transaction != null) {
-				transaction.commit();
-				transaction = null;
-			}
-					
-			//starting a transaction for the invocation work.
-			transaction = storageManager.getTransaction();
 			// Lock the RMD Bean just to avoid deadlocks
 			SandeshaUtil.getRMDBeanFromSequenceId(storageManager, invokerBean.getSequenceID());
 			// Depending on the transaction  support, the service will be invoked only once. 
@@ -74,6 +66,12 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			// removing the corresponding message context as well.
 			storageManager.removeMessageContext(messageContextKey);
 
+			// ending the transaction before invocation.
+			if(transaction != null) {
+				transaction.commit();
+				transaction = null;
+			}
+			
 			try {
 
 				boolean postFailureInvocation = false;
@@ -100,11 +98,7 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					msgToInvoke.setPaused(false);
 					AxisEngine.resumeReceive(msgToInvoke);
 				}
-				
-				if(transaction!=null){
-					transaction.commit();
-					transaction = storageManager.getTransaction();
-				}
+
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception :", e);
@@ -113,7 +107,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			}
 
 
-			
+			transaction = storageManager.getTransaction();
+			 
 			if (rmMsg.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION) {
 				Sequence sequence = (Sequence) rmMsg
 						.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE);
@@ -137,7 +132,8 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 					TerminateManager.cleanReceivingSideAfterInvocation(invokerBean.getSequenceID(), storageManager);
 					// exit from current iteration. (since an entry
 					// was removed)
-					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");					
+					if(log.isDebugEnabled()) log.debug("Exit: InvokerWorker::run Last message return");	
+					if(transaction != null && transaction.isActive()) transaction.commit();
 					return;
 				}
 			}

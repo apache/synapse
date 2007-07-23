@@ -238,6 +238,10 @@ public class Invoker extends SandeshaThread {
 				processedMessage = false;
 				
 				if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, looped over all sequences, sleep " + sleep);
+				
+				if(transaction != null && transaction.isActive()) transaction.commit();
+				transaction = null;
+				
 				return sleep;
 			}
 
@@ -255,6 +259,10 @@ public class Invoker extends SandeshaThread {
 					sleep = true;
 
 				if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, sleep " + sleep);
+				
+				if(transaction != null && transaction.isActive()) transaction.commit();
+				transaction = null;
+
 				return sleep;
 			}
 
@@ -282,6 +290,10 @@ public class Invoker extends SandeshaThread {
 			// If there aren't any beans to process then move on to the next sequence
 			if (invokerBeans.size() == 0) {
 				if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, no beans to invoke on sequence " + sequenceId + ", sleep " + sleep);
+				
+				if(transaction != null && transaction.isActive()) transaction.commit();
+				transaction = null;
+
 				return sleep;
 			}
 			
@@ -306,6 +318,12 @@ public class Invoker extends SandeshaThread {
 					sleep = true;
 					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.workAlreadyAssigned, workId);
 					if (log.isDebugEnabled()) log.debug("Exit: Invoker::internalRun, " + message + ", sleep " + sleep);
+					
+					if(transaction != null) {
+						transaction.commit();
+						transaction = null;
+					}
+					
 					return sleep;
 				}
 

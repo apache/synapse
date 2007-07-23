@@ -96,6 +96,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
       
 				if (msgCtx == null) {
 					// This sender bean has already been processed
+					
+					if(transaction != null && transaction.isActive()) transaction.commit();
+					transaction = null;
+
 					return;
 				}
       
@@ -113,12 +117,24 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if (qualifiedForSending != null && !qualifiedForSending.equals(Sandesha2Constants.VALUE_TRUE)) {
 				if (log.isDebugEnabled())
 					log.debug("Exit: SenderWorker::run, !qualified for sending");
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return;
 			}
 
 			if (msgCtx == null) {
 				if (log.isDebugEnabled())
 					log.debug(SandeshaMessageHelper.getMessage(SandeshaMessageKeys.sendHasUnavailableMsgEntry));
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return;			
 			}
 
@@ -128,6 +144,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if (msgsNotToSend != null && msgsNotToSend.contains(new Integer(rmMsgCtx.getMessageType()))) {
 				if (log.isDebugEnabled())
 					log.debug("Exit: SenderWorker::run, message type to be dropped " + rmMsgCtx.getMessageType());
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return;	
 			}
 
@@ -177,6 +199,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			if (!continueSending) { 
 				if (log.isDebugEnabled())
 					log.debug("Exit: SenderWorker::run, !continueSending");
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return;
 			}
 

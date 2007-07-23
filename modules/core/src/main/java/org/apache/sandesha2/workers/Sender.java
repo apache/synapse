@@ -77,6 +77,7 @@ public class Sender extends SandeshaThread {
 			// Pick a sequence using a round-robin approach
 			ArrayList allSequencesList = getSequences();
 			int size = allSequencesList.size();
+
 			if (log.isDebugEnabled())
 				log.debug("Choosing one from " + size + " sequences");
 			if(nextIndex >= size) {
@@ -103,13 +104,13 @@ public class Sender extends SandeshaThread {
 				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, looped over all sequences, sleep " + sleep);
 				return sleep;
 			}
+			
+			transaction = storageManager.getTransaction();
 
 			SequenceEntry entry = (SequenceEntry) allSequencesList.get(nextIndex++);
 			String sequenceId = entry.getSequenceId();
 			if (log.isDebugEnabled())
 				log.debug("Chose sequence " + sequenceId);
-
-			transaction = storageManager.getTransaction();
 
 			String rmVersion = null;
 			// Check that the sequence is still valid
@@ -141,6 +142,12 @@ public class Sender extends SandeshaThread {
 			if (!found) {
 				stopThreadForSequence(sequenceId, entry.isRmSource());
 				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, sequence has ended");
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return false;
 			}
 			
@@ -149,6 +156,12 @@ public class Sender extends SandeshaThread {
 			
 			if (senderBean == null) {
 				if (log.isDebugEnabled()) log.debug("Exit: Sender::internalRun, no message for this sequence");
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return false; // Move on to the next sequence in the list
 			}
 
@@ -170,13 +183,18 @@ public class Sender extends SandeshaThread {
 									workId);
 					log.debug("Exit: Sender::internalRun, " + message + ", sleeping");
 				}
+				
+				if(transaction != null && transaction.isActive()) {
+					transaction.commit();
+					transaction = null;
+				}
+				
 				return true;
 			}
 
-			if(transaction != null) {
-				transaction.commit();
-				transaction = null;
-			}
+			//commiting the transaction here to release resources early.
+			if(transaction != null && transaction.isActive()) transaction.commit();
+			transaction = null;
 
 			// start a worker which will work on this messages.
 			SenderWorker worker = new SenderWorker(context, senderBean, rmVersion);
@@ -193,9 +211,6 @@ public class Sender extends SandeshaThread {
 			// remember not to sleep at the end of the list of sequences.
 			processedMessage = true;
 			
-			if(transaction != null && transaction.isActive()) transaction.commit();
-			transaction = null;
-
 		} catch (Exception e) {
 
 			// TODO : when this is the client side throw the exception to
@@ -312,7 +327,6 @@ public class Sender extends SandeshaThread {
 			} 	    
 	    
 			if(transaction != null && transaction.isActive()) transaction.commit();
-			transaction = null;
 			
 		} catch (SandeshaException e) {
 			if (log.isErrorEnabled())
@@ -352,6 +366,7 @@ public class Sender extends SandeshaThread {
     		if (log.isDebugEnabled())
     			log.debug("Removing RMSBean " + rmsBean);
     		storageManager.getRMSBeanMgr().delete(rmsBean.getCreateSeqMsgID());
+    		storageManager.removeMessageContext( rmsBean.getReferenceMessageStoreKey() );
     	}	    	
     }
 

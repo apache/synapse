@@ -11,7 +11,7 @@
         </handler> 
         
        	<handler name="SequenceIDDispatcher" class="org.apache.sandesha2.handlers.SequenceIDDispatcher">
-            <order phase="Dispatch" after="SandeshaGlobalInHandler" before="AddressingBasedDispatcher"  />
+            <order phase="Addressing" before="AddressingValidationHandler"  />
         </handler> 
         
         <handler name="SandeshaInHandler" class="org.apache.sandesha2.handlers.SandeshaInHandler">

@@ -32,13 +32,9 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.namespace.QName;
 import java.util.*;
-import java.net.URLConnection;
 import java.io.IOException;
 
 /**
@@ -52,6 +48,7 @@ public class SynapseConfiguration {
     /** The remote registry made available to the Synapse configuration. Only one is supported */
     Registry registry = null;
 
+    private QName defaultQName = null;
     /** Holds Proxy services defined through Synapse */
     private Map proxyServices = new HashMap();
 
@@ -435,4 +432,12 @@ public class SynapseConfiguration {
         log.error(msg);
         throw new SynapseException(msg);
     }
+
+	public void setDefaultQName(QName defaultQName) {
+		this.defaultQName = defaultQName;
+	}
+
+	public QName getDefaultQName() {
+		return defaultQName;
+	}
 }

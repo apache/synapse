@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators;
 
 import org.apache.synapse.Constants;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 

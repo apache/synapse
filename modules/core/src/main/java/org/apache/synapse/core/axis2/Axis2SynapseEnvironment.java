@@ -19,6 +19,9 @@
 
 package org.apache.synapse.core.axis2;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.soap.SOAPProcessingException;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +35,10 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.Executors;
+
 
 /**
  * <p> This is the Axis2 implementation of the MessageContext
@@ -39,8 +46,9 @@ import org.apache.synapse.statistics.StatisticsUtils;
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
-
+    private int threadPoolSize = 10; 
     private SynapseConfiguration synapseConfig;
+    private ConfigurationContext configContext;
     /**
      * The StatisticsCollector object
      */
@@ -51,10 +59,12 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     public Axis2SynapseEnvironment(ConfigurationContext cfgCtx,
                                    SynapseConfiguration synapseConfig) {
+    	this.configContext = cfgCtx;
         this.synapseConfig = synapseConfig;
     }
 
     public void injectMessage(final MessageContext synCtx) {
+    	log.debug("Injecting MessageContext");
         synCtx.setEnvironment(this);
         if (synCtx.isResponse()) {
             //Process statistics related to a sequence which has send mediator as a child,end point
@@ -105,6 +115,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             }
 
         } else {
+        	log.debug("Using Main Sequence for injected message");
             synCtx.getMainSequence().mediate(synCtx);
         }
     }
@@ -117,9 +128,17 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     public MessageContext createMessageContext() {
+    	log.debug("Creating Message Context");
         org.apache.axis2.context.MessageContext axis2MC
                 = new org.apache.axis2.context.MessageContext();
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
+		try {
+			mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
+			mc.getEnvelope().addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
         return mc;
     }
 
@@ -141,4 +160,5 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         this.statisticsCollector = collector;
     }
 
+	
 }

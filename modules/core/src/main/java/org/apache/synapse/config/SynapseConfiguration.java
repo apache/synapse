@@ -21,6 +21,7 @@ package org.apache.synapse.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
@@ -28,11 +29,11 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.registry.Registry;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
-
 import javax.xml.namespace.QName;
 import java.util.*;
 import java.io.IOException;
@@ -41,397 +42,468 @@ import java.io.IOException;
  * The SynapseConfiguration holds the global configuration for a Synapse
  * instance.
  */
-public class SynapseConfiguration {
+public class SynapseConfiguration implements ManagedLifecycle {
 
-    private static final Log log = LogFactory.getLog(SynapseConfiguration.class);
+	private static final Log log = LogFactory
+			.getLog(SynapseConfiguration.class);
 
-    /** The remote registry made available to the Synapse configuration. Only one is supported */
-    Registry registry = null;
+	/**
+	 * The remote registry made available to the Synapse configuration. Only one
+	 * is supported
+	 */
+	Registry registry = null;
 
-    private QName defaultQName = null;
-    /** Holds Proxy services defined through Synapse */
-    private Map proxyServices = new HashMap();
+	private QName defaultQName = null;
 
-    /**
-     * The local registry is a simple HashMap and provides the ability to override definitions
-     * of a remote registry for entries defined locally with the same key
-     */
-    private Map localRegistry = new HashMap();
+	/** Holds Proxy services defined through Synapse */
+	private Map proxyServices = new HashMap();
 
-    /** Hold reference to the Axis2 ConfigurationContext */
-    private AxisConfiguration axisConfiguration = null;
+	private List startup = null; // this will be a list of ManagedLifecycle
 
-    /** Save the path to the configuration file loaded, to save it later if required */
-    private String pathToConfigFile = null;
+	// objects
 
-    /**
-     * Add a named sequence into the local registry
-     * @param key the name for the sequence
-     * @param mediator a Sequence mediator
-     */
-    public void addSequence(String key, Mediator mediator) {
-        localRegistry.put(key, mediator);
-    }
+	/**
+	 * The local registry is a simple HashMap and provides the ability to
+	 * override definitions of a remote registry for entries defined locally
+	 * with the same key
+	 */
+	private Map localRegistry = new HashMap();
 
-    /**
-     * Allow a dynamic sequence to be cached and made available through the local registry
-     * @param key the key to lookup the sequence from the remote registry
-     * @param entry the Entry object which holds meta information and the cached resource
-     */
-    public void addSequence(String key, Entry entry) {
-        localRegistry.put(key, entry);
-    }
+	/** Hold reference to the Axis2 ConfigurationContext */
+	private AxisConfiguration axisConfiguration = null;
 
-    /**
-     * Returns the map of defined sequences in the configuraiton excluding the fetched sequences
-     * from remote registry
-     * @return Map of SequenceMediators defined in the local configuraion
-     */
-    public Map getDefinedSequences() {
-        Map definedSequences = new HashMap();
-        Iterator itr = localRegistry.values().iterator();
-        while(itr.hasNext()) {
-            Object o = itr.next();
-            if(o instanceof SequenceMediator) {
-                definedSequences.put(((SequenceMediator) o).getName(), o);
-            }
-        }
-        return definedSequences;
-    }
+	/**
+	 * Save the path to the configuration file loaded, to save it later if
+	 * required
+	 */
+	private String pathToConfigFile = null;
 
-    /**
-     * Return the sequence specified with the given key
-     * @param key the key being referenced
-     * @return the sequence referenced by the key
-     */
-    public Mediator getSequence(String key) {
-        Object o = localRegistry.get(key);
-        if (o != null && o instanceof Mediator) {
-            return (Mediator) o;
-        }
+	/**
+	 * Add a named sequence into the local registry
+	 * 
+	 * @param key
+	 *            the name for the sequence
+	 * @param mediator
+	 *            a Sequence mediator
+	 */
+	public void addSequence(String key, Mediator mediator) {
+		localRegistry.put(key, mediator);
+	}
 
-        Entry entry = null;
-        if (o != null && o instanceof Entry) {
-            entry = (Entry) o;
-        } else {
-            entry = new Entry(key);
-            entry.setType(Entry.REMOTE_ENTRY);
-            entry.setMapper(MediatorFactoryFinder.getInstance());
-        }
+	/**
+	 * Allow a dynamic sequence to be cached and made available through the
+	 * local registry
+	 * 
+	 * @param key
+	 *            the key to lookup the sequence from the remote registry
+	 * @param entry
+	 *            the Entry object which holds meta information and the cached
+	 *            resource
+	 */
+	public void addSequence(String key, Entry entry) {
+		localRegistry.put(key, entry);
+	}
 
-        if (registry != null) {
-            o = registry.getResource(entry);
-            if (o != null && o instanceof Mediator) {
-                localRegistry.put(key, entry);
-                return (Mediator) o;
-            }
-        }
+	/**
+	 * Returns the map of defined sequences in the configuraiton excluding the
+	 * fetched sequences from remote registry
+	 * 
+	 * @return Map of SequenceMediators defined in the local configuraion
+	 */
+	public Map getDefinedSequences() {
+		Map definedSequences = new HashMap();
+		Iterator itr = localRegistry.values().iterator();
+		while (itr.hasNext()) {
+			Object o = itr.next();
+			if (o instanceof SequenceMediator) {
+				definedSequences.put(((SequenceMediator) o).getName(), o);
+			}
+		}
+		return definedSequences;
+	}
 
-        return null;
-    }
+	/**
+	 * Return the sequence specified with the given key
+	 * 
+	 * @param key
+	 *            the key being referenced
+	 * @return the sequence referenced by the key
+	 */
+	public Mediator getSequence(String key) {
+		Object o = localRegistry.get(key);
+		if (o != null && o instanceof Mediator) {
+			return (Mediator) o;
+		}
 
-    /**
-     * Removes a sequence from the local registry
-     * @param key of the sequence to be removed
-     */
-    public void removeSequence(String key) {
-        localRegistry.remove(key);
-    }
+		Entry entry = null;
+		if (o != null && o instanceof Entry) {
+			entry = (Entry) o;
+		} else {
+			entry = new Entry(key);
+			entry.setType(Entry.REMOTE_ENTRY);
+			entry.setMapper(MediatorFactoryFinder.getInstance());
+		}
 
-    /**
-     * Return the main/default sequence to be executed. This is the sequence which
-     * will execute for all messages when message mediation takes place
-     * @return the main mediator sequence
-     */
-    public Mediator getMainSequence() {
-        return getSequence(Constants.MAIN_SEQUENCE_KEY);
-    }
+		if (registry != null) {
+			o = registry.getResource(entry);
+			if (o != null && o instanceof Mediator) {
+				localRegistry.put(key, entry);
+				return (Mediator) o;
+			}
+		}
 
-    /**
-     * Return the fault sequence to be executed when Synapse encounters a fault scenario
-     * during processing
-     * @return the fault sequence
-     */
-    public Mediator getFaultSequence() {
-        return getSequence(Constants.FAULT_SEQUENCE_KEY);
-    }
+		return null;
+	}
 
-    /**
-     * Define a resource to the local registry. All static resources (e.g. URL source)
-     * are loaded during this definition phase, and the inability to load such a resource
-     * will not allow the definition of the resource to the local registry
-     *
-     * @param key the key associated with the resource
-     * @param entry the Entry that holds meta information about the resource and its
-     * contents (or cached contents if the Entry refers to a dynamic resource off a
-     * remote registry)
-     */
-    public void addEntry(String key, Entry entry) {
+	/**
+	 * Removes a sequence from the local registry
+	 * 
+	 * @param key
+	 *            of the sequence to be removed
+	 */
+	public void removeSequence(String key) {
+		localRegistry.remove(key);
+	}
 
-        if (entry.getType() == Entry.URL_SRC) {
-            try {
-                entry.setValue(Util.getOMElementFromURL(entry.getSrc().toString()));
-                localRegistry.put(key, entry);
-            } catch (IOException e) {
-                handleException("Can not read from source URL : " + entry.getSrc());
-            }
-        } else {
-            localRegistry.put(key, entry);
-        }
-    }
+	/**
+	 * Return the main/default sequence to be executed. This is the sequence
+	 * which will execute for all messages when message mediation takes place
+	 * 
+	 * @return the main mediator sequence
+	 */
+	public Mediator getMainSequence() {
+		return getSequence(Constants.MAIN_SEQUENCE_KEY);
+	}
 
-    /**
-     * Returns the map of defined entries in the configuraiton excluding the fetched entries
-     * from remote registry
-     * @return Map of Entries defined in the local configuraion
-     */
-    public Map getDefinedEntries() {
-        Map definedEntries = new HashMap();
-        Iterator itr = localRegistry.values().iterator();
-        while(itr.hasNext()) {
-            Object o = itr.next();
-            if(o instanceof Entry && ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
-                definedEntries.put(((Entry) o).getKey(), o);
-            }
-        }
-        return definedEntries;
-    }
+	/**
+	 * Return the fault sequence to be executed when Synapse encounters a fault
+	 * scenario during processing
+	 * 
+	 * @return the fault sequence
+	 */
+	public Mediator getFaultSequence() {
+		return getSequence(Constants.FAULT_SEQUENCE_KEY);
+	}
 
-    /**
-    * Get the resource with the given key
-    * @param key the key of the resource required
-    * @return its value
-    */
-    public Object getEntry(String key) {
-        Object o = localRegistry.get(key);
-        if (o != null && o instanceof Entry) {
-            Entry entry = (Entry) o;
-            if (entry.isDynamic()) {
-                if (entry.isCached() && !entry.isExpired()) {
-                    return entry.getValue();
-                } else if (registry != null) {
-                    o = registry.getResource(entry);
-                }
-            } else {
-                return entry.getValue();
-            }
-        }
-        return o;
-    }
+	/**
+	 * Define a resource to the local registry. All static resources (e.g. URL
+	 * source) are loaded during this definition phase, and the inability to
+	 * load such a resource will not allow the definition of the resource to the
+	 * local registry
+	 * 
+	 * @param key
+	 *            the key associated with the resource
+	 * @param entry
+	 *            the Entry that holds meta information about the resource and
+	 *            its contents (or cached contents if the Entry refers to a
+	 *            dynamic resource off a remote registry)
+	 */
+	public void addEntry(String key, Entry entry) {
 
-    /**
-     * Get the Entry object mapped to the given key
-     * @param key the key for which the Entry is required
-     * @return its value
-     */
-    public Entry getEntryDefinition(String key) {
-        Object o = localRegistry.get(key);
-        if (o == null || o instanceof Entry) {
-            if (o == null) {
-                // this is not a local definition
-                Entry entry = new Entry(key);
-                entry.setType(Entry.REMOTE_ENTRY);
-                addEntry(key, entry);
-                return entry;
-            }
-            return (Entry) o;
-        } else {
-            handleException("Invalid local registry entry : " + key);
-            return null;
-        }
-    }
+		if (entry.getType() == Entry.URL_SRC) {
+			try {
+				entry.setValue(Util.getOMElementFromURL(entry.getSrc()
+						.toString()));
+				localRegistry.put(key, entry);
+			} catch (IOException e) {
+				handleException("Can not read from source URL : "
+						+ entry.getSrc());
+			}
+		} else {
+			localRegistry.put(key, entry);
+		}
+	}
 
-    /**
-     * Deletes any reference mapped to the given key from the local registry
-     * @param key the key of the reference to be removed
-     */
-    public void removeEntry(String key) {
-        localRegistry.remove(key);
-    }
+	/**
+	 * Returns the map of defined entries in the configuraiton excluding the
+	 * fetched entries from remote registry
+	 * 
+	 * @return Map of Entries defined in the local configuraion
+	 */
+	public Map getDefinedEntries() {
+		Map definedEntries = new HashMap();
+		Iterator itr = localRegistry.values().iterator();
+		while (itr.hasNext()) {
+			Object o = itr.next();
+			if (o instanceof Entry
+					&& ((Entry) o).getType() != Entry.REMOTE_ENTRY) {
+				definedEntries.put(((Entry) o).getKey(), o);
+			}
+		}
+		return definedEntries;
+	}
 
-    /**
-     * Define a named endpoint with the given key
-     * @param key the key for the endpoint
-     * @param endpoint the endpoint definition
-     */
-    public void addEndpoint(String key, Endpoint endpoint) {
-        localRegistry.put(key, endpoint);
-    }
+	/**
+	 * Get the resource with the given key
+	 * 
+	 * @param key
+	 *            the key of the resource required
+	 * @return its value
+	 */
+	public Object getEntry(String key) {
+		Object o = localRegistry.get(key);
+		if (o != null && o instanceof Entry) {
+			Entry entry = (Entry) o;
+			if (entry.isDynamic()) {
+				if (entry.isCached() && !entry.isExpired()) {
+					return entry.getValue();
+				} else if (registry != null) {
+					o = registry.getResource(entry);
+				}
+			} else {
+				return entry.getValue();
+			}
+		}
+		return o;
+	}
 
-    /**
-     * Add a dynamic endpoint definition to the local registry
-     * @param key the key for the endpoint definition
-     * @param entry the actual endpoint definition to be added
-     */
-    public void addEndpoint(String key, Entry entry) {
-        localRegistry.put(key, entry);
-    }
+	/**
+	 * Get the Entry object mapped to the given key
+	 * 
+	 * @param key
+	 *            the key for which the Entry is required
+	 * @return its value
+	 */
+	public Entry getEntryDefinition(String key) {
+		Object o = localRegistry.get(key);
+		if (o == null || o instanceof Entry) {
+			if (o == null) {
+				// this is not a local definition
+				Entry entry = new Entry(key);
+				entry.setType(Entry.REMOTE_ENTRY);
+				addEntry(key, entry);
+				return entry;
+			}
+			return (Entry) o;
+		} else {
+			handleException("Invalid local registry entry : " + key);
+			return null;
+		}
+	}
 
-    /**
-     * Returns the map of defined endpoints in the configuraiton excluding the fetched endpoints
-     * from remote registry
-     * @return Map of Endpoints defined in the local configuraion
-     */
-    public Map getDefinedEndpoints() {
-        Map definedEndpoints = new HashMap();
-        Iterator itr = localRegistry.values().iterator();
-        while(itr.hasNext()) {
-            Object o = itr.next();
-            if(o instanceof Endpoint) {
-                definedEndpoints.put(((Endpoint) o).getName(), o);
-            }
-        }
-        return definedEndpoints;
-    }
+	/**
+	 * Deletes any reference mapped to the given key from the local registry
+	 * 
+	 * @param key
+	 *            the key of the reference to be removed
+	 */
+	public void removeEntry(String key) {
+		localRegistry.remove(key);
+	}
 
-    /**
-     * Get the definition of the endpoint with the given key
-     * @param key the key of the endpoint
-     * @return the endpoint definition
-     */
-    public Endpoint getEndpoint(String key) {
-        Object o = localRegistry.get(key);
-        if (o != null && o instanceof Endpoint) {
-            return (Endpoint) o;
-        }
+	/**
+	 * Define a named endpoint with the given key
+	 * 
+	 * @param key
+	 *            the key for the endpoint
+	 * @param endpoint
+	 *            the endpoint definition
+	 */
+	public void addEndpoint(String key, Endpoint endpoint) {
+		localRegistry.put(key, endpoint);
+	}
 
-        Entry entry = null;
-        if (o != null && o instanceof Entry) {
-            entry = (Entry) o;
-        } else {
-            entry = new Entry(key);
-            entry.setType(Entry.REMOTE_ENTRY);
-            entry.setMapper(XMLToEndpointMapper.getInstance());
-        }
+	/**
+	 * Add a dynamic endpoint definition to the local registry
+	 * 
+	 * @param key
+	 *            the key for the endpoint definition
+	 * @param entry
+	 *            the actual endpoint definition to be added
+	 */
+	public void addEndpoint(String key, Entry entry) {
+		localRegistry.put(key, entry);
+	}
 
-        if (registry != null) {
-            o = registry.getResource(entry);
-            if (o != null && o instanceof Endpoint) {
-                localRegistry.put(key, entry);
-                return (Endpoint) o;
-            }
-        }
+	/**
+	 * Returns the map of defined endpoints in the configuraiton excluding the
+	 * fetched endpoints from remote registry
+	 * 
+	 * @return Map of Endpoints defined in the local configuraion
+	 */
+	public Map getDefinedEndpoints() {
+		Map definedEndpoints = new HashMap();
+		Iterator itr = localRegistry.values().iterator();
+		while (itr.hasNext()) {
+			Object o = itr.next();
+			if (o instanceof Endpoint) {
+				definedEndpoints.put(((Endpoint) o).getName(), o);
+			}
+		}
+		return definedEndpoints;
+	}
 
-        return null;
-    }
+	/**
+	 * Get the definition of the endpoint with the given key
+	 * 
+	 * @param key
+	 *            the key of the endpoint
+	 * @return the endpoint definition
+	 */
+	public Endpoint getEndpoint(String key) {
+		Object o = localRegistry.get(key);
+		if (o != null && o instanceof Endpoint) {
+			return (Endpoint) o;
+		}
 
-    /**
-     * Deletes the endpoint with the given key
-     * @param key of the endpoint to be deleted
-     */
-    public void removeEndpoint(String key) {
-        localRegistry.remove(key);
-    }
+		Entry entry = null;
+		if (o != null && o instanceof Entry) {
+			entry = (Entry) o;
+		} else {
+			entry = new Entry(key);
+			entry.setType(Entry.REMOTE_ENTRY);
+			entry.setMapper(XMLToEndpointMapper.getInstance());
+		}
 
-    /**
-     * Add a Proxy service to the configuration
-     * @param name the name of the Proxy service
-     * @param proxy the Proxy service instance
-     */
-    public void addProxyService(String name, ProxyService proxy) {
-        proxyServices.put(name, proxy);
-    }
+		if (registry != null) {
+			o = registry.getResource(entry);
+			if (o != null && o instanceof Endpoint) {
+				localRegistry.put(key, entry);
+				return (Endpoint) o;
+			}
+		}
 
-    /**
-     * Get the Proxy service with the given name
-     * @param name the name being looked up
-     * @return the Proxy service
-     */
-    public ProxyService getProxyService(String name) {
-        return (ProxyService) proxyServices.get(name);
-    }
+		return null;
+	}
 
-    /**
-     * Deletes the Proxy Service named with the given name
-     * @param name of the Proxy Service to be deleted
-     */
-    public void removeProxyService(String name) {
-        Object o = proxyServices.get(name);
-        if (o == null) {
-            handleException("Unknown proxy service for name : " + name);
-        } else {
-            try {
-                if(getAxisConfiguration().getServiceForActivation(name) != null) {
-                    if (getAxisConfiguration().getServiceForActivation(name).isActive()) {
-                        getAxisConfiguration().getService(name).setActive(false);
-                    }
-                    getAxisConfiguration().removeService(name);
-                }
-                proxyServices.remove(name);
-            } catch (AxisFault axisFault) {
-                handleException(axisFault.getMessage());
-            }
-        }
-    }
+	/**
+	 * Deletes the endpoint with the given key
+	 * 
+	 * @param key
+	 *            of the endpoint to be deleted
+	 */
+	public void removeEndpoint(String key) {
+		localRegistry.remove(key);
+	}
 
-    /**
-     * Return the list of defined proxy services
-     * @return the proxy services defined
-     */
-    public Collection getProxyServices() {
-        return proxyServices.values();
-    }
+	/**
+	 * Add a Proxy service to the configuration
+	 * 
+	 * @param name
+	 *            the name of the Proxy service
+	 * @param proxy
+	 *            the Proxy service instance
+	 */
+	public void addProxyService(String name, ProxyService proxy) {
+		proxyServices.put(name, proxy);
+	}
 
-    /**
-     * Return an unmodifiable copy of the local registry
-     * @return an unmodifiable copy of the local registry
-     */
-    public Map getLocalRegistry() {
-        return Collections.unmodifiableMap(localRegistry);
-    }
+	/**
+	 * Get the Proxy service with the given name
+	 * 
+	 * @param name
+	 *            the name being looked up
+	 * @return the Proxy service
+	 */
+	public ProxyService getProxyService(String name) {
+		return (ProxyService) proxyServices.get(name);
+	}
 
-    /**
-     * Get the remote registry defined (if any)
-     * @return the currently defined remote registry
-     */
-    public Registry getRegistry() {
-        return registry;
-    }
+	/**
+	 * Deletes the Proxy Service named with the given name
+	 * 
+	 * @param name
+	 *            of the Proxy Service to be deleted
+	 */
+	public void removeProxyService(String name) {
+		Object o = proxyServices.get(name);
+		if (o == null) {
+			handleException("Unknown proxy service for name : " + name);
+		} else {
+			try {
+				if (getAxisConfiguration().getServiceForActivation(name) != null) {
+					if (getAxisConfiguration().getServiceForActivation(name)
+							.isActive()) {
+						getAxisConfiguration().getService(name)
+								.setActive(false);
+					}
+					getAxisConfiguration().removeService(name);
+				}
+				proxyServices.remove(name);
+			} catch (AxisFault axisFault) {
+				handleException(axisFault.getMessage());
+			}
+		}
+	}
 
-    /**
-     * Set the remote registry for the configuration
-     * @param registry the remote registry for the configuration
-     */
-    public void setRegistry(Registry registry) {
-        this.registry = registry;
-    }
+	/**
+	 * Return the list of defined proxy services
+	 * 
+	 * @return the proxy services defined
+	 */
+	public Collection getProxyServices() {
+		return proxyServices.values();
+	}
 
-    /**
-     * Set the Axis2 AxisConfiguration to the SynapseConfiguration
-     * @param axisConfig
-     */
-    public void setAxisConfiguration(AxisConfiguration axisConfig) {
-        this.axisConfiguration = axisConfig;
-    }
+	/**
+	 * Return an unmodifiable copy of the local registry
+	 * 
+	 * @return an unmodifiable copy of the local registry
+	 */
+	public Map getLocalRegistry() {
+		return Collections.unmodifiableMap(localRegistry);
+	}
 
-    /**
-     * Get the Axis2 AxisConfiguration for the SynapseConfiguration
-     * @return AxisConfiguration of the Axis2
-     */
-    public AxisConfiguration getAxisConfiguration() {
-        return axisConfiguration;
-    }
+	/**
+	 * Get the remote registry defined (if any)
+	 * 
+	 * @return the currently defined remote registry
+	 */
+	public Registry getRegistry() {
+		return registry;
+	}
 
-    /**
-     * The path to the currently loaded configuration file
-     * @return file path to synapse.xml
-     */
-    public String getPathToConfigFile() {
-        return pathToConfigFile;
-    }
+	/**
+	 * Set the remote registry for the configuration
+	 * 
+	 * @param registry
+	 *            the remote registry for the configuration
+	 */
+	public void setRegistry(Registry registry) {
+		this.registry = registry;
+	}
 
-    /**
-     * Set the path to the loaded synapse.xml
-     * @param pathToConfigFile path to the synapse.xml loaded
-     */
-    public void setPathToConfigFile(String pathToConfigFile) {
-        this.pathToConfigFile = pathToConfigFile;
-    }
+	/**
+	 * Set the Axis2 AxisConfiguration to the SynapseConfiguration
+	 * 
+	 * @param axisConfig
+	 */
+	public void setAxisConfiguration(AxisConfiguration axisConfig) {
+		this.axisConfiguration = axisConfig;
+	}
 
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
+	/**
+	 * Get the Axis2 AxisConfiguration for the SynapseConfiguration
+	 * 
+	 * @return AxisConfiguration of the Axis2
+	 */
+	public AxisConfiguration getAxisConfiguration() {
+		return axisConfiguration;
+	}
+
+	/**
+	 * The path to the currently loaded configuration file
+	 * 
+	 * @return file path to synapse.xml
+	 */
+	public String getPathToConfigFile() {
+		return pathToConfigFile;
+	}
+
+	/**
+	 * Set the path to the loaded synapse.xml
+	 * 
+	 * @param pathToConfigFile
+	 *            path to the synapse.xml loaded
+	 */
+	public void setPathToConfigFile(String pathToConfigFile) {
+		this.pathToConfigFile = pathToConfigFile;
+	}
+
+	private void handleException(String msg) {
+		log.error(msg);
+		throw new SynapseException(msg);
+	}
 
 	public void setDefaultQName(QName defaultQName) {
 		this.defaultQName = defaultQName;
@@ -439,5 +511,63 @@ public class SynapseConfiguration {
 
 	public QName getDefaultQName() {
 		return defaultQName;
+	}
+
+	public void setStartup(List l) {
+		startup = l;
+	}
+
+	public List getStartup() {
+		return startup;
+	}
+
+	public void destroy() {
+		log.debug("destroy");
+		for (Iterator it = getProxyServices().iterator(); it.hasNext(); ) {
+			ProxyService p = (ProxyService)it.next();
+			if (p.getTargetInLineInSequence()!=null) {
+				p.getTargetInLineInSequence().destroy();
+			}
+			if (p.getTargetInLineOutSequence()!=null) {
+				p.getTargetInLineOutSequence().destroy();
+			}
+		}
+		
+		Map sequences = getDefinedSequences();
+		for (Iterator it = sequences.entrySet().iterator(); it.hasNext();) {
+			ManagedLifecycle m = (ManagedLifecycle) it.next();
+			m.destroy();
+		}
+		if (startup != null) {
+			for (Iterator it = startup.iterator(); it.hasNext();) {
+				ManagedLifecycle m = (ManagedLifecycle) it.next();
+				m.destroy();
+			}
+		}
+	}
+
+	public void init(SynapseEnvironment se) {
+		log.debug("init");
+		for (Iterator it = getProxyServices().iterator(); it.hasNext(); ) {
+			ProxyService p = (ProxyService)it.next();
+			if (p.getTargetInLineInSequence()!=null) {
+				p.getTargetInLineInSequence().init(se);
+			}
+			if (p.getTargetInLineOutSequence()!=null) {
+				p.getTargetInLineOutSequence().init(se);
+			}
+		}
+		
+		Map sequences = getDefinedSequences();
+		for (Iterator it = sequences.values().iterator(); it.hasNext();) {
+			ManagedLifecycle m = (ManagedLifecycle) it.next();
+			m.init(se);
+		}
+		if (startup != null) {
+			for (Iterator it = startup.iterator(); it.hasNext();) {
+				ManagedLifecycle m = (ManagedLifecycle) it.next();
+				m.init(se);
+			}
+		}
 	}
 }

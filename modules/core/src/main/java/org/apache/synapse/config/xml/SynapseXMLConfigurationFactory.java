@@ -1,15 +1,13 @@
 package org.apache.synapse.config.xml;
 
-import java.io.IOException;
+
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -33,6 +31,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 		
 		SynapseConfiguration config = new SynapseConfiguration();
 		config.setDefaultQName(definitions.getQName());
+		
         SequenceMediator rootSequence = new SequenceMediator();
         rootSequence.setName(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY);
 
@@ -62,7 +61,10 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                             defineProxy(config, elt);
                         } else if (Constants.REGISTRY_ELT.equals(elt.getQName())) {
                             defineRegistry(config, elt);
-                        } else {
+                        } else if (Constants.STARTUP_ELT.equals(elt.getQName())) {
+                            defineStartup(config, elt);
+                        }  
+                        else {
                             Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
                             rootSequence.addChild(m);
                         }
@@ -106,6 +108,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
             handleException("Only one remote registry can be defined within a configuration");
         }
         config.setRegistry(RegistryFactory.createRegistry(elem));
+    }
+    
+    private static void defineStartup(SynapseConfiguration config, OMElement elem) {
+        if (config.getStartup() != null) {
+            handleException("Only one startup set can be defined within a configuration");
+        }
+        config.setStartup(StartupWrapperFactory.createStartup(elem));
     }
 
     private static void defineProxy(SynapseConfiguration config, OMElement elem) {

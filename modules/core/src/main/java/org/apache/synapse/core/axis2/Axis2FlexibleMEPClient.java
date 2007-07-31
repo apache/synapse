@@ -227,7 +227,7 @@ public class Axis2FlexibleMEPClient {
             callback.setTimeOutAction(endpoint.getTimeoutAction());
         }
         mepClient.setCallback(callback);
-        
+
         mepClient.execute(false);
 
         // with the nio transport, this causes the listener not to write a 202
@@ -280,8 +280,11 @@ public class Axis2FlexibleMEPClient {
         newMC.setProperty(MessageContext.TRANSPORT_HEADERS,
             ori.getProperty(MessageContext.TRANSPORT_HEADERS));
 
-        // copy axis properties from the original to the copy
-        newMC.setProperties(ori.getProperties());
+        Iterator iter = ori.getOptions().getProperties().keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            newMC.setProperty(key, ori.getProperty(key));
+        }
 
         return newMC;
     }

@@ -22,6 +22,7 @@ package org.apache.synapse.core;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsCollector;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 /**
  * The SynapseEnvironment allows access into the the host SOAP engine. It allows
@@ -52,7 +53,7 @@ public interface SynapseEnvironment {
     /**
      * This method returns the StatisticsCollector
      *
-     * @return Retruns the StatisticsCollector
+     * @return Returns the StatisticsCollector
      */
     public StatisticsCollector getStatisticsCollector();
 
@@ -62,4 +63,12 @@ public interface SynapseEnvironment {
      * @param statisticsCollector
      */
     public void setStatisticsCollector(StatisticsCollector statisticsCollector);
+    
+    /**
+     * This is used by anyone who needs access to a ThreadPool. It offers the ability to
+     * start work. See the backport concurrent documentation
+     * @return Returns the ExecutorService
+     */
+    // public ExecutorService getExecutorService();
+    // not used yet
 }

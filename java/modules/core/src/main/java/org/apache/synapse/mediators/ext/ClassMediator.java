@@ -22,143 +22,94 @@ package org.apache.synapse.mediators.ext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.MediatorProperty;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.mediators.AbstractMediator;
 
 /**
- * The class mediator delegates the mediation to a new instance of a specified class. The specified class
- * must implement the Mediator interface
- *
+ * The class mediator delegates the mediation to a new instance of a specified
+ * class. The specified class must implement the Mediator interface
+ * 
  * @see Mediator
  */
-public class ClassMediator extends AbstractMediator {
+public class ClassMediator extends AbstractMediator implements ManagedLifecycle {
 
-    private static final Log log = LogFactory.getLog(ClassMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+	private static final Log log = LogFactory.getLog(ClassMediator.class);
 
-    private Class clazz = null;
-    private List properties = new ArrayList();
+	private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
 
-    /**
-     * Delegate mediation to a new instance of the specified class
-     *
-     * @param synCtx the message context
-     * @return as per standard semantics
-     */
-    public boolean mediate(MessageContext synCtx) {
+	private Mediator mediator = null;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Class mediator <" + clazz.getName() + ">:: mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Class mediator");
-        }
-        Mediator m = null;
-        try {
-            try {
-                m = (Mediator) clazz.newInstance();
-            } catch (Exception e) {
-                String msg = "Error while creating an instance of the specified mediator class : " +
-                        clazz.getName();
-                if (shouldTrace) {
-                    trace.trace(msg);
-                }
-                handleException(msg, e);
-            }
-            if (m == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("The instance of the specified mediator class : \" +\n" +
-                            clazz.getName() + "is null");
-                }
-                return true;
-            }
-            setProperties(m, synCtx, shouldTrace);
-            if (shouldTrace) {
-                trace.trace("Executing an instance of the specified class : " + clazz.getName());
-            }
-            return m.mediate(synCtx);
-        } finally {
-            if (shouldTrace) {
-                trace.trace("End : Class mediator");
-            }
-        }
-    }
+	/**
+	 * Don't use a new instance... do one instance of the object per instance of
+	 * this mediator
+	 * 
+	 * @param synCtx
+	 *            the message context
+	 * @return as per standard semantics
+	 */
+	public boolean mediate(MessageContext synCtx) {
 
-    /**
-     * Only String properties are supported
-     *
-     * @param m the mediator
-     */
-    private void setProperties(Mediator m, MessageContext synCtx, boolean shouldTrace) {
+		if (log.isDebugEnabled()) {
+			log.debug("Class mediator <" + mediator.getClass()
+					+ ">:: mediate()");
+		}
+		boolean shouldTrace = shouldTrace(synCtx.getTracingState());
+		if (shouldTrace) {
+			trace.trace("Start : Class mediator");
+		}
 
-        if (!properties.isEmpty()) {
-            for (Iterator iter = properties.iterator(); iter.hasNext();) {
+		try {
 
-                MediatorProperty mProp = (MediatorProperty) iter.next();
+			if (mediator == null) {
+				if (log.isDebugEnabled()) {
+					log.debug("The instance of the specified mediator is null");
 
-                String mName = "set" + Character.toUpperCase(mProp.getName().charAt(0)) +
-                                            mProp.getName().substring(1);
-                String value = (mProp.getValue() != null ?
-                        mProp.getValue() :
-                        Axis2MessageContext.getStringValue(mProp.getExpression(), synCtx));
+				}
+				return true;
+			}
+			if (shouldTrace) {
+				trace.trace("Executing an instance of the specified class : "
+						+ mediator.getClass());
+			}
+			return mediator.mediate(synCtx);
+		} finally {
+			if (shouldTrace) {
+				trace.trace("End : Class mediator");
+			}
+		}
+	}
 
-                try {
-                    if (value != null) {
-                        Method method = m.getClass().getMethod(mName, new Class[]{String.class});
-                        if (log.isDebugEnabled()) {
-                            log.debug("Setting property :: invoking method " + mName + "(" + value + ")");
-                        }
-                        if (shouldTrace) {
-                            trace.trace("Setting property :: invoking method " + mName + "(" + value + ")");
-                        }
-                        method.invoke(m, new Object[]{value});
-                    }
-                } catch (Exception e) {
-                    String msg = "Error setting property : " + mProp.getName() + " as a String property into class" +
-                            " mediator : " + m.getClass() + " : " + e.getMessage();
+	
 
-                    if (shouldTrace) {
-                        trace.trace(msg);
-                    }
-                    handleException(msg, e);
-                }
-            }
-        }
-    }
+	public void destroy() {
+		log.debug("destroy");
+		if (mediator instanceof ManagedLifecycle) {
+			((ManagedLifecycle) mediator).destroy();
+		}
+	}
 
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
+	public void init(SynapseEnvironment se) {
+		log.debug("init");
+		if (mediator == null) {
+			log.debug("init called before mediator set");
+			return;
+		}
 
-    public void setClazz(Class clazz) {
-        this.clazz = clazz;
-    }
+		if (mediator instanceof ManagedLifecycle) {
+			((ManagedLifecycle) mediator).init(se);
 
-    public Class getClazz() {
-        return clazz;
-    }
+		}
+	}
 
-    public void addProperty(MediatorProperty p) {
-        properties.add(p);
-    }
+	public void setMediator(Mediator mediator) {
+		this.mediator = mediator;
+	}
 
-    public void addAllProperties(List list) {
-        properties.addAll(list);
-    }
-
-    public List getProperties() {
-        return properties;
-    }
-
+	public Mediator getMediator() {
+		return mediator;
+	}
 }

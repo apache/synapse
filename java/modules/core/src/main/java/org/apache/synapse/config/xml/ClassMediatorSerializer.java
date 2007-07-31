@@ -47,15 +47,15 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
         OMElement clazz = fac.createOMElement("class", synNS);
         finalizeSerialization(clazz, mediator);
 
-        if (mediator.getClazz() != null) {
+        if (mediator.getMediator() != null) {
             clazz.addAttribute(fac.createOMAttribute(
-                "name", nullNS, mediator.getClazz().getName()));
+                "name", nullNS, mediator.getMediator().getClass().getName()));
         } else {
             handleException("Invalid class mediator. " +
                 "The class name is required");
         }
 
-        serializeProperties(clazz, mediator.getProperties());
+        //serializeProperties(clazz, mediator.getProperties());
 
         if (parent != null) {
             parent.addChild(clazz);

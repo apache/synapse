@@ -54,6 +54,7 @@ public class SynapseModule implements Module {
 
     private static final String SYNAPSE_SERVICE_NAME = "synapse";
     private static final QName MEDIATE_OPERATION_Q_NAME = new QName("mediate");
+    private SynapseConfiguration synCfg;
 
     public void init(ConfigurationContext configurationContext,
         AxisModule axisModule) throws AxisFault {
@@ -79,7 +80,7 @@ public class SynapseModule implements Module {
         }   
         // Initializing the SynapseEnvironment and SynapseConfiguration
         log.info("Initializing the Synapse configuration ...");
-        SynapseConfiguration synCfg = initializeSynapse(configurationContext);
+        synCfg = initializeSynapse(configurationContext);
 
         log.info("Deploying the Synapse service..");
         // Dynamically initialize the Synapse Service and deploy it into Axis2
@@ -114,7 +115,7 @@ public class SynapseModule implements Module {
                 proxy.stop(synCfg);
             }
         }
-
+        
         log.info("Synapse initialized successfully...!");
     }
 
@@ -164,6 +165,9 @@ public class SynapseModule implements Module {
             log.fatal(msg, e);
             throw new SynapseException(msg, e);
         }
+        // now initialize SynapseConfig
+        
+        synapseConfiguration.init(synEnv);
         
         return synapseConfiguration;
     }
@@ -183,5 +187,7 @@ public class SynapseModule implements Module {
     public void shutdown(ConfigurationContext configurationContext)
         throws AxisFault {
         // ignore
+    	synCfg.destroy();
+    	
     }
 }

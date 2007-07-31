@@ -21,8 +21,10 @@ package org.apache.synapse.mediators;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,7 +35,7 @@ import java.util.List;
  *
  * @see ListMediator
  */
-public abstract class AbstractListMediator extends AbstractMediator implements ListMediator {
+public abstract class AbstractListMediator extends AbstractMediator implements ListMediator, ManagedLifecycle {
 
     private static final Log log = LogFactory.getLog(AbstractListMediator.class);
 
@@ -80,5 +82,24 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
 
     public Mediator removeChild(int pos) {
         return (Mediator) mediators.remove(pos);
+    }
+    
+    public void init(SynapseEnvironment se) {
+    	log.debug("init");
+    	for (Iterator it = mediators.iterator(); it.hasNext();) {
+            Mediator m = (Mediator) it.next();
+            if (m instanceof ManagedLifecycle) {
+            	((ManagedLifecycle)m).init(se);
+            }
+        } 
+    }
+    public void destroy() {
+    	log.debug("destroy");
+    	for (Iterator it = mediators.iterator(); it.hasNext();) {
+            Mediator m = (Mediator) it.next();
+            if (m instanceof ManagedLifecycle) {
+            	((ManagedLifecycle)m).destroy();
+            }
+        } 
     }
 }

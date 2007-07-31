@@ -125,7 +125,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-nhttp</artifactId>
+            <artifactId>synapse-transports</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -22,7 +22,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
         <format>tar.gz</format>
-        <format>zip</format>
+        <!--<format>zip</format>-->
     </formats>
 
     <fileSets>
@@ -184,10 +184,10 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>modules/nhttp/target</directory>
+            <directory>modules/transports/target</directory>
             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
-                <include>synapse-nhttp-${synapse.version}.jar</include>
+                <include>synapse-transports-${synapse.version}.jar</include>
             </includes>
         </fileSet>
     </fileSets>

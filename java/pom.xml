@@ -97,7 +97,7 @@
                         <configuration>
                             <descriptors>
                                 <descriptor>src/main/assembly/bin.xml</descriptor>
-                                <descriptor>src/main/assembly/src.xml</descriptor>
+                                <!--<descriptor>src/main/assembly/src.xml</descriptor>-->
                             </descriptors>
                             <finalName>synapse-${synapse.version}</finalName>
                         </configuration>
@@ -215,7 +215,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-nhttp</artifactId>
+                <artifactId>synapse-transports</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -548,7 +548,7 @@
             <version>${js.version}</version>
         </dependency>
 
-        <!-- dependencies for nhttp transport -->
+        <!-- dependencies for transports module -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
@@ -563,6 +563,26 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore-niossl</artifactId>
             <version>${httpcore.nio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-vfs</groupId>
+            <artifactId>commons-vfs</artifactId>
+            <version>${commons.vfs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons.net.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>${jsch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>oro</groupId>
+            <artifactId>oro</artifactId>
+            <version>${oro.version}</version>
         </dependency>
 
         <!-- dependencies for extensions -->
@@ -676,17 +696,6 @@
 
     <repositories>
         <repository>
-            <id>ibiblio-m2</id>
-            <name>Ibiblio Maven 2 Repo</name>
-            <url>http://www.ibiblio.org/maven2</url>
-            <releases>
-            	<updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
             <id>apache-snapshots</id>
             <name>Apache Maven 2 Snapshot Repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
@@ -711,7 +720,7 @@
     </repositories>
 
     <modules>
-        <module>modules/nhttp</module>
+        <module>modules/transports</module>
         <module>modules/core</module>
         <module>modules/extensions</module>
         <module>modules/samples</module>
@@ -722,6 +731,10 @@
         <!-- Synapse and related components -->
         <synapse.version>SNAPSHOT</synapse.version>
         <httpcore.nio.version>4.0-alpha5</httpcore.nio.version>
+        <commons.vfs.version>1.0</commons.vfs.version>
+        <commons.net.version>1.4.1</commons.net.version>
+        <jsch.version>0.1.31</jsch.version>
+        <oro.version>2.0.8</oro.version>
 
         <!-- Axis2 1.2 and its dependencies -->
         <axis2.version>1.2</axis2.version>

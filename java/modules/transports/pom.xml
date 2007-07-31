@@ -29,9 +29,9 @@
         <version>SNAPSHOT</version>
     </parent>
 
-    <artifactId>synapse-nhttp</artifactId>
-    <name>Apache Synapse - HttpCore-NIO</name>
-    <description>Apache Synapse - HttpCore-NIO</description>
+    <artifactId>synapse-transports</artifactId>
+    <name>Apache Synapse - Transports</name>
+    <description>Apache Synapse - Transports</description>
     <packaging>jar</packaging>
 
     <build>

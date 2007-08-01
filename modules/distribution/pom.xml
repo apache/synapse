@@ -11,14 +11,52 @@
 
     <groupId>org.apache.sandesha2</groupId>
     <artifactId>distribution</artifactId>
-
     <name>Sandesha2 - Distribution</name>
     <description>Sandesha2 - Distribution</description>
     <packaging>pom</packaging>
 
     <build>
     <plugins>
-
+	<plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-antrun-plugin</artifactId>
+	    <version>1.1</version>
+	    <inherited>false</inherited>
+	    <executions>
+		    <execution>
+			    <id>javadoc-generation</id>
+			    <phase>package</phase>
+			    <configuration>
+				    <tasks>
+					    <mkdir dir="${basedir}/target/docs/apidocs"/>
+					    <javadoc packagenames="org.apache.sandesha2.*"
+							     destdir="${basedir}/target/docs/apidocs"
+							     classpathref="maven.runtime.classpath"
+							     author="true"
+							     version="true"
+							     use="true"
+							     windowtitle="Sandesha2 API"
+							     doctitle="Sandesha2"
+							     bottom="Copyright &#169; 2007 Apache Web Services Project. All Rights Reserved."
+							     >
+							    <packageset dir="../../modules/core/src/main/java" defaultexcludes="yes">
+								    <include name="org/apache/sandesha2/**"/>
+							    </packageset>
+							    <packageset dir="../../modules/interop/src/main/java" defaultexcludes="yes">
+								    <include name="org/apache/sandesha2/**"/>
+							    </packageset>    
+							    <packageset dir="../../modules/rampart-integration/src/main/java" defaultexcludes="yes">
+								    <include name="org/apache/sandesha2/**"/>
+							    </packageset>							
+					      </javadoc>
+				        </tasks>
+				    </configuration>
+				    <goals>
+					    <goal>run</goal>
+				    </goals>
+			    </execution>
+		    </executions>
+        </plugin>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
@@ -34,6 +72,7 @@
                         <descriptors>
                             <descriptor>src/main/assembly/bin.xml</descriptor>
                             <descriptor>src/main/assembly/src.xml</descriptor>
+			    <descriptor>src/main/assembly/doc.xml</descriptor>
                         </descriptors>
                         <finalName>sandesha2-${version}</finalName>
                     </configuration>

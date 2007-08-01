@@ -1,0 +1,35 @@
+<assembly>
+    <id>docs</id>
+    <includeBaseDirectory>true</includeBaseDirectory> 
+    <formats>
+	<!--<format>tar.gz</format>  //uncomment,if tar.gz archive needed-->
+        <format>zip</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+	    <directory>../../xdocs</directory>
+            <outputDirectory>xdocs</outputDirectory>
+            <excludes>
+                <exclude>.svn/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+	    <directory>target/docs/apidocs</directory>
+	    <outputDirectory>apidocs</outputDirectory>
+            <excludes>
+                <exclude>.svn/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>../..</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>LICENSE.txt</include>
+                <include>README.txt</include>
+                <include>release-notes.html</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
+

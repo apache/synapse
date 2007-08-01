@@ -16,6 +16,10 @@
 
 package org.tempuri;
 
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
+
 /**
  * EchoStringRequestBodyType bean class
  */
@@ -285,6 +289,11 @@ public class EchoStringRequestBodyType implements
 			 */
 			private java.lang.String createPrefix() {
 				return "ns" + (int) Math.random();
+			}
+
+			public void serialize(MTOMAwareXMLStreamWriter arg0) throws XMLStreamException {
+				// TODO Auto-generated method stub
+				
 			}
 		};
 

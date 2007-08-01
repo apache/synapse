@@ -16,6 +16,10 @@
 
 package org.tempuri;
 
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.axis2.databinding.utils.writer.MTOMAwareXMLStreamWriter;
+
 /**
  * Ping bean class
  */
@@ -207,6 +211,11 @@ public class Ping implements org.apache.axis2.databinding.ADBBean {
 			 */
 			private java.lang.String createPrefix() {
 				return "ns" + (int) Math.random();
+			}
+
+			public void serialize(MTOMAwareXMLStreamWriter arg0) throws XMLStreamException {
+				// TODO Auto-generated method stub
+				
 			}
 		};
 

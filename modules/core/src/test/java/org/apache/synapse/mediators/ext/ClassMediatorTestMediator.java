@@ -33,6 +33,8 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class ClassMediatorTestMediator extends AbstractMediator implements ManagedLifecycle {
 
     public static boolean invoked = false;
+    public static boolean initialized = false;
+    public static boolean destroyed = false;
 
     public static String testProp = null;
 
@@ -54,10 +56,10 @@ public class ClassMediatorTestMediator extends AbstractMediator implements Manag
     }
 
     public void init(SynapseEnvironment se) {
-//To change body of implemented methods use File | Settings | File Templates.
+        initialized = true;
     }
 
     public void destroy() {
-//To change body of implemented methods use File | Settings | File Templates.
+        destroyed = true;
     }
 }

@@ -104,6 +104,9 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
                         throw new SynapseException(msg, e);
 
                     }
+                } else if (child.getAttributeValue(new QName("expression")) != null) {
+                    // check whether there is an XPATH exp for the property value
+                    // todo:
                 } else {
                     // now try XML child
                     OMElement value = child.getFirstElement();

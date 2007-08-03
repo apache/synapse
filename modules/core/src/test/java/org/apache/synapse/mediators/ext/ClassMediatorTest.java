@@ -19,14 +19,12 @@
 
 package org.apache.synapse.mediators.ext;
 
-import junit.framework.TestCase;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.ClassMediatorFactory;
-import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.TestMessageContext;
 import org.apache.synapse.config.xml.AbstractTestCase;
-import org.apache.synapse.mediators.MediatorProperty;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 
 /**
  * Tests the class mediator instantiation and setting of literal and
@@ -49,6 +47,26 @@ public class ClassMediatorTest extends AbstractTestCase {
         cm.mediate(new TestMessageContext());
         assertTrue(ClassMediatorTestMediator.invoked);
         assertTrue(ClassMediatorTestMediator.testProp.equals("testValue"));
+    }
+
+    public void testInitialization() throws Exception {
+        Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
+                "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
+                        "xmlns='http://ws.apache.org/ns/synapse'/>"));
+        ((ManagedLifecycle) cm).init(new Axis2SynapseEnvironment());
+        assertTrue(ClassMediatorTestMediator.initialized);
+        cm.mediate(new TestMessageContext());
+        assertTrue(ClassMediatorTestMediator.invoked);
+    }
+
+    public void testDestroy() throws Exception {
+        Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
+                "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
+                        "xmlns='http://ws.apache.org/ns/synapse'/>"));
+        cm.mediate(new TestMessageContext());
+        assertTrue(ClassMediatorTestMediator.invoked);
+        ((ManagedLifecycle) cm).destroy();
+        assertTrue(ClassMediatorTestMediator.destroyed);
     }
 
 //    public void testCreationWithXPathProperties() throws Exception {

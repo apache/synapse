@@ -40,5 +40,7 @@ public class ClassMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, classMediatorSerializer));
     }
 
+    // todo: need to add more scenarios with properties
+
 
 }

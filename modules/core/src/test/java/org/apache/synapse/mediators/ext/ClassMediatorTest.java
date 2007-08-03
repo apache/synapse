@@ -22,41 +22,44 @@ package org.apache.synapse.mediators.ext;
 import junit.framework.TestCase;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.TestMessageContext;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.ClassMediatorFactory;
+import org.apache.synapse.config.xml.MediatorFactoryFinder;
+import org.apache.synapse.config.xml.AbstractTestCase;
 import org.apache.synapse.mediators.MediatorProperty;
 
 /**
  * Tests the class mediator instantiation and setting of literal and
  * XPath parameters at runtime.
  */
-public class ClassMediatorTest extends TestCase {
+public class ClassMediatorTest extends AbstractTestCase {
 
     public void testCreationWithoutProperties() throws Exception {
-        ClassMediator cm = new ClassMediator();
-        cm.setClazz(ClassMediatorTestMediator.class);
+        Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
+                "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
+                        "xmlns='http://ws.apache.org/ns/synapse'/>"));
         cm.mediate(new TestMessageContext());
         assertTrue(ClassMediatorTestMediator.invoked);
     }
 
     public void testCreationWithLiteralProperties() throws Exception {
-        ClassMediator cm = new ClassMediator();
-        MediatorProperty mp = new MediatorProperty();
-        mp.setName("testProp");
-        mp.setValue("testValue");
-        cm.addProperty(mp);
-        cm.setClazz(ClassMediatorTestMediator.class);
+        Mediator cm = MediatorFactoryFinder.getInstance().getMediator(createOMElement(
+                "<class name='org.apache.synapse.mediators.ext.ClassMediatorTestMediator' " +
+                        "xmlns='http://ws.apache.org/ns/synapse'><property name='testProp' value='testValue'/></class>"));
         cm.mediate(new TestMessageContext());
+        assertTrue(ClassMediatorTestMediator.invoked);
         assertTrue(ClassMediatorTestMediator.testProp.equals("testValue"));
     }
 
-    public void testCreationWithXPathProperties() throws Exception {
-        ClassMediator cm = new ClassMediator();
-        MediatorProperty mp = new MediatorProperty();
-        mp.setName("testProp");
-        mp.setExpression(new AXIOMXPath("concat('XPath ','is ','FUN!')"));
-        cm.addProperty(mp);
-        cm.setClazz(ClassMediatorTestMediator.class);
-        cm.mediate(new TestMessageContext());
-        assertTrue(ClassMediatorTestMediator.testProp.equals("XPath is FUN!"));
-    }
+//    public void testCreationWithXPathProperties() throws Exception {
+//        ClassMediator cm = new ClassMediator();
+//        MediatorProperty mp = new MediatorProperty();
+//        mp.setName("testProp");
+//        mp.setExpression(new AXIOMXPath("concat('XPath ','is ','FUN!')"));
+//        cm.addProperty(mp);
+//        cm.setClazz(ClassMediatorTestMediator.class);
+//        cm.mediate(new TestMessageContext());
+//        assertTrue(ClassMediatorTestMediator.testProp.equals("XPath is FUN!"));
+//    }
 
 }

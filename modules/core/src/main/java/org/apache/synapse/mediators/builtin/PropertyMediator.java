@@ -152,7 +152,7 @@ public class PropertyMediator extends AbstractMediator {
                 }
             } else if (Constants.SCOPE_AXIS2.equals(scope)
                     && smc instanceof Axis2MessageContext) {
-                //Removing property from the  Axis2 Message Context
+                //Removing property from the        Axis2 Message Context
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();

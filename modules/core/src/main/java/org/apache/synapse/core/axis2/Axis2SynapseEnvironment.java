@@ -46,7 +46,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 public class Axis2SynapseEnvironment implements SynapseEnvironment {
 
     private static final Log log = LogFactory.getLog(Axis2SynapseEnvironment.class);
-    private int threadPoolSize = 10; 
+    private int threadPoolSize = 10;
     private SynapseConfiguration synapseConfig;
     private ConfigurationContext configContext;
     /**
@@ -138,7 +138,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
         return mc;
     }
 
@@ -160,5 +160,5 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         this.statisticsCollector = collector;
     }
 
-	
+
 }

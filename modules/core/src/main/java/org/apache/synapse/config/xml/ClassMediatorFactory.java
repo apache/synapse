@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
 
 /**
  * Creates an instance of a Class mediator using XML configuration specified
- * 
+ * <p/>
  * <pre>
  * &lt;class name=&quot;class-name&quot;&gt;
  *   &lt;property name=&quot;string&quot; value=&quot;literal&quot;&gt;
@@ -45,106 +45,107 @@ import javax.xml.namespace.QName;
  */
 public class ClassMediatorFactory extends AbstractMediatorFactory {
 
-	private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
+    private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
-	private static final QName CLASS_Q = new QName(Constants.SYNAPSE_NAMESPACE,
-			"class");
+    private static final QName CLASS_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+            "class");
 
-	public Mediator createMediator(OMElement elem) {
+    public Mediator createMediator(OMElement elem) {
 
-		ClassMediator classMediator = new ClassMediator();
+        ClassMediator classMediator = new ClassMediator();
 
-		OMAttribute name = elem.getAttribute(new QName(
-				Constants.NULL_NAMESPACE, "name"));
-		if (name == null) {
-			String msg = "The name of the actual mediator class is a required attribute";
-			log.error(msg);
-			throw new SynapseException(msg);
-		}
-		Class clazz = null;
-		Mediator m = null;
-		try {
-			clazz = getClass().getClassLoader().loadClass(
-					name.getAttributeValue());
-			m = (Mediator) clazz.newInstance();
-		} catch (Exception e) {
-			String msg = "Error : " + name.getAttributeValue();
-			log.error(msg, e);
-			throw new SynapseException(msg, e);
-		}
+        OMAttribute name = elem.getAttribute(new QName(
+                Constants.NULL_NAMESPACE, "name"));
+        if (name == null) {
+            String msg = "The name of the actual mediator class is a required attribute";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
+        Class clazz = null;
+        Mediator m = null;
+        try {
+            clazz = getClass().getClassLoader().loadClass(
+                    name.getAttributeValue());
+            m = (Mediator) clazz.newInstance();
+        } catch (Exception e) {
+            String msg = "Error : " + name.getAttributeValue();
+            log.error(msg, e);
+            throw new SynapseException(msg, e);
+        }
 
-		for (Iterator it = elem.getChildElements(); it.hasNext();) {
-			OMElement child = (OMElement) it.next();
-			if (child.getLocalName().toLowerCase().equals("property")) {
+        for (Iterator it = elem.getChildElements(); it.hasNext();) {
+            OMElement child = (OMElement) it.next();
+            if (child.getLocalName().toLowerCase().equals("property")) {
 
-				String propertyName = child
-						.getAttributeValue(new QName("name"));
-				String mName = "set"
-						+ Character.toUpperCase(propertyName.charAt(0))
-						+ propertyName.substring(1);
+                String propertyName = child
+                        .getAttributeValue(new QName("name"));
+                String mName = "set"
+                        + Character.toUpperCase(propertyName.charAt(0))
+                        + propertyName.substring(1);
 
-				// try to set String value first
-				if (child.getAttributeValue(new QName("value")) != null) {
-					String value = child.getAttributeValue(new QName("value"));
+                // try to set String value first
+                if (child.getAttributeValue(new QName("value")) != null) {
+                    String value = child.getAttributeValue(new QName("value"));
 
-					try {
-						Method method = m.getClass().getMethod(mName,
-								new Class[] { String.class });
-						if (log.isDebugEnabled()) {
-							log.debug("Setting property :: invoking method "
-									+ mName + "(" + value + ")");
-						}
-						method.invoke(m, new Object[] { value });
+                    try {
+                        Method method = m.getClass().getMethod(mName,
+                                new Class[]{String.class});
+                        if (log.isDebugEnabled()) {
+                            log.debug("Setting property :: invoking method "
+                                    + mName + "(" + value + ")");
+                        }
+                        method.invoke(m, new Object[]{value});
 
-					} catch (Exception e) {
-						String msg = "Error setting property : " + propertyName
-								+ " as a String property into class"
-								+ " mediator : " + m.getClass() + " : "
-								+ e.getMessage();
-						throw new SynapseException(msg, e);
+                    } catch (Exception e) {
+                        String msg = "Error setting property : " + propertyName
+                                + " as a String property into class"
+                                + " mediator : " + m.getClass() + " : "
+                                + e.getMessage();
+                        throw new SynapseException(msg, e);
 
-					}
-				} else {
-					// now try XML child
-					OMElement value = child.getFirstElement();
-					if (value != null) {
+                    }
+                } else {
+                    // now try XML child
+                    OMElement value = child.getFirstElement();
+                    if (value != null) {
 
-						try {
-							Method method = m.getClass().getMethod(mName,
-									new Class[] { OMElement.class });
-							if (log.isDebugEnabled()) {
-								log
-										.debug("Setting property :: invoking method "
-												+ mName + "(" + value + ")");
-							}
-							method.invoke(m, new Object[] { value });
+                        try {
+                            Method method = m.getClass().getMethod(mName,
+                                    new Class[]{OMElement.class});
+                            if (log.isDebugEnabled()) {
+                                log
+                                        .debug("Setting property :: invoking method "
+                                                + mName + "(" + value + ")");
+                            }
+                            method.invoke(m, new Object[]{value});
 
-						} catch (Exception e) {
-							String msg = "Error setting property : "
-									+ propertyName
-									+ " as an OMElement property into class"
-									+ " mediator : " + m.getClass() + " : "
-									+ e.getMessage();
-							throw new SynapseException(msg, e);
+                        } catch (Exception e) {
+                            String msg = "Error setting property : "
+                                    + propertyName
+                                    + " as an OMElement property into class"
+                                    + " mediator : " + m.getClass() + " : "
+                                    + e.getMessage();
+                            throw new SynapseException(msg, e);
 
-						}
+                        }
 
-					}
+                    }
 
-					// after successfully creating the mediator
-					// set its common attributes such as tracing etc
-					classMediator.setMediator(m);
-					initMediator(classMediator, elem);
-					// classMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
+                    // classMediator.addAllProperties(MediatorPropertyFactory.getMediatorProperties(elem));
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		return classMediator;
-	}
+        // after successfully creating the mediator
+        // set its common attributes such as tracing etc
+        classMediator.setMediator(m);
+        initMediator(classMediator, elem);
 
-	public QName getTagQName() {
-		return CLASS_Q;
-	}
+        return classMediator;
+    }
+
+    public QName getTagQName() {
+        return CLASS_Q;
+    }
 }

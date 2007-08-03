@@ -19,7 +19,7 @@
 
 package org.apache.axis2.transport.base;
 
-import org.apache.axis2.Constants;
+
 import javax.xml.namespace.QName;
 
 public class BaseConstants {
@@ -50,13 +50,19 @@ public class BaseConstants {
     /**
      * The name of the element which wraps binary content into a SOAP envelope
      */
+
+    // This has to match org.apache.synapse.util.PayloadHelper
+    // at some future point this can be merged into Axiom as a common base
+    public final static String AXIOMPAYLOADNS = "http://ws.apache.org/commons/ns/payload";
+
+   
     public static final QName DEFAULT_BINARY_WRAPPER =
-            new QName(Constants.AXIS2_NAMESPACE_URI, "binary");
+            new QName(AXIOMPAYLOADNS, "binary");
     /**
      * The name of the element which wraps plain text content into a SOAP envelope
      */
     public static final QName DEFAULT_TEXT_WRAPPER =
-            new QName(Constants.AXIS2_NAMESPACE_URI, "text");
+            new QName(AXIOMPAYLOADNS, "text");
 
     //-------------------------- services.xml parameters --------------------------------
     /**

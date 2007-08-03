@@ -5,12 +5,14 @@ import java.util.Iterator;
 import javax.activation.DataHandler;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.soap.SOAP11Version;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -258,5 +260,38 @@ public class PayloadHelper {
 			}
 		}
 		setMapPayload(mc.getEnvelope(), map);
+	}
+	
+	public static XMLStreamReader getStAXPayload(SOAPEnvelope envelope) {
+		 
+		OMElement el = getXMLPayload(envelope);
+		if (el==null) {
+			return null;
+		}
+		return el.getXMLStreamReader();
+	}
+	public static XMLStreamReader getStAXPayload(MessageContext mc) {
+		if (mc.getEnvelope() == null) {
+			log.error("null envelope");
+			return null;
+		}
+		return getStAXPayload(mc.getEnvelope());
+	}
+	public static void setStAXPayload(SOAPEnvelope envelope, XMLStreamReader streamReader) {
+		StAXOMBuilder builder = new StAXOMBuilder(envelope.getOMFactory(), streamReader);
+		OMElement el = builder.getDocumentElement();
+		setXMLPayload(envelope, el);
+	}
+	public static void setStAXPayload(MessageContext mc, XMLStreamReader streamReader) {
+		if (mc.getEnvelope() == null) {
+			try {
+				mc.setEnvelope(OMAbstractFactory.getSOAP12Factory()
+						.createSOAPEnvelope());
+			} catch (Exception e) {
+				throw new SynapseException(e);
+			}
+			setStAXPayload(mc.getEnvelope(), streamReader);
+		}
+	
 	}
 }

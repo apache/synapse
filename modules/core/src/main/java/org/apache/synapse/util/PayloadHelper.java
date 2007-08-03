@@ -24,6 +24,9 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.util.SimpleMap;
 
 public class PayloadHelper {
+	
+	// this has to match org.apache.axis2.base.transport.BaseConstants 
+	// at some future point we will merge this into Axiom as a common parent
 	public final static String AXIOMPAYLOADNS = "http://ws.apache.org/commons/ns/payload";
 
 	public final static QName BINARYELT = new QName(AXIOMPAYLOADNS, "binary",
@@ -294,4 +297,6 @@ public class PayloadHelper {
 		}
 	
 	}
+	
+	
 }

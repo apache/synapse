@@ -19,10 +19,8 @@
 
 package org.apache.synapse;
 
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMAbstractFactory;
-
-import javax.xml.namespace.QName;
+import org.apache.axiom.om.OMNamespace;
 
 /**
  * Global constants for the Synapse project
@@ -47,6 +45,9 @@ public interface Constants {
 
     /** The system property used to specify/override the synapse configuration XML location */
     String SYNAPSE_XML = "synapse.xml";
+
+    /** The system property used to specify/override the synapse home location */
+    String SYNAPSE_HOME = "synapse.home";
 
     /** a message context property set to hold the relates to for POX responses */
     String RELATES_TO_FOR_POX = "RelatesToForPox";

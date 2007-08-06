@@ -36,16 +36,10 @@ public class ThrottleMediatorSerializationTest extends AbstractTestCase {
         throttleMediatorSerializer = new ThrottleMediatorSerializer();
     }
 
-    public void testPropertyMediatorSerializationSenarioOne() throws Exception {
+    public void testThrottleMediatorSerializationSenarioOne() throws Exception {
         String inputXml = "<throttle:throttle xmlns:throttle=\"http://ws.apache.org/ns/synapse/throttle\" xmlns=\"http://ws.apache.org/ns/synapse\" >" +
                 "<policy key=\"thottleKey\"/></throttle:throttle>";
         assertTrue(serialization(inputXml, throttleMediatorFactory, throttleMediatorSerializer));
         assertTrue(serialization(inputXml, throttleMediatorSerializer));
     }
-//     public void testPropertyMediatorSerializationSenarioTwo() throws Exception {
-//        String inputXml = "<throttle:throttle xmlns:throttle=\"http://ws.apache.org/ns/synapse/throttle\" xmlns=\"http://ws.apache.org/ns/synapse\" >" +
-//                "<policy><inXml/></policy></throttle:throttle>";
-//        assertTrue(serialization(inputXml, throttleMediatorFactory, throttleMediatorSerializer));
-//        assertTrue(serialization(inputXml, throttleMediatorSerializer));
-//    }
 }

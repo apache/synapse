@@ -128,9 +128,14 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     public MessageContext createMessageContext() {
-    	log.debug("Creating Message Context");
+
+        if (log.isDebugEnabled()) {
+            log.debug("Creating Message Context");
+        }
+        
         org.apache.axis2.context.MessageContext axis2MC
                 = new org.apache.axis2.context.MessageContext();
+        axis2MC.setConfigurationContext(this.configContext);
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
 		try {
 			mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());

@@ -28,6 +28,12 @@ import org.apache.synapse.MessageContext;
 
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.axiom.om.OMElement;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * The class mediator delegates the mediation to a new instance of a specified
@@ -43,7 +49,9 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 
 	private Mediator mediator = null;
 
-	/**
+    private List properties = new ArrayList();
+
+    /**
 	 * Don't use a new instance... do one instance of the object per instance of
 	 * this mediator
 	 * 
@@ -67,7 +75,6 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 			if (mediator == null) {
 				if (log.isDebugEnabled()) {
 					log.debug("The instance of the specified mediator is null");
-
 				}
 				return true;
 			}
@@ -82,8 +89,6 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 			}
 		}
 	}
-
-	
 
 	public void destroy() {
 		log.debug("destroy");
@@ -112,4 +117,12 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 	public Mediator getMediator() {
 		return mediator;
 	}
+
+    public void addProperty(OMElement property) {
+        properties.add(property);
+    }
+
+    public List getProperties() {
+        return this.properties;
+    }
 }

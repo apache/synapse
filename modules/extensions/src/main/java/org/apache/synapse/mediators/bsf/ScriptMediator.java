@@ -95,6 +95,9 @@ public class ScriptMediator extends AbstractMediator {
      */
     private XMLHelper xmlHelper;
 
+    /** Lock used to ensure thread-safe lookup of the object from the registry */
+    private final Object resourceLock = new Object();
+
     /**
      * Create a script mediator for the given language and given script source
      *
@@ -263,16 +266,17 @@ public class ScriptMediator extends AbstractMediator {
 
         Entry entry = synCtx.getConfiguration().getEntryDefinition(key);
         boolean needsReload = (entry != null) && entry.isDynamic() && (!entry.isCached() || entry.isExpired());
+        synchronized (resourceLock) {
+            if (scriptSourceCode == null || needsReload) {
+                Object o = synCtx.getEntry(key);
+                if (o instanceof OMElement) {
+                    scriptSourceCode = ((OMElement) (o)).getText();
+                } else if (o instanceof String) {
+                    scriptSourceCode = (String) o;
+                }
 
-        if (scriptSourceCode == null || needsReload) {
-            Object o = synCtx.getEntry(key);
-            if (o instanceof OMElement) {
-                scriptSourceCode = ((OMElement) (o)).getText();
-            } else if (o instanceof String) {
-                scriptSourceCode = (String) o;
+                scriptEngine.eval(scriptSourceCode);
             }
-
-            scriptEngine.eval(scriptSourceCode);
         }
     }
 

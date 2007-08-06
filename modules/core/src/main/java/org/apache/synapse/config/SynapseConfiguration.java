@@ -19,24 +19,25 @@
 
 package org.apache.synapse.config;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Mediator;
 import org.apache.synapse.Constants;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.engine.AxisConfiguration;
+
 import javax.xml.namespace.QName;
-import java.util.*;
 import java.io.IOException;
+import java.util.*;
 
 /**
  * The SynapseConfiguration holds the global configuration for a Synapse
@@ -521,53 +522,71 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		return startup;
 	}
 
-	public void destroy() {
-		log.debug("destroy");
-		for (Iterator it = getProxyServices().iterator(); it.hasNext(); ) {
-			ProxyService p = (ProxyService)it.next();
-			if (p.getTargetInLineInSequence()!=null) {
-				p.getTargetInLineInSequence().destroy();
-			}
-			if (p.getTargetInLineOutSequence()!=null) {
-				p.getTargetInLineOutSequence().destroy();
-			}
-		}
-		
-		Map sequences = getDefinedSequences();
-		for (Iterator it = sequences.entrySet().iterator(); it.hasNext();) {
-			ManagedLifecycle m = (ManagedLifecycle) it.next();
-			m.destroy();
-		}
-		if (startup != null) {
-			for (Iterator it = startup.iterator(); it.hasNext();) {
-				ManagedLifecycle m = (ManagedLifecycle) it.next();
-				m.destroy();
-			}
-		}
-	}
+    public void destroy() {
+        log.debug("destroy");
+        for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
+            Object o = it.next();
+            if (o instanceof ProxyService) {
+                ProxyService p = (ProxyService) o;
+                if (p.getTargetInLineInSequence() != null) {
+                    p.getTargetInLineInSequence().destroy();
+                }
+                if (p.getTargetInLineOutSequence() != null) {
+                    p.getTargetInLineOutSequence().destroy();
+                }
+            }
+        }
 
-	public void init(SynapseEnvironment se) {
-		log.debug("init");
-		for (Iterator it = getProxyServices().iterator(); it.hasNext(); ) {
-			ProxyService p = (ProxyService)it.next();
-			if (p.getTargetInLineInSequence()!=null) {
-				p.getTargetInLineInSequence().init(se);
-			}
-			if (p.getTargetInLineOutSequence()!=null) {
-				p.getTargetInLineOutSequence().init(se);
-			}
-		}
-		
-		Map sequences = getDefinedSequences();
-		for (Iterator it = sequences.values().iterator(); it.hasNext();) {
-			ManagedLifecycle m = (ManagedLifecycle) it.next();
-			m.init(se);
-		}
-		if (startup != null) {
-			for (Iterator it = startup.iterator(); it.hasNext();) {
-				ManagedLifecycle m = (ManagedLifecycle) it.next();
-				m.init(se);
-			}
-		}
-	}
+        Map sequences = getDefinedSequences();
+        for (Iterator it = sequences.entrySet().iterator(); it.hasNext();) {
+            Object o = it.next();
+            if (o instanceof ManagedLifecycle) {
+                ManagedLifecycle m = (ManagedLifecycle) o;
+                m.destroy();
+            }
+        }
+        if (startup != null) {
+            for (Iterator it = startup.iterator(); it.hasNext();) {
+                Object o = it.next();
+                if (o instanceof ManagedLifecycle) {
+                    ManagedLifecycle m = (ManagedLifecycle) o;
+                    m.destroy();
+                }
+            }
+        }
+    }
+
+    public void init(SynapseEnvironment se) {
+        log.debug("init");
+        for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
+            Object o = it.next();
+            if (o instanceof ProxyService) {
+                ProxyService p = (ProxyService) o;
+                if (p.getTargetInLineInSequence() != null) {
+                    p.getTargetInLineInSequence().init(se);
+                }
+                if (p.getTargetInLineOutSequence() != null) {
+                    p.getTargetInLineOutSequence().init(se);
+                }
+            }
+        }
+
+        Map sequences = getDefinedSequences();
+        for (Iterator it = sequences.values().iterator(); it.hasNext();) {
+            Object o = it.next();
+            if (o instanceof ManagedLifecycle) {
+                ManagedLifecycle m = (ManagedLifecycle) o;
+                m.init(se);
+            }
+        }
+        if (startup != null) {
+            for (Iterator it = startup.iterator(); it.hasNext();) {
+                Object o = it.next();
+                if (o instanceof ManagedLifecycle) {
+                    ManagedLifecycle m = (ManagedLifecycle) o;
+                    m.init(se);
+                }
+            }
+        }
+    }
 }

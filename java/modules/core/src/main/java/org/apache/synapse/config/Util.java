@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
 
 import javax.xml.stream.XMLInputFactory;
@@ -34,10 +35,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URI;
-import java.net.MalformedURLException;
 
 public class Util {
 
@@ -108,6 +108,28 @@ public class Util {
      */
     public static Object getObject(URL url) {
         try {
+            if (url != null && "file".equals(url.getProtocol())) {
+                try {
+                    url.openStream();
+                } catch (IOException ignored) {
+                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+                    if (synapseHome != null) {
+                        if (synapseHome.endsWith("/")) {
+                            synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
+                        }
+                        url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
+                        try {
+                            url.openStream();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            log.error(e);
+                        }
+                    }
+                }
+            }
+            if (url == null) {
+                return null;
+            }
             URLConnection urlc = url.openConnection();
             XMLToObjectMapper xmlToObject =
                 getXmlToObjectMapper(urlc.getContentType());
@@ -141,12 +163,32 @@ public class Util {
 
     /**
      * Return an OMElement from a URL source
-     * @param url a URL string
+     * @param urlStr a URL string
      * @return an OMElement of the resource
      * @throws IOException for invalid URL's or IO errors
      */
-    public static OMElement getOMElementFromURL(String url) throws IOException {
-        URLConnection conn = new URL(url).openConnection();
+    public static OMElement getOMElementFromURL(String urlStr) throws IOException {
+        URL url = new URL(urlStr);
+        if ("file".equals(url.getProtocol())) {
+            try {
+                url.openStream();
+            } catch (IOException ignored) {
+                String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+                if (synapseHome != null) {
+                    if (synapseHome.endsWith("/")) {
+                        synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
+                    }
+                    url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
+                    try {
+                        url.openStream();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        log.error(e);
+                    }
+                }
+            }
+        }
+        URLConnection conn = url.openConnection();
         conn.setReadTimeout(10000);
         conn.setConnectTimeout(2000);
         conn.setRequestProperty("Connection", "close"); // if http is being used

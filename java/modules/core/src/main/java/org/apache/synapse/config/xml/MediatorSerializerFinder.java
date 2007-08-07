@@ -51,7 +51,8 @@ public class MediatorSerializerFinder {
         RMSequenceMediatorSerializer.class,     
         ClassMediatorSerializer.class,
         ValidateMediatorSerializer.class,
-        XSLTMediatorSerializer.class        
+        XSLTMediatorSerializer.class,
+        POJOCommandMediatorSerializer.class
     };
 
     private static MediatorSerializerFinder instance = null;

@@ -22,10 +22,11 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.ClassMediator;
-import org.apache.synapse.mediators.filters.FilterMediator;
+
+import java.util.Iterator;
 
 /**
  * <pre>
@@ -47,15 +48,22 @@ public class ClassMediatorSerializer extends AbstractMediatorSerializer  {
         OMElement clazz = fac.createOMElement("class", synNS);
         finalizeSerialization(clazz, mediator);
 
-        if (mediator.getMediator() != null) {
+        if (mediator.getMediator() != null && mediator.getMediator().getClass().getName() != null) {
             clazz.addAttribute(fac.createOMAttribute(
                 "name", nullNS, mediator.getMediator().getClass().getName()));
         } else {
-            handleException("Invalid class mediator. " +
-                "The class name is required");
+            handleException("Invalid class mediator. The class name is required");
         }
 
-        //serializeProperties(clazz, mediator.getProperties());
+        Iterator itr = mediator.getProperties().iterator();
+        while(itr.hasNext()) {
+            Object property = itr.next();
+            if (property instanceof OMElement) {
+                clazz.addChild((OMElement) property);
+            } else {
+                handleException("ClassMediator property can not be serialized");
+            }
+        }
 
         if (parent != null) {
             parent.addChild(clazz);

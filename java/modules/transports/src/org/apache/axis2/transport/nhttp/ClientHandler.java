@@ -180,7 +180,9 @@ public class ClientHandler implements NHttpClientHandler {
      * @param conn the connection being processed
      */
     public void timeout(final NHttpClientConnection conn) {
-        log.debug("Connection Timeout");
+        if (log.isDebugEnabled()) {
+            log.debug("Connection Timeout");
+        }
         shutdownConnection(conn);
     }
 
@@ -276,7 +278,9 @@ public class ClientHandler implements NHttpClientHandler {
 
         switch (response.getStatusLine().getStatusCode()) {
             case HttpStatus.SC_ACCEPTED : {
-                log.debug("Received a 202 Accepted response");
+                if (log.isDebugEnabled()) {
+                    log.debug("Received a 202 Accepted response");
+                }
 
                 // create a dummy message with an empty SOAP envelope and a property
                 // NhttpConstants.SC_ACCEPTED set to Boolean.TRUE to indicate this is a
@@ -326,7 +330,9 @@ public class ClientHandler implements NHttpClientHandler {
                 if (contentType != null &&
                     (contentType.getValue().indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) >= 0) ||
                      contentType.getValue().indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) >=0) {
-                    log.debug("Received an internal server error with a SOAP payload");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Received an internal server error with a SOAP payload");
+                    }
                     processResponse(conn, context, response);
                     return;
                 }

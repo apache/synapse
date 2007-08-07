@@ -60,8 +60,10 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
         task = new TimerTask() {
             public void run() {
                 if (pollInProgress) {
-                    log.debug("Transport " + transportName +
-                        " onPoll() trigger : already executing poll..");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Transport " + transportName +
+                                " onPoll() trigger : already executing poll..");
+                    }
                     return;
                 }
 

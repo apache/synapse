@@ -89,7 +89,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 
 	public void destroy() {
         if (log.isDebugEnabled()) {
-            log.debug("ClassMediator::destroy()");
+            log.debug("Class Mediator::destroy()");
         }
         if (mediator instanceof ManagedLifecycle) {
 			((ManagedLifecycle) mediator).destroy();
@@ -98,11 +98,13 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 
 	public void init(SynapseEnvironment se) {
         if (log.isDebugEnabled()) {
-            log.debug("ClassMediator::init()");
+            log.debug("Class Mediator::init()");
         }
         if (mediator == null) {
-			log.debug("init called before mediator set");
-			return;
+            if (log.isDebugEnabled()) {
+                log.debug("init called before mediator set");
+            }
+            return;
 		}
 
 		if (mediator instanceof ManagedLifecycle) {

@@ -40,7 +40,16 @@ public class ClassMediatorSerializationTest extends AbstractTestCase {
         assertTrue(serialization(inputXml, classMediatorSerializer));
     }
 
-    // todo: need to add more scenarios with properties
+    public void testClassMediatorSerializationWithProperty() throws Exception {
+        String inputXml = "<class xmlns=\"http://ws.apache.org/ns/synapse\" name=\"org.apache.synapse.config.xml.TestMediator\"><property name=\"testProp\" value=\"This is a test\"/></class> ";
+        assertTrue(serialization(inputXml, classMediatorFactory, classMediatorSerializer));
+        assertTrue(serialization(inputXml, classMediatorSerializer));
+    }
 
-
+    public void testClassMediatorSerializationWithInlineProperty() throws Exception {
+        String inputXml = "<class xmlns=\"http://ws.apache.org/ns/synapse\" name=\"org.apache.synapse.config.xml.TestMediator\"><property name=\"testElemProp\"><test/></property></class> ";
+        assertTrue(serialization(inputXml, classMediatorFactory, classMediatorSerializer));
+        assertTrue(serialization(inputXml, classMediatorSerializer));
+    }
+    
 }

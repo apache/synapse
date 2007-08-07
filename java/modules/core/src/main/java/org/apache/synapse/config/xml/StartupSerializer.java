@@ -3,7 +3,7 @@ package org.apache.synapse.config.xml;
 
 
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.startup.Startup;
+import org.apache.synapse.Startup;
 
 public interface StartupSerializer {
 

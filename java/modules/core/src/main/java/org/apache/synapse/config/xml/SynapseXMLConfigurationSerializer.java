@@ -21,7 +21,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointAbstractSerializer;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.startup.Startup;
+import org.apache.synapse.Startup;
 
 public class SynapseXMLConfigurationSerializer implements
 		ConfigurationSerializer {

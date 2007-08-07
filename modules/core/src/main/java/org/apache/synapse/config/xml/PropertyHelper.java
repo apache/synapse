@@ -64,12 +64,12 @@ public class PropertyHelper {
                 String value = property.getAttributeValue(new QName("value"));
 
                 try {
-                    Method method = o.getClass().getMethod(mName, String.class);
+                    Method method = o.getClass().getMethod(mName, new Class[]{String.class});
                     if (log.isDebugEnabled()) {
                         log.debug("Setting property :: invoking method "
                                 + mName + "(" + value + ")");
                     }
-                    method.invoke(o, value);
+                    method.invoke(o, new Object[]{value});
 
                 } catch (Exception e) {
                     handleException("Error setting property : " + propertyName
@@ -83,12 +83,12 @@ public class PropertyHelper {
                 if (value != null) {
 
                     try {
-                        Method method = o.getClass().getMethod(mName, OMElement.class);
+                        Method method = o.getClass().getMethod(mName, new Class[]{OMElement.class});
                         if (log.isDebugEnabled()) {
                             log.debug("Setting property :: invoking method "
                                     + mName + "(" + value + ")");
                         }
-                        method.invoke(o, value);
+                        method.invoke(o, new Object[]{value});
 
                     } catch (Exception e) {
                         handleException("Error setting property : " + propertyName
@@ -126,7 +126,7 @@ public class PropertyHelper {
                 String expression = property.getAttributeValue(new QName("expression"));
 
                 try {
-                    Method method = o.getClass().getMethod(mName, String.class);
+                    Method method = o.getClass().getMethod(mName, new Class[]{String.class});
 
                     AXIOMXPath xp = new AXIOMXPath(expression);
                     OMElementUtils.addNameSpaces(xp, property, log);
@@ -137,7 +137,7 @@ public class PropertyHelper {
                                 + mName + "(" + expression + ")");
                     }
 
-                    method.invoke(o, value);
+                    method.invoke(o, new Object[]{value});
 
                 } catch(NoSuchMethodException e) {
                     handleException("Unable to set the dynamic property value to the class. " +

@@ -12,7 +12,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.startup.Startup;
+import org.apache.synapse.Startup;
 
 import sun.misc.Service;
 

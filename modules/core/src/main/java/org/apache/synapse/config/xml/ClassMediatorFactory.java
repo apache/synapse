@@ -19,18 +19,16 @@
 
 package org.apache.synapse.config.xml;
 
-import java.lang.reflect.Method;
-import java.util.Iterator;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.ext.ClassMediator;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 
 /**
  * Creates an instance of a Class mediator using XML configuration specified
@@ -76,6 +74,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
         for (Iterator it = elem.getChildElements(); it.hasNext();) {
             OMElement child = (OMElement) it.next();
             if(PropertyHelper.isStaticProperty(child)) {
+                classMediator.addProperty(child);
                 PropertyHelper.setStaticProperty(child, m);
             }
         }

@@ -44,27 +44,27 @@ public class StartupFinder {
 		instance = null;
 	}
 
-	private static final Class[] builtins = { SimpleQuartzFactory.class};
-	
+	private static final Class[] builtins = { SimpleQuartzFactory.class };
+
 	private StartupFinder() {
 		// preregister any built in
-		for (int i=0; i<builtins.length;i++) {
+		for (int i = 0; i < builtins.length; i++) {
 			Class b = builtins[i];
 			StartupFactory sf;
 			try {
-				sf = (StartupFactory)b.newInstance();
+				sf = (StartupFactory) b.newInstance();
 			} catch (Exception e) {
-				throw new SynapseException("cannot instantiate "+b.getName(),e);
-				
+				throw new SynapseException("cannot instantiate " + b.getName(),
+						e);
+
 			}
 			factoryMap.put(sf.getTagQName(), b);
-			serializerMap.put(sf.getTagQName(),sf.getSerializerClass());
-	
+			serializerMap.put(sf.getTagQName(), sf.getSerializerClass());
+
 		}
-		
+
 		registerExtensions();
 	}
-
 
 	private void handleException(String msg) {
 		log.error(msg);
@@ -143,15 +143,20 @@ public class StartupFinder {
 		}
 	}
 
-    /**
-     * This method will serialize the config using the supplied QName (looking
+	/**
+	 * This method will serialize the config using the supplied QName (looking
 	 * up the right class to do it)
-     * 
-     * @param parent - Parent OMElement to which the created element will be added if not null
-     * @param startup - Startup to be serialized
-     * @throws XMLStreamException if the serialization encounter an error
-     */
-    public void serializeStartup(OMElement parent, Startup startup) throws XMLStreamException {
+	 * 
+	 * @param parent -
+	 *            Parent OMElement to which the created element will be added if
+	 *            not null
+	 * @param startup -
+	 *            Startup to be serialized
+	 * @throws XMLStreamException
+	 *             if the serialization encounter an error
+	 */
+	public void serializeStartup(OMElement parent, Startup startup)
+			throws XMLStreamException {
 
 		Class cls = (Class) serializerMap.get(startup.getTagQName());
 		if (cls == null) {
@@ -163,7 +168,7 @@ public class StartupFinder {
 
 		try {
 			StartupSerializer ss = (StartupSerializer) cls.newInstance();
-			ss.serializeStartup(parent,  startup);
+			ss.serializeStartup(parent, startup);
 
 		} catch (InstantiationException e) {
 			String msg = "Error initializing startup serializer: " + cls;

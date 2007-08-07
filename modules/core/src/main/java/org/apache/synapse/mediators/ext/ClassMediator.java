@@ -19,21 +19,18 @@
 
 package org.apache.synapse.mediators.ext;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
-
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.axiom.om.OMElement;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The class mediator delegates the mediation to a new instance of a specified
@@ -91,15 +88,19 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 	}
 
 	public void destroy() {
-		log.debug("destroy");
-		if (mediator instanceof ManagedLifecycle) {
+        if (log.isDebugEnabled()) {
+            log.debug("ClassMediator::destroy()");
+        }
+        if (mediator instanceof ManagedLifecycle) {
 			((ManagedLifecycle) mediator).destroy();
 		}
 	}
 
 	public void init(SynapseEnvironment se) {
-		log.debug("init");
-		if (mediator == null) {
+        if (log.isDebugEnabled()) {
+            log.debug("ClassMediator::init()");
+        }
+        if (mediator == null) {
 			log.debug("init called before mediator set");
 			return;
 		}

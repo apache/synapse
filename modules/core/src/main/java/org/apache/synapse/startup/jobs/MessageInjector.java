@@ -19,6 +19,10 @@ public class MessageInjector implements Job, ManagedLifecycle {
 
 	private SynapseEnvironment synapseEnvironment;
 
+	public void init(SynapseEnvironment se) {
+		synapseEnvironment = se;
+	}
+
 	public void setMessage(OMElement el) {
 		log.debug("set message " + el.toString());
 		message = el;
@@ -52,10 +56,6 @@ public class MessageInjector implements Job, ManagedLifecycle {
 	}
 
 	public void destroy() {
-	}
-
-	public void init(SynapseEnvironment se) {
-		synapseEnvironment = se;
 	}
 
 }

@@ -129,7 +129,9 @@ public class NHttpConfiguration {
         }
 
         if (val != null && Integer.valueOf(val).intValue() > 0) {
-            log.debug("Using nhttp tuning parameter : " + name + " = " + val);
+            if (log.isDebugEnabled()) {
+                log.debug("Using nhttp tuning parameter : " + name + " = " + val);
+            }
             return Integer.valueOf(val).intValue();
         }        
         return def;

@@ -130,17 +130,15 @@ public class StartupFinder {
 		}
 	}
 
-	
-	/**
-	 * This method will serialize the config using the supplied QName (looking
+    /**
+     * This method will serialize the config using the supplied QName (looking
 	 * up the right class to do it)
-	 * 
-	 * @param synCfg
-	 * @param qName
-	 * @param outputStream
-	 * @throws XMLStreamException
-	 */
-	public void serializeStartup(OMElement parent, Startup startup) throws XMLStreamException {
+     * 
+     * @param parent - Parent OMElement to which the created element will be added if not null
+     * @param startup - Startup to be serialized
+     * @throws XMLStreamException if the serialization encounter an error
+     */
+    public void serializeStartup(OMElement parent, Startup startup) throws XMLStreamException {
 
 		Class cls = (Class) serializerMap.get(startup.getTagQName());
 		if (cls == null) {

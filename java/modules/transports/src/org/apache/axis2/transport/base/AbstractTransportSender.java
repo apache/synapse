@@ -134,7 +134,9 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
                 try {
                     engine.receive(msgCtx);
                 } catch (AxisFault e) {
-                    log.debug("Error receiving message", e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error receiving message", e);
+                    }
                     if (msgCtx.isServerSide()) {
                         engine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
                     }

@@ -64,7 +64,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
     }
 
     public void injectMessage(final MessageContext synCtx) {
-    	log.debug("Injecting MessageContext");
+        if (log.isDebugEnabled()) {
+            log.debug("Injecting MessageContext");
+        }
         synCtx.setEnvironment(this);
         if (synCtx.isResponse()) {
             //Process statistics related to a sequence which has send mediator as a child,end point
@@ -115,7 +117,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             }
 
         } else {
-        	log.debug("Using Main Sequence for injected message");
+            if (log.isDebugEnabled()) {
+                log.debug("Using Main Sequence for injected message");
+            }
             synCtx.getMainSequence().mediate(synCtx);
         }
     }

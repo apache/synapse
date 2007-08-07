@@ -150,7 +150,9 @@ public class Axis2HttpRequest {
      * @return source channel to read serialized message contents
      */
     public ReadableByteChannel getSourceChannel() {
-        log.debug("get source channel of the pipe on which the outgoing response is written");
+        if (log.isDebugEnabled()) {
+            log.debug("get source channel of the pipe on which the outgoing response is written");
+        }
         return pipe.source();
     }
 
@@ -161,7 +163,9 @@ public class Axis2HttpRequest {
      */
     public void streamMessageContents() throws AxisFault {
 
-        log.debug("start streaming outgoing http request");
+        if (log.isDebugEnabled()) {
+            log.debug("start streaming outgoing http request");
+        }
         OutputStream out = Channels.newOutputStream(pipe.sink());
 
         messageFormatter.writeTo(msgContext, format, out, true);

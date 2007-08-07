@@ -189,7 +189,9 @@ public class HttpCoreNIOListener implements TransportListener {
      * @throws AxisFault
      */
     public void start() throws AxisFault {
-        log.debug("Starting Listener...");
+        if (log.isDebugEnabled()) {
+            log.debug("Starting Listener...");
+        }
         // start the Listener in a new seperate thread
         Thread t = new Thread(new Runnable() {
             public void run() {

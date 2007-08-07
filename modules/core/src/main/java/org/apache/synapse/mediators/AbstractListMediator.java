@@ -85,8 +85,10 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
     }
     
     public void init(SynapseEnvironment se) {
-    	log.debug("init");
-    	for (Iterator it = mediators.iterator(); it.hasNext();) {
+        if (log.isDebugEnabled()) {
+            log.debug("init");
+        }
+        for (Iterator it = mediators.iterator(); it.hasNext();) {
             Mediator m = (Mediator) it.next();
             if (m instanceof ManagedLifecycle) {
             	((ManagedLifecycle)m).init(se);
@@ -94,8 +96,10 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
         } 
     }
     public void destroy() {
-    	log.debug("destroy");
-    	for (Iterator it = mediators.iterator(); it.hasNext();) {
+        if (log.isDebugEnabled()) {
+            log.debug("destroy");
+        }
+        for (Iterator it = mediators.iterator(); it.hasNext();) {
             Mediator m = (Mediator) it.next();
             if (m instanceof ManagedLifecycle) {
             	((ManagedLifecycle)m).destroy();

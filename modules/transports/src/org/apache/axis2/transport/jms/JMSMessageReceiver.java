@@ -88,14 +88,18 @@ public class JMSMessageReceiver implements MessageListener {
                 log.debug(sb.toString());
             }
         } catch (JMSException e) {
-            log.debug("Error reading JMS message headers for debug logging", e);
+            if (log.isDebugEnabled()) {
+                log.debug("Error reading JMS message headers for debug logging", e);
+            }
         }
 
         // has this message already expired? expiration time == 0 means never expires
         try {
             long expiryTime = message.getJMSExpiration();                        
             if (expiryTime > 0 && System.currentTimeMillis() > expiryTime) {
-                log.debug("Discard expired message with ID : " + message.getJMSMessageID());
+                if (log.isDebugEnabled()) {
+                    log.debug("Discard expired message with ID : " + message.getJMSMessageID());
+                }
                 return;
             }
         } catch (JMSException ignore) {}

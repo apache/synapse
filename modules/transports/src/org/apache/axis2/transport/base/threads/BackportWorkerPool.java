@@ -19,7 +19,9 @@ public class BackportWorkerPool implements WorkerPool {
     public BackportWorkerPool(int core, int max, int keepAlive,
         int queueLength, String threadGroupName, String threadGroupId) {
 
-        log.debug("Using backport of the util.concurrent package..");
+        if (log.isDebugEnabled()) {
+            log.debug("Using backport of the util.concurrent package..");
+        }
         executor = new ThreadPoolExecutor(
             core, max, keepAlive,
             TimeUnit.SECONDS,

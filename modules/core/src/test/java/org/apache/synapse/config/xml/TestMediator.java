@@ -20,6 +20,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.axiom.om.OMElement;
 
 /**
  *
@@ -28,8 +29,28 @@ import org.apache.synapse.mediators.AbstractMediator;
 
 public class TestMediator extends AbstractMediator {
 
+    private String testProp = "test property";
+
+    private OMElement testElemProp;
+
     public boolean mediate(MessageContext synCtx) {
         return false;
+    }
+
+    public String getTestProp() {
+        return this.testProp;
+    }
+
+    public void setTestProp(String value) {
+        this.testProp = value;
+    }
+
+    public OMElement getTestElemProp() {
+        return testElemProp;
+    }
+
+    public void setTestElemProp(OMElement testElemProp) {
+        this.testElemProp = testElemProp;
     }
 
     public String getType() {

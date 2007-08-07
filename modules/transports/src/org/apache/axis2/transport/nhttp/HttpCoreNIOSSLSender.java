@@ -72,7 +72,9 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             try {
                 KeyStore keyStore = KeyStore.getInstance(type);
                 URL url = getClass().getClassLoader().getResource(location);
-                log.debug("Loading Key Store from URL : " + url);
+                if (log.isDebugEnabled()) {
+                    log.debug("Loading Key Store from URL : " + url);
+                }
 
                 keyStore.load(url.openStream(), storePassword.toCharArray());
                 KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
@@ -98,7 +100,9 @@ public class HttpCoreNIOSSLSender extends HttpCoreNIOSender{
             try {
                 KeyStore trustStore = KeyStore.getInstance(type);
                 URL url = getClass().getClassLoader().getResource(location);
-                log.debug("Loading Trust Key Store from URL : " + url);
+                if (log.isDebugEnabled()) {
+                    log.debug("Loading Trust Key Store from URL : " + url);
+                }
 
                 trustStore.load(url.openStream(), storePassword.toCharArray());
                 TrustManagerFactory trustManagerfactory = TrustManagerFactory.getInstance(

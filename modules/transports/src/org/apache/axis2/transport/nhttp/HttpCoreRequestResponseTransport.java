@@ -46,17 +46,23 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
     }
 
     public void acknowledgeMessage(MessageContext msgContext) throws AxisFault {
-        log.debug("Acking one-way request");
+        if (log.isDebugEnabled()) {
+            log.debug("Acking one-way request");
+        }
     }
 
     public void awaitResponse() throws InterruptedException, AxisFault {
-        log.debug("Returning thread but keeping socket open -- awaiting response");
+        if (log.isDebugEnabled()) {
+            log.debug("Returning thread but keeping socket open -- awaiting response");
+        }
         status = RequestResponseTransportStatus.WAITING;
         msgContext.getOperationContext().setProperty(Constants.RESPONSE_WRITTEN, "SKIP");
     }
 
     public void signalResponseReady() {
-        log.debug("Signal response available");
+        if (log.isDebugEnabled()) {
+            log.debug("Signal response available");
+        }
         status = RequestResponseTransportStatus.SIGNALLED;
     }
 

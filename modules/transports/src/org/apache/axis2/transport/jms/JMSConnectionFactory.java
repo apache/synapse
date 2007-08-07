@@ -200,7 +200,9 @@ public class JMSConnectionFactory {
             } catch (JMSException ignore) {}
 
         } else {
-            log.debug("Initializing the JMS connection factory : " + name);
+            if (log.isDebugEnabled()) {
+                log.debug("Initializing the JMS connection factory : " + name);
+            }
         }
 
         // get the CF reference freshly [again] from JNDI

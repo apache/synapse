@@ -199,7 +199,9 @@ public abstract class AbstractTransportListener implements TransportListener {
                     engine.receive(msgCtx);
                 } catch (AxisFault e) {
                     e.printStackTrace();
-                    log.debug("Error receiving message", e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error receiving message", e);
+                    }
                     if (msgCtx.isServerSide()) {
                         engine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
                     }

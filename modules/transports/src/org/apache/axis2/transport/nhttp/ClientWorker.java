@@ -87,8 +87,10 @@ public class ClientWorker implements Runnable {
         // context, as it may get a 202 accepted or 200. So if the operation is complete ignore
         // this message, else, create a new message context and handle this
         if (responseMsgCtx == null && outMsgCtx.getOperationContext().isComplete()) {
-            log.debug("Error getting IN message context from the operation context. " +
-                "Possibly an RM terminate sequence message");
+            if (log.isDebugEnabled()) {
+                log.debug("Error getting IN message context from the operation context. " +
+                        "Possibly an RM terminate sequence message");
+            }
             return;
 
         } else {

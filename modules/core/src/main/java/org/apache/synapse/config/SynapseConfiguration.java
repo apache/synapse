@@ -81,7 +81,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Add a named sequence into the local registry
-	 * 
+	 *
 	 * @param key
 	 *            the name for the sequence
 	 * @param mediator
@@ -94,7 +94,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Allow a dynamic sequence to be cached and made available through the
 	 * local registry
-	 * 
+	 *
 	 * @param key
 	 *            the key to lookup the sequence from the remote registry
 	 * @param entry
@@ -108,7 +108,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Returns the map of defined sequences in the configuraiton excluding the
 	 * fetched sequences from remote registry
-	 * 
+	 *
 	 * @return Map of SequenceMediators defined in the local configuraion
 	 */
 	public Map getDefinedSequences() {
@@ -125,7 +125,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Return the sequence specified with the given key
-	 * 
+	 *
 	 * @param key
 	 *            the key being referenced
 	 * @return the sequence referenced by the key
@@ -158,7 +158,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Removes a sequence from the local registry
-	 * 
+	 *
 	 * @param key
 	 *            of the sequence to be removed
 	 */
@@ -169,7 +169,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Return the main/default sequence to be executed. This is the sequence
 	 * which will execute for all messages when message mediation takes place
-	 * 
+	 *
 	 * @return the main mediator sequence
 	 */
 	public Mediator getMainSequence() {
@@ -179,7 +179,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Return the fault sequence to be executed when Synapse encounters a fault
 	 * scenario during processing
-	 * 
+	 *
 	 * @return the fault sequence
 	 */
 	public Mediator getFaultSequence() {
@@ -191,7 +191,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * source) are loaded during this definition phase, and the inability to
 	 * load such a resource will not allow the definition of the resource to the
 	 * local registry
-	 * 
+	 *
 	 * @param key
 	 *            the key associated with the resource
 	 * @param entry
@@ -218,7 +218,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Returns the map of defined entries in the configuraiton excluding the
 	 * fetched entries from remote registry
-	 * 
+	 *
 	 * @return Map of Entries defined in the local configuraion
 	 */
 	public Map getDefinedEntries() {
@@ -236,7 +236,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Get the resource with the given key
-	 * 
+	 *
 	 * @param key
 	 *            the key of the resource required
 	 * @return its value
@@ -260,7 +260,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Get the Entry object mapped to the given key
-	 * 
+	 *
 	 * @param key
 	 *            the key for which the Entry is required
 	 * @return its value
@@ -284,7 +284,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Deletes any reference mapped to the given key from the local registry
-	 * 
+	 *
 	 * @param key
 	 *            the key of the reference to be removed
 	 */
@@ -294,7 +294,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Define a named endpoint with the given key
-	 * 
+	 *
 	 * @param key
 	 *            the key for the endpoint
 	 * @param endpoint
@@ -306,7 +306,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Add a dynamic endpoint definition to the local registry
-	 * 
+	 *
 	 * @param key
 	 *            the key for the endpoint definition
 	 * @param entry
@@ -319,7 +319,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	/**
 	 * Returns the map of defined endpoints in the configuraiton excluding the
 	 * fetched endpoints from remote registry
-	 * 
+	 *
 	 * @return Map of Endpoints defined in the local configuraion
 	 */
 	public Map getDefinedEndpoints() {
@@ -336,7 +336,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Get the definition of the endpoint with the given key
-	 * 
+	 *
 	 * @param key
 	 *            the key of the endpoint
 	 * @return the endpoint definition
@@ -369,7 +369,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Deletes the endpoint with the given key
-	 * 
+	 *
 	 * @param key
 	 *            of the endpoint to be deleted
 	 */
@@ -379,7 +379,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Add a Proxy service to the configuration
-	 * 
+	 *
 	 * @param name
 	 *            the name of the Proxy service
 	 * @param proxy
@@ -391,7 +391,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Get the Proxy service with the given name
-	 * 
+	 *
 	 * @param name
 	 *            the name being looked up
 	 * @return the Proxy service
@@ -402,7 +402,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Deletes the Proxy Service named with the given name
-	 * 
+	 *
 	 * @param name
 	 *            of the Proxy Service to be deleted
 	 */
@@ -429,7 +429,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Return the list of defined proxy services
-	 * 
+	 *
 	 * @return the proxy services defined
 	 */
 	public Collection getProxyServices() {
@@ -438,7 +438,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Return an unmodifiable copy of the local registry
-	 * 
+	 *
 	 * @return an unmodifiable copy of the local registry
 	 */
 	public Map getLocalRegistry() {
@@ -447,7 +447,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Get the remote registry defined (if any)
-	 * 
+	 *
 	 * @return the currently defined remote registry
 	 */
 	public Registry getRegistry() {
@@ -456,7 +456,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Set the remote registry for the configuration
-	 * 
+	 *
 	 * @param registry
 	 *            the remote registry for the configuration
 	 */
@@ -466,7 +466,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Set the Axis2 AxisConfiguration to the SynapseConfiguration
-	 * 
+	 *
 	 * @param axisConfig
 	 */
 	public void setAxisConfiguration(AxisConfiguration axisConfig) {
@@ -475,7 +475,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Get the Axis2 AxisConfiguration for the SynapseConfiguration
-	 * 
+	 *
 	 * @return AxisConfiguration of the Axis2
 	 */
 	public AxisConfiguration getAxisConfiguration() {
@@ -484,7 +484,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * The path to the currently loaded configuration file
-	 * 
+	 *
 	 * @return file path to synapse.xml
 	 */
 	public String getPathToConfigFile() {
@@ -493,7 +493,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 
 	/**
 	 * Set the path to the loaded synapse.xml
-	 * 
+	 *
 	 * @param pathToConfigFile
 	 *            path to the synapse.xml loaded
 	 */
@@ -523,7 +523,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	}
 
     public void destroy() {
-        log.debug("destroy");
+        if (log.isDebugEnabled()) {
+            log.debug("destroy");
+        }
         for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
             Object o = it.next();
             if (o instanceof ProxyService) {
@@ -557,7 +559,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
     }
 
     public void init(SynapseEnvironment se) {
-        log.debug("init");
+        if (log.isDebugEnabled()) {
+            log.debug("init");
+        }
         for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
             Object o = it.next();
             if (o instanceof ProxyService) {

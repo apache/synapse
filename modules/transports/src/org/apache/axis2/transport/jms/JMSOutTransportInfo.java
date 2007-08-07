@@ -142,7 +142,9 @@ public class JMSOutTransportInfo implements OutTransportInfo {
         try {
             return (Destination) context.lookup(destinationName);
         } catch (NameNotFoundException e) {
-            log.debug("Cannot locate destination : " + destinationName + " using " + url, e);
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot locate destination : " + destinationName + " using " + url, e);
+            }
         } catch (NamingException e) {
             handleException("Cannot locate destination : " + destinationName + " using " + url, e);
         }
@@ -158,7 +160,9 @@ public class JMSOutTransportInfo implements OutTransportInfo {
         try {
             return (Destination) jmsConnectionFactory.getContext().lookup(replyDest);
         } catch (NameNotFoundException e) {
-            log.debug("Cannot locate reply destination : " + replyDest, e);
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot locate reply destination : " + replyDest, e);
+            }
         } catch (NamingException e) {
             handleException("Cannot locate reply destination : " + replyDest, e);
         }

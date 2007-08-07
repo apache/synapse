@@ -235,8 +235,10 @@ public class ServerHandler implements NHttpServiceHandler {
     public void timeout(final NHttpServerConnection conn) {
         HttpRequest req = (HttpRequest) conn.getContext().getAttribute(HttpContext.HTTP_REQUEST);
         if (req != null) {
-            log.debug("Connection Timeout for request to : " + req.getRequestLine().getUri() +
-                " Probably the keepalive connection was closed");
+            if (log.isDebugEnabled()) {
+                log.debug("Connection Timeout for request to : " + req.getRequestLine().getUri() +
+                        " Probably the keepalive connection was closed");
+            }
         } else {
             log.warn("Connection Timeout");
         }
@@ -276,9 +278,12 @@ public class ServerHandler implements NHttpServiceHandler {
      */
     public void exception(NHttpServerConnection conn, IOException e) {
         if (e instanceof ConnectionClosedException ||
-            e.getMessage().contains("Connection reset by peer") ||
-            e.getMessage().contains("forcibly closed")) {
-            log.debug("I/O error (Probably the keepalive connection was closed):" + e.getMessage());
+                e.getMessage().contains("Connection reset by peer") ||
+                e.getMessage().contains("forcibly closed")) {
+            if (log.isDebugEnabled()) {
+                log.debug("I/O error (Probably the keepalive connection " +
+                        "was closed):" + e.getMessage());
+            }
         } else {
             log.error("I/O error: " + e.getMessage());
         }

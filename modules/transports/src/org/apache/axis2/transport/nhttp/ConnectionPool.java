@@ -95,7 +95,9 @@ public class ConnectionPool {
 
         connections.add(conn);
 
-        log.debug("Released a connection to host: " + host.getHostName() + " on port : " +
-            host.getPort() + " to the connection pool of current size : " + connections.size());
+        if (log.isDebugEnabled()) {
+            log.debug("Released a connection to host: " + host.getHostName() + " on port : " +
+                    host.getPort() + " to the connection pool of current size : " + connections.size());
+        }
     }
 }

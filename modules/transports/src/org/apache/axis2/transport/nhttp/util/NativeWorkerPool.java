@@ -39,7 +39,9 @@ public class NativeWorkerPool implements WorkerPool {
     public NativeWorkerPool(int core, int max, int keepAlive,
         int queueLength, String threadGroupName, String threadGroupId) {
 
-        log.debug("Using native util.concurrent package..");
+        if (log.isDebugEnabled()) {
+            log.debug("Using native util.concurrent package..");
+        }
         executor = new ThreadPoolExecutor(
             core, max, keepAlive,
             TimeUnit.SECONDS,

@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Startup;
+import org.apache.synapse.startup.quartz.SimpleQuartzFactory;
 
 import sun.misc.Service;
 
@@ -43,15 +44,27 @@ public class StartupFinder {
 		instance = null;
 	}
 
+	private static final Class[] builtins = { SimpleQuartzFactory.class};
+	
 	private StartupFinder() {
-		factoryMap = new HashMap();
+		// preregister any built in
+		for (int i=0; i<builtins.length;i++) {
+			Class b = builtins[i];
+			StartupFactory sf;
+			try {
+				sf = (StartupFactory)b.newInstance();
+			} catch (Exception e) {
+				throw new SynapseException("cannot instantiate "+b.getName(),e);
+				
+			}
+			factoryMap.put(sf.getTagQName(), b);
+			serializerMap.put(sf.getTagQName(),sf.getSerializerClass());
+	
+		}
+		
 		registerExtensions();
 	}
 
-	private void handleException(String msg, Exception e) {
-		log.error(msg, e);
-		throw new SynapseException(msg, e);
-	}
 
 	private void handleException(String msg) {
 		log.error(msg);

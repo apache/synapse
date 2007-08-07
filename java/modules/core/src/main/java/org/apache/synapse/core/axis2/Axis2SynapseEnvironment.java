@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPProcessingException;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
@@ -140,6 +142,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         org.apache.axis2.context.MessageContext axis2MC
                 = new org.apache.axis2.context.MessageContext();
         axis2MC.setConfigurationContext(this.configContext);
+        axis2MC.setServiceContext(new ServiceContext());
+        axis2MC.setOperationContext(new OperationContext());
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
 		try {
 			mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());

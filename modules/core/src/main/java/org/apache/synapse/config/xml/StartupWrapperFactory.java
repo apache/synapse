@@ -6,7 +6,7 @@ import java.util.List;
 
 
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.startup.Startup;
+import org.apache.synapse.Startup;
 
 public class StartupWrapperFactory {
 

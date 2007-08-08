@@ -871,13 +871,15 @@ public class FaultManager {
         MessageReceiver msgReceiver = axisOperation.getMessageReceiver();
         if ((msgReceiver != null) && (msgReceiver instanceof CallbackReceiver))
         {
-          Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
-          if (callback instanceof Callback)
-          {
-            ((Callback)callback).onError(fault);
-          } else if(callback instanceof AxisCallback) {
-        	((AxisCallback)callback).onError(fault);
-          }
+            Object callback = ((CallbackReceiver)msgReceiver).lookupCallback(context.getMessageID());
+            if (callback instanceof Callback)
+            {
+                ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(Callback)callback);
+                ((Callback)callback).onError(fault);
+            } else if(callback instanceof AxisCallback) {
+                ((CallbackReceiver)msgReceiver).addCallback(context.getMessageID(),(AxisCallback)callback);
+                ((AxisCallback)callback).onError(fault);
+            }
         }
       }
 		}

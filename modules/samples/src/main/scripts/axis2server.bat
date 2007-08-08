@@ -35,7 +35,7 @@ if "%AXIS2_HOME%"=="" set AXIS2_HOME=%~dps0
 rem find AXIS2_HOME if it does not exist due to either an invalid value passed
 rem by the user or the %0 problem on Windows 9x
 
-if exist "%AXIS2_HOME%\repository\conf\axis2.xml" goto checkJava
+if exist "%AXIS2_HOME%\..\..\webapp\WEB-INF\classes\conf\axis2.xml" goto checkJava
 
 :noAxis2Home
 echo AXIS2_HOME environment variable is set incorrectly or AXIS2 could not be located.
@@ -88,22 +88,22 @@ goto end
 :runAxis2
 rem set the classes by looping through the libs
 setlocal EnableDelayedExpansion
-set AXIS2_CLASS_PATH=%AXIS2_HOME%/../../lib;%AXIS2_HOME%/../../repository/conf
-FOR %%c in ("%AXIS2_HOME%\..\..\lib\*.jar") DO set AXIS2_CLASS_PATH=!AXIS2_CLASS_PATH!;%%c
+set AXIS2_CLASS_PATH=%AXIS2_HOME%/../../webapp/WEB-INF/lib;%AXIS2_HOME%/../../repository/conf
+FOR %%c in ("%AXIS2_HOME%\..\..\webapp\WEB-INF\lib\*.jar") DO set AXIS2_CLASS_PATH=!AXIS2_CLASS_PATH!;%%c
 
 rem use proper bouncy castle version for the JDK
 
 "%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.4" >NUL
 IF ERRORLEVEL 1 goto checkJdk15
 echo  Using Bouncy castle JAR for Java 1.4
-FOR %%C in ("%AXIS2_HOME%\..\..\lib\bcprov-jdk13*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
+FOR %%C in ("%AXIS2_HOME%\..\..\webapp\WEB-INF\lib\bcprov-jdk13*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
 goto runServer
 
 :checkJdk15
 "%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.5" >NUL
 IF ERRORLEVEL 1 goto runServer
 echo  Using Bouncy castle JAR for Java 1.5
-FOR %%C in ("%AXIS2_HOME%\..\..\lib\bcprov-jdk15*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
+FOR %%C in ("%AXIS2_HOME%\..\..\webapp\WEB-INF\lib\bcprov-jdk15*.jar") DO set AXIS2_CLASS_PATH="%%~fC";!AXIS2_CLASS_PATH!
 
 :runServer
 set AXIS2_ENDORSED=%AXIS2_HOME%\..\..\lib\endorsed

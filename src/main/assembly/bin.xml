@@ -203,7 +203,6 @@
                 <exclude>org.apache.ant:ant-launcher:jar</exclude>
                 <exclude>axis:axis-ant:jar</exclude>
                 <exclude>javax.servlet:servlet-api:jar</exclude>
-                <exclude>commons-collections:commons-collections:jar</exclude>
                 <exclude>commons-discovery:commons-discovery:jar</exclude>
                 <exclude>commons-io:commons-io:jar</exclude>
                 <exclude>org.apache.geronimo.specs:geronimo-javamail:jar</exclude>

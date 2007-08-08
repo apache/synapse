@@ -667,6 +667,143 @@
             <version>${quartz.version}</version>
         </dependency>
         
+         <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>catalina</artifactId>
+            <version>${tomcat.version}</version>
+             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>catalina-optional</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>jasper-compiler</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>jasper-compiler-jdt</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>jasper-runtime</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+          <dependency>
+                <groupId>tomcat</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${tomcat.version}</version>
+               <scope>provided</scope>
+            </dependency>
+        <!--<dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>${tomcat.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>naming-factory</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>naming-resources</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>${tomcat.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>servlets-default</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>tomcat-coyote</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>tomcat-http</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>tomcat-util</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>naming-factory-dbcp</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j</artifactId>
+            <version>${mx4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-tools</artifactId>
+            <version>${mx4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-jmx</artifactId>
+            <version>${mx4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>saxon8</groupId>
+            <artifactId>saxon8</artifactId>
+            <version>0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>saxon8</groupId>
+            <artifactId>saxon8xqj</artifactId>
+            <version>0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>saxon8</groupId>
+            <artifactId>saxon8-dom</artifactId>
+            <version>0.0</version>
+        </dependency>
+        
     </dependencies>
 
     <reporting>
@@ -791,6 +928,8 @@
         <xbean.version>2.2.0</xbean.version>
         <bsf.version>3.0-beta1</bsf.version>
         <groovy.version>1.0</groovy.version>
+        <tomcat.version>5.5.15</tomcat.version>
+        <mx4j.version>3.0.1</mx4j.version>
 
     </properties>
 

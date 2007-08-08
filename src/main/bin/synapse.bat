@@ -92,27 +92,29 @@ if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 :runSynapse
 rem set the classes by looping through the libs
 setlocal EnableDelayedExpansion
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/lib"
-FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/webapp/WEB-INF/lib"
+FOR %%C in ("%SYNAPSE_HOME%\webapp\WEB-INF\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\webapp\WEB-INF\lib";%SYNAPSE_CLASS_PATH%
+
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\webapp\WEB-INF\classes";%SYNAPSE_CLASS_PATH%
 
 rem use proper bouncy castle version for the JDK
 
 "%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.4" >NUL
 IF ERRORLEVEL 1 goto checkJdk15
 echo  Using Bouncy castle JAR for Java 1.4
-FOR %%C in ("%SYNAPSE_HOME%\lib\bcprov-jdk13*.jar") DO set SYNAPSE_CLASS_PATH="%%~fC";!SYNAPSE_CLASS_PATH!
+FOR %%C in ("%SYNAPSE_HOME%\webapp\WEB-INF\lib\bcprov-jdk13*.jar") DO set SYNAPSE_CLASS_PATH="%%~fC";!SYNAPSE_CLASS_PATH!
 goto runServer
 
 :checkJdk15
 "%JAVA_HOME%\bin\java" -version 2>&1 | findstr "1.5" >NUL
 IF ERRORLEVEL 1 goto runServer
 echo  Using Bouncy castle JAR for Java 1.5
-FOR %%C in ("%SYNAPSE_HOME%\lib\bcprov-jdk15*.jar") DO set SYNAPSE_CLASS_PATH="%%~fC";!SYNAPSE_CLASS_PATH!
+FOR %%C in ("%SYNAPSE_HOME%\webapp\WEB-INF\lib\bcprov-jdk15*.jar") DO set SYNAPSE_CLASS_PATH="%%~fC";!SYNAPSE_CLASS_PATH!
 
 :runServer
 rem if a sample configuration is not specified, use default
-if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\repository\conf\synapse.xml"
+if "%_SYNAPSE_XML%" == "" set _SYNAPSE_XML=-Dsynapse.xml="%SYNAPSE_HOME%\webapp\WEB-INF\classes\conf\synapse.xml"
 
 set SYNAPSE_ENDORSED="%SYNAPSE_HOME%\lib\endorsed";"%JAVA_ENDORSED_DIRS%";"%JAVA_HOME%\lib\endorsed"
 
@@ -123,7 +125,7 @@ echo Using SYNAPSE_HOME:    %SYNAPSE_HOME%
 echo Using JAVA_HOME:       %JAVA_HOME%
 echo Using SYNAPSE_XML:     %_SYNAPSE_XML%
 
-%_JAVACMD% %_PORT% %_SYNAPSE_XML% -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Daxis2.xml="%SYNAPSE_HOME%\repository\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer "%SYNAPSE_HOME%\repository"
+%_JAVACMD% %_PORT% %_SYNAPSE_XML% -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Daxis2.xml="%SYNAPSE_HOME%\webapp\WEB-INF\classes\conf\axis2.xml" -Djava.endorsed.dirs=%SYNAPSE_ENDORSED% %_XDEBUG% -cp %SYNAPSE_CLASS_PATH% org.apache.synapse.SynapseServer "%SYNAPSE_HOME%\repository"
 goto end
 
 :end

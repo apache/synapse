@@ -53,6 +53,26 @@
         <fileSet>
             <directory>repository</directory>
             <outputDirectory>synapse-${synapse.version}/repository</outputDirectory>
+            <excludes>
+                <exclude>conf/axis2.xml</exclude>
+                <exclude>conf/synapse.xml</exclude>
+                <exclude>conf/web.xml</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>repository/conf</directory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/classes/conf</outputDirectory>
+            <includes>
+                <include>axis2.xml</include>
+                <include>synapse.xml</include>                     
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>repository/conf</directory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/</outputDirectory>
+            <includes>
+                <include>web.xml</include>                     
+            </includes>
         </fileSet>
         <fileSet>
             <directory>repository/conf/sample/resources/misc/client</directory>
@@ -63,7 +83,7 @@
         </fileSet>
         <fileSet>
             <directory>modules/core/src/main/resources</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/classes/conf</outputDirectory>
             <includes>
                 <include>log4j.properties</include>
                 <include>identity.jks</include>
@@ -141,51 +161,51 @@
         </fileSet>
 
         <!--<fileSet>-->
-            <!--<directory>target/javadoc</directory>-->
-            <!--<outputDirectory>synapse-${synapse.version}/docs/api</outputDirectory>-->
-            <!--<includes>-->
-                <!--<include>**/*</include>-->
-            <!--</includes>-->
+        <!--<directory>target/javadoc</directory>-->
+        <!--<outputDirectory>synapse-${synapse.version}/docs/api</outputDirectory>-->
+        <!--<includes>-->
+        <!--<include>**/*</include>-->
+        <!--</includes>-->
         <!--</fileSet>-->
         <!--<fileSet>-->
-            <!--<directory>target/additional-libs</directory>-->
-            <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
-            <!--<includes>-->
-                <!--<include>**/*</include>-->
-            <!--</includes>-->
+        <!--<directory>target/additional-libs</directory>-->
+        <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
+        <!--<includes>-->
+        <!--<include>**/*</include>-->
+        <!--</includes>-->
         <!--</fileSet>-->
         <!--<fileSet>-->
-            <!--<directory>target</directory>-->
-            <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
-            <!--<includes>-->
-                <!--<include>synapse.jar</include>-->
-            <!--</includes>-->
+        <!--<directory>target</directory>-->
+        <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
+        <!--<includes>-->
+        <!--<include>synapse.jar</include>-->
+        <!--</includes>-->
         <!--</fileSet>-->
 
         <fileSet>
             <directory>modules/core/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
             <includes>
                 <include>synapse-core-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/samples/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
             <includes>
                 <include>synapse-samples-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/extensions/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
             <includes>
                 <include>synapse-extensions-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/transports/target</directory>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
             <includes>
                 <include>synapse-transports-${synapse.version}.jar</include>
             </includes>
@@ -193,8 +213,25 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
             <excludes>
+                <exclude>tomcat:catalina:jar</exclude>
+                <exclude>tomcat:catalina-optional:jar</exclude>
+                <exclude>tomcat:jasper-compiler:jar</exclude>
+                <exclude>tomcat:jasper-compiler-jdt:jar</exclude>
+                <exclude>tomcat:jasper-runtime:jar</exclude>
+                <exclude>tomcat:naming-factory:jar</exclude>
+                <exclude>tomcat:naming-resources:jar</exclude>
+                <exclude>tomcat:servlets-default:jar</exclude>
+                <exclude>tomcat:tomcat-coyote:jar</exclude>
+                <exclude>tomcat:tomcat-http:jar</exclude>
+                <exclude>tomcat:tomcat-util:jar</exclude>
+                <exclude>tomcat:naming-factory-dbcp:jar</exclude>
+                <exclude>tomcat:tomcat-apr:jar</exclude>
+                <exclude>tomcat:jsp-api:jar</exclude>
+                <exclude>tomcat:servlet-api:jar</exclude>
+                <exclude>mx4j:mx4j-tools:jar</exclude>
+                <exclude>mx4j:mx4j-jmx:jar</exclude>
                 <exclude>org.apache.axis2:addressing:mar</exclude>
                 <exclude>org.apache.rampart:rampart:mar</exclude>
                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
@@ -207,7 +244,7 @@
                 <exclude>commons-io:commons-io:jar</exclude>
                 <exclude>org.apache.geronimo.specs:geronimo-javamail:jar</exclude>
                 <exclude>xml-apis:xml-apis:jar</exclude>
-                <exclude>xerces:xercesImpl:jar</exclude>                
+                <exclude>xerces:xercesImpl:jar</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
@@ -244,6 +281,6 @@
             </includes>
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
-
     </dependencySets>
+  
 </assembly>

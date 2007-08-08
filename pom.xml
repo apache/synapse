@@ -787,22 +787,6 @@
             <version>${mx4j.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>saxon8</groupId>
-            <artifactId>saxon8</artifactId>
-            <version>0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>saxon8</groupId>
-            <artifactId>saxon8xqj</artifactId>
-            <version>0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>saxon8</groupId>
-            <artifactId>saxon8-dom</artifactId>
-            <version>0.0</version>
-        </dependency>
         
     </dependencies>
 

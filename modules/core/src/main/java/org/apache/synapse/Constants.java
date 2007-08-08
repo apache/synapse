@@ -49,6 +49,9 @@ public interface Constants {
     /** The system property used to specify/override the synapse home location */
     String SYNAPSE_HOME = "synapse.home";
 
+    /** The synapse conf directory location */
+    String SYNAPSE_CONF_DIRECTORY= "webapp/WEB-INF/classes/conf";
+
     /** a message context property set to hold the relates to for POX responses */
     String RELATES_TO_FOR_POX = "RelatesToForPox";
 

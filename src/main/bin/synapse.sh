@@ -84,12 +84,12 @@ if $os400; then
 fi
 
 # update classpath
-SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib"
-for f in $SYNAPSE_HOME/lib/*.jar
+SYNAPSE_CLASSPATH="$SYNAPSE_HOME/webapp/WEB-INF/lib"
+for f in $SYNAPSE_HOME/webapp/WEB-INF/lib/*.jar
 do
   SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f
 done
-SYNAPSE_CLASSPATH=$JAVA_HOME/lib/tools.jar:$SYNAPSE_CLASSPATH:$CLASSPATH
+SYNAPSE_CLASSPATH=$SYNAPSE_HOME/webapp/WEB-INF/classes:$JAVA_HOME/lib/tools.jar:$SYNAPSE_CLASSPATH:$CLASSPATH
 
 # use proper bouncy castle version for the JDK
 jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`
@@ -97,13 +97,13 @@ jdk_14=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.4`
 
 if [ "$jdk_15" ]; then
     echo " Using Bouncy castle JAR for Java 1.5"
-    for f in $SYNAPSE_HOME/lib/bcprov-jdk15*.jar
+    for f in $SYNAPSE_HOME/webapp/WEB-INF/lib/bcprov-jdk15*.jar
     do
       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH
     done
 elif [ "$jdk_14" ]; then
     echo " Using Bouncy castle JAR for Java 1.4"
-    for f in $SYNAPSE_HOME/lib/bcprov-jdk13*.jar
+    for f in $SYNAPSE_HOME/webapp/WEB-INF/lib/bcprov-jdk13*.jar
     do
       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH
     done
@@ -121,7 +121,7 @@ fi
 SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 
 # synapse.xml
-SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/synapse.xml
+SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/webapp/WEB-INF/classes/conf/synapse.xml
 
 if [ "$1" = "-xdebug" ]; then
   XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
@@ -152,4 +152,4 @@ echo "Using SYNAPSE_HOME:    $SYNAPSE_HOME"
 echo "Using JAVA_HOME:       $JAVA_HOME"
 echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
 
-$JAVA_HOME/bin/java $XDEBUG $PORT $SYNAPSE_XML -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Daxis2.xml=$SYNAPSE_HOME/repository/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseServer $SYNAPSE_HOME/repository
+$JAVA_HOME/bin/java $XDEBUG $PORT $SYNAPSE_XML -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration -Daxis2.xml=$SYNAPSE_HOME/webapp/WEB-INF/classes/conf/axis2.xml -Djava.endorsed.dirs=$SYNAPSE_ENDORSED -classpath $SYNAPSE_CLASSPATH org.apache.synapse.SynapseServer $SYNAPSE_HOME/repository

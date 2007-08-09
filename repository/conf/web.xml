@@ -30,7 +30,7 @@ Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <servlet>
         <servlet-name>StartUpServlet</servlet-name>
         <servlet-class>org.apache.synapse.core.axis2.SynapseStartUpServlet</servlet-class>
-        <!-- synapse.home parameter must have set if synapse is going to deploy in the exsiting tomcat
+        <!-- synapse.home parameter is optinal. if set this,then it take as the synapse.home
          This value must contains the absolute path to the syapase home  -->
         <!--<init-param>-->
             <!--<param-name>synapse.home</param-name>-->

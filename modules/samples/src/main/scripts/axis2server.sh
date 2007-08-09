@@ -80,12 +80,12 @@ if $os400; then
 fi
 
 # update classpath
-AXIS2_CLASSPATH="$AXIS2_HOME/../../webapp/WEB-INF/lib"
-for f in "$AXIS2_HOME"/../../webapp/WEB-INF/lib/*.jar
+AXIS2_CLASSPATH="$AXIS2_HOME/../../lib"
+for f in "$AXIS2_HOME"/../../lib/*.jar
 do
   AXIS2_CLASSPATH="$AXIS2_CLASSPATH":$f
 done
-AXIS2_CLASSPATH=$AXIS2_HOME/../../webapp/WEB-INF/classes:"$JAVA_HOME/lib/tools.jar":"$AXIS2_CLASSPATH":"$CLASSPATH"
+AXIS2_CLASSPATH="$JAVA_HOME/lib/tools.jar":"$AXIS2_CLASSPATH":"$CLASSPATH"
 
 # use proper bouncy castle version for the JDK
 jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`
@@ -93,13 +93,13 @@ jdk_14=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.4`
 
 if [ "$jdk_15" ]; then
     echo " Using Bouncy castle JAR for Java 1.5"
-    for f in $AXIS2_HOME/../../webapp/WEB-INF/lib/bcprov-jdk15*.jar
+    for f in $AXIS2_HOME/../../lib/bcprov-jdk15*.jar
     do
       AXIS2_CLASSPATH=$f:$AXIS2_CLASSPATH
     done
 elif [ "$jdk_14" ]; then
     echo " Using Bouncy castle JAR for Java 1.4"
-    for f in $AXIS2_HOME/../../webapp/WEB-INF/lib/bcprov-jdk13*.jar
+    for f in $AXIS2_HOME/../../lib/bcprov-jdk13*.jar
     do
       AXIS2_CLASSPATH=$f:$AXIS2_CLASSPATH
     done

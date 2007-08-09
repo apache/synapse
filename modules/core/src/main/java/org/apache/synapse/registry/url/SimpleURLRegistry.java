@@ -23,8 +23,8 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Util;
 import org.apache.synapse.registry.AbstractRegistry;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.registry.RegistryEntry;
@@ -53,25 +53,9 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
         log.info("==> Repository fetch of resource with key : " + key);
         URLConnection urlc = null;
         try {
-            URL url = new URL(getRoot() + key);
-            if ("file".equals(url.getProtocol())) {
-                try {
-                    url.openStream();
-                } catch (IOException ignored) {
-                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
-                    if (synapseHome != null) {
-                        if (synapseHome.endsWith("/")) {
-                            synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
-                        }
-                        url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
-                        try {
-                            url.openStream();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            log.error(e);
-                        }
-                    }
-                }
+            URL url = Util.getURLFromPath(getRoot() + key);
+            if (url == null) {
+                return null;
             }
             urlc = url.openConnection();
             urlc.connect();
@@ -102,25 +86,9 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
             log.debug("Perform RegistryEntry lookup for key : " + key);
         }
         try {
-            URL url = new URL(getRoot() + key);
-            if ("file".equals(url.getProtocol())) {
-                try {
-                    url.openStream();
-                } catch (IOException ignored) {
-                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
-                    if (synapseHome != null) {
-                        if (synapseHome.endsWith("/")) {
-                            synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
-                        }
-                        url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
-                        try {
-                            url.openStream();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            log.error(e);
-                        }
-                    }
-                }
+            URL url = Util.getURLFromPath(getRoot() + key);
+            if (url == null) {
+                return null;
             }
             URLConnection urlc = url.openConnection();
             urlc.setReadTimeout(30000);
@@ -187,83 +155,57 @@ public class SimpleURLRegistry extends AbstractRegistry implements Registry {
     }
 
     public RegistryEntry[] getChildren(RegistryEntry entry) {
-
-        try {
-            URL url;
-            if (entry == null) {
-                URLRegistryEntry urlEntry = new URLRegistryEntry();
-                urlEntry.setKey("");
-                entry = urlEntry;
-            }
-            url = new URL(getRoot() + entry.getKey());
-            if ("file".equals(url.getProtocol())) {
-                try {
-                    url.openStream();
-                } catch (IOException ignored) {
-                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
-                    if (synapseHome != null) {
-                        if (synapseHome.endsWith("/")) {
-                            synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
-                        }
-                        url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
-                        try {
-                            url.openStream();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            log.error(e);
-                        }
-                    }
-                }
-            }
-
-            if (url.getProtocol().equals("file")) {
-
-                File file = new File(url.getFile());
-                if (!file.isDirectory()) {
-                    return null;
-                }
-
-                InputStream inStream = null;
-                try {
-                    inStream = (InputStream) url.getContent();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-                    ArrayList entryList = new ArrayList();
-                    String key = "";
-                    while ((key = reader.readLine()) != null) {
-                        URLRegistryEntry registryEntry = new URLRegistryEntry();
-                        if (entry.getKey().equals("")) {
-                            registryEntry.setKey(key);
-                        } else {
-                            if (entry.getKey().endsWith("/")) {
-                                registryEntry.setKey(entry.getKey() + key);
-                            } else {
-                                registryEntry.setKey(entry.getKey() + "/" + key);
-                            }
-                        }
-
-                        entryList.add(registryEntry);
-                    }
-
-                    RegistryEntry[] entries = new RegistryEntry[entryList.size()];
-                    for (int i = 0; i < entryList.size(); i++) {
-                        entries[i] = (RegistryEntry) entryList.get(i);
-                    }
-                    return entries;
-
-                } catch (Exception e) {
-                    throw new SynapseException("Error in reading the URL.");
-                }
-
-            } else {
-                throw new SynapseException("Invalid protocol.");
-            }
-
-        } catch (MalformedURLException e) {
-            handleException("Invalid URL reference " + getRoot() + entry.getKey(), e);
+        URL url;
+        if (entry == null) {
+            URLRegistryEntry urlEntry = new URLRegistryEntry();
+            urlEntry.setKey("");
+            entry = urlEntry;
         }
+        url = Util.getURLFromPath(getRoot() + entry.getKey());
+        if (url == null) {
+            return null;
+        }
+        if (url.getProtocol().equals("file")) {
 
-        return null;
+            File file = new File(url.getFile());
+            if (!file.isDirectory()) {
+                return null;
+            }
+            InputStream inStream = null;
+            try {
+                inStream = (InputStream) url.getContent();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+                ArrayList entryList = new ArrayList();
+                String key = "";
+                while ((key = reader.readLine()) != null) {
+                    URLRegistryEntry registryEntry = new URLRegistryEntry();
+                    if (entry.getKey().equals("")) {
+                        registryEntry.setKey(key);
+                    } else {
+                        if (entry.getKey().endsWith("/")) {
+                            registryEntry.setKey(entry.getKey() + key);
+                        } else {
+                            registryEntry.setKey(entry.getKey() + "/" + key);
+                        }
+                    }
+
+                    entryList.add(registryEntry);
+                }
+
+                RegistryEntry[] entries = new RegistryEntry[entryList.size()];
+                for (int i = 0; i < entryList.size(); i++) {
+                    entries[i] = (RegistryEntry) entryList.get(i);
+                }
+                return entries;
+
+            } catch (Exception e) {
+                throw new SynapseException("Error in reading the URL.");
+            }
+
+        } else {
+            throw new SynapseException("Invalid protocol.");
+        }
     }
 
     public RegistryEntry[] getDescendants(RegistryEntry entry) {

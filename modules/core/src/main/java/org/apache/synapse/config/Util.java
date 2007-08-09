@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -45,6 +46,7 @@ public class Util {
 
     /**
      * Return a StreamSource for the given Object
+     *
      * @param o the object
      * @return the StreamSource
      */
@@ -84,14 +86,13 @@ public class Util {
                 handleException("Error converting to a StreamSource", e);
             }
 
-        } else if (o instanceof URI){
+        } else if (o instanceof URI) {
             try {
-                return ((URI)(o)).toURL().openStream();                   
+                return ((URI) (o)).toURL().openStream();
             } catch (IOException e) {
-                handleException("Error opening stream form URI",e);
+                handleException("Error opening stream form URI", e);
             }
-        }
-        else {
+        } else {
             handleException("Cannot convert object to a StreamSource");
         }
         return null;
@@ -103,6 +104,7 @@ public class Util {
      * (if available) would be used to transform this content into an Object.
      * If a suitable XMLToObjectMapper cannot be found, the content would be
      * treated as XML and an OMNode would be returned
+     *
      * @param url the URL to the resource
      * @return an Object created from the given URL
      */
@@ -112,17 +114,29 @@ public class Util {
                 try {
                     url.openStream();
                 } catch (IOException ignored) {
+                    String path = url.getPath();
+                    if (log.isDebugEnabled()) {
+                        log.debug("Can not open a connection to the URL with a path :" +
+                                  path);
+                    }
                     String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
                     if (synapseHome != null) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Trying  to resolve an absolute path of the " +
+                                      " URL using the synapse.home : " + synapseHome);
+                        }
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
                         }
-                        url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
+                        url = new URL(url.getProtocol() + ":" + synapseHome + "/" + path);
                         try {
                             url.openStream();
                         } catch (IOException e) {
-                            e.printStackTrace();
-                            log.error(e);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Faild to resolve an absolute path of the " +
+                                          " URL using the synapse.home : " + synapseHome);
+                            }
+                            log.error("IO Error reading from URL " + url.getPath() + e);
                         }
                     }
                 }
@@ -132,13 +146,13 @@ public class Util {
             }
             URLConnection urlc = url.openConnection();
             XMLToObjectMapper xmlToObject =
-                getXmlToObjectMapper(urlc.getContentType());
+                    getXmlToObjectMapper(urlc.getContentType());
 
             try {
                 XMLStreamReader parser = XMLInputFactory.newInstance().
-                    createXMLStreamReader(urlc.getInputStream());
+                        createXMLStreamReader(urlc.getInputStream());
                 StAXOMBuilder builder = new StAXOMBuilder(parser);
-                OMElement omElem =  builder.getDocumentElement();
+                OMElement omElem = builder.getDocumentElement();
 
                 // detach from URL connection and keep in memory
                 // TODO remove this 
@@ -163,30 +177,15 @@ public class Util {
 
     /**
      * Return an OMElement from a URL source
+     *
      * @param urlStr a URL string
      * @return an OMElement of the resource
      * @throws IOException for invalid URL's or IO errors
      */
     public static OMElement getOMElementFromURL(String urlStr) throws IOException {
-        URL url = new URL(urlStr);
-        if ("file".equals(url.getProtocol())) {
-            try {
-                url.openStream();
-            } catch (IOException ignored) {
-                String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
-                if (synapseHome != null) {
-                    if (synapseHome.endsWith("/")) {
-                        synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
-                    }
-                    url = new URL(url.getProtocol() + ":" + synapseHome + "/" + url.getPath());
-                    try {
-                        url.openStream();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        log.error(e);
-                    }
-                }
-            }
+        URL url = getURLFromPath(urlStr);
+        if (url == null) {
+            return null;
         }
         URLConnection conn = url.openConnection();
         conn.setReadTimeout(10000);
@@ -202,11 +201,12 @@ public class Util {
                 return doc;
             } catch (Exception e) {
                 handleException("Error parsing resource at URL : " + url +
-                    " as XML", e);
+                                " as XML", e);
             } finally {
                 try {
                     urlInStream.close();
-                } catch (IOException ignore) {}
+                } catch (IOException ignore) {
+                }
             }
         }
         return null;
@@ -225,10 +225,72 @@ public class Util {
     /**
      * Return a suitable XMLToObjectMapper for the given content type if one
      * is available, else return null;
+     *
      * @param contentType the content type for which a mapper is required
      * @return a suitable XMLToObjectMapper or null if none can be found
      */
     public static XMLToObjectMapper getXmlToObjectMapper(String contentType) {
         return null;
+    }
+
+    /**
+     * Utility method to resolve url(only If need) path using synapse home system property
+     *
+     * @param path Path to the URL
+     * @return Valid URL instance or null(if it is inavalid or can not open a connection to it )
+     */
+    public static URL getURLFromPath(String path) {
+        if (path == null || "null".equals(path)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Can not create a URL from 'null' ");
+            }
+            return null;
+        }
+        URL url = null;
+        try {
+            url = new URL(path);
+            if ("file".equals(url.getProtocol())) {
+                try {
+                    url.openStream();
+                } catch (MalformedURLException e) {
+                    handleException("Invalid URL reference : " + path, e);
+                } catch (IOException ignored) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Can not open a connection to the URL with a path :" +
+                                  path);
+                    }
+                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+                    if (synapseHome != null) {
+                        if (synapseHome.endsWith("/")) {
+                            synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
+                        }
+                        if (log.isDebugEnabled()) {
+                            log.debug("Trying  to resolve an absolute path of the " +
+                                      " URL using the synapse.home : " + synapseHome);
+                        }
+                        try {
+                            url = new URL(url.getProtocol() + ":" + synapseHome + "/" +
+                                          url.getPath());
+                            url.openStream();
+                        } catch (MalformedURLException e) {
+                            handleException("Invalid URL reference " + url.getPath() + e);
+                        } catch (IOException e) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Faild to resolve an absolute path of the " +
+                                          " URL using the synapse.home : " + synapseHome);
+                            }
+                            log.error("IO Error reading from URL : " + url.getPath() + e);
+                        }
+                    }
+                }
+            } else {
+                throw new SynapseException("Invalid protocol.");
+            }
+        } catch (MalformedURLException e) {
+            handleException("Invalid URL reference :  " + path, e);
+        } catch (IOException e) {
+            handleException("IO Error reading from URL : " + path, e);
+        }
+        return url;
     }
 }

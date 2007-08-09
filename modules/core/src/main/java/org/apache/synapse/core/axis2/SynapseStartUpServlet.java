@@ -20,7 +20,6 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.synapse.Constants;
 import org.apache.synapse.ServerManager;
 
@@ -32,8 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * This servlet will start and stop all the listeners.
@@ -54,52 +51,42 @@ public class SynapseStartUpServlet extends HttpServlet {
         if ("true".equals(servletContext.getAttribute("hasAlreadyInit"))) {
             return;
         }
-        String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+        String synapseHome = resolveSynapseHome(servletConfig);
         //Setting the all required system properties
-        if (synapseHome == null || "".equals(synapseHome)) {
-            synapseHome = servletConfig.getInitParameter(Constants.SYNAPSE_HOME);
-            if (synapseHome != null) {
-                if (synapseHome.endsWith("/")) {
-                    synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
-                }
-                System.setProperty(Constants.SYNAPSE_HOME, synapseHome);
-                try {
-                    //load the synapse log4j properties
-                    URL url = new URL("file:" + synapseHome + File.separator
-                                      + Constants.SYNAPSE_CONF_DIRECTORY + File.separator
-                                      + "log4j.properties");
-                    PropertyConfigurator.configure(url);
-                } catch (MalformedURLException ignore) {
-                }
-                //setting axis2 repository location
-                String axis2Repo = System.getProperty(org.apache.axis2.Constants.AXIS2_REPO);
-                if (axis2Repo == null) {
-                    ServerManager.axis2Repolocation = synapseHome +
-                                                      File.separator + "repository";
-                    System.setProperty(org.apache.axis2.Constants.AXIS2_REPO,
-                                       synapseHome +
-                                       File.separator + "repository");
-                }
-                //setting axis2 configuration location
-                String axis2Xml = System.getProperty(org.apache.axis2.Constants.AXIS2_CONF);
-                if (axis2Xml == null) {
-                    System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
-                                       synapseHome + File.separator
-                                       + Constants.SYNAPSE_CONF_DIRECTORY
-                                       + File.separator + org.apache.axis2.Constants.AXIS2_CONF);
-                }
-                //setting synapse configuration location
-                String synapseXml = System.getProperty(org.apache.synapse.Constants.SYNAPSE_XML);
-                if (synapseXml == null) {
-                    System.setProperty(org.apache.synapse.Constants.SYNAPSE_XML,
-                                       synapseHome + File.separator
-                                       + Constants.SYNAPSE_CONF_DIRECTORY
-                                       + File.separator + org.apache.synapse.Constants.SYNAPSE_XML);
-                }
-            } else {
-                log.fatal("synapse.home had not set : startup failed");
-                return;
+        if (synapseHome != null) {
+            if (synapseHome.endsWith("/")) {
+                synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
             }
+            System.setProperty(Constants.SYNAPSE_HOME, synapseHome);
+            //setting axis2 repository location
+            String axis2Repo = System.getProperty(org.apache.axis2.Constants.AXIS2_REPO);
+            if (axis2Repo == null) {
+                ServerManager.axis2Repolocation = synapseHome + "/WEB-INF" +
+                                                  File.separator + "repository";
+                System.setProperty(org.apache.axis2.Constants.AXIS2_REPO,
+                                   synapseHome + "/WEB-INF" +
+                                   File.separator + "repository");
+            }
+            //setting axis2 configuration location
+            String axis2Xml = System.getProperty(org.apache.axis2.Constants.AXIS2_CONF);
+            if (axis2Xml == null) {
+                System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
+                                   synapseHome + File.separator
+                                   + "WEB-INF/conf"
+                                   + File.separator + org.apache.axis2.Constants.AXIS2_CONF);
+            }
+            //setting synapse configuration location
+            String synapseXml = System.getProperty(org.apache.synapse.Constants.SYNAPSE_XML);
+            if (synapseXml == null) {
+                System.setProperty(org.apache.synapse.Constants.SYNAPSE_XML,
+                                   synapseHome + File.separator
+                                   + "WEB-INF/conf"
+                                   + File.separator + org.apache.synapse.Constants.SYNAPSE_XML);
+
+            }
+        } else {
+            log.fatal("Can not resolve synapse home  : startup failed");
+            return;
         }
         serverManager = ServerManager.getInstance();
         serverManager.start();
@@ -124,5 +111,32 @@ public class SynapseStartUpServlet extends HttpServlet {
             }
         } catch (Exception ignored) {
         }
+    }
+
+    private String resolveSynapseHome(ServletConfig servletConfig) {
+        // If synapse.home has provided as init-param,the it will take as synapse home
+        String synapseHomeAsParam = servletConfig.getInitParameter(Constants.SYNAPSE_HOME);
+        if (synapseHomeAsParam != null) {
+            if (synapseHomeAsParam.endsWith("/")) {
+                return synapseHomeAsParam.substring(0, synapseHomeAsParam.lastIndexOf("/"));
+            }
+        }
+        //if synapse.home has set as a system property , then use it
+        String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+        //Setting the all required system properties
+        if (synapseHome == null || "".equals(synapseHome)) {
+            ServletContext servletContext = servletConfig.getServletContext();
+            //if synapse.home stil can not find ,then resolve it using real path of the WEB-INF
+            String webinfPath = servletContext.getRealPath("WEB-INF");
+            if (webinfPath != null) {
+                synapseHome = webinfPath.substring(0, webinfPath.lastIndexOf("WEB-INF"));
+                if (synapseHome != null) {
+                    if (synapseHome.endsWith("/")) {
+                        synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
+                    }
+                }
+            }
+        }
+        return synapseHome;
     }
 }

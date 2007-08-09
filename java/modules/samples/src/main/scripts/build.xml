@@ -100,7 +100,7 @@
             <sysproperty key="policy" value="${policy}"/>
             <sysproperty key="rest" value="${rest}"/>
             <sysproperty key="wsrm" value="${wsrm}"/>
-            <sysproperty key="javax.net.ssl.trustStore" value="./../../webapp/WEB-INF/classes/conf/trust.jks"/>
+            <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>
             <!--
             <jvmarg value="-Xdebug"/>
@@ -137,7 +137,7 @@
             <sysproperty key="opt_mode" value="${opt_mode}"/>
             <sysproperty key="opt_url"  value="${opt_url}"/>
             <sysproperty key="opt_file" value="${opt_file}"/>
-            <sysproperty key="javax.net.ssl.trustStore" value="./../../webapp/WEB-INF/lib/trust.jks"/>
+            <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>
             <!--
             <jvmarg value="-Xdebug"/>
@@ -174,8 +174,8 @@
         <mkdir dir="${class.dir}"/>
         <path id="javac.classpath">
             <pathelement path="${class.dir}"/>
-            <pathelement path="../../webapp/WEB-INF/lib"/>
-            <fileset dir="../../webapp/WEB-INF/lib">
+            <pathelement path="../../lib"/>
+            <fileset dir="../../lib">
                 <include name="**/*.jar"/>
             </fileset>
         </path>

@@ -151,7 +151,12 @@ public class SOAPFaultEnvelopeCreator {
 
 		SOAPFault fault = faultMsgEnvelope.getBody().getFault();
 
-		if (data.getExceptionString() != null)
+        SOAPFaultCode code = fault.getCode();
+        if (data.getCode()!=null) {
+            code.setText(data.getCode());
+        }
+
+        if (data.getExceptionString() != null)
 			fault.getDetail().setText(data.getExceptionString());
 		
 		//SequenceFault header is added only for SOAP 1.1

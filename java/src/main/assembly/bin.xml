@@ -61,19 +61,13 @@
         </fileSet>
         <fileSet>
             <directory>repository/conf</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/classes/conf</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/repository/conf</outputDirectory>
             <includes>
                 <include>axis2.xml</include>
                 <include>synapse.xml</include>                     
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>repository/conf</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/</outputDirectory>
-            <includes>
-                <include>web.xml</include>                     
-            </includes>
-        </fileSet>
+
         <fileSet>
             <directory>repository/conf/sample/resources/misc/client</directory>
             <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/conf</outputDirectory>
@@ -83,7 +77,7 @@
         </fileSet>
         <fileSet>
             <directory>modules/core/src/main/resources</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/classes/conf</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>log4j.properties</include>
                 <include>identity.jks</include>
@@ -184,28 +178,28 @@
 
         <fileSet>
             <directory>modules/core/target</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-core-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/samples/target</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-samples-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/extensions/target</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-extensions-${synapse.version}.jar</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>modules/transports/target</directory>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <includes>
                 <include>synapse-transports-${synapse.version}.jar</include>
             </includes>
@@ -213,7 +207,7 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>synapse-${synapse.version}/webapp/WEB-INF/lib</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
             <excludes>
                 <exclude>tomcat:catalina:jar</exclude>
                 <exclude>tomcat:catalina-optional:jar</exclude>

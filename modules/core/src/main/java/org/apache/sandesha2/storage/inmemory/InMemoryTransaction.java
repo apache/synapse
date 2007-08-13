@@ -135,7 +135,7 @@ public class InMemoryTransaction implements Transaction {
 			RMBean bean = (RMBean) beans.next();
 			synchronized (bean) {
 				bean.setTransaction(null);
-				bean.notify();
+				bean.notifyAll();
 			}
 		}
 		enlistedBeans.clear();

@@ -235,7 +235,7 @@ public abstract class SandeshaThread extends Thread{
 		reRunThread = true;
 		
 		if (!hasPausedRunning)
-			notify();
+			notifyAll();
 	}
 	
 	/**
@@ -309,7 +309,7 @@ public abstract class SandeshaThread extends Thread{
 			synchronized (this) {
 				if(log.isDebugEnabled()) log.debug("SandeshaThread really stopping " + this);
 				hasStoppedRunning = true;
-				notify();
+				notifyAll();
 			}
 		}
 	}

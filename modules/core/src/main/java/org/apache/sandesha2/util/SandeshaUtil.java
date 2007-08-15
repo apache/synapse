@@ -357,7 +357,8 @@ public class SandeshaUtil {
 			newMessageContext.setConfigurationContext(configContext);
 			
 			Options oldOptions = referenceMessage.getOptions();
-			Options newOptions = new Options ();
+            Options newOptions = new Options ();
+            newOptions.setProperties(oldOptions.getProperties());
 			
 			newMessageContext.setOptions(newOptions);
 			

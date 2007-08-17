@@ -123,26 +123,39 @@ SYNAPSE_ENDORSED=$SYNAPSE_HOME/lib/endorsed
 # synapse.xml
 SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/synapse.xml
 
-if [ "$1" = "-xdebug" ]; then
-  XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
-fi
-
-if [ "$1" = "-sample" ]; then
-  SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
-fi
-
-if [ "$3" = "-xdebug" ]; then
-  XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
-fi
-
-if [ "$3" = "-sample" ]; then
-  SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$4.xml
-fi
-
 PORT="-Dport=8080"
-if [ "$1" = "-port" ]; then
-  PORT="-Dport=$2"
-fi
+
+while [ $# -ge 1 ]; do
+
+if [ "$1" = "-xdebug" ]; then
+    XDEBUG="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=8000"
+    shift
+
+  elif [ "$1" = "-sample" ]; then
+    SYNAPSE_XML=-Dsynapse.xml=$SYNAPSE_HOME/repository/conf/sample/synapse_sample_$2.xml
+    shift 2 # -sample and sample number
+
+  elif [ "$1" = "-port" ]; then
+    PORT="-Dport=$2"
+    shift 2 # -port and port number
+
+elif [ "$1" = "-h" ]; then
+    echo "Usage: synapse.sh ( commands ... )"
+    echo "commands:"
+    echo "  -xdebug           Start Synapse under JPDA debugger"
+    echo "  -sample (number)  Start with sample Synapse configuration of given number"
+    echo "  -port (number)    Listen in HTTP port with given number (default:8080)"
+    shift
+    exit 0
+
+  else
+    echo "Error: unknown command:$1"
+    echo "For help: synapse.sh -h"
+    shift
+    exit 1
+  fi
+
+done
 
 # ----- Execute The Requested Command -----------------------------------------
 

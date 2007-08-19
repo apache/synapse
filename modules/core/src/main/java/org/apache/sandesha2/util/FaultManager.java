@@ -477,6 +477,7 @@ public class FaultManager {
 		String SOAPNamespaceValue = factory.getSoapVersionURI();
 		
 		if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
+                        reasonText.setLang(Sandesha2Constants.LANG_EN);
 			reason.addSOAPText(reasonText);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_CODE_LOCAL_NAME, faultCode);
 			referenceRMMsgContext.setProperty(SOAP12Constants.SOAP_FAULT_REASON_LOCAL_NAME, reason);

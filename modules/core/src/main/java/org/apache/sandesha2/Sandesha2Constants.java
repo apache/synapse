@@ -642,4 +642,5 @@ public interface Sandesha2Constants {
         public static final QName Q_ELEM_ENFORCE_RM = new QName(URI_RM_POLICY_NS, ELEM_ENFORCE_RM, ATTR_WSRM);
         
     }
+    static final String LANG_EN = "en";
 }

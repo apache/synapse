@@ -951,6 +951,9 @@ public class SandeshaUtil {
 		newMsg.setAxisService(oldMsg.getAxisService());
 		newMsg.setTransportOut(oldMsg.getTransportOut());
 		newMsg.setTransportIn(oldMsg.getTransportIn());
+
+                //Copy property objects from oldMsg to newMsg
+                newMsg.setProperties(oldMsg.getProperties());
 		
 		return newMsg;
 		

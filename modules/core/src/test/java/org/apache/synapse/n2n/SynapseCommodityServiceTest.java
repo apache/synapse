@@ -35,12 +35,14 @@ import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.engine.ListenerManager;
+import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.Constants;
 import org.apache.synapse.utils.Services;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
+import java.util.HashMap;
 
 
 public class SynapseCommodityServiceTest extends TestCase {
@@ -66,11 +68,30 @@ public class SynapseCommodityServiceTest extends TestCase {
                         "./target/test_repos/synapse",
                         "./../../repository/conf/axis2.xml");
 
+        HashMap messageReciverMap = new HashMap();
+        Class inOnlyMessageReceiver = org.apache.axis2.util.Loader.loadClass(
+                "org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver");
+        org.apache.axis2.engine.MessageReceiver messageReceiver =
+                (org.apache.axis2.engine.MessageReceiver) inOnlyMessageReceiver.newInstance();
+        messageReciverMap.put(
+                org.apache.axis2.description.WSDL2Constants.MEP_URI_IN_ONLY,
+                messageReceiver);
+        Class inoutMessageReceiver = org.apache.axis2.util.Loader.loadClass(
+                "org.apache.axis2.rpc.receivers.RPCMessageReceiver");
+        MessageReceiver inOutmessageReceiver =
+                (MessageReceiver) inoutMessageReceiver.newInstance();
+        messageReciverMap.put(
+                org.apache.axis2.description.WSDL2Constants.MEP_URI_IN_OUT,
+                inOutmessageReceiver);
+        messageReciverMap.put(org.apache.axis2.description.WSDL2Constants.MEP_URI_ROBUST_IN_ONLY,
+            inOutmessageReceiver);
+
         AxisService businessService =
                 AxisService.createService(Services.class.getName(),
                                           businessConfigCtx.getAxisConfiguration(),
-                                          RPCMessageReceiver.class,
-                                          "http://business.org", "http://business.org");
+                                          messageReciverMap,
+                                          "http://business.org", "http://business.org",
+                                          Services.class.getClassLoader());
         businessConfigCtx.getAxisConfiguration().addService(businessService);
 
         TransportInDescription synTrsIn = (TransportInDescription)

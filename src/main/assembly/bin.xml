@@ -204,6 +204,13 @@
                 <include>synapse-transports-${synapse.version}.jar</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>modules/core/src/main/resources</directory>
+            <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
+            <includes>
+                <include>patches.txt</include>
+            </includes>
+        </fileSet>        
     </fileSets>
     <dependencySets>
         <dependencySet>
@@ -247,9 +254,6 @@
                 <include>xml-apis:xml-apis:jar</include>
                 <include>xerces:xercesImpl:jar</include>
             </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
         </dependencySet>
         <dependencySet>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>

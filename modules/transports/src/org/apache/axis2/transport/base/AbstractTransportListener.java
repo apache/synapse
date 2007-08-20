@@ -192,9 +192,6 @@ public abstract class AbstractTransportListener implements TransportListener {
 
         // send the message context through the axis engine
         try {
-            if (msgCtx.getEnvelope().getBody().hasFault()) {
-                engine.receiveFault(msgCtx);
-            } else {
                 try {
                     engine.receive(msgCtx);
                 } catch (AxisFault e) {
@@ -206,7 +203,6 @@ public abstract class AbstractTransportListener implements TransportListener {
                         engine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
                     }
                 }
-            }
         } catch (AxisFault axisFault) {
             logException("Error processing received message", axisFault);
         }

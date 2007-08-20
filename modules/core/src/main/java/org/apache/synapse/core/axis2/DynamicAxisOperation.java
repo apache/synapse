@@ -86,7 +86,7 @@ public class DynamicAxisOperation extends OutInAxisOperation {
 			this.callback = callback;
 		}
 
-		public void execute(boolean block) throws AxisFault {
+		public void executeImpl(boolean block) throws AxisFault {
 
             // if the MEP is completed, throw a fault
             if (completed) {

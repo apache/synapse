@@ -11,7 +11,7 @@
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
@@ -172,11 +172,7 @@ public class ClientWorker implements Runnable {
 
         AxisEngine engine = new AxisEngine(cfgCtx);
         try {
-            if (envelope.getBody().hasFault()) {
-                engine.receiveFault(responseMsgCtx);
-            } else {
-                engine.receive(responseMsgCtx);
-            }
+            engine.receive(responseMsgCtx);
         } catch (AxisFault af) {
             log.error("Fault processing response message through Axis2", af);
         }

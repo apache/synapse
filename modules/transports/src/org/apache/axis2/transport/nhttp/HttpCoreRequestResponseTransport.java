@@ -11,7 +11,7 @@
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
@@ -40,6 +40,7 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
     private static final Log log = LogFactory.getLog(HttpCoreRequestResponseTransport.class);
     private RequestResponseTransportStatus status = RequestResponseTransportStatus.INITIAL;
     private MessageContext msgContext = null;
+    private boolean responseWritten = false;
 
     HttpCoreRequestResponseTransport(MessageContext msgContext) {
         this.msgContext = msgContext;
@@ -72,4 +73,12 @@ public class HttpCoreRequestResponseTransport implements RequestResponseTranspor
 
     public void signalFaultReady(AxisFault fault) {
     }
+    
+    public boolean isResponseWritten() {
+		return responseWritten;
+	}
+
+	public void setResponseWritten(boolean responseWritten) {
+		this.responseWritten = responseWritten;
+	}
 }

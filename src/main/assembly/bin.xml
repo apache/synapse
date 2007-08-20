@@ -249,6 +249,9 @@
             </includes>
         </dependencySet>
         <dependencySet>
+            <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
+        </dependencySet>
+        <dependencySet>
             <outputDirectory>synapse-${synapse.version}/repository/modules</outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>

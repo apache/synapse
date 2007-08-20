@@ -11,7 +11,7 @@
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
@@ -278,7 +278,7 @@ public class ServerWorker implements Runnable {
                 try {
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
                     serverHandler.commitResponse(conn, response);
-                    service.printWSDL(os, getIpAddress(), contextPath);
+                    service.printWSDL(os, getIpAddress());
 
                 } catch (AxisFault e) {
                     handleException("Axis2 fault writing ?wsdl output", e);
@@ -296,8 +296,7 @@ public class ServerWorker implements Runnable {
                 try {
                     response.addHeader(CONTENT_TYPE, TEXT_XML);
                     serverHandler.commitResponse(conn, response);
-                    service.printWSDL2(os, getIpAddress(), contextPath);
-
+                    service.printWSDL2(os, getIpAddress());
                 } catch (AxisFault e) {
                     handleException("Axis2 fault writing ?wsdl2 output", e);
                     return;
@@ -337,7 +336,14 @@ public class ServerWorker implements Runnable {
                     service.populateSchemaMappings();
                     //write out the correct schema
                     Map schemaTable = service.getSchemaMappingTable();
-                    final XmlSchema schema = (XmlSchema)schemaTable.get(schemaName);
+                    XmlSchema schema = (XmlSchema)schemaTable.get(schemaName);
+                    if (schema == null) {
+                        int dotIndex = schemaName.indexOf('.');
+                        if (dotIndex > 0) {
+                            String schemaKey = schemaName.substring(0,dotIndex);
+                            schema = (XmlSchema) schemaTable.get(schemaKey);
+                        }
+                    }
                     //schema found - write it to the stream
                     if (schema != null) {
                         response.addHeader(CONTENT_TYPE, TEXT_XML);

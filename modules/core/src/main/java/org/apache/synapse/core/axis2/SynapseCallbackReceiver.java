@@ -166,6 +166,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
             MessageContext axisOutMsgCtx =
                     ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext();
 
+            response.setServiceContext(null);
             response.setOperationContext(axisOutMsgCtx.getOperationContext());
             response.getAxisMessage().setParent(
                 axisOutMsgCtx.getOperationContext().getAxisOperation());

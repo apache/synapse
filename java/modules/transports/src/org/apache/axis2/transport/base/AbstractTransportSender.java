@@ -128,9 +128,6 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
         
         // send the message context through the axis engine
         try {
-            if (msgCtx.getEnvelope().getBody().hasFault()) {
-                engine.receiveFault(msgCtx);
-            } else {
                 try {
                     engine.receive(msgCtx);
                 } catch (AxisFault e) {
@@ -141,7 +138,6 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
                         engine.sendFault(MessageContextBuilder.createFaultMessageContext(msgCtx, e));
                     }
                 }
-            }
         } catch (AxisFault axisFault) {
             logException("Error processing response message", axisFault);
         }

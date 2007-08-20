@@ -21,6 +21,7 @@ package org.apache.axis2.transport.nhttp;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.util.Utils;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.MessageFormatter;
@@ -35,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
@@ -96,10 +98,21 @@ public class Axis2HttpRequest {
      * @return the HttpRequest to be sent out
      */
     public HttpRequest getRequest() throws IOException {
-        HttpEntityEnclosingRequest httpRequest = new BasicHttpEntityEnclosingRequest(
-                "POST", 
-                epr.getAddress());
-        httpRequest.setEntity(new BasicHttpEntity());
+
+        HttpEntityEnclosingRequest httpRequest = null;
+        if(!Utils.isExplicitlyTrue(msgContext, NhttpConstants.FORCE_HTTP_1_0))
+        {
+            httpRequest = new BasicHttpEntityEnclosingRequest(
+                "POST", epr.getAddress(), HttpVersion.HTTP_1_0);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            messageFormatter.writeTo(msgContext, format, baos, true);
+            BasicHttpEntity entity = new BasicHttpEntity();
+            entity.setContentLength(baos.toByteArray().length);
+            httpRequest.setEntity(entity);
+        } else {
+            httpRequest = new BasicHttpEntityEnclosingRequest("POST", epr.getAddress());
+            httpRequest.setEntity(new BasicHttpEntity());
+        }
 
         // set any transport headers
         Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);

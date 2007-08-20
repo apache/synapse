@@ -22,4 +22,5 @@ package org.apache.axis2.transport.nhttp;
 public class NhttpConstants {
     public static final String SC_ACCEPTED = "SC_ACCEPTED";
     public static final String SENDING_FAULT = "sending_fault";
+    public static final String FORCE_HTTP_1_0 = "FORCE_HTTP_1.0";
 }

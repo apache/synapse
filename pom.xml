@@ -870,7 +870,7 @@
         <oro.version>2.0.8</oro.version>
 
         <!-- Axis2 1.2 and its dependencies -->
-        <axis2.version>1.2</axis2.version>
+        <axis2.version>1.3</axis2.version>
         <axiom.version>1.2.4</axiom.version>
         <xml_schema.version>1.3.1</xml_schema.version>
         <xml_apis.version>1.3.03</xml_apis.version>
@@ -880,11 +880,11 @@
         <backport_util_concurrent.version>2.2</backport_util_concurrent.version>
 
         <!-- addressing, rampart, sandesha, neethi -->
-        <addressing.version>1.2</addressing.version>
-        <rampart.version>1.2</rampart.version>
-        <sandesha2.version>1.2</sandesha2.version>
-        <neethi.version>2.0.1</neethi.version>
-        <wss4j.version>1.5.2</wss4j.version>
+        <addressing.version>1.3</addressing.version>
+        <rampart.version>SNAPSHOT</rampart.version>
+        <sandesha2.version>SNAPSHOT</sandesha2.version>
+        <neethi.version>2.0.2</neethi.version>
+        <wss4j.version>SNAPSHOT</wss4j.version>
         <opensaml.version>1.1</opensaml.version>
         <xmlsec.version>1.4.0</xmlsec.version>
         <bcprov.jdk13.version>132</bcprov.jdk13.version>

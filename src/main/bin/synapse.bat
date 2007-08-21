@@ -90,9 +90,12 @@ goto runSynapse
 if "%_JAVACMD%" == "" set _JAVACMD=java.exe
 
 :runSynapse
-rem set the classes by looping through the libs
+rem set the classes by looping through the libs, add patches first
 setlocal EnableDelayedExpansion
-set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%/lib"
+set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib\patches"
+FOR %%C in ("%SYNAPSE_HOME%\lib\patches\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
+
+set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%SYNAPSE_HOME%\lib"
 FOR %%C in ("%SYNAPSE_HOME%\lib\*.jar") DO set SYNAPSE_CLASS_PATH=!SYNAPSE_CLASS_PATH!;"%%~fC"
 set SYNAPSE_CLASS_PATH="%SYNAPSE_HOME%\lib";%SYNAPSE_CLASS_PATH%
 

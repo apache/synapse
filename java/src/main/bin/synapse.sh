@@ -83,8 +83,14 @@ if $os400; then
   export QIBM_MULTI_THREADED=Y
 fi
 
-# update classpath
-SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib"
+# update classpath - add any patches first
+SYNAPSE_CLASSPATH="$SYNAPSE_HOME/lib/patches"
+for f in $SYNAPSE_HOME/lib/patches/*.jar
+do
+  SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f
+done
+
+SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:"$SYNAPSE_HOME/lib"
 for f in $SYNAPSE_HOME/lib/*.jar
 do
   SYNAPSE_CLASSPATH=$SYNAPSE_CLASSPATH:$f

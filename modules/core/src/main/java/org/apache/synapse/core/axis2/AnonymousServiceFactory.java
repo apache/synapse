@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 
 import javax.xml.namespace.QName;
 
@@ -48,7 +49,7 @@ public class AnonymousServiceFactory {
 
     public static final String DYNAMIC_OPERATION  = "__DYNAMIC_OPERATION__";
 
-    private static final SynapseCallbackReceiver synapseCallback = new SynapseCallbackReceiver();
+    private static SynapseCallbackReceiver synapseCallbackReceiver = null;
 
     /**
      * Creates an AxisService for the requested QoS for sending out messages
@@ -59,8 +60,9 @@ public class AnonymousServiceFactory {
      * @param wsSecOn
      * @return An Axis service for the requested QoS
      */
-    public static AxisService getAnonymousService(AxisConfiguration axisCfg,
-        boolean wsAddrOn, boolean wsRMOn, boolean wsSecOn) {
+    public static AxisService getAnonymousService(SynapseConfiguration synCfg,
+                                                  AxisConfiguration axisCfg, boolean wsAddrOn,
+                                                  boolean wsRMOn, boolean wsSecOn) {
 
         String servicekey = null;
         if (!wsAddrOn) {
@@ -88,7 +90,7 @@ public class AnonymousServiceFactory {
                         return service;
                     }
 
-                    service = createAnonymousService(axisCfg, servicekey);
+                    service = createAnonymousService(synCfg, axisCfg, servicekey);
 
                     if (wsAddrOn) {
                         service.engageModule(axisCfg.getModule(
@@ -123,13 +125,13 @@ public class AnonymousServiceFactory {
      * @param axisCfg the Axis2 configuration
      * @return an anonymous service named with the given QoS key
      */
-    private static AxisService createAnonymousService(
+    private static AxisService createAnonymousService(SynapseConfiguration synCfg,
         AxisConfiguration axisCfg, String serviceKey) {
 
         try {
             DynamicAxisOperation dynamicOperation =
                 new DynamicAxisOperation(new QName(DYNAMIC_OPERATION));
-            dynamicOperation.setMessageReceiver(synapseCallback);
+            dynamicOperation.setMessageReceiver(getCallbackReceiver(synCfg));
             AxisMessage inMsg = new AxisMessage();
             inMsg.setName("in-message");
             inMsg.setParent(dynamicOperation);
@@ -150,6 +152,14 @@ public class AnonymousServiceFactory {
                  serviceKey, e);
         }
         return null;
+    }
+
+    private static SynapseCallbackReceiver getCallbackReceiver(SynapseConfiguration synCfg) {
+        if (synapseCallbackReceiver == null) {
+            synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg);
+        }
+
+        return synapseCallbackReceiver;
     }
 
 }

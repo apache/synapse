@@ -37,6 +37,7 @@ import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.synapse.Constants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.Endpoint;
 
 import java.util.*;
@@ -47,17 +48,13 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
     private Map callbackStore;  // this will be made thread safe within the constructor
 
-    /**
-     * Timer to schedule the timeout task.
-     */
-    private Timer timeOutTimer = null;
-
-    public SynapseCallbackReceiver() {
+    public SynapseCallbackReceiver(SynapseConfiguration synCfg) {
         callbackStore = Collections.synchronizedMap(new HashMap());
 
         // create the Timer object and a TimeoutHandler task. Schedule it to run every 10 seconds from here
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
-        timeOutTimer = new Timer(true);
+        
+        Timer timeOutTimer = synCfg.getSynapseTimer();
         timeOutTimer.schedule(timeoutHandler, 0, Constants.TIMEOUT_HANDLER_INTERVAL);
     }
 

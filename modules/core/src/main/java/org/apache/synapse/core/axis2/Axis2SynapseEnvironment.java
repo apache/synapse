@@ -31,6 +31,7 @@ import org.apache.synapse.Constants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.util.UUIDGenerator;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -145,7 +146,8 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         axis2MC.setServiceContext(new ServiceContext());
         axis2MC.setOperationContext(new OperationContext());
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
-		try {
+        mc.setMessageID(UUIDGenerator.getUUID());
+        try {
 			mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
 			mc.getEnvelope().addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
 		} catch (Exception e) {

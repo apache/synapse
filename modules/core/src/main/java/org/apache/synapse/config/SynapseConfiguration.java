@@ -70,7 +70,12 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 */
 	private Map localRegistry = new HashMap();
 
-	/** Hold reference to the Axis2 ConfigurationContext */
+    /**
+     * This will provide the timer deamon object for the sheduled tasks.
+     */
+    private Timer synapseTimer = new Timer(true);
+
+    /** Hold reference to the Axis2 ConfigurationContext */
 	private AxisConfiguration axisConfiguration = null;
 
 	/**
@@ -79,7 +84,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 */
 	private String pathToConfigFile = null;
 
-	/**
+    /**
 	 * Add a named sequence into the local registry
 	 *
 	 * @param key
@@ -521,6 +526,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	public List getStartup() {
 		return startup;
 	}
+
+    public Timer getSynapseTimer() {
+        return synapseTimer;
+    }
 
     public void destroy() {
         if (log.isDebugEnabled()) {

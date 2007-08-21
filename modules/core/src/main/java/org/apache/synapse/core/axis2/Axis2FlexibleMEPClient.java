@@ -169,7 +169,7 @@ public class Axis2FlexibleMEPClient {
         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
 
         AxisService anoymousService =
-            AnonymousServiceFactory.getAnonymousService(
+            AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),
             axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
         ServiceGroupContext sgc = new ServiceGroupContext(
             axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());

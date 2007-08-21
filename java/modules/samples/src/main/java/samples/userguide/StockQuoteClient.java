@@ -64,6 +64,7 @@ public class StockQuoteClient {
         String svcPolicy = getProperty("policy", null);
         String rest      = getProperty("rest", null);
         String wsrm      = getProperty("wsrm", null);
+        String itr       = getProperty("itr", "1");
 
         double price = 0; int quantity = 0;
 		ConfigurationContext configContext = null;
@@ -98,7 +99,8 @@ public class StockQuoteClient {
                 payload = StockQuoteHandler.createMarketActivityRequest();
                 options.setAction("urn:getMarketActivity");
             } else if ("quote".equals(mode)) {
-                payload = StockQuoteHandler.createStandardQuoteRequest(symbol);
+                payload = StockQuoteHandler.createStandardQuoteRequest(
+                        symbol, Integer.parseInt(itr));
                 options.setAction("urn:getQuote");
             }
 

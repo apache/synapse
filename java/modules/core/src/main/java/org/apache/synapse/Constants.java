@@ -215,4 +215,13 @@ public interface Constants {
     String ANONYMOUS_SEQUENCES = "AnonymousSequences";
     /** Anonymous ProxyServices key   */
     String ANONYMOUS_PROXYSERVICES = "AnonymousProxyServices";
+
+    /** Property key for the aggregation corelation */
+    String AGGREGATE_CORELATION = "aggregateCorelation";
+
+    /** Property key for the message sequence details in an aggregation */
+    String MESSAGE_SEQUENCE = "messageSequence";
+
+    /** String message sequence delemiter */
+    String MESSAGE_SEQUENCE_DELEMITER = "/";
 }

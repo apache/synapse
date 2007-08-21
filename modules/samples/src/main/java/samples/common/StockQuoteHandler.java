@@ -66,15 +66,17 @@ public class StockQuoteHandler {
      * @param symbol the stock symbol
      * @return OMElement for SOAP body
      */
-    public static OMElement createStandardQuoteRequest(String symbol) {
+    public static OMElement createStandardQuoteRequest(String symbol, int itrCount) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
         OMNamespace ns      = factory.createOMNamespace("http://services.samples/xsd", "m0");
         OMElement getQuote  = factory.createOMElement("getQuote", ns);
-        OMElement request   = factory.createOMElement("request", ns);
-        OMElement symb      = factory.createOMElement("symbol", ns);
-        request.addChild(symb);
-        getQuote.addChild(request);
-        symb.setText(symbol);
+        for (int i =0; i<itrCount; i++) {
+            OMElement request   = factory.createOMElement("request", ns);
+            OMElement symb      = factory.createOMElement("symbol", ns);
+            request.addChild(symb);
+            getQuote.addChild(request);
+            symb.setText(symbol);
+        }
         return getQuote;
     }
 

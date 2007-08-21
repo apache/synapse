@@ -75,6 +75,7 @@
     <property name="policy" value=""/>
     <property name="rest" value=""/>
     <property name="wsrm" value=""/>
+    <property name="itr" value=""/>
     <property name="jms_dest" value=""/>
     <property name="jms_type" value=""/>
     <property name="jms_payload" value=""/>
@@ -100,6 +101,7 @@
             <sysproperty key="policy" value="${policy}"/>
             <sysproperty key="rest" value="${rest}"/>
             <sysproperty key="wsrm" value="${wsrm}"/>
+            <sysproperty key="itr" value="${itr}"/>
             <sysproperty key="javax.net.ssl.trustStore" value="./../../lib/trust.jks"/>
             <sysproperty key="javax.net.ssl.trustStorePassword" value="password"/>
             <!--

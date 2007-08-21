@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.CopyUtils;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -98,7 +99,14 @@ public class SandeshaUtil {
 	
 	private static AxisModule axisModule = null;
 
-	public static AxisModule getAxisModule() {
+        
+	/**
+	 * Private Constructor.
+         * All utility methods are static.
+	 */
+	private SandeshaUtil() {}
+
+        public static AxisModule getAxisModule() {
 		return axisModule;
 	}
 
@@ -922,31 +930,23 @@ public class SandeshaUtil {
 		return phases;
 	}
 	
-	public static MessageContext cloneMessageContext (MessageContext oldMsg) throws AxisFault {
+        /**
+         * Clone the MessageContext
+         * @param oldMsg
+         * @return
+         * @throws AxisFault
+         */
+        public static MessageContext cloneMessageContext (MessageContext oldMsg) throws AxisFault {
 		MessageContext newMsg = new MessageContext ();
 		newMsg.setOptions(new Options (oldMsg.getOptions()));
 		
-		
-		//TODO hd to use following hack since a 'clone' method was not available for SOAPEnvelopes.
-		//Do it the correct way when that becomes available.
-		OMElement newElement = oldMsg.getEnvelope().cloneOMElement();
-		String elementString = newElement.toString();
-		
-		try {
-			ByteArrayInputStream stream = new ByteArrayInputStream(
-					elementString.getBytes("UTF8"));
-			StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(
-					XMLInputFactory.newInstance().createXMLStreamReader(stream),
-					null);
-			SOAPEnvelope envelope = builder.getSOAPEnvelope();
-
-			newMsg.setEnvelope(envelope);
-		} catch (XMLStreamException e) {
-			throw AxisFault.makeFault(e);
-		} catch (UnsupportedEncodingException e) {
-			throw AxisFault.makeFault(e);
-		}
-		
+                // Create a copy of the envelope
+                SOAPEnvelope oldEnvelope = oldMsg.getEnvelope();
+                if (oldEnvelope != null) {
+                    SOAPEnvelope newEnvelope = copySOAPEnvelope(oldMsg.getEnvelope());
+                    newMsg.setEnvelope(newEnvelope);
+                }
+                
 		newMsg.setConfigurationContext(oldMsg.getConfigurationContext());
 		newMsg.setAxisService(oldMsg.getAxisService());
 		newMsg.setTransportOut(oldMsg.getTransportOut());
@@ -959,6 +959,22 @@ public class SandeshaUtil {
 		
 	}
 
+        /** 
+         * Create a copy of the SOAPEnvelope
+         * @param sourceEnv
+         * @return targetEnv
+         */
+        private static SOAPEnvelope copySOAPEnvelope(SOAPEnvelope sourceEnv) {
+            if (log.isDebugEnabled()) {
+                log.debug("Start Create in-memory copy of the SOAPEnvelope");
+            }
+            // Delegate to the CopuUtils provided by Axiom
+            SOAPEnvelope targetEnv = CopyUtils.copy(sourceEnv);
+            if (log.isDebugEnabled()) {
+                log.debug("End Create in-memory copy of the SOAPEnvelope");
+            }
+            return targetEnv;
+        }
   /**
    * Remove the MustUnderstand header blocks.
    * @param envelope

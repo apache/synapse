@@ -151,7 +151,12 @@ public class HttpCoreNIOListener implements TransportListener {
         sslContext = getSSLContext(transprtIn);
         sslIOSessionHandler = getSSLIOSessionHandler(transprtIn);
 
-        serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, host, port);
+        param = transprtIn.getParameter(NhttpConstants.WSDL_EPR_PREFIX);
+        if (param != null) {
+            serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, (String) param.getValue());
+        } else {
+            serviceEPRPrefix = getServiceEPRPrefix(cfgCtx, host, port);
+        }
     }
 
     /**
@@ -164,6 +169,18 @@ public class HttpCoreNIOListener implements TransportListener {
             cfgCtx.getServiceContextPath() +
             (!cfgCtx.getServiceContextPath().endsWith("/") ? "/" : "");
     }
+
+    /**
+     * Return the EPR prefix for services made available over this transport
+     * @return
+     */
+    protected String getServiceEPRPrefix(ConfigurationContext cfgCtx, String wsdlEPRPrefix) {
+        return wsdlEPRPrefix +
+            (!cfgCtx.getServiceContextPath().startsWith("/") ? "/" : "") +
+            cfgCtx.getServiceContextPath() +
+            (!cfgCtx.getServiceContextPath().endsWith("/") ? "/" : "");
+    }
+
 
     /**
      * Create the SSLContext to be used by this listener

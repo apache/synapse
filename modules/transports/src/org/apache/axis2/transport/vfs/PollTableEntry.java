@@ -18,6 +18,10 @@
 */
 package org.apache.axis2.transport.vfs;
 
+/**
+ * Holds information about an entry in the VFS transport poll table used by the
+ * VFS Transport Listener
+ */
 public class PollTableEntry {
 
     // status of last scan

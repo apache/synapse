@@ -31,4 +31,10 @@ public class VFSConstants {
     public static final String REPLY_FILE_NAME = "transport.vfs.ReplyFileName";
 
     public static final String DEFAULT_RESPONSE_FILE = "response.xml";
+
+    // transport header property names used by the VFS transport
+    public static final String FILE_PATH = "FILE_PATH";
+    public static final String FILE_NAME = "FILE_NAME";
+    public static final String FILE_LENGTH = "FILE_LENGTH";
+    public static final String LAST_MODIFIED = "LAST_MODIFIED";
 }

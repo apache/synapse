@@ -953,8 +953,7 @@ public class SandeshaUtil {
 		newMsg.setTransportIn(oldMsg.getTransportIn());
 
                 //Copy property objects from oldMsg to newMsg
-                newMsg.setProperties(oldMsg.getProperties());
-		
+		copyConfiguredProperties(oldMsg,newMsg);
 		return newMsg;
 		
 	}

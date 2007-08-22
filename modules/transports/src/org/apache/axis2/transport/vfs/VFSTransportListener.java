@@ -21,6 +21,7 @@ package org.apache.axis2.transport.vfs;
 import org.apache.axis2.transport.base.AbstractTransportListener;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
+import org.apache.axis2.transport.base.AbstractPollingTransportListener;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -37,8 +38,8 @@ import javax.xml.namespace.QName;
 import java.util.*;
 
 /**
- * The "file" transport is a polling based transport - i.e. it gets kicked off at
- * a specified duration, and would iterate through a list of directories or files
+ * The "vfs" transport is a polling based transport - i.e. it gets kicked off at
+ * specified periodic durations, and would iterate through a list of directories or files
  * specified according to poll durations. When scanning a directory, it will match
  * its contents against a given regex to find the set of input files. For compressed
  * files, the contents could be matched against a regex to find individual files.
@@ -47,69 +48,62 @@ import java.util.*;
  *
  * The processed files would be deleted or renamed as specified in the configuration
  *
-file:///directory/filename.ext
-file:////somehost/someshare/afile.txt
-jar:../lib/classes.jar!/META-INF/manifest.mf
-zip:http://somehost/downloads/somefile.zip
-jar:zip:outer.zip!/nested.jar!/somedir
-jar:zip:outer.zip!/nested.jar!/some%21dir
-tar:gz:http://anyhost/dir/mytar.tar.gz!/mytar.tar!/path/in/tar/README.txt
-tgz:file://anyhost/dir/mytar.tgz!/somepath/somefile
-gz:/my/gz/file.gz
-http://somehost:8080/downloads/somefile.jar
-http://myusername@somehost/index.html
-webdav://somehost:8080/dist
-ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz
-sftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz
-smb://somehost/home
-
-axis2.xml - transport definition
-    <transportReceiver name="file" class="org.apache.axis2.transport.file.FileTransportListener">
-      <parameter name="transport.file.Directory" locked="false">..</parameter>
-    </transportReceiver>
-
-services.xml - service attachment
-    <parameter name="transport.file.FileURI" locked="true">..</parameter>
-    <parameter name="transport.file.FileNamePattern" locked="true">..</parameter>
-    <parameter name="transport.file.ContentType" locked="true">..</parameter>
-
-    <parameter name="transport.PollInterval" locked="true">..</parameter>
-
-    <parameter name="transport.file.ActionAfterProcess" locked="true">..</parameter>
-	<parameter name="transport.file.ActionAfterErrors" locked="true">..</parameter>
-    <parameter name="transport.file.ActionAfterFailure" locked="true">..</parameter>
+ * Supported VFS example URIs
+ * 
+ * file:///directory/filename.ext
+ * file:////somehost/someshare/afile.txt
+ * jar:../lib/classes.jar!/META-INF/manifest.mf
+ * zip:http://somehost/downloads/somefile.zip
+ * jar:zip:outer.zip!/nested.jar!/somedir
+ * jar:zip:outer.zip!/nested.jar!/some%21dir
+ * tar:gz:http://anyhost/dir/mytar.tar.gz!/mytar.tar!/path/in/tar/README.txt
+ * tgz:file://anyhost/dir/mytar.tgz!/somepath/somefile
+ * gz:/my/gz/file.gz
+ * http://somehost:8080/downloads/somefile.jar
+ * http://myusername@somehost/index.html
+ * webdav://somehost:8080/dist
+ * ftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz
+ * sftp://myusername:mypassword@somehost/pub/downloads/somefile.tgz
+ * smb://somehost/home
+ *
+ * axis2.xml - transport definition
+ *  <transportReceiver name="file" class="org.apache.axis2.transport.file.FileTransportListener"/>
+ *
+ * services.xml - service attachment
+ *  required parameters
+ *  <parameter name="transport.file.FileURI" locked="true">..</parameter>
+ *  <parameter name="transport.file.FileNamePattern" locked="true">..</parameter>
+ *
+ *  optional parameters
+ *  <parameter name="transport.file.ContentType" locked="true">..</parameter>
+ *  <parameter name="transport.PollInterval" locked="true">..</parameter>
+ *
+ *  <parameter name="transport.file.ActionAfterProcess" locked="true">..</parameter>
+ * 	<parameter name="transport.file.ActionAfterErrors" locked="true">..</parameter>
+ *  <parameter name="transport.file.ActionAfterFailure" locked="true">..</parameter>
  */
-public class VFSTransportListener extends AbstractTransportListener {
+public class VFSTransportListener extends AbstractPollingTransportListener {
 
     public static final String TRANSPORT_NAME = "vfs";
-    public static final String FILE_PATH = "FILE_PATH";
-    public static final String FILE_NAME = "FILE_NAME";
-    public static final String FILE_LENGTH = "FILE_LENGTH";
-    public static final String LAST_MODIFIED = "LAST_MODIFIED";
 
     public static final String DELETE = "DELETE";
     public static final String MOVE = "MOVE";
 
     /** Keep the list of directories/files and poll durations */
     private final List pollTable = new ArrayList();
-
     /** The VFS file system manager */
     private FileSystemManager fsManager = null;
-    /** default interval in ms before polls */
-    private int pollInterval = BaseConstants.DEFAULT_POLL_INTERVAL;
-    /** The main timer that runs as a daemon thread */
-    private final Timer timer = new Timer("PollTimer", true);
-    /** is a poll already executing? */
-    protected boolean pollInProgress = false;
-    /** a lock to prevent concurrent execution of polling */
-    private final Object pollLock = new Object();
-    /** a map that keeps track of services to the timer tasks created for them */
-    private Map serviceToTimerTaskMap = new HashMap();
 
     static {
         log = LogFactory.getLog(VFSTransportListener.class);
     }
 
+    /**
+     * Initializes the VFS transport by getting the VFS File System manager
+     * @param cfgCtx the Axsi2 configuration context
+     * @param trpInDesc the VFS transport in description from the axis2.xml
+     * @throws AxisFault on error
+     */
     public void init(ConfigurationContext cfgCtx, TransportInDescription trpInDesc)
         throws AxisFault {
         setTransportName(TRANSPORT_NAME);
@@ -285,14 +279,14 @@ public class VFSTransportListener extends AbstractTransportListener {
             String filePath = file.getName().getPath();
 
             Map transportHeaders = new HashMap();
-            transportHeaders.put(FILE_PATH, filePath);
-            transportHeaders.put(FILE_NAME, fileName);
+            transportHeaders.put(VFSConstants.FILE_PATH, filePath);
+            transportHeaders.put(VFSConstants.FILE_NAME, fileName);
 
             try {
-                transportHeaders.put(FILE_LENGTH, Long.valueOf(content.getSize()));
+                transportHeaders.put(VFSConstants.FILE_LENGTH, Long.valueOf(content.getSize()));
             } catch (FileSystemException ignore) {}
             try {
-                transportHeaders.put(LAST_MODIFIED, Long.valueOf(content.getLastModifiedTime()));
+                transportHeaders.put(VFSConstants.LAST_MODIFIED, Long.valueOf(content.getLastModifiedTime()));
             } catch (FileSystemException ignore) {}
 
             // compute the unique message ID
@@ -456,65 +450,5 @@ public class VFSTransportListener extends AbstractTransportListener {
                 pollTable.remove(entry);
             }
         }
-    }
-
-    /**
-     * Schedule a repeated poll at the specified interval for the given service
-     * @param service the service to be polled
-     * @param pollInterval the interval between successive polls
-     */
-    public void schedulePoll(AxisService service, long pollInterval) {
-        TimerTask task = (TimerTask) serviceToTimerTaskMap.get(service);
-
-        // if a timer task exists, cancel it first and create a new one
-        if (task != null) {
-            task.cancel();
-        }
-
-        task = new TimerTask() {
-            public void run() {
-                if (pollInProgress) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Transport " + transportName +
-                                " onPoll() trigger : already executing poll..");
-                    }
-                    return;
-                }
-
-                workerPool.execute(new Runnable() {
-                    public void run() {
-                        synchronized (pollLock) {
-                            pollInProgress = true;
-                            try {
-                                onPoll();
-                            } finally {
-                                pollInProgress = false;
-                            }
-                        }
-                    }
-                });
-            }
-        };
-        serviceToTimerTaskMap.put(service, task);
-        timer.scheduleAtFixedRate(task, pollInterval, pollInterval);
-    }
-
-    /**
-     * Cancel any pending timer tasks for the given service
-     * @param service the service for which the timer task should be cancelled
-     */
-    public void cancelPoll(AxisService service) {
-        TimerTask task = (TimerTask) serviceToTimerTaskMap.get(service);
-        if (task != null) {
-            task.cancel();
-        }
-    }
-
-    public int getPollInterval() {
-        return pollInterval;
-    }
-
-    public void setPollInterval(int pollInterval) {
-        this.pollInterval = pollInterval;
     }
 }

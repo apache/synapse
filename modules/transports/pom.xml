@@ -34,10 +34,6 @@
     <description>Apache Synapse - Transports</description>
     <packaging>jar</packaging>
 
-    <build>
-        <sourceDirectory>src</sourceDirectory>
-    </build>
-
     <dependencies>
 
     </dependencies>

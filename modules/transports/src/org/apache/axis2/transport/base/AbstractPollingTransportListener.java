@@ -34,15 +34,15 @@ public abstract class AbstractPollingTransportListener extends AbstractTransport
     public static final int DEFAULT_POLL_INTERVAL = 5 * 60 * 1000; // 5 mins by default
 
     /** default interval in ms before polls */
-    private int pollInterval = DEFAULT_POLL_INTERVAL;
+    protected int pollInterval = DEFAULT_POLL_INTERVAL;
     /** The main timer that runs as a daemon thread */
-    private final Timer timer = new Timer("PollTimer", true);
+    protected final Timer timer = new Timer("PollTimer", true);
     /** is a poll already executing? */
     protected boolean pollInProgress = false;
     /** a lock to prevent concurrent execution of polling */
-    private final Object pollLock = new Object();
+    protected final Object pollLock = new Object();
     /** a map that keeps track of services to the timer tasks created for them */
-    private Map serviceToTimerTaskMap = new HashMap();
+    protected Map serviceToTimerTaskMap = new HashMap();
 
     /**
      * Schedule a repeated poll at the specified interval for the given service

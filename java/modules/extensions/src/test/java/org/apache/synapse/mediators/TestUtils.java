@@ -19,14 +19,6 @@
 
 package org.apache.synapse.mediators;
 
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMElement;
@@ -42,6 +34,13 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.registry.url.SimpleURLRegistry;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.Map;
+
 public class TestUtils {
 
     public static TestMessageContext getTestContext(String bodyText, Map props) throws Exception {
@@ -55,7 +54,7 @@ public class TestUtils {
             Iterator iter = props.keySet().iterator();
             while (iter.hasNext()) {
                 String key = (String) iter.next();
-                testConfig.addEntry(key, (Entry)props.get(key));
+                testConfig.addEntry(key, (Entry) props.get(key));
             }
         }
         synCtx.setConfiguration(testConfig);
@@ -65,7 +64,41 @@ public class TestUtils {
         omDoc.addChild(envelope);
 
         XMLStreamReader parser = XMLInputFactory.newInstance().
-            createXMLStreamReader(new StringReader(bodyText));
+                createXMLStreamReader(new StringReader(bodyText));
+        StAXOMBuilder builder = new StAXOMBuilder(parser);
+
+        // set a dummy static message
+        envelope.getBody().addChild(builder.getDocumentElement());
+
+        synCtx.setEnvelope(envelope);
+        return synCtx;
+    }
+
+    public static Axis2MessageContext getAxis2MessageContext(String bodyText,
+                                                             Map props) throws Exception {
+        // create a test synapse context
+        SynapseConfiguration testConfig = new SynapseConfiguration();
+        org.apache.axis2.context.MessageContext inContext =
+                new org.apache.axis2.context.MessageContext();
+
+        Axis2MessageContext synCtx = new Axis2MessageContext(inContext, testConfig, null);
+        testConfig.setRegistry(new SimpleURLRegistry());
+
+        if (props != null) {
+            Iterator iter = props.keySet().iterator();
+            while (iter.hasNext()) {
+                String key = (String) iter.next();
+                testConfig.addEntry(key, (Entry) props.get(key));
+            }
+        }
+        synCtx.setConfiguration(testConfig);
+
+        SOAPEnvelope envelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+        OMDocument omDoc = OMAbstractFactory.getSOAP11Factory().createOMDocument();
+        omDoc.addChild(envelope);
+
+        XMLStreamReader parser = XMLInputFactory.newInstance().
+                createXMLStreamReader(new StringReader(bodyText));
         StAXOMBuilder builder = new StAXOMBuilder(parser);
 
         // set a dummy static message
@@ -108,6 +141,7 @@ public class TestUtils {
         synCtx.setEnvelope(envelope);
         return synCtx;
     }
+
     public static TestMessageContext getTestContext(String bodyText) throws Exception {
         return getTestContext(bodyText, null);
     }
@@ -118,7 +152,7 @@ public class TestUtils {
                 new org.apache.axis2.context.MessageContext();
         SynapseConfiguration config = new SynapseConfiguration();
         SynapseEnvironment env = new Axis2SynapseEnvironment();
-        MessageContext synMc = new Axis2MessageContext(mc,config,env);
+        MessageContext synMc = new Axis2MessageContext(mc, config, env);
         SOAPEnvelope envelope =
                 OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
         OMDocument omDoc =

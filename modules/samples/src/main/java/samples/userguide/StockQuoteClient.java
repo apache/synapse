@@ -54,139 +54,165 @@ public class StockQuoteClient {
 
     public static void main(String[] args) {
 
-        // defaults
-        String symbol    = getProperty("symbol", "IBM");
-        String mode      = getProperty("mode", "quote");
-        String addUrl    = getProperty("addurl", null);
-        String trpUrl    = getProperty("trpurl", null);
-        String prxUrl    = getProperty("prxurl", null);
-        String repo      = getProperty("repository", "client_repo");
-        String svcPolicy = getProperty("policy", null);
-        String rest      = getProperty("rest", null);
-        String wsrm      = getProperty("wsrm", null);
-        String itr       = getProperty("itr", "1");
-
-        double price = 0; int quantity = 0;
-		ConfigurationContext configContext = null;
-
         try {
-            Options options = new Options();
-            OMElement payload = null;
-            ServiceClient serviceClient = null;
+            executeClient();
 
-            if (repo != null && !"null".equals(repo)) {
-                configContext =
-                    ConfigurationContextFactory.
-                        createConfigurationContextFromFileSystem(repo,
-                            repo+ File.separator + "conf" + File.separator + "axis2.xml");
-                serviceClient = new ServiceClient(configContext, null);
+            if ("placeorder".equals(InnerStruct.MODE)) {
+                System.out.println("Order placed for " + InnerStruct.QUANTITY + " shares of stock " +
+                        InnerStruct.SYMBOL + " at a price of $ " + InnerStruct.PRICE);
             } else {
-                serviceClient = new ServiceClient();
-            }
-
-            if ("customquote".equals(mode)) {
-                payload = StockQuoteHandler.createCustomQuoteRequest(symbol);
-                options.setAction("urn:getQuote");
-            } else if ("fullquote".equals(mode)) {
-                payload = StockQuoteHandler.createFullQuoteRequest(symbol);
-                options.setAction("urn:getFullQuote");
-            } else if ("placeorder".equals(mode)) {
-                price = getRandom(100, 0.9, true);
-                quantity = (int) getRandom(10000, 1.0, true);
-                payload = StockQuoteHandler.createPlaceOrderRequest(price, quantity, symbol);
-                options.setAction("urn:placeOrder");
-            } else if ("marketactivity".equals(mode)) {
-                payload = StockQuoteHandler.createMarketActivityRequest();
-                options.setAction("urn:getMarketActivity");
-            } else if ("quote".equals(mode)) {
-                payload = StockQuoteHandler.createStandardQuoteRequest(
-                        symbol, Integer.parseInt(itr));
-                options.setAction("urn:getQuote");
-            }
-
-            // set addressing, transport and proxy url
-            if (addUrl != null && !"null".equals(addUrl)) {
-                serviceClient.engageModule("addressing");
-                options.setTo(new EndpointReference(addUrl));
-            }
-            if (trpUrl != null && !"null".equals(trpUrl)) {
-                options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);
-            }
-            if (prxUrl != null && !"null".equals(prxUrl)) {
-                HttpTransportProperties.ProxyProperties proxyProperties =
-                    new HttpTransportProperties.ProxyProperties();
-                URL url = new URL(prxUrl);
-                proxyProperties.setProxyName(url.getHost());
-                proxyProperties.setProxyPort(url.getPort());
-                proxyProperties.setUserName("");
-                proxyProperties.setPassWord("");
-                proxyProperties.setDomain("");
-                options.setProperty(HTTPConstants.PROXY, proxyProperties);
-            }
-
-            // apply any service policies if any
-            if (svcPolicy != null && !"null".equals(svcPolicy) && svcPolicy.length() > 0) {
-                System.out.println("Using WS-Security");
-                serviceClient.engageModule("addressing");
-                serviceClient.engageModule("rampart");
-                options.setProperty(
-                    RampartMessageData.KEY_RAMPART_POLICY, loadPolicy(svcPolicy));
-            }
-
-            if (Boolean.parseBoolean(rest)) {
-                System.out.println("Sending as REST");
-                options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
-            }
-            if (Boolean.parseBoolean(wsrm)) {
-                System.out.println("Using WS-RM");
-                serviceClient.engageModule("sandesha2");
-                options.setProperty("Sandesha2LastMessage", "true");
-                options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
-            }
-
-            serviceClient.setOptions(options);
-
-            if ("placeorder".equals(mode)) {
-                serviceClient.fireAndForget(payload);
-                Thread.sleep(5000);
-                System.out.println("Order placed for " + quantity + " shares of stock " +
-                symbol + " at a price of $ " + price);
-
-            } else {
-                OMElement result = serviceClient.sendReceive(payload);
-
-                if (Boolean.parseBoolean(wsrm)) {
-                    // give some time for RM to terminate normally
-                    Thread.sleep(5000);
-                }
-
-                if("customquote".equals(mode)) {
+                if ("customquote".equals(InnerStruct.MODE)) {
                     System.out.println("Custom :: Stock price = $" +
-                    StockQuoteHandler.parseCustomQuoteResponse(result));
-                } else if ("quote".equals(mode)) {
+                            StockQuoteHandler.parseCustomQuoteResponse(InnerStruct.RESULT));
+                } else if ("quote".equals(InnerStruct.MODE)) {
                     System.out.println("Standard :: Stock price = $" +
-                        StockQuoteHandler.parseStandardQuoteResponse(result));
-                } else if ("fullquote".equals(mode)) {
+                            StockQuoteHandler.parseStandardQuoteResponse(InnerStruct.RESULT));
+                } else if ("fullquote".equals(InnerStruct.MODE)) {
                     System.out.println("Full :: Average price = $" +
-                        StockQuoteHandler.parseFullQuoteResponse(result));
-                } else if ("marketactivity".equals(mode)) {
+                            StockQuoteHandler.parseFullQuoteResponse(InnerStruct.RESULT));
+                } else if ("marketactivity".equals(InnerStruct.MODE)) {
                     System.out.println("Activity :: Average price = $" +
-                        StockQuoteHandler.parseMarketActivityResponse(result));
-                }
-                if (Boolean.parseBoolean(wsrm)) {
-                    configContext.getListenerManager().stop();
-					serviceClient.cleanup();
-					System.exit(0);
+                            StockQuoteHandler.parseMarketActivityResponse(InnerStruct.RESULT));
                 }
             }
-
-            try {
-                configContext.terminate();
-            } catch (Exception ignore) {}
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static OMElement executeTestClient() throws Exception {
+        executeClient();
+        return InnerStruct.RESULT;
+    }
+
+    public static void executeClient() throws Exception {
+
+        // defaults
+        String symbol = getProperty("symbol", "IBM");
+        String mode = getProperty("mode", "quote");
+        String addUrl = getProperty("addurl", null);
+        String trpUrl = getProperty("trpurl", null);
+        String prxUrl = getProperty("prxurl", null);
+        String repo = getProperty("repository", "client_repo");
+        String svcPolicy = getProperty("policy", null);
+        String rest = getProperty("rest", null);
+        String wsrm = getProperty("wsrm", null);
+        String itr = getProperty("itr", "1");
+
+        double price = 0;
+        int quantity = 0;
+        ConfigurationContext configContext = null;
+
+        Options options = new Options();
+        OMElement payload = null;
+        ServiceClient serviceClient = null;
+
+        if (repo != null && !"null".equals(repo)) {
+            configContext =
+                    ConfigurationContextFactory.
+                            createConfigurationContextFromFileSystem(repo,
+                                    repo + File.separator + "conf" + File.separator + "axis2.xml");
+            serviceClient = new ServiceClient(configContext, null);
+        } else {
+            serviceClient = new ServiceClient();
+        }
+
+        if ("customquote".equals(mode)) {
+            payload = StockQuoteHandler.createCustomQuoteRequest(symbol);
+            options.setAction("urn:getQuote");
+        } else if ("fullquote".equals(mode)) {
+            payload = StockQuoteHandler.createFullQuoteRequest(symbol);
+            options.setAction("urn:getFullQuote");
+        } else if ("placeorder".equals(mode)) {
+            price = getRandom(100, 0.9, true);
+            quantity = (int) getRandom(10000, 1.0, true);
+            payload = StockQuoteHandler.createPlaceOrderRequest(price, quantity, symbol);
+            options.setAction("urn:placeOrder");
+        } else if ("marketactivity".equals(mode)) {
+            payload = StockQuoteHandler.createMarketActivityRequest();
+            options.setAction("urn:getMarketActivity");
+        } else if ("quote".equals(mode)) {
+            payload = StockQuoteHandler.createStandardQuoteRequest(
+                    symbol, Integer.parseInt(itr));
+            options.setAction("urn:getQuote");
+        }
+
+        // set addressing, transport and proxy url
+        if (addUrl != null && !"null".equals(addUrl)) {
+            serviceClient.engageModule("addressing");
+            options.setTo(new EndpointReference(addUrl));
+        }
+        if (trpUrl != null && !"null".equals(trpUrl)) {
+            options.setProperty(Constants.Configuration.TRANSPORT_URL, trpUrl);
+        }
+        if (prxUrl != null && !"null".equals(prxUrl)) {
+            HttpTransportProperties.ProxyProperties proxyProperties =
+                    new HttpTransportProperties.ProxyProperties();
+            URL url = new URL(prxUrl);
+            proxyProperties.setProxyName(url.getHost());
+            proxyProperties.setProxyPort(url.getPort());
+            proxyProperties.setUserName("");
+            proxyProperties.setPassWord("");
+            proxyProperties.setDomain("");
+            options.setProperty(HTTPConstants.PROXY, proxyProperties);
+        }
+
+        // apply any service policies if any
+        if (svcPolicy != null && !"null".equals(svcPolicy) && svcPolicy.length() > 0) {
+            System.out.println("Using WS-Security");
+            serviceClient.engageModule("addressing");
+            serviceClient.engageModule("rampart");
+            options.setProperty(
+                    RampartMessageData.KEY_RAMPART_POLICY, loadPolicy(svcPolicy));
+        }
+
+        if (Boolean.parseBoolean(rest)) {
+            System.out.println("Sending as REST");
+            options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
+        }
+        if (Boolean.parseBoolean(wsrm)) {
+            System.out.println("Using WS-RM");
+            serviceClient.engageModule("sandesha2");
+            options.setProperty("Sandesha2LastMessage", "true");
+            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
+        }
+
+        serviceClient.setOptions(options);
+
+        InnerStruct.MODE = mode;
+        InnerStruct.SYMBOL = symbol;
+        InnerStruct.PRICE = price;
+        InnerStruct.QUANTITY = quantity;
+
+        if ("placeorder".equals(mode)) {
+            serviceClient.fireAndForget(payload);
+            Thread.sleep(5000);
+
+        } else {
+            OMElement result = serviceClient.sendReceive(payload);
+            InnerStruct.RESULT = result;
+            if (Boolean.parseBoolean(wsrm)) {
+                // give some time for RM to terminate normally
+                Thread.sleep(5000);
+
+                configContext.getListenerManager().stop();
+                serviceClient.cleanup();
+                System.exit(0);
+            }
+        }
+
+        try {
+            configContext.terminate();
+        } catch (Exception ignore) {
+        }
+    }
+
+    private static class InnerStruct {
+        static String MODE = null;
+        static String SYMBOL = null;
+        static int QUANTITY = 0;
+        static double PRICE = 0;
+        static OMElement RESULT = null;
     }
 
     private static Policy loadPolicy(String xmlPath) throws Exception {
@@ -197,7 +223,7 @@ public class StockQuoteClient {
     private static double getRandom(double base, double varience, boolean onlypositive) {
         double rand = Math.random();
         return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
-            * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
+                * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
     }
 
 }

@@ -40,6 +40,7 @@
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
             <includes>
                 <include>synapse.sh</include>
+                <include>synapse-daemon.sh</include>
             </includes>
             <fileMode>755</fileMode>
         </fileSet>
@@ -48,6 +49,8 @@
             <outputDirectory>synapse-${synapse.version}/bin</outputDirectory>
             <includes>
                 <include>synapse.bat</include>
+                <include>install-synapse-service.bat</include>
+                <include>uninstall-synapse-service.bat</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -64,13 +67,14 @@
             <outputDirectory>synapse-${synapse.version}/repository/conf</outputDirectory>
             <includes>
                 <include>axis2.xml</include>
-                <include>synapse.xml</include>                     
+                <include>synapse.xml</include>
             </includes>
         </fileSet>
 
         <fileSet>
             <directory>repository/conf/sample/resources/misc/client</directory>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/conf</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/conf
+            </outputDirectory>
             <includes>
                 <include>axis2.xml</include>
             </includes>
@@ -85,8 +89,17 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>src/main/bin</directory>
+            <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+            <includes>
+                <include>wrapper.dll</include>
+                <include>libwrapper.so</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>repository/conf/sample/resources/misc/server</directory>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/conf</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/conf
+            </outputDirectory>
             <includes>
                 <include>axis2.xml</include>
             </includes>
@@ -103,6 +116,14 @@
             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
             <includes>
                 <include>release_notes.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/bin</directory>
+            <outputDirectory>synapse-${synapse.version}</outputDirectory>
+            <includes>
+                <include>wrapper.exe</include>
+                <include>wrapper</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -210,7 +231,7 @@
             <includes>
                 <include>patches.txt</include>
             </includes>
-        </fileSet>        
+        </fileSet>
     </fileSets>
     <dependencySets>
         <dependencySet>
@@ -265,7 +286,8 @@
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Client/client_repo/modules
+            </outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
                 <include>org.apache.rampart:rampart:mar</include>
@@ -274,7 +296,8 @@
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
         <dependencySet>
-            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules</outputDirectory>
+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/repository/modules
+            </outputDirectory>
             <includes>
                 <include>org.apache.axis2:addressing:mar</include>
                 <include>org.apache.rampart:rampart:mar</include>
@@ -283,5 +306,5 @@
             <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
         </dependencySet>
     </dependencySets>
-  
+
 </assembly>

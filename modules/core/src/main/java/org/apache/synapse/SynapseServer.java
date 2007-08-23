@@ -46,5 +46,24 @@ public class SynapseServer {
         ServerManager.axis2Repolocation = args[0];
         ServerManager serverManager = ServerManager.getInstance();
         serverManager.start();
+        addShutdownHook();
+
+    }
+
+    private static void addShutdownHook() {
+        Thread shutdownHook;
+        shutdownHook = new Thread() {
+            public void run() {
+                log.info("Shutting down Apache Synapse ...");
+                try {
+                    ServerManager.getInstance().stop();
+                    log.info("Shutdown complete");
+                    log.info("Halting JVM");
+                } catch (Exception e) {
+                    log.warn("Error occurred while shutting down Apache Synapse : " + e);
+                }
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
     }
 }

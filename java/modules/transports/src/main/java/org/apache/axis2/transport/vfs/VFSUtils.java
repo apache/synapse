@@ -109,7 +109,7 @@ public class VFSUtils extends BaseUtils {
 
         // next check if the OutTransportInfo specifies one
         if (fileName == null) {
-            fileName = vfsOutInfo.getReplyFileName();
+            fileName = vfsOutInfo.getOutFileName();
         }
 
         // if none works.. use default

@@ -19,6 +19,7 @@
 
 package org.apache.synapse.mediators;
 
+import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Constants;
@@ -119,27 +120,44 @@ public class GetPropertyFunction implements Function {
         }
         if (Constants.SCOPE_DEFAULT.equals(scope)) {
 
-            if (Constants.HEADER_TO.equals(key) && synCtx.getTo() != null) {
-                return synCtx.getTo().getAddress();
-            } else if (Constants.HEADER_FROM.equals(key) && synCtx.getFrom() != null) {
-                return synCtx.getFrom().getAddress();
-            } else if (Constants.HEADER_ACTION.equals(key) && synCtx.getWSAAction() != null) {
-                return synCtx.getWSAAction();
-            } else if (Constants.HEADER_FAULT.equals(key) && synCtx.getFaultTo() != null) {
-                return synCtx.getFaultTo().getAddress();
-            } else if (Constants.HEADER_REPLY_TO.equals(key) && synCtx.getReplyTo() != null) {
-                return synCtx.getReplyTo().getAddress();
-            } else if (Constants.HEADER_MESSAGE_ID.equals(key) && synCtx.getMessageID() != null) {
-                return synCtx.getMessageID();
+            if (Constants.HEADER_TO.equals(key)) {
+                EndpointReference toEPR = synCtx.getTo();
+                if (toEPR != null) {
+                    return toEPR.getAddress();
+                }
+            } else if (Constants.HEADER_FROM.equals(key)) {
+                EndpointReference fromEPR = synCtx.getFrom();
+                if (fromEPR != null) {
+                    return fromEPR.getAddress();
+                }
+            } else if (Constants.HEADER_ACTION.equals(key)) {
+                String wsaAction = synCtx.getWSAAction();
+                if (wsaAction != null) {
+                    return wsaAction;
+                }
+            } else if (Constants.HEADER_FAULT.equals(key)) {
+                EndpointReference faultEPR = synCtx.getFaultTo();
+                if (faultEPR != null) {
+                    return faultEPR.getAddress();
+                }
+            } else if (Constants.HEADER_REPLY_TO.equals(key)) {
+                EndpointReference replyToEPR = synCtx.getReplyTo();
+                if (replyToEPR != null) {
+                    return replyToEPR.getAddress();
+                }
+            } else if (Constants.HEADER_MESSAGE_ID.equals(key)) {
+                String messageID = synCtx.getMessageID();
+                if (messageID != null) {
+                    return messageID;
+                }
             } else {
                 Object result = synCtx.getProperty(key);
                 if (result != null) {
                     return result;
                 } else {
-                    return synCtx.getEntry(key);       
+                    return synCtx.getEntry(key);
                 }
             }
-
         } else if (Constants.SCOPE_AXIS2.equals(scope) && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();

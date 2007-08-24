@@ -338,13 +338,22 @@ public abstract class BaseUtils {
         return (str != null && str.trim().length() > 0);
     }
 
-    public static String getServiceParam(AxisService service, String paramName) throws AxisFault {
+    public static String getRequiredServiceParam(AxisService service, String paramName) throws AxisFault {
         Parameter param = service.getParameter(paramName);
         if (param != null && param.getValue() != null && param.getValue() instanceof String) {
             return (String) param.getValue();
         } else {
             throw new AxisFault("Cannot find parameter : " + paramName +
                 " for service : " + service.getName());
+        }
+    }
+
+    public static String getOptionalServiceParam(AxisService service, String paramName) throws AxisFault {
+        Parameter param = service.getParameter(paramName);
+        if (param != null && param.getValue() != null && param.getValue() instanceof String) {
+            return (String) param.getValue();
+        } else {
+            return null;
         }
     }
 

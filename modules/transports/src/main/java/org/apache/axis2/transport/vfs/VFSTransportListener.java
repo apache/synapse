@@ -18,17 +18,13 @@
 */
 package org.apache.axis2.transport.vfs;
 
-import org.apache.axis2.transport.base.AbstractTransportListener;
 import org.apache.axis2.transport.base.BaseConstants;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.base.AbstractPollingTransportListener;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.*;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.vfs.*;
@@ -71,16 +67,19 @@ import java.util.*;
  *
  * services.xml - service attachment
  *  required parameters
- *  <parameter name="transport.file.FileURI" locked="true">..</parameter>
- *  <parameter name="transport.file.FileNamePattern" locked="true">..</parameter>
+ *  <parameter name="transport.vfs.FileURI">..</parameter>
+ *  <parameter name="transport.vfs.ContentType">..</parameter>
  *
  *  optional parameters
- *  <parameter name="transport.file.ContentType" locked="true">..</parameter>
- *  <parameter name="transport.PollInterval" locked="true">..</parameter>
+ *  <parameter name="transport.vfs.FileNamePattern">..</parameter>
+ *  <parameter name="transport.PollInterval">..</parameter>
+ * 
+ *  <parameter name="transport.vfs.ActionAfterProcess">..</parameter>
+ * 	<parameter name="transport.vfs.ActionAfterErrors" >..</parameter>
+ *  <parameter name="transport.vfs.ActionAfterFailure">..</parameter>
  *
- *  <parameter name="transport.file.ActionAfterProcess" locked="true">..</parameter>
- * 	<parameter name="transport.file.ActionAfterErrors" locked="true">..</parameter>
- *  <parameter name="transport.file.ActionAfterFailure" locked="true">..</parameter>
+ *  <parameter name="transport.vfs.ReplyFileURI" >..</parameter>
+ *  <parameter name="transport.vfs.ReplyFileName">..</parameter>
  */
 public class VFSTransportListener extends AbstractPollingTransportListener {
 
@@ -182,7 +181,7 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                                 processFile(entry, children[i]);
                                 successCount++;
                             } catch (Exception e) {
-                                logException("Error processing file : " + entry.getFileURI(), e);
+                                logException("Error processing File URI : " + entry.getFileURI(), e);
                                 failCount++;
                             }
                         }
@@ -254,7 +253,25 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
                 }
             } else {
                 try {
-                    fileObject.delete();
+                    fileObject.close();
+                    if (fileObject.getChildren().length > 0) {
+                        if (fileObject.delete(new FileSelector() {
+
+                            public boolean includeFile(FileSelectInfo fileSelectInfo) throws Exception {
+                                return true;
+                            }
+
+                            public boolean traverseDescendents(FileSelectInfo fileSelectInfo) throws Exception {
+                                return true;
+                            }
+                        }) == 0) {
+                            log.error("Error deleting file : " + fileObject);
+                        }
+                    } else {
+                        if (!fileObject.delete()) {
+                            log.error("Error deleting file : " + fileObject);
+                        }
+                    }
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
                 }
@@ -355,6 +372,13 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
 
         } catch (FileSystemException e) {
             handleException("Error reading file content or attributes : " + file, e);
+            
+        } finally {
+            try {
+                file.close();
+            } catch (FileSystemException warn) {
+                log.warn("Cannot close file after processing : " + file.getName().getPath(), warn);
+            }
         }
     }
 
@@ -411,20 +435,20 @@ public class VFSTransportListener extends AbstractPollingTransportListener {
         PollTableEntry entry = new PollTableEntry();
         try {
             entry.setFileURI(
-                BaseUtils.getServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_URI));
+                BaseUtils.getRequiredServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_URI));
             entry.setFileNamePattern(
-                BaseUtils.getServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
+                BaseUtils.getOptionalServiceParam(service, VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
             entry.setContentType(
-                BaseUtils.getServiceParam(service, VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
-            String option = BaseUtils.getServiceParam(
+                BaseUtils.getRequiredServiceParam(service, VFSConstants.TRANSPORT_FILE_CONTENT_TYPE));
+            String option = BaseUtils.getOptionalServiceParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS);
             entry.setActionAfterProcess(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = BaseUtils.getServiceParam(
+            option = BaseUtils.getOptionalServiceParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_ERRORS);
             entry.setActionAfterErrors(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);
-            option = BaseUtils.getServiceParam(
+            option = BaseUtils.getOptionalServiceParam(
                 service, VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE);
             entry.setActionAfterFailure(
                 MOVE.equals(option) ? PollTableEntry.MOVE : PollTableEntry.DELETE);

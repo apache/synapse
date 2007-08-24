@@ -20,6 +20,9 @@
 package org.apache.axis2.transport.vfs;
 
 public class VFSConstants {
+    // vfs transport prefix (e.g. used in an out EPR etc)
+    public static final String VFS_PREFIX = "vfs:";
+
     public static final String TRANSPORT_FILE_ACTION_AFTER_PROCESS = "transport.vfs.ActionAfterProcess";
     public static final String TRANSPORT_FILE_ACTION_AFTER_ERRORS = "transport.vfs.ActionAfterErrors";
     public static final String TRANSPORT_FILE_ACTION_AFTER_FAILURE = "transport.vfs.ActionAfterFailure";

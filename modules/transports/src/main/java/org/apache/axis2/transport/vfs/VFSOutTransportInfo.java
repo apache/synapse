@@ -32,23 +32,27 @@ public class VFSOutTransportInfo implements OutTransportInfo {
 
     private static final Log log = LogFactory.getLog(VFSOutTransportInfo.class);
 
-    private String replyFileURI = null;
-    private String replyFileName = null;
+    private String outFileURI = null;
+    private String outFileName = null;
     private String contentType = null;
 
-    VFSOutTransportInfo(String replyFileURI) {
-        this.replyFileURI = replyFileURI;    
+    VFSOutTransportInfo(String outFileURI) {
+        if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
+            this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
+        } else {
+            this.outFileURI = outFileURI;
+        }
     }
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
-    public String getReplyFileURI() {
-        return replyFileURI;
+    public String getOutFileURI() {
+        return outFileURI;
     }
 
-    public String getReplyFileName() {
-        return replyFileName;
+    public String getOutFileName() {
+        return outFileName;
     }
 }

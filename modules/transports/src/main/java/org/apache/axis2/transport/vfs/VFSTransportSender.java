@@ -32,8 +32,6 @@ import org.apache.commons.vfs.*;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMOutputFormat;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.io.OutputStream;
 
 public class VFSTransportSender extends AbstractTransportSender {
@@ -78,7 +76,7 @@ public class VFSTransportSender extends AbstractTransportSender {
 
         VFSOutTransportInfo vfsOutInfo = null;
 
-       if (targetAddress != null) {
+        if (targetAddress != null) {
             vfsOutInfo = new VFSOutTransportInfo(targetAddress);
         } else if (outTransportInfo != null && outTransportInfo instanceof VFSOutTransportInfo) {
             vfsOutInfo = (VFSOutTransportInfo) outTransportInfo;
@@ -86,7 +84,7 @@ public class VFSTransportSender extends AbstractTransportSender {
 
         if (vfsOutInfo != null) {
             try {
-                FileObject replyFile = fsManager.resolveFile(vfsOutInfo.getReplyFileURI());
+                FileObject replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());
                 if (replyFile.exists()) {
 
                     if (replyFile.getType() == FileType.FOLDER) {
@@ -103,7 +101,7 @@ public class VFSTransportSender extends AbstractTransportSender {
                         
                     } else {
                         handleException("Unsupported reply file type : " + replyFile.getType() +
-                            " for file : " + vfsOutInfo.getReplyFileURI());
+                            " for file : " + vfsOutInfo.getOutFileURI());
                     }
                 } else {
                     replyFile.createFile();
@@ -111,7 +109,7 @@ public class VFSTransportSender extends AbstractTransportSender {
                 }
             } catch (FileSystemException e) {
                 handleException("Error resolving reply file : " +
-                    vfsOutInfo.getReplyFileURI(), e);
+                    vfsOutInfo.getOutFileURI(), e);
             }
         } else {
             handleException("Unable to determine out transport information to send message");

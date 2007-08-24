@@ -78,7 +78,11 @@ public class PollTableEntry {
     }
 
     public void setFileURI(String fileURI) {
-        this.fileURI = fileURI;
+        if (fileURI.startsWith(VFSConstants.VFS_PREFIX)) {
+            this.fileURI = fileURI.substring(VFSConstants.VFS_PREFIX.length());
+        } else {
+            this.fileURI = fileURI;
+        }
     }
 
     public String getFileNamePattern() {

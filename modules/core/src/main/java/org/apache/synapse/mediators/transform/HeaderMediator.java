@@ -84,7 +84,7 @@ public class HeaderMediator extends AbstractMediator {
         }
         if (action == ACTION_SET) {
             String value = (getValue() != null ? getValue() :
-                    Axis2MessageContext.getStringValue(getExpression(), synCtx));
+                    Axis2MessageContext.getStringValue(expression, synCtx));
             if (log.isDebugEnabled()) {
                 log.debug("Setting header : " + qName + " to : " + value);
             }

@@ -51,8 +51,7 @@ public class SynapseServer {
     }
 
     private static void addShutdownHook() {
-        Thread shutdownHook;
-        shutdownHook = new Thread() {
+        Thread shutdownHook = new Thread() {
             public void run() {
                 log.info("Shutting down Apache Synapse ...");
                 try {

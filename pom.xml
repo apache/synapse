@@ -816,11 +816,11 @@
     </reporting>
 
     <distributionManagement>
-        <!--<repository>
-          <id>apache-snapshots</id>
-          <name>Maven Central Repository</name>
-          <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository</url>
-        </repository>-->
+        <snapshotRepository>
+            <id>apache-snapshots</id>
+            <name>Apache Development Repository</name>
+            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
+        </snapshotRepository>
         <repository>
           <id>apache-releases</id>
           <name>Apache Ibiblio rsync Repository</name>

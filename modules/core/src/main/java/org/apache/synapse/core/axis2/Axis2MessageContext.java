@@ -19,28 +19,28 @@
 
 package org.apache.synapse.core.axis2;
 
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.SOAPHeader;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMElementImpl;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
+import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.addressing.RelatesTo;
-import org.apache.synapse.*;
-import org.apache.synapse.mediators.GetPropertyFunction;
-import org.apache.synapse.mediators.MediatorFaultHandler;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.Entry;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.*;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.mediators.GetPropertyFunction;
+import org.apache.synapse.mediators.MediatorFaultHandler;
+import org.jaxen.JaxenException;
 import org.jaxen.SimpleFunctionContext;
 import org.jaxen.XPathFunctionContext;
-import org.jaxen.JaxenException;
 
 import java.util.*;
 
@@ -399,10 +399,11 @@ public class Axis2MessageContext implements MessageContext {
                 }
                 StringBuffer textValue = new StringBuffer();
                 if (result instanceof List) {
-                    Iterator iter = ((List) result).iterator();
+                    List list = (List) result;
+                    Iterator iter = list.iterator();
                     while (iter.hasNext()) {
                         Object o = iter.next();
-                        if (o == null) {
+                        if (o == null && list.size() == 1) {
                             return null;
                         }
                         if (o instanceof OMTextImpl) {

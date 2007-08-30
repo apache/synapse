@@ -103,6 +103,7 @@ public class ServerManager {
     public void stop() {
         try {
             if (listenerManager != null) {
+                listenerManager.stop();
                 listenerManager.destroy();
             }
             //we need to call this method to clean the team fils we created.

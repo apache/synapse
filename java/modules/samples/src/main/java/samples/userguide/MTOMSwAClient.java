@@ -52,12 +52,12 @@ public class MTOMSwAClient {
     public static void main(String[] args) throws Exception {
 
         String targetEPR = getProperty("opt_url", "http://localhost:8080/soap/MTOMSwASampleService");
-        String fileName  = getProperty("opt_file", "./../../repository/conf/sample/resources/mtom/asf-logo.gif");
-        String mode      = getProperty("opt_mode", "mtom");
+        String fileName = getProperty("opt_file", "./../../repository/conf/sample/resources/mtom/asf-logo.gif");
+        String mode = getProperty("opt_mode", "mtom");
 
-        if (args.length > 0) mode      = args[0];
+        if (args.length > 0) mode = args[0];
         if (args.length > 1) targetEPR = args[1];
-        if (args.length > 2) fileName  = args[2];
+        if (args.length > 2) fileName = args[2];
 
         if ("mtom".equals(mode)) {
             sendUsingMTOM(fileName, targetEPR);
@@ -66,7 +66,7 @@ public class MTOMSwAClient {
         }
     }
 
-    private static void sendUsingSwA(String fileName, String targetEPR) throws IOException {
+    public static MessageContext sendUsingSwA(String fileName, String targetEPR) throws IOException {
 
         Options options = new Options();
         options.setTo(new EndpointReference(targetEPR));
@@ -86,11 +86,11 @@ public class MTOMSwAClient {
 
 
         SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
-        SOAPEnvelope env    = factory.getDefaultEnvelope();
-        OMNamespace ns      = factory.createOMNamespace("http://www.apache-synapse.org/test", "m0");
-        OMElement payload   = factory.createOMElement("uploadFileUsingSwA", ns);
-        OMElement request   = factory.createOMElement("request", ns);
-        OMElement imageId   = factory.createOMElement("imageId", ns);
+        SOAPEnvelope env = factory.getDefaultEnvelope();
+        OMNamespace ns = factory.createOMNamespace("http://www.apache-synapse.org/test", "m0");
+        OMElement payload = factory.createOMElement("uploadFileUsingSwA", ns);
+        OMElement request = factory.createOMElement("request", ns);
+        OMElement imageId = factory.createOMElement("imageId", ns);
         imageId.setText(attachmentID);
         request.addChild(imageId);
         payload.addChild(request);
@@ -103,28 +103,30 @@ public class MTOMSwAClient {
 
         SOAPBody body = response.getEnvelope().getBody();
         String imageContentId = body.
-            getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "uploadFileUsingSwAResponse")).
-            getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "response")).
-            getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "imageId")).
-            getText();
+                getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "uploadFileUsingSwAResponse")).
+                getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "response")).
+                getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "imageId")).
+                getText();
 
-        Attachments attachment  = response.getAttachmentMap();
+        Attachments attachment = response.getAttachmentMap();
         dataHandler = attachment.getDataHandler(imageContentId);
         File tempFile = File.createTempFile("swa-", ".gif");
         FileOutputStream fos = new FileOutputStream(tempFile);
         dataHandler.writeTo(fos);
-		fos.flush();
-		fos.close();
+        fos.flush();
+        fos.close();
 
         System.out.println("Saved response to file : " + tempFile.getAbsolutePath());
+
+        return response;
     }
 
-    private static void sendUsingMTOM(String fileName, String targetEPR) throws IOException {
+    public static OMElement sendUsingMTOM(String fileName, String targetEPR) throws IOException {
         OMFactory factory = OMAbstractFactory.getOMFactory();
         OMNamespace ns = factory.createOMNamespace("http://www.apache-synapse.org/test", "m0");
         OMElement payload = factory.createOMElement("uploadFileUsingMTOM", ns);
         OMElement request = factory.createOMElement("request", ns);
-        OMElement image   = factory.createOMElement("image", ns);
+        OMElement image = factory.createOMElement("image", ns);
 
         System.out.println("Sending file : " + fileName + " as MTOM");
         FileDataSource fileDataSource = new FileDataSource(new File(fileName));
@@ -144,9 +146,9 @@ public class MTOMSwAClient {
         OMElement response = serviceClient.sendReceive(payload);
 
         OMText binaryNode = (OMText) response.
-            getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "response")).
-            getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "image")).
-            getFirstOMChild();
+                getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "response")).
+                getFirstChildWithName(new QName("http://www.apache-synapse.org/test", "image")).
+                getFirstOMChild();
         dataHandler = (DataHandler) binaryNode.getDataHandler();
         InputStream is = dataHandler.getInputStream();
 
@@ -163,5 +165,6 @@ public class MTOMSwAClient {
         dest.flush();
         dest.close();
         System.out.println("Saved response to file : " + tempFile.getAbsolutePath());
+        return response;
     }
 }

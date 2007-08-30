@@ -170,7 +170,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.3</version>
             </plugin>
 
             <plugin>
@@ -912,7 +912,7 @@
         <!-- misc -->
         <junit.version>3.8.2</junit.version>
         <log4j.version>1.2.13</log4j.version>
-        <xmlunit.version>1.0</xmlunit.version>
+        <xmlunit.version>1.1</xmlunit.version>
         <wrapper.version>0.0</wrapper.version>
 
         <!-- dependencies of Synapse extensions module -->

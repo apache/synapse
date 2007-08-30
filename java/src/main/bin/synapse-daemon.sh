@@ -15,7 +15,7 @@ APP_NAME="Synapse"
 APP_LONG_NAME="Apache Synapse (Synapse)"
 
 # Wrapper
-WRAPPER_CMD="./wrapper"
+WRAPPER_CMD="./bin/native/wrapper"
 WRAPPER_CONF="./repository/conf/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.

@@ -119,12 +119,9 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>src/main/bin</directory>
-            <outputDirectory>synapse-${synapse.version}</outputDirectory>
-            <includes>
-                <include>wrapper.exe</include>
-                <include>wrapper</include>
-            </includes>
+            <directory>src/main/bin/native</directory>
+            <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>
+            <fileMode>755</fileMode>
         </fileSet>
         <fileSet>
             <directory>src/site/resources</directory>

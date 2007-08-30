@@ -57,8 +57,8 @@ public class GetPropertyFunction implements Function {
      * Returns the string value of the property which is get from the corresponding context to the provided scope .
      * The default scope is used to get property from the synapse message context
      *
-     * @param context
-     * @param args
+     * @param context the context at the point in the expression when the function is called
+     * @param args  arguments of the functions 
      * @return The string value of a property
      * @throws FunctionCallException
      */
@@ -93,9 +93,9 @@ public class GetPropertyFunction implements Function {
     /**
      * Returns the string value of the property using arg. one as key and arg. two as scope
      *
-     * @param scopeObject
-     * @param keyObject
-     * @param navigator
+     * @param scopeObject scope will decide from where property will pick (axis2,transport,default(synapse))
+     * @param keyObject the key of the property
+     * @param navigator obect model which can navigating around
      * @return The String value of property using arg. one as key and arg. two as scope
      */
     public Object evaluate(Object scopeObject, Object keyObject, Navigator navigator) {

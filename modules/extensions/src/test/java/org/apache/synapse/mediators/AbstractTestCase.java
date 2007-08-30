@@ -83,8 +83,6 @@ public abstract class AbstractTestCase extends XMLTestCase {
             log.error(e);
         } catch (IOException e) {
             log.error(e);
-        } catch (ParserConfigurationException e) {
-            log.error(e);
         }
         return false;
     }
@@ -99,8 +97,6 @@ public abstract class AbstractTestCase extends XMLTestCase {
         } catch (SAXException e) {
             log.error(e);
         } catch (IOException e) {
-            log.error(e);
-        } catch (ParserConfigurationException e) {
             log.error(e);
         }
         return false;
@@ -118,8 +114,6 @@ public abstract class AbstractTestCase extends XMLTestCase {
         } catch (SAXException e) {
             log.error(e);
         } catch (IOException e) {
-            log.error(e);
-        } catch (ParserConfigurationException e) {
             log.error(e);
         }
         return false;

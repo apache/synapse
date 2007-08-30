@@ -251,11 +251,18 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		if (o != null && o instanceof Entry) {
 			Entry entry = (Entry) o;
 			if (entry.isDynamic()) {
-				if (entry.isCached() && !entry.isExpired()) {
-					return entry.getValue();
-				} else if (registry != null) {
-					o = registry.getResource(entry);
-				}
+                if (entry.isCached() && !entry.isExpired()) {
+                    return entry.getValue();
+                } else if (registry != null) {
+                    o = registry.getResource(entry);
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Will not  evaluate the value of the remote entry,  because" +
+                                " the registry is not available");
+                    }
+                    return null; // otherwise will return an entry with a value null
+                    // (method expects return  a value not an entry )
+                }
 			} else {
 				return entry.getValue();
 			}

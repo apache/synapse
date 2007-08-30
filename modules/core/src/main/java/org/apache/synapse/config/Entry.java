@@ -19,9 +19,9 @@
 
 package org.apache.synapse.config;
 
-import org.apache.synapse.SynapseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 
 import java.net.URL;
 
@@ -76,10 +76,11 @@ public class Entry {
     }
 
     public void setType(int type) {
-        if (type <= 4 && type >= 0)
+        if (type <= 4 && type >= 0) {
             this.type = type;
-        else
+        } else {
             handleException("Invalid entry type for the static entry");
+        }
     }
 
     public URL getSrc() {

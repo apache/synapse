@@ -76,6 +76,10 @@
                                               tofile="target/test_repos/synapse/conf/synapseIdentity.jks"/>
                                         <copy file="../core/src/main/resources/axis2Identity.jks"
                                               tofile="target/test_repos/synapse/conf/axis2Identity.jks"/>
+                                        <copy file="../core/src/main/resources/trust.jks"
+                                              tofile="target/test_repos/synapse/conf/trust.jks"/>
+                                        <copy file="../core/src/main/resources/identity.jks"
+                                              tofile="target/test_repos/synapse/conf/identity.jks"/>
                                         <copy file="../core/src/main/resources/axis2Trust.jks"
                                               tofile="target/test_repos/synapse/conf/axis2Trust.jks"/>
                                         <copy file="../core/src/main/resources/synapseTrust.jks"
@@ -343,6 +347,11 @@
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-extensions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby</groupId>
+            <artifactId>jruby-complete</artifactId>
+            <version>0.9.9</version>
         </dependency>
     </dependencies>
 

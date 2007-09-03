@@ -66,7 +66,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         this.synapseConfig = synapseConfig;
     }
 
-    public void injectMessage(final MessageContext synCtx) {
+    public boolean injectMessage(final MessageContext synCtx) {
         if (log.isDebugEnabled()) {
             log.debug("Injecting MessageContext");
         }
@@ -123,8 +123,9 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
             if (log.isDebugEnabled()) {
                 log.debug("Using Main Sequence for injected message");
             }
-            synCtx.getMainSequence().mediate(synCtx);
+            return synCtx.getMainSequence().mediate(synCtx);
         }
+        return true;
     }
 
     public void send(EndpointDefinition endpoint, MessageContext synCtx) {

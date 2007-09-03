@@ -202,6 +202,48 @@
                                             <fileset dir="${RSQ.dir}"/>
                                         </jar>
 
+                                        <property name="src5"
+                                                  value="services/LoadbalanceFailoverService/src"/>
+                                        <delete dir="${temp.dir}"/>
+                                        <mkdir dir="${temp.dir}"/>
+                                        <mkdir dir="${classes}"/>
+                                        <javac debug="on" destdir="${classes}" fork="true">
+                                            <src path="${src5}"/>
+                                            <classpath refid="maven.compile.classpath"/>
+                                        </javac>
+
+                                        <property name="LBFA1.dir" value="${temp.dir}/LBService1"/>
+                                        <mkdir dir="${LBFA1.dir}"/>
+
+                                        <mkdir dir="${LBFA1.dir}/META-INF"/>
+                                        <copy file="${src5}/../conf/service1/services.xml"
+                                              tofile="${LBFA1.dir}/META-INF/services.xml"/>
+                                        <copy toDir="${LBFA1.dir}">
+                                            <fileset dir="${classes}">
+                                                <include name="**/LBService1.class"/>
+                                            </fileset>
+                                        </copy>
+
+                                        <jar destfile="${services}/LBService1.aar">
+                                            <fileset dir="${LBFA1.dir}"/>
+                                        </jar>
+
+                                        <property name="LBFA2.dir" value="${temp.dir}/LBService2"/>
+                                        <mkdir dir="${LBFA2.dir}"/>
+
+                                        <mkdir dir="${LBFA2.dir}/META-INF"/>
+                                        <copy file="${src5}/../conf/service2/services.xml"
+                                              tofile="${LBFA2.dir}/META-INF/services.xml"/>
+                                        <copy toDir="${LBFA2.dir}">
+                                            <fileset dir="${classes}">
+                                                <include name="**/LBService2.class"/>
+                                            </fileset>
+                                        </copy>
+
+                                        <jar destfile="${services}/LBService2.aar">
+                                            <fileset dir="${LBFA2.dir}"/>
+                                        </jar>
+
                                     </tasks>
                                 </configuration>
                                 <goals>

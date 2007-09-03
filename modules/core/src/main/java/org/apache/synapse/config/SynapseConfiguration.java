@@ -542,6 +542,8 @@ public class SynapseConfiguration implements ManagedLifecycle {
         if (log.isDebugEnabled()) {
             log.debug("destroy");
         }
+        synapseTimer.cancel();
+        synapseTimer = null;
         for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
             Object o = it.next();
             if (o instanceof ProxyService) {

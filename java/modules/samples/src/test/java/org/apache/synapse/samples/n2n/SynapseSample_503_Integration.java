@@ -18,7 +18,7 @@ public class SynapseSample_503_Integration extends AbstractAutomationTestCase {
 
     public void testSample() throws Exception {
         String resultString = getStringResultOfTest(StockQuoteClient.executeTestClient());
-        assertXpathExists("ns:getQuoteResponse", resultString);
-        assertXpathExists("ns:getQuoteResponse/ns:return", resultString);
+        assertXpathExists("ms:CheckPriceResponse", resultString);
+        assertXpathExists("ms:CheckPriceResponse/ms:Price", resultString);
     }
 }

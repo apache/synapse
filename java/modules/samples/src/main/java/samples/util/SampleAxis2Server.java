@@ -57,7 +57,11 @@ public class SampleAxis2Server {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-		String repoLocation = null;
+        startServer(args);
+    }
+
+    public static ListenerManager startServer(String[] args) {
+        String repoLocation = null;
 		String confLocation = null;
 
 		CommandLineOptionParser optionsParser = new CommandLineOptionParser(args);
@@ -72,7 +76,7 @@ public class SampleAxis2Server {
 		if ((invalidOptionsList.size()>0)||(args.length>4))
 		{
 			printUsage();
-			return;
+			return null;
 		}
 
 		Map optionsMap = optionsParser.getAllOptions();
@@ -105,10 +109,12 @@ public class SampleAxis2Server {
             ListenerManager listenerManager =  new ListenerManager();
 				listenerManager.init(configctx);
 			listenerManager.start();
-			log.info("[SimpleAxisServer] Started");
-		} catch (Throwable t) {
+            log.info("[SimpleAxisServer] Started");
+            return listenerManager;
+        } catch (Throwable t) {
             log.fatal("[SimpleAxisServer] Shutting down. Error starting SimpleAxisServer", t);
         }
+        return null;
     }
 
     private static void configurePort(ConfigurationContext configCtx) {

@@ -21,6 +21,7 @@ package org.apache.synapse.samples.n2n;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.ServerManager;
+import org.apache.axis2.engine.ListenerManager;
 import org.custommonkey.xmlunit.NamespaceContext;
 import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -67,6 +68,13 @@ public abstract class AbstractAutomationTestCase extends XMLTestCase {
         OutputStream os = new ByteArrayOutputStream();
         elem.serialize(os);
         return os.toString();
+    }
+
+    protected ListenerManager startCustomAxis2Server(String httpPort, String httpsPort) throws Exception {
+        System.setProperty("http_port", httpPort);
+        System.setProperty("https_port", httpsPort);
+        return SampleAxis2Server.startServer(new String[]{"-repo", "modules/samples/target/test_repos/axis2Server/",
+                    "-conf", "modules/samples/target/test_repos/axis2Server/conf/axis2.xml"});
     }
 
     protected void tearDown() throws Exception {

@@ -864,6 +864,7 @@
         <module>modules/samples</module>
         <module>modules/mar</module>
         <module>modules/war</module>
+        <module>modules/handler</module>
     </modules>
 
     <properties>

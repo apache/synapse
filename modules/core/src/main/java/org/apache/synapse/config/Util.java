@@ -283,9 +283,7 @@ public class Util {
                         }
                     }
                 }
-            } else {
-                throw new SynapseException("Invalid protocol.");
-            }
+            }             
         } catch (MalformedURLException e) {
             handleException("Invalid URL reference :  " + path, e);
         } catch (IOException e) {

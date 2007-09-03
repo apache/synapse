@@ -39,31 +39,35 @@ import org.apache.axis2.wsdl.WSDLConstants;
 
 import javax.xml.namespace.QName;
 import java.util.Random;
+import java.io.File;
 
 public class LoadbalanceFailoverClient {
 
     /**
-     * @param args  0: simple | session
-     *              1: port
-     *              2: iteration
+     * @param args 0: simple | session
+     *             1: port
+     *             2: iteration
      */
     public static void main(String[] args) {
 
         String mode = System.getProperty("mode");
-
-        if (mode != null) {
-            if (mode.equalsIgnoreCase("session")) {
-                new LoadbalanceFailoverClient().sessionfullClient();
-            } else if (mode.equalsIgnoreCase("simple") || mode.equalsIgnoreCase("")) {
+        try {
+            if (mode != null) {
+                if (mode.equalsIgnoreCase("session")) {
+                    new LoadbalanceFailoverClient().sessionfullClient();
+                } else if (mode.equalsIgnoreCase("simple") || mode.equalsIgnoreCase("")) {
+                    new LoadbalanceFailoverClient().sessionlessClient();
+                }
+            } else {
+                // default is simple client
                 new LoadbalanceFailoverClient().sessionlessClient();
             }
-        } else {
-            // default is simple client
-            new LoadbalanceFailoverClient().sessionlessClient();
+        } catch (AxisFault axisFault) {
+            System.out.println(axisFault.getMessage());
         }
     }
 
-    private void sessionlessClient() {
+    public String sessionlessClient() throws AxisFault {
 
         String synapsePort = "8080";
         int iterations = 100;
@@ -76,7 +80,7 @@ public class LoadbalanceFailoverClient {
             try {
                 stringToInt(pPort);
                 synapsePort = System.getProperty("port");
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 // run with default value
             }
         }
@@ -84,10 +88,10 @@ public class LoadbalanceFailoverClient {
         if (pIterations != null) {
             try {
                 iterations = stringToInt(pIterations);
-                if(iterations != -1) {
+                if (iterations != -1) {
                     infinite = false;
                 }
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 // run with default values
             }
         }
@@ -101,27 +105,34 @@ public class LoadbalanceFailoverClient {
 
         options.setAction("sampleOperation");
 
-        try {
-            ConfigurationContext configContext = ConfigurationContextFactory.
+        String repo = System.getProperty("repository");
+        ConfigurationContext configContext;
+        if (repo != null) {
+            configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+                    repo, repo + File.separator + "conf" + File.separator + "axis2.xml");
+        } else {
+            configContext = ConfigurationContextFactory.
                     createConfigurationContextFromFileSystem("client_repo", null);
-            ServiceClient client = new ServiceClient(configContext, null);
-            options.setTimeOutInMilliSeconds(10000000);
-
-            client.setOptions(options);
-            client.engageModule("addressing");
-
-            long i = 0;
-            while(i < iterations || infinite) {
-                OMElement responseElement = client.sendReceive(value);
-                String response = responseElement.getText();
-
-                i++;
-                System.out.println("Request: " + i + " ==> " + response);
-            }
-
-        } catch (AxisFault axisFault) {
-            System.out.println(axisFault.getMessage());
         }
+        ServiceClient client = new ServiceClient(configContext, null);
+        options.setTimeOutInMilliSeconds(10000000);
+
+        client.setOptions(options);
+        client.engageModule("addressing");
+
+        String testString = "";
+
+        long i = 0;
+        while (i < iterations || infinite) {
+            OMElement responseElement = client.sendReceive(value);
+            String response = responseElement.getText();
+
+            i++;
+            System.out.println("Request: " + i + " ==> " + response);
+            testString += (":" + i + ">" + response + ":");
+        }
+
+        return testString;
     }
 
     /**
@@ -129,7 +140,7 @@ public class LoadbalanceFailoverClient {
      * choose one envelope for each iteration and send it to the ESB. ESB should be configured with
      * session affinity load balancer and the SampleClientInitiatedSession dispatcher. This will
      * output request number, session number and the server ID for each iteration. So it can be
-     * observed that one session number always associated with one server ID.       
+     * observed that one session number always associated with one server ID.
      */
     private void sessionfullClient() {
 
@@ -144,7 +155,7 @@ public class LoadbalanceFailoverClient {
             try {
                 stringToInt(pPort);
                 synapsePort = System.getProperty("port");
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 // run with default value
             }
         }
@@ -152,10 +163,10 @@ public class LoadbalanceFailoverClient {
         if (pIterations != null) {
             try {
                 iterations = stringToInt(pIterations);
-                if(iterations != -1) {
+                if (iterations != -1) {
                     infinite = false;
                 }
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 // run with default values
             }
         }
@@ -180,7 +191,7 @@ public class LoadbalanceFailoverClient {
 
             int i = 0;
             int sessionNumber = 0;
-            while(i < iterations || infinite) {
+            while (i < iterations || infinite) {
 
                 i++;
 

@@ -166,7 +166,8 @@ public class Axis2MessageContext implements MessageContext {
         properties.put(key, value);
 
         // do not commit response by default in the server process
-        if (Constants.RESPONSE.equals(key)) {
+        if (Constants.RESPONSE.equals(key) &&
+                getAxis2MessageContext().getOperationContext() != null) {
             getAxis2MessageContext().getOperationContext().setProperty(
                 org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
         }

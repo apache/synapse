@@ -121,8 +121,11 @@ public class XSLTMediator extends AbstractMediator {
      */
     private boolean isDOMRequired = true;
 
-    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
-            "//s12:Envelope/s12:Body/child::*[position()=1]";
+    // todo - this is a hack to get the handler module case working - ruwan
+//    public static final String DEFAULT_XPATH = "//s11:Envelope/s11:Body/child::*[position()=1] | " +
+//            "//s12:Envelope/s12:Body/child::*[position()=1]";
+    public static final String DEFAULT_XPATH = "s11:Body/child::*[position()=1] | " +
+            "s12:Body/child::*[position()=1]";
 
     static {
         // Set the TransformerFactory system property to generate and use translets.

@@ -34,8 +34,12 @@ public interface SynapseEnvironment {
      * This method injects a new message into the Synapse engine. This is used by
      * the underlying SOAP engine to inject messages into Synapse for mediation.
      * e.g. The SynapseMessageReceiver used by Axis2 invokes this to inject new messages
+     *
+     * @param smc - Synapse MessageContext to be injected
+     * @return boolean true if the message processing should be continued
+     *  and false if it should be aborted
      */
-    public void injectMessage(MessageContext smc);
+    public boolean injectMessage(MessageContext smc);
 
     /**
      * This method allows a message to be sent through the underlying SOAP engine.

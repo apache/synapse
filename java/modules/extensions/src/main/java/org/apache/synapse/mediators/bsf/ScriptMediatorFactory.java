@@ -28,6 +28,10 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.Constants;
 
+import java.util.Map;
+import java.util.Iterator;
+import java.util.TreeMap;
+
 /**
  * Creates an instance of a Script mediator for inline or external script mediation for BSF
  * scripting languages.
@@ -36,6 +40,7 @@ import org.apache.synapse.config.xml.Constants;
  *    &lt;script [key=&quot;entry-key&quot;]
  *      [function=&quot;script-function-name&quot;] language="javascript|groovy|ruby"&gt
  *      (text | xml)?
+ *      &lt;include key=&quot;entry-key&quot; /&gt;
  *    &lt;/script&gt;
  * </pre>
  *
@@ -46,10 +51,15 @@ import org.apache.synapse.config.xml.Constants;
  * MessageContext to enable working with the XML in a way natural to the scripting language. For
  * example when using JavaScript get/setPayloadXML use E4X XML objects, when using Ruby they
  * use REXML documents.
+ * 
+ * For external script mediation, that is when using key, function, language attributes,
+ * &lt;include key&quot;entry-key&quot; /&gt; is used to include one or more additional script files.
  */
 public class ScriptMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE, "script");
+
+    private static final QName INCLUDE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "include");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -66,16 +76,41 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
             throw new SynapseException("Cannot use 'function' attribute without 'key' attribute for a script mediator");
         }
 
+        Map includeKeysMap = getIncludeKeysMap(elem);
+
         if (keyAtt != null) {
             String functionName = (funcAtt == null ? null : funcAtt.getAttributeValue());
-            mediator = new ScriptMediator(
-                langAtt.getAttributeValue(), keyAtt.getAttributeValue(), functionName);
+            mediator = new ScriptMediator(langAtt.getAttributeValue(),
+                    includeKeysMap, keyAtt.getAttributeValue(), functionName);
         } else {
             mediator = new ScriptMediator(langAtt.getAttributeValue(), elem.getText());
         }
 
         initMediator(mediator, elem);
         return mediator;
+    }
+
+    private Map getIncludeKeysMap(OMElement elem) {
+    	// get <include /> scripts
+    	// map key = registry entry key, value = script source
+   	    // at this time map values are null, later loaded
+    	// from void ScriptMediator.prepareExternalScript(MessageContext synCtx)
+
+    	Map includeKeysMap = new TreeMap(); // TreeMap used to keep given scripts order if needed
+        Iterator iter = elem.getChildrenWithName(INCLUDE_Q);
+        while (iter.hasNext()) {
+            OMElement includeElem = (OMElement) iter.next();
+            OMAttribute key = includeElem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+
+            if (key == null) {
+                throw new SynapseException("Cannot use 'include' element without 'key' attribute for a script mediator");
+            }
+
+            String keyText = key.getAttributeValue();
+            includeKeysMap.put(keyText, null);
+        }
+
+        return includeKeysMap;
     }
 
     public QName getTagQName() {

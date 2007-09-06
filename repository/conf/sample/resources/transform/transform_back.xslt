@@ -30,7 +30,7 @@
   
 <xsl:template match="m0:return">
 
-<m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test">
+<m:CheckPriceResponse xmlns:m="http://services.samples/xsd">
 	<m:Code><xsl:value-of select="m0:symbol"/></m:Code>
 	<m:Price><xsl:value-of select="m0:last"/></m:Price>
 </m:CheckPriceResponse>

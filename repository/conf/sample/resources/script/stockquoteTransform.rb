@@ -28,7 +28,7 @@ def transformRequest(mc)
 end
 
 def transformResponse(mc)
-  newResponse = Document.new '<m:CheckPriceResponse xmlns:m="http://www.apache-synapse.org/test"><m:Code>' <<
+  newResponse = Document.new '<m:CheckPriceResponse xmlns:m="http://services.samples/xsd"><m:Code>' <<
     '</m:Code><m:Price></m:Price></m:CheckPriceResponse>'
   lastPrice=mc.getPayloadXML().root.elements[1].get_elements('ns:last')
   code=mc.getPayloadXML().root.elements[1].get_elements('ns:symbol') 

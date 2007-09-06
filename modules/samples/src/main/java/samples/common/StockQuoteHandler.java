@@ -39,7 +39,7 @@ public class StockQuoteHandler {
 
     /**
      * Create a new custom quote request with a body as follows
-     * <m0:CheckPriceRequest xmlns:m0="http://www.apache-synapse.org/test">
+     * <m0:CheckPriceRequest xmlns:m0="http://services.samples/xsd">
      *   <m0:Code>symbol</m0:Code>
      * </m0:CheckPriceRequest>
      * @param symbol the stock symbol
@@ -48,7 +48,7 @@ public class StockQuoteHandler {
     public static OMElement createCustomQuoteRequest(String symbol) {
         OMFactory factory   = OMAbstractFactory.getOMFactory();
         OMNamespace ns      = factory.createOMNamespace(
-            "http://www.apache-synapse.org/test", "m0");
+            "http://services.samples/xsd", "m0");
         OMElement chkPrice  = factory.createOMElement("CheckPriceRequest", ns);
         OMElement code      = factory.createOMElement("Code", ns);
         chkPrice.addChild(code);
@@ -329,7 +329,7 @@ public class StockQuoteHandler {
     public static String parseCustomQuoteResponse(OMElement result) throws Exception {
 
         AXIOMXPath xPath = new AXIOMXPath("//ns:Price");
-        xPath.addNamespace("ns","http://www.apache-synapse.org/test");
+        xPath.addNamespace("ns","http://services.samples/xsd");
         OMElement price = (OMElement) xPath.selectSingleNode(result);        
         if (price != null) {
             return price.getText();

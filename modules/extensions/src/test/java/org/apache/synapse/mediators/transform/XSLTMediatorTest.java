@@ -38,13 +38,13 @@ import java.net.URL;
 public class XSLTMediatorTest extends TestCase {
 
     private static final String SOURCE =
-        "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+        "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
         "<m0:Code>String</m0:Code>\n" +
         "</m0:CheckPriceRequest>";
 
     private static final String ENCLOSING_SOURCE =
         "<m:someOtherElement xmlns:m=\"http://someother\">" +
-        "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+        "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
         "<m0:Code>String</m0:Code>\n" +
         "</m0:CheckPriceRequest>" +
         "</m:someOtherElement>";
@@ -58,7 +58,7 @@ public class XSLTMediatorTest extends TestCase {
 
         // set xpath condition to select source
         AXIOMXPath xpath = new AXIOMXPath("//m0:CheckPriceRequest");
-        xpath.addNamespace("m0", "http://www.apache-synapse.org/test");
+        xpath.addNamespace("m0", "http://services.samples/xsd");
         transformMediator.setSource(xpath);
 
         // set XSLT transformation URL
@@ -144,7 +144,7 @@ public class XSLTMediatorTest extends TestCase {
 
         // set xpath condition to select source
         AXIOMXPath xpath = new AXIOMXPath("//m0:CheckPriceRequest");
-        xpath.addNamespace("m0", "http://www.apache-synapse.org/test");
+        xpath.addNamespace("m0", "http://services.samples/xsd");
         transformMediator.setSource(xpath);
 
         // set XSLT transformation URL

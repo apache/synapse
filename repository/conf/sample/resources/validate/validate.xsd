@@ -18,7 +18,7 @@
   ~  under the License.
   -->
 
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.apache-synapse.org/test" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://www.apache-synapse.org/test">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://services.samples/xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://services.samples/xsd">
 	<xs:element name="CheckPriceRequest">
 		<xs:complexType>
 			<xs:sequence>

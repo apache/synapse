@@ -18,8 +18,8 @@
   ~  under the License.
   -->
 
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m1="http://www.apache-synapse.org/test" xmlns:m2="http://www.apache-synapse.org/test2" targetNamespace="http://www.apache-synapse.org/test2" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:import namespace="http://www.apache-synapse.org/test" schemaLocation="validate.xsd"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:m1="http://services.samples/xsd" xmlns:m2="http://services.samples/xsd2" targetNamespace="http://services.samples/xsd2" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://services.samples/xsd" schemaLocation="validate.xsd"/>
 	
 	<xs:element name="CheckPriceRequest2">
 		<xs:complexType>

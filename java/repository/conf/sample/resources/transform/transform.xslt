@@ -20,7 +20,7 @@
 <xsl:stylesheet version="2.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-	xmlns:m0="http://www.apache-synapse.org/test"
+	xmlns:m0="http://services.samples/xsd"
 	exclude-result-prefixes="m0 fn">
 <xsl:output method="xml" omit-xml-declaration="yes" indent="yes"/>
 

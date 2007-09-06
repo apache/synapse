@@ -30,6 +30,9 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.mediators.AbstractMediator;
 
 import javax.script.*;
+import java.util.TreeMap;
+import java.util.Map;
+import java.util.Iterator;
 
 /**
  * A Synapse mediator that calls a function in any scripting language supported by the BSF.
@@ -66,6 +69,10 @@ public class ScriptMediator extends AbstractMediator {
      * The language of the script code
      */
     private String language;
+    /**
+     * The map of included scripts; key = registry entry key, value = script source 
+     */
+    private Map includes = new TreeMap();
     /**
      * The optional name of the function to be invoked, defaults to mediate
      */
@@ -117,9 +124,10 @@ public class ScriptMediator extends AbstractMediator {
      * @param key      the registry entry key to load the script
      * @param function the function to be invoked
      */
-    public ScriptMediator(String language, String key, String function) {
+    public ScriptMediator(String language, Map includeKeysMap, String key, String function) {
         this.language = language;
         this.key = key;
+        this.includes = includeKeysMap;
         if (function != null) {
             this.function = function;
         }
@@ -278,6 +286,27 @@ public class ScriptMediator extends AbstractMediator {
                 scriptEngine.eval(scriptSourceCode);
             }
         }
+
+        // load <include /> scripts; reload each script if needed
+    	for(Iterator iter = includes.keySet().iterator(); iter.hasNext();) {
+    		String includeKey = (String) iter.next();
+    		String includeSourceCode = (String) includes.get(includeKey);
+            Entry includeEntry = synCtx.getConfiguration().getEntryDefinition(includeKey);
+            boolean includeEntryNeedsReload = (entry != null) && entry.isDynamic()
+            			&& (!entry.isCached() || entry.isExpired());
+            synchronized (resourceLock) {
+                if (includeSourceCode == null || needsReload) {
+                    Object o = synCtx.getEntry(includeKey);
+                    if (o instanceof OMElement) {
+                    	includeSourceCode = ((OMElement) (o)).getText();
+                    } else if (o instanceof String) {
+                    	includeSourceCode = (String) o;
+                    }
+                    includes.put(includeKey, includeSourceCode);
+                    scriptEngine.eval(includeSourceCode);
+                }
+            }
+    	}
     }
 
     protected void initScriptEngine() {

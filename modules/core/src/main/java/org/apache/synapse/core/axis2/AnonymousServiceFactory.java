@@ -21,9 +21,9 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.AxisMessage;
+import org.apache.axis2.description.OutOnlyAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +47,8 @@ public class AnonymousServiceFactory {
     private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
     private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
 
-    public static final String DYNAMIC_OPERATION  = "__DYNAMIC_OPERATION__";
+    public static final String OUT_IN_OPERATION = "__OUT_IN_OPERATION__";
+    public static final String OUT_ONLY_OPERATION = "__OUT_ONLY_OPERATION__";
 
     private static SynapseCallbackReceiver synapseCallbackReceiver = null;
 
@@ -130,7 +131,7 @@ public class AnonymousServiceFactory {
 
         try {
             DynamicAxisOperation dynamicOperation =
-                new DynamicAxisOperation(new QName(DYNAMIC_OPERATION));
+                new DynamicAxisOperation(new QName(OUT_IN_OPERATION));
             dynamicOperation.setMessageReceiver(getCallbackReceiver(synCfg));
             AxisMessage inMsg = new AxisMessage();
             inMsg.setName("in-message");
@@ -140,8 +141,18 @@ public class AnonymousServiceFactory {
             outMsg.setParent(dynamicOperation);
             dynamicOperation.addMessage(inMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
             dynamicOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+            OutOnlyAxisOperation asyncOperation =
+                new OutOnlyAxisOperation(new QName(OUT_ONLY_OPERATION));
+            asyncOperation.setMessageReceiver(getCallbackReceiver(synCfg));
+            AxisMessage outOnlyMsg = new AxisMessage();
+            outOnlyMsg.setName("out-message");
+            outOnlyMsg.setParent(asyncOperation);
+            asyncOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+
             AxisService axisAnonymousService  = new AxisService(serviceKey);
             axisAnonymousService.addOperation(dynamicOperation);
+            axisAnonymousService.addOperation(asyncOperation);
             axisCfg.addService(axisAnonymousService);
             axisCfg.getPhasesInfo().setOperationPhases(dynamicOperation);
             return axisAnonymousService;

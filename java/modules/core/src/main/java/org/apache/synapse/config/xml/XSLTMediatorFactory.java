@@ -72,6 +72,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
         if (attSource != null) {
             try {
+                transformMediator.setSourceXPathString(attSource.getAttributeValue());
                 AXIOMXPath xp = new AXIOMXPath(attSource.getAttributeValue());
                 OMElementUtils.addNameSpaces(xp, elem, log);
                 transformMediator.setSource(xp);

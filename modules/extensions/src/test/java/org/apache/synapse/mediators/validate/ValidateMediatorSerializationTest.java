@@ -33,7 +33,7 @@ public class ValidateMediatorSerializationTest extends AbstractTestCase {
         validateMediatorSerializer = new ValidateMediatorSerializer();
     }
 
-    public void testValidateMediatorSerialization() {
+    public void testValidateMediatorSerialization() throws Exception {
 
         String validateConfiguration = "<syn:validate xmlns:syn=\"http://ws.apache.org/ns/synapse\" source=\"//regRequest\">" +
                 "<syn:schema key=\"file:synapse_repository/conf/sample/validate.xsd\"/>" +
@@ -43,11 +43,7 @@ public class ValidateMediatorSerializationTest extends AbstractTestCase {
                 "</syn:on-fail>" +
                 "</syn:validate>";
 
-        try {
-            assertTrue(serialization(validateConfiguration, validateMediatorFactory, validateMediatorSerializer));
-        } catch (Exception e) {
-            fail("Exception in test.");
-        }
+        assertTrue(serialization(validateConfiguration, validateMediatorFactory, validateMediatorSerializer));
     }
 
 }

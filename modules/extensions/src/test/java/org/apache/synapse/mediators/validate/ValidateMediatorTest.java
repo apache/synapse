@@ -51,42 +51,42 @@ public class ValidateMediatorTest extends TestCase {
          "http://javax.xml.XMLConstants/feature/secure-processing";
 
     private static final String VALID_ENVELOPE_TWO_SCHEMAS =
-            "<Outer xmlns=\"http://www.apache-synapse.org/test2\">" +
-            "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+            "<Outer xmlns=\"http://services.samples/xsd2\">" +
+            "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
             "<m0:Code>String</m0:Code>\n" +
             "</m0:CheckPriceRequest>\n" +
-            "<m1:CheckPriceRequest2 xmlns:m1=\"http://www.apache-synapse.org/test2\">\n" +
+            "<m1:CheckPriceRequest2 xmlns:m1=\"http://services.samples/xsd2\">\n" +
             "<m1:Code2>String</m1:Code2>\n" +
             "</m1:CheckPriceRequest2>\n" +
             "</Outer>";
 
     private static final String INVALID_ENVELOPE_TWO_SCHEMAS =
-            "<Outer xmlns=\"http://www.apache-synapse.org/test2\">" +
-            "<m1:CheckPriceRequest2 xmlns:m1=\"http://www.apache-synapse.org/test2\">\n" +
+            "<Outer xmlns=\"http://services.samples/xsd2\">" +
+            "<m1:CheckPriceRequest2 xmlns:m1=\"http://services.samples/xsd2\">\n" +
             "<m1:Code2>String</m1:Code2>\n" +
             "</m1:CheckPriceRequest2>\n" +
-            "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+            "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
             "<m0:Code>String</m0:Code>\n" +
             "</m0:CheckPriceRequest>\n" +
             "</Outer>";
 
     private static final String VALID_ENVELOPE =
-            "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+            "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
             "\t<m0:Code>String</m0:Code>\n" +
             "</m0:CheckPriceRequest>\n";
 
     private static final String IN_VALID_ENVELOPE =
-            "<m0:CheckPriceRequest xmlns:m0=\"http://www.apache-synapse.org/test\">\n" +
+            "<m0:CheckPriceRequest xmlns:m0=\"http://services.samples/xsd\">\n" +
             "\t<m0:Codes>String</m0:Codes>\n" +
             "</m0:CheckPriceRequest>\n";
 
     private static final String VALID_ENVELOPE_NO_NS =
-            "<CheckPriceRequest xmlns=\"http://www.apache-synapse.org/test\">\n" +
+            "<CheckPriceRequest xmlns=\"http://services.samples/xsd\">\n" +
             "<Code>String</Code>\n" +
             "</CheckPriceRequest>\n";
 
     private static final String IN_VALID_ENVELOPE_NO_NS =
-            "<CheckPriceRequest xmlns=\"http://www.apache-synapse.org/test\">\n" +
+            "<CheckPriceRequest xmlns=\"http://services.samples/xsd\">\n" +
             "<Codes>String</Codes>\n" +
             "</CheckPriceRequest>\n";
 
@@ -153,7 +153,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail
@@ -183,7 +183,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test2");
+        source.addNamespace("m0", "http://services.samples/xsd2");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail
@@ -217,7 +217,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-2");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:Outer");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test2");
+        source.addNamespace("m0", "http://services.samples/xsd2");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail
@@ -250,7 +250,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail
@@ -279,7 +279,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail
@@ -308,7 +308,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail
@@ -361,7 +361,7 @@ public class ValidateMediatorTest extends TestCase {
         keys.add("xsd-key-1");
         validate.setSchemaKeys(keys);
         AXIOMXPath source = new AXIOMXPath("//m0:CheckPriceRequest");
-        source.addNamespace("m0", "http://www.apache-synapse.org/test");
+        source.addNamespace("m0", "http://services.samples/xsd");
         validate.setSource(source);
 
         // set dummy mediator to be called on fail

@@ -17,18 +17,14 @@
 
 package org.apache.sandesha2.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMElement;
@@ -66,6 +62,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.RMMsgContext;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaException;
+import org.apache.sandesha2.addressing.EPRDecorator;
 import org.apache.sandesha2.client.SandeshaClientConstants;
 import org.apache.sandesha2.context.ContextManager;
 import org.apache.sandesha2.i18n.SandeshaMessageHelper;
@@ -758,6 +755,52 @@ public class SandeshaUtil {
 		return util;
 	}
 
+	public static EPRDecorator getEPRDecorator(ConfigurationContext context) throws SandeshaException {
+		EPRDecorator decorator = null;
+		AxisConfiguration config = context.getAxisConfiguration();
+		Parameter p = config.getParameter(Sandesha2Constants.EPR_DECORATOR);
+		if(p != null) decorator = (EPRDecorator) p.getValue();
+		if (decorator != null) return decorator;
+
+		try {
+			//Currently module policies are used to find the decorator impl. These cant be overriden
+			String decoratorClassStr = getDefaultPropertyBean(context.getAxisConfiguration()).getEPRDecoratorClass();
+			decorator = getEPRDecoratorInstance(decoratorClassStr,context);
+			p = new Parameter(Sandesha2Constants.EPR_DECORATOR,decorator);
+			config.addParameter(p);
+		} catch(AxisFault e) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitEPRDecorator, e.toString());
+			throw new SandeshaException(message,e);
+		}
+		return decorator;
+}
+	
+	private static EPRDecorator getEPRDecoratorInstance (String className,ConfigurationContext context) throws SandeshaException {
+		try {
+			ClassLoader classLoader = null;
+			AxisConfiguration config = context.getAxisConfiguration();
+			Parameter classLoaderParam = config.getParameter(Sandesha2Constants.MODULE_CLASS_LOADER);
+			if(classLoaderParam != null) classLoader = (ClassLoader) classLoaderParam.getValue(); 
+				  if (classLoader==null)
+	    	throw new SandeshaException (SandeshaMessageHelper.getMessage(SandeshaMessageKeys.classLoaderNotFound));
+		    
+		  Class c = classLoader.loadClass(className);
+			Class configContextClass = context.getClass();
+			
+			Constructor constructor = c.getConstructor(new Class[] { configContextClass });
+			Object obj = constructor.newInstance(new Object[] {context});
+					if (!(obj instanceof EPRDecorator)) {
+				String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.eprDecoratorMustImplement, className);
+				throw new SandeshaException(message);
+			}
+			return (EPRDecorator) obj;
+			
+		} catch (Exception e) {
+			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cannotInitEPRDecorator, e.toString());
+			throw new SandeshaException(message,e);
+		}
+	}
+	
 	private static SecurityManager getSecurityManagerInstance (String className,ConfigurationContext context) throws SandeshaException {
 		try {
 			ClassLoader classLoader = null;

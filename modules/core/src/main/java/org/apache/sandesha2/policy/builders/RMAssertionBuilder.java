@@ -124,9 +124,11 @@ public class RMAssertionBuilder implements AssertionBuilder {
             }  else if (Sandesha2Constants.Assertions.ELEM_SEC_MGR
                     .equals(name)) {
                 propertyBean.setSecurityManagerClass (element.getText().trim());
-            }  else if (Sandesha2Constants.Assertions.ELEM_STORAGE_MGR
+            }
+            else if (Sandesha2Constants.Assertions.ELEM_EPR_DECORATOR.equals(name)) {
+            	propertyBean.setEPRDecoratorClass(element.getText().trim());
+            } else if (Sandesha2Constants.Assertions.ELEM_STORAGE_MGR
                     .equals(name)) {
-            	
                 if (element!=null) {
                     //finding out storage managers.
                 	

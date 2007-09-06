@@ -52,6 +52,8 @@ public class SandeshaPolicyBean implements Assertion {
     private String permanentStorageManagerClass = null;
 
     private String securityManagerClass = null;
+
+    private String eprDecoratorClass = null;
     
     private String contextManagerClass = null;
 
@@ -214,6 +216,14 @@ public class SandeshaPolicyBean implements Assertion {
         this.securityManagerClass = className;
     }
     
+    public String getEPRDecoratorClass(){
+    	return eprDecoratorClass;
+    }
+    
+    public void setEPRDecoratorClass(String className) {
+      this.eprDecoratorClass = className;
+    }
+    
     public String getContextManagerClass() {
     	return contextManagerClass;
     }
@@ -343,6 +353,11 @@ public class SandeshaPolicyBean implements Assertion {
 			// <wsrm:SecurityManager />
 			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_SEC_MGR.getLocalPart(), namespaceURI);
 			writer.writeCharacters(getSecurityManagerClass());
+			writer.writeEndElement();
+			
+			//<wsrm:EPRDecorator />
+			writer.writeStartElement(prefix, Sandesha2Constants.Assertions.Q_ELEM_EPR_DECORATOR.getLocalPart(), namespaceURI);
+			writer.writeCharacters(getEPRDecoratorClass());
 			writer.writeEndElement();
 			
 			//<wsrm:ContextManager />

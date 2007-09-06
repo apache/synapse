@@ -208,6 +208,7 @@ public class RMMsgCreator {
 
 		if(replyTo != null) {
 			EndpointReference replyToEPR = new EndpointReference(replyTo);
+			replyToEPR = SandeshaUtil.getEPRDecorator(createSeqRMMsg.getConfigurationContext()).decorateEndpointReference(replyToEPR);
 			createSeqRMMsg.setReplyTo(replyToEPR);
 		}
 

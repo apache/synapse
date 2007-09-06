@@ -420,6 +420,8 @@ public interface Sandesha2Constants {
 		
 		public static final String RetransmissionCount = "RetransmissionCount";
 
+		public static final String EPRDecorator = "EPRDecorator";
+		
 		public static final String SecurityManager = "SecurityManager";
 
 		public static final String ContextManager = "ContextManager";
@@ -459,6 +461,8 @@ public interface Sandesha2Constants {
 			public static final int RetransmissionCount = 8;
 			
 			public static final int MaximumRetransmissionCount = 10;
+			
+			public static final String EPRDecorator = "org.apache.sandesha2.addressing.EPRDecoratorImpl";
 			
 			public static final String SecurityManager = "org.apache.sandesha2.security.dummy.DummySecurityManager";
 
@@ -544,6 +548,8 @@ public interface Sandesha2Constants {
 	
 	static final String SECURITY_MANAGER = "Sandesha2SecurityManager";
 	
+	static final String EPR_DECORATOR = "Sandesha2EPRDecorator";	
+	
 	static final String CONTEXT_MANAGER = "Sandesha2ContextManager";
 	
 	static final String RETRANSMITTABLE_PHASES = "RMRetransmittablePhases";
@@ -608,6 +614,7 @@ public interface Sandesha2Constants {
         public static final String ELEM_MSG_TYPES_TO_DROP = "MessageTypesToDrop";
         public static final String ELEM_STORAGE_MGR = "StorageManagers";
         public static final String ELEM_SEC_MGR = "SecurityManager";
+        public static final String ELEM_EPR_DECORATOR = "EPRDecorator";
         public static final String ELEM_CONTEXT_MGR = "ContextManager";
         public static final String ELEM_INMEMORY_STORAGE_MGR = "InMemoryStorageManager";
         public static final String ELEM_PERMANENT_STORAGE_MGR = "PermanentStorageManager";
@@ -632,6 +639,7 @@ public interface Sandesha2Constants {
         public static final QName Q_ELEM_MSG_TYPES_TO_DROP = new QName(URI_RM_POLICY_NS, ELEM_MSG_TYPES_TO_DROP, ATTR_WSRM);
         public static final QName Q_ELEM_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_STORAGE_MGR, ATTR_WSRM);
         public static final QName Q_ELEM_SEC_MGR = new QName(URI_RM_POLICY_NS, ELEM_SEC_MGR, ATTR_WSRM);
+        public static final QName Q_ELEM_EPR_DECORATOR = new QName(URI_RM_POLICY_NS, ELEM_EPR_DECORATOR, ATTR_WSRM);
         public static final QName Q_ELEM_CONTEXT_MGR = new QName(URI_RM_POLICY_NS, ELEM_CONTEXT_MGR, ATTR_WSRM);
         public static final QName Q_ELEM_INMEMORY_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_INMEMORY_STORAGE_MGR, ATTR_WSRM);
         public static final QName Q_ELEM_PERMANENT_STORAGE_MGR =new QName(URI_RM_POLICY_NS, ELEM_PERMANENT_STORAGE_MGR, ATTR_WSRM);

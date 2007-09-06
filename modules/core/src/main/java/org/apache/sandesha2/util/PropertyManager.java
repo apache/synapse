@@ -65,6 +65,7 @@ public class PropertyManager {
 		loadMessageTypesToDrop(msgTypesToDrop, propertyBean);
 
 		propertyBean.setSecurityManagerClass(Sandesha2Constants.Properties.DefaultValues.SecurityManager);
+		propertyBean.setEPRDecoratorClass(Sandesha2Constants.Properties.DefaultValues.EPRDecorator);
 		propertyBean.setContextManagerClass(Sandesha2Constants.Properties.DefaultValues.ContextManager);
 		propertyBean.setEnableMakeConnection(Sandesha2Constants.Properties.DefaultValues.EnableMakeConnection);
 		propertyBean.setEnableRMAnonURI(Sandesha2Constants.Properties.DefaultValues.EnableRMAnonURI);
@@ -132,6 +133,9 @@ public class PropertyManager {
 			String securityManagerClassStr = properties
 			    .getProperty(Sandesha2Constants.Properties.SecurityManager);
 			loadSecurityManagerClass(securityManagerClassStr,propertyBean);
+			
+			String eprDecoratorParam = properties.getProperty(Sandesha2Constants.Properties.EPRDecorator);
+			loadEPRDecoratorClass(eprDecoratorParam,propertyBean);
 			
 			String contextManagerClassStr = properties.getProperty(Sandesha2Constants.Properties.ContextManager);
 			loadContextManagerClass(contextManagerClassStr,propertyBean);
@@ -206,6 +210,10 @@ public class PropertyManager {
 		Parameter securityManagerClassParam = desc.getParameter(Sandesha2Constants.Properties.SecurityManager);
 		String securityManagerClassStr = (String) securityManagerClassParam.getValue();
 		loadSecurityManagerClass(securityManagerClassStr,propertyBean);
+		
+		Parameter eprDecoratorClassParam = desc.getParameter(Sandesha2Constants.Properties.EPRDecorator);
+		String eprDecoratorClassString = (String) eprDecoratorClassParam.getValue();
+		loadEPRDecoratorClass(eprDecoratorClassString,propertyBean);
 
 		return propertyBean;
 	}
@@ -492,6 +500,18 @@ public class PropertyManager {
 
 	}
 
+	/**
+	 * Loads the EPR decorator class name.
+	 * 
+	 * @param properties
+	 */
+	private static void loadEPRDecoratorClass(String eprDecoratorClassStr, SandeshaPolicyBean propertyBean) {
+		if (eprDecoratorClassStr != null) {
+			eprDecoratorClassStr = eprDecoratorClassStr.trim();
+			propertyBean.setEPRDecoratorClass(eprDecoratorClassStr);
+		}
+	}
+	
 	/**
 	 * Loads the SecurityManager class name.
 	 * 

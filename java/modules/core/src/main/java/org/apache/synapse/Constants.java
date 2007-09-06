@@ -127,6 +127,8 @@ public interface Constants {
 
     String RESPONSE = "RESPONSE";
 
+    String OUT_ONLY = "OUT_ONLY";
+
     /** The tracing state -off */
     int TRACING_OFF =0;
     /** The tracing state-on */

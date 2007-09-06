@@ -16,6 +16,9 @@
 package org.apache.axis2.transport.jms;
 
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.OMNode;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -31,6 +34,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.LogFactory;
 
 import javax.jms.*;
+import javax.activation.DataHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -238,37 +242,71 @@ public class JMSSender extends AbstractTransportSender {
         Message message = null;
         String msgType = getProperty(msgContext, JMSConstants.JMS_MESSAGE_TYPE);
 
-        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
-        MessageFormatter messageFormatter = null;
-        try {
-            messageFormatter = TransportUtils.getMessageFormatter(msgContext);
-        } catch (AxisFault axisFault) {
-            throw new JMSException("Unable to get the message formatter to use");
-        }
+        // check the first element of the SOAP body, do we have content wrapped using the
+        // default wrapper elements for binary (BaseConstants.DEFAULT_BINARY_WRAPPER) or
+        // text (BaseConstants.DEFAULT_TEXT_WRAPPER) ? If so, do not create SOAP messages
+        // for JMS but just get the payload in its native format
+        String jmsPayloadType = guessMessageType(msgContext);
 
-        String contentType = messageFormatter.getContentType(
-            msgContext, format, msgContext.getSoapAction());
+        if (jmsPayloadType == null) {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            messageFormatter.writeTo(msgContext, format, baos, true);
-            baos.flush();
-        } catch (IOException e) {
-            handleException("IO Error while creating BytesMessage", e);
-        }
+            OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
+            MessageFormatter messageFormatter = null;
+            try {
+                messageFormatter = TransportUtils.getMessageFormatter(msgContext);
+            } catch (AxisFault axisFault) {
+                throw new JMSException("Unable to get the message formatter to use");
+            }
 
-        if (msgType != null && JMSConstants.JMS_BYTE_MESSAGE.equals(msgType) ||
-            contentType.indexOf(HTTPConstants.HEADER_ACCEPT_MULTIPART_RELATED) > -1) {
+            String contentType = messageFormatter.getContentType(
+                msgContext, format, msgContext.getSoapAction());
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                messageFormatter.writeTo(msgContext, format, baos, true);
+                baos.flush();
+            } catch (IOException e) {
+                handleException("IO Error while creating BytesMessage", e);
+            }
+
+            if (msgType != null && JMSConstants.JMS_BYTE_MESSAGE.equals(msgType) ||
+                contentType.indexOf(HTTPConstants.HEADER_ACCEPT_MULTIPART_RELATED) > -1) {
+                message = session.createBytesMessage();
+                BytesMessage bytesMsg = (BytesMessage) message;
+                bytesMsg.writeBytes(baos.toByteArray());
+            } else {
+                message = session.createTextMessage();  // default
+                TextMessage txtMsg = (TextMessage) message;
+                txtMsg.setText(new String(baos.toByteArray()));
+            }
+            message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+
+        } else if (JMSConstants.JMS_BYTE_MESSAGE.equals(jmsPayloadType)) {
             message = session.createBytesMessage();
             BytesMessage bytesMsg = (BytesMessage) message;
-            bytesMsg.writeBytes(baos.toByteArray());
-        } else {
-            message = session.createTextMessage();  // default
-            TextMessage txtMsg = (TextMessage) message;
-            txtMsg.setText(new String(baos.toByteArray()));
-        }
+            OMElement wrapper = msgContext.getEnvelope().getBody().
+                getFirstChildWithName(BaseConstants.DEFAULT_BINARY_WRAPPER);
+            OMNode omNode = wrapper.getFirstOMChild();
+            if (omNode != null && omNode instanceof OMText) {
+                Object dh = ((OMText) omNode).getDataHandler();
+                if (dh != null && dh instanceof DataHandler) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        ((DataHandler) dh).writeTo(baos);
+                    } catch (IOException e) {
+                        handleException("Error serializing binary content of element : " +
+                            BaseConstants.DEFAULT_BINARY_WRAPPER, e);
+                    }
+                    bytesMsg.writeBytes(baos.toByteArray());
+                }
+            }
 
-        message.setStringProperty(BaseConstants.CONTENT_TYPE, contentType);
+        } else if (JMSConstants.JMS_TEXT_MESSAGE.equals(jmsPayloadType)) {
+            message = session.createTextMessage();
+            TextMessage txtMsg = (TextMessage) message;
+            txtMsg.setText(msgContext.getEnvelope().getBody().
+                getFirstChildWithName(BaseConstants.DEFAULT_TEXT_WRAPPER).getText());
+        }
 
         // set the JMS correlation ID if specified
         String correlationId = getProperty(msgContext, JMSConstants.JMS_COORELATION_ID);
@@ -292,6 +330,23 @@ public class JMSSender extends AbstractTransportSender {
 
         JMSUtils.setTransportHeaders(msgContext, message);
         return message;
+    }
+
+    /**
+     * Guess the message type to use for JMS looking at the message contexts' envelope
+     * @param msgContext the message context
+     * @return JMSConstants.JMS_BYTE_MESSAGE or JMSConstants.JMS_TEXT_MESSAGE or null
+     */
+    private String guessMessageType(MessageContext msgContext) {
+        OMElement firstChild = msgContext.getEnvelope().getBody().getFirstElement();
+        if (firstChild != null) {
+            if (BaseConstants.DEFAULT_BINARY_WRAPPER.equals(firstChild.getQName())) {
+                return JMSConstants.JMS_BYTE_MESSAGE;
+            } else if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(firstChild.getQName())) {
+                return JMSConstants.JMS_TEXT_MESSAGE;
+            }
+        }
+        return null;
     }
 
     /**

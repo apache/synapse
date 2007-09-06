@@ -175,9 +175,14 @@ public class Axis2FlexibleMEPClient {
             axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
 
+        boolean outOnlyMessage = "true".equals(
+            synapseOutMessageContext.getProperty(Constants.OUT_ONLY));
+
         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
         AxisOperation axisAnonymousOperation = anoymousService.getOperation(
-            new QName(AnonymousServiceFactory.DYNAMIC_OPERATION));
+            outOnlyMessage ?
+                new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :
+                new QName(AnonymousServiceFactory.OUT_IN_OPERATION));
 
         Options clientOptions = new Options();
         clientOptions.setUseSeparateListener(separateListener);
@@ -210,25 +215,27 @@ public class Axis2FlexibleMEPClient {
                 fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());
             }
         }
-        OperationClient mepClient = axisAnonymousOperation.createClient(
-            serviceCtx, clientOptions);
+
+        OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);
         mepClient.addMessageContext(axisOutMsgCtx);
         axisOutMsgCtx.setAxisMessage(
             axisAnonymousOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
 
-        // always set a callback as we decide if the send it blocking or non blocking within
-        // the MEP client. This does not cause an overhead, as we simply create a 'holder'
-        // object with a reference to the outgoing synapse message context synapseOutMessageContext
-        AsyncCallback callback = new AsyncCallback(synapseOutMessageContext);
-        if (endpoint != null) {
-            // set the timeout time and the timeout action to the callback, so that the TimeoutHandler
-            // can detect timed out callbacks and take approprite action.
-            callback.setTimeOutOn(System.currentTimeMillis() + endpoint.getTimeoutDuration());
-            callback.setTimeOutAction(endpoint.getTimeoutAction());
+        if (!outOnlyMessage) {
+            // always set a callback as we decide if the send it blocking or non blocking within
+            // the MEP client. This does not cause an overhead, as we simply create a 'holder'
+            // object with a reference to the outgoing synapse message context synapseOutMessageContext
+            AsyncCallback callback = new AsyncCallback(synapseOutMessageContext);
+            if (endpoint != null) {
+                // set the timeout time and the timeout action to the callback, so that the TimeoutHandler
+                // can detect timed out callbacks and take approprite action.
+                callback.setTimeOutOn(System.currentTimeMillis() + endpoint.getTimeoutDuration());
+                callback.setTimeOutAction(endpoint.getTimeoutAction());
+            }
+            mepClient.setCallback(callback);
         }
-        mepClient.setCallback(callback);
 
-        mepClient.execute(false);
+        mepClient.execute(true);
 
         // with the nio transport, this causes the listener not to write a 202
         // Accepted response, as this implies that Synapse does not yet know if

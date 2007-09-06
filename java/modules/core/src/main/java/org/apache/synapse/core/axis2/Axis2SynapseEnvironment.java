@@ -145,7 +145,7 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 = new org.apache.axis2.context.MessageContext();
         axis2MC.setConfigurationContext(this.configContext);
         axis2MC.setServiceContext(new ServiceContext());
-        axis2MC.setOperationContext(new OperationContext());
+//        axis2MC.setOperationContext(new OperationContext());
         MessageContext mc = new Axis2MessageContext(axis2MC, synapseConfig, this);
         mc.setMessageID(UUIDGenerator.getUUID());
         try {

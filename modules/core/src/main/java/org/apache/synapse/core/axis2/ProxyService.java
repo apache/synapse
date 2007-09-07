@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.transport.http.server.HttpUtils;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.wsdl.WSDLConstants;
@@ -46,10 +48,7 @@ import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.util.*;
-import java.net.URI;
-import java.net.URLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 
 /**
  * <proxy-service name="string" [transports="(http |https |jms )+|all"]>
@@ -386,7 +385,7 @@ public class ProxyService {
             }
         }
 
-        try {
+        /*try {
             String[] eprs = proxyService.getEPRs();
             boolean found = false;
             for (int i=0; i<eprs.length; i++) {
@@ -405,7 +404,7 @@ public class ProxyService {
         } catch (AxisFault axisFault) {
             axisFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
+*/
         return proxyService;
     }
 
@@ -416,9 +415,12 @@ public class ProxyService {
     }
 
     public void stop(SynapseConfiguration synCfg) {
-        AxisConfiguration axisConfig = synCfg.getAxisConfiguration().getAxisConfiguration();
+        AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
         try {
-            axisConfig.getService(this.getName()).setActive(false);
+            AxisService as = axisConfig.getService(this.getName());
+            if (as != null) {
+                as.setActive(false);
+            }
             this.setRunning(false);
         } catch (AxisFault axisFault) {
             handleException(axisFault.getMessage());

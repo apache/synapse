@@ -177,6 +177,8 @@ public class ProxyService {
      */
     protected int traceState = Constants.TRACING_UNSET;
 
+    private String address = null;
+
     public ProxyService() {
     }
 
@@ -383,6 +385,27 @@ public class ProxyService {
                         + name, axisFault);
             }
         }
+
+        try {
+            String[] eprs = proxyService.getEPRs();
+            boolean found = false;
+            for (int i=0; i<eprs.length; i++) {
+                if (eprs[i].startsWith("http://")) {
+                    this.address = proxyService.getEPRs()[i];
+                    found = true;
+                }
+            }
+            if (!found) {
+                for (int i=0; i<eprs.length; i++) {
+                    if (eprs[i].startsWith("https://")) {
+                        this.address = proxyService.getEPRs()[i];
+                    }
+                }
+            }
+        } catch (AxisFault axisFault) {
+            axisFault.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
         return proxyService;
     }
 
@@ -614,5 +637,14 @@ public class ProxyService {
 
     public void setTargetInLineFaultSequence(SequenceMediator targetInLineFaultSequence) {
         this.targetInLineFaultSequence = targetInLineFaultSequence;
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

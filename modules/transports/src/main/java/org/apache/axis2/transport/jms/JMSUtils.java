@@ -238,6 +238,8 @@ public class JMSUtils extends BaseUtils {
                     Context.SECURITY_CREDENTIALS, (String) p.getValue());
             } else if (JMSConstants.CONFAC_JNDI_NAME_PARAM.equals(p.getName())) {
                 jmsConFactory.setConnFactoryJNDIName((String) p.getValue());
+                jmsConFactory.addJNDIContextProperty(
+                    JMSConstants.CONFAC_JNDI_NAME_PARAM, (String) p.getValue());
             }
         }
     }
@@ -361,13 +363,20 @@ public class JMSUtils extends BaseUtils {
      */
     public static void sendMessageToJMSDestination(Session session,
         Destination destination, Message message) throws AxisFault {
+
         MessageProducer producer = null;
         try {
-            producer = session.createProducer(destination);
             if (log.isDebugEnabled()) {
                 log.debug("Sending message to destination : " + destination);
             }
-            producer.send(message);
+
+            if (destination instanceof Queue) {
+                producer = ((QueueSession) session).createSender((Queue) destination);
+                ((QueueSender) producer).send(message);
+            } else {
+                producer = ((TopicSession) session).createPublisher((Topic) destination);
+                ((TopicPublisher) producer).publish(message);
+            }
 
         } catch (JMSException e) {
             handleException("Error creating a producer or sending to : " + destination, e);

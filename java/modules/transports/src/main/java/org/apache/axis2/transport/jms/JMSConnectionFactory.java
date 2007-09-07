@@ -182,7 +182,7 @@ public class JMSConnectionFactory {
      * @throws JMSException on exceptions
      * @throws NamingException on exceptions
      */
-    public void connectAndListen() throws JMSException, NamingException {
+    public synchronized void connectAndListen() throws JMSException, NamingException {
 
         // if this is a reconnection/re-initialization effort after the detection of a
         // disconnection, close all sessions and the CF connection and re-initialize
@@ -211,7 +211,31 @@ public class JMSConnectionFactory {
         log.info("Connected to the JMS connection factory : " + connFactoryJNDIName);
 
         try {
-            connection = conFactory.createConnection();
+            QueueConnectionFactory qConFac = null;
+            TopicConnectionFactory tConFac = null;
+            if (conFactory instanceof QueueConnectionFactory) {
+                qConFac = (QueueConnectionFactory) conFactory;
+            } else {
+                tConFac = (TopicConnectionFactory) conFactory;
+            }
+
+            String user = (String) jndiProperties.get(Context.SECURITY_PRINCIPAL);
+            String pass = (String) jndiProperties.get(Context.SECURITY_CREDENTIALS);
+
+            if (user != null && pass != null) {
+                if (qConFac != null) {
+                    connection = qConFac.createQueueConnection(user, pass);
+                } else {
+                    connection = tConFac.createTopicConnection(user, pass);
+                }
+            } else {
+                if (qConFac != null) {
+                    connection = qConFac.createQueueConnection();
+                } else {
+                    connection = tConFac.createTopicConnection();
+                }
+            }
+
         } catch (JMSException e) {
             handleException("Error connecting to Connection Factory : " + connFactoryJNDIName, e);
         }
@@ -232,11 +256,24 @@ public class JMSConnectionFactory {
      * @return a JMS Session to send messages to the destination using this connection factory
      */
     public Session getSessionForDestination(String destinationJNDIname) {
+
         Session session = (Session) jmsSessions.get(destinationJNDIname);
+
         if (session == null) {
-            try {
-                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                jmsSessions.put(destinationJNDIname,  session);
+            try {                
+                Destination dest = (Destination) context.lookup(destinationJNDIname);
+                if (dest instanceof Topic) {
+                    session = ((TopicConnection) connection).
+                        createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+                } else {
+                    session = ((QueueConnection) connection).
+                        createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+                }
+
+                jmsSessions.put(destinationJNDIname, session);
+
+            } catch (NamingException e) {
+                handleException("Error looking up destination : " + destinationJNDIname, e);
             } catch (JMSException e) {
                 handleException("Unable to create a session using connection factory : " + name, e);
             }

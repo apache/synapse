@@ -35,6 +35,8 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.jms.*;
 import javax.activation.DataHandler;
+import javax.naming.Context;
+import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -117,8 +119,39 @@ public class JMSSender extends AbstractTransportSender {
                     jmsOut.loadConnectionFactoryFromProperies();
                     try {
                         // create a one time connection and session to be used
-                        connection = jmsOut.getConnectionFactory().createConnection();
-                        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                        Hashtable jndiProps = jmsOut.getProperties();
+                        String user = (String) jndiProps.get(Context.SECURITY_PRINCIPAL);
+                        String pass = (String) jndiProps.get(Context.SECURITY_CREDENTIALS);
+
+                        QueueConnectionFactory qConFac = null;
+                        TopicConnectionFactory tConFac = null;
+                        if (jmsOut.getConnectionFactory() instanceof QueueConnectionFactory) {
+                            qConFac = (QueueConnectionFactory) jmsOut.getConnectionFactory();
+                        } else {
+                            tConFac = (TopicConnectionFactory) jmsOut.getConnectionFactory();
+                        }
+
+                        if (user != null && pass != null) {
+                            if (qConFac != null) {
+                                connection = qConFac.createQueueConnection(user, pass);
+                            } else {
+                                connection = tConFac.createTopicConnection(user, pass);
+                            }
+                        } else {
+                           if (qConFac != null) {
+                                connection = qConFac.createQueueConnection();
+                            } else {
+                                connection = tConFac.createTopicConnection();
+                            }
+                        }
+
+                        if (qConFac != null) {
+                            session = ((QueueConnection)connection).
+                                createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+                        } else {
+                            session = ((TopicConnection)connection).
+                                createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+                        }
 
                     } catch (JMSException e) {
                         handleException("Error creating a connection/session for : " + targetAddress);
@@ -416,6 +449,14 @@ public class JMSSender extends AbstractTransportSender {
             JMSConnectionFactory jmsConFactory =
                 new JMSConnectionFactory(conFacParams.getName(), cfgCtx);
             JMSUtils.setConnectionFactoryParameters(conFacParams, jmsConFactory);
+
+            try {
+                jmsConFactory.connectAndListen();
+            } catch (NamingException e) {
+                log.warn("Error looking up JMS connection factory : " + jmsConFactory.getName(), e);
+            } catch (JMSException e) {
+                log.warn("Error connecting to JMS connection factory : " + jmsConFactory.getName(), e);
+            }
 
             connectionFactories.put(jmsConFactory.getName(), jmsConFactory);
         }

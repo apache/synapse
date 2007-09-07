@@ -410,7 +410,11 @@ public class Axis2MessageContext implements MessageContext {
                         if (o instanceof OMTextImpl) {
                             textValue.append(((OMTextImpl) o).getText());
                         } else if (o instanceof OMElementImpl) {
-                            textValue.append(((OMElementImpl) o).getText());
+                            String s = ((OMElementImpl) o).getText();
+                            if (s.trim().length() == 0) {
+                                s = o.toString();
+                            }
+                            textValue.append(s);
                         }
                     }
                 } else {

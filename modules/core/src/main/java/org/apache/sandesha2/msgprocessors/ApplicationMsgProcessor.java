@@ -148,6 +148,9 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 			String to = toEPR.getAddress();
 			String sequenceKey = (String) msgContext.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
+			if (sequenceKey == null)
+				sequenceKey = (String)configContext.getAxisConfiguration().getParameterValue(SandeshaClientConstants.SEQUENCE_KEY);
+			
 			internalSequenceId = SandeshaUtil.getInternalSequenceID(to, sequenceKey);
 
 			String lastAppMessage = (String) msgContext.getProperty(SandeshaClientConstants.LAST_MESSAGE);

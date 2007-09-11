@@ -19,7 +19,6 @@ package org.apache.sandesha2.storage;
 import org.apache.sandesha2.policy.SandeshaPolicyBean;
 import org.apache.sandesha2.storage.beanmanagers.InvokerBeanMgr;
 import org.apache.sandesha2.storage.beans.InvokerBean;
-import org.apache.sandesha2.util.PropertyManager;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.Sandesha2Constants;
 import org.apache.sandesha2.SandeshaTestCase;

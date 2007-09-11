@@ -72,7 +72,10 @@ public class WSRMMessageSender  {
 		
 		toAddress = rmMsgCtx.getTo().getAddress();
 		sequenceKey = (String) options.getProperty(SandeshaClientConstants.SEQUENCE_KEY);
-		
+
+		if (sequenceKey == null)
+			sequenceKey = (String)configurationContext.getAxisConfiguration().getParameterValue(SandeshaClientConstants.SEQUENCE_KEY);
+
 		if(internalSequenceID==null)
 		{
 			internalSequenceID = SandeshaUtil.getInternalSequenceID(toAddress, sequenceKey);			
@@ -167,7 +170,7 @@ public class WSRMMessageSender  {
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
 		
-	    SandeshaUtil.executeAndStore(rmMsgCtx, key, storageManager);
+    SandeshaUtil.executeAndStore(rmMsgCtx, key, storageManager);
 	
 		retramsmitterMgr.insert(senderBean);
 		

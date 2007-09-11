@@ -891,8 +891,7 @@ public class SandeshaUtil {
 		MessageContext msgContext = rmMsgContext.getMessageContext();
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 
-		SandeshaPolicyBean policy = getPropertyBean(msgContext.getAxisOperation());
-	    if(manager.requiresMessageSerialization()) {
+    if(manager.requiresMessageSerialization()) {
 			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_TRUE);
 
 			StorageManager store = getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration());
@@ -929,7 +928,6 @@ public class SandeshaUtil {
 	}
 	
 	public static void modifyExecutionChainForStoring (MessageContext message, StorageManager manager)
-	throws SandeshaException
 	{
 		
 		Object property = message.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);

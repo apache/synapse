@@ -17,7 +17,6 @@
 package org.apache.sandesha2;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.axis2.Constants;

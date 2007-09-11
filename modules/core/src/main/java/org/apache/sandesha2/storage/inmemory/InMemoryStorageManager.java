@@ -338,6 +338,15 @@ public class InMemoryStorageManager extends StorageManager {
 	public void  initStorage (AxisModule moduleDesc) {
 		
 	}
+	
+	//We do not support user transactions in-memory
+	public boolean hasUserTransaction(MessageContext msg) {
+		return false;
+	}
+	  
+	public boolean requiresMessageSerialization() {
+		return useSerialization;
+	}
 
 	private class SerializedStorageEntry {
 		MessageContext       message;
@@ -355,6 +364,7 @@ public class InMemoryStorageManager extends StorageManager {
 		SOAPEnvelope   envelope;
 	}
 }
+
 
 
 

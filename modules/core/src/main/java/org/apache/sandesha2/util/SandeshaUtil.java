@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMElement;
@@ -883,7 +884,7 @@ public class SandeshaUtil {
 		else 
 			return false;
 	}
-	public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey) throws AxisFault {
+	 public static void executeAndStore (RMMsgContext rmMsgContext, String storageKey, StorageManager manager) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: SandeshaUtil::executeAndStore, " + storageKey);
 		
@@ -891,7 +892,7 @@ public class SandeshaUtil {
 		ConfigurationContext configurationContext = msgContext.getConfigurationContext();
 
 		SandeshaPolicyBean policy = getPropertyBean(msgContext.getAxisOperation());
-		if(policy.isUseMessageSerialization()) {
+	    if(manager.requiresMessageSerialization()) {
 			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_TRUE);
 
 			StorageManager store = getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration());
@@ -908,27 +909,26 @@ public class SandeshaUtil {
 	
 			Sandesha2TransportOutDesc sandesha2TransportOutDesc = new Sandesha2TransportOutDesc();
 			msgContext.setTransportOut(sandesha2TransportOutDesc);
+			
+			//this invocation has to be a blocking one.
+			Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
+			if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue())
+				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
 	
 	 		// sending the message once through Sandesha2TransportSender.
 			if (msgContext.isPaused())
 				AxisEngine.resumeSend(msgContext);
 			else {
-				//this invocation has to be a blocking one.
-				
-				Boolean isTransportNonBlocking = (Boolean) msgContext.getProperty(MessageContext.TRANSPORT_NON_BLOCKING);
-				if (isTransportNonBlocking!=null && isTransportNonBlocking.booleanValue())
-					msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
-				
-				AxisEngine.send(msgContext);
-				
-				msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
+				AxisEngine.send(msgContext);	
 			}
+			//put the original value of isTransportNonBlocking back on
+			msgContext.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, isTransportNonBlocking);
 		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: SandeshaUtil::executeAndStore");
 	}
 	
-	public static void modifyExecutionChainForStoring (MessageContext message)
+	public static void modifyExecutionChainForStoring (MessageContext message, StorageManager manager)
 	throws SandeshaException
 	{
 		
@@ -936,8 +936,7 @@ public class SandeshaUtil {
 		if (property!=null)
 			return; //Phases are already set. Dont hv to redo.
 		
-		SandeshaPolicyBean policy = getPropertyBean(message.getAxisOperation());
-		if(policy.isUseMessageSerialization())
+	    if(manager.requiresMessageSerialization())
 			return; // No need to mess with the transport when we use message serialization
 		
 		TransportOutDescription transportOutDescription = message.getTransportOut();
@@ -1120,40 +1119,53 @@ public class SandeshaUtil {
 	}	
 	
 	
-	public static SOAPEnvelope cloneEnvelope(SOAPEnvelope envelope) throws SandeshaException {
-		
-		// Now clone the env and set it in the message context
-		XMLStreamReader streamReader = envelope.cloneOMElement().getXMLStreamReader();
-		SOAPEnvelope clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
+  public static SOAPEnvelope cloneEnvelope(SOAPEnvelope envelope) throws SandeshaException {
+	    
+	    // Now clone the env and set it in the message context. We need to be sure that we
+    // close off the stream reader, in order to free up some of the heap.
+    XMLStreamReader streamReader = null;
+    SOAPEnvelope clonedEnvelope = null;
+    try {
+      streamReader = envelope.getXMLStreamReader();     
+      clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
+      // you have to explicitely set the 'processed' attribute for header
+      // blocks, since it get lost in the above read from the stream.
+     
+      SOAPHeader header = envelope.getHeader();
+      if (header != null) {
+        Iterator childrenOfOldEnv = header.getChildElements();
+        Iterator childrenOfNewEnv = clonedEnvelope.getHeader().getChildElements();
+        while (childrenOfOldEnv.hasNext()) {        
+          SOAPHeaderBlock oldEnvHeaderBlock = (SOAPHeaderBlock) childrenOfOldEnv.next();
+          SOAPHeaderBlock newEnvHeaderBlock = (SOAPHeaderBlock) childrenOfNewEnv.next();
 
-		// you have to explicitely set the 'processed' attribute for header
-		// blocks, since it get lost in the above read from the stream.
+          QName oldEnvHeaderBlockQName = oldEnvHeaderBlock.getQName();
+          if (oldEnvHeaderBlockQName != null) {
+            if (oldEnvHeaderBlockQName.equals(newEnvHeaderBlock.getQName())) {
+              if (oldEnvHeaderBlock.isProcessed())
+                newEnvHeaderBlock.setProcessed();
+              } else {
+                String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cloneDoesNotMatchToOriginal);
+                throw new SandeshaException(message);
+              }
+            }
+          }
+        }
+        // Completely build the new tree
+        clonedEnvelope.build();
+      } finally {
+      if(streamReader != null) {
+        try {
+          streamReader.close();
+        } catch(XMLStreamException e) {
+          log.debug("Caught exception closing stream", e);
+        }
+      }
 
-		SOAPHeader header = envelope.getHeader();
-		if (header != null) {
-			Iterator childrenOfOldEnv = header.getChildElements();
-			Iterator childrenOfNewEnv = clonedEnvelope.getHeader().getChildElements();
-			while (childrenOfOldEnv.hasNext()) {
-				
-				SOAPHeaderBlock oldEnvHeaderBlock = (SOAPHeaderBlock) childrenOfOldEnv.next();
-				SOAPHeaderBlock newEnvHeaderBlock = (SOAPHeaderBlock) childrenOfNewEnv.next();
-
-				QName oldEnvHeaderBlockQName = oldEnvHeaderBlock.getQName();
-				if (oldEnvHeaderBlockQName != null) {
-					if (oldEnvHeaderBlockQName.equals(newEnvHeaderBlock.getQName())) {
-						if (oldEnvHeaderBlock.isProcessed())
-							newEnvHeaderBlock.setProcessed();
-					} else {
-						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cloneDoesNotMatchToOriginal);
-						throw new SandeshaException(message);
-					}
-				}
-			}
-		}
-		
-		return clonedEnvelope;
-	}
-	
+    }
+    return clonedEnvelope;
+  }
+	  
 	public static final String getStackTraceFromException(Exception e) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     PrintWriter pw = new PrintWriter(baos);

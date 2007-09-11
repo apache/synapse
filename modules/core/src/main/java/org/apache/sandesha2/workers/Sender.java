@@ -200,12 +200,15 @@ public class Sender extends SandeshaThread {
 			SenderWorker worker = new SenderWorker(context, senderBean, rmVersion);
 			worker.setLock(getWorkerLock());
 			worker.setWorkId(workId);
-			threadPool.execute(worker);
-
-			// adding the workId to the lock after assigning it to a thread
-			// makes sure
-			// that all the workIds in the Lock are handled by threads.
-			getWorkerLock().addWork(workId);
+			
+			try {
+				// Set the lock up before we start the thread, but roll it back
+				// if we hit any problems
+				getWorkerLock().addWork(workId, worker);
+				threadPool.execute(worker);
+			} catch(Exception e) {
+				getWorkerLock().removeWork(workId);
+			}			
 
 			// If we got to here then we found work to do on the sequence, so we should
 			// remember not to sleep at the end of the list of sequences.

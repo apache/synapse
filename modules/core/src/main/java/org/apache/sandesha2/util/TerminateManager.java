@@ -366,7 +366,7 @@ public class TerminateManager {
 //		terminateRMMessage.setProperty(Sandesha2Constants.MessageContextProperties.SEQUENCE_PROPERTY_KEY, sequencePropertyKey);
 		
 		// / addTerminateSeqTransaction.commit();
-		SandeshaUtil.executeAndStore(terminateRMMessage, key);
+	    SandeshaUtil.executeAndStore(terminateRMMessage, key, storageManager);
 		
 		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
 		

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.axiom.om.impl.builder.StAXBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -76,6 +77,12 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 		
 		if (log.isDebugEnabled())
 			log.debug("Enter: SenderWorker::run");
+		
+	    // If we are not the holder of the correct lock, then we have to stop
+	    if(lock != null && !lock.ownsLock(workId, this)) {
+	      if (log.isDebugEnabled()) log.debug("Exit: SenderWorker::run, another worker holds the lock");
+	      return;
+	    }
 
 		Transaction transaction = null;
 		
@@ -253,8 +260,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 			try {
 				InvocationResponse response = InvocationResponse.CONTINUE;
 				
-				SandeshaPolicyBean policy = SandeshaUtil.getPropertyBean(msgCtx.getAxisOperation());
-				if(policy.isUseMessageSerialization()) {
+		        if(storageManager.requiresMessageSerialization()) {
 					if(msgCtx.isPaused()) {
 						if (log.isDebugEnabled())
 							log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
@@ -268,12 +274,6 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 						AxisEngine.send(msgCtx);  // TODO check if this should return an invocation response
 					}
 				} else {
-					// had to fully build the SOAP envelope to support
-					// retransmissions.
-					// Otherwise a 'parserAlreadyAccessed' exception could
-					// get thrown in retransmissions.
-					// But this has a performance reduction.
-					msgCtx.getEnvelope().build();
 	
 					ArrayList retransmittablePhases = (ArrayList) msgCtx.getProperty(Sandesha2Constants.RETRANSMITTABLE_PHASES);
 					if (retransmittablePhases!=null) {
@@ -289,6 +289,7 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				
 					if (log.isDebugEnabled())
 						log.debug("Resuming a send for message : " + msgCtx.getEnvelope().getHeader());
+			        msgCtx.setProperty(MessageContext.TRANSPORT_NON_BLOCKING, Boolean.FALSE);
 					response = AxisEngine.resumeSend(msgCtx);
 				}
 				if(log.isDebugEnabled()) log.debug("Engine resume returned " + response);
@@ -647,9 +648,21 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setSoapAction("");
 			}
 
+	        InvocationResponse response = null;
+	        
 			if (resenvelope!=null) {
-				AxisEngine.receive(responseMessageContext);
+				response = AxisEngine.receive(responseMessageContext);
 			}
+	        if(!InvocationResponse.SUSPEND.equals(response)) {
+	            // Performance work - need to close the XMLStreamReader to prevent GC thrashing.
+	            SOAPEnvelope env = responseMessageContext.getEnvelope();
+	            if(env!=null){
+	              StAXBuilder sb = (StAXBuilder)responseMessageContext.getEnvelope().getBuilder();
+	              if(sb!=null){
+	                sb.close();
+	              }            
+	            }
+	        }
 
 		} catch (Exception e) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noValidSyncResponse);

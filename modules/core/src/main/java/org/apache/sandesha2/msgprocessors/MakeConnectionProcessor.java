@@ -211,7 +211,7 @@ public class MakeConnectionProcessor implements MsgProcessor {
 		messagePending.toSOAPEnvelope(returnMessage.getEnvelope());
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction) {
 		return false;
 	}
 

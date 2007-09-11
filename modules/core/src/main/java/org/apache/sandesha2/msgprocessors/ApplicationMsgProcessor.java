@@ -51,6 +51,9 @@ import org.apache.sandesha2.util.RMMsgCreator;
 import org.apache.sandesha2.util.SOAPAbstractFactory;
 import org.apache.sandesha2.util.SandeshaUtil;
 import org.apache.sandesha2.util.SequenceManager;
+import org.apache.sandesha2.workers.SandeshaThread;
+import org.apache.sandesha2.workers.SenderWorker;
+import org.apache.sandesha2.workers.WorkerLock;
 import org.apache.sandesha2.wsrm.CreateSequence;
 import org.apache.sandesha2.wsrm.SequenceOffer;
 
@@ -82,7 +85,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		return false;
 	}
 	
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction tran) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processOutMessage");
 
@@ -252,7 +255,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 				// server and the client sides.
 				if (rmsBean == null) {
 					rmsBean = SequenceManager.setupNewClientSequence(msgContext, internalSequenceId, storageManager);
-					rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, storageManager);
+					rmsBean = addCreateSequenceMessage(rmMsgCtx, rmsBean, storageManager, tran);
 				}
 			}
 		
@@ -405,7 +408,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		
 		// processing the response if not an dummy.
 		if (!dummyMessage)
-			processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager);
+			processResponseMessage(rmMsgCtx, rmsBean, internalSequenceId, outSequenceID, messageNumber, storageKey, storageManager, tran);
 		
 		//Users wont be able to get reliable response msgs in the back channel in the back channel of a 
 		//reliable message. If he doesn't have a endpoint he should use polling mechanisms.
@@ -417,7 +420,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	}
 
 	private RMSBean addCreateSequenceMessage(RMMsgContext applicationRMMsg, RMSBean rmsBean,
-			StorageManager storageManager) throws AxisFault {
+			StorageManager storageManager, Transaction tran) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::addCreateSequenceMessage, " + rmsBean);
@@ -484,7 +487,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		createSeqMsg.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 		
-		SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey);
+		SandeshaUtil.executeAndStore(createSeqRMMessage, createSequenceMessageStoreKey, storageManager);
 
 		retransmitterMgr.insert(createSeqEntry);
 
@@ -497,7 +500,7 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 	}
 
 	private void processResponseMessage(RMMsgContext rmMsg, RMSBean rmsBean, String internalSequenceId, String outSequenceID, long messageNumber,
-			String storageKey, StorageManager storageManager) throws AxisFault {
+		    String storageKey, StorageManager storageManager, Transaction tran) throws AxisFault {
 		if (log.isDebugEnabled())
 			log.debug("Enter: ApplicationMsgProcessor::processResponseMessage, " + internalSequenceId + ", " + outSequenceID);
 
@@ -521,6 +524,11 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 			}
 		}
 
+		boolean sendingNow = false;
+		if(outSequenceID != null && !storageManager.hasUserTransaction(msg)) {
+		  sendingNow = true;
+		}
+		
 		// Now that we have decided which sequence to use for the message, make sure that we secure
 		// it with the correct token.
 		RMMsgCreator.secureOutboundMessage(rmsBean, msg);
@@ -563,11 +571,35 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 		// increasing the current handler index, so that the message will not be
 		// going throught the SandeshaOutHandler again.
 		msg.setCurrentHandlerIndex(msg.getCurrentHandlerIndex() + 1);
-
-		SandeshaUtil.executeAndStore(rmMsg, storageKey);
+		SandeshaUtil.executeAndStore(rmMsg, storageKey, storageManager);
+		
+		// Lock the sender bean before we insert it, if we are planning to send it ourselves
+		SenderWorker worker = null;
+		if(sendingNow) {
+		  String workId = appMsgEntry.getMessageID() + appMsgEntry.getTimeToSend();
+		  SandeshaThread sender = storageManager.getSender();
+		  ConfigurationContext context = msg.getConfigurationContext();
+		  WorkerLock lock = sender.getWorkerLock();
+      
+		  worker = new SenderWorker(context, appMsgEntry, rmsBean.getRMVersion());
+		  worker.setLock(lock);
+		  worker.setWorkId(workId);
+		  // Actually take the lock
+		  lock.addWork(workId, worker);
+		}
 
 		retransmitterMgr.insert(appMsgEntry);
 
+		// Commit the transaction, so that the sender worker starts with a clean slate.
+		if(tran != null && tran.isActive()) tran.commit();
+		 
+		if(worker != null) {
+		  try {
+		    worker.run();
+		  } catch(Exception e)  {
+		    log.error("Caught exception running SandeshaWorker", e);
+		  }
+		}
 		if (log.isDebugEnabled())
 			log.debug("Exit: ApplicationMsgProcessor::processResponseMessage");
 	}

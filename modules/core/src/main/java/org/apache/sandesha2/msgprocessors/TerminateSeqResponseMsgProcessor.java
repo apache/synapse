@@ -89,7 +89,7 @@ public class TerminateSeqResponseMsgProcessor implements MsgProcessor {
 		return true;
   }
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction) {
 		if(log.isDebugEnabled()) log.debug("Enter: TerminateSeqResponseMsgProcessor::processOutMessage");
 		if(log.isDebugEnabled()) log.debug("Exit: TerminateSeqResponseMsgProcessor::processOutMessage " + Boolean.FALSE);
 		return false;

@@ -266,7 +266,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 			msgContext.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
 			// passing the message through sandesha2sender
-			SandeshaUtil.executeAndStore(ackRMMsgCtx, key);
+		    SandeshaUtil.executeAndStore(ackRMMsgCtx, key, storageManager);
 
 			// inserting the new Ack.
 			senderBeanMgr.insert(ackBean);

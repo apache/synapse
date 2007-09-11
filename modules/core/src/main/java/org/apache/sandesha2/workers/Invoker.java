@@ -124,7 +124,7 @@ public class Invoker extends SandeshaThread {
 					
 						//adding the workId to the lock after assigning it to a thread makes sure 
 						//that all the workIds in the Lock are handled by threads.
-						getWorkerLock().addWork(workId);
+			            getWorkerLock().addWork(workId, worker);
 
 						long msgNumber = invoker.getMsgNo();
 						//if necessary, update the "next message number" bean under this transaction
@@ -349,12 +349,14 @@ public class Invoker extends SandeshaThread {
 				if(contextMgr != null) {
 					work = contextMgr.wrapWithContext(work, bean.getContext());
 				}
-				threadPool.execute(work);
-				
-				//adding the workId to the lock after assigning it to a thread makes sure 
-				//that all the workIds in the Lock are handled by threads.
-				getWorkerLock().addWork(workId);
-				
+				try {
+					// Set the lock up before we start the thread, but roll it back
+					// if we hit any problems
+					getWorkerLock().addWork(workId, worker);
+					threadPool.execute(work);
+				} catch(Exception e) {
+					getWorkerLock().removeWork(workId);
+				}				
 				processedMessage = true;
 			}
 			

@@ -28,6 +28,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
@@ -345,6 +346,18 @@ public class SequenceProcessor {
 			RMMsgContext ackRMMsgContext = AcknowledgementManager.generateAckMessage(rmMsgCtx, bean, sequenceId, storageManager,true);
 
 			AcknowledgementManager.addAckBeanEntry(ackRMMsgContext, sequenceId, timeToSend, storageManager);
+			
+			// If the MEP doesn't need the backchannel, and nor do we, we should signal it so that it
+			// can close off as soon as possible.
+			result = InvocationResponse.ABORT;
+			RequestResponseTransport t = null;
+			t = (RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+			
+			// Tell the transport that there will be no response message
+			if(t != null) {
+				TransportUtils.setResponseWritten(msgCtx, false);
+				t.acknowledgeMessage(msgCtx);
+			}
 		}
 		
 		// If this message matches the WSRM 1.0 pattern for an empty last message (e.g.

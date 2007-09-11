@@ -84,10 +84,11 @@ public class SandeshaOutHandler extends AbstractHandler {
 				return returnValue ;
 			}
 		}
-		
+
+	    StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 		//this will change the execution chain of this message to work correctly in retransmissions.
 		//For e.g. Phases like security will be removed to be called in each retransmission.
-		SandeshaUtil.modifyExecutionChainForStoring(msgCtx);
+	    SandeshaUtil.modifyExecutionChainForStoring(msgCtx, storageManager);
 
 		String DONE = (String) msgCtx.getProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE);
 		if (null != DONE && "true".equals(DONE)) {
@@ -97,7 +98,6 @@ public class SandeshaOutHandler extends AbstractHandler {
 		}
 		
 		msgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
-		StorageManager storageManager = SandeshaUtil.getSandeshaStorageManager(context, context.getAxisConfiguration());
 
 		Transaction transaction = null;
 
@@ -126,7 +126,7 @@ public class SandeshaOutHandler extends AbstractHandler {
 			}
 
 			if (msgProcessor != null){
-				if(msgProcessor.processOutMessage(rmMsgCtx)){
+		        if(msgProcessor.processOutMessage(rmMsgCtx, transaction)){
 					//the msg was paused
 					returnValue = InvocationResponse.SUSPEND;
 				}

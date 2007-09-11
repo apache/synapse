@@ -167,7 +167,7 @@ public class WSRMMessageSender  {
 
 		SenderBeanMgr retramsmitterMgr = storageManager.getSenderBeanMgr();
 		
-		SandeshaUtil.executeAndStore(rmMsgCtx, key);
+	    SandeshaUtil.executeAndStore(rmMsgCtx, key, storageManager);
 	
 		retramsmitterMgr.insert(senderBean);
 		

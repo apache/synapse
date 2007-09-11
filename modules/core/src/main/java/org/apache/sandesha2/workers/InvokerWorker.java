@@ -1,5 +1,7 @@
 package org.apache.sandesha2.workers;
 
+import org.apache.axiom.om.impl.builder.StAXBuilder;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -7,6 +9,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
+import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.commons.logging.Log;
@@ -85,19 +88,30 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 						&& Sandesha2Constants.VALUE_TRUE.equals(postFaulureProperty))
 					postFailureInvocation = true;
 
+		        InvocationResponse response = null;
 				if (postFailureInvocation) {
 					makeMessageReadyForReinjection(msgToInvoke);
 					if (log.isDebugEnabled())
 						log.debug("Receiving message, key=" + messageContextKey + ", msgCtx="
 								+ msgToInvoke.getEnvelope().getHeader());
-					AxisEngine.receive(msgToInvoke);
+					response = AxisEngine.receive(msgToInvoke);
 				} else {
 					if (log.isDebugEnabled())
 						log.debug("Resuming message, key=" + messageContextKey + ", msgCtx="
 								+ msgToInvoke.getEnvelope().getHeader());
 					msgToInvoke.setPaused(false);
-					AxisEngine.resumeReceive(msgToInvoke);
+					response = AxisEngine.resumeReceive(msgToInvoke);
 				}
+		        if(!InvocationResponse.SUSPEND.equals(response)) {
+		            // Performance work - need to close the XMLStreamReader to prevent GC thrashing.
+		            SOAPEnvelope env = msgToInvoke.getEnvelope();
+		            if(env!=null){
+		              StAXBuilder sb = (StAXBuilder)msgToInvoke.getEnvelope().getBuilder();
+		              if(sb!=null){
+		                sb.close();
+		              }
+		            }
+		        }
 
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
@@ -105,7 +119,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 
 				handleFault(rmMsg, e);
 			}
-
 
 			transaction = storageManager.getTransaction();
 			 

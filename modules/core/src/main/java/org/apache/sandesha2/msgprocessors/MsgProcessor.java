@@ -40,5 +40,5 @@ public interface MsgProcessor {
 	 * @return true if the msg context has been paused
 	 * @throws AxisFault
 	 */
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault;
+	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction)throws AxisFault;
 }

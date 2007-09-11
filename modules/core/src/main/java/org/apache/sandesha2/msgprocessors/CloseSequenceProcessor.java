@@ -141,7 +141,7 @@ public class CloseSequenceProcessor extends WSRMMessageSender implements MsgProc
 		return false;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	 public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 		if (log.isDebugEnabled()) 
 			log.debug("Enter: CloseSequenceProcessor::processOutMessage");
 		

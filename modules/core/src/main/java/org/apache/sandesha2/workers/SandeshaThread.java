@@ -131,8 +131,10 @@ public abstract class SandeshaThread extends Thread{
 			}
 		}
 		
-		if (log.isDebugEnabled())
-			log.debug("Exit: SandeshaThread::stopRunning, " + this);
+	    // In a unit test, tracing 'this' once the thread was stopped caused
+	    // an exception, so we just trace exit.
+	    if (log.isDebugEnabled())
+	      log.debug("Exit: SandeshaThread::stopRunning");
 	}
 	
 	public synchronized boolean isThreadStarted() {

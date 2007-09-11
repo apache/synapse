@@ -262,7 +262,7 @@ public class CreateSeqResponseMsgProcessor implements MsgProcessor {
 		return true;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction) {
 		if (log.isDebugEnabled()) {
 			log.debug("Enter: CreateSeqResponseMsgProcessor::processOutMessage");
 			log.debug("Exit: CreateSeqResponseMsgProcessor::processOutMessage " + Boolean.FALSE);

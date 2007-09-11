@@ -100,5 +100,16 @@ public abstract class StorageManager {
 	public abstract MessageContext retrieveMessageContext (String storageKey, ConfigurationContext configContext) throws SandeshaStorageException;
 
 	public abstract void removeMessageContext (String storageKey) throws SandeshaStorageException;
-
+	
+	
+	/**
+	 * If there is no user transaction in scope then we can optimize the sending / invoking of a
+	 * message. This method allows the StorageManager to tell the core Sandesha code if there
+	 * is a transaction in scope.
+	 * @return true, if there is a user transaction in scope.
+	 */
+	public abstract boolean hasUserTransaction(MessageContext message) throws SandeshaStorageException;
+	 
+	public abstract boolean requiresMessageSerialization();
+	
 }

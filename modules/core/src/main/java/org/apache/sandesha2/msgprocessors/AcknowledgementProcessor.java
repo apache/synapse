@@ -116,6 +116,12 @@ public class AcknowledgementProcessor {
 		String outSequenceId = sequenceAck.getIdentifier().getIdentifier();
 		RMSBean rmsBean = SandeshaUtil.getRMSBeanFromSequenceId(storageManager, outSequenceId);
 
+		if(rmsBean==null){
+		  if (log.isDebugEnabled())
+			  log.debug("Exit: AcknowledgementProcessor::processAckHeader, Sequence bean not found");
+		  return;
+		}
+		
 		if (outSequenceId == null || "".equals(outSequenceId)) {
 			String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.outSeqIDIsNull);
 			log.debug(message);

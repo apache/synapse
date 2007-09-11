@@ -149,17 +149,18 @@ public class PollingManager extends SandeshaThread {
 			// This sequence must have been terminated, or deleted
 			stopThreadForSequence(entry.getSequenceId(), true);
 		} else {
-      if (log.isDebugEnabled())
-        log.debug("Polling rms " + beanToPoll);
+			if (log.isDebugEnabled())
+				log.debug("Polling rms " + beanToPoll);
 			// The sequence is there, but we still only poll if we are expecting reply messages,
 			// or if we don't have clean ack state.
-      boolean cleanAcks = false;
-      if (beanToPoll.getNextMessageNumber() > -1)
-      	cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
+			boolean cleanAcks = false;
+			if (beanToPoll.getNextMessageNumber() > -1)
+				cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
 			long  repliesExpected = beanToPoll.getExpectedReplies();
-			if((force ||	!cleanAcks || repliesExpected > 0) && beanToPoll.getReferenceMessageStoreKey() != null)
-				pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
+			if(beanToPoll.getSequenceID() != null && (force || !cleanAcks || repliesExpected > 0) && beanToPoll.getReferenceMessageStoreKey() != null)
+		            pollForSequence(beanToPoll.getAnonymousUUID(), beanToPoll.getInternalSequenceID(), beanToPoll.getReferenceMessageStoreKey(), beanToPoll, entry);
 		}
+		
 
 		if(log.isDebugEnabled()) log.debug("Exit: PollingManager::pollRMSSide");
 	}
@@ -262,7 +263,7 @@ public class PollingManager extends SandeshaThread {
 			//this message should not be sent until it is qualified. I.e. till it is sent through the Sandesha2TransportSender.
 			makeConnectionRMMessage.setProperty(Sandesha2Constants.QUALIFIED_FOR_SENDING, Sandesha2Constants.VALUE_FALSE);
 			
-			SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey);
+	        SandeshaUtil.executeAndStore(makeConnectionRMMessage, makeConnectionMsgStoreKey, storageManager);
 			
 			senderBeanMgr.insert(makeConnectionSenderBean);			
 		}

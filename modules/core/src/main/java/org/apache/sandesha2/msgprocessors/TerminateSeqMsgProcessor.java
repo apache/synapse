@@ -349,7 +349,7 @@ public class TerminateSeqMsgProcessor extends WSRMMessageSender implements MsgPr
 		return terminateSeqResponseRMMsg;
 	}
 
-	public boolean processOutMessage(RMMsgContext rmMsgCtx) throws AxisFault {
+	public boolean processOutMessage(RMMsgContext rmMsgCtx, Transaction transaction) throws AxisFault {
 
 		if (log.isDebugEnabled())
 			log.debug("Enter: TerminateSeqMsgProcessor::processOutMessage");

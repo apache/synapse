@@ -269,7 +269,7 @@
             </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
-    <wsdl:service name="SimpleStockQuoteService">
+    <wsdl:service name="SecureStockQuoteService">
         <wsdl:port name="SimpleStockQuoteServiceSOAP11port_https"
                    binding="axis2:SimpleStockQuoteServiceSOAP11Binding">
             <soap:address location="https://asankha:9002/soap/SimpleStockQuoteService"/>

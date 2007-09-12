@@ -203,7 +203,6 @@ public abstract class BaseUtils {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
                 envelope = handleLegacyMessage(msgContext, message);
             }
         }
@@ -257,7 +256,7 @@ public abstract class BaseUtils {
             OMTextImpl textData = (OMTextImpl) soapFactory.createOMText(textPayload);
 
             if (wrapperQName == null) {
-                wrapperQName = BaseConstants.DEFAULT_BINARY_WRAPPER;
+                wrapperQName = BaseConstants.DEFAULT_TEXT_WRAPPER;
             }
             wrapper = soapFactory.createOMElement(wrapperQName, null);
             wrapper.addChild(textData);

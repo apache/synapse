@@ -133,7 +133,7 @@ public class JMSConnectionFactory {
             try {
                 log.info("Creating a JMS Queue with the JNDI name : " + destinationJNDIName +
                     " using the connection factory definition named : " + name);
-                JMSUtils.createJMSQueue(conFactory.createConnection(), destinationJNDIName);
+                JMSUtils.createDestination(conFactory, destinationJNDIName);
 
                 destinationName = getPhysicalDestinationName(destinationJNDIName);
                 
@@ -298,7 +298,7 @@ public class JMSConnectionFactory {
         }
 
         try {
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = JMSUtils.createSession(connection, false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = null;
 
             try {
@@ -306,10 +306,10 @@ public class JMSConnectionFactory {
 
             } catch (NameNotFoundException e) {
                 log.warn("Cannot find destination : " + destinationJNDIname + ". Creating a Queue");
-                destination = session.createQueue(destinationJNDIname);
+                destination = JMSUtils.createDestination(session, destinationJNDIname);
             }
 
-            MessageConsumer consumer = session.createConsumer(destination);
+            MessageConsumer consumer = JMSUtils.createConsumer(session, destination);
             consumer.setMessageListener(jmsMessageReceiver);
             jmsSessions.put(destinationJNDIname, session);
 

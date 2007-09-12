@@ -19,6 +19,7 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.ConfigurationContext;
@@ -34,6 +35,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.LogFactory;
 
 import javax.jms.*;
+import javax.jms.Queue;
 import javax.activation.DataHandler;
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -169,9 +171,13 @@ public class JMSSender extends AbstractTransportSender {
                 destination = jmsOut.getDestination();
             }
 
-            String replyDestName = (String) msgCtx.getProperty(JMSConstants.JMS_WAIT_REPLY);
+            String replyDestName = (String) msgCtx.getProperty(JMSConstants.JMS_REPLY_TO);
             if (replyDestName != null) {
-                replyDestination = jmsOut.getReplyDestination(replyDestName);
+                if (jmsConnectionFactory != null) {
+                    replyDestination = jmsConnectionFactory.getDestination(replyDestName);
+                } else {
+                    replyDestination = jmsOut.getReplyDestination(replyDestName);
+                }
             }
 
             // now we are going to use the JMS session, but if this was a session from a
@@ -181,6 +187,7 @@ public class JMSSender extends AbstractTransportSender {
 
                 // convert the axis message context into a JMS Message that we can send over JMS
                 Message message = null;
+                String correlationId = null;
                 try {
                     message = createJMSMessage(msgCtx, session);
                 } catch (JMSException e) {
@@ -198,6 +205,14 @@ public class JMSSender extends AbstractTransportSender {
                 if (waitForResponse) {
                     replyDestination = JMSUtils.setReplyDestination(
                         replyDestination, session, message);
+                    // force the use of a JMS correlation ID if synchronous
+                    try {
+                        correlationId = message.getJMSCorrelationID();
+                        if (correlationId == null) {
+                            correlationId = UUIDGenerator.getUUID();
+                            message.setJMSCorrelationID(correlationId);
+                        }
+                    } catch (JMSException ignore) {}
                 }
 
                 // send the outgoing message over JMS to the destination selected
@@ -205,7 +220,7 @@ public class JMSSender extends AbstractTransportSender {
 
                 // if we are expecting a synchronous response back for the message sent out
                 if (waitForResponse) {
-                    waitForResponseAndProcess(session, replyDestination, msgCtx);
+                    waitForResponseAndProcess(session, replyDestination, msgCtx, correlationId);
                 }
             }
 
@@ -228,9 +243,25 @@ public class JMSSender extends AbstractTransportSender {
      * @throws AxisFault on error
      */
     private void waitForResponseAndProcess(Session session, Destination replyDestination,
-        MessageContext msgCtx) throws AxisFault {
+        MessageContext msgCtx, String correlationId) throws AxisFault {
+
         try {
-            MessageConsumer consumer = session.createConsumer(replyDestination);
+            MessageConsumer consumer = null;
+            if (replyDestination instanceof Queue) {
+                if (correlationId != null) {
+                    consumer = ((QueueSession) session).createReceiver((Queue) replyDestination,
+                        "JMSCorrelationID = '" + correlationId + "'");
+                } else {
+                    consumer = ((QueueSession) session).createReceiver((Queue) replyDestination);
+                }
+            } else {
+                if (correlationId != null) {
+                    consumer = ((TopicSession) session).createSubscriber((Topic) replyDestination,
+                        correlationId, false);
+                } else {
+                    consumer = ((TopicSession) session).createSubscriber((Topic) replyDestination);
+                }
+            }
 
             // how long are we willing to wait for the sync response
             long timeout = JMSConstants.DEFAULT_JMS_TIMEOUT;
@@ -241,7 +272,8 @@ public class JMSSender extends AbstractTransportSender {
 
             if (log.isDebugEnabled()) {
                 log.debug("Waiting for a maximum of " + timeout +
-                    "ms for a response message to destination : " + replyDestination);
+                    "ms for a response message to destination : " + replyDestination +
+                    " with JMS correlation ID : " + correlationId);
             }
 
             Message reply = consumer.receive(timeout);
@@ -250,7 +282,8 @@ public class JMSSender extends AbstractTransportSender {
 
             } else {
                 log.warn("Did not receive a JMS response within " +
-                    timeout + " ms to destination : " + replyDestination);
+                    timeout + " ms to destination : " + replyDestination +
+                    " with JMS correlation ID : " + correlationId);
             }
 
         } catch (JMSException e) {

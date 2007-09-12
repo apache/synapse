@@ -50,6 +50,7 @@ import javax.activation.DataHandler;
 import javax.naming.Context;
 import java.io.*;
 import java.util.*;
+import java.nio.ByteBuffer;
 
 /**
  * Miscallaneous methods used for the JMS transport
@@ -75,10 +76,33 @@ public class JMSUtils extends BaseUtils {
      */
     public static String createJMSQueue(Connection con, String destinationJNDIName) throws JMSException {
         try {
-            Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            QueueSession session = ((QueueConnection) con).createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
             Queue queue = session.createQueue(destinationJNDIName);
-            log.info("JMS Destination with JNDI name : " + destinationJNDIName + " created");
+            log.info("JMS Queue with JNDI name : " + destinationJNDIName + " created");
             return queue.getQueueName();
+
+        } finally {
+            try {
+                con.close();
+            } catch (JMSException ignore) {}
+        }
+    }
+
+    /**
+     * Create a JMS Topic using the given connection with the JNDI destination name, and return the
+     * JMS Destination name of the created queue
+     *
+     * @param con the JMS Connection to be used
+     * @param destinationJNDIName the JNDI name of the Topic to be created
+     * @return the JMS Destination name of the created Topic
+     * @throws JMSException on error
+     */
+    public static String createJMSTopic(Connection con, String destinationJNDIName) throws JMSException {
+        try {
+            TopicSession session = ((TopicConnection) con).createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+            Topic topic = session.createTopic(destinationJNDIName);
+            log.info("JMS Topic with JNDI name : " + destinationJNDIName + " created");
+            return topic.getTopicName();
 
         } finally {
             try {
@@ -301,7 +325,7 @@ public class JMSUtils extends BaseUtils {
         if (replyDestination == null) {
            try {
                // create temporary queue to receive the reply
-               replyDestination = session.createTemporaryQueue();
+               replyDestination = createTemporaryDestination(session);
            } catch (JMSException e) {
                handleException("Error creating temporary queue for response");
            }
@@ -343,7 +367,7 @@ public class JMSUtils extends BaseUtils {
                 }
 
                 try {
-                    destination = session.createQueue(name);
+                    destination = createDestination(session, name);
                 } catch (JMSException e) {
                     handleException("Error creating destination Queue : " + name, e);
                 }
@@ -604,18 +628,79 @@ public class JMSUtils extends BaseUtils {
     }
 
     public byte[] getMessageBinaryPayload(Object message) {
+
         if (message instanceof BytesMessage) {
             BytesMessage bytesMessage = (BytesMessage) message;
-            byte[] msgBytes;
+            ByteBuffer msgBytes = ByteBuffer.allocate(1024);
             try {
-                msgBytes = new byte[(int) bytesMessage.getBodyLength()];
-                bytesMessage.reset();
-                bytesMessage.readBytes(msgBytes);
+                while (true) {
+                    byte[] temp = new byte[1024];
+                    int read = bytesMessage.readBytes(temp);
+                    if (read > 0) {
+                        msgBytes.put(temp, 0, read);
+                    } else {
+                        msgBytes.flip();
+                        return msgBytes.array();
+                    }
+                }
 
             } catch (JMSException e) {
                 handleException("Error reading JMS binary message payload", e);
             }
         }
         return null;
+    }
+
+    // ----------- JMS 1.0.2b compatibility methods -------------
+    public static Session createSession(Connection con,
+        boolean transacted, int acknowledgeMode) throws JMSException {
+
+        if (con instanceof QueueConnection) {
+            return ((QueueConnection) con).createQueueSession(transacted, acknowledgeMode);
+        } else {
+            return ((TopicConnection) con).createTopicSession(transacted, acknowledgeMode);
+        }
+    }
+
+    public static Destination createDestination(Session session, String destName)
+        throws JMSException {
+
+        if (session instanceof QueueSession) {
+            return ((QueueSession) session).createQueue(destName);
+        } else {
+            return ((TopicSession) session).createTopic(destName);
+        }
+    }
+
+    public static void createDestination(ConnectionFactory conFactory,
+        String destinationJNDIName) throws JMSException {
+
+        if (conFactory instanceof QueueConnectionFactory) {
+            JMSUtils.createJMSQueue(
+                ((QueueConnectionFactory) conFactory).createQueueConnection(),
+                destinationJNDIName);
+        } else {
+            JMSUtils.createJMSTopic(
+                ((TopicConnectionFactory) conFactory).createTopicConnection(),
+                destinationJNDIName);
+        }
+    }
+    public static MessageConsumer createConsumer(Session session, Destination dest)
+        throws JMSException {
+
+        if (dest instanceof Queue) {
+            return ((QueueSession) session).createReceiver((Queue) dest);
+        } else {
+            return ((TopicSession) session).createSubscriber((Topic) dest);
+        }
+    }
+
+    public static Destination createTemporaryDestination(Session session) throws JMSException {
+
+        if (session instanceof QueueSession) {
+            return ((QueueSession) session).createTemporaryQueue();
+        } else {
+            return ((TopicSession) session).createTemporaryTopic();
+        }
     }
 }

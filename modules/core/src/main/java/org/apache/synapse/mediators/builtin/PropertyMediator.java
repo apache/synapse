@@ -100,7 +100,7 @@ public class PropertyMediator extends AbstractMediator {
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
                 org.apache.axis2.context.MessageContext axis2MessageCtx =
                         axis2smc.getAxis2MessageContext();
-                axis2MessageCtx.setProperty(name, resultValue);
+                axis2MessageCtx.getOptions().setProperty(name, resultValue);
 
             } else if (Constants.SCOPE_TRANSPORT.equals(scope)
                     && smc instanceof Axis2MessageContext) {

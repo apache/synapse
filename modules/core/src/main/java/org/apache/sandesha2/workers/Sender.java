@@ -493,8 +493,14 @@ public class Sender extends SandeshaThread {
 				// Emit a message to warn the user that MakeConnections are not arriving to pick
 				// messages up
 				if(log.isWarnEnabled()) {
-					String messageType = Integer.toString(bean.getMessageType());
-					String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPolling, messageType);
+					String message = null;
+					if (bean.getMessageType() == Sandesha2Constants.MessageTypes.APPLICATION)					
+						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPolling);					
+					else
+					{
+						String messageType = Integer.toString(bean.getMessageType());
+						message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.noPollingProtocol, messageType);
+					}
 					log.warn(message);
 				}
 				

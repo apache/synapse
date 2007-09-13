@@ -37,6 +37,8 @@ import org.apache.sandesha2.storage.beans.RMSBean;
 import org.apache.sandesha2.util.MsgInitializer;
 import org.apache.sandesha2.util.SandeshaUtil;
 
+import java.util.Map;
+
 public class SequenceIDDispatcher extends AbstractDispatcher {
 
 	private final String NAME = "SequenceIDDIspatcher";
@@ -79,7 +81,10 @@ public class SequenceIDDispatcher extends AbstractDispatcher {
 
 				//If this is the RMD of the sequence 				
 				RMDBean rmdBean = SandeshaUtil.getRMDBeanFromSequenceId(storageManager, sequenceID);
-				String serviceName = rmdBean.getServiceName();
+                String serviceName = null;
+                if (rmdBean != null ) {
+                    serviceName = rmdBean.getServiceName();
+                }
 				if (serviceName != null) {
 					service = configurationContext.getAxisConfiguration()
 							.getService(serviceName);

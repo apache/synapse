@@ -71,6 +71,13 @@ public class InvokerBean extends RMBean {
 		this.setSequenceID(sequenceId);
 	}
 
+	public InvokerBean(InvokerBean beanToCopy) {
+		context = beanToCopy.getContext();
+		messageContextRefKey = beanToCopy.getMessageContextRefKey();
+		msgNo = beanToCopy.getMsgNo();
+		sequenceID = beanToCopy.getSequenceID();
+	}
+	
 	/**
 	 * @return Returns the messageContextRefKey.
 	 */

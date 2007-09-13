@@ -128,8 +128,9 @@ abstract class InMemoryBeanMgr {
 								SandeshaMessageKeys.nonUniqueResult,
 								result.toString(),
 								candidate.toString());
-						log.error(message);
-						throw new SandeshaException (message);
+						SandeshaException e = new SandeshaException(message);
+						log.error(message, e);
+						throw e;
 					}
 				}
 			}

@@ -416,7 +416,7 @@ public class Sender extends SandeshaThread {
 				if (inMsg != null)
 					t = (RequestResponseTransport) inMsg.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 	
-				if((t != null && !RequestResponseTransportStatus.WAITING.equals(t.getStatus()))) {
+				if((t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus()))) {
 					if(log.isWarnEnabled()) {
 						String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.freeingTransport);
 						log.warn(message);

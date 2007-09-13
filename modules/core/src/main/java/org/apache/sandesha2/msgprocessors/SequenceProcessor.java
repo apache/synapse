@@ -352,14 +352,14 @@ public class SequenceProcessor {
 			
 			// If the MEP doesn't need the backchannel, and nor do we, we should signal it so that it
 			// can close off as soon as possible.
-			result = InvocationResponse.ABORT;
-			RequestResponseTransport t = null;
-			t = (RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
-			
-			// Tell the transport that there will be no response message
-			if(t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus())) {
-				TransportUtils.setResponseWritten(msgCtx, false);
-				t.acknowledgeMessage(msgCtx);
+			if (backchannelFree) {
+				RequestResponseTransport t = null;
+				t = (RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
+
+				if(t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus())) {
+					TransportUtils.setResponseWritten(msgCtx, false);
+					t.acknowledgeMessage(msgCtx);
+				}
 			}
 		}
 		

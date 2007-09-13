@@ -43,6 +43,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -356,6 +357,38 @@ public class SandeshaClient {
 		// cleanup previous sequence
 		cleanupTerminatedSequence(to, oldSequenceKey, SandeshaUtil.getSandeshaStorageManager(configurationContext, configurationContext.getAxisConfiguration()));
 		
+		// If the client requested async operations, mint a replyTo EPR
+		boolean resetReply = false;
+		if(options.isUseSeparateListener() && options.getReplyTo() == null) {
+			try {
+				if(log.isDebugEnabled()) log.debug("Creating replyTo EPR");
+				
+				// Try to work out which transport to use. If the user didn't choose one
+				// then we use the To address to take a guess.
+				TransportOutDescription senderTransport = options.getTransportOut();
+				String transportName = null;
+				if(senderTransport != null) {
+					transportName = senderTransport.getName();
+				}
+
+				if(transportName == null) {
+					int index = to.indexOf(':');
+					if(index > 0) transportName = to.substring(0, index);
+				}
+
+				EndpointReference replyTo = serviceContext.getMyEPR(transportName);
+				if(replyTo != null) {
+					options.setReplyTo(replyTo);
+					resetReply = true;
+				}
+				
+				if(log.isDebugEnabled()) log.debug("Created replyTo EPR: " + replyTo);
+
+			} catch(AxisFault e) {
+				if(log.isDebugEnabled()) log.debug("Caught exception", e);
+				throw new SandeshaException(e);
+			}
+		}
 		try {			
 			//just to inform the sender.
 			serviceClient.fireAndForget (null);
@@ -364,6 +397,7 @@ public class SandeshaClient {
 		}
 		finally {
 			options.setAction(oldAction);
+			if(resetReply) options.setReplyTo(null);
 			
 			options.setProperty(SandeshaClientConstants.DUMMY_MESSAGE, Sandesha2Constants.VALUE_FALSE);
 			options.setProperty(SandeshaClientConstants.SEQUENCE_KEY, oldSequenceKey);

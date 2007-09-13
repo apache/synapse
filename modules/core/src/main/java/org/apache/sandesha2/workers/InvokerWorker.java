@@ -59,6 +59,13 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			InvokerBean invokerBean = invokerBeanMgr.retrieve(messageContextKey);
 
 			msgToInvoke = storageManager.retrieveMessageContext(messageContextKey, configurationContext);
+
+			// ending the transaction before invocation.
+			if(transaction != null) {
+				transaction.commit();
+				transaction = storageManager.getTransaction();
+			}
+
 			RMMsgContext rmMsg = MsgInitializer.initializeMessage(msgToInvoke);
 
 			// Lock the RMD Bean just to avoid deadlocks
@@ -69,11 +76,6 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 			// removing the corresponding message context as well.
 			storageManager.removeMessageContext(messageContextKey);
 
-			// ending the transaction before invocation.
-			if(transaction != null) {
-				transaction.commit();
-				transaction = null;
-			}
 			
 			try {
 
@@ -112,11 +114,17 @@ public class InvokerWorker extends SandeshaWorker implements Runnable {
 		              }
 		            }
 		        }
+		        
+		        if (transaction != null && transaction.isActive())
+		        	transaction.commit();
 
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
 					log.debug("Exception :", e);
 
+				if (transaction != null && transaction.isActive())
+					transaction.rollback();
+				
 				handleFault(rmMsg, e);
 			}
 

@@ -152,8 +152,9 @@ public class PollingManager extends SandeshaThread {
 			if (log.isDebugEnabled())
 				log.debug("Polling rms " + beanToPoll);
 			// The sequence is there, but we still only poll if we are expecting reply messages,
-			// or if we don't have clean ack state.
-			boolean cleanAcks = false;
+			// or if we don't have clean ack state. (We assume acks are clean, and only unset
+			// this if we find evidence to the contrary).
+			boolean cleanAcks = true;
 			if (beanToPoll.getNextMessageNumber() > -1)
 				cleanAcks = AcknowledgementManager.verifySequenceCompletion(beanToPoll.getClientCompletedMessages(), beanToPoll.getNextMessageNumber());
 			long  repliesExpected = beanToPoll.getExpectedReplies();

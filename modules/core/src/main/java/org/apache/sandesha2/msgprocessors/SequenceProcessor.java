@@ -30,6 +30,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.engine.Handler.InvocationResponse;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.axis2.transport.RequestResponseTransport.RequestResponseTransportStatus;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -332,6 +333,8 @@ public class SequenceProcessor {
 		boolean sendAck = false;
 		
 		boolean ackBackChannel = SpecSpecificConstants.sendAckInBackChannel (rmMsgCtx.getMessageType());
+		// If we are processing an inOnly message we must ack the back channel otherwise the connection stays open
+		if (!ackBackChannel && mep == WSDLConstants.MEP_CONSTANT_IN_ONLY) ackBackChannel = true;
 		EndpointReference acksTo = new EndpointReference (bean.getAcksToEPR());
 		if (acksTo.hasAnonymousAddress() && backchannelFree && ackBackChannel) {
 			boolean responseWritten = TransportUtils.isResponseWritten(msgCtx);
@@ -354,7 +357,7 @@ public class SequenceProcessor {
 			t = (RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 			
 			// Tell the transport that there will be no response message
-			if(t != null) {
+			if(t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus())) {
 				TransportUtils.setResponseWritten(msgCtx, false);
 				t.acknowledgeMessage(msgCtx);
 			}
@@ -369,7 +372,7 @@ public class SequenceProcessor {
 		{
 			if (rmMsgCtx.getRelatesTo()==null) {
 				if (log.isDebugEnabled())
-					log.debug("Exit: SequenceProcessor::processReliableMessage, got WSRM 1.0 lastmessage");
+					log.debug("SequenceProcessor::processReliableMessage, got WSRM 1.0 lastmessage");
 				msgCtx.getAxisOperation().setMessageReceiver(new RMMessageReceiver ());
 			}
 		}

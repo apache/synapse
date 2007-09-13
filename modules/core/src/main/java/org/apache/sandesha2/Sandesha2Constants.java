@@ -558,6 +558,10 @@ public interface Sandesha2Constants {
 	
 	static final String propertiesToCopyFromReferenceRequestMessage = "propertiesToCopyFromReferenceRequestMessage";
 	
+	static final String propertiesToCopyFromReferenceMessageAsStringArray = "propertiesToCopyFromReferenceMessageAsStringArray";
+	
+	static final String propertiesToCopyFromReferenceRequestMessageAsStringArray = "propertiesToCopyFromReferenceRequestMessageAsStringArray";
+	
 	static final String MSG_NO_OF_IN_MSG = "MsgNoOfInMsg";
 	
 	static final String MAKE_CONNECTION_RESPONSE = "MakeConnectionResponse";

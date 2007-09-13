@@ -27,6 +27,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.description.AxisDescription;
 import org.apache.axis2.description.AxisModule;
 import org.apache.axis2.description.AxisOperation;
@@ -198,6 +199,32 @@ public class SandeshaModule implements Module, ModulePolicyExtension {
 					}
 				}
 		);
+		
+		Parameter propertiesFromRefMsg = module.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceMessage);
+		if (propertiesFromRefMsg!=null) {
+			String value = (String) propertiesFromRefMsg.getValue();
+			if (value!=null) {
+				value = value.trim();
+				String[] propertyNames = value.split(",");
+				Parameter param = new Parameter();
+				param.setName(Sandesha2Constants.propertiesToCopyFromReferenceMessageAsStringArray);
+				param.setValue(propertyNames);
+				module.addParameter(param);
+			}
+		}
+		
+		Parameter propertiesFromRefReqMsg = module.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessage);
+		if (propertiesFromRefReqMsg!=null) {
+			String value = (String) propertiesFromRefReqMsg.getValue();
+			if (value!=null) {
+				value = value.trim();
+				String[] propertyNames = value.split(",");
+				Parameter param = new Parameter();
+				param.setName(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessageAsStringArray);
+				param.setValue(propertyNames);
+				module.addParameter(param);
+			}
+		}
 
 		if(log.isDebugEnabled()) log.debug("Exit: SandeshaModule::init");
 	}

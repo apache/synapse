@@ -465,12 +465,10 @@ public class SandeshaUtil {
 			throw new SandeshaException (message);
 		}
 		
-		Parameter propertiesFromRefMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceMessage);
+		Parameter propertiesFromRefMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceMessageAsStringArray);
 		if (propertiesFromRefMsg!=null) {
-			String value = (String) propertiesFromRefMsg.getValue();
-			if (value!=null) {
-				value = value.trim();
-				String[] propertyNames = value.split(",");
+			String[] propertyNames = (String[]) propertiesFromRefMsg.getValue();
+			if (propertyNames!=null) {
 				for (int i=0;i<propertyNames.length;i++) {
 					String tmp = propertyNames[i];
 					String propertyName = null;
@@ -493,17 +491,15 @@ public class SandeshaUtil {
 			}
 		}
 		
-		Parameter propertiesFromRefReqMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessage);
+		Parameter propertiesFromRefReqMsg = axisModule.getParameter(Sandesha2Constants.propertiesToCopyFromReferenceRequestMessageAsStringArray);
 		OperationContext referenceOpCtx = fromMessage.getOperationContext();
 		MessageContext referenceRequestMessage = null;
 		if (referenceOpCtx!=null) 
 			referenceRequestMessage=referenceOpCtx.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 		
 		if (propertiesFromRefReqMsg!=null && referenceRequestMessage!=null) {
-			String value = (String) propertiesFromRefReqMsg.getValue();
-			if (value!=null) {
-				value = value.trim();
-				String[] propertyNames = value.split(",");
+			String[] propertyNames = (String[]) propertiesFromRefReqMsg.getValue();
+			if (propertyNames!=null) {
 				for (int i=0;i<propertyNames.length;i++) {
 					String propertyName = propertyNames[i];
 					Object val = referenceRequestMessage.getProperty(propertyName);

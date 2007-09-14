@@ -77,6 +77,9 @@
     <!--POJO deployer , this will alow users to drop .class file and make that into a service-->
     <deployer extension=".class" directory="pojo" class="org.apache.axis2.deployment.POJODeployer"/>
 
+    <!-- Mediator deployer -->
+    <deployer extension="jar" directory="mediators" class="org.apache.synapse.core.axis2.MediatorDeployer"/>
+
     <!-- Following parameter will set the host name for the epr-->
     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->
 

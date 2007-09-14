@@ -118,6 +118,15 @@ public class MediatorSerializerFinder {
         }
     }
 
+    /**
+     * This method will return the serializer Map registered with the Finder
+     * 
+     * @return Map of serilaizers already registered with the Finder
+     */
+    public Map getSerializerMap() {
+        return serializerMap;
+    }
+
     private static void handleException(String msg) {
         log.error(msg);
         throw new SynapseException(msg);

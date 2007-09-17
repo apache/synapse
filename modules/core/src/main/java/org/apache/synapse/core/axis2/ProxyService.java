@@ -77,91 +77,83 @@ public class ProxyService {
     private static final Log log = LogFactory.getLog(ProxyService.class);
     private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
     /**
-     * The proxy service name
+     * The name of the proxy service
      */
     private String name;
     /**
-     * The proxy service description
+     * The proxy service description. This could be optional informative text about the service
      */
     private String description;
     /**
-     * The transport/s over which this service should be exposed
+     * The transport/s over which this service should be exposed, or defaults to all available
      */
-    //private String transports;
     private ArrayList transports;
     /**
-     * The target endpoint, if assigned
+     * The target endpoint key
      */
     private String targetEndpoint = null;
     /**
-     * The target inSequence, if assigned
+     * The target inSequence key
      */
     private String targetInSequence = null;
     /**
-     * The target outSequence, if assigned
+     * The target outSequence key
      */
     private String targetOutSequence = null;
     /**
-     * The target faultSequence, if assigned
+     * The target faultSequence key
      */
     private String targetFaultSequence = null;
     /**
-     * The target endpoint, if assigned
+     * The inlined definition of the target endpoint, if defined
      */
     private Endpoint targetInLineEndpoint = null;
     /**
-     * The target inSequence, if assigned
+     * The inlined definition of the target in-sequence, if defined
      */
     private SequenceMediator targetInLineInSequence = null;
     /**
-     * The target outSequence, if assigned
+     * The inlined definition of the target out-sequence, if defined
      */
     private SequenceMediator targetInLineOutSequence = null;
     /**
-     * The target faultSequence, if assigned
+     * The inlined definition of the target fault-sequence, if defined
      */
     private SequenceMediator targetInLineFaultSequence = null;
-    // if a target endpoint or sequence is not specified,
-    // the default Synapse main mediator will be used
     /**
-     * A list parameters
+     * A list of any service parameters (e.g. JMS parameters etc)
      */
     private Map parameters = new HashMap();
-
     /**
-     * The key for the base WSDL, if specified
+     * The key for the base WSDL
      */
     private String wsdlKey;
     /**
-     * The URI for the base WSDL, if specified
+     * The URI for the base WSDL, if defined as a URL
      */
     private URI wsdlURI;
     /**
-     * Inline XML representation of wsdl
+     * The inlined representation of the service WSDL, if defined inline
      */
     private Object inLineWSDL;
-    /**
-     * The keys for any supplied schemas
-     */   // todo: do we need this
-    private List schemaKeys = new ArrayList();
     /**
      * The keys for any supplied policies that would apply at the service level
      */
     private List serviceLevelPolicies = new ArrayList();
     /**
-     * Should WS RM (default configuration) be engaged on this service
+     * Should WS RM be engaged on this service
      */
     private boolean wsRMEnabled = false;
     /**
-     * Should WS Sec (default configuration) be engaged on this service
+     * Should WS Sec be engaged on this service
      */
     private boolean wsSecEnabled = false;
     /**
-     * This will say weather need to start the service at the load or not
+     * Should this service be started by default on initialization?
      */
     private boolean startOnLoad = true;
     /**
-     * This will hold the status of the proxy weather it is running or not
+     * Is this service running now?
      */
     private boolean running = false;
 
@@ -176,9 +168,13 @@ public class ProxyService {
      */
     protected int traceState = Constants.TRACING_UNSET;
 
-    public ProxyService() {
-    }
-
+    /**
+     * Build the underlying Axis2 service from the Proxy service definition
+     *
+     * @param synCfg the Synapse configuration
+     * @param axisCfg the Axis2 configuration
+     * @return the Axis2 service for the Proxy
+     */
     public AxisService buildAxisService(SynapseConfiguration synCfg, AxisConfiguration axisCfg) {
 
         AxisService proxyService = null;
@@ -282,7 +278,7 @@ public class ProxyService {
         }
         proxyService.setName(name);
         if (description != null) {
-            proxyService.setServiceDescription(description);
+            proxyService.setDocumentation(description);
         }
 
         // process transports and expose over requested transports. If none
@@ -467,14 +463,6 @@ public class ProxyService {
 
     public void setWSDLKey(String wsdlKey) {
         this.wsdlKey = wsdlKey;
-    }
-
-    public List getSchemas() {
-        return schemaKeys;
-    }
-
-    public void setSchemas(List schemas) {
-        this.schemaKeys = schemas;
     }
 
     public List getServiceLevelPolicies() {

@@ -27,6 +27,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.synapse.Constants;
+import org.apache.synapse.core.axis2.SynapseInitializationModule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,9 +36,9 @@ import java.io.File;
 /**
  * This will be the Module class for the Synapse handler based mediations inside axis2 server. This
  * will just set the default system property of SYNAPSE_XML to the repository/conf/synapse.xml in
- * the axis2 servers repository and call the normal SynapseModule.init()
+ * the axis2 servers repository and call the normal SynapseInitializationModule.init()
  *
- * @see org.apache.synapse.core.axis2.SynapseModule
+ * @see org.apache.synapse.core.axis2.SynapseInitializationModule
  */
 public class SynapseModule implements Module {
 
@@ -47,16 +48,16 @@ public class SynapseModule implements Module {
     private static final Log log = LogFactory.getLog(SynapseModule.class);
 
     /**
-     * Normal SynapseModule which initiates the Synapse
+     * Normal SynapseInitializationModule which initiates the Synapse
      */
-    private org.apache.synapse.core.axis2.SynapseModule module = null;
+    private SynapseInitializationModule initializationModule = null;
 
     /**
      * This method will call the normal initiation after setting the SYNAPSE_XML file to get from
      * the axis2 respository/conf folder
      * 
      * @param configurationContext - ConfigurationContext of the Axis2 env
-     * @param axisModule - AxisModule describing handler module of Synapse
+     * @param axisModule - AxisModule describing handler initializationModule of Synapse
      * @throws AxisFault - incase of a failure in initiation
      */
     public void init(ConfigurationContext configurationContext,
@@ -66,69 +67,69 @@ public class SynapseModule implements Module {
                     getAxisConfiguration().getRepository().getPath() + "/conf/synapse.xml");
         }
         if (new File(System.getProperty(Constants.SYNAPSE_XML)).exists()) {
-            module = new org.apache.synapse.core.axis2.SynapseModule();
-            module.init(configurationContext, axisModule);
+            initializationModule = new org.apache.synapse.core.axis2.SynapseInitializationModule();
+            initializationModule.init(configurationContext, axisModule);
         } else {
-            handleException("Unable to initialize the Synapse module. Couldn't " +
+            handleException("Unable to initialize the Synapse initializationModule. Couldn't " +
                     "find the configuration file in the location "
                     + System.getProperty(Constants.SYNAPSE_XML));
         }
     }
 
     /**
-     * Just do what the main SynapseModule tells you to do
+     * Just do what the main SynapseInitializationModule tells you to do
      * 
      * @param axisDescription
      * @throws AxisFault
      */
     public void engageNotify(AxisDescription axisDescription) throws AxisFault {
-        if (module != null) {
-            module.engageNotify(axisDescription);
+        if (initializationModule != null) {
+            initializationModule.engageNotify(axisDescription);
         } else {
-            handleException("Couldn't find the module");
+            handleException("Couldn't find the initializationModule");
         }
     }
 
     /**
-     * Just do what the main SynapseModule tells you to do
+     * Just do what the main SynapseInitializationModule tells you to do
      * 
      * @param assertion
      * @return
      */
     public boolean canSupportAssertion(Assertion assertion) {
-        if (module != null) {
-            return module.canSupportAssertion(assertion);
+        if (initializationModule != null) {
+            return initializationModule.canSupportAssertion(assertion);
         } else {
             return false;
         }
     }
 
     /**
-     * Just do what the main SynapseModule tells you to do
+     * Just do what the main SynapseInitializationModule tells you to do
      * 
      * @param policy
      * @param axisDescription
      * @throws AxisFault
      */
     public void applyPolicy(Policy policy, AxisDescription axisDescription) throws AxisFault {
-        if (module != null) {
-            module.applyPolicy(policy, axisDescription);
+        if (initializationModule != null) {
+            initializationModule.applyPolicy(policy, axisDescription);
         } else {
-            handleException("Couldn't find the module");
+            handleException("Couldn't find the initializationModule");
         }
     }
 
     /**
-     * Just do what the main SynapseModule tells you to do
+     * Just do what the main SynapseInitializationModule tells you to do
      * 
      * @param configurationContext
      * @throws AxisFault
      */
     public void shutdown(ConfigurationContext configurationContext) throws AxisFault {
-        if (module != null) {
-            module.shutdown(configurationContext);
+        if (initializationModule != null) {
+            initializationModule.shutdown(configurationContext);
         } else {
-            handleException("Couldn't find the module");
+            handleException("Couldn't find the initializationModule");
         }
     }
 

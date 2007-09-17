@@ -1,12 +1,9 @@
 package org.apache.synapse.config.xml;
 
-import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.endpoints.EndpointAbstractFactory;
-import org.apache.synapse.mediators.eip.splitter.CloneMediator;
-import org.apache.synapse.mediators.eip.splitter.IterateMediator;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.eip.splitter.CloneMediator;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;

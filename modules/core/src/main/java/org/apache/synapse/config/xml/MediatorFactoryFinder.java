@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.ext.POJOCommandMediator;
 import org.apache.synapse.config.xml.XSLTMediatorFactory;
 import org.apache.synapse.config.xml.ValidateMediatorFactory;
 import org.apache.synapse.config.XMLToObjectMapper;
@@ -65,7 +64,8 @@ public  class MediatorFactoryFinder implements XMLToObjectMapper {
         ClassMediatorFactory.class,
         ValidateMediatorFactory.class,
         XSLTMediatorFactory.class,
-        POJOCommandMediatorFactory.class
+        POJOCommandMediatorFactory.class,
+        CloneMediatorFactory.class
     };
 
     private static MediatorFactoryFinder instance = null;

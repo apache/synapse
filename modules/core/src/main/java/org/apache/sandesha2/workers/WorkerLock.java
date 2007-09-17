@@ -26,9 +26,10 @@ public class WorkerLock {
 
 	}
 	
-  public synchronized void addWork (String work, Object owner) {
-    if(locks.containsKey(work)) return;
+  public synchronized boolean addWork (String work, Object owner) {
+    if(locks.containsKey(work)) return false;
     locks.put(work, owner);
+	return true;
   }
 	
 	public synchronized void removeWork (String work) {

@@ -20,10 +20,12 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.engine.AxisConfigurator;
 import org.apache.axis2.modules.Module;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,7 +79,11 @@ public class SynapseModule implements Module {
             }
         } catch (UnknownHostException e) {
             log.warn("Unable to report hostname or IP address for tracing", e);
-        }   
+        }
+
+        // this will deploy the mediators in the mediator extensions folder
+        configurationContext.getAxisConfiguration().getConfigurator().loadServices();
+
         // Initializing the SynapseEnvironment and SynapseConfiguration
         log.info("Initializing the Synapse configuration ...");
         synCfg = initializeSynapse(configurationContext);

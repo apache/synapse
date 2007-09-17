@@ -20,12 +20,9 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.deployment.DeploymentEngine;
-import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.engine.AxisConfigurator;
 import org.apache.axis2.modules.Module;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,8 +35,6 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 
 import javax.xml.namespace.QName;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
@@ -50,9 +45,9 @@ import java.util.ArrayList;
  * This is the Synapse Module implementation class, which would initialize Synapse when it is
  * deployed onto an Axis2 configuration.
  */
-public class SynapseModule implements Module {
+public class SynapseInitializationModule implements Module {
 
-    private static final Log log = LogFactory.getLog(SynapseModule.class);
+    private static final Log log = LogFactory.getLog(SynapseInitializationModule.class);
 
     private static final String SYNAPSE_SERVICE_NAME = "synapse";
     private static final QName MEDIATE_OPERATION_Q_NAME = new QName("mediate");

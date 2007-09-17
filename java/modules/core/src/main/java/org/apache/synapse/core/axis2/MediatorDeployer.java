@@ -130,13 +130,15 @@ public class MediatorDeployer implements Deployer {
                     Class serClass = urlCl.loadClass(serClassName[i]);
                     MediatorSerializer serInst = (MediatorSerializer) serClass.newInstance();
                     MediatorSerializerFinder.getInstance()
-                            .getSerializerMap().put(serInst.getMediatorClassName(), serClass);
+                            .getSerializerMap().put(serInst.getMediatorClassName(), serInst);
                     log.info("Mediator loaded and registered for " +
                             "the serialization as: " + serInst.getMediatorClassName());
                 }
             } else {
-                handleException("Unable to find the MediatorSerializer implementation. " +
-                        "Unable to register the MediatorSerializer with the SerializerFinder");
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to find the MediatorSerializer implementation. " +
+                            "Unable to register the MediatorSerializer with the SerializerFinder");
+                }
             }
 
         } catch (IOException e) {

@@ -142,7 +142,7 @@ public class SequenceProcessor {
 			throw new SandeshaException(message);
 		}
 
-		if (bean==null && FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, false)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: SequenceProcessor::processReliableMessage, Unknown sequence");
 			return InvocationResponse.ABORT;

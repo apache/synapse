@@ -132,7 +132,7 @@ public class AckRequestedProcessor extends WSRMMessageSender {
 		}
 
 		// Check that the sequence requested exists
-		if (rmdBean == null || FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, piggybackedAckRequest)) {
+		if (FaultManager.checkForUnknownSequence(rmMsgCtx, sequenceId, storageManager, piggybackedAckRequest)) {
 			if (log.isDebugEnabled())
 				log.debug("Exit: AckRequestedProcessor::processAckRequestedHeader, Unknown sequence ");
 			return false;

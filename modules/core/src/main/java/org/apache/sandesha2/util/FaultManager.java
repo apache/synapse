@@ -575,8 +575,12 @@ public class FaultManager {
 		
 		String soapFaultSubcode = null;
 		String identifier = null;
+		boolean isSOAP11SequenceUnknownFault = false;
+		
 		if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(SOAPNamespaceValue)) {
 			// Need to get the sequence part from the Header.
+			if (log.isDebugEnabled()) 
+		    	log.debug("soap11");
 			try {
 				SequenceFault sequenceFault = (SequenceFault)rmMsgCtx.getMessagePart(Sandesha2Constants.MessageParts.SEQUENCE_FAULT);
 	      
@@ -585,6 +589,9 @@ public class FaultManager {
 					soapFaultSubcode = sequenceFault.getFaultCode().getFaultCode().getLocalPart();
 					// Get the identifier - if there is one.
 					identifier = sequenceFault.getFaultCode().getDetail();
+					isSOAP11SequenceUnknownFault = true;
+					if (log.isDebugEnabled()) 
+						log.debug("isSOAP11SequenceUnknownFault " + identifier);
 				} 
 	    		    	
 			} catch (SandeshaException e) {
@@ -602,7 +609,7 @@ public class FaultManager {
 		
 		// Get the identifier, if there is one.
 		SOAPFaultDetail detail = faultPart.getDetail();
-		if (detail != null)
+		if (detail != null && !isSOAP11SequenceUnknownFault)
 		{
 			OMElement identifierOM = detail.getFirstChildWithName(new QName(rmMsgCtx.getRMNamespaceValue(), 
 					Sandesha2Constants.WSRM_COMMON.IDENTIFIER));

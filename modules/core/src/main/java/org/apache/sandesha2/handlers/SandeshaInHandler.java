@@ -23,6 +23,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.MessageValidator;
@@ -126,6 +127,7 @@ public class SandeshaInHandler extends AbstractHandler {
 			AckRequestedProcessor reqProcessor = new AckRequestedProcessor();
 			if(reqProcessor.processAckRequestedHeaders(rmMsgCtx)){
 				returnValue = InvocationResponse.SUSPEND;
+				msgCtx.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
 			}
 			
 			// Process MessagePending headers

@@ -29,6 +29,10 @@
                  class="org.apache.synapse.core.axis2.SynapseDispatcher">
             <order after="SOAPMessageBodyBasedDispatcher" phase="Dispatch"/>
         </handler>
+        <handler name="SynapseMustUnderstandHandler"
+                 class="org.apache.synapse.core.axis2.SynapseMustUnderstandHandler">
+            <order after="SynapseDispatcher" phase="Dispatch"/>
+        </handler>
     </InFlow>
 
 </module>

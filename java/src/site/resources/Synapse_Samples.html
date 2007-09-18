@@ -2195,6 +2195,63 @@ perform a similar function to the messages discussed in sample 53.</p>
 
 <p></p>
 
+<h2><a name="Sample105">Sample 105:</a></h2>
+<pre>&lt;!-- routing messages without processing security headers --&gt;
+&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+    &lt;proxy name="StockQuoteProxy"&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri="http://localhost:9000/soap/SecureStockQuoteService"/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+            &lt;outSequence&gt;
+                &lt;send/&gt;
+            &lt;/outSequence&gt;
+        &lt;/target&gt;
+        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+    &lt;/proxy&gt;
+&lt;/definitions&gt;</pre>
+
+<p><strong>Objective: Routing the messages arrived to a proxy service without processing
+the MustUnderstand headers (Security header)</strong></p>
+
+<p><strong>Pre-Requisites:</strong><br>
+You may also need to download and install the unlimited strength policy files
+for your JDK before using Apache Rampart (e.g. see
+http://java.sun.com/javase/downloads/index_jdk5.jsp)</p>
+
+<p>Start the Synapse configuration numbered 105: i.e. synapse -sample 105<br>
+Start the Axis2 server and deploy the SecureStockQuoteService if not already
+done</p>
+
+<p></p>
+
+<p>The proxy service will recieve secure messages with security headers which are MustUnderstand.
+But hence element 'engageSec' is not present in the proxy configuration synapse
+will not engage that Apache Rampart on this proxy service. It is expected that an MustUnderstand
+failure exception on the AxisEngine would occur before the message arrives Synapse. But Synapse
+handles this message and gets it in by setting all the headers which are MustUnderstand and not
+processed to processed state. This will enable synapse to route the messages without reading the
+Security headers (just routing the messages from client to service, both of which are secure). To
+execute the client, send a stock quote request to the proxy service, and sign
+and encrypt the request by specifying the client side security policy as
+follows:</p>
+<pre>ant stockquote -Dtrpurl=http://localhost:8080/soap/StockQuoteProxy -Dpolicy=./../../repository/conf/sample/resources/policy/client_policy_3.xml</pre>
+
+<p>By following through the debug logs or TCPMon output, you could see that
+the request received by the proxy service was signed and encrypted. Also,
+looking up the WSDL of the proxy service by requesting the
+URL http://localhost:8080/soap/StockQuoteProxy?wsdl reveals the security
+policy attachments are not there and security is not engaged. When sending the message to the
+backend service, you could verify that the security headers were there as in the original
+message to synapse from client, and that the response received does use WS-Security,
+and forwarded back to the client without any modification. You should note that this wont be a
+security hole because the message inside synapse is signed and encrypted and can only be forwarded
+to a secure service to be usefull.</p>
+
 <h1><a name="Transport">Transports</a></h1>
 
 <h2><a name="Sample110">Sample 110:</a></h2>

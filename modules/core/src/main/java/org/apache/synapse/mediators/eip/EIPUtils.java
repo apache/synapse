@@ -19,26 +19,24 @@
 
 package org.apache.synapse.mediators.eip;
 
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.TransportInDescription;
+import org.apache.synapse.Constants;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.JaxenException;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utility methods for the EIP implementations

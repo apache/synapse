@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.apache.synapse.config.xml;
 
 import org.apache.synapse.mediators.eip.Target;
@@ -11,13 +30,31 @@ import org.apache.commons.logging.LogFactory;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ * This will build the Target util object for EIP mediators using
+ * &lt;target&gt; element specified as follows
+ *
+ * &lt;target (sequence="string reference")? (endpoint="string reference")?&gt;
+ *  (&lt;sequence&gt; | &lt;endpoinit&gt;)?
+ * &lt;/target&gt;
  */
 public class TargetFactory {
 
+    /**
+     * This will hold the logger for the logging purposes
+     */
     private static final Log log = LogFactory.getLog(TargetFactory.class);
+
+    /**
+     * Holds the QName of the target element in the xml configuration
+     */
     private static final QName TARGET_Q = new QName(Constants.SYNAPSE_NAMESPACE, "target");
 
+    /**
+     * This static method will be used to build the Target from the specified element
+     * 
+     * @param elem - OMElement describing the xml configuration of the target
+     * @return Target built by parsing the given element
+     */
     public static Target createTarget(OMElement elem) {
 
         if (!TARGET_Q.equals(elem.getQName())) {
@@ -65,6 +102,11 @@ public class TargetFactory {
         return target;
     }
 
+    /**
+     * This privaet method is used for the exception handling and logging purposes
+     *
+     * @param message - String message to be logged and the message of the exception
+     */
     private static void handleException (String message) {
         if (log.isDebugEnabled()) {
             log.debug(message);

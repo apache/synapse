@@ -28,7 +28,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -47,7 +47,7 @@ import java.util.List;
 public class HeaderMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(HeaderMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
 
@@ -92,15 +92,15 @@ public class HeaderMediator extends AbstractMediator {
                 trace.trace("Set Header : " + qName + " to : " + value);
             }
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
-                if (Constants.HEADER_TO.equals(qName.getLocalPart())) {
+                if (SynapseConstants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(new EndpointReference(value));
-                } else if (Constants.HEADER_FROM.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_FROM.equals(qName.getLocalPart())) {
                     synCtx.setFrom(new EndpointReference(value));
-                } else if (Constants.HEADER_ACTION.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_ACTION.equals(qName.getLocalPart())) {
                     synCtx.setWSAAction(value);
-                } else if (Constants.HEADER_FAULT.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_FAULT.equals(qName.getLocalPart())) {
                     synCtx.setFaultTo(new EndpointReference(value));
-                } else if (Constants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(new EndpointReference(value));
                 } else {
                     addCustomHeader(synCtx);
@@ -119,15 +119,15 @@ public class HeaderMediator extends AbstractMediator {
             }
 
             if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
-                if (Constants.HEADER_TO.equals(qName.getLocalPart())) {
+                if (SynapseConstants.HEADER_TO.equals(qName.getLocalPart())) {
                     synCtx.setTo(null);
-                } else if (Constants.HEADER_FROM.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_FROM.equals(qName.getLocalPart())) {
                     synCtx.setFrom(null);
-                } else if (Constants.HEADER_ACTION.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_ACTION.equals(qName.getLocalPart())) {
                     synCtx.setWSAAction(null);
-                } else if (Constants.HEADER_FAULT.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_FAULT.equals(qName.getLocalPart())) {
                     synCtx.setFaultTo(null);
-                } else if (Constants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
+                } else if (SynapseConstants.HEADER_REPLY_TO.equals(qName.getLocalPart())) {
                     synCtx.setReplyTo(null);
                 } else {
                     SOAPEnvelope envelope = synCtx.getEnvelope();

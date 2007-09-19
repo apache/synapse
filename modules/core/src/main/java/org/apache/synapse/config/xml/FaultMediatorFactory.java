@@ -48,17 +48,17 @@ import java.net.URISyntaxException;
  */
 public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
-    private static final QName FAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "makefault");
+    private static final QName FAULT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "makefault");
 
-    private static final QName ATT_VERSION_Q = new QName(Constants.NULL_NAMESPACE, "version");
-    private static final QName CODE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "code");
-    private static final QName REASON_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "reason");
-    private static final QName NODE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "node");
-    private static final QName ROLE_Q        = new QName(Constants.SYNAPSE_NAMESPACE, "role");
-    private static final QName DETAIL_Q      = new QName(Constants.SYNAPSE_NAMESPACE, "detail");
+    private static final QName ATT_VERSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "version");
+    private static final QName CODE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "code");
+    private static final QName REASON_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "reason");
+    private static final QName NODE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "node");
+    private static final QName ROLE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "role");
+    private static final QName DETAIL_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "detail");
 
-    private static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
-    private static final QName ATT_EXPR_Q  = new QName(Constants.NULL_NAMESPACE, "expression");
+    private static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
+    private static final QName ATT_EXPR_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
 
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";

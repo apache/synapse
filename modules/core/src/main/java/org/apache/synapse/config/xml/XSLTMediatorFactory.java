@@ -28,7 +28,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.OMElementUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
-import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
 import org.jaxen.JaxenException;
@@ -48,9 +48,9 @@ import java.util.Iterator;
 public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(XSLTMediatorFactory.class);
-    private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "xslt");
-    public static final QName ATT_NAME_Q  = new QName(Constants.NULL_NAMESPACE, "name");
-    public static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
+    private static final QName TAG_NAME    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "xslt");
+    public static final QName ATT_NAME_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
+    public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
 
 
     public QName getTagQName() {
@@ -61,8 +61,8 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
 
         XSLTMediator transformMediator = new XSLTMediator();
 
-        OMAttribute attXslt   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-        OMAttribute attSource = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
+        OMAttribute attXslt   = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+        OMAttribute attSource = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "source"));
 
         if (attXslt != null) {
             transformMediator.setXsltKey(attXslt.getAttributeValue());
@@ -86,7 +86,7 @@ public class XSLTMediatorFactory extends AbstractMediatorFactory {
         // set its common attributes such as tracing etc
         initMediator(transformMediator, elem);
         // set the features 
-        Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "feature"));
+        Iterator iter = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature"));
         while (iter.hasNext()) {
             OMElement featureElem = (OMElement) iter.next();
             OMAttribute attName = featureElem.getAttribute(ATT_NAME_Q);

@@ -31,12 +31,9 @@ import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
-import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -45,7 +42,6 @@ import org.apache.synapse.config.Util;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.axis2.transport.base.BaseConstants;
-import org.apache.axis2.AxisFault;
 import org.jaxen.JaxenException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -81,7 +77,7 @@ import java.util.Properties;
 public class XSLTMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(XSLTMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * The feature for which deciding swiching between DOM and Stream during the

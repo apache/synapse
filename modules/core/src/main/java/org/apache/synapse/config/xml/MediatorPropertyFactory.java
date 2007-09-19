@@ -51,7 +51,7 @@ public class MediatorPropertyFactory {
 
         List propertyList = new ArrayList();
 
-        Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "property"));
+        Iterator iter = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property"));
         while (iter.hasNext()) {
 
             OMElement propEle = (OMElement) iter.next();

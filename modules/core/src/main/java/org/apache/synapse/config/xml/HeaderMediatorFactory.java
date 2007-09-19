@@ -50,15 +50,15 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(HeaderMediatorFactory.class);
 
-    private static final QName HEADER_Q = new QName(Constants.SYNAPSE_NAMESPACE, "header");
+    private static final QName HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "header");
 
     public Mediator createMediator(OMElement elem) {
 
         HeaderMediator headerMediator = new HeaderMediator();
-        OMAttribute name   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute value  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-        OMAttribute exprn  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "expression"));
-        OMAttribute action = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "action"));
+        OMAttribute name   = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        OMAttribute value  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "value"));
+        OMAttribute exprn  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "expression"));
+        OMAttribute action = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "action"));
 
         if (name == null || name.getAttributeValue() == null) {
             String msg = "A valid name attribute is required for the header mediator";

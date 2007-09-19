@@ -19,8 +19,7 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.Constants;
-import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 
@@ -31,10 +30,10 @@ import org.apache.synapse.MessageContext;
 public abstract class AbstractMediator implements Mediator {
 
     /** The parent tracing state */
-     protected  int parentTraceState = Constants.TRACING_UNSET;
+     protected  int parentTraceState = SynapseConstants.TRACING_UNSET;
 
     /** State of tracing for the current mediator */
-     protected int traceState = Constants.TRACING_UNSET;
+     protected int traceState = SynapseConstants.TRACING_UNSET;
 
     /**
      * Returns the class name of the mediator
@@ -94,8 +93,8 @@ public abstract class AbstractMediator implements Mediator {
      * @return true if tracing should be performed
      */
     public boolean shouldTrace(int parentTraceState){
-        return (traceState == Constants.TRACING_ON) ||
-                (traceState == Constants.TRACING_UNSET &&
-                parentTraceState == Constants.TRACING_ON);
+        return (traceState == SynapseConstants.TRACING_ON) ||
+                (traceState == SynapseConstants.TRACING_UNSET &&
+                parentTraceState == SynapseConstants.TRACING_ON);
     }
 }

@@ -58,8 +58,8 @@ public class ProxyServiceSerializer {
     private static final Log log = LogFactory.getLog(PropertyMediatorSerializer.class);
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    protected static final OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     public static OMElement serializeProxy(OMElement parent, ProxyService service) {
 
@@ -207,26 +207,26 @@ public class ProxyServiceSerializer {
 
         int isEnableStatistics = service.getStatisticsEnable();
         String statisticsValue = null;
-        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
-            statisticsValue = Constants.STATISTICS_ENABLE;
-        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
-            statisticsValue = Constants.STATISTICS_DISABLE;
+        if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
+            statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_OFF) {
+            statisticsValue = XMLConfigConstants.STATISTICS_DISABLE;
         }
         if (statisticsValue != null) {
             proxy.addAttribute(fac.createOMAttribute(
-                    Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
+                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
         }
 
         int traceState = service.getTraceState();
         String traceValue = null;
-        if (traceState == org.apache.synapse.Constants.TRACING_ON) {
-            traceValue = Constants.TRACE_ENABLE;
-        } else if (traceState == org.apache.synapse.Constants.TRACING_OFF) {
-            traceValue = Constants.TRACE_DISABLE;
+        if (traceState == org.apache.synapse.SynapseConstants.TRACING_ON) {
+            traceValue = XMLConfigConstants.TRACE_ENABLE;
+        } else if (traceState == org.apache.synapse.SynapseConstants.TRACING_OFF) {
+            traceValue = XMLConfigConstants.TRACE_DISABLE;
         }
         if (traceValue != null) {
             proxy.addAttribute(fac.createOMAttribute(
-                    Constants.TRACE_ATTRIB_NAME, nullNS, traceValue));
+                    XMLConfigConstants.TRACE_ATTRIB_NAME, nullNS, traceValue));
         }
         if (parent != null) {
             parent.addChild(proxy);

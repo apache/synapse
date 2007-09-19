@@ -20,7 +20,7 @@
 package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 
 import javax.xml.namespace.QName;
@@ -46,24 +46,24 @@ public class EndpointAbstractFactory {
         }
 
         OMElement addressElement = configElement.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "address"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "address"));
         if (addressElement != null) {
             EndpointFactory endpointFactory = AddressEndpointFactory.getInstance();
             return endpointFactory;
         }
 
         OMElement wsdlElement = configElement.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
         if (wsdlElement != null) {
             EndpointFactory endpointFactory = WSDLEndpointFactory.getInstance();
             return endpointFactory;
         }
 
         OMElement lbElement = configElement.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "loadbalance"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
         if (lbElement != null) {
             OMElement sessionElement = configElement.
-                    getFirstChildWithName(new QName(Constants.SYNAPSE_NAMESPACE, "session"));
+                    getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "session"));
             if (sessionElement != null) {
                 EndpointFactory endpointFactory = SALoadbalanceEndpointFactory.getInstance();
                 return endpointFactory;
@@ -74,7 +74,7 @@ public class EndpointAbstractFactory {
         }
 
         OMElement foElement = configElement.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "failover"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
         if (foElement != null) {
             EndpointFactory endpointFactory = FailoverEndpointFactory.getInstance();
             return endpointFactory;

@@ -39,7 +39,7 @@ public class EntryFactory implements XMLToObjectMapper {
 
     public static Entry createEntry(OMElement elem) {
 
-        OMAttribute key = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+        OMAttribute key = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
         if (key == null) {
             handleException("The 'key' attribute is required for a local registry entry");
             return null;
@@ -47,7 +47,7 @@ public class EntryFactory implements XMLToObjectMapper {
         } else {
 
             Entry entry = new Entry(key.getAttributeValue());
-            String src  = elem.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "src"));
+            String src  = elem.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "src"));
 
             // if a src attribute is present, this is a URL source resource,
             // it would now be loaded from the URL source, as all static properties

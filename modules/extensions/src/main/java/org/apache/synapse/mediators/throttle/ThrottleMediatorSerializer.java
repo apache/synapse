@@ -27,7 +27,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
-import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.SequenceMediatorSerializer;
 
 /**
@@ -39,7 +39,7 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
     private static final Log log = LogFactory.getLog(ThrottleMediatorSerializer.class);
 
     private static final OMNamespace throttleNS
-            = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE + "/throttle", "throttle");
+            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE + "/throttle", "throttle");
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
         if (!(m instanceof ThrottleMediator)) {
@@ -63,27 +63,27 @@ public class ThrottleMediatorSerializer extends AbstractMediatorSerializer {
         finalizeSerialization(throttle, throttleMediator);
         String onReject = throttleMediator.getOnReject();
         if (onReject != null) {
-            throttle.addAttribute(fac.createOMAttribute(Constants.ONREJECT, nullNS, onReject));
+            throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONREJECT, nullNS, onReject));
         } else {
             Mediator mediator = throttleMediator.getOnRejectMediator();
             SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
             if (mediator != null && mediator instanceof SequenceMediator) {
                 OMElement element = serializer.serializeAnonymousSequence(null,
                         (SequenceMediator) mediator);
-                element.setLocalName(Constants.ONREJECT);
+                element.setLocalName(XMLConfigConstants.ONREJECT);
                 throttle.addChild(element);
             }
         }
         String onAccept = throttleMediator.getOnAccept();
         if (onAccept != null) {
-            throttle.addAttribute(fac.createOMAttribute(Constants.ONACCEPT, nullNS, onAccept));
+            throttle.addAttribute(fac.createOMAttribute(XMLConfigConstants.ONACCEPT, nullNS, onAccept));
         } else {
             Mediator mediator = throttleMediator.getOnAcceptMediator();
             SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
             if (mediator != null && mediator instanceof SequenceMediator) {
                 OMElement element = serializer.serializeAnonymousSequence(null,
                         (SequenceMediator) mediator);
-                element.setLocalName(Constants.ONACCEPT);
+                element.setLocalName(XMLConfigConstants.ONACCEPT);
                 throttle.addChild(element);
             }
         }

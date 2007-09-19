@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.statistics;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
 import java.util.*;
 
@@ -53,7 +53,7 @@ public class StatisticsCollector {
         if (statisticsHolder == null) {
             statisticsHolder = new StatisticsHolder();
             statisticsHolder.setKey(keyOfStatistic);
-            statisticsHolder.setStatisticsCategory(Constants.ENDPOINT_STATISTICS);
+            statisticsHolder.setStatisticsCategory(SynapseConstants.ENDPOINT_STATISTICS);
             endpointStatistics.put(keyOfStatistic, statisticsHolder);
         }
         statisticsHolder.update(isResponse, inTime, outTime, isFault);
@@ -76,7 +76,7 @@ public class StatisticsCollector {
         if (statisticsHolder == null) {
             statisticsHolder = new StatisticsHolder();
             statisticsHolder.setKey(keyOfStatistic);
-            statisticsHolder.setStatisticsCategory(Constants.PROXYSERVICE_STATISTICS);
+            statisticsHolder.setStatisticsCategory(SynapseConstants.PROXYSERVICE_STATISTICS);
             proxyServicesStatistics.put(keyOfStatistic, statisticsHolder);
         }
         statisticsHolder.update(isResponse, inTime, outTime, isFault);
@@ -98,7 +98,7 @@ public class StatisticsCollector {
         if (statisticsHolder == null) {
             statisticsHolder = new StatisticsHolder();
             statisticsHolder.setKey(keyOfStatistic);
-            statisticsHolder.setStatisticsCategory(Constants.SEQUENCE_STATISTICS);
+            statisticsHolder.setStatisticsCategory(SynapseConstants.SEQUENCE_STATISTICS);
             sequenceStatistics.put(keyOfStatistic, statisticsHolder);
         }
         statisticsHolder.update(isResponse, inTime, outTime, isFault);

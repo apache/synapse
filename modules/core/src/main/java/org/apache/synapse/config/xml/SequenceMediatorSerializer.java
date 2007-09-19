@@ -47,14 +47,14 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
         OMElement sequence = fac.createOMElement("sequence", synNS);
         int isEnableStatistics = mediator.getStatisticsEnable();
         String statisticsValue = null;
-        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
-            statisticsValue = Constants.STATISTICS_ENABLE;
-        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
-            statisticsValue = Constants.STATISTICS_DISABLE;
+        if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
+            statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_OFF) {
+            statisticsValue = XMLConfigConstants.STATISTICS_DISABLE;
         }
         if (statisticsValue != null) {
             sequence.addAttribute(fac.createOMAttribute(
-                    Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
+                    XMLConfigConstants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
         }
         if (mediator.getErrorHandler() != null) {
             sequence.addAttribute(fac.createOMAttribute(
@@ -89,14 +89,14 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 
             int isEnableStatistics = mediator.getStatisticsEnable();
             String statisticsValue = null;
-            if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
-                statisticsValue = Constants.STATISTICS_ENABLE;
-            } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
-                statisticsValue = Constants.STATISTICS_DISABLE;
+            if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
+                statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
+            } else if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_OFF) {
+                statisticsValue = XMLConfigConstants.STATISTICS_DISABLE;
             }
             if (statisticsValue != null) {
                 sequence.addAttribute(fac.createOMAttribute(
-                        Constants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
+                        XMLConfigConstants.STATISTICS_ATTRIB_NAME, nullNS, statisticsValue));
             }
 
             if (mediator.getKey() != null) {

@@ -1,6 +1,6 @@
 package org.apache.synapse.samples.n2n;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
 /**
  *
@@ -8,7 +8,7 @@ import org.apache.synapse.Constants;
 public class SynapseSample_113_Integration extends AbstractAutomationTestCase {
 
     protected void setUp() throws Exception {
-        System.setProperty(Constants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_113.xml");
+        System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_113.xml");
         System.setProperty("addurl", SYNAPSE_BASE_URL + "soap/StockQuoteProxy");
         // todo: JMS setting up
         super.setUp();

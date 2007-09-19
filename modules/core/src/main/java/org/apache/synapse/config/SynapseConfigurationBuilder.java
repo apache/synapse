@@ -21,7 +21,7 @@ package org.apache.synapse.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.mediators.base.SynapseMediator;
@@ -35,7 +35,7 @@ import java.io.File;
 /**
  * Builds a Synapse Configuration model with a given input (e.g. XML, programmatic creation, default etc)
  */
-public class SynapseConfigurationBuilder implements Constants {
+public class SynapseConfigurationBuilder {
 
     private static Log log = LogFactory.getLog(SynapseConfigurationBuilder.class);
 

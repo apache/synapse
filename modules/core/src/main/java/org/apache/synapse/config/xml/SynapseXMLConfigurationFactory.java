@@ -26,14 +26,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 	private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
 	
 	public SynapseConfiguration getConfiguration(OMElement definitions) {
-		if (!definitions.getQName().equals(Constants.DEFINITIONS_ELT)) throw new SynapseException("Wrong QName for this config factory "+definitions.getQName());
+		if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) throw new SynapseException("Wrong QName for this config factory "+definitions.getQName());
 		
 		
 		SynapseConfiguration config = new SynapseConfiguration();
 		config.setDefaultQName(definitions.getQName());
 		
         SequenceMediator rootSequence = new SequenceMediator();
-        rootSequence.setName(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY);
+        rootSequence.setName(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY);
 
 
 
@@ -43,9 +43,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     Object o = iter.next();
                     if (o instanceof OMElement) {
                         OMElement elt = (OMElement) o;
-                        if (Constants.SEQUENCE_ELT.equals(elt.getQName())) {
+                        if (XMLConfigConstants.SEQUENCE_ELT.equals(elt.getQName())) {
                             String key = elt.getAttributeValue(
-                                new QName(Constants.NULL_NAMESPACE, "key"));
+                                new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
                             // this could be a sequence def or a mediator of the main sequence
                             if (key != null) {
                                 Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
@@ -53,15 +53,15 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                             } else {
                                 defineSequence(config, elt);
                             }
-                        } else if (Constants.ENDPOINT_ELT.equals(elt.getQName())) {
+                        } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
                             defineEndpoint(config, elt);
-                        } else if (Constants.ENTRY_ELT.equals(elt.getQName())) {
+                        } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
                             defineEntry(config, elt);
-                        } else if (Constants.PROXY_ELT.equals(elt.getQName())) {
+                        } else if (XMLConfigConstants.PROXY_ELT.equals(elt.getQName())) {
                             defineProxy(config, elt);
-                        } else if (Constants.REGISTRY_ELT.equals(elt.getQName())) {
+                        } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
                             defineRegistry(config, elt);
-                        } else if (Constants.STARTUP_ELT.equals(elt.getQName())) {
+                        } else if (XMLConfigConstants.STARTUP_ELT.equals(elt.getQName())) {
                             defineStartup(config, elt);
                         }  
                         else {
@@ -135,7 +135,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static void defineSequence(SynapseConfiguration config, OMElement ele) {
 
-        String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
+        String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
             if (config.getLocalRegistry().get(name) != null) {
                 handleException("Duplicate sequence definition : " + name);
@@ -148,7 +148,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public static void defineEndpoint(SynapseConfiguration config, OMElement ele) {
 
-        String name = ele.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
+        String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
             if (config.getLocalRegistry().get(name.trim()) != null) {
                 handleException("Duplicate endpoint definition : " + name);
@@ -169,9 +169,9 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
      */
     private static void setDefaultMainSequence(SynapseConfiguration config) {
         SequenceMediator main = new SequenceMediator();
-        main.setName(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY);
+        main.setName(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY);
         main.addChild(new SendMediator());
-        config.addSequence(org.apache.synapse.Constants.MAIN_SEQUENCE_KEY, main);
+        config.addSequence(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY, main);
     }
 
     /**
@@ -182,11 +182,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
      */
     private static void setDefaultFaultSequence(SynapseConfiguration config) {
         SequenceMediator fault = new SequenceMediator();
-        fault.setName(org.apache.synapse.Constants.FAULT_SEQUENCE_KEY);
+        fault.setName(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY);
         LogMediator log = new LogMediator();
         log.setLogLevel(LogMediator.FULL);
         fault.addChild(log);
-        config.addSequence(org.apache.synapse.Constants.FAULT_SEQUENCE_KEY, fault);
+        config.addSequence(org.apache.synapse.SynapseConstants.FAULT_SEQUENCE_KEY, fault);
     }
 
     private static void handleException(String msg) {
@@ -202,7 +202,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 	
 	public QName getTagQName() {
 		
-		return Constants.DEFINITIONS_ELT;
+		return XMLConfigConstants.DEFINITIONS_ELT;
 	}
 
 	public Class getSerializerClass() {

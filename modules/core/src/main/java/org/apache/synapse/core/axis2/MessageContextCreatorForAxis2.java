@@ -20,11 +20,9 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -34,7 +32,7 @@ import org.apache.synapse.core.SynapseEnvironment;
  * The MessageContext needs to be set up and then is used by the SynapseMessageReceiver to inject messages.
  * This class is used by the SynapseMessageReceiver to find the environment. The env is stored in a Parameter to the Axis2 config
  */
-public class MessageContextCreatorForAxis2 implements Constants {
+public class MessageContextCreatorForAxis2 {
 
     private static Log log = LogFactory.getLog(MessageContextCreatorForAxis2.class);
 

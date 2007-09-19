@@ -24,7 +24,7 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.MediatorProperty;
@@ -44,7 +44,7 @@ import java.util.List;
 public class LogMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(LogMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /** Log levels ,according to the  log level ,the information going to log  will  be changed */
     public static final int CUSTOM = 0;

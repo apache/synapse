@@ -49,13 +49,13 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
     private static final Log log = LogFactory.getLog(ValidateMediatorFactory.class);
 
-    private static final QName VALIDATE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "validate");
-    private static final QName ON_FAIL_Q  = new QName(Constants.SYNAPSE_NAMESPACE, "on-fail");
-    private static final QName SCHEMA_Q   = new QName(Constants.SYNAPSE_NAMESPACE, "schema");
-    private static final QName KEY_Q      = new QName(Constants.NULL_NAMESPACE, "key");
-    private static final QName SOURCE_Q   = new QName(Constants.NULL_NAMESPACE, "source");
-    public static final QName ATT_NAME_Q  = new QName(Constants.NULL_NAMESPACE, "name");
-    public static final QName ATT_VALUE_Q = new QName(Constants.NULL_NAMESPACE, "value");
+    private static final QName VALIDATE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "validate");
+    private static final QName ON_FAIL_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "on-fail");
+    private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
+    private static final QName KEY_Q      = new QName(XMLConfigConstants.NULL_NAMESPACE, "key");
+    private static final QName SOURCE_Q   = new QName(XMLConfigConstants.NULL_NAMESPACE, "source");
+    public static final QName ATT_NAME_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
+    public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -117,7 +117,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         // set its common attributes such as tracing etc
         initMediator(validateMediator,elem);
         // set the features
-        Iterator iter = elem.getChildrenWithName(new QName(Constants.SYNAPSE_NAMESPACE, "feature"));
+        Iterator iter = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature"));
         while (iter.hasNext()) {
             OMElement featureElem = (OMElement) iter.next();
             OMAttribute attName = featureElem.getAttribute(ATT_NAME_Q);

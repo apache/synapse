@@ -29,10 +29,11 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.synapse.util.UUIDGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -41,7 +42,7 @@ import org.jaxen.JaxenException;
 public class RMSequenceMediator extends AbstractMediator {
 
     private static Log log = LogFactory.getLog(RMSequenceMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     private AXIOMXPath correlation = null;
     private AXIOMXPath lastMessage = null;
@@ -76,7 +77,7 @@ public class RMSequenceMediator extends AbstractMediator {
 
         String version = getVersionValue();
         orgMessageCtx.getOptions().setProperty(
-            Constants.SANDESHA_SPEC_VERSION, version);
+            SynapseConstants.SANDESHA_SPEC_VERSION, version);
         if (log.isDebugEnabled()) {
             log.debug("using WS-RM version " + version);
         }
@@ -84,11 +85,11 @@ public class RMSequenceMediator extends AbstractMediator {
         if (isSingle()) {
             String sequenceID = UUIDGenerator.getUUID();
             orgMessageCtx.getOptions().setProperty(
-                Constants.SANDESHA_SEQUENCE_KEY, sequenceID);
+                SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
             orgMessageCtx.getOptions().setProperty(
                 SandeshaClientConstants.OFFERED_SEQUENCE_ID, UUIDGenerator.getUUID());
             orgMessageCtx.getOptions().setProperty(
-                Constants.SANDESHA_LAST_MESSAGE, "true");
+                SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
             return true;
         }
 
@@ -109,14 +110,14 @@ public class RMSequenceMediator extends AbstractMediator {
 
         String sequenceID = retrieveSequenceID(correlationValue);
         orgMessageCtx.getOptions().setProperty(
-            Constants.SANDESHA_SEQUENCE_KEY, sequenceID);
+            SynapseConstants.SANDESHA_SEQUENCE_KEY, sequenceID);
         if (log.isDebugEnabled()) {
             log.debug("RMSequence Mediator  ::  using sequence " + sequenceID);
         }
 
         if (lastMessage) {
             orgMessageCtx.getOptions().setProperty(
-                Constants.SANDESHA_LAST_MESSAGE, "true");
+                SynapseConstants.SANDESHA_LAST_MESSAGE, "true");
             sequenceMap.remove(correlationValue);
         }
 
@@ -164,7 +165,7 @@ public class RMSequenceMediator extends AbstractMediator {
     }
 
     private String getVersionValue() {
-        if (Constants.SEQUENCE_VERSION_1_1.equals(getVersion())) {
+        if (XMLConfigConstants.SEQUENCE_VERSION_1_1.equals(getVersion())) {
             return WSRM_SpecVersion_1_1;
         } else {
             return WSRM_SpecVersion_1_0;

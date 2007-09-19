@@ -180,7 +180,7 @@ public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapp
 
 	public static void serializeConfiguration(SynapseConfiguration synCfg, OutputStream outputStream) throws XMLStreamException {
 		if (synCfg.getDefaultQName()==null) {
-			serializeConfiguration(synCfg, Constants.DEFINITIONS_ELT, outputStream);
+			serializeConfiguration(synCfg, XMLConfigConstants.DEFINITIONS_ELT, outputStream);
 		}
 		else {
 			serializeConfiguration(synCfg, synCfg.getDefaultQName(), outputStream);

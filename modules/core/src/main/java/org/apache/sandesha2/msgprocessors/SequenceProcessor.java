@@ -381,11 +381,15 @@ public class SequenceProcessor {
 		// transactional delivery. Either way, if they have one we should use it.
 		SandeshaThread invoker = storageManager.getInvoker();
 		if (invoker != null) {
-		    //Whatever the MEP, we stop processing here and the invoker will do the real work. As we
-		    // are taking responsibility for the message we need to return SUSPEND
-		    result = InvocationResponse.SUSPEND;
+			// Whatever the MEP, we stop processing here and the invoker will do the real work. We only
+			// SUSPEND if we need to keep the backchannel open for the response... we may as well ABORT
+			// to let other cases end more quickly.
+			if(backchannelFree && ackBackChannel) {
+				result = InvocationResponse.ABORT;
+			} else {
+				result = InvocationResponse.SUSPEND;
+			}
 		    
-	        msgCtx.setProperty(RequestResponseTransport.HOLD_RESPONSE, Boolean.TRUE);
 			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
 			storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());

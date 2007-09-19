@@ -70,6 +70,7 @@ public class ProxyService {
 
     private static final Log log = LogFactory.getLog(ProxyService.class);
     private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
+    private final Log serviceLog;
     /**
      * The name of the proxy service
      */
@@ -162,6 +163,17 @@ public class ProxyService {
      */
     protected int traceState = SynapseConstants.TRACING_UNSET;
 
+
+    /**
+     * Constructor
+     *
+     * @param name the name of the Proxy service
+     */
+    public ProxyService(String name) {
+        this.name = name;
+        serviceLog = LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + name);
+    }
+
     /**
      * Build the underlying Axis2 service from the Proxy service definition
      *
@@ -171,9 +183,19 @@ public class ProxyService {
      */
     public AxisService buildAxisService(SynapseConfiguration synCfg, AxisConfiguration axisCfg) {
 
+        auditInfo("Building Axis service for Proxy service : " + name);
         AxisService proxyService = null;
+
+        // get the wsdlElement as an OMElement
+        if (trace()) {
+            trace.info("Loading the WSDL : " +
+                (wsdlKey != null ? " key = " + wsdlKey :
+                (wsdlURI != null ? " URI = " + wsdlURI : " <Inlined>")));
+        }
+
         InputStream wsdlInputStream = null;
         OMElement wsdlElement = null;
+
         if (wsdlKey != null) {
             synCfg.getEntryDefinition(wsdlKey);
             Object keyObject = synCfg.getEntry(wsdlKey);
@@ -192,21 +214,31 @@ public class ProxyService {
                 handleException("Error reading from wsdl URI", e);
             }
         }
+
+        // if a WSDL was found
         if (wsdlElement != null) {
             OMNamespace wsdlNamespace = wsdlElement.getNamespace();
+
+            // serialize and create an inputstream to read WSDL
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
+                if (trace()) trace.info("Serializing wsdlElement found to build Axis service");
                 wsdlElement.serialize(baos);
                 wsdlInputStream = new ByteArrayInputStream(baos.toByteArray());
             } catch (XMLStreamException e) {
                 handleException("Error converting to a StreamSource", e);
             }
+
             if (wsdlInputStream != null) {
+
                 try {
                     // detect version of the WSDL 1.1 or 2.0
+                    if (trace()) trace.info("WSDL Namespace is : " + wsdlNamespace);
+
                     if (wsdlNamespace != null) {
                         boolean isWSDL11 = false;
                         WSDLToAxisServiceBuilder wsdlToAxisServiceBuilder = null;
+
                         if (WSDL2Constants.WSDL_NAMESPACE.
                                 equals(wsdlNamespace.getNamespaceURI())) {
                             wsdlToAxisServiceBuilder =
@@ -225,6 +257,13 @@ public class ProxyService {
                         if (wsdlToAxisServiceBuilder == null) {
                             throw new SynapseException(
                                     "Could not get the WSDL to Axis Service Builder");
+                        }
+
+                        if (trace()) {
+                            trace.info("Populating Axis service using WSDL");
+                            if (trace.isTraceEnabled()) {
+                                trace.trace("WSDL : " + wsdlElement.toString());
+                            }
                         }
                         proxyService = wsdlToAxisServiceBuilder.populateService();
                         proxyService.setWsdlFound(true);
@@ -259,9 +298,9 @@ public class ProxyService {
         } else {
             // this is for POX... create a dummy service and an operation for which
             // our SynapseDispatcher will properly dispatch to
+            if (trace()) trace.info("Did not find a WSDL. Assuming a POX or Legacy service");
             proxyService = new AxisService();
-            AxisOperation mediateOperation =
-                    new InOutAxisOperation(new QName("mediate"));
+            AxisOperation mediateOperation = new InOutAxisOperation(new QName("mediate"));
             proxyService.addOperation(mediateOperation);
         }
 
@@ -281,10 +320,12 @@ public class ProxyService {
         if (transports == null || transports.size() == 0) {
             // default to all transports using service name as destination
         } else {
+            if (trace()) trace.info("Exposing transports : " + transports);
             proxyService.setExposedTransports(transports);
         }
 
         // process parameters
+        if (trace()) trace.info("Setting service parameters : " + parameters);
         Iterator iter = parameters.keySet().iterator();
         while (iter.hasNext()) {
             String name = (String) iter.next();
@@ -302,30 +343,35 @@ public class ProxyService {
             }
         }
 
+        if (trace()) trace.info("Seeting service level policies : " + serviceLevelPolicies);
         // if service level policies are specified, apply them
+
         if (!serviceLevelPolicies.isEmpty()) {
             Policy svcEffectivePolicy = null;
             iter = serviceLevelPolicies.iterator();
+
             while (iter.hasNext()) {
                 String policyKey = (String) iter.next();
                 synCfg.getEntryDefinition(policyKey);
                 Object policyProp = synCfg.getEntry(policyKey);
                 if (policyProp != null) {
                     if (svcEffectivePolicy == null) {
-
                         svcEffectivePolicy = PolicyEngine.getPolicy(
-                                Util.getStreamSource(policyProp).getInputStream());
+                            Util.getStreamSource(policyProp).getInputStream());
                     } else {
                         svcEffectivePolicy = (Policy) svcEffectivePolicy.merge(
-                                PolicyEngine.getPolicy(
-                                        Util.getStreamSource(policyProp).getInputStream()));
+                            PolicyEngine.getPolicy(Util.getStreamSource(policyProp).getInputStream()));
                     }
                 }
             }
             PolicyInclude pi = proxyService.getPolicyInclude();
             if (pi != null && svcEffectivePolicy != null) {
+                if (trace()) {
+                    if (trace.isTraceEnabled()) {
+                        trace.trace("Effective policy applied : " + svcEffectivePolicy);
+                    }
+                }
                 pi.addPolicyElement(PolicyInclude.AXIS_SERVICE_POLICY, svcEffectivePolicy);
-                // todo: check whether the rm or sec is enabled
             }
         }
 
@@ -340,11 +386,14 @@ public class ProxyService {
         }
 
         try {
+            auditInfo("Adding service " + name + "to the Axis2 configuration");
             axisCfg.addService(proxyService);
             this.setRunning(true);
         } catch (AxisFault axisFault) {
             try {
                 if (axisCfg.getService(proxyService.getName()) != null) {
+                    if (trace()) trace.info("Removing service " + name + " due to error : "
+                        + axisFault.getMessage());
                     axisCfg.removeService(proxyService.getName());
                 }
             } catch (AxisFault ignore) {}
@@ -354,9 +403,10 @@ public class ProxyService {
         // todo: need to remove this and engage modules by looking at policies
         // should RM be engaged on this service?
         if (wsRMEnabled) {
+            auditInfo("WS-Reliable messaging is enabled for service : " + name);
             try {
                 proxyService.engageModule(axisCfg.getModule(
-                        SynapseConstants.SANDESHA2_MODULE_NAME), axisCfg);
+                    SynapseConstants.SANDESHA2_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS RM module on proxy service : " + name, axisFault);
             }
@@ -364,43 +414,107 @@ public class ProxyService {
 
         // should Security be engaged on this service?
         if (wsSecEnabled) {
+            auditInfo("WS-Security is enabled for service : " + name);
             try {
                 proxyService.engageModule(axisCfg.getModule(
-                        SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
+                    SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS Sec module on proxy service : "
                         + name, axisFault);
             }
         }
 
+        auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
         return proxyService;
     }
 
+    /**
+     * Start the proxy service
+     * @param synCfg the synapse configuration
+     */
     public void start(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
-        axisConfig.getServiceForActivation(this.getName()).setActive(true);
-        this.setRunning(true);
+        if (axisConfig != null) {
+            axisConfig.getServiceForActivation(this.getName()).setActive(true);
+            this.setRunning(true);
+            auditInfo("Started the proxy service : " + name);
+        } else {
+            auditWarn("Unable to start proxy service : " + name + 
+                ". Couldn't access Axis configuration");
+        }
     }
 
+    /**
+     * Stop the proxy service
+     * @param synCfg the synapse configuration
+     */
     public void stop(SynapseConfiguration synCfg) {
         AxisConfiguration axisConfig = synCfg.getAxisConfiguration();
-        try {
-            AxisService as = axisConfig.getService(this.getName());
-            if (as != null) {
-                as.setActive(false);
+        if (axisConfig != null) {
+            try {
+                AxisService as = axisConfig.getService(this.getName());
+                if (as != null) {
+                    as.setActive(false);
+                }
+                this.setRunning(false);
+                auditInfo("Started the proxy service : " + name);
+            } catch (AxisFault axisFault) {
+                handleException("Error stopping the proxy service : " + name, axisFault);
             }
-            this.setRunning(false);
-        } catch (AxisFault axisFault) {
-            handleException(axisFault.getMessage());
+        } else {
+            auditWarn("Unable to stop proxy service : " + name +
+                ". Couldn't access Axis configuration");
         }
+    }
+
+    private void handleException(String msg) {
+        serviceLog.error(msg);
+        log.error(msg);
+        if (trace()) trace.error(msg);
+        throw new SynapseException(msg);
+    }
+
+    private void handleException(String msg, Exception e) {
+        serviceLog.error(msg);
+        log.error(msg, e);
+        if (trace()) trace.error(msg + " :: " + e.getMessage());
+        throw new SynapseException(msg, e);
+    }
+
+    /**
+     * Write to the general log, as well as any service specific logs the audit message at INFO
+     * @param message the INFO level audit message
+     */
+    private void auditInfo(String message) {
+        log.info(message);
+        serviceLog.info(message);
+        if (trace()) {
+            trace.info(message);
+        }
+    }
+
+    /**
+     * Write to the general log, as well as any service specific logs the audit message at WARN
+     * @param message the WARN level audit message
+     */
+    private void auditWarn(String message) {
+        log.warn(message);
+        serviceLog.warn(message);
+        if (trace()) {
+            trace.warn(message);
+        }
+    }
+
+    /**
+     * Return true if tracing should be enabled
+     * @return true if tracing is enabled for this service
+     */
+    private boolean trace() {
+        return traceState == SynapseConstants.TRACING_ON;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
@@ -497,16 +611,6 @@ public class ProxyService {
 
     public void setRunning(boolean running) {
         this.running = running;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
-    private static void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
     }
 
     /**

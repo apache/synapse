@@ -28,7 +28,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -43,6 +42,8 @@ import java.util.List;
  */
 public class EIPUtils {
 
+    public static final String AGGREGATE_CORELATION = "aggregateCorelation";
+    
     /**
      * This will be used for logging purposes
      */
@@ -120,7 +121,7 @@ public class EIPUtils {
             }
 
             // set the parent details to the splitted MC 
-            newCtx.setProperty(Constants.AGGREGATE_CORELATION, synCtx.getMessageID());
+            newCtx.setProperty(AGGREGATE_CORELATION, synCtx.getMessageID());
 
             // set the parent properties to the splitted MC
             newCtx.setTo(synCtx.getTo());

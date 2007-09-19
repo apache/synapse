@@ -42,16 +42,16 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
-    private static final QName PROP_Q = new QName(Constants.SYNAPSE_NAMESPACE, "property");
+    private static final QName PROP_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
 
     public Mediator createMediator(OMElement elem) {
 
         PropertyMediator propMediator = new PropertyMediator();
-        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute value = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "value"));
-        OMAttribute expression = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "expression"));
-        OMAttribute scope = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "scope"));
-        OMAttribute action = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "action"));
+        OMAttribute name = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        OMAttribute value = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "value"));
+        OMAttribute expression = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "expression"));
+        OMAttribute scope = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "scope"));
+        OMAttribute action = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "action"));
         if (name == null) {
             String msg = "The 'name' attribute is required for the configuration of a property mediator";
             log.error(msg);
@@ -78,9 +78,9 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
         }
         if (scope != null) {
             String valueStr = scope.getAttributeValue();
-            if (!Constants.SCOPE_AXIS2.equals(valueStr) && !Constants.SCOPE_TRANSPORT.equals(valueStr)
-                    && !Constants.SCOPE_DEFAULT.equals(valueStr)) {
-                String msg = "Only '" + Constants.SCOPE_AXIS2 + "' or '" + Constants.SCOPE_TRANSPORT
+            if (!XMLConfigConstants.SCOPE_AXIS2.equals(valueStr) && !XMLConfigConstants.SCOPE_TRANSPORT.equals(valueStr)
+                    && !XMLConfigConstants.SCOPE_DEFAULT.equals(valueStr)) {
+                String msg = "Only '" + XMLConfigConstants.SCOPE_AXIS2 + "' or '" + XMLConfigConstants.SCOPE_TRANSPORT
                         + "' values are allowed for attribute scope for a property mediator"
                         + ", Unsupported scope " + valueStr;
                 log.error(msg);

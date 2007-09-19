@@ -52,14 +52,14 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(SwitchMediatorFactory.class);
 
-    private static final QName SWITCH_Q = new QName(Constants.SYNAPSE_NAMESPACE, "switch");
-    private static final QName CASE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "case");
-    private static final QName DEFAULT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "default");
+    private static final QName SWITCH_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "switch");
+    private static final QName CASE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "case");
+    private static final QName DEFAULT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "default");
 
     public Mediator createMediator(OMElement elem) {
 
         SwitchMediator switchMediator = new SwitchMediator();
-        OMAttribute source = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
+        OMAttribute source = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "source"));
         if (source == null) {
             String msg = "A 'source' XPath attribute is required for a switch mediator";
             log.error(msg);
@@ -83,7 +83,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
         while (iter.hasNext()) {
             OMElement caseElem = (OMElement) iter.next();
             SwitchCase aCase = new SwitchCase();
-            OMAttribute regex = caseElem.getAttribute(new QName(Constants.NULL_NAMESPACE, "regex"));
+            OMAttribute regex = caseElem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "regex"));
             if (regex == null) {
                 String msg = "The 'regex' attribute is required for a switch case definition";
                 log.error(msg);

@@ -45,7 +45,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(ClassMediatorFactory.class);
 
-    private static final QName CLASS_Q = new QName(Constants.SYNAPSE_NAMESPACE,
+    private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             "class");
 
     public Mediator createMediator(OMElement elem) {
@@ -53,7 +53,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
         ClassMediator classMediator = new ClassMediator();
 
         OMAttribute name = elem.getAttribute(new QName(
-                Constants.NULL_NAMESPACE, "name"));
+                XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name == null) {
             String msg = "The name of the actual mediator class is a required attribute";
             log.error(msg);

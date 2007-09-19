@@ -23,7 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
@@ -178,7 +178,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * @return the main mediator sequence
 	 */
 	public Mediator getMainSequence() {
-		return getSequence(Constants.MAIN_SEQUENCE_KEY);
+		return getSequence(SynapseConstants.MAIN_SEQUENCE_KEY);
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 * @return the fault sequence
 	 */
 	public Mediator getFaultSequence() {
-		return getSequence(Constants.FAULT_SEQUENCE_KEY);
+		return getSequence(SynapseConstants.FAULT_SEQUENCE_KEY);
 	}
 
 	/**

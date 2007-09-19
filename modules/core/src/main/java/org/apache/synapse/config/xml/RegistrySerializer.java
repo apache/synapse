@@ -40,8 +40,8 @@ public class RegistrySerializer {
     private static final Log log = LogFactory.getLog(RegistrySerializer.class);
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    protected static final OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     public static OMElement serializeRegistry(OMElement parent, Registry registry) {
 

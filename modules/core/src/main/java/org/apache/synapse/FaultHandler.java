@@ -49,14 +49,14 @@ public abstract class FaultHandler {
 
     public void handleFault(MessageContext synCtx, Exception e) {
 
-        if (synCtx.getProperty(Constants.ERROR_CODE) == null) {
-            synCtx.setProperty(Constants.ERROR_CODE, "00000");
+        if (synCtx.getProperty(SynapseConstants.ERROR_CODE) == null) {
+            synCtx.setProperty(SynapseConstants.ERROR_CODE, "00000");
         }
-        if (synCtx.getProperty(Constants.ERROR_MESSAGE) == null) {
+        if (synCtx.getProperty(SynapseConstants.ERROR_MESSAGE) == null) {
             // use only the first line as the message for multiline exception messages (Axis2 has these)
-            synCtx.setProperty(Constants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
+            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, e.getMessage().split("\n")[0]);
         }
-        synCtx.setProperty(Constants.ERROR_DETAIL, getStackTrace(e));
+        synCtx.setProperty(SynapseConstants.ERROR_DETAIL, getStackTrace(e));
 
         try {
             onFault(synCtx);

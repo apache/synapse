@@ -22,8 +22,9 @@ package org.apache.synapse.mediators;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -77,7 +78,7 @@ public class GetPropertyFunction implements Function {
             }
             return null;
         } else if (size == 1) {
-            return evaluate(Constants.SCOPE_DEFAULT, args.get(0), context.getNavigator());
+            return evaluate(XMLConfigConstants.SCOPE_DEFAULT, args.get(0), context.getNavigator());
         } else if (size == 2) {
             return evaluate(args.get(0), args.get(1), context.getNavigator());
         } else {
@@ -118,34 +119,34 @@ public class GetPropertyFunction implements Function {
             }
             return null;
         }
-        if (Constants.SCOPE_DEFAULT.equals(scope)) {
+        if (XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
 
-            if (Constants.HEADER_TO.equals(key)) {
+            if (SynapseConstants.HEADER_TO.equals(key)) {
                 EndpointReference toEPR = synCtx.getTo();
                 if (toEPR != null) {
                     return toEPR.getAddress();
                 }
-            } else if (Constants.HEADER_FROM.equals(key)) {
+            } else if (SynapseConstants.HEADER_FROM.equals(key)) {
                 EndpointReference fromEPR = synCtx.getFrom();
                 if (fromEPR != null) {
                     return fromEPR.getAddress();
                 }
-            } else if (Constants.HEADER_ACTION.equals(key)) {
+            } else if (SynapseConstants.HEADER_ACTION.equals(key)) {
                 String wsaAction = synCtx.getWSAAction();
                 if (wsaAction != null) {
                     return wsaAction;
                 }
-            } else if (Constants.HEADER_FAULT.equals(key)) {
+            } else if (SynapseConstants.HEADER_FAULT.equals(key)) {
                 EndpointReference faultEPR = synCtx.getFaultTo();
                 if (faultEPR != null) {
                     return faultEPR.getAddress();
                 }
-            } else if (Constants.HEADER_REPLY_TO.equals(key)) {
+            } else if (SynapseConstants.HEADER_REPLY_TO.equals(key)) {
                 EndpointReference replyToEPR = synCtx.getReplyTo();
                 if (replyToEPR != null) {
                     return replyToEPR.getAddress();
                 }
-            } else if (Constants.HEADER_MESSAGE_ID.equals(key)) {
+            } else if (SynapseConstants.HEADER_MESSAGE_ID.equals(key)) {
                 String messageID = synCtx.getMessageID();
                 if (messageID != null) {
                     return messageID;
@@ -158,11 +159,11 @@ public class GetPropertyFunction implements Function {
                     return synCtx.getEntry(key);
                 }
             }
-        } else if (Constants.SCOPE_AXIS2.equals(scope) && synCtx instanceof Axis2MessageContext) {
+        } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope) && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             return axis2MessageContext.getConfigurationContext().getProperty(key);
-        } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+        } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
                 && synCtx instanceof Axis2MessageContext) {
             org.apache.axis2.context.MessageContext axis2MessageContext
                     = ((Axis2MessageContext) synCtx).getAxis2MessageContext();

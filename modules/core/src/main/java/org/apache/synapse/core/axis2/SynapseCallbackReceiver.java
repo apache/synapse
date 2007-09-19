@@ -34,7 +34,7 @@ import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sandesha2.client.SandeshaClientConstants;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -55,7 +55,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore);
         
         Timer timeOutTimer = synCfg.getSynapseTimer();
-        timeOutTimer.schedule(timeoutHandler, 0, Constants.TIMEOUT_HANDLER_INTERVAL);
+        timeOutTimer.schedule(timeoutHandler, 0, SynapseConstants.TIMEOUT_HANDLER_INTERVAL);
     }
 
     public void addCallback(String MsgID, Callback callback) {
@@ -69,7 +69,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
         if (messageCtx.getOptions() != null && messageCtx.getOptions().getRelatesTo() != null) {
             messageID = messageCtx.getOptions().getRelatesTo().getValue();
         } else if (messageCtx.getProperty(SandeshaClientConstants.SEQUENCE_KEY) == null) {
-            messageID = (String) messageCtx.getProperty(Constants.RELATES_TO_FOR_POX);
+            messageID = (String) messageCtx.getProperty(SynapseConstants.RELATES_TO_FOR_POX);
         }
 
         if (messageID != null) {
@@ -125,10 +125,10 @@ public class SynapseCallbackReceiver implements MessageReceiver {
                         }
                         // set an error code to the message context, so that error sequences can filter
                         // using that property to determine the cause of error
-                        synapseOutMsgCtx.setProperty(Constants.ERROR_CODE, Constants.SENDING_FAULT);
+                        synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.SENDING_FAULT);
                         SOAPFaultReason faultReason = fault.getReason();
                         if (faultReason != null) {
-                            synapseOutMsgCtx.setProperty(Constants.ERROR_MESSAGE,
+                            synapseOutMsgCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
                                     faultReason.getText());
                         }
                         ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, e);
@@ -171,7 +171,7 @@ public class SynapseCallbackReceiver implements MessageReceiver {
 
             // set properties on response
             response.setServerSide(true);
-            response.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+            response.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             response.setProperty(MessageContext.TRANSPORT_OUT,
                     axisOutMsgCtx.getProperty(MessageContext.TRANSPORT_OUT));
             response.setProperty(org.apache.axis2.Constants.OUT_TRANSPORT_INFO,

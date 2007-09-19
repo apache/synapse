@@ -37,8 +37,8 @@ public class EntrySerializer {
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
     protected static final OMNamespace synNS = fac.createOMNamespace(
-            Constants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+            XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**
      * Serialize the Entry object to an OMElement representing the entry

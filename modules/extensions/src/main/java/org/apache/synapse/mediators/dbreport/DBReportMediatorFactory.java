@@ -21,7 +21,7 @@ package org.apache.synapse.mediators.dbreport;
 
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.dblookup.Query;
 import org.apache.axiom.om.OMElement;
@@ -57,23 +57,23 @@ public class DBReportMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(DBReportMediatorFactory.class);
 
-    private static final QName DBREPORT_Q = new QName(Constants.SYNAPSE_NAMESPACE, "dbreport");
+    private static final QName DBREPORT_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dbreport");
 
     private static final QName DRIVER_Q   =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "driver");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "driver");
     private static final QName URL_Q      =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "url");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "url");
     private static final QName USER_Q     =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "user");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "user");
     private static final QName PASS_Q     =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "password");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "password");
 
     private static final QName INSERT_Q   =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "insert");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "insert");
     private static final QName SQL_Q      =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "sql");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "sql");
     private static final QName PARAM_Q    =
-        new QName(org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "parameter");
+        new QName(org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
 
     private static final QName PROPERTY_Q = new QName("property");
     private static final QName XPATH_Q    = new QName("xpath");
@@ -86,7 +86,7 @@ public class DBReportMediatorFactory extends AbstractMediatorFactory {
 
         try {
             AXIOMXPath xpath = new AXIOMXPath("//syn:connection/syn:jdbc");
-            xpath.addNamespace("syn", org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE);
+            xpath.addNamespace("syn", org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE);
             OMElement jdbc = (OMElement) xpath.selectSingleNode(elem);
 
             try {

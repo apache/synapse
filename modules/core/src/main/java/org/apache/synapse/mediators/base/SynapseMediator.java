@@ -21,7 +21,7 @@ package org.apache.synapse.mediators.base;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.statistics.StatisticsStack;
 import org.apache.synapse.statistics.StatisticsUtils;
@@ -40,7 +40,7 @@ import org.apache.synapse.mediators.AbstractListMediator;
 public class SynapseMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(SynapseMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Perform the mediation specified by the rule set
@@ -64,10 +64,10 @@ public class SynapseMediator extends AbstractListMediator {
             }
             //put the required property for the collecttng statistics for the message mediation
             StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
-                    Constants.SEQUENCE_STATISTICS_STACK);
+                    SynapseConstants.SEQUENCE_STATISTICS_STACK);
             if (sequenceStack == null) {
                 sequenceStack = new SequenceStatisticsStack();
-                synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK,sequenceStack);
+                synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK,sequenceStack);
             }
             String seqName = "MainSequence";
             boolean isFault = synCtx.getEnvelope().getBody().hasFault();

@@ -19,7 +19,7 @@
 
 package org.apache.synapse.endpoints.utils;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
 
 /**
@@ -61,10 +61,10 @@ public class EndpointDefinition {
     private long timeoutDuration = 0;
 
     /** action to perform when a timeout occurs (NONE | DISCARD | DISCARD_AND_FAULT) **/
-    private int timeoutAction = Constants.NONE;
+    private int timeoutAction = SynapseConstants.NONE;
 
     /** To decide to whether statistics should have collected or not */
-    private int statisticsEnable = Constants.STATISTICS_UNSET;
+    private int statisticsEnable = SynapseConstants.STATISTICS_UNSET;
 
     /**
      * This should return the absolute EPR address referenced by the named endpoint. This may be possibly computed.

@@ -47,8 +47,8 @@ public class XMLConfigurationSerializer {
     private static final Log log = LogFactory.getLog(XMLConfigurationSerializer.class);
 
     private static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    private static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
-    private static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    private static final OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    private static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**
      * order of entries is irrelavant, however its nice to have some order

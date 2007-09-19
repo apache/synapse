@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
@@ -98,7 +98,7 @@ public class SynapseInitializationModule implements Module {
 
         log.info("Initializing Sandesha 2...");
         AxisModule sandeshaAxisModule = configurationContext.getAxisConfiguration().
-            getModule(Constants.SANDESHA2_MODULE_NAME);
+            getModule(SynapseConstants.SANDESHA2_MODULE_NAME);
         if (sandeshaAxisModule != null) {
             Module sandesha2 = sandeshaAxisModule.getModule();
             sandesha2.init(configurationContext, sandeshaAxisModule);
@@ -127,16 +127,16 @@ public class SynapseInitializationModule implements Module {
         AxisConfiguration axisConfiguration = cfgCtx.getAxisConfiguration();
         SynapseConfiguration synapseConfiguration;
 
-        String config = System.getProperty(Constants.SYNAPSE_XML);
+        String config = System.getProperty(SynapseConstants.SYNAPSE_XML);
 
         if (config != null) {
             if (log.isDebugEnabled()) {
-                log.debug("System property '" + Constants.SYNAPSE_XML +
+                log.debug("System property '" + SynapseConstants.SYNAPSE_XML +
                         "' specifies synapse configuration as " + config);
             }
             synapseConfiguration = SynapseConfigurationBuilder.getConfiguration(config);
         } else {
-            log.warn("System property '" + Constants.SYNAPSE_XML +
+            log.warn("System property '" + SynapseConstants.SYNAPSE_XML +
                 "' is not specified. Using default configuration..");
             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
         }
@@ -145,11 +145,11 @@ public class SynapseInitializationModule implements Module {
         synapseConfiguration.setAxisConfiguration(cfgCtx.getAxisConfiguration());
 
         // set the Synapse configuration and environment into the Axis2 configuration
-        Parameter synapseCtxParam = new Parameter(Constants.SYNAPSE_CONFIG, null);
+        Parameter synapseCtxParam = new Parameter(SynapseConstants.SYNAPSE_CONFIG, null);
         synapseCtxParam.setValue(synapseConfiguration);
         MessageContextCreatorForAxis2.setSynConfig(synapseConfiguration);
 
-        Parameter synapseEnvParam = new Parameter(Constants.SYNAPSE_ENV, null);
+        Parameter synapseEnvParam = new Parameter(SynapseConstants.SYNAPSE_ENV, null);
         Axis2SynapseEnvironment synEnv = new Axis2SynapseEnvironment(cfgCtx, synapseConfiguration);
         synapseEnvParam.setValue(synEnv);
         MessageContextCreatorForAxis2.setSynEnv(synEnv);
@@ -160,8 +160,8 @@ public class SynapseInitializationModule implements Module {
 
         } catch (AxisFault e) {
             String msg =
-                "Could not set parameters '" + Constants.SYNAPSE_CONFIG +
-                    "' and/or '" + Constants.SYNAPSE_ENV +
+                "Could not set parameters '" + SynapseConstants.SYNAPSE_CONFIG +
+                    "' and/or '" + SynapseConstants.SYNAPSE_ENV +
                     "'to the Axis2 configuration : " + e.getMessage();
             log.fatal(msg, e);
             throw new SynapseException(msg, e);

@@ -66,13 +66,13 @@ public class ProxyServiceFactory {
 
     public static ProxyService createProxy(OMElement elem) {
 
-        ProxyService proxy = new ProxyService();
+        ProxyService proxy = null;
 
         OMAttribute name = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name == null) {
             handleException("The 'name' attribute is required for a Proxy service definition");
         } else {
-            proxy.setName(name.getAttributeValue());
+            proxy = new ProxyService(name.getAttributeValue());
         }
 
         OMAttribute statistics = elem.getAttribute(

@@ -80,7 +80,7 @@ public class Axis2MessageContext implements MessageContext {
     private boolean faultResponse = false;
 
     /** Attribute of MC stating the tracing state of the message */
-    private int tracingState = Constants.TRACING_UNSET;
+    private int tracingState = SynapseConstants.TRACING_UNSET;
 
     public SynapseConfiguration getConfiguration() {
         return synCfg;
@@ -99,23 +99,23 @@ public class Axis2MessageContext implements MessageContext {
     }
 
     public Mediator getMainSequence() {
-        Object o = localEntries.get(Constants.MAIN_SEQUENCE_KEY);
+        Object o = localEntries.get(SynapseConstants.MAIN_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
             return (Mediator) o;
         } else {
             Mediator main = getConfiguration().getMainSequence();
-            localEntries.put(Constants.MAIN_SEQUENCE_KEY, main);
+            localEntries.put(SynapseConstants.MAIN_SEQUENCE_KEY, main);
             return main;
         }
     }
 
     public Mediator getFaultSequence() {
-        Object o = localEntries.get(Constants.FAULT_SEQUENCE_KEY);
+        Object o = localEntries.get(SynapseConstants.FAULT_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
             return (Mediator) o;
         } else {
             Mediator fault = getConfiguration().getFaultSequence();
-            localEntries.put(Constants.FAULT_SEQUENCE_KEY, fault);
+            localEntries.put(SynapseConstants.FAULT_SEQUENCE_KEY, fault);
             return fault;
         }
     }
@@ -166,7 +166,7 @@ public class Axis2MessageContext implements MessageContext {
         properties.put(key, value);
 
         // do not commit response by default in the server process
-        if (Constants.RESPONSE.equals(key) &&
+        if (SynapseConstants.RESPONSE.equals(key) &&
                 getAxis2MessageContext().getOperationContext() != null) {
             getAxis2MessageContext().getOperationContext().setProperty(
                 org.apache.axis2.Constants.RESPONSE_WRITTEN, "SKIP");
@@ -302,11 +302,11 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setResponse(boolean b) {
         response = b;
-        axis2MessageContext.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
+        axis2MessageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.valueOf(b));
     }
 
     public boolean isResponse() {
-        Object o = properties.get(Constants.RESPONSE);
+        Object o = properties.get(SynapseConstants.RESPONSE);
         if (o != null && o instanceof String && ((String) o).equalsIgnoreCase("true")) {
             return true;
         }
@@ -343,7 +343,7 @@ public class Axis2MessageContext implements MessageContext {
 
     public void setAxis2MessageContext(org.apache.axis2.context.MessageContext axisMsgCtx) {
         this.axis2MessageContext = axisMsgCtx;
-        Boolean resp = (Boolean) axisMsgCtx.getProperty(Constants.ISRESPONSE_PROPERTY);
+        Boolean resp = (Boolean) axisMsgCtx.getProperty(SynapseConstants.ISRESPONSE_PROPERTY);
         if (resp != null)
             response = resp.booleanValue();
     }
@@ -381,13 +381,13 @@ public class Axis2MessageContext implements MessageContext {
 
                 // set function context into XPath
                 SimpleFunctionContext fc = new XPathFunctionContext();
-                fc.registerFunction(Constants.SYNAPSE_NAMESPACE, "get-property", getPropertyFunc);
+                fc.registerFunction(SynapseConstants.SYNAPSE_NAMESPACE, "get-property", getPropertyFunc);
                 fc.registerFunction(null, "get-property", getPropertyFunc);
                 xpath.setFunctionContext(fc);
 
                 // register namespace for XPath extension function
-                xpath.addNamespace("synapse", Constants.SYNAPSE_NAMESPACE);
-                xpath.addNamespace("syn", Constants.SYNAPSE_NAMESPACE);
+                xpath.addNamespace("synapse", SynapseConstants.SYNAPSE_NAMESPACE);
+                xpath.addNamespace("syn", SynapseConstants.SYNAPSE_NAMESPACE);
 
             } catch (JaxenException je) {
                 handleException("Error setting up the Synapse XPath " +

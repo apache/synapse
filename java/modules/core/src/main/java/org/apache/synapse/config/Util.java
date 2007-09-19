@@ -24,7 +24,7 @@ import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 
 import javax.xml.stream.XMLInputFactory;
@@ -119,7 +119,7 @@ public class Util {
                         log.debug("Can not open a connection to the URL with a path :" +
                                   path);
                     }
-                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+                    String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Trying  to resolve an absolute path of the " +
@@ -259,7 +259,7 @@ public class Util {
                         log.debug("Can not open a connection to the URL with a path :" +
                                   path);
                     }
-                    String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+                    String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
                     if (synapseHome != null) {
                         if (synapseHome.endsWith("/")) {
                             synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));

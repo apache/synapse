@@ -25,8 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 
 import javax.xml.namespace.QName;
@@ -42,7 +41,7 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(SpringMediatorFactory.class);
 
-    private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE + "/spring", "spring");
+    private static final QName TAG_NAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE + "/spring", "spring");
 
     /**
      * Create a Spring mediator instance referring to the bean and configuration given
@@ -54,8 +53,8 @@ public class SpringMediatorFactory extends AbstractMediatorFactory {
     public Mediator createMediator(OMElement elem) {
 
         SpringMediator sm = new SpringMediator();
-        OMAttribute bean = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "bean"));
-        OMAttribute key  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+        OMAttribute bean = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "bean"));
+        OMAttribute key  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
 
         if (bean == null) {
             handleException("The 'bean' attribute is required for a Spring mediator definition");

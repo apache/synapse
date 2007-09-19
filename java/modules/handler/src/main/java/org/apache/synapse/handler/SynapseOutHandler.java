@@ -20,14 +20,13 @@
 package org.apache.synapse.handler;
 
 import org.apache.axis2.handlers.AbstractHandler;
-import org.apache.axis2.engine.Handler;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.util.HandlerUtil;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.FaultHandler;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -61,10 +60,10 @@ public class SynapseOutHandler extends AbstractHandler {
 
         // handles the incoming and outgoing behaviours in client and server sides
         if (messageContext.isServerSide()) {
-            synCtx.setProperty(Constants.RESPONSE, Boolean.TRUE);
+            synCtx.setProperty(SynapseConstants.RESPONSE, Boolean.TRUE);
             synCtx.setResponse(true);
         } else {
-            synCtx.setProperty(Constants.RESPONSE, Boolean.FALSE);
+            synCtx.setProperty(SynapseConstants.RESPONSE, Boolean.FALSE);
             synCtx.setResponse(false);
         }
 

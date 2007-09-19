@@ -22,7 +22,7 @@ package org.apache.synapse.mediators.base;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.AbstractListMediator;
@@ -45,7 +45,7 @@ import java.util.Stack;
 public class SequenceMediator extends AbstractListMediator {
 
     private static final Log log = LogFactory.getLog(SequenceMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     /** The name of the this sequence */
     private String name = null;
     /** The local registry key which is used to pick a sequnce definition*/
@@ -58,7 +58,7 @@ public class SequenceMediator extends AbstractListMediator {
     private String registryKey = null;
 
     /** To decide to whether statistics should have collected or not  */
-    private int statisticsEnable = Constants.STATISTICS_UNSET;
+    private int statisticsEnable = SynapseConstants.STATISTICS_UNSET;
 
     /**
      * If this mediator refers to another named Sequence, execute that. Else
@@ -83,15 +83,15 @@ public class SequenceMediator extends AbstractListMediator {
         if (key == null) {
             // Setting Required property to collect the sequence statistics
             boolean isStatisticsEnable
-                    = (org.apache.synapse.Constants.STATISTICS_ON == statisticsEnable);
+                    = (org.apache.synapse.SynapseConstants.STATISTICS_ON == statisticsEnable);
             if (isStatisticsEnable) {
                 StatisticsStack sequenceStack
-                        = (StatisticsStack) synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                        = (StatisticsStack) synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
                 if (sequenceStack == null) {
                     sequenceStack = new SequenceStatisticsStack();
-                    synCtx.setProperty(Constants.SEQUENCE_STATISTICS_STACK, sequenceStack);
+                    synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK, sequenceStack);
                 }
-                String seqName = (name == null ? Constants.ANONYMOUS_SEQUENCES : name);
+                String seqName = (name == null ? SynapseConstants.ANONYMOUS_SEQUENCES : name);
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                 sequenceStack.put(seqName, System.currentTimeMillis(),
                         !synCtx.isResponse(), isStatisticsEnable, isFault);

@@ -36,8 +36,8 @@ import java.util.Iterator;
 public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    protected static final OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
     private static final Log log = LogFactory.getLog(AbstractMediatorSerializer.class);
 
     /**
@@ -50,14 +50,14 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
     protected static void finalizeSerialization(OMElement mediatorOmElement, Mediator mediator) {
         int traceState = mediator.getTraceState();
         String traceValue = null;
-        if (traceState == org.apache.synapse.Constants.TRACING_ON) {
-            traceValue = Constants.TRACE_ENABLE;
-        } else if (traceState == org.apache.synapse.Constants.TRACING_OFF) {
-            traceValue = Constants.TRACE_DISABLE;
+        if (traceState == org.apache.synapse.SynapseConstants.TRACING_ON) {
+            traceValue = XMLConfigConstants.TRACE_ENABLE;
+        } else if (traceState == org.apache.synapse.SynapseConstants.TRACING_OFF) {
+            traceValue = XMLConfigConstants.TRACE_DISABLE;
         }
         if (traceValue != null) {
             mediatorOmElement.addAttribute(fac.createOMAttribute(
-                Constants.TRACE_ATTRIB_NAME, nullNS, traceValue));
+                XMLConfigConstants.TRACE_ATTRIB_NAME, nullNS, traceValue));
         }
 
     }
@@ -97,7 +97,7 @@ public abstract class AbstractMediatorSerializer implements MediatorSerializer {
         while (iter.hasNext()) {
             String prefix = (String) iter.next();
             String uri = xpath.getNamespaceContext().translateNamespacePrefixToUri(prefix);
-            if (!Constants.SYNAPSE_NAMESPACE.equals(uri)) {
+            if (!XMLConfigConstants.SYNAPSE_NAMESPACE.equals(uri)) {
                 elem.declareNamespace(uri, prefix);
             }
         }

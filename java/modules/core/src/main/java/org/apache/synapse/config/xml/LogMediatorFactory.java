@@ -41,7 +41,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
-    private static final QName LOG_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "log");
+    private static final QName LOG_Q    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "log");
     private static final String SIMPLE  = "simple";
     private static final String HEADERS = "headers";
     private static final String FULL    = "full";
@@ -60,7 +60,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
         initMediator(logMediator,elem);
         
         // Set the high level set of properties to be logged (i.e. log level)
-        OMAttribute level = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "level"));
+        OMAttribute level = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "level"));
         if (level != null) {
             String levelstr = level.getAttributeValue();
             if (SIMPLE.equals(levelstr)) {
@@ -75,7 +75,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
         }
 
         // check if a custom separator has been supplied, if so use it
-        OMAttribute separator = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "separator"));
+        OMAttribute separator = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "separator"));
         if (separator != null) {
             logMediator.setSeparator(separator.getAttributeValue());
         }

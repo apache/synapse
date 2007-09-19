@@ -23,7 +23,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
@@ -62,7 +62,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
 
         OMElement loadbalanceElement =  null;
         loadbalanceElement = epConfig.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "loadbalance"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "loadbalance"));
 
         if(loadbalanceElement != null) {
 
@@ -70,7 +70,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
 
             // set endpoint name
             OMAttribute name = epConfig.getAttribute(new QName(
-                    org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "name"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
             if (name != null) {
                 loadbalanceEndpoint.setName(name.getAttributeValue());
@@ -110,7 +110,7 @@ public class LoadbalanceEndpointFactory implements EndpointFactory {
 
         ArrayList endpoints = new ArrayList();
         Iterator iter = loadbalanceElement.getChildrenWithName
-                (org.apache.synapse.config.xml.Constants.ENDPOINT_ELT);
+                (org.apache.synapse.config.xml.XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {
 
             OMElement endptElem = (OMElement) iter.next();

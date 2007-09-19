@@ -20,7 +20,7 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ServerManager;
 
 import javax.servlet.ServletConfig;
@@ -57,7 +57,7 @@ public class SynapseStartUpServlet extends HttpServlet {
             if (synapseHome.endsWith("/")) {
                 synapseHome = synapseHome.substring(0, synapseHome.lastIndexOf("/"));
             }
-            System.setProperty(Constants.SYNAPSE_HOME, synapseHome);
+            System.setProperty(SynapseConstants.SYNAPSE_HOME, synapseHome);
             //setting axis2 repository location
             String axis2Repo = System.getProperty(org.apache.axis2.Constants.AXIS2_REPO);
             if (axis2Repo == null) {
@@ -76,12 +76,12 @@ public class SynapseStartUpServlet extends HttpServlet {
                                    + File.separator + org.apache.axis2.Constants.AXIS2_CONF);
             }
             //setting synapse configuration location
-            String synapseXml = System.getProperty(org.apache.synapse.Constants.SYNAPSE_XML);
+            String synapseXml = System.getProperty(org.apache.synapse.SynapseConstants.SYNAPSE_XML);
             if (synapseXml == null) {
-                System.setProperty(org.apache.synapse.Constants.SYNAPSE_XML,
+                System.setProperty(org.apache.synapse.SynapseConstants.SYNAPSE_XML,
                                    synapseHome + File.separator
                                    + "WEB-INF/conf"
-                                   + File.separator + org.apache.synapse.Constants.SYNAPSE_XML);
+                                   + File.separator + org.apache.synapse.SynapseConstants.SYNAPSE_XML);
 
             }
         } else {
@@ -115,14 +115,14 @@ public class SynapseStartUpServlet extends HttpServlet {
 
     private String resolveSynapseHome(ServletConfig servletConfig) {
         // If synapse.home has provided as init-param,the it will take as synapse home
-        String synapseHomeAsParam = servletConfig.getInitParameter(Constants.SYNAPSE_HOME);
+        String synapseHomeAsParam = servletConfig.getInitParameter(SynapseConstants.SYNAPSE_HOME);
         if (synapseHomeAsParam != null) {
             if (synapseHomeAsParam.endsWith("/")) {
                 return synapseHomeAsParam.substring(0, synapseHomeAsParam.lastIndexOf("/"));
             }
         }
         //if synapse.home has set as a system property , then use it
-        String synapseHome = System.getProperty(Constants.SYNAPSE_HOME);
+        String synapseHome = System.getProperty(SynapseConstants.SYNAPSE_HOME);
         //Setting the all required system properties
         if (synapseHome == null || "".equals(synapseHome)) {
             ServletContext servletContext = servletConfig.getServletContext();

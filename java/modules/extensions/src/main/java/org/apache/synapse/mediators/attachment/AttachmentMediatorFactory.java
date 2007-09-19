@@ -28,8 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.config.xml.Constants;
-import org.apache.synapse.config.xml.MediatorFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.OMElementUtils;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.jaxen.JaxenException;
@@ -37,15 +36,15 @@ import org.jaxen.JaxenException;
 public class AttachmentMediatorFactory extends AbstractMediatorFactory {
 
 	private static final Log log = LogFactory.getLog(AttachmentMediatorFactory.class);
-    private static final QName TAG_NAME    = new QName(Constants.SYNAPSE_NAMESPACE, "attachments");
+    private static final QName TAG_NAME    = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attachments");
 	
 	public Mediator createMediator(OMElement elem) {	
 		AttachmentMediator mediator = new AttachmentMediator();
 		
-		OMAttribute attMode   = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "mode"));        
-        OMAttribute attMimeType = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "mimeType"));
-        OMElement omPath = elem.getFirstChildWithName(new QName(Constants.NULL_NAMESPACE, "attachmentPath"));
-        OMElement omNS = elem.getFirstChildWithName(new QName(Constants.NULL_NAMESPACE, "attachmentNS"));       
+		OMAttribute attMode   = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "mode"));
+        OMAttribute attMimeType = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "mimeType"));
+        OMElement omPath = elem.getFirstChildWithName(new QName(XMLConfigConstants.NULL_NAMESPACE, "attachmentPath"));
+        OMElement omNS = elem.getFirstChildWithName(new QName(XMLConfigConstants.NULL_NAMESPACE, "attachmentNS"));
         
         if(attMode != null && attMode.getAttributeValue().equals("MTOM_TO_BASE64")){
         	mediator.setMode(AttachmentMediator.MTOM_TO_BASE64);
@@ -64,8 +63,8 @@ public class AttachmentMediatorFactory extends AbstractMediatorFactory {
 				OMElementUtils.addNameSpaces(xp, elem, log);
 				
 				if(omNS != null){
-					String prefix = omNS.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "prefix"));
-					String name = omNS.getAttributeValue(new QName(Constants.NULL_NAMESPACE, "name"));
+					String prefix = omNS.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "prefix"));
+					String name = omNS.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
 					xp.addNamespace(prefix,name);		
 				}
 				

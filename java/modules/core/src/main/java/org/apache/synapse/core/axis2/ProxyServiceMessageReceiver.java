@@ -33,7 +33,7 @@ import org.apache.synapse.statistics.impl.ProxyServiceStatisticsStack;
 public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
 
     private static final Log log = LogFactory.getLog(ProxyServiceMessageReceiver.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * The name of the Proxy Service
@@ -59,24 +59,24 @@ public class ProxyServiceMessageReceiver extends SynapseMessageReceiver {
         MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(mc);
 
         try {
-            synCtx.setProperty(org.apache.synapse.Constants.PROXY_SERVICE, name);
+            synCtx.setProperty(org.apache.synapse.SynapseConstants.PROXY_SERVICE, name);
             ProxyService proxy = synCtx.getConfiguration().getProxyService(name);
 
             // Setting Required property to collect the proxy service statistics
             boolean statisticsEnable;
             if (proxy != null) {
                 statisticsEnable = (
-                        org.apache.synapse.Constants.STATISTICS_ON == proxy.getStatisticsEnable());
+                        org.apache.synapse.SynapseConstants.STATISTICS_ON == proxy.getStatisticsEnable());
                 if (statisticsEnable) {
                     ProxyServiceStatisticsStack proxyServiceStatisticsStack
                             = new ProxyServiceStatisticsStack();
                     boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                     proxyServiceStatisticsStack.put(name, System.currentTimeMillis(),
                             !synCtx.isResponse(), statisticsEnable, isFault);
-                    synCtx.setProperty(org.apache.synapse.Constants.PROXYSERVICE_STATISTICS_STACK,
+                    synCtx.setProperty(org.apache.synapse.SynapseConstants.PROXYSERVICE_STATISTICS_STACK,
                             proxyServiceStatisticsStack);
                 }
-                boolean shouldTrace = (proxy.getTraceState() == Constants.TRACING_ON);
+                boolean shouldTrace = (proxy.getTraceState() == SynapseConstants.TRACING_ON);
                 if (shouldTrace) {
                     trace.trace("Proxy Service " + name + " received a new message...");
                     trace.trace("Received Message :: " + mc.getEnvelope());

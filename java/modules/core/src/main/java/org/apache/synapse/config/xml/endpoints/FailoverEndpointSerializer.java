@@ -25,9 +25,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,9 +51,9 @@ public class FailoverEndpointSerializer implements EndpointSerializer {
         FailoverEndpoint failoverEndpoint = (FailoverEndpoint) endpoint;
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
-        OMElement failoverElement = fac.createOMElement("failover", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement failoverElement = fac.createOMElement("failover", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(failoverElement);
 
         String name = failoverEndpoint.getName();

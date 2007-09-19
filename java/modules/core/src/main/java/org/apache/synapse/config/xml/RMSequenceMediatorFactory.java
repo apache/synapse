@@ -42,17 +42,17 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
 
     private static final Log log = LogFactory.getLog(LogMediatorFactory.class);
 
-    private static final QName SEQUENCE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "RMSequence");
+    private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "RMSequence");
 
     public Mediator createMediator(OMElement elem) {
 
         RMSequenceMediator sequenceMediator = new RMSequenceMediator();
         OMAttribute correlation =
-            elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "correlation"));
+            elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "correlation"));
         OMAttribute lastMessage =
-            elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "last-message"));
-        OMAttribute single = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "single"));
-        OMAttribute version = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "version"));
+            elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "last-message"));
+        OMAttribute single = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "single"));
+        OMAttribute version = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "version"));
 
         if (single == null && correlation == null) {
             String msg = "The 'single' attribute value of true or a 'correlation' attribute is " +
@@ -126,10 +126,10 @@ public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
         }
 
         if (version != null) {
-            if (!Constants.SEQUENCE_VERSION_1_0.equals(version.getAttributeValue()) &&
-                !Constants.SEQUENCE_VERSION_1_1.equals(version.getAttributeValue())) {
-                String msg = "Only '" + Constants.SEQUENCE_VERSION_1_0 + "' or '" +
-                    Constants.SEQUENCE_VERSION_1_1
+            if (!XMLConfigConstants.SEQUENCE_VERSION_1_0.equals(version.getAttributeValue()) &&
+                !XMLConfigConstants.SEQUENCE_VERSION_1_1.equals(version.getAttributeValue())) {
+                String msg = "Only '" + XMLConfigConstants.SEQUENCE_VERSION_1_0 + "' or '" +
+                    XMLConfigConstants.SEQUENCE_VERSION_1_1
                     + "' values are allowed for attribute version for a RMSequence mediator"
                     + ", Unsupported version " + version.getAttributeValue();
                 log.error(msg);

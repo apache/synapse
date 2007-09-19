@@ -22,10 +22,9 @@ package org.apache.synapse.mediators.filters;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SwitchCase;
-import org.apache.synapse.config.xml.AnonymousListMediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -42,7 +41,7 @@ import java.util.List;
 public class SwitchMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SwitchMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private AXIOMXPath source = null;

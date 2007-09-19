@@ -18,7 +18,7 @@
  */
 package org.apache.synapse.statistics;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -43,12 +43,12 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         ProxyServiceStatisticsStack proxyServiceStatisticsStack = (ProxyServiceStatisticsStack)
-                synCtx.getProperty(Constants.PROXYSERVICE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.PROXYSERVICE_STATISTICS_STACK);
         if (proxyServiceStatisticsStack != null) {
             proxyServiceStatisticsStack.reportToStatisticsCollector(statisticsCollector,isFault);
         }
         ProxyServiceStatisticsStack synapseServiceStatisticsStack = (ProxyServiceStatisticsStack)
-                synCtx.getProperty(Constants.SYNAPSESERVICE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.SYNAPSESERVICE_STATISTICS_STACK);
         if (synapseServiceStatisticsStack != null) {
             synapseServiceStatisticsStack.reportToStatisticsCollector(statisticsCollector,isFault);
         }
@@ -63,9 +63,9 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         EndPointStatisticsStack endPointStatisticsStack = (EndPointStatisticsStack)
-                synCtx.getProperty(Constants.ENDPOINT_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.ENDPOINT_STATISTICS_STACK);
         if (endPointStatisticsStack != null) {
-            Object endpointObj = synCtx.getProperty(Constants.PROCESSED_ENDPOINT);
+            Object endpointObj = synCtx.getProperty(SynapseConstants.PROCESSED_ENDPOINT);
             if (endpointObj instanceof Endpoint) {
                 Endpoint endpoint = (Endpoint) endpointObj;
                 String name = endpoint.getName();
@@ -90,7 +90,7 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         SequenceStatisticsStack sequenceStatisticsStack = (SequenceStatisticsStack)
-                synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
         if (sequenceStatisticsStack != null) {
             sequenceStatisticsStack.reportToStatisticsCollector(statisticsCollector,isFault);
         }
@@ -105,7 +105,7 @@ public class StatisticsUtils {
         StatisticsCollector statisticsCollector = getStatisticsCollector(synCtx);
         boolean isFault = synCtx.getEnvelope().getBody().hasFault();
         SequenceStatisticsStack sequenceStatisticsStack = (SequenceStatisticsStack)
-                synCtx.getProperty(Constants.SEQUENCE_STATISTICS_STACK);
+                synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
         if (sequenceStatisticsStack != null) {
             sequenceStatisticsStack.reportAllToStatisticsCollector(statisticsCollector,isFault);
         }

@@ -21,7 +21,7 @@ package org.apache.synapse.mediators.filters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
 
@@ -34,7 +34,7 @@ import org.apache.synapse.mediators.AbstractListMediator;
 public class InMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
     private static final Log log = LogFactory.getLog(InMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Executes the list of sub/child mediators, if the filter condition is satisfied

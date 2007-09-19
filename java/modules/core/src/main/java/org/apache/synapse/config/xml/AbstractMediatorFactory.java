@@ -36,15 +36,15 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
     protected void initMediator(Mediator mediator, OMElement mediatorOmElement) {
 
         OMAttribute trace = mediatorOmElement.getAttribute(
-            new QName(Constants.NULL_NAMESPACE, Constants.TRACE_ATTRIB_NAME));
+            new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.TRACE_ATTRIB_NAME));
 
         if (trace != null) {
             String traceValue = trace.getAttributeValue();
             if (traceValue != null) {
-                if (traceValue.equals(Constants.TRACE_ENABLE)) {
-                    mediator.setTraceState(org.apache.synapse.Constants.TRACING_ON);
-                } else if (traceValue.equals(Constants.TRACE_DISABLE)) {
-                    mediator.setTraceState(org.apache.synapse.Constants.TRACING_OFF);
+                if (traceValue.equals(XMLConfigConstants.TRACE_ENABLE)) {
+                    mediator.setTraceState(org.apache.synapse.SynapseConstants.TRACING_ON);
+                } else if (traceValue.equals(XMLConfigConstants.TRACE_DISABLE)) {
+                    mediator.setTraceState(org.apache.synapse.SynapseConstants.TRACING_OFF);
                 }
             }
         }

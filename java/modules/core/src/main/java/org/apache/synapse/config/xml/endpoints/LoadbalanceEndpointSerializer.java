@@ -27,9 +27,8 @@ import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,7 +51,7 @@ public class LoadbalanceEndpointSerializer implements EndpointSerializer {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         LoadbalanceEndpoint loadbalanceEndpoint = (LoadbalanceEndpoint) endpoint;
 
@@ -61,7 +60,7 @@ public class LoadbalanceEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        OMElement loadbalanceElement = fac.createOMElement("loadbalance", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement loadbalanceElement = fac.createOMElement("loadbalance", SynapseConstants.SYNAPSE_OMNAMESPACE);
         endpointElement.addChild(loadbalanceElement);
 
         LoadbalanceAlgorithm algorithm = loadbalanceEndpoint.getAlgorithm();
@@ -70,7 +69,7 @@ public class LoadbalanceEndpointSerializer implements EndpointSerializer {
              algorithmName = "roundRobin";
         }
         loadbalanceElement.addAttribute
-                (org.apache.synapse.config.xml.Constants.ALGORITHM_NAME, algorithmName, null);
+                (org.apache.synapse.config.xml.XMLConfigConstants.ALGORITHM_NAME, algorithmName, null);
 
         // set if failover is turned off in the endpoint
         if (!loadbalanceEndpoint.isFailover()) {

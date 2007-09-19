@@ -19,7 +19,7 @@
 package org.apache.axis2.transport.nhttp;
 
 import org.apache.http.nio.NHttpClientConnection;
-import org.apache.http.protocol.HttpExecutionContext;
+import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.HttpHost;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,7 +78,7 @@ public class ConnectionPool {
     public static void release(NHttpClientConnection conn) {
 
         HttpHost host = (HttpHost) conn.getContext().getAttribute(
-            HttpExecutionContext.HTTP_TARGET_HOST);
+            ExecutionContext.HTTP_TARGET_HOST);
         String key = host.getHostName() + ":" + Integer.toString(host.getPort());
 
         List connections = (List) connMap.get(key);

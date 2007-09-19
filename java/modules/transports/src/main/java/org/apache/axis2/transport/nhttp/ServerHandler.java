@@ -20,7 +20,6 @@ package org.apache.axis2.transport.nhttp;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.nhttp.util.PipeImpl;
-import org.apache.axis2.transport.nhttp.util.NativeWorkerPool;
 import org.apache.axis2.transport.nhttp.util.WorkerPool;
 import org.apache.axis2.transport.nhttp.util.WorkerPoolFactory;
 import org.apache.http.*;
@@ -104,7 +103,7 @@ public class ServerHandler implements NHttpServiceHandler {
 
         HttpContext context = conn.getContext();
         HttpRequest request = conn.getHttpRequest();
-        context.setAttribute(HttpContext.HTTP_REQUEST, request);
+        context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
         // allocate temporary buffers to process this request
         context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
@@ -117,7 +116,7 @@ public class ServerHandler implements NHttpServiceHandler {
             context.setAttribute(RESPONSE_SOURCE_CHANNEL, responsePipe.source());
 
             // create the default response to this request
-            HttpVersion httpVersion = request.getRequestLine().getHttpVersion();
+            ProtocolVersion httpVersion = request.getRequestLine().getProtocolVersion();
             HttpResponse response = responseFactory.newHttpResponse(
                 httpVersion, HttpStatus.SC_OK, context);
             response.setParams(this.params);
@@ -233,7 +232,8 @@ public class ServerHandler implements NHttpServiceHandler {
      * @param conn the connection being processed
      */
     public void timeout(final NHttpServerConnection conn) {
-        HttpRequest req = (HttpRequest) conn.getContext().getAttribute(HttpContext.HTTP_REQUEST);
+        HttpRequest req = (HttpRequest) conn.getContext().getAttribute(
+                ExecutionContext.HTTP_REQUEST);
         if (req != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Connection Timeout for request to : " + req.getRequestLine().getUri() +
@@ -261,7 +261,7 @@ public class ServerHandler implements NHttpServiceHandler {
     public void exception(final NHttpServerConnection conn, final HttpException e) {
         HttpContext context = conn.getContext();
         HttpRequest request = conn.getHttpRequest();
-        HttpVersion ver = request.getRequestLine().getHttpVersion();
+        ProtocolVersion ver = request.getRequestLine().getProtocolVersion();
         HttpResponse response = responseFactory.newHttpResponse(
             ver, HttpStatus.SC_BAD_REQUEST, context);
         byte[] msg = EncodingUtils.getAsciiBytes("Malformed HTTP request: " + e.getMessage());

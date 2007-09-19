@@ -53,6 +53,10 @@ public class LoggingIOSession implements IOSession {
         this.log = LogFactory.getLog(session.getClass());
     }
 
+    public int getStatus() {
+        return this.session.getStatus();
+    }
+
     public ByteChannel channel() {
         return this.channel;
     }

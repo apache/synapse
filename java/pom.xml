@@ -328,6 +328,12 @@
             </dependency>
 
             <dependency>
+                <groupId>jms</groupId>
+                <artifactId>jms-1.0.2b-spec</artifactId>
+                <version>${jms.spec.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>wsdl4j</groupId>
                 <artifactId>wsdl4j</artifactId>
                 <version>${wsdl4j.version}</version>
@@ -564,6 +570,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore-niossl</artifactId>
             <version>${httpcore.nio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jms</groupId>
+            <artifactId>jms-1.0.2b-spec</artifactId>
+            <version>${jms.spec.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-vfs</groupId>
@@ -870,7 +881,8 @@
     <properties>
         <!-- Synapse and related components -->
         <synapse.version>SNAPSHOT</synapse.version>
-        <httpcore.nio.version>4.0-alpha5</httpcore.nio.version>
+        <httpcore.nio.version>4.0-alpha6-SNAPSHOT</httpcore.nio.version>
+        <jms.spec.version>1.0</jms.spec.version>
         <commons.vfs.version>1.0</commons.vfs.version>
         <commons.net.version>1.4.1</commons.net.version>
         <jsch.version>0.1.31</jsch.version>

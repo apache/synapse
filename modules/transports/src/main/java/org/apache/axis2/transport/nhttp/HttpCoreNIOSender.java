@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
@@ -40,7 +39,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.transport.OutTransportInfo;
@@ -249,8 +247,8 @@ public class HttpCoreNIOSender extends AbstractHandler implements TransportSende
             String headerName = (String) iter.next();
             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
                 HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
-                HTTP.DATE_DIRECTIVE.equalsIgnoreCase(headerName) ||
-                HTTP.SERVER_DIRECTIVE.equalsIgnoreCase(headerName) ||
+                HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
+                HTTP.SERVER_HEADER.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
                 HTTP.CONTENT_LEN.equalsIgnoreCase(headerName) ||
                 HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {

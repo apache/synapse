@@ -117,8 +117,8 @@ public class ClientHandler implements NHttpClientHandler {
         try {
             HttpContext context = conn.getContext();
 
-            context.setAttribute(HttpExecutionContext.HTTP_CONNECTION, conn);
-            context.setAttribute(HttpExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
+            context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
+            context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
 
             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());
             context.setAttribute(REQUEST_SOURCE_CHANNEL, axis2Req.getSourceChannel());
@@ -128,7 +128,7 @@ public class ClientHandler implements NHttpClientHandler {
             this.httpProcessor.process(request, context);
 
             conn.submitRequest(request);
-            context.setAttribute(HttpExecutionContext.HTTP_REQUEST, request);
+            context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);
@@ -147,8 +147,8 @@ public class ClientHandler implements NHttpClientHandler {
             HttpContext context = conn.getContext();
             Axis2HttpRequest axis2Req = (Axis2HttpRequest) attachment;
 
-            context.setAttribute(HttpExecutionContext.HTTP_CONNECTION, conn);
-            context.setAttribute(HttpExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
+            context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
+            context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());
 
             // allocate temporary buffers to process this request
             context.setAttribute(REQUEST_BUFFER, ByteBuffer.allocate(cfg.getBufferZise()));
@@ -162,7 +162,7 @@ public class ClientHandler implements NHttpClientHandler {
             this.httpProcessor.process(request, context);
 
             conn.submitRequest(request);
-            context.setAttribute(HttpExecutionContext.HTTP_REQUEST, request);
+            context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
 
         } catch (IOException e) {
             handleException("I/O Error : " + e.getMessage(), e, conn);
@@ -359,11 +359,11 @@ public class ClientHandler implements NHttpClientHandler {
             context.setAttribute(RESPONSE_SINK_CHANNEL, responsePipe.sink());
 
             BasicHttpEntity entity = new BasicHttpEntity();
-            if (response.getStatusLine().getHttpVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
+            if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
                 entity.setChunked(true);
             }
             response.setEntity(entity);
-            context.setAttribute(HttpContext.HTTP_RESPONSE, response);
+            context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);
 
             workerPool.execute(
                 new ClientWorker(cfgCtx, Channels.newInputStream(responsePipe.source()), response,

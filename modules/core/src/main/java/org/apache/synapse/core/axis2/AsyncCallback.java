@@ -22,7 +22,7 @@ package org.apache.synapse.core.axis2;
 import org.apache.axis2.client.async.Callback;
 import org.apache.axis2.client.async.AsyncResult;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
 /**
  * This class only "holds" the Synapse out message context for the Synapse callback message
@@ -40,7 +40,7 @@ public class AsyncCallback extends Callback {
     /**
      * Action to perform when timeout occurs.
      */
-    private int timeOutAction = Constants.NONE;
+    private int timeOutAction = SynapseConstants.NONE;
 
 
     public AsyncCallback(org.apache.synapse.MessageContext synapseOutMsgCtx) {

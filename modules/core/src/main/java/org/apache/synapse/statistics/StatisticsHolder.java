@@ -18,8 +18,6 @@
  */
 package org.apache.synapse.statistics;
 
-import org.apache.synapse.Constants;
-
 /**
  * To hold statistics that will collected during both of in and out message mediation
  */

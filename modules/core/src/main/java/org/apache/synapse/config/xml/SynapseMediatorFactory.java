@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.base.SynapseMediator;
 
 import javax.xml.namespace.QName;
@@ -36,7 +37,7 @@ import javax.xml.namespace.QName;
  */
 public class SynapseMediatorFactory extends AbstractListMediatorFactory {
 
-    private final static QName RULES_Q = new QName(Constants.SYNAPSE_NAMESPACE, "rules");
+    private final static QName RULES_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "rules");
 
     public QName getTagQName() {
         return RULES_Q;

@@ -20,14 +20,11 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.soap.SOAPProcessingException;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.context.OperationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -37,10 +34,6 @@ import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.statistics.StatisticsCollector;
 import org.apache.synapse.statistics.StatisticsUtils;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 
 
 /**
@@ -79,20 +72,20 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
         }
 
         // if this is a response to a proxy service 
-        if (synCtx.getProperty(Constants.PROXY_SERVICE) != null) {
+        if (synCtx.getProperty(SynapseConstants.PROXY_SERVICE) != null) {
 
             if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
-                    Constants.PROXY_SERVICE)).getTargetOutSequence() != null) {
+                    SynapseConstants.PROXY_SERVICE)).getTargetOutSequence() != null) {
 
                 String sequenceName = synCtx.getConfiguration().getProxyService((String) synCtx.
-                        getProperty(Constants.PROXY_SERVICE)).getTargetOutSequence();
+                        getProperty(SynapseConstants.PROXY_SERVICE)).getTargetOutSequence();
                 Mediator outSequence = synCtx.getSequence(sequenceName);
 
                 if (outSequence != null) {
                     if (log.isDebugEnabled()) {
                         log.debug("Using the sequence named " + sequenceName
                                 + " for the outgoing message mediation of the proxy service "
-                                + synCtx.getProperty(Constants.PROXY_SERVICE));
+                                + synCtx.getProperty(SynapseConstants.PROXY_SERVICE));
                     }
                     outSequence.mediate(synCtx);
                 } else {
@@ -103,17 +96,17 @@ public class Axis2SynapseEnvironment implements SynapseEnvironment {
                 }
 
             } else if (synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
-                    Constants.PROXY_SERVICE)).getTargetInLineOutSequence() != null) {
+                    SynapseConstants.PROXY_SERVICE)).getTargetInLineOutSequence() != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Using the anonymous out-sequence specified in the proxy service "
-                            + synCtx.getProperty(Constants.PROXY_SERVICE)
+                            + synCtx.getProperty(SynapseConstants.PROXY_SERVICE)
                             + " for outgoing message mediation");
                 }
                 synCtx.getConfiguration().getProxyService((String) synCtx.getProperty(
-                        Constants.PROXY_SERVICE)).getTargetInLineOutSequence().mediate(synCtx);
+                        SynapseConstants.PROXY_SERVICE)).getTargetInLineOutSequence().mediate(synCtx);
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Proxy service " + synCtx.getProperty(Constants.PROXY_SERVICE)
+                    log.debug("Proxy service " + synCtx.getProperty(SynapseConstants.PROXY_SERVICE)
                             + " does not specifies an out-sequence - sending the response back");
                 }
                 Axis2Sender.sendBack(synCtx);

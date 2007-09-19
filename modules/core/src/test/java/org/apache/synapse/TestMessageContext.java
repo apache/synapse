@@ -87,23 +87,23 @@ public class TestMessageContext implements MessageContext {
     }
 
     public Mediator getMainSequence() {
-        Object o = localEntries.get(Constants.MAIN_SEQUENCE_KEY);
+        Object o = localEntries.get(SynapseConstants.MAIN_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
             return (Mediator) o;
         } else {
             Mediator main = getConfiguration().getMainSequence();
-            localEntries.put(Constants.MAIN_SEQUENCE_KEY, main);
+            localEntries.put(SynapseConstants.MAIN_SEQUENCE_KEY, main);
             return main;
         }
     }
 
     public Mediator getFaultSequence() {
-        Object o = localEntries.get(Constants.FAULT_SEQUENCE_KEY);
+        Object o = localEntries.get(SynapseConstants.FAULT_SEQUENCE_KEY);
         if (o != null && o instanceof Mediator) {
             return (Mediator) o;
         } else {
             Mediator fault = getConfiguration().getFaultSequence();
-            localEntries.put(Constants.FAULT_SEQUENCE_KEY, fault);
+            localEntries.put(SynapseConstants.FAULT_SEQUENCE_KEY, fault);
             return fault;
         }
     }

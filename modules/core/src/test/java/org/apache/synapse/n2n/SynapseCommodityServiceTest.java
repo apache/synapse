@@ -32,15 +32,13 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.TransportInDescription;
-import org.apache.axis2.rpc.receivers.RPCMessageReceiver;
 import org.apache.axis2.transport.TransportListener;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.AxisFault;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.utils.Services;
 
-import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.HashMap;
 
@@ -52,7 +50,7 @@ public class SynapseCommodityServiceTest extends TestCase {
 
     protected void setUp() throws java.lang.Exception {
         // Initializing Synapse repository
-        System.setProperty(Constants.SYNAPSE_XML,
+        System.setProperty(SynapseConstants.SYNAPSE_XML,
                            "./../../repository/conf/sample/resources/misc/synapse.xml");
         System.setProperty(org.apache.axis2.Constants.AXIS2_CONF,
                            "./../../repository/conf/axis2.xml");

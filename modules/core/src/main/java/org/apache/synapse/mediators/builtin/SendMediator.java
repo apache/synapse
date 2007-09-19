@@ -21,7 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
@@ -40,7 +40,7 @@ import java.util.List;
 public class SendMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SendMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     private Endpoint endpoint = null;
 

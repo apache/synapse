@@ -47,14 +47,14 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
     private static final Log log = LogFactory.getLog(POJOCommandMediatorFactory.class);
 
     private static final QName POJO_COMMAND_Q =
-            new QName(Constants.SYNAPSE_NAMESPACE, "pojoCommand");
+            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "pojoCommand");
 
     public Mediator createMediator(OMElement elem) {
 
         POJOCommandMediator pojoMediator = new POJOCommandMediator();
 
         // Class name of the Command object should be present
-        OMAttribute name = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
+        OMAttribute name = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name == null) {
             String msg = "The name of the actual POJO command implementation class" +
                     " is a required attribute";

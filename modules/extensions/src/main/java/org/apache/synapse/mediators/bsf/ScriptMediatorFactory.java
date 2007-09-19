@@ -26,7 +26,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
-import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 
 import java.util.Map;
 import java.util.Iterator;
@@ -57,16 +57,16 @@ import java.util.TreeMap;
  */
 public class ScriptMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName TAG_NAME = new QName(Constants.SYNAPSE_NAMESPACE, "script");
+    private static final QName TAG_NAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "script");
 
-    private static final QName INCLUDE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "include");
+    private static final QName INCLUDE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "include");
 
     public Mediator createMediator(OMElement elem) {
 
         ScriptMediator mediator;
-        OMAttribute keyAtt  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
-        OMAttribute langAtt = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "language"));
-        OMAttribute funcAtt = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "function"));
+        OMAttribute keyAtt  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+        OMAttribute langAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "language"));
+        OMAttribute funcAtt = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "function"));
 
         if (langAtt == null) {
             throw new SynapseException("The 'language' attribute is required for a script mediator");
@@ -100,7 +100,7 @@ public class ScriptMediatorFactory extends AbstractMediatorFactory {
         Iterator iter = elem.getChildrenWithName(INCLUDE_Q);
         while (iter.hasNext()) {
             OMElement includeElem = (OMElement) iter.next();
-            OMAttribute key = includeElem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+            OMAttribute key = includeElem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
 
             if (key == null) {
                 throw new SynapseException("Cannot use 'include' element without 'key' attribute for a script mediator");

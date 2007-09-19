@@ -22,7 +22,7 @@ package org.apache.synapse.config.xml.endpoints;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.commons.logging.Log;
@@ -56,7 +56,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
     public Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint) {
 
         OMElement failoverElement = epConfig.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "failover"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
         if (failoverElement != null) {
 
             FailoverEndpoint failoverEndpoint = new FailoverEndpoint();
@@ -90,7 +90,7 @@ public class FailoverEndpointFactory implements EndpointFactory {
 
         ArrayList endpoints = new ArrayList();
         Iterator iter = failoverElement.getChildrenWithName
-                (org.apache.synapse.config.xml.Constants.ENDPOINT_ELT);
+                (org.apache.synapse.config.xml.XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {
 
             OMElement endptElem = (OMElement) iter.next();

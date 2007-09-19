@@ -22,9 +22,10 @@ package org.apache.synapse.mediators.builtin;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -56,7 +57,7 @@ public class PropertyMediator extends AbstractMediator {
     /** Set the property (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
     private int action = ACTION_SET;
     private static final Log log = LogFactory.getLog(PropertyMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Sets a property into the current (local) Synapse Context or into the Axis Message Context
@@ -91,10 +92,10 @@ public class PropertyMediator extends AbstractMediator {
             if (scope == null) {
                 //Setting property into the  Synapse Context
                 smc.setProperty(name, resultValue);
-            } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
+            } else if (XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
                 //Setting property into the  Synapse Context
                 smc.setProperty(name, resultValue);
-            } else if (Constants.SCOPE_AXIS2.equals(scope)
+            } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
                     && smc instanceof Axis2MessageContext) {
                 //Setting property into the  Axis2 Message Context
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
@@ -102,7 +103,7 @@ public class PropertyMediator extends AbstractMediator {
                         axis2smc.getAxis2MessageContext();
                 axis2MessageCtx.getOptions().setProperty(name, resultValue);
 
-            } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+            } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
                     && smc instanceof Axis2MessageContext) {
                 //Setting Transport Headers
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
@@ -144,13 +145,13 @@ public class PropertyMediator extends AbstractMediator {
                 if (pros != null) {
                     pros.remove(name);
                 }
-            } else if (Constants.SCOPE_DEFAULT.equals(scope)) {
+            } else if (XMLConfigConstants.SCOPE_DEFAULT.equals(scope)) {
                 //Removing property from the  Synapse Context
                 Set pros = smc.getPropertyKeySet();
                 if (pros != null) {
                     pros.remove(name);
                 }
-            } else if (Constants.SCOPE_AXIS2.equals(scope)
+            } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)
                     && smc instanceof Axis2MessageContext) {
                 //Removing property from the        Axis2 Message Context
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;
@@ -160,7 +161,7 @@ public class PropertyMediator extends AbstractMediator {
                 if (pros != null) {
                     pros.remove(name);
                 }
-            } else if (Constants.SCOPE_TRANSPORT.equals(scope)
+            } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)
                     && smc instanceof Axis2MessageContext) {
                 // Removing transport headers
                 Axis2MessageContext axis2smc = (Axis2MessageContext) smc;

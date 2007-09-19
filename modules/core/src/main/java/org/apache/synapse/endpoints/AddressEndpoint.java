@@ -20,12 +20,10 @@
 package org.apache.synapse.endpoints;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.FaultHandler;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.statistics.impl.EndPointStatisticsStack;
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -149,18 +147,18 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
 
         String endPointName = this.getName();
         if(endPointName ==null) {
-            endPointName = Constants.ANONYMOUS_ENDPOINTS;
+            endPointName = SynapseConstants.ANONYMOUS_ENDPOINTS;
         }
         // Setting Required property to collect the End Point statistics
         boolean statisticsEnable =
-                (org.apache.synapse.Constants.STATISTICS_ON == endpoint.getStatisticsEnable());
+                (org.apache.synapse.SynapseConstants.STATISTICS_ON == endpoint.getStatisticsEnable());
         if (statisticsEnable) {
             EndPointStatisticsStack endPointStatisticsStack = null;
             Object statisticsStackObj =
-                    synCtx.getProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK);
+                    synCtx.getProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATISTICS_STACK);
             if (statisticsStackObj == null) {
                 endPointStatisticsStack = new EndPointStatisticsStack();
-                synCtx.setProperty(org.apache.synapse.Constants.ENDPOINT_STATISTICS_STACK,
+                synCtx.setProperty(org.apache.synapse.SynapseConstants.ENDPOINT_STATISTICS_STACK,
                         endPointStatisticsStack);
             } else if (statisticsStackObj instanceof EndPointStatisticsStack) {
                 endPointStatisticsStack = (EndPointStatisticsStack) statisticsStackObj;
@@ -188,7 +186,7 @@ public class AddressEndpoint extends FaultHandler implements Endpoint {
         synCtx.pushFaultHandler(this);
 
         // add this as the last endpoint to process this message. it is used by statistics code.
-        synCtx.setProperty(Constants.PROCESSED_ENDPOINT, this);
+        synCtx.setProperty(SynapseConstants.PROCESSED_ENDPOINT, this);
 
         synCtx.getEnvironment().send(endpoint, synCtx);
     }

@@ -51,7 +51,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.sandesha2.client.SandeshaClientConstants;
@@ -150,7 +150,7 @@ public class Axis2FlexibleMEPClient {
             }
 
             if (endpoint.isUseSeparateListener()) {
-                axisOutMsgCtx.setProperty(Constants.OUTFLOW_USE_SEPARATE_LISTENER, Boolean.TRUE);
+                axisOutMsgCtx.getOptions().setUseSeparateListener(true);
             }
 
             axisOutMsgCtx.setTo(new EndpointReference(eprAddress));
@@ -176,7 +176,7 @@ public class Axis2FlexibleMEPClient {
         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
 
         boolean outOnlyMessage = "true".equals(
-            synapseOutMessageContext.getProperty(Constants.OUT_ONLY));
+            synapseOutMessageContext.getProperty(SynapseConstants.OUT_ONLY));
 
         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
         AxisOperation axisAnonymousOperation = anoymousService.getOperation(
@@ -191,7 +191,7 @@ public class Axis2FlexibleMEPClient {
             // if a WS-RM policy is specified, use it
             if (wsRMPolicyKey != null) {
                 clientOptions.setProperty(
-                    org.apache.synapse.config.xml.Constants.SANDESHA_POLICY,
+                    SynapseConstants.SANDESHA_POLICY,
                     getPolicy(synapseOutMessageContext, wsRMPolicyKey));
             }
             copyRMOptions(originalInMsgCtx, clientOptions);
@@ -205,7 +205,7 @@ public class Axis2FlexibleMEPClient {
             // if a WS-Sec policy is specified, use it
             if (wsSecPolicyKey != null) {
                 clientOptions.setProperty(
-                    org.apache.synapse.config.xml.Constants.RAMPART_POLICY,
+                    SynapseConstants.RAMPART_POLICY,
                     getPolicy(synapseOutMessageContext, wsSecPolicyKey));
             }
             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
@@ -298,17 +298,17 @@ public class Axis2FlexibleMEPClient {
     
     private static void copyRMOptions(MessageContext oriContext, Options targetOptions) {
         Options oriOptions = oriContext.getOptions();
-        if(oriOptions.getProperty(Constants.SANDESHA_LAST_MESSAGE) != null) {
-            targetOptions.setProperty(Constants.SANDESHA_LAST_MESSAGE, 
-                    oriOptions.getProperty(Constants.SANDESHA_LAST_MESSAGE));
+        if(oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE) != null) {
+            targetOptions.setProperty(SynapseConstants.SANDESHA_LAST_MESSAGE,
+                    oriOptions.getProperty(SynapseConstants.SANDESHA_LAST_MESSAGE));
         }
-        if(oriOptions.getProperty(Constants.SANDESHA_SPEC_VERSION) != null) {
-            targetOptions.setProperty(Constants.SANDESHA_SPEC_VERSION, 
-                    oriOptions.getProperty(Constants.SANDESHA_SPEC_VERSION));
+        if(oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION) != null) {
+            targetOptions.setProperty(SynapseConstants.SANDESHA_SPEC_VERSION,
+                    oriOptions.getProperty(SynapseConstants.SANDESHA_SPEC_VERSION));
         }
-        if(oriOptions.getProperty(Constants.SANDESHA_SEQUENCE_KEY) != null) {
-            targetOptions.setProperty(Constants.SANDESHA_SEQUENCE_KEY, 
-                    oriOptions.getProperty(Constants.SANDESHA_SEQUENCE_KEY));
+        if(oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY) != null) {
+            targetOptions.setProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY,
+                    oriOptions.getProperty(SynapseConstants.SANDESHA_SEQUENCE_KEY));
         }
         if(oriOptions.getProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID) != null) {
             targetOptions.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID,

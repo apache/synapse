@@ -22,7 +22,6 @@ package org.apache.synapse.mediators.ext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.*;
 import org.apache.synapse.config.xml.PropertyHelper;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.OMElement;
@@ -51,7 +50,7 @@ public class POJOCommandMediator extends AbstractMediator {
     /**
      * This will hold the trace object to be used for tracing
      */
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * This will hold the command object to be executed

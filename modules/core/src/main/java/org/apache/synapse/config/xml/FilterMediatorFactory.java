@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.filters.FilterMediator;
 import org.jaxen.JaxenException;
 
@@ -46,14 +47,14 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
 
     private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
 
-    private static final QName FILTER_Q    = new QName(Constants.SYNAPSE_NAMESPACE, "filter");
+    private static final QName FILTER_Q    = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "filter");
 
     public Mediator createMediator(OMElement elem) {
         FilterMediator filter = new FilterMediator();
 
-        OMAttribute attXpath  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "xpath"));
-        OMAttribute attSource = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "source"));
-        OMAttribute attRegex  = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "regex"));
+        OMAttribute attXpath  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "xpath"));
+        OMAttribute attSource = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "source"));
+        OMAttribute attRegex  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "regex"));
 
         if (attXpath != null) {
             if (attXpath.getAttributeValue() != null && attXpath.getAttributeValue().trim().length() == 0) {

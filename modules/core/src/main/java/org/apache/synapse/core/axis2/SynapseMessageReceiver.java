@@ -58,10 +58,10 @@ public class SynapseMessageReceiver implements MessageReceiver {
         try {
             StatisticsStack synapseServiceStack =
                     (StatisticsStack) synCtx.getProperty(
-                            org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK);
+                            org.apache.synapse.SynapseConstants.SYNAPSESERVICE_STATISTICS_STACK);
             if (synapseServiceStack == null) {
                 synapseServiceStack = new ProxyServiceStatisticsStack();
-                synCtx.setProperty(org.apache.synapse.Constants.SYNAPSESERVICE_STATISTICS_STACK,
+                synCtx.setProperty(org.apache.synapse.SynapseConstants.SYNAPSESERVICE_STATISTICS_STACK,
                         synapseServiceStack);
             }
             String name = "SynapseService";

@@ -20,9 +20,7 @@
 package org.apache.synapse.core.axis2;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.Constants;
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.mediators.transform.FaultMediator;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 
 import java.util.TimerTask;
@@ -89,12 +87,12 @@ public class TimeoutHandler extends TimerTask {
                     Object key = i.next();
                     AsyncCallback callback = (AsyncCallback) callbackStore.get(key);
 
-                    if (callback.getTimeOutAction() != Constants.NONE) {
+                    if (callback.getTimeOutAction() != SynapseConstants.NONE) {
 
                         if (callback.getTimeOutOn() <= currentTime) {
                             callbackStore.remove(key);
 
-                            if (callback.getTimeOutAction() == Constants.DISCARD_AND_FAULT) {
+                            if (callback.getTimeOutAction() == SynapseConstants.DISCARD_AND_FAULT) {
 
                                 // actiavte the fault sequence of the current sequence mediator
 
@@ -102,7 +100,7 @@ public class TimeoutHandler extends TimerTask {
 
                                 // add an error code to the message context, so that error sequences
                                 // can identify the cause of error
-                                msgContext.setProperty(Constants.ERROR_CODE, Constants.TIME_OUT);
+                                msgContext.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.TIME_OUT);
 
                                 Stack faultStack = msgContext.getFaultStack();
 

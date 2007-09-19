@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
-import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,15 +42,15 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
      * The Tag Name for throttle
      */
     private static final QName TAG_NAME
-            = new QName(Constants.SYNAPSE_NAMESPACE + "/throttle", "throttle");
+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE + "/throttle", "throttle");
 
     public Mediator createMediator(OMElement elem) {
 
         ThrottleMediator throttleMediator = new ThrottleMediator();
         OMElement policy = elem.getFirstChildWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "policy"));
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "policy"));
         if (policy != null) {
-            OMAttribute key = policy.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+            OMAttribute key = policy.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
             if (key != null) {
                 String keyValue = key.getAttributeValue();
                 if (keyValue != null && !"".equals(keyValue)) {
@@ -72,7 +72,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
         initMediator(throttleMediator,elem);
         SequenceMediatorFactory mediatorFactory = new SequenceMediatorFactory();
         OMAttribute onReject = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, Constants.ONREJECT));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.ONREJECT));
         if (onReject != null) {
             String onRejectValue = onReject.getAttributeValue();
             if (onRejectValue != null) {
@@ -80,14 +80,14 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
             }
         } else {
             OMElement onRejectMediatorElement = elem.getFirstChildWithName(
-                    new QName(Constants.SYNAPSE_NAMESPACE, Constants.ONREJECT));
+                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.ONREJECT));
             if (onRejectMediatorElement != null) {
                 throttleMediator.setOnRejectMediator(mediatorFactory.createAnonymousSequence(
                         onRejectMediatorElement));
             }
         }
         OMAttribute onAccept = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, Constants.ONACCEPT));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.ONACCEPT));
         if (onAccept != null) {
             String onAcceptValue = onAccept.getAttributeValue();
             if (onAcceptValue != null) {
@@ -95,7 +95,7 @@ public class ThrottleMediatorFactory extends AbstractMediatorFactory {
             }
         } else {
             OMElement onAcceptMediatorElement = elem.getFirstChildWithName(
-                    new QName(Constants.SYNAPSE_NAMESPACE, Constants.ONACCEPT));
+                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.ONACCEPT));
             if (onAcceptMediatorElement != null) {
                 throttleMediator.setOnAcceptMediator(mediatorFactory.createAnonymousSequence(
                         onAcceptMediatorElement));

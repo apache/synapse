@@ -22,7 +22,7 @@ package org.apache.synapse.mediators.filters;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractListMediator;
@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 public class FilterMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
     private static final Log log = LogFactory.getLog(FilterMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     private AXIOMXPath source = null;
     private Pattern regex = null;
     private AXIOMXPath xpath = null;

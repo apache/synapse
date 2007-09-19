@@ -26,7 +26,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.statistics.StatisticsUtils;
@@ -74,7 +74,7 @@ public class Axis2Sender {
         AxisEngine ae = new AxisEngine(messageContext.getConfigurationContext());
 
         try {
-            messageContext.setProperty(Constants.ISRESPONSE_PROPERTY, Boolean.TRUE);
+            messageContext.setProperty(SynapseConstants.ISRESPONSE_PROPERTY, Boolean.TRUE);
             // check if addressing is already engaged for this message.
             // if engaged we should use the addressing enabled Configuraion context.
             if (smc.isResponse()) {

@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
 import org.apache.synapse.endpoints.algorithms.RoundRobin;
-import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class LoadbalanceAlgorithmFactory {
         LoadbalanceAlgorithm algorithm = null;
 
         String algorithmName = "roundRobin";
-        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(null, Constants.ALGORITHM_NAME));
+        OMAttribute algoAttribute = loadbalanceElement.getAttribute(new QName(null, XMLConfigConstants.ALGORITHM_NAME));
         if(algoAttribute != null) {
             algorithmName = algoAttribute.getAttributeValue();
         }

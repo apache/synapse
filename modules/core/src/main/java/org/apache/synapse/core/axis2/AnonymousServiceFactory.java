@@ -27,7 +27,7 @@ import org.apache.axis2.description.OutOnlyAxisOperation;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 
@@ -95,15 +95,15 @@ public class AnonymousServiceFactory {
 
                     if (wsAddrOn) {
                         service.engageModule(axisCfg.getModule(
-                            Constants.ADDRESSING_MODULE_NAME), axisCfg);
+                            SynapseConstants.ADDRESSING_MODULE_NAME), axisCfg);
 
                         if (wsRMOn) {
                             service.engageModule(axisCfg.getModule(
-                                Constants.SANDESHA2_MODULE_NAME), axisCfg);
+                                SynapseConstants.SANDESHA2_MODULE_NAME), axisCfg);
                         }
                         if (wsSecOn) {
                             service.engageModule(axisCfg.getModule(
-                                Constants.RAMPART_MODULE_NAME), axisCfg);
+                                SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
                         }
                     }
                     // if WS-A is off, WS-Sec and WS-RM should be too

@@ -48,7 +48,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
     private static final Log log = LogFactory.getLog(SequenceMediatorFactory.class);
 
-    private static final QName SEQUENCE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "sequence");
+    private static final QName SEQUENCE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
 
     public QName getTagQName() {
         return SEQUENCE_Q;
@@ -56,21 +56,21 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
     public SequenceMediator createAnonymousSequence(OMElement elem) {
         SequenceMediator seqMediator = new SequenceMediator();
-        OMAttribute e = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "onError"));
+        OMAttribute e = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "onError"));
         if (e != null) {
             seqMediator.setErrorHandler(e.getAttributeValue());
         }
         initMediator(seqMediator, elem);
         addChildren(elem, seqMediator);
         OMAttribute statistics = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
-                if (Constants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
-                } else if (Constants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
+                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }
@@ -81,8 +81,8 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
 
         SequenceMediator seqMediator = new SequenceMediator();
 
-        OMAttribute n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "name"));
-        OMAttribute e = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "onError"));
+        OMAttribute n = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+        OMAttribute e = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "onError"));
         if (n != null) {
             seqMediator.setName(n.getAttributeValue());
             if (e != null) {
@@ -92,7 +92,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             addChildren(elem, seqMediator);
 
         } else {
-            n = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "key"));
+            n = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
             if (n != null) {
                 seqMediator.setKey(n.getAttributeValue());
                 if (e != null) {
@@ -109,14 +109,14 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         }
 
         OMAttribute statistics = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, Constants.STATISTICS_ATTRIB_NAME));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, XMLConfigConstants.STATISTICS_ATTRIB_NAME));
         if (statistics != null) {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
-                if (Constants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
-                } else if (Constants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
+                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
+                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }

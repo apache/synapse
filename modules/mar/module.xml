@@ -8,9 +8,13 @@
         <handler name="SandeshaGlobalInHandler" class="org.apache.sandesha2.handlers.SandeshaGlobalInHandler">
             <!-- Global In handler should come before addressing dispatching -->
             <order phase="Dispatch" phaseFirst="true"/>
+        </handler>
+        <handler name="MessageContextCorrectionHandler" class="org.apache.sandesha2.handlers.MessageContextCorrectionHandler">
+            <!-- A handler which handle the duplicate messages -->
+            <order phase="Transport"/>
         </handler> 
         
-       	<handler name="SequenceIDDispatcher" class="org.apache.sandesha2.handlers.SequenceIDDispatcher">
+           <handler name="SequenceIDDispatcher" class="org.apache.sandesha2.handlers.SequenceIDDispatcher">
             <order phase="Addressing" before="AddressingBasedDispatcher"  />
         </handler> 
         

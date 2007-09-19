@@ -109,6 +109,7 @@ public final class SynapseConstants {
     //- tracing and statistics constants -
         /** Tracing logger name */
         public static final String TRACE_LOGGER ="TRACE_LOGGER";
+        public static final String SERVICE_LOGGER_PREFIX ="SERVICE_LOGGER.";
 
         /** The tracing state -off */
         public static final int TRACING_OFF =0;

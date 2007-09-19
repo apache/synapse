@@ -46,7 +46,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
     /**
      * This will hold the QName of the clone mediator element in the xml configuration
      */
-    private static final QName CLONE_Q = new QName(Constants.SYNAPSE_NAMESPACE, "clone");
+    private static final QName CLONE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "clone");
 
     /**
      * This method implements the createMediator method of the MediatorFactory interface
@@ -61,14 +61,14 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
         initMediator(mediator, elem);
         
         OMAttribute continueParent = elem.getAttribute(new QName(
-                Constants.NULL_NAMESPACE, "continueParent"));
+                XMLConfigConstants.NULL_NAMESPACE, "continueParent"));
         if (continueParent != null) {
             mediator.setContinueParent(
                     Boolean.valueOf(continueParent.getAttributeValue()).booleanValue());
         }
 
         Iterator targetElements = elem.getChildrenWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "target"));
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target"));
         while (targetElements.hasNext()) {
             mediator.addTarget(TargetFactory.createTarget((OMElement) targetElements.next()));
         }

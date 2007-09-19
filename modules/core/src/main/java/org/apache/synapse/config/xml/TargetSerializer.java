@@ -45,12 +45,12 @@ public class TargetSerializer {
      * This holds the Synapse namesapce for all the elements (qualified from default)
      */
     private static final OMNamespace synNS
-            = fac.createOMNamespace(Constants.SYNAPSE_NAMESPACE, "syn");
+            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
 
     /**
      * This holds the null namespace for all the attributes (unqualified from default)
      */
-    private static final OMNamespace nullNS = fac.createOMNamespace(Constants.NULL_NAMESPACE, "");
+    private static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**
      * This static method will serialize the Target object to the target elements

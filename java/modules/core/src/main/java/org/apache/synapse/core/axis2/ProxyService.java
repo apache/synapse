@@ -21,18 +21,14 @@ package org.apache.synapse.core.axis2;
 
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.transport.http.server.HttpUtils;
 import org.apache.axis2.description.*;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.endpoints.Endpoint;
@@ -41,8 +37,6 @@ import org.apache.synapse.config.Util;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLInputFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
@@ -75,7 +69,7 @@ import java.net.*;
 public class ProxyService {
 
     private static final Log log = LogFactory.getLog(ProxyService.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     /**
      * The name of the proxy service
      */
@@ -162,11 +156,11 @@ public class ProxyService {
     /**
      * To decide to whether statistics should have collected or not
      */
-    private int statisticsEnable = Constants.STATISTICS_UNSET;
+    private int statisticsEnable = SynapseConstants.STATISTICS_UNSET;
     /**
      * The variable that indicate tracing on or off for the current mediator
      */
-    protected int traceState = Constants.TRACING_UNSET;
+    protected int traceState = SynapseConstants.TRACING_UNSET;
 
     /**
      * Build the underlying Axis2 service from the Proxy service definition
@@ -362,7 +356,7 @@ public class ProxyService {
         if (wsRMEnabled) {
             try {
                 proxyService.engageModule(axisCfg.getModule(
-                        Constants.SANDESHA2_MODULE_NAME), axisCfg);
+                        SynapseConstants.SANDESHA2_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS RM module on proxy service : " + name, axisFault);
             }
@@ -372,7 +366,7 @@ public class ProxyService {
         if (wsSecEnabled) {
             try {
                 proxyService.engageModule(axisCfg.getModule(
-                        Constants.RAMPART_MODULE_NAME), axisCfg);
+                        SynapseConstants.RAMPART_MODULE_NAME), axisCfg);
             } catch (AxisFault axisFault) {
                 handleException("Error loading WS Sec module on proxy service : "
                         + name, axisFault);

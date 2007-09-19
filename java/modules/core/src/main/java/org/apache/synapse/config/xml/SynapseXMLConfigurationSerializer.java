@@ -32,10 +32,10 @@ public class SynapseXMLConfigurationSerializer implements
 	private static final OMFactory fac = OMAbstractFactory.getOMFactory();
 
 	private static final OMNamespace synNS = fac.createOMNamespace(
-			Constants.SYNAPSE_NAMESPACE, "syn");
+			XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
 
 	private static final OMNamespace nullNS = fac.createOMNamespace(
-			Constants.NULL_NAMESPACE, "");
+			XMLConfigConstants.NULL_NAMESPACE, "");
 
 	/**
 	 * order of entries is irrelavant, however its nice to have some order
@@ -145,7 +145,7 @@ public class SynapseXMLConfigurationSerializer implements
 	}
 
 	public QName getTagQName() {
-		return Constants.DEFINITIONS_ELT;
+		return XMLConfigConstants.DEFINITIONS_ELT;
 	}
 
 }

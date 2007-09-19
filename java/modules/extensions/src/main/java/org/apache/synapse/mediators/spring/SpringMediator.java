@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.config.Util;
 import org.apache.synapse.config.Entry;
@@ -44,7 +44,7 @@ import org.springframework.core.io.InputStreamResource;
 public class SpringMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(SpringMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * The Spring bean ref to be used

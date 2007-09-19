@@ -25,7 +25,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 
 /**
  * Serializes an IndirectEndpoint to an XML configuration.
@@ -43,7 +43,7 @@ public class IndirectEndpointSerializer implements EndpointSerializer {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         IndirectEndpoint indirectEndpoint = (IndirectEndpoint) endpoint;
         String ref = indirectEndpoint.getKey();

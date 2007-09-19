@@ -21,26 +21,20 @@ package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.synapse.config.xml.endpoints.utils.WSDL11EndpointBuilder;
-import org.apache.synapse.config.xml.endpoints.utils.WSDL20EndpointBuilder;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.synapse.config.Util;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
-import java.net.URLConnection;
-import java.io.InputStream;
-import java.io.IOException;
 
 /**
  * Creates an WSDL based endpoint from a XML configuration.
@@ -79,7 +73,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
         if (!anonymousEndpoint) {
             OMAttribute name = epConfig.getAttribute(new QName(
-                    org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "name"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "name"));
 
             if (name != null) {
                 wsdlEndpoint.setName(name.getAttributeValue());
@@ -87,14 +81,14 @@ public class WSDLEndpointFactory implements EndpointFactory {
         }
 
         OMElement wsdlElement = epConfig.getFirstChildWithName
-                (new QName(Constants.SYNAPSE_NAMESPACE, "wsdl"));
+                (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "wsdl"));
 
         if (wsdlElement != null) {
 
             // set the suspend on fail duration.
             OMElement suspendElement = wsdlElement.getFirstChildWithName(new QName(
-                    Constants.SYNAPSE_NAMESPACE,
-                    org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    org.apache.synapse.config.xml.XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE));
 
             if (suspendElement != null) {
                 String suspend = suspendElement.getText();
@@ -115,14 +109,14 @@ public class WSDLEndpointFactory implements EndpointFactory {
             // get the service name and port name. at this point we should not worry about the presence
             // of those parameters. they are handled by corresponding WSDL builders.
             String serviceName = wsdlElement.getAttributeValue
-                    (new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"service"));
+                    (new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,"service"));
 
             String portName = wsdlElement.getAttributeValue
-                    (new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"port"));
+                    (new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,"port"));
 
             // check if wsdl is supplied as a URI
             String wsdlURI = wsdlElement.getAttributeValue
-                    (new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,"uri"));
+                    (new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,"uri"));
 
             // set serviceName and portName in the endpoint. it does not matter if these are
             // null at this point. we are setting them only for serialization purpose.
@@ -174,17 +168,17 @@ public class WSDLEndpointFactory implements EndpointFactory {
                 // for now, QOS information has to be provided explicitly.
                 extractQOSInformation(endpoint, wsdlElement);
                 OMAttribute statistics = epConfig.getAttribute(
-                        new QName(org.apache.synapse.config.xml.Constants.NULL_NAMESPACE,
-                                org.apache.synapse.config.xml.Constants.STATISTICS_ATTRIB_NAME));
+                        new QName(org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE,
+                                org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME));
                 if (statistics != null) {
                     String statisticsValue = statistics.getAttributeValue();
                     if (statisticsValue != null) {
-                        if (org.apache.synapse.config.xml.Constants.STATISTICS_ENABLE.equals(
+                        if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE.equals(
                                 statisticsValue)) {
-                            endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_ON);
-                        } else if (org.apache.synapse.config.xml.Constants.STATISTICS_DISABLE.equals(
+                            endpoint.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                        } else if (org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE.equals(
                                 statisticsValue)) {
-                            endpoint.setStatisticsEnable(org.apache.synapse.Constants.STATISTICS_OFF);
+                            endpoint.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                         }
                     }
                 }
@@ -210,9 +204,9 @@ public class WSDLEndpointFactory implements EndpointFactory {
     private void extractQOSInformation(EndpointDefinition endpointDefinition, OMElement wsdlElement) {
 
         OMAttribute format = wsdlElement.getAttribute(new QName(
-                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "format"));
+                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "format"));
         OMAttribute optimize = wsdlElement.getAttribute(new QName(
-                org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "optimize"));
+                org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "optimize"));
 
         if (format != null)
         {
@@ -236,7 +230,7 @@ public class WSDLEndpointFactory implements EndpointFactory {
         }
 
         OMElement wsAddr = wsdlElement.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableAddressing"));
+                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableAddressing"));
         if (wsAddr != null) {
             endpointDefinition.setAddressingOn(true);
             String useSepList = wsAddr.getAttributeValue(new QName(
@@ -250,21 +244,21 @@ public class WSDLEndpointFactory implements EndpointFactory {
         }
 
         OMElement wsSec = wsdlElement.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableSec"));
+                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec"));
         if (wsSec != null) {
             endpointDefinition.setSecurityOn(true);
             OMAttribute policy = wsSec.getAttribute(new QName(
-                    org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "policy"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
                 endpointDefinition.setWsSecPolicyKey(policy.getAttributeValue());
             }
         }
         OMElement wsRm = wsdlElement.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "enableRM"));
+                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
         if (wsRm != null) {
             endpointDefinition.setReliableMessagingOn(true);
             OMAttribute policy = wsRm.getAttribute(new QName(
-                    org.apache.synapse.config.xml.Constants.NULL_NAMESPACE, "policy"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.NULL_NAMESPACE, "policy"));
             if (policy != null) {
                 endpointDefinition.setWsRMPolicyKey(policy.getAttributeValue());
             }
@@ -272,10 +266,10 @@ public class WSDLEndpointFactory implements EndpointFactory {
 
         // set the timeout configuration
         OMElement timeout = wsdlElement.getFirstChildWithName(new QName(
-                org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "timeout"));
+                org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
         if (timeout != null) {
             OMElement duration = timeout.getFirstChildWithName(new QName(
-                    org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "duration"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "duration"));
             if (duration != null) {
                 String d = duration.getText();
                 if (d != null) {
@@ -285,19 +279,19 @@ public class WSDLEndpointFactory implements EndpointFactory {
             }
 
             OMElement action = timeout.getFirstChildWithName(new QName(
-                    org.apache.synapse.config.xml.Constants.SYNAPSE_NAMESPACE, "action"));
+                    org.apache.synapse.config.xml.XMLConfigConstants.SYNAPSE_NAMESPACE, "action"));
             if (action != null) {
                 String a = action.getText();
                 if (a != null) {
                     if ((a.trim()).equalsIgnoreCase("discard")) {
-                        endpointDefinition.setTimeoutAction(Constants.DISCARD);
+                        endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD);
 
                         // set timeout duration to 30 seconds, if it is not set explicitly
                         if (endpointDefinition.getTimeoutDuration() == 0) {
                             endpointDefinition.setTimeoutDuration(30000);
                         }
                     } else if ((a.trim()).equalsIgnoreCase("fault")) {
-                        endpointDefinition.setTimeoutAction(Constants.DISCARD_AND_FAULT);
+                        endpointDefinition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
 
                         // set timeout duration to 30 seconds, if it is not set explicitly
                         if (endpointDefinition.getTimeoutDuration() == 0) {

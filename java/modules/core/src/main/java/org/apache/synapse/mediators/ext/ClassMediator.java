@@ -22,7 +22,7 @@ package org.apache.synapse.mediators.ext;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
@@ -42,7 +42,7 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 
 	private static final Log log = LogFactory.getLog(ClassMediator.class);
 
-	private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+	private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
 	private Mediator mediator = null;
 

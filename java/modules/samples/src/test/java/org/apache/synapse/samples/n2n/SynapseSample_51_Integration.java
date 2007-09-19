@@ -1,6 +1,6 @@
 package org.apache.synapse.samples.n2n;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.axiom.om.OMElement;
 import samples.userguide.MTOMSwAClient;
 
@@ -10,7 +10,7 @@ import samples.userguide.MTOMSwAClient;
 public class SynapseSample_51_Integration extends AbstractAutomationTestCase {
 
     protected void setUp() throws Exception {
-        System.setProperty(Constants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_51.xml");
+        System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_51.xml");
         super.setUp();
     }
 

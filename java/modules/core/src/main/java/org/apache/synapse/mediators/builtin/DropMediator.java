@@ -21,7 +21,7 @@ package org.apache.synapse.mediators.builtin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.statistics.StatisticsUtils;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -32,7 +32,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 public class DropMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(DropMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Halts further mediation of the current message by returning false.

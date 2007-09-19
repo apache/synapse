@@ -8,7 +8,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.xml.Constants;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.PropertyHelper;
 import org.apache.synapse.config.xml.StartupFactory;
 import org.apache.synapse.Startup;
@@ -30,17 +30,17 @@ import org.apache.synapse.SynapseException;
  */
 
 public class SimpleQuartzFactory implements StartupFactory {
-	public  final static QName JOB = new QName(Constants.SYNAPSE_NAMESPACE,
+	public  final static QName JOB = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
 			"job");
 
-	private final static QName SIMPLE = new QName(Constants.SYNAPSE_NAMESPACE,
+	private final static QName SIMPLE = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
 			"simpletrigger");
 
-	private final static QName CRON = new QName(Constants.SYNAPSE_NAMESPACE,
+	private final static QName CRON = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
 			"crontrigger");
 
 	private final static QName PROPERTY = new QName(
-			Constants.SYNAPSE_NAMESPACE, "property");
+			XMLConfigConstants.SYNAPSE_NAMESPACE, "property");
 
 	private final static Log log = LogFactory.getLog(SimpleQuartzFactory.class);
 

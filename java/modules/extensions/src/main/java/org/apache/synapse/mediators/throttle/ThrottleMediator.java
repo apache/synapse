@@ -22,7 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyEngine;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
@@ -42,7 +42,7 @@ import org.wso2.throttle.factory.AccessControllerFactory;
 public class ThrottleMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(ThrottleMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     /** The key for getting policy value - key refer to registry entry  */
     private String policyKey = null;
     /** InLine policy object - XML   */

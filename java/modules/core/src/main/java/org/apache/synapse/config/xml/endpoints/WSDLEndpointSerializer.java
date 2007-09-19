@@ -25,7 +25,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.WSDLEndpoint;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.endpoints.utils.EndpointDefinition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +53,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
 
         fac = OMAbstractFactory.getOMFactory();
-        OMElement endpointElement = fac.createOMElement("endpoint", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement endpointElement = fac.createOMElement("endpoint", SynapseConstants.SYNAPSE_OMNAMESPACE);
 
         WSDLEndpoint wsdlEndpoint = (WSDLEndpoint) endpoint;
         String name = wsdlEndpoint.getName();
@@ -61,7 +61,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             endpointElement.addAttribute("name", name, null);
         }
 
-        OMElement wsdlElement = fac.createOMElement("wsdl", Constants.SYNAPSE_OMNAMESPACE);
+        OMElement wsdlElement = fac.createOMElement("wsdl", SynapseConstants.SYNAPSE_OMNAMESPACE);
         String serviceName = wsdlEndpoint.getServiceName();
         if (serviceName != null) {
             wsdlElement.addAttribute("service", serviceName, null);
@@ -87,8 +87,8 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             // user has set some value for this. let's serialize it.
 
             OMElement suspendElement = fac.createOMElement(
-                    org.apache.synapse.config.xml.Constants.SUSPEND_DURATION_ON_FAILURE,
-                    Constants.SYNAPSE_OMNAMESPACE);
+                    org.apache.synapse.config.xml.XMLConfigConstants.SUSPEND_DURATION_ON_FAILURE,
+                    SynapseConstants.SYNAPSE_OMNAMESPACE);
 
             suspendElement.setText(Long.toString(suspendDuration / 1000));
             wsdlElement.addChild(suspendElement);
@@ -116,17 +116,17 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
 
         int isEnableStatistics = endpointDefinition.getStatisticsEnable();
         String statisticsValue = null;
-        if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_ON) {
-            statisticsValue = org.apache.synapse.config.xml.Constants.STATISTICS_ENABLE;
-        } else if (isEnableStatistics == org.apache.synapse.Constants.STATISTICS_OFF) {
-            statisticsValue = org.apache.synapse.config.xml.Constants.STATISTICS_DISABLE;
+        if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
+            statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ENABLE;
+        } else if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_OFF) {
+            statisticsValue = org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_DISABLE;
         }
         if (statisticsValue != null) {
             wsdlElement.addAttribute(fac.createOMAttribute(
-                    org.apache.synapse.config.xml.Constants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
+                    org.apache.synapse.config.xml.XMLConfigConstants.STATISTICS_ATTRIB_NAME, null, statisticsValue));
         }
         if (endpointDefinition.isAddressingOn()) {
-            OMElement addressing = fac.createOMElement("enableAddressing", Constants.SYNAPSE_OMNAMESPACE);
+            OMElement addressing = fac.createOMElement("enableAddressing", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.isUseSeparateListener()) {
                 addressing.addAttribute(fac.createOMAttribute(
                         "separateListener", null, "true"));
@@ -135,7 +135,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
 
         if (endpointDefinition.isReliableMessagingOn()) {
-            OMElement rm = fac.createOMElement("enableRM", Constants.SYNAPSE_OMNAMESPACE);
+            OMElement rm = fac.createOMElement("enableRM", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getWsRMPolicyKey() != null) {
                 rm.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsRMPolicyKey()));
@@ -144,7 +144,7 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
         }
 
         if (endpointDefinition.isSecurityOn()) {
-            OMElement sec = fac.createOMElement("enableSec", Constants.SYNAPSE_OMNAMESPACE);
+            OMElement sec = fac.createOMElement("enableSec", SynapseConstants.SYNAPSE_OMNAMESPACE);
             if (endpointDefinition.getWsSecPolicyKey() != null) {
                 sec.addAttribute(fac.createOMAttribute(
                         "policy", null, endpointDefinition.getWsSecPolicyKey()));
@@ -152,18 +152,18 @@ public class WSDLEndpointSerializer implements EndpointSerializer {
             wsdlElement.addChild(sec);
         }
 
-        if (endpointDefinition.getTimeoutAction() != Constants.NONE) {
-            OMElement timeout = fac.createOMElement("timeout", Constants.SYNAPSE_OMNAMESPACE);
+        if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {
+            OMElement timeout = fac.createOMElement("timeout", SynapseConstants.SYNAPSE_OMNAMESPACE);
             wsdlElement.addChild(timeout);
 
-            OMElement duration = fac.createOMElement("duration", Constants.SYNAPSE_OMNAMESPACE);
+            OMElement duration = fac.createOMElement("duration", SynapseConstants.SYNAPSE_OMNAMESPACE);
             duration.setText(Long.toString(endpointDefinition.getTimeoutDuration() / 1000));
             timeout.addChild(duration);
 
-            OMElement action = fac.createOMElement("action", Constants.SYNAPSE_OMNAMESPACE);
-            if (endpointDefinition.getTimeoutAction() == Constants.DISCARD) {
+            OMElement action = fac.createOMElement("action", SynapseConstants.SYNAPSE_OMNAMESPACE);
+            if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {
                 action.setText("discard");
-            } else if (endpointDefinition.getTimeoutAction() == Constants.DISCARD_AND_FAULT) {
+            } else if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD_AND_FAULT) {
                 action.setText("fault");
             }
             timeout.addChild(action);

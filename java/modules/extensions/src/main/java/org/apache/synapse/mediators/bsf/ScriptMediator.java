@@ -23,7 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.bsf.xml.XMLHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -54,7 +54,7 @@ import java.util.Iterator;
 public class ScriptMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(ScriptMediator.class);
-    private static final Log trace = LogFactory.getLog(Constants.TRACE_LOGGER);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * The name of the variable made available to the scripting language to access the message

@@ -1,11 +1,8 @@
 package org.apache.synapse.samples.n2n;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.axis2.engine.ListenerManager;
-import org.apache.axis2.context.ConfigurationContext;
-import samples.userguide.StockQuoteClient;
 import samples.userguide.LoadbalanceFailoverClient;
-import samples.util.SampleAxis2Server;
 
 /**
  *
@@ -15,7 +12,7 @@ public class SynapseSample_54_Integration extends AbstractAutomationTestCase {
     ListenerManager listenerManager = null;
 
     protected void setUp() throws Exception {
-        System.setProperty(Constants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_54.xml");
+        System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_54.xml");
         System.setProperty("addurl", SYNAPSE_BASE_URL);
         System.setProperty("symbol", "IBM");
         System.setProperty("mode", "quote");

@@ -39,7 +39,7 @@ public class MetricsAggregatorModule implements Module {
 
         Counter globalRequestCounter = new Counter();
         Parameter globalRequestCounterParameter = new Parameter();
-        globalRequestCounterParameter.setName(Constants.GLOBAL_REQUEST_COUNTER);
+        globalRequestCounterParameter.setName(MetricsConstants.GLOBAL_REQUEST_COUNTER);
         globalRequestCounterParameter.setValue(globalRequestCounter);
         axiConfiguration.addParameter(globalRequestCounterParameter);
 

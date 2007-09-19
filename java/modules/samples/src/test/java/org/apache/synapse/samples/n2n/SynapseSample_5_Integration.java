@@ -19,7 +19,7 @@
 
 package org.apache.synapse.samples.n2n;
 
-import org.apache.synapse.Constants;
+import org.apache.synapse.SynapseConstants;
 import org.apache.axis2.AxisFault;
 import samples.userguide.StockQuoteClient;
 
@@ -29,7 +29,7 @@ import samples.userguide.StockQuoteClient;
 public class SynapseSample_5_Integration extends AbstractAutomationTestCase {
 
     protected void setUp() throws Exception {
-        System.setProperty(Constants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_5.xml");
+        System.setProperty(SynapseConstants.SYNAPSE_XML, SAMPLE_CONFIG_ROOT_PATH + "synapse_sample_5.xml");
         System.setProperty("addurl", "http://localhost:9000/soap/SimpleStockQuoteService");
         System.setProperty("trpurl", SYNAPSE_BASE_URL);
         super.setUp();

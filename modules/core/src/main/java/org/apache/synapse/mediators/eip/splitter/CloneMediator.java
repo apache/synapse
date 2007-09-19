@@ -19,30 +19,24 @@
 
 package org.apache.synapse.mediators.eip.splitter;
 
-import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.mediators.eip.EIPUtils;
-import org.apache.synapse.mediators.eip.Target;
-import org.apache.synapse.MessageContext;
-import org.apache.synapse.Constants;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.endpoints.Endpoint;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.eip.EIPUtils;
+import org.apache.synapse.mediators.eip.Target;
 
-import javax.xml.namespace.QName;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This mediator will clone the message in to different messages and mediated as specified in
  * the target elements.
  */
 public class CloneMediator extends AbstractMediator {
+
+    private static final String MESSAGE_SEQUENCE = "messageSequence";
+    private static final String MESSAGE_SEQUENCE_DELEMITER = "/";
 
     /**
      * This will hold the logger which is used for logging purposes
@@ -63,45 +57,45 @@ public class CloneMediator extends AbstractMediator {
     /**
      * This will implement the mediate method of the Mediator interface and will provide the
      * functionality of cloning message in to the specified targets and mediation
-     * 
+     *
      * @param synCtx - MessageContext which is subjected to the cloning
      * @return boolean true if this needs to be further mediated (continueParent=true)
-     *  false otherwise
+     *         false otherwise
      */
     public boolean mediate(MessageContext synCtx) {
-        
+
         if (targets.size() != 0) {
-            
-            for (int i=0; i<targets.size(); i++) {
+
+            for (int i = 0; i < targets.size(); i++) {
                 MessageContext newContext = getClonedMessageContext(synCtx, i, targets.size());
                 Object o = targets.get(i);
-                
+
                 if (o instanceof Target) {
                     Target target = (Target) o;
                     target.mediate(newContext);
                 }
             }
         }
-        
+
         return continueParent;
     }
 
     /**
      * This private method is used to clone the MC in to a new MC
-     * 
-     * @param synCtx - MessageContext which is subjected to the clonning
+     *
+     * @param synCtx          - MessageContext which is subjected to the clonning
      * @param messageSequence - int clonning message number
-     * @param messageCount - int complete count of cloned messages
+     * @param messageCount    - int complete count of cloned messages
      * @return MessageContext which is cloned from the given parameters
      */
     private MessageContext getClonedMessageContext(MessageContext synCtx,
-                                                   int messageSequence, int messageCount) {
-        
+        int messageSequence, int messageCount) {
+
         MessageContext newCtx = EIPUtils.createNewMessageContext(synCtx, synCtx.getEnvelope());
 
         // Sets the property MESSAGE_SEQUENCE to the MC for aggragation purposes 
-        newCtx.setProperty(Constants.MESSAGE_SEQUENCE, String.valueOf(messageSequence)
-                + Constants.MESSAGE_SEQUENCE_DELEMITER + messageCount);
+        newCtx.setProperty(MESSAGE_SEQUENCE, String.valueOf(messageSequence)
+            + MESSAGE_SEQUENCE_DELEMITER + messageCount);
 
         return newCtx;
     }

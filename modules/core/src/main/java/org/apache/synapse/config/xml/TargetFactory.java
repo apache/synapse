@@ -47,7 +47,7 @@ public class TargetFactory {
     /**
      * Holds the QName of the target element in the xml configuration
      */
-    private static final QName TARGET_Q = new QName(Constants.SYNAPSE_NAMESPACE, "target");
+    private static final QName TARGET_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
 
     /**
      * This static method will be used to build the Target from the specified element
@@ -62,38 +62,38 @@ public class TargetFactory {
         }
 
         Target target = new Target();
-        OMAttribute toAttr = elem.getAttribute(new QName(Constants.NULL_NAMESPACE, "to"));
+        OMAttribute toAttr = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "to"));
         if (toAttr != null && toAttr.getAttributeValue() != null) {
             target.setTo(toAttr.getAttributeValue());
         }
 
         OMAttribute soapAction = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, "soapAction"));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "soapAction"));
         if (soapAction != null && soapAction.getAttributeValue() != null) {
             target.setSoapAction(soapAction.getAttributeValue());
         }
 
         OMAttribute sequenceAttr = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, "sequence"));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence"));
         if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
             target.setSequenceRef(sequenceAttr.getAttributeValue());
         }
 
         OMAttribute endpointAttr = elem.getAttribute(
-                new QName(Constants.NULL_NAMESPACE, "endpoint"));
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "endpoint"));
         if (endpointAttr != null && endpointAttr.getAttributeValue() != null) {
             target.setEndpointRef(endpointAttr.getAttributeValue());
         }
 
         OMElement sequence = elem.getFirstChildWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "sequence"));
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"));
         if (sequence != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
             target.setSequence(fac.createAnonymousSequence(sequence));
         }
 
         OMElement endpoint = elem.getFirstChildWithName(
-                new QName(Constants.SYNAPSE_NAMESPACE, "endpoint"));
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
         if (endpoint != null) {
             target.setEndpoint(EndpointAbstractFactory.
                     getEndpointFactroy(endpoint).createEndpoint(endpoint, true));

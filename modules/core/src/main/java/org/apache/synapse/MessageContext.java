@@ -27,6 +27,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.commons.logging.Log;
 
 import java.util.Set;
 import java.util.Stack;
@@ -314,4 +315,9 @@ public interface MessageContext {
 
     public void pushFaultHandler(FaultHandler fault);
 
+    /**
+     * Return the service level Log for this message context or null
+     * @return the service level Log for the message
+     */
+    public Log getServiceLog();
 }

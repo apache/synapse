@@ -37,6 +37,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.commons.logging.Log;
 
 /**
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the
@@ -291,5 +292,9 @@ public class ScriptMessageContext implements MessageContext {
 
     public void pushFaultHandler(FaultHandler fault) {
         mc.pushFaultHandler(fault);
+    }
+
+    public Log getServiceLog() {
+        return null;
     }
 }

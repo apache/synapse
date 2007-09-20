@@ -337,6 +337,19 @@ public class Axis2MessageContext implements MessageContext {
         this.faultStack.push(fault);
     }
 
+    /**
+     * Return the service level Log for this message context or null
+     * @return the service level Log for the message
+     */
+    public Log getServiceLog() {
+        String serviceName = (String) getProperty(SynapseConstants.PROXY_SERVICE);
+        if (serviceName != null && synCfg.getProxyService(serviceName) != null) {
+            return LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
+        } else {
+            return null;
+        }
+    }
+
     public org.apache.axis2.context.MessageContext getAxis2MessageContext() {
         return axis2MessageContext;
     }

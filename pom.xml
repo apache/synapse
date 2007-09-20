@@ -334,6 +334,17 @@
             </dependency>
 
             <dependency>
+                <groupId>commons-dbcp</groupId>
+                <artifactId>commons-dbcp</artifactId>
+                <version>${commons.dbcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>${commons.pool.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>wsdl4j</groupId>
                 <artifactId>wsdl4j</artifactId>
                 <version>${wsdl4j.version}</version>
@@ -553,6 +564,16 @@
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <version>${js.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>${commons.dbcp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>${commons.pool.version}</version>
         </dependency>
 
         <!-- dependencies for transports module -->
@@ -883,6 +904,8 @@
         <synapse.version>SNAPSHOT</synapse.version>
         <httpcore.nio.version>4.0-alpha6-SNAPSHOT</httpcore.nio.version>
         <jms.spec.version>1.0</jms.spec.version>
+        <commons.dbcp.version>1.2.2</commons.dbcp.version>
+        <commons.pool.version>1.3</commons.pool.version>
         <commons.vfs.version>1.0</commons.vfs.version>
         <commons.net.version>1.4.1</commons.net.version>
         <jsch.version>0.1.31</jsch.version>

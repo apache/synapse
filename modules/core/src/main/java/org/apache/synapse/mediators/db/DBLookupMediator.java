@@ -17,93 +17,65 @@
  *  under the License.
  */
 
-package org.apache.synapse.mediators.dblookup;
+package org.apache.synapse.mediators.db;
 
-import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.xml.namespace.QName;
 import java.sql.*;
 import java.util.*;
 
 /**
  * Simple database table lookup mediator. Designed only for read/lookup
  */
-public class DBLookupMediator extends AbstractMediator implements ManagedLifecycle {
+public class DBLookupMediator extends AbstractDBMediator {
 
     private static final Log log = LogFactory.getLog(DBLookupMediator.class);
 
-    /** Hold JDBC properties */
-    private Map jdbcProps = new HashMap();
-    /** The connection to the database */
-    Connection conn = null;
-    /** Query map */
-    Map queryMap = new HashMap();
     /** Result cache */
     Map cacheMap = new HashMap();
 
-    public boolean mediate(MessageContext msgCtx) {
+    protected void processStatement(Statement stmnt, MessageContext msgCtx) {
 
-        for (Iterator iter = queryMap.keySet().iterator(); iter.hasNext(); ) {
-            processQuery((String) iter.next(), msgCtx);
-        }
-        return true;
-    }
-
-    private void processQuery(String attName, MessageContext msgCtx) {
-
+/*
         // if available in cache, serve from cache and return
         String result = (String) cacheMap.get(attName);
         if (result != null) {
             msgCtx.setProperty(attName, result);
             return;
         }
-
-        Query query = (Query) queryMap.get(attName);
-
+*/
+        // execute the prepared statement, and extract the first result row and
+        // set as message context properties, any results that have been specified
         try {
-            PreparedStatement ps = query.getStatement();
+            PreparedStatement ps = getPreparedStatement(stmnt, msgCtx);
+            ResultSet rs = ps.executeQuery();
 
-            // set parameters if any
-            List params = query.getParameters();
-            int column = 1;
-            for (Iterator pi = params.iterator(); pi.hasNext(); ) {
-                Query.Parameter param = (Query.Parameter) pi.next();
-                switch (param.getType()) {
-                    case Types.VARCHAR: {
-                        ps.setString(column++,
-                            param.getPropertyName() != null ?
-                                (String) msgCtx.getProperty(param.getPropertyName()) :
-                                Axis2MessageContext.getStringValue(param.getXpath(), msgCtx));
-                        break;
+            if (rs.next()) {
+                Iterator propNameIter = stmnt.getResultsMap().keySet().iterator();
+                while (propNameIter.hasNext()) {
+                    String propName = (String) propNameIter.next();
+                    String columnStr = (String) stmnt.getResultsMap().get(propName);
+
+                    Object obj = null;
+                    try {
+                        int colNum = Integer.parseInt(columnStr);
+                        obj = rs.getObject(colNum);
+                    } catch (NumberFormatException ignore) {
+                        obj = rs.getObject(columnStr);
                     }
-                    case Types.INTEGER: {
-                        ps.setInt(column++,
-                            Integer.parseInt(param.getPropertyName() != null ?
-                                (String) msgCtx.getProperty(param.getPropertyName()) :
-                                Axis2MessageContext.getStringValue(param.getXpath(), msgCtx)));
-                        break;
-                    }
-                    default: {
+
+                    if (obj != null) {
+                        msgCtx.setProperty(propName, obj.toString());
+                        cacheMap.put(propName, obj.toString());
+                    } else {
                         // todo handle this
                     }
                 }
-            }
-
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Object obj = rs.getObject(1);
-                if (obj != null) {
-                    msgCtx.setProperty(attName, obj.toString());
-                    cacheMap.put(attName, obj.toString());
-                } else {
-                    // todo handle this
-                }
+            } else {
+                // todo
             }
         } catch (SQLException e) {
             // todo handle this
@@ -111,37 +83,4 @@ public class DBLookupMediator extends AbstractMediator implements ManagedLifecyc
         }
     }
 
-    public void init(SynapseEnvironment se) {
-        // establish database connection
-    }
-
-    public void destroy() {
-        // disconnect from the database
-        log.debug("Shutting down database connection of the DB Lookup mediator");
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            log.warn("Error shutting down the database connection", e);
-        }
-    }
-
-    public void setConn(Connection conn) {
-        this.conn = conn;
-    }
-
-    public void addQuery(String name, Query q) {
-        queryMap.put(name, q);
-    }
-
-    public void addJDBCProperty(QName name, String value) {
-        jdbcProps.put(name, value);
-    }
-
-    public Map getJdbcProps() {
-        return jdbcProps;
-    }
-
-    public Map getQueryMap() {
-        return queryMap;
-    }
 }

@@ -1,5 +1,3 @@
 org.apache.synapse.mediators.spring.SpringMediatorSerializer
 org.apache.synapse.mediators.bsf.ScriptMediatorSerializer
 org.apache.synapse.mediators.throttle.ThrottleMediatorSerializer
-org.apache.synapse.mediators.dblookup.DBLookupMediatorSerializer
-org.apache.synapse.mediators.dbreport.DBReportMediatorSerializer

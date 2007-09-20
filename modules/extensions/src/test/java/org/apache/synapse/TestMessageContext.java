@@ -28,6 +28,7 @@ import org.apache.axis2.addressing.RelatesTo;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
+import org.apache.commons.logging.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -274,5 +275,9 @@ public class TestMessageContext implements MessageContext {
 
     public void pushFaultHandler(FaultHandler fault) {
         faultStack.push(fault);
+    }
+
+    public Log getServiceLog() {
+        return null;
     }
 }

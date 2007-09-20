@@ -392,17 +392,31 @@ public class SequenceProcessor {
 		    
 			InvokerBeanMgr storageMapMgr = storageManager.getInvokerBeanMgr();
 
-			storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());
 			InvokerBean invokerBean = new InvokerBean(key, msgNo, sequenceId);
 			
 			ContextManager contextMgr = SandeshaUtil.getContextManager(configCtx);
 			if(contextMgr != null) invokerBean.setContext(contextMgr.storeContext());
 
-			storageMapMgr.insert(invokerBean);
+			boolean wasAdded = storageMapMgr.insert(invokerBean);
 
 			// This will avoid performing application processing more than once.
 			rmMsgCtx.setProperty(Sandesha2Constants.APPLICATION_PROCESSING_DONE, "true");
+			
+			if (wasAdded) {
+				storageManager.storeMessageContext(key, rmMsgCtx.getMessageContext());        
+			} else {
+				// Abort this message immediately as this message has already been added
+				sendAck = false;
+				result = InvocationResponse.ABORT;
+				RequestResponseTransport t = null;
+				t = (RequestResponseTransport) rmMsgCtx.getProperty(RequestResponseTransport.TRANSPORT_CONTROL);
 
+				// Tell the transport that there will be no response message
+				if(t != null && RequestResponseTransportStatus.WAITING.equals(t.getStatus())) {
+					TransportUtils.setResponseWritten(msgCtx, false);
+					t.acknowledgeMessage(msgCtx);
+				}
+			}
 		}
 
 		if (transaction != null && transaction.isActive()) 

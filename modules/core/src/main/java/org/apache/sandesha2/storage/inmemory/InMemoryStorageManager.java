@@ -235,7 +235,7 @@ public class InMemoryStorageManager extends StorageManager {
 				
 				if(entry != null) {
 					messageContext = entry.msgContext;
-					SOAPEnvelope clonedEnvelope = SandeshaUtil.cloneEnvelope(entry.envelope);
+					SOAPEnvelope clonedEnvelope = SandeshaUtil.copySOAPEnvelope(entry.envelope);
 					messageContext.setEnvelope(clonedEnvelope);
 				}
 			}

@@ -684,6 +684,8 @@ public class SandeshaClient {
 	 */
 	public static void waitUntilSequenceCompleted(ServiceClient serviceClient, long maxWaitingTime)
 			throws SandeshaException {
+		if (log.isDebugEnabled())
+			log.debug("Enter: SandeshaClient::waitUntilSequenceCompleted , " + maxWaitingTime);
 
 		long startTime = System.currentTimeMillis();
 
@@ -718,6 +720,8 @@ public class SandeshaClient {
 				}
 			}
 		}
+		if (log.isDebugEnabled())
+			log.debug("Exit: SandeshaClient::waitUntilSequenceCompleted , " + maxWaitingTime);
 	}
 
 	public static void waitUntilSequenceCompleted(ServiceClient serviceClient, long maxWaitingTime, String sequenceKey)

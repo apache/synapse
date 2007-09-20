@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.CopyUtils;
@@ -36,7 +34,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.AddressingConstants;
@@ -205,6 +202,8 @@ public class SandeshaUtil {
 			return "Fault";
 		case Sandesha2Constants.MessageTypes.MAKE_CONNECTION_MSG:
 			return "MakeConnection";
+		case Sandesha2Constants.MessageTypes.LAST_MESSAGE:
+			return "LastMessage";
 		case Sandesha2Constants.MessageTypes.UNKNOWN:
 			return "Unknown";
 		default:
@@ -994,22 +993,24 @@ public class SandeshaUtil {
 		
 	}
 
-        /** 
-         * Create a copy of the SOAPEnvelope
-         * @param sourceEnv
-         * @return targetEnv
-         */
-        private static SOAPEnvelope copySOAPEnvelope(SOAPEnvelope sourceEnv) {
-            if (log.isDebugEnabled()) {
-                log.debug("Start Create in-memory copy of the SOAPEnvelope");
-            }
-            // Delegate to the CopuUtils provided by Axiom
-            SOAPEnvelope targetEnv = CopyUtils.copy(sourceEnv);
-            if (log.isDebugEnabled()) {
-                log.debug("End Create in-memory copy of the SOAPEnvelope");
-            }
-            return targetEnv;
-        }
+	/** 
+	 * Create a copy of the SOAPEnvelope
+	 * @param sourceEnv
+	 * @return targetEnv
+	*/
+	public static SOAPEnvelope copySOAPEnvelope(SOAPEnvelope sourceEnv) {
+        if (log.isDebugEnabled()) 
+            log.debug("Enter: SandeshaUtil::copySOAPEnvelope");
+        
+        // Delegate to the CopuUtils provided by Axiom
+        SOAPEnvelope targetEnv = CopyUtils.copy(sourceEnv);
+        
+        if (log.isDebugEnabled()) 
+            log.debug("Exit: SandeshaUtil::copySOAPEnvelope");            
+		            
+		return targetEnv;
+	}
+
   /**
    * Remove the MustUnderstand header blocks.
    * @param envelope
@@ -1111,55 +1112,7 @@ public class SandeshaUtil {
 		}
 		else return false;
 	}	
-	
-	
-  public static SOAPEnvelope cloneEnvelope(SOAPEnvelope envelope) throws SandeshaException {
-	    
-	    // Now clone the env and set it in the message context. We need to be sure that we
-    // close off the stream reader, in order to free up some of the heap.
-    XMLStreamReader streamReader = null;
-    SOAPEnvelope clonedEnvelope = null;
-    try {
-      streamReader = envelope.getXMLStreamReader();     
-      clonedEnvelope = new StAXSOAPModelBuilder(streamReader, null).getSOAPEnvelope();
-      // you have to explicitely set the 'processed' attribute for header
-      // blocks, since it get lost in the above read from the stream.
-     
-      SOAPHeader header = envelope.getHeader();
-      if (header != null) {
-        Iterator childrenOfOldEnv = header.getChildElements();
-        Iterator childrenOfNewEnv = clonedEnvelope.getHeader().getChildElements();
-        while (childrenOfOldEnv.hasNext()) {        
-          SOAPHeaderBlock oldEnvHeaderBlock = (SOAPHeaderBlock) childrenOfOldEnv.next();
-          SOAPHeaderBlock newEnvHeaderBlock = (SOAPHeaderBlock) childrenOfNewEnv.next();
-
-          QName oldEnvHeaderBlockQName = oldEnvHeaderBlock.getQName();
-          if (oldEnvHeaderBlockQName != null) {
-            if (oldEnvHeaderBlockQName.equals(newEnvHeaderBlock.getQName())) {
-              if (oldEnvHeaderBlock.isProcessed())
-                newEnvHeaderBlock.setProcessed();
-              } else {
-                String message = SandeshaMessageHelper.getMessage(SandeshaMessageKeys.cloneDoesNotMatchToOriginal);
-                throw new SandeshaException(message);
-              }
-            }
-          }
-        }
-        // Completely build the new tree
-        clonedEnvelope.build();
-      } finally {
-      if(streamReader != null) {
-        try {
-          streamReader.close();
-        } catch(XMLStreamException e) {
-          log.debug("Caught exception closing stream", e);
-        }
-      }
-
-    }
-    return clonedEnvelope;
-  }
-	  
+	 	  
 	public static final String getStackTraceFromException(Exception e) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     PrintWriter pw = new PrintWriter(baos);

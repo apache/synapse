@@ -114,7 +114,11 @@ public class MakeConnectionProcessor implements MsgProcessor {
 			if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage, no matching message found");
 			return false;
 		}
-		
+	
+		if (transaction != null && transaction.isActive()) {
+			transaction.commit();
+			transaction = storageManager.getTransaction();
+		}
 		replyToPoll(rmMsgCtx, senderBean, storageManager, pending, makeConnection.getNamespaceValue(), transaction);
 		
 		if(log.isDebugEnabled()) log.debug("Exit: MakeConnectionProcessor::processInMessage");

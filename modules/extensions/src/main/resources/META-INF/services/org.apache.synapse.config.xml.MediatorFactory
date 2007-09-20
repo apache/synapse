@@ -2,5 +2,3 @@ org.apache.synapse.mediators.spring.SpringMediatorFactory
 org.apache.synapse.mediators.bsf.ScriptMediatorFactory
 org.apache.synapse.mediators.attachment.AttachmentMediatorFactory
 org.apache.synapse.mediators.throttle.ThrottleMediatorFactory
-org.apache.synapse.mediators.dblookup.DBLookupMediatorFactory
-org.apache.synapse.mediators.dbreport.DBReportMediatorFactory

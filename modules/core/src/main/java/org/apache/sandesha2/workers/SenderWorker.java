@@ -547,6 +547,10 @@ public class SenderWorker extends SandeshaWorker implements Runnable {
 				responseMessageContext.setProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE, requestMsgOpCtx
 								.getProperty(HTTPConstants.MTOM_RECEIVED_CONTENT_TYPE));
 
+ responseMessageContext.setOperationContext(requestMsgOpCtx);
+                if ( !requestMsgOpCtx.isComplete()) {
+                    requestMsgOpCtx.addMessageContext(responseMessageContext);
+                }
 				//If the response MsgCtx was not available Axis2 would hv put the transport info into a 
 				//HashMap, getting the data from it.
 				HashMap transportInfoMap = (HashMap) msgCtx.getProperty(Constants.Configuration.TRANSPORT_INFO_MAP);

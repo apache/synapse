@@ -199,6 +199,7 @@ public class ValidateMediator extends AbstractListMediator {
                                     " Executing 'on-fail' sequence");
                     log.debug("Failed message envelope : " + synCtx.getEnvelope());
                 }
+		    synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorHandler.getSaxParseException().getMessage());
                 // super.mediate() invokes the "on-fail" sequence of mediators
                 if (shouldTrace) {
                     trace.trace("Validation failed. Invoking the \"on-fail\" " +

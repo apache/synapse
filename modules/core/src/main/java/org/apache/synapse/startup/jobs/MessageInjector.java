@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.apache.synapse.startup.jobs;
 
 import org.apache.axiom.om.OMElement;
@@ -10,29 +29,67 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.startup.Job;
 import org.apache.synapse.util.PayloadHelper;
 
+/**
+ * Injects a Message in to the Synapse environment
+ */
 public class MessageInjector implements Job, ManagedLifecycle {
-	private Log log = LogFactory.getLog(MessageInjector.class);
 
-	private OMElement message;
+    /**
+     * Holds the logger for logging purposes
+     */
+    private Log log = LogFactory.getLog(MessageInjector.class);
 
-	String to;
+    /**
+     * Holds the Message to be injected
+     */
+    private OMElement message = null;
 
-	private SynapseEnvironment synapseEnvironment;
+    /**
+     * Holds the to address for the message to be injected
+     */
+    private String to = null;
 
-	public void init(SynapseEnvironment se) {
+    /**
+     * Holds the SynapseEnv to which the message will be injected
+     */
+    private SynapseEnvironment synapseEnvironment;
+
+    /**
+     * Initializes the Injector
+     *
+     * @param se
+     *          SynapseEnvironment of synapse
+     */
+    public void init(SynapseEnvironment se) {
 		synapseEnvironment = se;
 	}
 
-	public void setMessage(OMElement el) {
-		log.debug("set message " + el.toString());
-		message = el;
+    /**
+     * Set the message to be injected
+     *
+     * @param elem
+     *          OMElement describing the message
+     */
+    public void setMessage(OMElement elem) {
+		log.debug("set message " + elem.toString());
+		message = elem;
 	}
 
-	public void setTo(String url) {
+    /**
+     * Set the to address of the message to be injected
+     *
+     * @param url
+     *          String containing the to address
+     */
+    public void setTo(String url) {
 		to = url;
 	}
 
-	public void execute() {
+    /**
+     * This will be invoked by the schedular to inject the message
+     * in to the SynapseEnvironment
+     */
+    public void execute() {
 		log.debug("execute");
 		if (synapseEnvironment == null) {
 			log.error("Synapse Environment not set");
@@ -55,7 +112,10 @@ public class MessageInjector implements Job, ManagedLifecycle {
 
 	}
 
-	public void destroy() {
+    /**
+     * Destroys the Injector
+     */
+    public void destroy() {
 	}
 
 }

@@ -59,11 +59,10 @@
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/fault</actionMapping>
 
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
      </operation>
  
      <operation name="Sandesha2OperationInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
-        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
-        
         <!-- namespaces for the 2005-02 spec -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</actionMapping>
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/AckRequested</actionMapping>
@@ -139,7 +138,6 @@
 	      <!-- This will not be overriden by service level policies -->
 				<sandesha2:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</sandesha2:SecurityManager>
 				<sandesha2:ContextManager>org.apache.sandesha2.context.DummyContextManager</sandesha2:ContextManager>
-				<sandesha2:EPRDecorator>org.apache.sandesha2.addressing.EPRDecoratorImpl</sandesha2:EPRDecorator>
 				
 				<sandesha2:MakeConnection>
 				  <sandesha2:Enabled>true</sandesha2:Enabled>

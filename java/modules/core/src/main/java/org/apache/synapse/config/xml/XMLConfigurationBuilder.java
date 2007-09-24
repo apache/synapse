@@ -29,7 +29,6 @@ import org.apache.synapse.config.SynapseConfiguration;
 
 import javax.xml.stream.XMLStreamException;
 
-
 /**
  * Builds a Synapse Configuration from an XML input stream
  */
@@ -39,15 +38,12 @@ public class XMLConfigurationBuilder {
 
     public static SynapseConfiguration getConfiguration(InputStream is) throws XMLStreamException {
 
-    	
         log.info("Generating the Synapse configuration model by parsing the XML configuration");
-        OMElement definitions = null;
         
-        definitions = new StAXOMBuilder(is).getDocumentElement();
+        OMElement definitions = new StAXOMBuilder(is).getDocumentElement();
         definitions.build();
-        
-        SynapseConfiguration config = ConfigurationFactoryAndSerializerFinder.getInstance().getConfiguration(definitions);
-        return config;
+
+        return ConfigurationFactoryAndSerializerFinder.getInstance().getConfiguration(definitions);
         
     }
 }

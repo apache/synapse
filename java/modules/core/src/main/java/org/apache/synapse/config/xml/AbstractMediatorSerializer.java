@@ -36,8 +36,10 @@ import java.util.Iterator;
 public abstract class AbstractMediatorSerializer implements MediatorSerializer {
 
     protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-    protected static final OMNamespace synNS = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
-    protected static final OMNamespace nullNS = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+    protected static final OMNamespace synNS
+            = fac.createOMNamespace(XMLConfigConstants.SYNAPSE_NAMESPACE, "syn");
+    protected static final OMNamespace nullNS
+            = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
     private static final Log log = LogFactory.getLog(AbstractMediatorSerializer.class);
 
     /**

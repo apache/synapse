@@ -1,5 +1,23 @@
-package org.apache.synapse.config.xml;
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
 
+package org.apache.synapse.config.xml;
 
 import java.util.Iterator;
 
@@ -12,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.Startup;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.Util;
@@ -23,65 +42,65 @@ import org.apache.synapse.mediators.builtin.LogMediator;
 import org.apache.synapse.mediators.builtin.SendMediator;
 
 public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
-	private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
-	
-	public SynapseConfiguration getConfiguration(OMElement definitions) {
-		if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) throw new SynapseException("Wrong QName for this config factory "+definitions.getQName());
-		
-		
-		SynapseConfiguration config = new SynapseConfiguration();
-		config.setDefaultQName(definitions.getQName());
-		
+    
+    private static Log log = LogFactory.getLog(SynapseXMLConfigurationFactory.class);
+
+    public SynapseConfiguration getConfiguration(OMElement definitions) {
+        
+        if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) {
+            throw new SynapseException(
+                    "Wrong QName for this config factory " + definitions.getQName());
+        }
+
+        SynapseConfiguration config = new SynapseConfiguration();
+        config.setDefaultQName(definitions.getQName());
+
         SequenceMediator rootSequence = new SequenceMediator();
         rootSequence.setName(org.apache.synapse.SynapseConstants.MAIN_SEQUENCE_KEY);
 
-
-
-                Iterator iter = definitions.getChildren();
-
-                while (iter.hasNext()) {
-                    Object o = iter.next();
-                    if (o instanceof OMElement) {
-                        OMElement elt = (OMElement) o;
-                        if (XMLConfigConstants.SEQUENCE_ELT.equals(elt.getQName())) {
-                            String key = elt.getAttributeValue(
-                                new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
-                            // this could be a sequence def or a mediator of the main sequence
-                            if (key != null) {
-                                Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
-                                rootSequence.addChild(m);
-                            } else {
-                                defineSequence(config, elt);
-                            }
-                        } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
-                            defineEndpoint(config, elt);
-                        } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
-                            defineEntry(config, elt);
-                        } else if (XMLConfigConstants.PROXY_ELT.equals(elt.getQName())) {
-                            defineProxy(config, elt);
-                        } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
-                            defineRegistry(config, elt);
-                        } else if (XMLConfigConstants.STARTUP_ELT.equals(elt.getQName())) {
-                            defineStartup(config, elt);
-                        }  
-                        else {
-                            Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
-                            rootSequence.addChild(m);
-                        }
+        Iterator iter = definitions.getChildren();
+        
+        while (iter.hasNext()) {
+            Object o = iter.next();
+            if (o instanceof OMElement) {
+                OMElement elt = (OMElement) o;
+                if (XMLConfigConstants.SEQUENCE_ELT.equals(elt.getQName())) {
+                    String key = elt.getAttributeValue(
+                            new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
+                    // this could be a sequence def or a mediator of the main sequence
+                    if (key != null) {
+                        Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
+                        rootSequence.addChild(m);
+                    } else {
+                        defineSequence(config, elt);
                     }
+                } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
+                    defineEndpoint(config, elt);
+                } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
+                    defineEntry(config, elt);
+                } else if (XMLConfigConstants.PROXY_ELT.equals(elt.getQName())) {
+                    defineProxy(config, elt);
+                } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
+                    defineRegistry(config, elt);
+                } else if (XMLConfigConstants.STARTUP_ELT.equals(elt.getQName())) {
+                    defineStartup(config, elt);
+                } else {
+                    Mediator m = MediatorFactoryFinder.getInstance().getMediator(elt);
+                    rootSequence.addChild(m);
                 }
-
-
+            }
+        }
 
         if (config.getLocalRegistry().isEmpty() && config.getProxyServices().isEmpty() &&
                 rootSequence.getList().isEmpty() && config.getRegistry() != null) {
             OMNode remoteConfigNode = config.getRegistry().lookup("synapse.xml");
             try {
-            	config = XMLConfigurationBuilder.getConfiguration(Util.getStreamSource(remoteConfigNode).getInputStream());
+                config = XMLConfigurationBuilder.getConfiguration(
+                        Util.getStreamSource(remoteConfigNode).getInputStream());
             } catch (XMLStreamException xse) {
-            	throw new SynapseException("Problem loading remote synapse.xml ",xse);
+                throw new SynapseException("Problem loading remote synapse.xml ", xse);
             }
-            
+
         }
 
         if (config.getMainSequence() == null) {
@@ -109,12 +128,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
         config.setRegistry(RegistryFactory.createRegistry(elem));
     }
-    
+
     private static void defineStartup(SynapseConfiguration config, OMElement elem) {
-        if (config.getStartup() != null) {
-            handleException("Only one startup set can be defined within a configuration");
+        Startup startup = StartupFinder.getInstance().getStartup(elem);
+        if (config.getStartup(startup.getId()) != null) {
+            handleException("Duplicate startup with id : " + startup.getId());
         }
-        config.setStartup(StartupWrapperFactory.createStartup(elem));
+        config.addStartup(startup);
     }
 
     private static void defineProxy(SynapseConfiguration config, OMElement elem) {
@@ -199,14 +219,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         throw new SynapseException(msg, e);
     }
 
-	
-	public QName getTagQName() {
-		
-		return XMLConfigConstants.DEFINITIONS_ELT;
-	}
 
-	public Class getSerializerClass() {
-		return SynapseXMLConfigurationSerializer.class;
-	}
+    public QName getTagQName() {
+
+        return XMLConfigConstants.DEFINITIONS_ELT;
+    }
+
+    public Class getSerializerClass() {
+        return SynapseXMLConfigurationSerializer.class;
+    }
 
 }

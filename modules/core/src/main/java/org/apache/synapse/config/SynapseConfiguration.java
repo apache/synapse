@@ -23,10 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.SynapseException;
+import org.apache.synapse.*;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -45,8 +42,7 @@ import java.util.*;
  */
 public class SynapseConfiguration implements ManagedLifecycle {
 
-	private static final Log log = LogFactory
-			.getLog(SynapseConfiguration.class);
+	private static final Log log = LogFactory.getLog(SynapseConfiguration.class);
 
 	/**
 	 * The remote registry made available to the Synapse configuration. Only one
@@ -54,16 +50,22 @@ public class SynapseConfiguration implements ManagedLifecycle {
 	 */
 	Registry registry = null;
 
-	private QName defaultQName = null;
-
-	/** Holds Proxy services defined through Synapse */
-	private Map proxyServices = new HashMap();
-
-	private List startup = null; // this will be a list of ManagedLifecycle
-
-	// objects
+    /**
+     * This holds the default QName of the configuraiton
+     */
+    private QName defaultQName = null;
 
 	/**
+     * Holds Proxy services defined through Synapse
+     */
+	private Map proxyServices = new HashMap();
+
+    /**
+     * This holds a Map of ManagedLifecycle objects
+     */
+    private Map startups = new HashMap();
+
+    /**
 	 * The local registry is a simple HashMap and provides the ability to
 	 * override definitions of a remote registry for entries defined locally
 	 * with the same key
@@ -220,7 +222,28 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		}
 	}
 
-	/**
+    /**
+     * Gives the set of remote entries that are cached in localRegistry as mapping of entry key
+     * to the Entry definition
+     * 
+     * @return Map of locally cached entries
+     */
+    public Map getCachedEntries() {
+        Map cachedEntries = new HashMap();
+        for (Iterator itr = localRegistry.values().iterator(); itr.hasNext();) {
+            Object o = itr.next();
+            if (o != null && o instanceof Entry) {
+                Entry entry = (Entry) o;
+                if (entry.isDynamic() && entry.isCached()) {
+                    cachedEntries.put(entry.getKey(), entry);
+                }
+            }
+        }
+
+        return cachedEntries;
+    }
+
+    /**
 	 * Returns the map of defined entries in the configuraiton excluding the
 	 * fetched entries from remote registry
 	 *
@@ -304,7 +327,35 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		localRegistry.remove(key);
 	}
 
-	/**
+    /**
+     * Clears the cache of the remote entry with the key specified
+     * 
+     * @param key - String key of the entry
+     */
+    public void clearCachedEntry(String key) {
+        Entry entry = getEntryDefinition(key);
+        if (entry.isDynamic() && entry.isCached()) {
+            entry.clearCache();
+        }
+    }
+
+    /**
+     * Clears the cache of all the remote entries which has been
+     * cached in the configuration
+     */
+    public void clearCache() {
+        for (Iterator itr = localRegistry.values().iterator(); itr.hasNext();) {
+            Object o = itr.next();
+            if (o != null && o instanceof Entry) {
+                Entry entry = (Entry) o;
+                if (entry.isDynamic() && entry.isCached()) {
+                    entry.clearCache();
+                }
+            }
+        }
+    }
+
+    /**
 	 * Define a named endpoint with the given key
 	 *
 	 * @param key
@@ -513,37 +564,79 @@ public class SynapseConfiguration implements ManagedLifecycle {
 		this.pathToConfigFile = pathToConfigFile;
 	}
 
-	private void handleException(String msg) {
-		log.error(msg);
-		throw new SynapseException(msg);
-	}
-
-	public void setDefaultQName(QName defaultQName) {
+    /**
+     * Set the default QName of the Synapse Configuration
+     * 
+     * @param defaultQName
+     *          QName specifying the default QName of the configuration
+     */
+    public void setDefaultQName(QName defaultQName) {
 		this.defaultQName = defaultQName;
 	}
 
-	public QName getDefaultQName() {
+    /**
+     * Get the default QName of the configuraiton
+     * 
+     * @return default QName of the configuration
+     */
+    public QName getDefaultQName() {
 		return defaultQName;
 	}
 
-	public void setStartup(List l) {
-		startup = l;
-	}
-
-	public List getStartup() {
-		return startup;
-	}
-
+    /**
+     * Get the timer object for the Synapse Configuration
+     *
+     * @return synapseTimer timer object of the configuration
+     */
     public Timer getSynapseTimer() {
         return synapseTimer;
     }
 
+    /**
+     * Get the startup collection in the configuration
+     *
+     * @return collection of startup objects registered
+     */
+    public Collection getStartups() {
+        return startups.values();
+    }
+
+    /**
+     * Get the Startup with the specified id
+     * 
+     * @param id  
+     *          String id of the startup to be retrieved
+     * @return Startup object with the specified id or null
+     */
+    public Startup getStartup(String id) {
+        return (Startup) startups.get(id);
+    }
+
+    /**
+     * Add a startup to the startups map in the configuration
+     *
+     * @param startup
+     *              Startup object to be added 
+     */
+    public void addStartup(Startup startup) {
+        startups.put(startup.getId(), startup);
+    }
+
+    /**
+     * This method will be called on the soft shutdown or destroying the configuration
+     * and will destroy all the statefull managed parts of the configuration
+     */
     public void destroy() {
+        
         if (log.isDebugEnabled()) {
-            log.debug("destroy");
+            log.debug("Destroying the Synapse Configuration");
         }
+
+        // clear the timer tasks of Synapse
         synapseTimer.cancel();
         synapseTimer = null;
+
+        // stop and shutdown all the proxy services
         for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
             Object o = it.next();
             if (o instanceof ProxyService) {
@@ -557,6 +650,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
             }
         }
 
+        // destroy the managed mediators
         Map sequences = getDefinedSequences();
         for (Iterator it = sequences.entrySet().iterator(); it.hasNext();) {
             Object o = it.next();
@@ -565,8 +659,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 m.destroy();
             }
         }
-        if (startup != null) {
-            for (Iterator it = startup.iterator(); it.hasNext();) {
+
+        // destroy the startups
+        if (startups != null) {
+            for (Iterator it = startups.values().iterator(); it.hasNext();) {
                 Object o = it.next();
                 if (o instanceof ManagedLifecycle) {
                     ManagedLifecycle m = (ManagedLifecycle) o;
@@ -576,10 +672,20 @@ public class SynapseConfiguration implements ManagedLifecycle {
         }
     }
 
+    /**
+     * This method will be called in the startup of Synapse or in an initiation
+     * and will initialize all the managed parts of the Synapse Configuration
+     *
+     * @param se
+     *          SynapseEnvironment specifying the env to be initialized
+     */
     public void init(SynapseEnvironment se) {
+        
         if (log.isDebugEnabled()) {
-            log.debug("init");
+            log.debug("Initializing the Synapse Configuration");
         }
+
+        // initialize all the proxy services
         for (Iterator it = getProxyServices().iterator(); it.hasNext();) {
             Object o = it.next();
             if (o instanceof ProxyService) {
@@ -593,6 +699,7 @@ public class SynapseConfiguration implements ManagedLifecycle {
             }
         }
 
+        // initialize managed mediators
         Map sequences = getDefinedSequences();
         for (Iterator it = sequences.values().iterator(); it.hasNext();) {
             Object o = it.next();
@@ -601,8 +708,10 @@ public class SynapseConfiguration implements ManagedLifecycle {
                 m.init(se);
             }
         }
-        if (startup != null) {
-            for (Iterator it = startup.iterator(); it.hasNext();) {
+
+        // initialize the startups
+        if (startups != null) {
+            for (Iterator it = startups.values().iterator(); it.hasNext();) {
                 Object o = it.next();
                 if (o instanceof ManagedLifecycle) {
                     ManagedLifecycle m = (ManagedLifecycle) o;
@@ -611,4 +720,9 @@ public class SynapseConfiguration implements ManagedLifecycle {
             }
         }
     }
+
+    private void handleException(String msg) {
+		log.error(msg);
+		throw new SynapseException(msg);
+	}
 }

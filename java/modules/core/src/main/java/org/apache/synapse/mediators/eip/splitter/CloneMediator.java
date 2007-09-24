@@ -35,9 +35,6 @@ import java.util.List;
  */
 public class CloneMediator extends AbstractMediator {
 
-    private static final String MESSAGE_SEQUENCE = "messageSequence";
-    private static final String MESSAGE_SEQUENCE_DELEMITER = "/";
-
     /**
      * This will hold the logger which is used for logging purposes
      */
@@ -94,8 +91,8 @@ public class CloneMediator extends AbstractMediator {
         MessageContext newCtx = EIPUtils.createNewMessageContext(synCtx, synCtx.getEnvelope());
 
         // Sets the property MESSAGE_SEQUENCE to the MC for aggragation purposes 
-        newCtx.setProperty(MESSAGE_SEQUENCE, String.valueOf(messageSequence)
-            + MESSAGE_SEQUENCE_DELEMITER + messageCount);
+        newCtx.setProperty(EIPUtils.MESSAGE_SEQUENCE, String.valueOf(messageSequence)
+            + EIPUtils.MESSAGE_SEQUENCE_DELEMITER + messageCount);
 
         return newCtx;
     }

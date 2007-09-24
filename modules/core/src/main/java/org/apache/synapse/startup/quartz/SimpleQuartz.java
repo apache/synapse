@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.apache.synapse.startup.quartz;
 
 import java.util.HashSet;
@@ -12,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.startup.AbstractStartup;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -28,126 +48,128 @@ import org.quartz.impl.DirectSchedulerFactory;
  * SimpleQuartzJob is there to set the properties and start the actual business-logic class
  * It wraps up any properties that the job needs as in the JobDetail and JDMap
  */
-public class SimpleQuartz implements Startup {
-	private static final Log log = LogFactory.getLog(SimpleQuartz.class);
-	private static final int THREADPOOLSIZE = 5;
+public class SimpleQuartz extends AbstractStartup {
 
-	private String cron;
+    private static final Log log = LogFactory.getLog(SimpleQuartz.class);
+    private static final int THREADPOOLSIZE = 5;
 
-	private int repeatCount;
+    private String cron;
 
-	private long repeatInterval;
+    private int repeatCount;
 
-	private boolean simple; // true means use repeat, false means use cron
+    private long repeatInterval;
 
-	private String className;
+    private boolean simple; // true means use repeat, false means use cron
 
-//	private SynapseEnvironment synapseEnvironment;
+    private String className;
 
-	private Scheduler sch;
+    private Scheduler sch;
 
-	Set xmlProperties = new HashSet();
+    Set xmlProperties = new HashSet();
 
-	public QName getTagQName() {
-		return SimpleQuartzFactory.JOB;
-	}
+    public QName getTagQName() {
+        return SimpleQuartzFactory.JOB;
+    }
 
-	public void destroy() {
-		if (sch != null) {
-			try {
-				sch.shutdown();
-			} catch (SchedulerException e) {
-				throw new SynapseException(e);
-			}
-		}
+    public void destroy() {
+        if (sch != null) {
+            try {
+                sch.shutdown();
+            } catch (SchedulerException e) {
+                throw new SynapseException(e);
+            }
+        }
 
-	}
+    }
 
-	public void init(SynapseEnvironment synapseEnvironment) {
-		
-		//this.synapseEnvironment = synapseEnvironment;
-		try {
-			DirectSchedulerFactory.getInstance().createVolatileScheduler(
-					THREADPOOLSIZE);
-			sch = DirectSchedulerFactory.getInstance().getScheduler();
-			Trigger trigger = null;
-			if (simple) {
-				
-				trigger = TriggerUtils.makeImmediateTrigger(repeatCount, repeatInterval);
-			} else {
-				CronTrigger cronTrig = new CronTrigger();
-				cronTrig.setCronExpression(cron);
-				trigger = cronTrig;
-			}
-			// give the trigger a random name
-			trigger.setName("Trigger"+String.valueOf((new Random()).nextLong()));
-			trigger.setGroup("synapse.simple.quartz");
-			trigger.setVolatility(true);
-			JobDetail jobDetail = new JobDetail();
-			// Give the job a random name 
-			jobDetail.setName("Job"+String.valueOf((new Random()).nextLong()));
-			jobDetail.setGroup("synapse.simple.quartz");
-			jobDetail.setJobClass(SimpleQuartzJob.class);
-			JobDataMap jdm = new JobDataMap();
-			jdm.put(SimpleQuartzJob.SYNAPSEENVIRONMENT, synapseEnvironment);
-			jdm.put(SimpleQuartzJob.CLASSNAME, className);
-			jdm.put(SimpleQuartzJob.PROPERTIES, xmlProperties);
-			jobDetail.setJobDataMap(jdm);
-			sch.scheduleJob(jobDetail, trigger);
-			sch.start();
-			log.info("Scheduled job "+jobDetail.getFullName()+" for class "+className);
+    public void init(SynapseEnvironment synapseEnvironment) {
 
-		} catch (Exception e) {
-			throw new SynapseException("Problem with startup of Scheduler ", e);
-		}
+        try {
+            DirectSchedulerFactory.getInstance().createVolatileScheduler(
+                    THREADPOOLSIZE);
+            sch = DirectSchedulerFactory.getInstance().getScheduler();
+            Trigger trigger = null;
+            if (simple) {
 
-	}
+                trigger = TriggerUtils.makeImmediateTrigger(repeatCount, repeatInterval);
+            } else {
+                CronTrigger cronTrig = new CronTrigger();
+                cronTrig.setCronExpression(cron);
+                trigger = cronTrig;
+            }
+            // give the trigger a random name
+            trigger.setName("Trigger" + String.valueOf((new Random()).nextLong()));
+            trigger.setGroup("synapse.simple.quartz");
+            trigger.setVolatility(true);
+            JobDetail jobDetail = new JobDetail();
+            // Give the job a random name
+            jobDetail.setName("Job" + String.valueOf((new Random()).nextLong()));
+            jobDetail.setGroup("synapse.simple.quartz");
+            jobDetail.setJobClass(SimpleQuartzJob.class);
+            JobDataMap jdm = new JobDataMap();
+            jdm.put(SimpleQuartzJob.SYNAPSEENVIRONMENT, synapseEnvironment);
+            jdm.put(SimpleQuartzJob.CLASSNAME, className);
+            jdm.put(SimpleQuartzJob.PROPERTIES, xmlProperties);
+            jobDetail.setJobDataMap(jdm);
+            sch.scheduleJob(jobDetail, trigger);
+            sch.start();
+            log.info("Scheduled job " + jobDetail.getFullName() + " for class " + className);
 
-	public String getJobClass() {
-		return className;
-	}
-	
-	public void setJobClass(String attributeValue) {
-		className = attributeValue;
+        } catch (Exception e) {
+            throw new SynapseException("Problem with startup of Scheduler ", e);
+        }
 
-	}
+    }
 
-	public void setSimple(boolean b) {
-		simple = b;
-	}
-	
-	public boolean isSimple() {
-		return simple;
-	}
+    public String getJobClass() {
+        return className;
+    }
 
-	public void setInterval(long l) {
-		repeatInterval = l;
+    public void setJobClass(String attributeValue) {
+        className = attributeValue;
 
-	}
-	public long getInterval() {
-		return repeatInterval;
-	}
+    }
 
-	public void setCount(int i) {
-		repeatCount = i;
-	}
-	public int getCount() {
-		return repeatCount;
-	}
+    public void setSimple(boolean b) {
+        simple = b;
+    }
 
-	public void addProperty(OMElement prop) {
-		xmlProperties.add(prop);
-	}
-	public Set getProperties() {
-		return xmlProperties;
-	}
+    public boolean isSimple() {
+        return simple;
+    }
 
-	public void setCron(String attributeValue) {
-		cron = attributeValue;
+    public void setInterval(long l) {
+        repeatInterval = l;
 
-	}
-	public String getCron() {
-		return cron;
-	}
+    }
+
+    public long getInterval() {
+        return repeatInterval;
+    }
+
+    public void setCount(int i) {
+        repeatCount = i;
+    }
+
+    public int getCount() {
+        return repeatCount;
+    }
+
+    public void addProperty(OMElement prop) {
+        xmlProperties.add(prop);
+    }
+
+    public Set getProperties() {
+        return xmlProperties;
+    }
+
+    public void setCron(String attributeValue) {
+        cron = attributeValue;
+
+    }
+
+    public String getCron() {
+        return cron;
+    }
 
 }

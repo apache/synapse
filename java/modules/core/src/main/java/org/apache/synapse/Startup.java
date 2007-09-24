@@ -24,12 +24,26 @@ import javax.xml.namespace.QName;
 /**
  * This startup interface will be instatiated to create startup tasks
  */
-public interface Startup extends ManagedLifecycle{
+public interface Startup extends ManagedLifecycle {
 
     /**
      * This will return the configuration tag QName of the implemented startup
-     * 
+     *
      * @return QName representing the configuraiton element for the startup
      */
-    public QName getTagQName();
+    public abstract QName getTagQName();
+
+    /**
+     * This will return the id of the startup
+     *
+     * @return String representing the id
+     */
+    public String getId();
+
+    /**
+     * This will set the id of a Startup
+     *
+     * @param id String id to be set to the startup
+     */
+    public void setId(String id);
 }

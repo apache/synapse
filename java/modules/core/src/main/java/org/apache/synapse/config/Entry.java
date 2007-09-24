@@ -156,6 +156,12 @@ public class Entry {
         return value != null;
     }
 
+    public void clearCache() {
+        if (this.isDynamic()) {
+            value = null;
+        }
+    }
+
     public boolean isDynamic() {
         return type == REMOTE_ENTRY;
     }

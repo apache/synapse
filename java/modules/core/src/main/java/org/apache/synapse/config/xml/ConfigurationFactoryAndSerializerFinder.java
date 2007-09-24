@@ -17,7 +17,6 @@
  *  under the License.
  */
 
-
 package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
@@ -38,33 +37,29 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *
- * 
  * This class is based on J2SE Service Provider model
  * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
- * 
+ * <p/>
  * It deals with both the problem of turning an XML into a Synapse config and vice-versa
  */
+public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapper {
 
-/**
- * @author paul
- *
- */
-public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapper {
+    private static final Log log = LogFactory
+            .getLog(ConfigurationFactoryAndSerializerFinder.class);
 
-	private static final Log log = LogFactory.getLog(ConfigurationFactoryAndSerializerFinder.class);
-
-	private static final Class[] configurationFactories = {
-        SynapseXMLConfigurationFactory.class,
+    private static final Class[] configurationFactories = {
+            SynapseXMLConfigurationFactory.class,
     };
-	
+
 
     private static ConfigurationFactoryAndSerializerFinder instance = null;
 
     /**
      * A map of mediator QNames to implementation class
      */
-    private static Map factoryMap = new HashMap(), serializerMap = new HashMap();
+    private static Map factoryMap = new HashMap();
+
+    private static Map serializerMap = new HashMap();
 
     public static synchronized ConfigurationFactoryAndSerializerFinder getInstance() {
         if (instance == null) {
@@ -82,19 +77,19 @@ public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapp
     }
 
     private ConfigurationFactoryAndSerializerFinder() {
-	
+
         factoryMap = new HashMap();
 
         for (int i = 0; i < configurationFactories.length; i++) {
-			Class c = configurationFactories[i];
-			try {
+            Class c = configurationFactories[i];
+            try {
                 ConfigurationFactory fac = (ConfigurationFactory) c.newInstance();
                 factoryMap.put(fac.getTagQName(), c);
                 serializerMap.put(fac.getTagQName(), fac.getSerializerClass());
             } catch (Exception e) {
-				throw new SynapseException("Error instantiating " + c.getName(), e);
-			}
-		}
+                throw new SynapseException("Error instantiating " + c.getName(), e);
+            }
+        }
         // now iterate through the available pluggable mediator factories
         registerExtensions();
     }
@@ -111,13 +106,11 @@ public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapp
 
     /**
      * Register pluggable mediator factories from the classpath
-     *
+     * <p/>
      * This looks for JAR files containing a META-INF/services that adheres to the following
      * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider
      */
     private void registerExtensions() {
-
-        //log.debug("Registering mediator extensions found in the classpath : " + System.getResource("java.class.path"));
 
         // register MediatorFactory extensions
         Iterator it = Service.providers(ConfigurationFactory.class);
@@ -133,14 +126,14 @@ public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapp
     }
 
     /**
-	 * This method returns a Processor given an OMElement. This will be used
-	 * recursively by the elements which contain processor elements themselves
-	 * (e.g. rules)
-	 * 
-	 * @param element
+     * This method returns a Processor given an OMElement. This will be used
+     * recursively by the elements which contain processor elements themselves
+     * (e.g. rules)
+     *
+     * @param element
      * @return Processor
-	 */
-	public SynapseConfiguration getConfiguration(OMElement element) {
+     */
+    public SynapseConfiguration getConfiguration(OMElement element) {
 
         String localName = element.getLocalName();
         QName qName = null;
@@ -154,17 +147,17 @@ public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapp
         }
         Class cls = (Class) factoryMap.get(qName);
 
-     
 
         if (cls == null) {
-            String msg = "Unknown Configuration type referenced by configuration element : " + qName;
+            String msg = "Unknown Configuration type " +
+                    "referenced by configuration element : " + qName;
             log.error(msg);
             throw new SynapseException(msg);
         }
 
         try {
-			ConfigurationFactory cf = (ConfigurationFactory) cls.newInstance();
-			return cf.getConfiguration(element);
+            ConfigurationFactory cf = (ConfigurationFactory) cls.newInstance();
+            return cf.getConfiguration(element);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing configuration factory : " + cls;
@@ -175,61 +168,77 @@ public  class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMapp
             String msg = "Error initializing configuration factory : " + cls;
             log.error(msg);
             throw new SynapseException(msg, e);
-		}
-	}
+        }
+    }
 
-	public static void serializeConfiguration(SynapseConfiguration synCfg, OutputStream outputStream) throws XMLStreamException {
-		if (synCfg.getDefaultQName()==null) {
-			serializeConfiguration(synCfg, XMLConfigConstants.DEFINITIONS_ELT, outputStream);
-		}
-		else {
-			serializeConfiguration(synCfg, synCfg.getDefaultQName(), outputStream);
-		}
-	}
-	
-	/**
-	 * This method will serialize the config using the supplied QName (looking up the right class to do it) 
-	 * @param synCfg
-	 * @param qName
-	 * @param outputStream
-	 * @throws XMLStreamException
-	 */
-	public static void serializeConfiguration(SynapseConfiguration synCfg, QName qName,
-	        OutputStream outputStream) throws XMLStreamException {
-		
-		Class cls = (Class) serializerMap.get(qName);
-		   if (cls == null) {
-	            String msg = "Unknown Configuration type referenced by configuration element : " + qName;
-	            log.error(msg);
-	            throw new SynapseException(msg);
-	        }
+    /**
+     * @param synCfg
+     * @return
+     */
+    public static OMElement serializeConfiguration(SynapseConfiguration synCfg) {
+        if (synCfg.getDefaultQName() == null) {
+            return serializeConfiguration(synCfg, XMLConfigConstants.DEFINITIONS_ELT);
+        } else {
+            return serializeConfiguration(synCfg, synCfg.getDefaultQName());
+        }
+    }
 
-	        try {
-				ConfigurationSerializer cs = (ConfigurationSerializer) cls.newInstance();
-				cs.serializeConfiguration(synCfg, outputStream);
+    /**
+     * This method will serialize the config using the supplied QName
+     * (looking up the right class to do it)
+     *
+     * @param synCfg
+     * @param qName
+     * @throws XMLStreamException
+     */
+    public static OMElement serializeConfiguration(SynapseConfiguration synCfg, QName qName) {
 
-	        } catch (InstantiationException e) {
-	            String msg = "Error initializing configuration factory : " + cls;
-	            log.error(msg);
-	            throw new SynapseException(msg, e);
+        Class cls = (Class) serializerMap.get(qName);
+        if (cls == null) {
+            String msg = "Unknown Configuration type " +
+                    "referenced by configuration element : " + qName;
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
 
-	        } catch (IllegalAccessException e) {
-	            String msg = "Error initializing configuration factory : " + cls;
-	            log.error(msg);
-	            throw new SynapseException(msg, e);
-			} 
-	}
-	
-    /*
-    This method exposes all the MediatorFactories and its Extensions 
-    */
+        try {
+            ConfigurationSerializer cs = (ConfigurationSerializer) cls.newInstance();
+            return cs.serializeConfiguration(synCfg);
+
+        } catch (InstantiationException e) {
+            String msg = "Error initializing configuration factory : " + cls;
+            log.error(msg);
+            throw new SynapseException(msg, e);
+
+        } catch (IllegalAccessException e) {
+            String msg = "Error initializing configuration factory : " + cls;
+            log.error(msg);
+            throw new SynapseException(msg, e);
+        }
+    }
+
+    /**
+     * This method exposes all the ConfigurationFactories and its Extensions
+     *
+     * @return Map of factories
+     */
     public Map getFactoryMap() {
         return factoryMap;
     }
 
     /**
+     * This method exposes all the ConfigurationSerializer and its Extensions
+     *
+     * @return Map of serializers
+     */
+    public static Map getSerializerMap() {
+        return serializerMap;
+    }
+
+    /**
      * Allow the mediator factory finder to act as an XMLToObjectMapper for Mediators
-     * (i.e. Sequence Mediator) loaded dynamically from a Registry 
+     * (i.e. Sequence Mediator) loaded dynamically from a Registry
+     *
      * @param om
      * @return
      */

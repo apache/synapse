@@ -43,6 +43,10 @@ import java.util.List;
 public class EIPUtils {
 
     public static final String AGGREGATE_CORELATION = "aggregateCorelation";
+
+    public static final String MESSAGE_SEQUENCE = "messageSequence";
+    
+    public static final String MESSAGE_SEQUENCE_DELEMITER = "/";
     
     /**
      * This will be used for logging purposes

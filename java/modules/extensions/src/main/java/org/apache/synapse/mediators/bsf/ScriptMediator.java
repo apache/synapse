@@ -53,9 +53,6 @@ import java.util.Iterator;
  */
 public class ScriptMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(ScriptMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * The name of the variable made available to the scripting language to access the message
      */

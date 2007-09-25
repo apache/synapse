@@ -46,8 +46,6 @@ import java.util.List;
  */
 public class HeaderMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(HeaderMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
 

@@ -21,6 +21,7 @@ package samples.mediators;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMFactory;
@@ -30,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.xml.namespace.QName;
 
-public class DiscountQuoteMediator implements Mediator {
+public class DiscountQuoteMediator extends AbstractMediator {
 
     private static final Log log = LogFactory.getLog(DiscountQuoteMediator.class);
 

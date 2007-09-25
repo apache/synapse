@@ -33,9 +33,6 @@ import org.apache.synapse.mediators.AbstractListMediator;
  */
 public class InMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
-    private static final Log log = LogFactory.getLog(InMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * Executes the list of sub/child mediators, if the filter condition is satisfied
      *

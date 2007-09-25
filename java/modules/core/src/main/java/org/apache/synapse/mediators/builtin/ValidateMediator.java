@@ -61,9 +61,6 @@ import java.util.*;
  */
 public class ValidateMediator extends AbstractListMediator {
 
-    private static final Log log = LogFactory.getLog(ValidateMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * A list of property keys, referring to the schemas to be used for the validation
      */

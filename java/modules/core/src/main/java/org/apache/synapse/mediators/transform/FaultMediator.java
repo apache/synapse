@@ -47,8 +47,6 @@ import java.util.Iterator;
  */
 public class FaultMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(FaultMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     public static final String WSA_ACTION = "Action";
     /** Make a SOAP 1.1 fault */
     public static final int SOAP11 = 1;

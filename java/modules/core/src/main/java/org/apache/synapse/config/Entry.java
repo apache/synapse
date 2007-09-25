@@ -159,6 +159,7 @@ public class Entry {
     public void clearCache() {
         if (this.isDynamic()) {
             value = null;
+            expiryTime = System.currentTimeMillis();
         }
     }
 

@@ -76,9 +76,6 @@ import java.util.Properties;
  */
 public class XSLTMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(XSLTMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * The feature for which deciding swiching between DOM and Stream during the
      * transformation process

@@ -28,8 +28,6 @@ import org.apache.synapse.mediators.AbstractMediator;
 
 public class AttachmentMediator extends AbstractMediator {
 
-	private static final Log log = LogFactory.getLog(AttachmentMediator.class);
-	
 	public static final int BASE64_TO_MTOM = 0;
 	public static final int MTOM_TO_BASE64 = 1;
 	public static final int SwA_TO_BASE64 = 2;

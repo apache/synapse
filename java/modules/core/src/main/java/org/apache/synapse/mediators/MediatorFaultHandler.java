@@ -19,10 +19,8 @@
 
 package org.apache.synapse.mediators;
 
-import org.apache.synapse.FaultHandler;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
+import org.apache.synapse.*;
+import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 public class MediatorFaultHandler extends FaultHandler {
 
     private static final Log log = LogFactory.getLog(MediatorFaultHandler.class);
+    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * This holds the fault sequence for the mediator fault handler
@@ -60,9 +59,23 @@ public class MediatorFaultHandler extends FaultHandler {
      * @see org.apache.synapse.FaultHandler#handleFault(org.apache.synapse.MessageContext)
      */
     public void onFault(MessageContext synCtx) throws SynapseException {
-        if (log.isDebugEnabled()) {
-            log.debug("MediatorFaultHandler :: handleFault");
+
+        boolean traceOn = synCtx.getTracingState() == SynapseConstants.TRACING_ON;
+        boolean traceOrDebugOn = traceOn || log.isDebugEnabled();
+
+        String name = null;
+        if (faultMediator instanceof SequenceMediator) {
+            name = ((SequenceMediator) faultMediator).getName();
         }
+        if (name == null) {
+            name = faultMediator.getClass().getName();
+        }
+
+        if (traceOrDebugOn) {
+            traceOrDebugWarn(traceOn, "Executing fault handler mediator : " + name);
+        }
+
+        synCtx.getServiceLog().warn("Executing fault sequence mediator : " + name);
         this.faultMediator.mediate(synCtx);
     }
 
@@ -72,7 +85,6 @@ public class MediatorFaultHandler extends FaultHandler {
      * @return Mediator specifying the fault sequence for mediator fault handler
      */
     public Mediator getFaultMediator() {
-
         return faultMediator;
     }
 
@@ -82,7 +94,14 @@ public class MediatorFaultHandler extends FaultHandler {
      * @param faultMediator Mediator specifying the fault sequence to be used by the handler
      */
     public void setFaultMediator(Mediator faultMediator) {
-
         this.faultMediator = faultMediator;
     }
+
+    private void traceOrDebugWarn(boolean traceOn, String msg) {
+        if (traceOn) {
+            trace.warn(msg);
+        }
+        log.warn(msg);
+    }
+
 }

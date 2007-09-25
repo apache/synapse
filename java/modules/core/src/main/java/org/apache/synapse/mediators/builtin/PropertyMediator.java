@@ -56,8 +56,6 @@ public class PropertyMediator extends AbstractMediator {
     public static final int ACTION_REMOVE = 1;
     /** Set the property (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
     private int action = ACTION_SET;
-    private static final Log log = LogFactory.getLog(PropertyMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /**
      * Sets a property into the current (local) Synapse Context or into the Axis Message Context

@@ -19,12 +19,9 @@
 
 package org.apache.synapse.mediators.base;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.AbstractListMediator;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.statistics.StatisticsUtils;
@@ -44,11 +41,9 @@ import java.util.Stack;
  */
 public class SequenceMediator extends AbstractListMediator {
 
-    private static final Log log = LogFactory.getLog(SequenceMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     /** The name of the this sequence */
     private String name = null;
-    /** The local registry key which is used to pick a sequnce definition*/
+    /** The local registry key which is used to pick a sequence definition*/
     private String key = null;
     /** The name of the error handler which is used to handle error during the mediation */
     private String errorHandler = null;
@@ -58,7 +53,7 @@ public class SequenceMediator extends AbstractListMediator {
     private String registryKey = null;
 
     /** To decide to whether statistics should have collected or not  */
-    private int statisticsEnable = SynapseConstants.STATISTICS_UNSET;
+    private int statisticsState = SynapseConstants.STATISTICS_UNSET;
 
     /**
      * If this mediator refers to another named Sequence, execute that. Else
@@ -73,20 +68,24 @@ public class SequenceMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Sequence mediator <" + (name == null ? "anonymous" : name) + "> :: mediate()");
+        boolean statsOn = isStatsOn(synCtx);
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
         }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
-        }
+
         if (key == null) {
+
+            // The onError sequence for handling errors which may occur during the
+            // mediation through this sequence
+            Mediator errorHandlerMediator = null;
+
             // Setting Required property to collect the sequence statistics
-            boolean isStatisticsEnable
-                    = (org.apache.synapse.SynapseConstants.STATISTICS_ON == statisticsEnable);
-            if (isStatisticsEnable) {
-                StatisticsStack sequenceStack
-                        = (StatisticsStack) synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
+            if (statsOn) {
+                StatisticsStack sequenceStack = (StatisticsStack)
+                    synCtx.getProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK);
                 if (sequenceStack == null) {
                     sequenceStack = new SequenceStatisticsStack();
                     synCtx.setProperty(SynapseConstants.SEQUENCE_STATISTICS_STACK, sequenceStack);
@@ -94,76 +93,77 @@ public class SequenceMediator extends AbstractListMediator {
                 String seqName = (name == null ? SynapseConstants.ANONYMOUS_SEQUENCES : name);
                 boolean isFault = synCtx.getEnvelope().getBody().hasFault();
                 sequenceStack.put(seqName, System.currentTimeMillis(),
-                        !synCtx.isResponse(), isStatisticsEnable, isFault);
+                        !synCtx.isResponse(), statsOn, isFault);
             }
             try {
-                // The Mediator for handling error which occur during the mediation through this
-                // sequence
-                Mediator errorHandlerMediator = null;
+
                 // push the errorHandler sequence into the current message as the fault handler
                 if (errorHandler != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Setting the onError handler which has named as " +
-                                errorHandler + " for the sequence ");
-                    }
-                    if (shouldTrace) {
-                        trace.trace("Setting the onError handler which has named as " +
-                                errorHandler + " for the sequence ");
-                    }
                     errorHandlerMediator = synCtx.getSequence(errorHandler);
-                    synCtx.pushFaultHandler(
-                            new MediatorFaultHandler(errorHandlerMediator));
+
+                    if (errorHandlerMediator != null) {
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Setting the onError handler : " +
+                                errorHandler + " for the sequence : " + name);
+                        }
+                        synCtx.pushFaultHandler(
+                                new MediatorFaultHandler(errorHandlerMediator));
+                    } else {
+                        auditWarn("onError handler : " + errorHandler + " for sequence : " +
+                            name + " cannot be found", synCtx);
+                    }
                 }
-                boolean result = super.mediate(synCtx);
+
+                return super.mediate(synCtx);
+
+            } finally {
+
+                // if we pushed an error handler, pop it from the fault stack before we exit
                 if (errorHandlerMediator != null) {
-                    // pop our error handler from the fault stack before we exit, if we have pushed it
                     Stack faultStack = synCtx.getFaultStack();
                     if (faultStack != null && !faultStack.isEmpty()) {
                         Object o = faultStack.peek();
+
                         if (o instanceof MediatorFaultHandler &&
-                                errorHandlerMediator.equals(
-                                        ((MediatorFaultHandler) o).getFaultMediator())) {
+                            errorHandlerMediator.equals(
+                                ((MediatorFaultHandler) o).getFaultMediator())) {
                             faultStack.pop();
                         }
                     }
                 }
-                return result;
 
-            } finally {
                 //If this sequence is finished it's task normally
-                if (isStatisticsEnable) {
+                if (statsOn) {
                     StatisticsUtils.processSequenceStatistics(synCtx);
                 }
                 //If this sequence is a IN or OUT sequence of a proxy service
                 StatisticsUtils.processProxyServiceStatistics(synCtx);
-                if (shouldTrace) {
-                    trace.trace("End : Sequence <" + (name == null ? "anonymous" : name) + ">");
+
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn,
+                        "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }
             }
 
         } else {
+
             Mediator m = synCtx.getSequence(key);
             if (m == null) {
-                if (shouldTrace) {
-                    trace.trace("Sequence named " + key + " cannot be found.");
-                }
-                handleException("Sequence named " + key + " cannot be found.");
+                handleException("Sequence named " + key + " cannot be found", synCtx);
+
             } else {
-                if (shouldTrace) {
-                    trace.trace("Executing sequence named " + key);
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug("Executing sequence named " + key);
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Executing sequence named " + key);
                 }
                 return m.mediate(synCtx);
             }
         }
+
         return false;
     }
 
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
+    private boolean isStatsOn(MessageContext synCtx) {
+        return SynapseConstants.STATISTICS_ON == statisticsState;
     }
 
     /**
@@ -220,17 +220,17 @@ public class SequenceMediator extends AbstractListMediator {
      *
      * @return Returns the int value that indicate statistics is enabled or not.
      */
-    public int getStatisticsEnable() {
-        return statisticsEnable;
+    public int getStatisticsState() {
+        return statisticsState;
     }
 
     /**
      * To set the statistics enable variable value
      *
-     * @param statisticsEnable  To indicate statistics collecting state
+     * @param statisticsState  To indicate statistics collecting state
      */
-    public void setStatisticsEnable(int statisticsEnable) {
-        this.statisticsEnable = statisticsEnable;
+    public void setStatisticsState(int statisticsState) {
+        this.statisticsState = statisticsState;
     }
 
     /**

@@ -22,10 +22,7 @@ package org.apache.synapse.mediators.ext;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.ManagedLifecycle;
-import org.apache.synapse.Mediator;
-import org.apache.synapse.MessageContext;
+import org.apache.synapse.*;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.AbstractMediator;
 
@@ -80,7 +77,11 @@ public class ClassMediator extends AbstractMediator implements ManagedLifecycle 
 						+ mediator.getClass());
 			}
 			return mediator.mediate(synCtx);
-		} finally {
+        } catch (Exception e) {
+            // throw Synapse Exception for any exception in class meditor
+            // so that the fault handler will be invoked
+            throw new SynapseException("Error occured in the mediation of the class mediator", e);
+        } finally {
 			if (shouldTrace) {
 				trace.trace("End : Class mediator");
 			}

@@ -43,16 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 public class POJOCommandMediator extends AbstractMediator {
 
     /**
-     * This will hold the log variable to be used for logging
-     */
-    private static final Log log = LogFactory.getLog(POJOCommandMediator.class);
-
-    /**
-     * This will hold the trace object to be used for tracing
-     */
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
-    /**
      * This will hold the command object to be executed
      */
     private Class command = null;

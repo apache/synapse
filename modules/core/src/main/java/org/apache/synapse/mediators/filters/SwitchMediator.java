@@ -20,9 +20,6 @@
 package org.apache.synapse.mediators.filters;
 
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SwitchCase;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -40,9 +37,6 @@ import java.util.List;
  */
 public class SwitchMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(SwitchMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /** The XPath expression specifying the source element to apply the switch case expressions against   */
     private AXIOMXPath source = null;
     /** The list of switch cases    */
@@ -58,58 +52,63 @@ public class SwitchMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Switch mediator :: mediate()");
+        int parentsEffectiveTraceState = synCtx.getTracingState();
+        // if I have been explicitly asked to enable or disable tracing, set it to the message
+        // to pass it on; else, do nothing -> i.e. let the parents state flow
+        setEffectiveTraceState(synCtx);
+        int myEffectiveTraceState = synCtx.getTracingState();
+
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOn && trace.isTraceEnabled()) {
+            trace.trace("Evaluating XPath : " + source + " against message " + synCtx);
         }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Switch mediator");
-        }
+
         String sourceText = Axis2MessageContext.getStringValue(source, synCtx);
-        if (log.isDebugEnabled()) {
-            log.debug("Applying switch case regex patterns against evaluated source value : " +
-                    sourceText);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "XPath : " + source + " evaluates to : " + sourceText);
         }
+
         try {
-            saveAndSetTraceState(synCtx);
-            if (shouldTrace) {
-                trace.trace("Source Value : " + sourceText);
-                trace.trace("Start Case mediator list");
-            }
-            if (sourceText != null && !cases.isEmpty()) {
+            if ((sourceText == null || cases.isEmpty()) && defaultCase != null) {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Source XPath evaluated to : null or no switch " +
+                        "cases found. Executing the default case");
+                }
+
+                return defaultCase.mediate(synCtx);
+
+            } else {
                 for (Iterator iter = cases.iterator(); iter.hasNext();) {
                     SwitchCase swCase = (SwitchCase) iter.next();
+
                     if (swCase != null) {
                         if (swCase.matches(sourceText)) {
-                            if (shouldTrace) {
-                                trace.trace("Executing case for : " + swCase.getRegex());
+                            if (traceOrDebugOn) {
+                                traceOrDebug(traceOn, "Run matching case : " + swCase.getRegex());
                             }
                             return swCase.mediate(synCtx);
                         }
                     }
                 }
-                if (shouldTrace) {
-                    trace.trace("End Case mediator list");
-                }
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Source has been evaluated to Null...Default Case will be run");
+
+                if (defaultCase != null) {
+                    // if any of the switch cases did not match
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "None of the switch cases matched. Executing default");
+                    }
+                    return defaultCase.mediate(synCtx);
+                } else {
+                    if (traceOrDebugOn) {
+                        traceOrDebug(traceOn, "None of the switch cases matched. No default case");
+                    }
                 }
             }
-            if (defaultCase != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Executing default case");
-                }
-                if (shouldTrace) {
-                    trace.trace("Executing default case");
-                }
-                return defaultCase.mediate(synCtx);
-            }
+
         } finally {
-            restoreTracingState(synCtx);
-            if (shouldTrace) {
-                trace.trace("End : Switch mediator");
-            }
+            synCtx.setTracingState(parentsEffectiveTraceState);
         }
         return true;
     }

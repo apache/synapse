@@ -39,9 +39,6 @@ import java.util.List;
  * */
 public class SendMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(SendMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     private Endpoint endpoint = null;
 
     /**

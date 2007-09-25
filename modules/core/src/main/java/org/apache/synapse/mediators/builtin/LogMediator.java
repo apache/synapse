@@ -43,9 +43,6 @@ import java.util.List;
  */
 public class LogMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(LogMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /** Log levels ,according to the  log level ,the information going to log  will  be changed */
     public static final int CUSTOM = 0;
     public static final int SIMPLE = 1;

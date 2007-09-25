@@ -41,9 +41,6 @@ import org.jaxen.JaxenException;
 
 public class RMSequenceMediator extends AbstractMediator {
 
-    private static Log log = LogFactory.getLog(RMSequenceMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     private AXIOMXPath correlation = null;
     private AXIOMXPath lastMessage = null;
     private Boolean single = null;

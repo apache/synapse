@@ -20,9 +20,6 @@
 package org.apache.synapse.mediators.db;
 
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -32,21 +29,11 @@ import java.util.*;
  */
 public class DBLookupMediator extends AbstractDBMediator {
 
-    private static final Log log = LogFactory.getLog(DBLookupMediator.class);
-
-    /** Result cache */
-    Map cacheMap = new HashMap();
-
     protected void processStatement(Statement stmnt, MessageContext msgCtx) {
 
-/*
-        // if available in cache, serve from cache and return
-        String result = (String) cacheMap.get(attName);
-        if (result != null) {
-            msgCtx.setProperty(attName, result);
-            return;
-        }
-*/
+        boolean traceOn = isTraceOn(msgCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
         // execute the prepared statement, and extract the first result row and
         // set as message context properties, any results that have been specified
         try {
@@ -54,8 +41,14 @@ public class DBLookupMediator extends AbstractDBMediator {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn,
+                        "Processing the first row returned : " + stmnt.getRawStatement());
+                }
+
                 Iterator propNameIter = stmnt.getResultsMap().keySet().iterator();
                 while (propNameIter.hasNext()) {
+
                     String propName = (String) propNameIter.next();
                     String columnStr = (String) stmnt.getResultsMap().get(propName);
 
@@ -68,18 +61,29 @@ public class DBLookupMediator extends AbstractDBMediator {
                     }
 
                     if (obj != null) {
+                        if (traceOrDebugOn) {
+                            traceOrDebug(traceOn, "Column : " + columnStr +
+                                " returned value : " + obj +
+                                " Setting this as the message property : " + propName);
+                        }
                         msgCtx.setProperty(propName, obj.toString());
-                        cacheMap.put(propName, obj.toString());
                     } else {
-                        // todo handle this
+                        if (traceOrDebugOn) {
+                            traceOrDebugWarn(traceOn, "Column : " + columnStr +
+                                " returned null Skip setting message property : " + propName);
+                        }
                     }
                 }
             } else {
-                // todo
+                if (traceOrDebugOn) {
+                    traceOrDebug(traceOn, "Statement : "
+                        + stmnt.getRawStatement() + " returned 0 rows");
+                }
             }
+            
         } catch (SQLException e) {
-            // todo handle this
-            e.printStackTrace();
+            handleException("Error executing statement : " + stmnt.getRawStatement() +
+                " against DataSource : " + getDSName() + " :: " + e.getMessage(), e, msgCtx);
         }
     }
 

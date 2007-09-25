@@ -47,18 +47,24 @@ public class SynapseMediator extends AbstractListMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Synapse main mediator :: mediate()");
-        }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        try {
-            if (shouldTrace) {
-                trace.trace("Start : Synapse main mediator");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Mediation using '" + SynapseConstants.MAIN_SEQUENCE_KEY +
+                "' sequence Message is a : " + (synCtx.isResponse() ? "response" : "request"));
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
             }
+        }
+
+        try {
             // If the message flow path is OUT, then process the satatistics
             if (synCtx.isResponse()) {
                 StatisticsUtils.processAllSequenceStatistics(synCtx);
             }
+
             //put the required property for the collecttng statistics for the message mediation
             StatisticsStack sequenceStack = (StatisticsStack) synCtx.getProperty(
                     SynapseConstants.SEQUENCE_STATISTICS_STACK);
@@ -69,10 +75,16 @@ public class SynapseMediator extends AbstractListMediator {
             String seqName = "MainSequence";
             boolean isFault = synCtx.getEnvelope().getBody().hasFault();
             sequenceStack.put(seqName,System.currentTimeMillis(),!synCtx.isResponse(),true,isFault);
+
             return super.mediate(synCtx);
+
         } finally {
-            if (shouldTrace) {
-                trace.trace("End : Synapse main mediator");
+            if (traceOrDebugOn) {
+                if (traceOn && trace.isTraceEnabled()) {
+                    trace.trace("Message : " + synCtx);
+                }
+                traceOrDebug(traceOn, "End : Mediation using '" +
+                    SynapseConstants.MAIN_SEQUENCE_KEY + "' sequence");
             }
         }
     }

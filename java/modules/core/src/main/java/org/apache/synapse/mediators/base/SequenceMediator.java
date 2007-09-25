@@ -74,6 +74,10 @@ public class SequenceMediator extends AbstractListMediator {
 
         if (traceOrDebugOn) {
             traceOrDebug(traceOn, "Start : Sequence <" + (name == null ? "anonymous" : name) + ">");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
 
         if (key == null) {
@@ -114,11 +118,10 @@ public class SequenceMediator extends AbstractListMediator {
                     }
                 }
 
-                return super.mediate(synCtx);
+                boolean result = super.mediate(synCtx);
 
-            } finally {
-
-                // if we pushed an error handler, pop it from the fault stack before we exit
+                // if we pushed an error handler, pop it from the fault stack
+                // before we exit normally without an exception
                 if (errorHandlerMediator != null) {
                     Stack faultStack = synCtx.getFaultStack();
                     if (faultStack != null && !faultStack.isEmpty()) {
@@ -132,6 +135,10 @@ public class SequenceMediator extends AbstractListMediator {
                     }
                 }
 
+                return result;
+
+            } finally {
+
                 //If this sequence is finished it's task normally
                 if (statsOn) {
                     StatisticsUtils.processSequenceStatistics(synCtx);
@@ -140,6 +147,10 @@ public class SequenceMediator extends AbstractListMediator {
                 StatisticsUtils.processProxyServiceStatistics(synCtx);
 
                 if (traceOrDebugOn) {
+                    if (traceOn && trace.isTraceEnabled()) {
+                        trace.trace("Message : " + synCtx);
+                    }
+
                     traceOrDebug(traceOn,
                         "End : Sequence <" + (name == null ? "anonymous" : name) + ">");
                 }

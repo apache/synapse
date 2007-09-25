@@ -77,42 +77,45 @@ public class POJOCommandMediator extends AbstractMediator {
         // instantiate the command object
         try {
             commandObject = command.newInstance();
+
+            // then set the properties
+            Iterator itr = properties.iterator();
+            while (itr.hasNext()) {
+                Object property = itr.next();
+                if (property instanceof OMElement) {
+                    if (PropertyHelper.isStaticProperty((OMElement) property)) {
+                        PropertyHelper.setStaticProperty((OMElement) property, commandObject);
+                    } else {
+                        PropertyHelper.setDynamicProperty((OMElement) property, commandObject, synCtx);
+                    }
+                }
+            }
+
+            // then call the execute method if the Command interface is implemented
+            if (commandObject instanceof Command) {
+                ((Command) commandObject).execute();
+            } else {
+                // use the reflection to find the execute method
+                try {
+                    Method exeMethod = command.getMethod("execute", new Class[]{});
+                    try {
+                        exeMethod.invoke(commandObject, new Object[]{});
+                    } catch (IllegalAccessException e) {
+                        handleException("Unable to invoke the execute() method", e);
+                    } catch (InvocationTargetException e) {
+                        handleException("Unable to invoke the execute() method", e);
+                    }
+                } catch (NoSuchMethodException e) {
+                    // nothing to do in here (Command has no implementation)
+                }
+            }
         } catch (InstantiationException e) {
             handleException("Unable to instantiate the Command object", e);
         } catch (IllegalAccessException e) {
             handleException("Unable to instantiate the Command object", e);
-        }
-
-        // then set the properties
-        Iterator itr = properties.iterator();
-        while(itr.hasNext()) {
-            Object property = itr.next();
-            if(property instanceof OMElement) {
-                if(PropertyHelper.isStaticProperty((OMElement) property)) {
-                    PropertyHelper.setStaticProperty((OMElement) property, commandObject);
-                } else {
-                    PropertyHelper.setDynamicProperty((OMElement) property, commandObject, synCtx);
-                }
-            }
-        }
-
-        // then call the execute method if the Command interface is implemented
-        if(commandObject instanceof Command) {
-            ((Command) commandObject).execute();
-        } else {
-            // use the reflection to find the execute method
-            try {
-                Method exeMethod = command.getMethod("execute", new Class[]{});
-                try {
-                    exeMethod.invoke(commandObject, new Object[]{});
-                } catch (IllegalAccessException e) {
-                    handleException("Unable to invoke the execute() method", e);
-                } catch (InvocationTargetException e) {
-                    handleException("Unable to invoke the execute() method", e);
-                }
-            } catch (NoSuchMethodException e) {
-                // nothing to do in here (Command has no implementation)
-            }
+        } catch (Exception e) {
+            // convert any exception to SynException so that the fault handler will handle it
+            handleException("Error occured in the mediation of the command mediator", e);
         }
 
         // continue the mediator execution

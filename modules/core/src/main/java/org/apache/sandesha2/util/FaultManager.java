@@ -529,8 +529,10 @@ public class FaultManager {
 		//if this is throwable throwing it out, else we will log here.
 		
 		if (throwable)
-			throw fault;	
-		else
+            if (referenceRMMsgContext.getMessageContext().isServerSide()) {
+                throw fault;
+            }
+        else
 			log.error("Sandesha2 got a fault when processing the message essage " + referenceRMMsgContext.getMessageId(), fault);
 		
 	}

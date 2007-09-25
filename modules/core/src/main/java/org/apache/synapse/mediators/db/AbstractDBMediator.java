@@ -23,6 +23,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.AbstractDBMediatorFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -32,19 +33,15 @@ import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 
 import javax.xml.namespace.QName;
 import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Types;
+import java.sql.*;
+import java.sql.Date;
 import java.util.*;
+import java.math.BigDecimal;
 
 /**
  * This abstract DB mediator will perform common DB connection pooling etc. for all DB mediators
  */
 public abstract class AbstractDBMediator extends AbstractMediator implements ManagedLifecycle {
-
-    private static final Log log = LogFactory.getLog(AbstractDBMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
 
     /** Hold JDBC properties */
     protected Map dataSourceProps = new HashMap();
@@ -53,32 +50,56 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
     /** Statements */
     List statementList = new ArrayList();
 
-    /** For logging purposes refer to*/
-    private String url;
-
+    /**
+     * Initializes the mediator. Does nothing right now. If DataSource lookup is supported, could
+     * do the IC lookup here
+     * @param se the Synapse environment reference
+     */
     public void init(SynapseEnvironment se) {
-        url = (String) dataSourceProps.get(AbstractDBMediatorFactory.URL_Q);
+        // do nothing
     }
 
+    /**
+     * Destroys the mediator. If we are using our custom DataSource, then shut down the connections
+     */
     public void destroy() {
         try {
-            ((BasicDataSource) getDataSource()).close();
-            log.info("");
+            if (getDataSource() instanceof BasicDataSource) {
+                ((BasicDataSource) getDataSource()).close();
+            }
+            log.info("Successfully shut down DB connection pool for URL : " + getDSName());
         } catch (SQLException e) {
-            log.warn("Error shutting down DB connection pool for URL : " + url);
+            log.warn("Error shutting down DB connection pool for URL : " + getDSName());
         }
     }
 
+    /**
+     * Process each SQL statement against the current message
+     * @param synCtx the current message
+     * @return true, always
+     */
     public boolean mediate(MessageContext synCtx) {
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        
         for (Iterator iter = statementList.iterator(); iter.hasNext(); ) {
             processStatement((Statement) iter.next(), synCtx);
         }
         return true;
     }
 
+    /**
+     * Subclasses must specify how each SQL statement is processed
+     * @param query the SQL statement
+     * @param msgCtx current message
+     */
     abstract protected void processStatement(Statement query, MessageContext msgCtx);
+
+    /**
+     * Return the name or (hopefully) unique connection URL specific to the DataSource being used
+     * This is used for logging purposes only
+     * @return a unique name or URL to refer to the DataSource being used
+     */
+    protected String getDSName() {
+        return (String) dataSourceProps.get(AbstractDBMediatorFactory.URL_Q);
+    }
 
     public DataSource getDataSource() {
         return dataSource;
@@ -116,6 +137,14 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
      * @throws SQLException
      */
     protected PreparedStatement getPreparedStatement(Statement stmnt, MessageContext msgCtx) throws SQLException {
+
+        boolean shouldTrace = shouldTrace(msgCtx.getTracingState());
+        Log serviceLog = msgCtx.getServiceLog();
+
+        if (shouldTrace) {
+            trace.info("Getting a connection from DataSource " + getDSName() +
+                " and preparing statement : " + stmnt.getRawStatement());
+        }
         Connection con = getDataSource().getConnection();
         PreparedStatement ps = con.prepareStatement(stmnt.getRawStatement());
 
@@ -126,25 +155,99 @@ public abstract class AbstractDBMediator extends AbstractMediator implements Man
         for (Iterator pi = params.iterator(); pi.hasNext(); ) {
 
             Statement.Parameter param = (Statement.Parameter) pi.next();
+            String value = (param.getPropertyName() != null ?
+                (String) msgCtx.getProperty(param.getPropertyName()) :
+                Axis2MessageContext.getStringValue(param.getXpath(), msgCtx));
+
+            if (shouldTrace) {
+                trace.debug("Setting as parameter : " + column + " value : " + value +
+                    " as JDBC Type : " + param.getType() + "(see java.sql.Types for valid types)");
+            }
+
             switch (param.getType()) {
-                case Types.VARCHAR: {
-                    ps.setString(column++,
-                        param.getPropertyName() != null ?
-                            (String) msgCtx.getProperty(param.getPropertyName()) :
-                            Axis2MessageContext.getStringValue(param.getXpath(), msgCtx));
+                // according to J2SE 1.5 /docs/guide/jdbc/getstart/mapping.html
+                case Types.CHAR:
+                case Types.VARCHAR:
+                case Types.LONGVARCHAR: {
+                    ps.setString(column++, value);
+                    break;
+                }
+                case Types.NUMERIC:
+                case Types.DECIMAL: {
+                    ps.setBigDecimal(column++, new BigDecimal(value));
+                    break;
+                }
+                case Types.BIT: {
+                    ps.setBoolean(column++, Boolean.parseBoolean(value));
+                    break;
+                }
+                case Types.TINYINT: {
+                    ps.setByte(column++, Byte.parseByte(value));
+                    break;
+                }
+                case Types.SMALLINT: {
+                    ps.setShort(column++, Short.parseShort(value));
                     break;
                 }
                 case Types.INTEGER: {
-                    ps.setInt(column++,
-                        Integer.parseInt(param.getPropertyName() != null ?
-                            (String) msgCtx.getProperty(param.getPropertyName()) :
-                            Axis2MessageContext.getStringValue(param.getXpath(), msgCtx)));
+                    ps.setInt(column++, Integer.parseInt(value));
                     break;
                 }
+                case Types.BIGINT: {
+                    ps.setLong(column++, Long.parseLong(value));
+                    break;
+                }
+                case Types.REAL: {
+                    ps.setFloat(column++, Float.parseFloat(value));
+                    break;
+                }
+                case Types.FLOAT: {
+                    ps.setDouble(column++, Double.parseDouble(value));
+                    break;
+                }
+                case Types.DOUBLE: {
+                    ps.setDouble(column++, Double.parseDouble(value));
+                    break;
+                }
+                // skip BINARY, VARBINARY and LONGVARBINARY
+                case Types.DATE: {
+                    ps.setDate(column++, Date.valueOf(value));
+                    break;
+                }
+                case Types.TIME: {
+                    ps.setTime(column++, Time.valueOf(value));
+                    break;
+                }
+                case Types.TIMESTAMP: {
+                    ps.setTimestamp(column++, Timestamp.valueOf(value));
+                    break;
+                }
+                // skip CLOB, BLOB, ARRAY, DISTINCT, STRUCT, REF, JAVA_OBJECT
                 default: {
-                    // todo handle this
+                    String msg = "Trying to set an un-supported JDBC Type : " + param.getType() +
+                        " against column : " + column + " and statement : " + stmnt.getRawStatement() +
+                        " used by a DB mediator against DataSource : " + getDSName() +
+                        " (see java.sql.Types for valid type values)";
+
+                    log.error(msg);
+                    if (serviceLog != null) {
+                        msgCtx.getServiceLog().error(msg);
+                    }
+                    if (shouldTrace) {
+                        trace.error(msg);
+                    }
+                    throw new SynapseException(msg);
                 }
             }
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully prepared statement : " + stmnt.getRawStatement() +
+                "against DataSource : " + getDSName());
+        }
+        if (serviceLog != null && serviceLog.isDebugEnabled()) {
+            serviceLog.debug("Successfully prepared statement : " + stmnt.getRawStatement() +
+                "against DataSource : " + getDSName());
         }
         return ps;
     }

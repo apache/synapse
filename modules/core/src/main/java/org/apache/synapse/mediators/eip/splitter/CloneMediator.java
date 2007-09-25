@@ -36,11 +36,6 @@ import java.util.List;
 public class CloneMediator extends AbstractMediator {
 
     /**
-     * This will hold the logger which is used for logging purposes
-     */
-    private static final Log log = LogFactory.getLog(CloneMediator.class);
-
-    /**
      * This variable specifies whether to continue the parent message
      * (i.e. message which is sbjuected to cloning) or not
      */

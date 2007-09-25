@@ -41,8 +41,6 @@ import org.wso2.throttle.factory.AccessControllerFactory;
 
 public class ThrottleMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(ThrottleMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     /** The key for getting policy value - key refer to registry entry  */
     private String policyKey = null;
     /** InLine policy object - XML   */

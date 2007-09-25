@@ -68,9 +68,9 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }
@@ -114,9 +114,9 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
             String statisticsValue = statistics.getAttributeValue();
             if (statisticsValue != null) {
                 if (XMLConfigConstants.STATISTICS_ENABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_ON);
+                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_ON);
                 } else if (XMLConfigConstants.STATISTICS_DISABLE.equals(statisticsValue)) {
-                    seqMediator.setStatisticsEnable(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
+                    seqMediator.setStatisticsState(org.apache.synapse.SynapseConstants.STATISTICS_OFF);
                 }
             }
         }

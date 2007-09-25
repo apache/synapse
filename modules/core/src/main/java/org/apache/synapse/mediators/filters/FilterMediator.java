@@ -37,8 +37,6 @@ import java.util.regex.Matcher;
  */
 public class FilterMediator extends AbstractListMediator implements org.apache.synapse.mediators.FilterMediator {
 
-    private static final Log log = LogFactory.getLog(FilterMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
     private AXIOMXPath source = null;
     private Pattern regex = null;
     private AXIOMXPath xpath = null;

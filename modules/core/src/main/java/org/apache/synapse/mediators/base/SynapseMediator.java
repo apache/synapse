@@ -39,9 +39,6 @@ import org.apache.synapse.mediators.AbstractListMediator;
  */
 public class SynapseMediator extends AbstractListMediator {
 
-    private static final Log log = LogFactory.getLog(SynapseMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * Perform the mediation specified by the rule set
      *

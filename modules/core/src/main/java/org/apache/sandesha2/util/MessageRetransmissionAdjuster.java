@@ -36,6 +36,9 @@ import org.apache.sandesha2.storage.beans.SenderBean;
 public class MessageRetransmissionAdjuster {
 
 	private static final Log log = LogFactory.getLog(MessageRetransmissionAdjuster.class);
+	
+	public static final int NUMBER_OF_EAGER_RESENDS_ALLOWED = 3; //the number of msg resends until we slow down our pace
+	public static final int LAZY_RESEND_SCALE_FACTOR = 10; //lazy resends are 10 times slower than eager resends
 
 	public static boolean adjustRetransmittion(RMMsgContext rmMsgCtx, SenderBean retransmitterBean, ConfigurationContext configContext,
 			StorageManager storageManager) throws AxisFault {
@@ -104,13 +107,15 @@ public class MessageRetransmissionAdjuster {
 		long newInterval = baseInterval;
 		if (propertyBean.isExponentialBackoff()) {
 			newInterval = generateNextExponentialBackedoffDifference(count, baseInterval);
+		}		
+		else if(retransmitterBean.getSentCount()>NUMBER_OF_EAGER_RESENDS_ALLOWED){
+			//if we are not exponential backoff then we should still do a straight backoff after a set number
+			//of resends
+			newInterval*=LAZY_RESEND_SCALE_FACTOR;
 		}
 
-		long newTimeToSend = 0;
-
 		long timeNow = System.currentTimeMillis();
-		newTimeToSend = timeNow + newInterval;
-
+		long newTimeToSend = timeNow + newInterval;
 		retransmitterBean.setTimeToSend(newTimeToSend);
 
 		return retransmitterBean;

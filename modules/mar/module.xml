@@ -139,6 +139,7 @@
 	      <!-- This will not be overriden by service level policies -->
 				<sandesha2:SecurityManager>org.apache.sandesha2.security.dummy.DummySecurityManager</sandesha2:SecurityManager>
 				<sandesha2:ContextManager>org.apache.sandesha2.context.DummyContextManager</sandesha2:ContextManager>
+				<sandesha2:EPRDecorator>org.apache.sandesha2.addressing.EPRDecoratorImpl</sandesha2:EPRDecorator>
 				
 				<sandesha2:MakeConnection>
 				  <sandesha2:Enabled>true</sandesha2:Enabled>

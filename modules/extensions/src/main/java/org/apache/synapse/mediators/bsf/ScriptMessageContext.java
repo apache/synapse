@@ -38,6 +38,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ScriptMessageContext decorates the Synapse MessageContext adding methods to use the
@@ -295,6 +296,6 @@ public class ScriptMessageContext implements MessageContext {
     }
 
     public Log getServiceLog() {
-        return null;
+        return LogFactory.getLog(ScriptMessageContext.class);
     }
 }

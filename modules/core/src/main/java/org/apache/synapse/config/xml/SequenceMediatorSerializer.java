@@ -45,7 +45,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 
     public OMElement serializeAnonymousSequence(OMElement parent, SequenceMediator mediator) {
         OMElement sequence = fac.createOMElement("sequence", synNS);
-        int isEnableStatistics = mediator.getStatisticsEnable();
+        int isEnableStatistics = mediator.getStatisticsState();
         String statisticsValue = null;
         if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
             statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;
@@ -87,7 +87,7 @@ public class SequenceMediatorSerializer extends AbstractListMediatorSerializer {
 
         } else {
 
-            int isEnableStatistics = mediator.getStatisticsEnable();
+            int isEnableStatistics = mediator.getStatisticsState();
             String statisticsValue = null;
             if (isEnableStatistics == org.apache.synapse.SynapseConstants.STATISTICS_ON) {
                 statisticsValue = XMLConfigConstants.STATISTICS_ENABLE;

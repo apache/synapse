@@ -43,9 +43,6 @@ import org.springframework.core.io.InputStreamResource;
  */
 public class SpringMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(SpringMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * The Spring bean ref to be used
      */

@@ -37,10 +37,6 @@ import java.util.List;
  */
 public class ClassMediator extends AbstractMediator implements ManagedLifecycle {
 
-	private static final Log log = LogFactory.getLog(ClassMediator.class);
-
-	private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
 	private Mediator mediator = null;
 
     private List properties = new ArrayList();

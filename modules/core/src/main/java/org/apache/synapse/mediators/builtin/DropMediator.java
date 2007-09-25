@@ -31,9 +31,6 @@ import org.apache.synapse.mediators.AbstractMediator;
  */
 public class DropMediator extends AbstractMediator {
 
-    private static final Log log = LogFactory.getLog(DropMediator.class);
-    private static final Log trace = LogFactory.getLog(SynapseConstants.TRACE_LOGGER);
-
     /**
      * Halts further mediation of the current message by returning false.
      *

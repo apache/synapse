@@ -346,7 +346,7 @@ public class Axis2MessageContext implements MessageContext {
         if (serviceName != null && synCfg.getProxyService(serviceName) != null) {
             return LogFactory.getLog(SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
         } else {
-            return null;
+            return LogFactory.getLog(Axis2MessageContext.class);
         }
     }
 

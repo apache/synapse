@@ -43,16 +43,17 @@ import java.util.List;
  */
 public class LogMediator extends AbstractMediator {
 
-    /** Log levels ,according to the  log level ,the information going to log  will  be changed */
-    public static final int CUSTOM = 0;
-    public static final int SIMPLE = 1;
+    /** Log levels, according to the log level selected, the information logged will change */
+    public static final int CUSTOM  = 0;
+    public static final int SIMPLE  = 1;
     public static final int HEADERS = 2;
-    public static final int FULL = 3;
+    public static final int FULL    = 3;
 
-    /** The default log level has set to SIMPLE */
+    public static final String DEFAULT_SEP = ", ";
+
+    /** The default log level is set to SIMPLE */
     private int logLevel = SIMPLE;
     /** The separator for which used to separate logging information */
-    public static final String DEFAULT_SEP = ", ";
     private String separator = DEFAULT_SEP;
     /** The holder for the custom properties */
     private List properties = new ArrayList();
@@ -65,20 +66,24 @@ public class LogMediator extends AbstractMediator {
      */
     public boolean mediate(MessageContext synCtx) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Log mediator :: mediate()");
+        boolean traceOn = isTraceOn(synCtx);
+        boolean traceOrDebugOn = isTraceOrDebugOn(traceOn);
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "Start : Log mediator");
+
+            if (traceOn && trace.isTraceEnabled()) {
+                trace.trace("Message : " + synCtx);
+            }
         }
-        boolean shouldTrace = shouldTrace(synCtx.getTracingState());
-        if (shouldTrace) {
-            trace.trace("Start : Log mediator");
-        }
-        String logMessage = getLogMessage(synCtx);
+
         if (log.isInfoEnabled()) {
-            log.info(logMessage);
+            String logMessage = getLogMessage(synCtx);
         }
-        if (shouldTrace) {
-            trace.trace(logMessage);
-            trace.trace("End : Log mediator");
+
+
+        if (traceOrDebugOn) {
+            traceOrDebug(traceOn, "End : Log mediator");
         }
         return true;
     }

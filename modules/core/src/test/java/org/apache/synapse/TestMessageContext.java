@@ -29,6 +29,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -264,7 +265,7 @@ public class TestMessageContext implements MessageContext {
     }
 
     public Log getServiceLog() {
-        return null;
+        return LogFactory.getLog(TestMessageContext.class);
     }
 
     public MessageContext getSynapseContext() {

@@ -145,7 +145,7 @@ public class Entry {
     }
 
     public boolean isExpired() {
-        if(getType() == REMOTE_ENTRY) {
+        if (getType() == REMOTE_ENTRY && getExpiryTime() > 0) {
             return System.currentTimeMillis() > expiryTime;
         } else {
             return false;

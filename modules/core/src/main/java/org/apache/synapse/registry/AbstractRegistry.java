@@ -83,8 +83,12 @@ public abstract class AbstractRegistry implements Registry {
 
                 // renew cache lease for another cachable duration (as returned by the
                 // new getRegistryEntry() call
-                entry.setExpiryTime(
-                    System.currentTimeMillis() + re.getCachableDuration());
+                if (re.getCachableDuration() > 0) {
+                    entry.setExpiryTime(
+                            System.currentTimeMillis() + re.getCachableDuration());
+                } else {
+                    entry.setExpiryTime(-1);
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Renew cache lease for another " + re.getCachableDuration() / 1000 + "s");
                 }
@@ -132,7 +136,11 @@ public abstract class AbstractRegistry implements Registry {
 
         // increment cache expiry time as specified by the last getRegistryEntry() call
         if (re != null) {
-            entry.setExpiryTime(System.currentTimeMillis() + re.getCachableDuration());
+            if (re.getCachableDuration() > 0) {
+                entry.setExpiryTime(System.currentTimeMillis() + re.getCachableDuration());
+            } else {
+                entry.setExpiryTime(-1);
+            }
             entry.setVersion(re.getVersion());
         }
 

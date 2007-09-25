@@ -57,17 +57,18 @@
         <!-- namespaces for the 2007-02 spec -->
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/SequenceAcknowledgement</actionMapping>        
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/fault</actionMapping>
-
+        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/AckRequested</actionMapping>
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence</actionMapping>
-        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
+
      </operation>
  
      <operation name="Sandesha2OperationInOut" mep="http://www.w3.org/2006/01/wsdl/in-out">
+        <messageReceiver class="org.apache.sandesha2.msgreceivers.RMMessageReceiver"/>
         <!-- namespaces for the 2005-02 spec -->
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/CreateSequence</actionMapping>
         <actionMapping>http://schemas.xmlsoap.org/ws/2005/02/rm/AckRequested</actionMapping>
         
-        <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/AckRequested</actionMapping>
+
         
         <!-- namespaces for the 2007-02 spec -->
         <actionMapping>http://docs.oasis-open.org/ws-rx/wsrm/200702/CreateSequence</actionMapping>

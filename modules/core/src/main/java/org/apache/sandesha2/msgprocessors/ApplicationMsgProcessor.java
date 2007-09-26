@@ -91,9 +91,8 @@ public class ApplicationMsgProcessor implements MsgProcessor {
 
 		MessageContext msgContext = rmMsgCtx.getMessageContext();
 		ConfigurationContext configContext = msgContext.getConfigurationContext();
-
-		//validating the outgoing message
-		MessageValidator.validateOutgoingMessage(rmMsgCtx);
+		
+		//Please note: no need to check that RM1.0 annon out-in has a sequence offer, since we actually force an offer in this case
 		
 		// setting the Fault callback
 		SandeshaListener faultCallback = (SandeshaListener) msgContext.getOptions().getProperty(

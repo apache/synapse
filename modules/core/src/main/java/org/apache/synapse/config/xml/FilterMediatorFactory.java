@@ -45,16 +45,14 @@ import java.util.regex.PatternSyntaxException;
  */
 public class FilterMediatorFactory extends AbstractListMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
-
     private static final QName FILTER_Q    = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "filter");
 
     public Mediator createMediator(OMElement elem) {
         FilterMediator filter = new FilterMediator();
 
-        OMAttribute attXpath  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "xpath"));
-        OMAttribute attSource = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "source"));
-        OMAttribute attRegex  = elem.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "regex"));
+        OMAttribute attXpath  = elem.getAttribute(ATT_XPATH);
+        OMAttribute attSource = elem.getAttribute(ATT_SOURCE);
+        OMAttribute attRegex  = elem.getAttribute(ATT_REGEX);
 
         if (attXpath != null) {
             if (attXpath.getAttributeValue() != null && attXpath.getAttributeValue().trim().length() == 0) {
@@ -107,7 +105,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
         }
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(filter,elem);
+        processTraceState(filter,elem);
         addChildren(elem, filter);
         return filter;
     }

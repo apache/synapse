@@ -30,8 +30,6 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AnonymousListMediatorSerializer extends AbstractListMediatorSerializer {
 
-    private static final Log log = LogFactory.getLog(AnonymousListMediatorSerializer.class);
-
     /**
      * To serialize an  anonymous list mediator
      *
@@ -46,10 +44,5 @@ public abstract class AnonymousListMediatorSerializer extends AbstractListMediat
         AnonymousListMediator mediator = (AnonymousListMediator) m;
         serializeChildren(parent, mediator.getList());
         return parent;
-    }
-
-    private static void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 }

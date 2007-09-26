@@ -57,13 +57,8 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
     private static final QName ROLE_Q        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "role");
     private static final QName DETAIL_Q      = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "detail");
 
-    private static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
-    private static final QName ATT_EXPR_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
-
     private static final String SOAP11 = "soap11";
     private static final String SOAP12 = "soap12";
-
-    private static final Log log = LogFactory.getLog(FaultMediatorFactory.class);
 
     public Mediator createMediator(OMElement elem) {
 
@@ -84,8 +79,8 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
         OMElement code = elem.getFirstChildWithName(CODE_Q);
         if (code != null) {
-            OMAttribute value = code.getAttribute(ATT_VALUE_Q);
-            OMAttribute expression = code.getAttribute(ATT_EXPR_Q);
+            OMAttribute value = code.getAttribute(ATT_VALUE);
+            OMAttribute expression = code.getAttribute(ATT_EXPRN);
 
             if (value != null) {
                 String strValue = value.getAttributeValue();
@@ -125,8 +120,8 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
         OMElement reason = elem.getFirstChildWithName(REASON_Q);
         if (reason != null) {
-            OMAttribute value = reason.getAttribute(ATT_VALUE_Q);
-            OMAttribute expression = reason.getAttribute(ATT_EXPR_Q);
+            OMAttribute value = reason.getAttribute(ATT_VALUE);
+            OMAttribute expression = reason.getAttribute(ATT_EXPRN);
 
             if (value != null) {
                 faultMediator.setFaultReasonValue(value.getAttributeValue());
@@ -155,7 +150,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(faultMediator,elem);
+        processTraceState(faultMediator,elem);
 
         OMElement node = elem.getFirstChildWithName(NODE_Q);
         if (node != null && node.getText() != null) {

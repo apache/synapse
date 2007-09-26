@@ -22,9 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.jaxen.JaxenException;
@@ -48,15 +45,9 @@ import java.util.List;
  */
 public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
-    private static final Log log = LogFactory.getLog(ValidateMediatorFactory.class);
-
     private static final QName VALIDATE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "validate");
     private static final QName ON_FAIL_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "on-fail");
     private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
-    private static final QName KEY_Q      = new QName(XMLConfigConstants.NULL_NAMESPACE, "key");
-    private static final QName SOURCE_Q   = new QName(XMLConfigConstants.NULL_NAMESPACE, "source");
-    public static final QName ATT_NAME_Q  = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
-    public static final QName ATT_VALUE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "value");
 
     public Mediator createMediator(OMElement elem) {
 
@@ -70,7 +61,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
             Object o = schemas.next();
             if (o instanceof OMElement) {
                 OMElement omElem = (OMElement) o;
-                OMAttribute keyAtt = omElem.getAttribute(KEY_Q);
+                OMAttribute keyAtt = omElem.getAttribute(ATT_KEY);
                 if (keyAtt != null) {
                     schemaKeys.add(keyAtt.getAttributeValue());
                 } else {
@@ -88,7 +79,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         }
 
         // process source XPath attribute if present
-        OMAttribute attSource = elem.getAttribute(SOURCE_Q);
+        OMAttribute attSource = elem.getAttribute(ATT_SOURCE);
 
         if (attSource != null) {
             try {
@@ -116,13 +107,13 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
-        initMediator(validateMediator,elem);
+        processTraceState(validateMediator,elem);
         // set the features
-        Iterator iter = elem.getChildrenWithName(new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature"));
+        Iterator iter = elem.getChildrenWithName(FEATURE_Q);
         while (iter.hasNext()) {
             OMElement featureElem = (OMElement) iter.next();
-            OMAttribute attName = featureElem.getAttribute(ATT_NAME_Q);
-            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE_Q);
+            OMAttribute attName = featureElem.getAttribute(ATT_NAME);
+            OMAttribute attValue = featureElem.getAttribute(ATT_VALUE);
             if (attName != null && attValue != null) {
                 String name = attName.getAttributeValue();
                 String value = attValue.getAttributeValue();
@@ -146,16 +137,6 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
             }
         }
         return validateMediator;
-    }
-
-    private void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
     }
 
     public QName getTagQName() {

@@ -22,7 +22,6 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
@@ -33,10 +32,7 @@ import org.apache.synapse.mediators.builtin.LogMediator;
  * &lt;/log&gt;
  * </pre>
  */
-public class LogMediatorSerializer extends AbstractMediatorSerializer
-    {
-
-    private static final Log log = LogFactory.getLog(LogMediatorSerializer.class);
+public class LogMediatorSerializer extends AbstractMediatorSerializer {
 
     public OMElement serializeMediator(OMElement parent, Mediator m) {
 
@@ -46,7 +42,7 @@ public class LogMediatorSerializer extends AbstractMediatorSerializer
 
         LogMediator mediator = (LogMediator) m;
         OMElement log = fac.createOMElement("log", synNS);
-        finalizeSerialization(log,mediator);
+        saveTracingState(log,mediator);
 
         if (mediator.getLogLevel() != LogMediator.SIMPLE) {
             log.addAttribute(fac.createOMAttribute(
@@ -73,10 +69,4 @@ public class LogMediatorSerializer extends AbstractMediatorSerializer
     public String getMediatorClassName() {
         return LogMediator.class.getName();
     }
-
-    private void handleException(String msg) {
-        log.error(msg);
-        throw new SynapseException(msg);
-    }
-
 }
